@@ -26,7 +26,7 @@ Never create or push a CurseForge release tag unless the user **explicitly** req
 
 ## When the user asks for CurseForge
 
-1. Bump `GearQuest/GearQuest.toc` `## Version:` and `GearQuest/Core.lua` `GQ.VERSION`.
+1. Bump `GearQuest/GearQuestForever.toc` `## Version:` and `GearQuest/Core.lua` `GQ.VERSION`.
 2. Add `## vX.Y.Z` to `CHANGELOG.md`.
 3. Confirm `## X-Curse-Project-ID:` is the **Forever** project, not TBC GearQuest (`1669225`).
 4. Commit and push to `main`.

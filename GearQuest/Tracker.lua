@@ -167,7 +167,7 @@ end
 function GQ.Tracker:GetTrackedEntries()
     local results = {}
 
-    for id, record in pairs(GearQuestDB.hunts or {}) do
+    for id, record in pairs(GearQuestForeverDB.hunts or {}) do
         if NormalizeHuntStatus(record.status) == "tracked" then
             local entry = GQ.Data:GetEntryById(id)
             if entry
@@ -198,15 +198,15 @@ function GQ.Tracker:GetTrackedEntries()
 end
 
 function GQ.Tracker:GetSavedSize()
-    GearQuestDB.settings = GearQuestDB.settings or {}
-    local size = GearQuestDB.settings.trackerSize or {}
+    GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+    local size = GearQuestForeverDB.settings.trackerSize or {}
     return ClampSize(size.width or DEFAULT_WIDTH, size.height or 160)
 end
 
 function GQ.Tracker:SaveSize(width, height)
-    GearQuestDB.settings = GearQuestDB.settings or {}
+    GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
     width, height = ClampSize(width, height)
-    GearQuestDB.settings.trackerSize = {
+    GearQuestForeverDB.settings.trackerSize = {
         width = width,
         height = height,
     }
@@ -217,9 +217,9 @@ function GQ.Tracker:SavePosition()
         return
     end
 
-    GearQuestDB.settings = GearQuestDB.settings or {}
+    GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
     local point, _, relPoint, x, y = self.frame:GetPoint(1)
-    GearQuestDB.settings.trackerPos = {
+    GearQuestForeverDB.settings.trackerPos = {
         point = point,
         relPoint = relPoint,
         x = x,
@@ -232,7 +232,7 @@ function GQ.Tracker:RestorePosition()
         return
     end
 
-    local pos = GearQuestDB.settings and GearQuestDB.settings.trackerPos
+    local pos = GearQuestForeverDB.settings and GearQuestForeverDB.settings.trackerPos
     self.frame:ClearAllPoints()
     if pos and pos.point then
         self.frame:SetPoint(pos.point, UIParent, pos.relPoint or pos.point, pos.x or 0, pos.y or 0)
@@ -272,11 +272,11 @@ function GQ.Tracker:GetScrollGutter()
 end
 
 function GQ.Tracker:IsCollapsed()
-    return GearQuestDB.settings and GearQuestDB.settings.trackerCollapsed == true
+    return GearQuestForeverDB.settings and GearQuestForeverDB.settings.trackerCollapsed == true
 end
 
 function GQ.Tracker:SetCollapsed(collapsed)
-    GearQuestDB.settings = GearQuestDB.settings or {}
+    GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
     local wasCollapsed = self:IsCollapsed()
 
     if collapsed and not wasCollapsed and self.frame then
@@ -284,7 +284,7 @@ function GQ.Tracker:SetCollapsed(collapsed)
         self:SaveSize(width, height)
     end
 
-    GearQuestDB.settings.trackerCollapsed = collapsed and true or false
+    GearQuestForeverDB.settings.trackerCollapsed = collapsed and true or false
 
     if wasCollapsed and not collapsed then
         self:BeginExpand()
@@ -964,8 +964,8 @@ function GQ.Tracker:OpenHunt(entryId)
     end
 
     if log.GetListTab and log:GetListTab() ~= "active" then
-        GearQuestDB.ui = GearQuestDB.ui or {}
-        GearQuestDB.ui.listTab = "active"
+        GearQuestForeverDB.ui = GearQuestForeverDB.ui or {}
+        GearQuestForeverDB.ui.listTab = "active"
     end
 
     log:Show()

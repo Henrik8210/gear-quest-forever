@@ -3,7 +3,7 @@
 ## Notes: Leveling gear upgrades for WoW Forever - click a slot, pick a hunt, track it in the log.
 ## Author: Henrik8210
 ## Version: 0.1.0-beta.1-forever
-## SavedVariables: GearQuestDB
+## SavedVariables: GearQuestForeverDB
 
 Core.lua
 Spec.lua

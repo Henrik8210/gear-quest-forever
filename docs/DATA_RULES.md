@@ -2,16 +2,18 @@
 
 Rules for adding, importing, and maintaining gear quest entries in `GearQuest/Data.lua`. Follow these when curating data from Wowhead, in-game research, or leveling guides.
 
+**GearQuest Forever — target vs today:** Forever’s **target** is Classic 1–60 (+ Forever deltas). **Today**, generated data is still the inherited **TBC Anniversary 10–69 pipeline** (see [FOREVER-DATA-MIGRATION.md](./FOREVER-DATA-MIGRATION.md)); the addon caps display at level 60. Do not assume suffixes or item pools are globally Classic until phase 2–3 complete.
+
 ## Data sources (read this first)
 
 GearQuest uses **two different pipelines**. Do not apply one pipeline’s rules to the other.
 
 | Source | Levels | Classes | How it gets in | Authoritative doc |
 |--------|--------|---------|----------------|-------------------|
-| **Curated** (`Data.lua`) | 1–9 Alliance bands, **level 70 all classes**, seasonal/event items | All classes at 70; early Alliance for 1–9 | Manual curation, AtlasLoot Phase 3 import | This file (§ Curation workflow) |
-| **Generated** (`_generated/*.lua` → `DataAdapter.lua`) | **10–69 only** (never 70) | **Seven classes** (Paladin, Warrior, Hunter, Druid, Shaman, Rogue, Priest) | Stat-weight pipeline + Wowhead/cmangos | [`GearQuest/_generated/GEARQUEST-BIS-PIPELINE.md`](../GearQuest/_generated/GEARQUEST-BIS-PIPELINE.md) |
+| **Curated** (`Data.lua`) | 1–9 Alliance bands, seasonal/event items, hand-picked Paladin quest chains | Early Alliance mail melee; not full-class 1–60 yet | Manual curation | This file (§ Curation workflow) |
+| **Generated** (`_generated/*.lua` → `DataAdapter.lua`) | **10–69 only** | **Seven classes** (+ Mage/Warlock generated tables) | Stat-weight pipeline + Wowhead/cmangos (TBC-era until Forever migration) | [`GearQuest/_generated/GEARQUEST-BIS-PIPELINE.md`](../GearQuest/_generated/GEARQUEST-BIS-PIPELINE.md) |
 
-**Level 70 is always curated** — Phase 3 AtlasLoot BiS for the original **21** imported specs, plus **six stand-in copies** (Discipline, Frost, Affliction, Demonology, Assassination, Subtlety) via `scripts/clone-level70-specs.mjs`. Stand-ins share gear pools with their source spec; rogue weapons differ for dagger specs. **Hunter Marksmanship** still has no level-70 band. The generated pipeline deliberately does **not** produce level 70 (rule R1 in the pipeline doc: sockets, tier, librams, phase gating).
+**Forever max level is 60** (`GQ.MAX_PLAYER_LEVEL` in `Core.lua`). TBC **level 70** curated data was removed; do not re-import Phase 3 AtlasLoot into this repo. The generated pipeline still stops at **69** by design (rule R1). Migration phases: [FOREVER-DATA-MIGRATION.md](./FOREVER-DATA-MIGRATION.md).
 
 **Paladin 10–69** comes from the generated pipeline (`paladinPicks` + `paladinHorde1to9`). All seven classes merge into `GQ.Data.entries` at load time via `DataAdapter.lua`. Sanity check:
 
@@ -19,13 +21,13 @@ GearQuest uses **two different pipelines**. Do not apply one pipeline’s rules 
 node scripts/verify-generated-bis.mjs
 ```
 
-Expected total: **55,355** entries (**1,439 curated + 53,916 generated**) — always use the script, not a stale figure.
+Expected total: **67,320** entries (**287 curated + 67,033 generated**) — always use the script, not a stale figure.
 
 ### Ranking philosophy by source
 
 | Source | What “top 3” means |
 |--------|---------------------|
-| **Curated (early bands, level 70)** | Human judgment: realistic upgrades for that level band, correct armor tier, obtainability considered when hand-picking. |
+| **Curated (early bands)** | Human judgment: realistic upgrades for that level band, correct armor tier, obtainability considered when hand-picking. |
 | **Generated (all classes 10–69)** | **Pure stat score** from per-spec weights — obtainability is **not** gated beyond faction/rep/vendor locks in the pipeline. A level-60 chest can legitimately be a Naxxramas drop if stats win. Procs and suffixes are priced where data exists. |
 
 At **runtime**, `Compare.lua` ranks most generated candidates by item level vs equipped, armor-tier penalties, and small source bonuses — it does **not** re-run the full stat-weight model. Generated rows arrive with `curatedRank` from the pipeline; hand-curated rows keep author rank. **Exceptions:** (1) bands with `origin="guide"` (level-60 guide tiers) **must never be re-sorted by score**; (2) **Priest, Mage, and Warlock** always keep pipeline `curatedRank` (weapon pairing — staff vs 1H+off-hand). **`Compare.lua`’s ≥8 ilvl lower-tier armor rule applies to runtime re-ranking only**, not to how generated picks were chosen (those used armour multipliers in the pipeline).
@@ -121,7 +123,7 @@ Prefer the **highest armor tier the class can wear** at that level:
 
 **Ranking rule (runtime):** `Compare.lua` heavily penalizes lower-tier armor in Head/Chest/Legs/Feet/Hands/Wrist/Waist/Shoulder slots when re-sorting candidates. A cloth or leather piece only appears in the top 3 if its item level is **≥ 8 above** the best preferred-tier option for that slot. Cloaks (`Back`) and non-armor slots are exempt. **This is not how generated Paladin picks were selected** — see [GEARQUEST-BIS-PIPELINE.md](../GearQuest/_generated/GEARQUEST-BIS-PIPELINE.md) for armour multipliers and stat weights.
 
-When **hand-curating** early bands or level 70, prefer items that are **actually obtainable** at the target level (quest available, vendor visited, dungeon reachable). That preference does **not** apply to generated 10–69 Paladin data.
+When **hand-curating** early bands, prefer items that are **actually obtainable** at the target level (quest available, vendor visited, dungeon reachable). That preference does **not** apply to generated 10–69 data.
 
 ### Class armor profiles (can wear vs should wear)
 
@@ -277,7 +279,7 @@ Players can browse another class/level/spec without changing their character:
 
 | Method | Action |
 |--------|--------|
-| **Minimap** | **Right-click** GearQuest minimap icon → simulate panel (class, specialization, level 1–70). **Left-click** opens the log. **Reset** = `/gq set me`. |
+| **Minimap** | **Right-click** GearQuest minimap icon → simulate panel (class, specialization, level 1–60). **Left-click** opens the log. **Reset** = `/gq set me`. |
 | **Chat** | `/gq class hunter`, `/gq level 37`, `/gq spec holy`, `/gq set on` / `/gq set off`, `/gq set me` |
 
 Preview state lives in `GearQuestDB.settings.preview` (class, level, faction, `specByClass`). Spec choice in preview does not overwrite the live character’s saved spec.
@@ -594,7 +596,11 @@ GearQuest shows a **green ↑** on item icons when that item is one of your curr
 
 ---
 
-## TBC endgame (level 70) — token vendors and drop descriptions
+## TBC endgame (level 70) — legacy (Forever)
+
+**Not used in GearQuest Forever.** The section below documents the parent TBC Anniversary addon import workflow. Level 70 curated data was removed in migration phase 1.
+
+## TBC endgame (level 70) — token vendors and drop descriptions (reference only)
 
 When adding **Tier 5 / Tier 6 vendor pieces**, the `instructions` field must name the **actual item** and the **token boss** (not a random BT boss). Shaman uses **Defender** tokens (T5) and **Protector** tokens (T6).
 
@@ -671,9 +677,9 @@ Re-run after any `instructions` / `npc` / token-boss edits. Wowhead tooltip API 
 |------|--------|
 | **Level 1–9 Alliance** | Curated Warrior & Paladin; early generated bands for Hunter, Druid, Shaman, Rogue (`*Early1to9`) |
 | **Level 1–9 Horde** | Generated Horde bands: Paladin (`paladinHorde1to9`), Warrior (`warriorHorde1to9`); early 1–9 for Hunter/Druid/Shaman/Rogue |
-| **Level 10–69 all seven classes** | Generated (`*Picks`) — all specs per class, faction-gated rows in pipeline |
-| **Level 70** | Curated Phase 3 BiS — **21** AtlasLoot imports + **6** stand-in copies (27 specs with data); **MM Hunter** gap |
-| **Total** | **55,355** entries (1,439 curated + 53,916 generated) — `node scripts/verify-generated-bis.mjs` |
+| **Level 10–69 all seven classes** | Generated (`*Picks`) — all specs per class, faction-gated rows in pipeline (TBC-era pool until Classic/Forever regen) |
+| **Level 60 cap** | Addon and preview simulate **1–60** only |
+| **Total** | **67,320** entries (287 curated + 67,033 generated) — `node scripts/verify-generated-bis.mjs` |
 
 Empty Neck / Trinket / Head slots while leveling usually mean **missing data** for that class/band, not a broken addon.
 

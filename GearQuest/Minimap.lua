@@ -28,13 +28,13 @@ local function EnsureMinimapIcon(button)
 end
 
 local function GetAngle()
-    GearQuestDB.settings = GearQuestDB.settings or {}
-    return GearQuestDB.settings.minimapAngle or 200
+    GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+    return GearQuestForeverDB.settings.minimapAngle or 200
 end
 
 local function SetAngle(angle)
-    GearQuestDB.settings = GearQuestDB.settings or {}
-    GearQuestDB.settings.minimapAngle = angle
+    GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+    GearQuestForeverDB.settings.minimapAngle = angle
 end
 
 local function UpdatePosition(button)

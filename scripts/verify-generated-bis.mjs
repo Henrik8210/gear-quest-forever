@@ -158,7 +158,7 @@ const SOURCES = [
   },
 ];
 
-const TARGET_TOTAL = 68520;
+const TARGET_TOTAL = 67320;
 const TARGET_GENERATED = 67033;
 const TARGET_CURATED = TARGET_TOTAL - TARGET_GENERATED;
 
@@ -348,11 +348,16 @@ if (countRangedPicks("_generated/Data.Mage.generated.lua", "magePicks") === 0) {
 const paladinBody = extractTableBody(read("_generated/Data.Paladin.generated.lua"), "paladinPicks");
 const sash6570Holy = paladinBody.match(/\{6570,"Waist",17,17,3,"holy"[^}]+\}/);
 console.log("\n=== Suffix id spot checks ===");
-if (!sash6570Holy || !sash6570Holy[0].includes("suffixId=2032")) {
-  console.error("FAIL: item 6570 holy level 17 must carry suffixId=2032");
+const sash6570Classic =
+  sash6570Holy?.[0].includes('suffixRange="+11-13 Healing Spells"') &&
+  !sash6570Holy[0].includes("suffixId=");
+if (!sash6570Holy || (!sash6570Holy[0].includes("suffixId=2032") && !sash6570Classic)) {
+  console.error(
+    "FAIL: item 6570 holy level 17 must carry suffixId=2032 or Classic +11-13 Healing (suffixId omitted when range changed)",
+  );
   exitCode = 1;
 } else {
-  console.log("6570 holy @17: suffixId=2032 ok");
+  console.log(sash6570Classic ? "6570 holy @17: Classic healing suffix ok" : "6570 holy @17: suffixId=2032 ok");
 }
 
 const rogueBody = extractTableBody(read("_generated/Data.Rogue.generated.lua"), "roguePicks");
@@ -397,11 +402,15 @@ if (withSuffixId / suffixRows < 0.95) {
 
 const druidText = read("_generated/Data.Druid.generated.lua");
 const bandit9775 = druidText.match(/\{9775,"Waist",14,14[^}]*suffix="of Healing"[^}]+\}/);
-if (bandit9775 && !bandit9775[0].includes("suffixId=2031")) {
-  console.error("FAIL: Bandit Cinch 9775 @14 must carry suffixId=2031");
+const bandit9775Classic =
+  bandit9775?.[0].includes('suffixRange="+9-11 Healing Spells"') && !bandit9775[0].includes("suffixId=");
+if (bandit9775 && !bandit9775[0].includes("suffixId=2031") && !bandit9775Classic) {
+  console.error(
+    "FAIL: Bandit Cinch 9775 @14 must carry suffixId=2031 or Classic +9-11 Healing (suffixId omitted when range changed)",
+  );
   exitCode = 1;
 } else if (bandit9775) {
-  console.log("9775 @14: suffixId=2031 ok");
+  console.log(bandit9775Classic ? "9775 @14: Classic healing suffix ok" : "9775 @14: suffixId=2031 ok");
 }
 
 process.exit(exitCode);

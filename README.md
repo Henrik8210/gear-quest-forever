@@ -10,13 +10,13 @@ Click a gear slot on your character panel (right-click), browse from the log, or
 
 Forever is a new 1–60 Classic+ client (original continents, before Molten Core). The beta client is not on this machine yet, so two values are placeholders until first login:
 
-1. **`## Interface:`** in `GearQuest/GearQuest.toc` is currently `11507` (closest public 1–60 interface). After you launch the beta once, copy `lastAddonVersion` from:
+1. **`## Interface:`** in `GearQuest/GearQuestForever.toc` is currently `11507` (closest public 1–60 interface). After you launch the beta once, copy `lastAddonVersion` from:
 
    `World of Warcraft\<forever-folder>\WTF\Config.wtf`
 
 2. **Install folder** is expected to be something like `_forever_` beside `_anniversary_`. `scripts/sync-addon.ps1` looks for a few likely names, or set `$env:GEARQUEST_WOW_CLIENT`.
 
-Current BiS data is the Classic/TBC leveling snapshot from GearQuest. Forever has new quests, races, and stories — rankings will need a Forever pass after beta. Level 70 TBC lists will not apply.
+Current BiS data is still largely the Classic/TBC **leveling** snapshot from GearQuest (generated 10–69, curated 1–9 Alliance bands). **Max level is 60** — TBC level-70 endgame lists were removed. Forever has new quests, races, and item tweaks; see [docs/FOREVER-DATA-MIGRATION.md](docs/FOREVER-DATA-MIGRATION.md) for the data pass plan after beta.
 
 ## Commands
 
@@ -36,15 +36,22 @@ Current BiS data is the Classic/TBC leveling snapshot from GearQuest. Forever ha
 
 ## Local WoW install
 
-After editing addon files, sync to your game folder:
+After editing addon files, sync to your game folder. The install folder is **`GearQuestForever`** (TBC Anniversary uses **`GearQuest`** — same repo name, different products).
 
 ```powershell
 .\scripts\sync-addon.ps1
 ```
 
+No Forever client yet? You can still sync beside TBC GearQuest on Anniversary for rough UI testing (enable **Load out of date AddOns**):
+
+```powershell
+$env:GEARQUEST_WOW_CLIENT = "_anniversary_"
+.\scripts\sync-addon.ps1
+```
+
 ## Development
 
-- Addon lives in `GearQuest/` (folder matches toc name for CurseForge packager)
+- Source in repo: `GearQuest/`; game folder / CurseForge package: **`GearQuestForever`** (`GearQuestForever.toc`)
 - In-game title: **GearQuest Forever**
 - Interface placeholder: `## Interface: 11507` — update from the beta client
 - Project brief: [docs/PROJECT_BRIEF.md](docs/PROJECT_BRIEF.md)

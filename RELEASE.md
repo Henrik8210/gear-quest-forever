@@ -7,7 +7,7 @@ Publishing uses **GitHub Actions**, not the CurseForge webhook. Keep any CurseFo
 ## One-time setup
 
 1. **Create a new CurseForge project** at [authors.curseforge.com](https://authors.curseforge.com/) named **GearQuest Forever** (WoW Forever / Classic+). Do not attach it to the existing TBC GearQuest project.
-2. Copy the **Project ID** from CurseForge → Overview → paste into `GearQuest/GearQuest.toc` as `## X-Curse-Project-ID:`.
+2. Copy the **Project ID** from CurseForge → Overview → paste into `GearQuest/GearQuestForever.toc` as `## X-Curse-Project-ID:`.
 3. **API token:** [authors.curseforge.com → API tokens](https://authors.curseforge.com/#/settings/api-tokens) → create a token (or reuse your author token — it is account-level, not project-level).
 4. **GitHub secret:** this repo → Settings → Secrets and variables → Actions → New repository secret:
    - Name: `CF_API_KEY`
@@ -19,7 +19,7 @@ Publishing uses **GitHub Actions**, not the CurseForge webhook. Keep any CurseFo
 
 Only when explicitly publishing:
 
-1. Bump `## Version:` in `GearQuest/GearQuest.toc` and `GearQuest/Core.lua` (`GQ.VERSION`).
+1. Bump `## Version:` in `GearQuest/GearQuestForever.toc` and `GearQuest/Core.lua` (`GQ.VERSION`).
 2. Add a `## vX.Y.Z` section to `CHANGELOG.md`.
 3. Commit and push to `main`.
 4. Tag and push: `git tag vX.Y.Z` then `git push origin vX.Y.Z` (tag must match version with `v` prefix).

@@ -1,0 +1,1916 @@
+{
+  "862": {
+    "itemId": 862,
+    "era": "classic",
+    "scrapedAt": "2026-09-14T09:37:45.691Z",
+    "enchants": [
+      {
+        "suffix": "of the Owl",
+        "chance": 37,
+        "statsText": "+(8 - 9) Intellect , +(8 - 9) Spirit"
+      },
+      {
+        "suffix": "of the Eagle",
+        "chance": 20,
+        "statsText": "+(8 - 9) Intellect , +(8 - 9) Stamina"
+      },
+      {
+        "suffix": "of the Whale",
+        "chance": 18.3,
+        "statsText": "+(8 - 9) Spirit , +(8 - 9) Stamina"
+      },
+      {
+        "suffix": "of Intellect",
+        "chance": 9.5,
+        "statsText": "+(13 - 14) Intellect"
+      },
+      {
+        "suffix": "of Spirit",
+        "chance": 9.2,
+        "statsText": "+(13 - 14) Spirit"
+      },
+      {
+        "suffix": "of Concentration",
+        "chance": 6,
+        "statsText": "+(5 - 6) mana every 5 sec."
+      }
+    ],
+    "chanceSum": 100
+  },
+  "9409": {
+    "itemId": 9409,
+    "era": "classic",
+    "scrapedAt": "2026-09-14T09:39:18.144Z",
+    "enchants": [
+      {
+        "suffix": "of the Monkey",
+        "chance": 13.1,
+        "statsText": "+(7 - 8) Agility , +(7 - 8) Stamina"
+      },
+      {
+        "suffix": "of the Wolf",
+        "chance": 12.3,
+        "statsText": "+(7 - 8) Agility , +(7 - 8) Spirit"
+      },
+      {
+        "suffix": "of the Falcon",
+        "chance": 12.1,
+        "statsText": "+(7 - 8) Agility , +(7 - 8) Intellect"
+      },
+      {
+        "suffix": "of the Eagle",
+        "chance": 11.3,
+        "statsText": "+(7 - 8) Intellect , +(7 - 8) Stamina"
+      },
+      {
+        "suffix": "of the Whale",
+        "chance": 10.1,
+        "statsText": "+(7 - 8) Spirit , +(7 - 8) Stamina"
+      },
+      {
+        "suffix": "of the Owl",
+        "chance": 9.3,
+        "statsText": "+(7 - 8) Intellect , +(7 - 8) Spirit"
+      },
+      {
+        "suffix": "of Power",
+        "chance": 7,
+        "statsText": "+22 Attack Power"
+      },
+      {
+        "suffix": "of Agility",
+        "chance": 6.9,
+        "statsText": "+11 Agility"
+      },
+      {
+        "suffix": "of Intellect",
+        "chance": 4.5,
+        "statsText": "+11 Intellect"
+      },
+      {
+        "suffix": "of Spirit",
+        "chance": 4.3,
+        "statsText": "+11 Spirit"
+      },
+      {
+        "suffix": "of Stamina",
+        "chance": 4.2,
+        "statsText": "+11 Stamina"
+      },
+      {
+        "suffix": "of Nature's Wrath",
+        "chance": 2.4,
+        "statsText": "+16 Nature Spell Damage"
+      },
+      {
+        "suffix": "of Healing",
+        "chance": 1.2,
+        "statsText": "+24 Healing Spells"
+      },
+      {
+        "suffix": "of Arcane Wrath",
+        "chance": 1.1,
+        "statsText": "+16 Arcane Spell Damage"
+      }
+    ],
+    "chanceSum": 99.8
+  },
+  "9410": {
+    "itemId": 9410,
+    "era": "classic",
+    "scrapedAt": "2026-09-14T09:39:19.304Z",
+    "enchants": [
+      {
+        "suffix": "of the Bear",
+        "chance": 45.3,
+        "statsText": "+(10 - 11) Stamina , +(10 - 11) Strength"
+      },
+      {
+        "suffix": "of the Whale",
+        "chance": 11.4,
+        "statsText": "+(10 - 11) Spirit , +(10 - 11) Stamina"
+      },
+      {
+        "suffix": "of Strength",
+        "chance": 9.2,
+        "statsText": "+(15 - 16) Strength"
+      },
+      {
+        "suffix": "of the Eagle",
+        "chance": 7.5,
+        "statsText": "+(10 - 11) Intellect , +(10 - 11) Stamina"
+      },
+      {
+        "suffix": "of the Boar",
+        "chance": 6.5,
+        "statsText": "+(10 - 11) Spirit , +(10 - 11) Strength"
+      },
+      {
+        "suffix": "of Power",
+        "chance": 5.7,
+        "statsText": "+(30 - 32) Attack Power"
+      },
+      {
+        "suffix": "of the Monkey",
+        "chance": 5.5,
+        "statsText": "+(10 - 11) Agility , +(10 - 11) Stamina"
+      },
+      {
+        "suffix": "of the Gorilla",
+        "chance": 4.5,
+        "statsText": "+(10 - 11) Intellect , +(10 - 11) Strength"
+      },
+      {
+        "suffix": "of the Tiger",
+        "chance": 3.8,
+        "statsText": "+(10 - 11) Agility , +(10 - 11) Strength"
+      },
+      {
+        "suffix": "of Healing",
+        "chance": 0.6,
+        "statsText": "+(33 - 35) Healing Spells"
+      }
+    ],
+    "chanceSum": 100
+  },
+  "9428": {
+    "itemId": 9428,
+    "era": "classic",
+    "scrapedAt": "2026-09-14T09:39:20.436Z",
+    "enchants": [
+      {
+        "suffix": "of the Monkey",
+        "chance": 23.3,
+        "statsText": "+6 Agility , +6 Stamina"
+      },
+      {
+        "suffix": "of the Owl",
+        "chance": 12.7,
+        "statsText": "+6 Intellect , +6 Spirit"
+      },
+      {
+        "suffix": "of the Eagle",
+        "chance": 8.9,
+        "statsText": "+6 Intellect , +6 Stamina"
+      },
+      {
+        "suffix": "of the Whale",
+        "chance": 8.9,
+        "statsText": "+6 Spirit , +6 Stamina"
+      },
+      {
+        "suffix": "of Agility",
+        "chance": 8.7,
+        "statsText": "+(9 - 10) Agility"
+      },
+      {
+        "suffix": "of Stamina",
+        "chance": 8.7,
+        "statsText": "+(9 - 10) Stamina"
+      },
+      {
+        "suffix": "of Power",
+        "chance": 7.6,
+        "statsText": "+(18 - 20) Attack Power"
+      },
+      {
+        "suffix": "of the Bear",
+        "chance": 6.1,
+        "statsText": "+6 Stamina , +6 Strength"
+      },
+      {
+        "suffix": "of Intellect",
+        "chance": 5.2,
+        "statsText": "+(9 - 10) Intellect"
+      },
+      {
+        "suffix": "of Spirit",
+        "chance": 5,
+        "statsText": "+(9 - 10) Spirit"
+      },
+      {
+        "suffix": "of Nature's Wrath",
+        "chance": 2.6,
+        "statsText": "+(13 - 14) Nature Spell Damage"
+      },
+      {
+        "suffix": "of Healing",
+        "chance": 1.3,
+        "statsText": "+(20 - 22) Healing Spells"
+      },
+      {
+        "suffix": "of Arcane Wrath",
+        "chance": 1.1,
+        "statsText": "+(13 - 14) Arcane Spell Damage"
+      }
+    ],
+    "chanceSum": 100.1
+  },
+  "9455": {
+    "itemId": 9455,
+    "era": "classic",
+    "scrapedAt": "2026-09-14T10:33:46.228Z",
+    "enchants": [
+      {
+        "suffix": "of the Monkey",
+        "chance": 18,
+        "statsText": "+(5 - 6) Agility , +(5 - 6) Stamina"
+      },
+      {
+        "suffix": "of the Owl",
+        "chance": 12.4,
+        "statsText": "+(5 - 6) Intellect , +(5 - 6) Spirit"
+      },
+      {
+        "suffix": "of the Eagle",
+        "chance": 9.6,
+        "statsText": "+(5 - 6) Intellect , +(5 - 6) Stamina"
+      },
+      {
+        "suffix": "of the Whale",
+        "chance": 9.4,
+        "statsText": "+(5 - 6) Spirit , +(5 - 6) Stamina"
+      },
+      {
+        "suffix": "of Agility",
+        "chance": 9.2,
+        "statsText": "+(8 - 9) Agility"
+      },
+      {
+        "suffix": "of Stamina",
+        "chance": 8.9,
+        "statsText": "+(8 - 9) Stamina"
+      },
+      {
+        "suffix": "of Power",
+        "chance": 6.5,
+        "statsText": "+(16 - 18) Attack Power"
+      },
+      {
+        "suffix": "of Intellect",
+        "chance": 6.5,
+        "statsText": "+(8 - 9) Intellect"
+      },
+      {
+        "suffix": "of Spirit",
+        "chance": 6,
+        "statsText": "+(8 - 9) Spirit"
+      },
+      {
+        "suffix": "of the Falcon",
+        "chance": 4.6,
+        "statsText": "+(5 - 6) Agility , +(5 - 6) Intellect"
+      },
+      {
+        "suffix": "of the Wolf",
+        "chance": 4.4,
+        "statsText": "+(5 - 6) Agility , +(5 - 6) Spirit"
+      },
+      {
+        "suffix": "of Nature's Wrath",
+        "chance": 2.4,
+        "statsText": "+(11 - 13) Nature Spell Damage"
+      },
+      {
+        "suffix": "of Healing",
+        "chance": 1.2,
+        "statsText": "+(18 - 20) Healing Spells"
+      },
+      {
+        "suffix": "of Arcane Wrath",
+        "chance": 1.1,
+        "statsText": "+(11 - 13) Arcane Spell Damage"
+      }
+    ],
+    "chanceSum": 100.2
+  },
+  "9461": {
+    "itemId": 9461,
+    "era": "classic",
+    "scrapedAt": "2026-09-14T10:33:48.927Z",
+    "enchants": [
+      {
+        "suffix": "of the Owl",
+        "chance": 12.7,
+        "statsText": "+(6 - 7) Intellect , +(6 - 7) Spirit"
+      },
+      {
+        "suffix": "of the Bear",
+        "chance": 11.9,
+        "statsText": "+(6 - 7) Stamina , +(6 - 7) Strength"
+      },
+      {
+        "suffix": "of the Monkey",
+        "chance": 11.7,
+        "statsText": "+(6 - 7) Agility , +(6 - 7) Stamina"
+      },
+      {
+        "suffix": "of the Wolf",
+        "chance": 7.7,
+        "statsText": "+(6 - 7) Agility , +(6 - 7) Spirit"
+      },
+      {
+        "suffix": "of the Tiger",
+        "chance": 6.7,
+        "statsText": "+(6 - 7) Agility , +(6 - 7) Strength"
+      },
+      {
+        "suffix": "of the Gorilla",
+        "chance": 6.3,
+        "statsText": "+(6 - 7) Intellect , +(6 - 7) Strength"
+      },
+      {
+        "suffix": "of the Eagle",
+        "chance": 6.2,
+        "statsText": "+(6 - 7) Intellect , +(6 - 7) Stamina"
+      },
+      {
+        "suffix": "of the Whale",
+        "chance": 5.9,
+        "statsText": "+(6 - 7) Spirit , +(6 - 7) Stamina"
+      },
+      {
+        "suffix": "of the Boar",
+        "chance": 5.8,
+        "statsText": "+(6 - 7) Spirit , +(6 - 7) Strength"
+      },
+      {
+        "suffix": "of the Falcon",
+        "chance": 3.5,
+        "statsText": "+(6 - 7) Agility , +(6 - 7) Intellect"
+      },
+      {
+        "suffix": "of Intellect",
+        "chance": 3.1,
+        "statsText": "+10 Intellect"
+      },
+      {
+        "suffix": "of Spirit",
+        "chance": 3.1,
+        "statsText": "+10 Spirit"
+      },
+      {
+        "suffix": "of Stamina",
+        "chance": 2.9,
+        "statsText": "+10 Stamina"
+      },
+      {
+        "suffix": "of Agility",
+        "chance": 2.8,
+        "statsText": "+10 Agility"
+      },
+      {
+        "suffix": "of Strength",
+        "chance": 2.7,
+        "statsText": "+10 Strength"
+      },
+      {
+        "suffix": "of Regeneration",
+        "chance": 2,
+        "statsText": "+3 health every 5 sec."
+      },
+      {
+        "suffix": "of Concentration",
+        "chance": 2,
+        "statsText": "+4 mana every 5 sec."
+      },
+      {
+        "suffix": "of Eluding",
+        "chance": 1.8,
+        "statsText": "+1% Dodge , +5 Agility"
+      },
+      {
+        "suffix": "of Arcane Resistance",
+        "chance": 0.4,
+        "statsText": "+(13 - 14) Arcane Resistance"
+      },
+      {
+        "suffix": "of Nature Resistance",
+        "chance": 0.3,
+        "statsText": "+(13 - 14) Nature Resistance"
+      },
+      {
+        "suffix": "of Fire Resistance",
+        "chance": 0.2,
+        "statsText": "+(13 - 14) Fire Resistance"
+      },
+      {
+        "suffix": "of Frost Resistance",
+        "chance": 0.2,
+        "statsText": "+(13 - 14) Frost Resistance"
+      },
+      {
+        "suffix": "of Shadow Resistance",
+        "chance": 0.2,
+        "statsText": "+(13 - 14) Shadow Resistance"
+      }
+    ],
+    "chanceSum": 100.1
+  },
+  "9640": {
+    "itemId": 9640,
+    "era": "classic",
+    "scrapedAt": "2026-09-14T09:39:20.885Z",
+    "enchants": [
+      {
+        "suffix": "of the Bear",
+        "chance": 41,
+        "statsText": "+(11 - 12) Stamina , +(11 - 12) Strength"
+      },
+      {
+        "suffix": "of Power",
+        "chance": 13.2,
+        "statsText": "+34 Attack Power"
+      },
+      {
+        "suffix": "of the Whale",
+        "chance": 9.2,
+        "statsText": "+(11 - 12) Spirit , +(11 - 12) Stamina"
+      },
+      {
+        "suffix": "of Strength",
+        "chance": 9,
+        "statsText": "+17 Strength"
+      },
+      {
+        "suffix": "of the Eagle",
+        "chance": 6.5,
+        "statsText": "+(11 - 12) Intellect , +(11 - 12) Stamina"
+      },
+      {
+        "suffix": "of the Boar",
+        "chance": 5.6,
+        "statsText": "+(11 - 12) Spirit , +(11 - 12) Strength"
+      },
+      {
+        "suffix": "of the Monkey",
+        "chance": 5.1,
+        "statsText": "+(11 - 12) Agility , +(11 - 12) Stamina"
+      },
+      {
+        "suffix": "of the Gorilla",
+        "chance": 3.9,
+        "statsText": "+(11 - 12) Intellect , +(11 - 12) Strength"
+      },
+      {
+        "suffix": "of the Tiger",
+        "chance": 3.8,
+        "statsText": "+(11 - 12) Agility , +(11 - 12) Strength"
+      },
+      {
+        "suffix": "of Healing",
+        "chance": 2,
+        "statsText": "+37 Healing Spells"
+      },
+      {
+        "suffix": "of Arcane Resistance",
+        "chance": 0.1,
+        "statsText": "+17 Arcane Resistance"
+      },
+      {
+        "suffix": "of Fire Resistance",
+        "chance": 0.1,
+        "statsText": "+17 Fire Resistance"
+      },
+      {
+        "suffix": "of Frost Resistance",
+        "chance": 0.1,
+        "statsText": "+17 Frost Resistance"
+      },
+      {
+        "suffix": "of Nature Resistance",
+        "chance": 0.1,
+        "statsText": "+17 Nature Resistance"
+      },
+      {
+        "suffix": "of Shadow Resistance",
+        "chance": 0.1,
+        "statsText": "+17 Shadow Resistance"
+      }
+    ],
+    "chanceSum": 99.8
+  },
+  "10504": {
+    "itemId": 10504,
+    "era": "classic",
+    "scrapedAt": "2026-09-14T11:10:27.573Z",
+    "enchants": [
+      {
+        "suffix": "of Frozen Wrath",
+        "chance": 17.8,
+        "statsText": "+(34 - 36) Frost Spell Damage"
+      },
+      {
+        "suffix": "of Healing",
+        "chance": 17,
+        "statsText": "+(53 - 55) Healing Spells"
+      },
+      {
+        "suffix": "of Shadow Wrath",
+        "chance": 15.4,
+        "statsText": "+(34 - 36) Shadow Spell Damage"
+      },
+      {
+        "suffix": "of Nature's Wrath",
+        "chance": 12.4,
+        "statsText": "+(34 - 36) Nature Spell Damage"
+      },
+      {
+        "suffix": "of Arcane Wrath",
+        "chance": 11.1,
+        "statsText": "+(34 - 36) Arcane Spell Damage"
+      },
+      {
+        "suffix": "of Fiery Wrath",
+        "chance": 9.9,
+        "statsText": "+(34 - 36) Fire Spell Damage"
+      },
+      {
+        "suffix": "of Concentration",
+        "chance": 8.7,
+        "statsText": "+10 mana every 5 sec."
+      },
+      {
+        "suffix": "of Regeneration",
+        "chance": 7.6,
+        "statsText": "+6 health every 5 sec."
+      }
+    ],
+    "chanceSum": 99.9
+  },
+  "10777": {
+    "itemId": 10777,
+    "era": "classic",
+    "scrapedAt": "2026-09-14T11:10:30.818Z",
+    "enchants": [
+      {
+        "suffix": "of the Monkey",
+        "chance": 29.3,
+        "statsText": "+(9 - 10) Agility , +(9 - 10) Stamina"
+      },
+      {
+        "suffix": "of the Eagle",
+        "chance": 13.1,
+        "statsText": "+(9 - 10) Intellect , +(9 - 10) Stamina"
+      },
+      {
+        "suffix": "of the Owl",
+        "chance": 12.9,
+        "statsText": "+(9 - 10) Intellect , +(9 - 10) Spirit"
+      },
+      {
+        "suffix": "of the Whale",
+        "chance": 9.1,
+        "statsText": "+(9 - 10) Spirit , +(9 - 10) Stamina"
+      },
+      {
+        "suffix": "of the Bear",
+        "chance": 6.9,
+        "statsText": "+(9 - 10) Stamina , +(9 - 10) Strength"
+      },
+      {
+        "suffix": "of Spirit",
+        "chance": 5.4,
+        "statsText": "+(14 - 15) Spirit"
+      },
+      {
+        "suffix": "of the Tiger",
+        "chance": 5.1,
+        "statsText": "+(9 - 10) Agility , +(9 - 10) Strength"
+      },
+      {
+        "suffix": "of the Falcon",
+        "chance": 4.2,
+        "statsText": "+(9 - 10) Agility , +(9 - 10) Intellect"
+      },
+      {
+        "suffix": "of Defense",
+        "chance": 4.2,
+        "statsText": "+(9 - 10) Defense"
+      },
+      {
+        "suffix": "of the Wolf",
+        "chance": 3.6,
+        "statsText": "+(9 - 10) Agility , +(9 - 10) Spirit"
+      },
+      {
+        "suffix": "of the Gorilla",
+        "chance": 3.6,
+        "statsText": "+(9 - 10) Intellect , +(9 - 10) Strength"
+      },
+      {
+        "suffix": "of Healing",
+        "chance": 1.3,
+        "statsText": "+(31 - 33) Healing Spells"
+      },
+      {
+        "suffix": "of Arcane Wrath",
+        "chance": 1.2,
+        "statsText": "+(20 - 21) Arcane Spell Damage"
+      }
+    ],
+    "chanceSum": 99.9
+  },
+  "10783": {
+    "itemId": 10783,
+    "era": "classic",
+    "scrapedAt": "2026-09-14T09:40:29.540Z",
+    "enchants": [
+      {
+        "suffix": "of the Monkey",
+        "chance": 23.8,
+        "statsText": "+(12 - 13) Agility , +(12 - 13) Stamina"
+      },
+      {
+        "suffix": "of the Owl",
+        "chance": 11.5,
+        "statsText": "+(12 - 13) Intellect , +(12 - 13) Spirit"
+      },
+      {
+        "suffix": "of Agility",
+        "chance": 8.8,
+        "statsText": "+(19 - 20) Agility"
+      },
+      {
+        "suffix": "of Stamina",
+        "chance": 8.8,
+        "statsText": "+(19 - 20) Stamina"
+      },
+      {
+        "suffix": "of the Whale",
+        "chance": 8.6,
+        "statsText": "+(12 - 13) Spirit , +(12 - 13) Stamina"
+      },
+      {
+        "suffix": "of the Eagle",
+        "chance": 8.2,
+        "statsText": "+(12 - 13) Intellect , +(12 - 13) Stamina"
+      },
+      {
+        "suffix": "of Defense",
+        "chance": 7.6,
+        "statsText": "+13 Defense"
+      },
+      {
+        "suffix": "of the Bear",
+        "chance": 6,
+        "statsText": "+(12 - 13) Stamina , +(12 - 13) Strength"
+      },
+      {
+        "suffix": "of Intellect",
+        "chance": 5,
+        "statsText": "+(19 - 20) Intellect"
+      },
+      {
+        "suffix": "of Nature's Wrath",
+        "chance": 4.3,
+        "statsText": "+(27 - 29) Nature Spell Damage"
+      },
+      {
+        "suffix": "of the Wolf",
+        "chance": 2.8,
+        "statsText": "+(12 - 13) Agility , +(12 - 13) Spirit"
+      },
+      {
+        "suffix": "of the Boar",
+        "chance": 2.7,
+        "statsText": "+(12 - 13) Spirit , +(12 - 13) Strength"
+      },
+      {
+        "suffix": "of Fire Resistance",
+        "chance": 0.5,
+        "statsText": "+(19 - 20) Fire Resistance"
+      },
+      {
+        "suffix": "of Frost Resistance",
+        "chance": 0.4,
+        "statsText": "+(19 - 20) Frost Resistance"
+      },
+      {
+        "suffix": "of Shadow Resistance",
+        "chance": 0.4,
+        "statsText": "+(19 - 20) Shadow Resistance"
+      },
+      {
+        "suffix": "of Arcane Resistance",
+        "chance": 0.3,
+        "statsText": "+(19 - 20) Arcane Resistance"
+      },
+      {
+        "suffix": "of Nature Resistance",
+        "chance": 0.3,
+        "statsText": "+(19 - 20) Nature Resistance"
+      }
+    ],
+    "chanceSum": 100
+  },
+  "10784": {
+    "itemId": 10784,
+    "era": "classic",
+    "scrapedAt": "2026-09-14T09:40:30.591Z",
+    "enchants": [
+      {
+        "suffix": "of the Monkey",
+        "chance": 12.9,
+        "statsText": "+(16 - 17) Agility , +(16 - 17) Stamina"
+      },
+      {
+        "suffix": "of the Wolf",
+        "chance": 11.9,
+        "statsText": "+(16 - 17) Agility , +(16 - 17) Spirit"
+      },
+      {
+        "suffix": "of the Falcon",
+        "chance": 11.9,
+        "statsText": "+(16 - 17) Agility , +(16 - 17) Intellect"
+      },
+      {
+        "suffix": "of the Eagle",
+        "chance": 10.3,
+        "statsText": "+(16 - 17) Intellect , +(16 - 17) Stamina"
+      },
+      {
+        "suffix": "of the Whale",
+        "chance": 9.8,
+        "statsText": "+(16 - 17) Spirit , +(16 - 17) Stamina"
+      },
+      {
+        "suffix": "of the Owl",
+        "chance": 8.4,
+        "statsText": "+(16 - 17) Intellect , +(16 - 17) Spirit"
+      },
+      {
+        "suffix": "of Power",
+        "chance": 8.3,
+        "statsText": "+(50 - 52) Attack Power"
+      },
+      {
+        "suffix": "of Agility",
+        "chance": 6.9,
+        "statsText": "+(25 - 26) Agility"
+      },
+      {
+        "suffix": "of Nature's Wrath",
+        "chance": 5.2,
+        "statsText": "+(36 - 37) Nature Spell Damage"
+      },
+      {
+        "suffix": "of Intellect",
+        "chance": 4.2,
+        "statsText": "+(25 - 26) Intellect"
+      },
+      {
+        "suffix": "of Spirit",
+        "chance": 4.2,
+        "statsText": "+(25 - 26) Spirit"
+      },
+      {
+        "suffix": "of Stamina",
+        "chance": 4.1,
+        "statsText": "+(25 - 26) Stamina"
+      },
+      {
+        "suffix": "of Fire Resistance",
+        "chance": 0.4,
+        "statsText": "+(25 - 26) Fire Resistance"
+      },
+      {
+        "suffix": "of Nature Resistance",
+        "chance": 0.4,
+        "statsText": "+(25 - 26) Nature Resistance"
+      },
+      {
+        "suffix": "of Shadow Resistance",
+        "chance": 0.4,
+        "statsText": "+(25 - 26) Resist Shadow"
+      },
+      {
+        "suffix": "of Arcane Resistance",
+        "chance": 0.3,
+        "statsText": "+(25 - 26) Arcane Resistance"
+      },
+      {
+        "suffix": "of Frost Resistance",
+        "chance": 0.3,
+        "statsText": "+(25 - 26) Frost Resistance"
+      }
+    ],
+    "chanceSum": 99.9
+  },
+  "10787": {
+    "itemId": 10787,
+    "era": "classic",
+    "scrapedAt": "2026-09-14T09:40:32.790Z",
+    "enchants": [
+      {
+        "suffix": "of the Owl",
+        "chance": 25.2,
+        "statsText": "+(12 - 13) Intellect , +(12 - 13) Spirit"
+      },
+      {
+        "suffix": "of the Eagle",
+        "chance": 23.3,
+        "statsText": "+(12 - 13) Intellect , +(12 - 13) Stamina"
+      },
+      {
+        "suffix": "of the Whale",
+        "chance": 14.7,
+        "statsText": "+(12 - 13) Spirit , +(12 - 13) Stamina"
+      },
+      {
+        "suffix": "of Healing",
+        "chance": 12.7,
+        "statsText": "+(42 - 44) Healing Spells"
+      },
+      {
+        "suffix": "of Fiery Wrath",
+        "chance": 9.2,
+        "statsText": "+(27 - 29) Fire Spell Damage"
+      },
+      {
+        "suffix": "of Spirit",
+        "chance": 7.6,
+        "statsText": "+(19 - 20) Spirit"
+      },
+      {
+        "suffix": "of the Falcon",
+        "chance": 3.1,
+        "statsText": "+(12 - 13) Agility , +(12 - 13) Intellect"
+      },
+      {
+        "suffix": "of the Monkey",
+        "chance": 3,
+        "statsText": "+(12 - 13) Agility , +(12 - 13) Stamina"
+      },
+      {
+        "suffix": "of Nature Resistance",
+        "chance": 0.4,
+        "statsText": "+(19 - 20) Nature Resistance"
+      },
+      {
+        "suffix": "of Frost Resistance",
+        "chance": 0.3,
+        "statsText": "+(19 - 20) Frost Resistance"
+      },
+      {
+        "suffix": "of Arcane Resistance",
+        "chance": 0.2,
+        "statsText": "+(19 - 20) Arcane Resistance"
+      },
+      {
+        "suffix": "of Fire Resistance",
+        "chance": 0.2,
+        "statsText": "+(19 - 20) Fire Resistance"
+      },
+      {
+        "suffix": "of Shadow Resistance",
+        "chance": 0.1,
+        "statsText": "+(19 - 20) Shadow Resistance"
+      }
+    ],
+    "chanceSum": 100
+  },
+  "10795": {
+    "itemId": 10795,
+    "era": "classic",
+    "scrapedAt": "2026-09-14T11:10:59.423Z",
+    "enchants": [
+      {
+        "suffix": "of the Monkey",
+        "chance": 16.4,
+        "statsText": "+(9 - 10) Agility , +(9 - 10) Stamina"
+      },
+      {
+        "suffix": "of the Bear",
+        "chance": 10.3,
+        "statsText": "+(9 - 10) Stamina , +(9 - 10) Strength"
+      },
+      {
+        "suffix": "of the Owl",
+        "chance": 10.1,
+        "statsText": "+(9 - 10) Intellect , +(9 - 10) Spirit"
+      },
+      {
+        "suffix": "of the Tiger",
+        "chance": 6.9,
+        "statsText": "+(9 - 10) Agility , +(9 - 10) Strength"
+      },
+      {
+        "suffix": "of the Whale",
+        "chance": 5.7,
+        "statsText": "+(9 - 10) Spirit , +(9 - 10) Stamina"
+      },
+      {
+        "suffix": "of the Wolf",
+        "chance": 5.5,
+        "statsText": "+(9 - 10) Agility , +(9 - 10) Spirit"
+      },
+      {
+        "suffix": "of the Eagle",
+        "chance": 5.3,
+        "statsText": "+(9 - 10) Intellect , +(9 - 10) Stamina"
+      },
+      {
+        "suffix": "of the Gorilla",
+        "chance": 5,
+        "statsText": "+(9 - 10) Intellect , +(9 - 10) Strength"
+      },
+      {
+        "suffix": "of the Boar",
+        "chance": 5,
+        "statsText": "+(9 - 10) Spirit , +(9 - 10) Strength"
+      },
+      {
+        "suffix": "of Intellect",
+        "chance": 4.1,
+        "statsText": "+(14 - 15) Intellect"
+      },
+      {
+        "suffix": "of Eluding",
+        "chance": 3.7,
+        "statsText": "+1% Dodge , +(7 - 8) Agility"
+      },
+      {
+        "suffix": "of Stamina",
+        "chance": 3.3,
+        "statsText": "+(14 - 15) Stamina"
+      },
+      {
+        "suffix": "of Agility",
+        "chance": 3.1,
+        "statsText": "+(14 - 15) Agility"
+      },
+      {
+        "suffix": "of Strength",
+        "chance": 2.8,
+        "statsText": "+(14 - 15) Strength"
+      },
+      {
+        "suffix": "of the Falcon",
+        "chance": 2.8,
+        "statsText": "+(9 - 10) Agility , +(9 - 10) Intellect"
+      },
+      {
+        "suffix": "of Spirit",
+        "chance": 2.5,
+        "statsText": "+(14 - 15) Spirit"
+      },
+      {
+        "suffix": "of Regeneration",
+        "chance": 2.5,
+        "statsText": "+4 health every 5 sec."
+      },
+      {
+        "suffix": "of Concentration",
+        "chance": 2.1,
+        "statsText": "+6 mana every 5 sec."
+      },
+      {
+        "suffix": "of Shadow Resistance",
+        "chance": 1.6,
+        "statsText": "+(19 - 20) Shadow Resistance"
+      },
+      {
+        "suffix": "of Fire Resistance",
+        "chance": 0.8,
+        "statsText": "+(19 - 20) Fire Resistance"
+      },
+      {
+        "suffix": "of Frost Resistance",
+        "chance": 0.3,
+        "statsText": "+(19 - 20) Frost Resistance"
+      },
+      {
+        "suffix": "of Nature Resistance",
+        "chance": 0.2,
+        "statsText": "+(19 - 20) Nature Resistance"
+      },
+      {
+        "suffix": "of Arcane Resistance",
+        "chance": 0.1,
+        "statsText": "+(19 - 20) Arcane Resistance"
+      }
+    ],
+    "chanceSum": 100.1
+  },
+  "10796": {
+    "itemId": 10796,
+    "era": "classic",
+    "scrapedAt": "2026-09-14T09:40:35.100Z",
+    "enchants": [
+      {
+        "suffix": "of the Owl",
+        "chance": 21,
+        "statsText": "+(9 - 10) Intellect , +(9 - 10) Spirit"
+      },
+      {
+        "suffix": "of the Eagle",
+        "chance": 14.2,
+        "statsText": "+(9 - 10) Intellect , +(9 - 10) Stamina"
+      },
+      {
+        "suffix": "of the Whale",
+        "chance": 12.7,
+        "statsText": "+(9 - 10) Spirit , +(9 - 10) Stamina"
+      },
+      {
+        "suffix": "of Intellect",
+        "chance": 8.6,
+        "statsText": "+(14 - 15) Intellect"
+      },
+      {
+        "suffix": "of the Wolf",
+        "chance": 8.1,
+        "statsText": "+(9 - 10) Agility , +(9 - 10) Spirit"
+      },
+      {
+        "suffix": "of the Falcon",
+        "chance": 7.4,
+        "statsText": "+(9 - 10) Agility , +(9 - 10) Intellect"
+      },
+      {
+        "suffix": "of Spirit",
+        "chance": 7.1,
+        "statsText": "+(14 - 15) Spirit"
+      },
+      {
+        "suffix": "of Healing",
+        "chance": 5.3,
+        "statsText": "+(31 - 33) Healing Spells"
+      },
+      {
+        "suffix": "of Fiery Wrath",
+        "chance": 4.4,
+        "statsText": "+(20 - 21) Fire Spell Damage"
+      },
+      {
+        "suffix": "of Frozen Wrath",
+        "chance": 3.9,
+        "statsText": "+(20 - 21) Frost Spell Damage"
+      },
+      {
+        "suffix": "of Shadow Wrath",
+        "chance": 3.5,
+        "statsText": "+(20 - 21) Shadow Spell Damage"
+      },
+      {
+        "suffix": "of Arcane Wrath",
+        "chance": 2.7,
+        "statsText": "+(20 - 21) Arcane Spell Damage"
+      },
+      {
+        "suffix": "of Nature Resistance",
+        "chance": 0.4,
+        "statsText": "+(14 - 15) Nature Resistance"
+      },
+      {
+        "suffix": "of Arcane Resistance",
+        "chance": 0.3,
+        "statsText": "+(14 - 15) Arcane Resistance"
+      },
+      {
+        "suffix": "of Frost Resistance",
+        "chance": 0.3,
+        "statsText": "+(14 - 15) Frost Resistance"
+      },
+      {
+        "suffix": "of Fire Resistance",
+        "chance": 0.2,
+        "statsText": "+(14 - 15) Fire Resistance"
+      },
+      {
+        "suffix": "of Shadow Resistance",
+        "chance": 0.2,
+        "statsText": "+(14 - 15) Shadow Resistance"
+      }
+    ],
+    "chanceSum": 100.3
+  },
+  "10800": {
+    "itemId": 10800,
+    "era": "classic",
+    "scrapedAt": "2026-09-14T09:40:36.156Z",
+    "enchants": [
+      {
+        "suffix": "of the Monkey",
+        "chance": 23.2,
+        "statsText": "+(9 - 10) Agility , +(9 - 10) Stamina"
+      },
+      {
+        "suffix": "of the Owl",
+        "chance": 11.4,
+        "statsText": "+(9 - 10) Intellect , +(9 - 10) Spirit"
+      },
+      {
+        "suffix": "of Power",
+        "chance": 8.9,
+        "statsText": "+(28 - 30) Attack Power"
+      },
+      {
+        "suffix": "of Agility",
+        "chance": 8.6,
+        "statsText": "+(14 - 15) Agility"
+      },
+      {
+        "suffix": "of Stamina",
+        "chance": 8.5,
+        "statsText": "+(14 - 15) Stamina"
+      },
+      {
+        "suffix": "of the Whale",
+        "chance": 8.2,
+        "statsText": "+(9 - 10) Spirit , +(9 - 10) Stamina"
+      },
+      {
+        "suffix": "of the Eagle",
+        "chance": 8,
+        "statsText": "+(9 - 10) Intellect , +(9 - 10) Stamina"
+      },
+      {
+        "suffix": "of the Bear",
+        "chance": 5.8,
+        "statsText": "+(9 - 10) Stamina , +(9 - 10) Strength"
+      },
+      {
+        "suffix": "of Intellect",
+        "chance": 5,
+        "statsText": "+(14 - 15) Intellect"
+      },
+      {
+        "suffix": "of Spirit",
+        "chance": 5,
+        "statsText": "+(14 - 15) Spirit"
+      },
+      {
+        "suffix": "of Nature's Wrath",
+        "chance": 3,
+        "statsText": "+(20 - 21) Nature Spell Damage"
+      },
+      {
+        "suffix": "of Healing",
+        "chance": 2,
+        "statsText": "+(31 - 33) Healing Spells"
+      },
+      {
+        "suffix": "of Arcane Wrath",
+        "chance": 1.4,
+        "statsText": "+(20 - 21) Arcane Spell Damage"
+      },
+      {
+        "suffix": "of Frost Resistance",
+        "chance": 0.3,
+        "statsText": "+(14 - 15) Frost Resistance"
+      },
+      {
+        "suffix": "of Arcane Resistance",
+        "chance": 0.2,
+        "statsText": "+(14 - 15) Arcane Resistance"
+      },
+      {
+        "suffix": "of Fire Resistance",
+        "chance": 0.2,
+        "statsText": "+(14 - 15) Fire Resistance"
+      },
+      {
+        "suffix": "of Nature Resistance",
+        "chance": 0.2,
+        "statsText": "+(14 - 15) Nature Resistance"
+      },
+      {
+        "suffix": "of Shadow Resistance",
+        "chance": 0.1,
+        "statsText": "+(14 - 15) Shadow Resistance"
+      }
+    ],
+    "chanceSum": 100
+  },
+  "11118": {
+    "itemId": 11118,
+    "era": "classic",
+    "scrapedAt": "2026-09-14T09:40:37.053Z",
+    "enchants": [
+      {
+        "suffix": "of the Owl",
+        "chance": 12.6,
+        "statsText": "+(7 - 9) Intellect , +(7 - 9) Spirit"
+      },
+      {
+        "suffix": "of the Bear",
+        "chance": 12,
+        "statsText": "+(7 - 9) Stamina , +(7 - 9) Strength"
+      },
+      {
+        "suffix": "of the Monkey",
+        "chance": 10.9,
+        "statsText": "+(7 - 9) Agility , +(7 - 9) Stamina"
+      },
+      {
+        "suffix": "of the Wolf",
+        "chance": 6.8,
+        "statsText": "+(7 - 9) Agility , +(7 - 9) Spirit"
+      },
+      {
+        "suffix": "of the Tiger",
+        "chance": 6.5,
+        "statsText": "+(7 - 9) Agility , +(7 - 9) Strength"
+      },
+      {
+        "suffix": "of the Eagle",
+        "chance": 6.4,
+        "statsText": "+(7 - 9) Intellect , +(7 - 9) Stamina"
+      },
+      {
+        "suffix": "of the Whale",
+        "chance": 6.3,
+        "statsText": "+(7 - 9) Spirit , +(7 - 9) Stamina"
+      },
+      {
+        "suffix": "of the Boar",
+        "chance": 6.3,
+        "statsText": "+(7 - 9) Spirit , +(7 - 9) Strength"
+      },
+      {
+        "suffix": "of the Gorilla",
+        "chance": 5.8,
+        "statsText": "+(7 - 9) Intellect , +(7 - 9) Strength"
+      },
+      {
+        "suffix": "of Agility",
+        "chance": 3.7,
+        "statsText": "+(11 - 13) Agility"
+      },
+      {
+        "suffix": "of Stamina",
+        "chance": 3.4,
+        "statsText": "+(11 - 13) Stamina"
+      },
+      {
+        "suffix": "of Strength",
+        "chance": 3.4,
+        "statsText": "+(11 - 13) Strength"
+      },
+      {
+        "suffix": "of the Falcon",
+        "chance": 3.4,
+        "statsText": "+(7 - 9) Agility , +(7 - 9) Intellect"
+      },
+      {
+        "suffix": "of Intellect",
+        "chance": 3.1,
+        "statsText": "+(11 - 13) Intellect"
+      },
+      {
+        "suffix": "of Spirit",
+        "chance": 3.1,
+        "statsText": "+(11 - 13) Spirit"
+      },
+      {
+        "suffix": "of Eluding",
+        "chance": 2,
+        "statsText": "+1% Dodge , +(5 - 7) Agility"
+      },
+      {
+        "suffix": "of Regeneration",
+        "chance": 1.9,
+        "statsText": "+3 health every 5 sec."
+      },
+      {
+        "suffix": "of Concentration",
+        "chance": 1.8,
+        "statsText": "+(4 - 5) mana every 5 sec."
+      },
+      {
+        "suffix": "of Nature Resistance",
+        "chance": 0.3,
+        "statsText": "+(14 - 17) Nature Resistance"
+      },
+      {
+        "suffix": "of Fire Resistance",
+        "chance": 0.2,
+        "statsText": "+(14 - 17) Fire Resistance"
+      },
+      {
+        "suffix": "of Arcane Resistance",
+        "chance": 0.2,
+        "statsText": "+(15 - 17) Arcane Resistance"
+      },
+      {
+        "suffix": "of Frost Resistance",
+        "chance": 0.2,
+        "statsText": "+(15 - 17) Frost Resistance"
+      },
+      {
+        "suffix": "of Shadow Resistance",
+        "chance": 0.1,
+        "statsText": "+(15 - 17) Shadow Resistance"
+      }
+    ],
+    "chanceSum": 100.4
+  },
+  "11765": {
+    "itemId": 11765,
+    "era": "classic",
+    "scrapedAt": "2026-09-14T11:11:02.399Z",
+    "enchants": [
+      {
+        "suffix": "of the Monkey",
+        "chance": 12.9,
+        "statsText": "+(9 - 10) Agility , +(9 - 10) Stamina"
+      },
+      {
+        "suffix": "of the Wolf",
+        "chance": 12.1,
+        "statsText": "+(9 - 10) Agility , +(9 - 10) Spirit"
+      },
+      {
+        "suffix": "of the Falcon",
+        "chance": 11.1,
+        "statsText": "+(9 - 10) Agility , +(9 - 10) Intellect"
+      },
+      {
+        "suffix": "of the Eagle",
+        "chance": 10.4,
+        "statsText": "+(9 - 10) Intellect , +(9 - 10) Stamina"
+      },
+      {
+        "suffix": "of the Whale",
+        "chance": 10.2,
+        "statsText": "+(9 - 10) Spirit , +(9 - 10) Stamina"
+      },
+      {
+        "suffix": "of the Owl",
+        "chance": 8.5,
+        "statsText": "+(9 - 10) Intellect , +(9 - 10) Spirit"
+      },
+      {
+        "suffix": "of Power",
+        "chance": 7.8,
+        "statsText": "+30 Attack Power"
+      },
+      {
+        "suffix": "of Agility",
+        "chance": 7.2,
+        "statsText": "+15 Agility"
+      },
+      {
+        "suffix": "of Stamina",
+        "chance": 4.4,
+        "statsText": "+15 Stamina"
+      },
+      {
+        "suffix": "of Intellect",
+        "chance": 4.3,
+        "statsText": "+15 Intellect"
+      },
+      {
+        "suffix": "of Spirit",
+        "chance": 3.6,
+        "statsText": "+15 Spirit"
+      },
+      {
+        "suffix": "of Nature's Wrath",
+        "chance": 2.8,
+        "statsText": "+21 Nature Spell Damage"
+      },
+      {
+        "suffix": "of Healing",
+        "chance": 1.3,
+        "statsText": "+33 Healing Spells"
+      },
+      {
+        "suffix": "of Arcane Wrath",
+        "chance": 1.2,
+        "statsText": "+21 Arcane Spell Damage"
+      },
+      {
+        "suffix": "of Fire Resistance",
+        "chance": 0.6,
+        "statsText": "+15 Fire Resistance"
+      },
+      {
+        "suffix": "of Shadow Resistance",
+        "chance": 0.5,
+        "statsText": "+15 Shadow Resistance"
+      },
+      {
+        "suffix": "of Frost Resistance",
+        "chance": 0.4,
+        "statsText": "+15 Frost Resistance"
+      },
+      {
+        "suffix": "of Nature Resistance",
+        "chance": 0.4,
+        "statsText": "+15 Nature Resistance"
+      },
+      {
+        "suffix": "of Arcane Resistance",
+        "chance": 0.3,
+        "statsText": "+15 Arcane Resistance"
+      }
+    ],
+    "chanceSum": 100
+  },
+  "11766": {
+    "itemId": 11766,
+    "era": "classic",
+    "scrapedAt": "2026-09-14T11:11:05.417Z",
+    "enchants": [
+      {
+        "suffix": "of the Owl",
+        "chance": 23.5,
+        "statsText": "+(9 - 10) Intellect , +(9 - 10) Spirit"
+      },
+      {
+        "suffix": "of the Eagle",
+        "chance": 15,
+        "statsText": "+(9 - 10) Intellect , +(9 - 10) Stamina"
+      },
+      {
+        "suffix": "of the Whale",
+        "chance": 14.4,
+        "statsText": "+(9 - 10) Spirit , +(9 - 10) Stamina"
+      },
+      {
+        "suffix": "of Healing",
+        "chance": 7.2,
+        "statsText": "+33 Healing Spells"
+      },
+      {
+        "suffix": "of Intellect",
+        "chance": 7,
+        "statsText": "+15 Intellect"
+      },
+      {
+        "suffix": "of Spirit",
+        "chance": 6.6,
+        "statsText": "+15 Spirit"
+      },
+      {
+        "suffix": "of Fiery Wrath",
+        "chance": 5.6,
+        "statsText": "+21 Fire Spell Damage"
+      },
+      {
+        "suffix": "of Stamina",
+        "chance": 5.4,
+        "statsText": "+15 Stamina"
+      },
+      {
+        "suffix": "of Shadow Wrath",
+        "chance": 5.2,
+        "statsText": "+21 Shadow Spell Damage"
+      },
+      {
+        "suffix": "of Frozen Wrath",
+        "chance": 4.7,
+        "statsText": "+21 Frost Spell Damage"
+      },
+      {
+        "suffix": "of Arcane Wrath",
+        "chance": 3.7,
+        "statsText": "+21 Arcane Spell Damage"
+      },
+      {
+        "suffix": "of Fire Resistance",
+        "chance": 0.4,
+        "statsText": "+15 Fire Resistance"
+      },
+      {
+        "suffix": "of Nature Resistance",
+        "chance": 0.4,
+        "statsText": "+15 Nature Resistance"
+      },
+      {
+        "suffix": "of Arcane Resistance",
+        "chance": 0.3,
+        "statsText": "+15 Arcane Resistance"
+      },
+      {
+        "suffix": "of Frost Resistance",
+        "chance": 0.3,
+        "statsText": "+15 Frost Resistance"
+      },
+      {
+        "suffix": "of Shadow Resistance",
+        "chance": 0.3,
+        "statsText": "+15 Shadow Resistance"
+      }
+    ],
+    "chanceSum": 100
+  },
+  "11767": {
+    "itemId": 11767,
+    "era": "classic",
+    "scrapedAt": "2026-09-14T11:11:08.412Z",
+    "enchants": [
+      {
+        "suffix": "of the Bear",
+        "chance": 48.5,
+        "statsText": "+(9 - 10) Stamina , +(9 - 10) Strength"
+      },
+      {
+        "suffix": "of Power",
+        "chance": 11,
+        "statsText": "+30 Attack Power"
+      },
+      {
+        "suffix": "of Stamina",
+        "chance": 8.2,
+        "statsText": "+15 Stamina"
+      },
+      {
+        "suffix": "of Strength",
+        "chance": 7.6,
+        "statsText": "+15 Strength"
+      },
+      {
+        "suffix": "of the Boar",
+        "chance": 4.7,
+        "statsText": "+(9 - 10) Spirit , +(9 - 10) Strength"
+      },
+      {
+        "suffix": "of the Tiger",
+        "chance": 4.6,
+        "statsText": "+(9 - 10) Agility , +(9 - 10) Strength"
+      },
+      {
+        "suffix": "of the Whale",
+        "chance": 4.4,
+        "statsText": "+(9 - 10) Spirit , +(9 - 10) Stamina"
+      },
+      {
+        "suffix": "of the Eagle",
+        "chance": 3.2,
+        "statsText": "+(9 - 10) Intellect , +(9 - 10) Stamina"
+      },
+      {
+        "suffix": "of the Monkey",
+        "chance": 2.9,
+        "statsText": "+(9 - 10) Agility , +(9 - 10) Stamina"
+      },
+      {
+        "suffix": "of the Gorilla",
+        "chance": 2.9,
+        "statsText": "+(9 - 10) Intellect , +(9 - 10) Strength"
+      },
+      {
+        "suffix": "of Arcane Resistance",
+        "chance": 0.5,
+        "statsText": "+15 Arcane Resistance"
+      },
+      {
+        "suffix": "of Healing",
+        "chance": 0.5,
+        "statsText": "+33 Healing Spells"
+      },
+      {
+        "suffix": "of Fire Resistance",
+        "chance": 0.4,
+        "statsText": "+15 Fire Resistance"
+      },
+      {
+        "suffix": "of Nature Resistance",
+        "chance": 0.4,
+        "statsText": "+15 Nature Resistance"
+      },
+      {
+        "suffix": "of Shadow Resistance",
+        "chance": 0.2,
+        "statsText": "+15 Shadow Resistance"
+      },
+      {
+        "suffix": "of Frost Resistance",
+        "chance": 0.1,
+        "statsText": "+15 Frost Resistance"
+      }
+    ],
+    "chanceSum": 100.1
+  },
+  "11934": {
+    "itemId": 11934,
+    "era": "classic",
+    "scrapedAt": "2026-09-14T11:11:11.328Z",
+    "enchants": [
+      {
+        "suffix": "of the Owl",
+        "chance": 35.9,
+        "statsText": "+(10 - 11) Intellect , +(10 - 11) Spirit"
+      },
+      {
+        "suffix": "of the Eagle",
+        "chance": 22.3,
+        "statsText": "+(10 - 11) Intellect , +(10 - 11) Stamina"
+      },
+      {
+        "suffix": "of the Whale",
+        "chance": 17.9,
+        "statsText": "+(10 - 11) Spirit , +(10 - 11) Stamina"
+      },
+      {
+        "suffix": "of Intellect",
+        "chance": 10,
+        "statsText": "+16 Intellect"
+      },
+      {
+        "suffix": "of Spirit",
+        "chance": 8.6,
+        "statsText": "+16 Spirit"
+      },
+      {
+        "suffix": "of Concentration",
+        "chance": 5.5,
+        "statsText": "+6 mana every 5 sec."
+      }
+    ],
+    "chanceSum": 100.2
+  },
+  "12527": {
+    "itemId": 12527,
+    "era": "classic",
+    "scrapedAt": "2026-09-14T11:13:23.761Z",
+    "enchants": [
+      {
+        "suffix": "of the Eagle",
+        "chance": 11.7,
+        "statsText": "+7 Intellect , +7 Stamina"
+      },
+      {
+        "suffix": "of the Tiger",
+        "chance": 11.5,
+        "statsText": "+7 Agility , +7 Strength"
+      },
+      {
+        "suffix": "of the Bear",
+        "chance": 11.4,
+        "statsText": "+7 Stamina , +7 Strength"
+      },
+      {
+        "suffix": "of the Whale",
+        "chance": 11.2,
+        "statsText": "+7 Spirit , +7 Stamina"
+      },
+      {
+        "suffix": "of the Boar",
+        "chance": 11.2,
+        "statsText": "+7 Spirit , +7 Strength"
+      },
+      {
+        "suffix": "of the Wolf",
+        "chance": 11,
+        "statsText": "+7 Agility , +7 Spirit"
+      },
+      {
+        "suffix": "of the Monkey",
+        "chance": 10.5,
+        "statsText": "+7 Agility , +7 Stamina"
+      },
+      {
+        "suffix": "of Agility",
+        "chance": 6.8,
+        "statsText": "+11 Agility"
+      },
+      {
+        "suffix": "of Stamina",
+        "chance": 6,
+        "statsText": "+11 Stamina"
+      },
+      {
+        "suffix": "of Strength",
+        "chance": 5.7,
+        "statsText": "+11 Strength"
+      },
+      {
+        "suffix": "of Power",
+        "chance": 3,
+        "statsText": "+22 Attack Power"
+      }
+    ],
+    "chanceSum": 100
+  },
+  "13258": {
+    "itemId": 13258,
+    "era": "classic",
+    "scrapedAt": "2026-09-14T11:13:26.734Z",
+    "enchants": [
+      {
+        "suffix": "of the Monkey",
+        "chance": 51.9,
+        "statsText": "+(14 - 15) Agility , +(14 - 15) Stamina"
+      },
+      {
+        "suffix": "of the Eagle",
+        "chance": 7,
+        "statsText": "+(14 - 15) Intellect , +(14 - 15) Stamina"
+      },
+      {
+        "suffix": "of the Owl",
+        "chance": 6.5,
+        "statsText": "+(14 - 15) Intellect , +(14 - 15) Spirit"
+      },
+      {
+        "suffix": "of the Bear",
+        "chance": 6,
+        "statsText": "+(14 - 15) Stamina , +(14 - 15) Strength"
+      },
+      {
+        "suffix": "of Defense",
+        "chance": 5.6,
+        "statsText": "+(14 - 15) Defense"
+      },
+      {
+        "suffix": "of the Whale",
+        "chance": 4.5,
+        "statsText": "+(14 - 15) Spirit , +(14 - 15) Stamina"
+      },
+      {
+        "suffix": "of the Tiger",
+        "chance": 4.1,
+        "statsText": "+(14 - 15) Agility , +(14 - 15) Strength"
+      },
+      {
+        "suffix": "of the Falcon",
+        "chance": 2.9,
+        "statsText": "+(14 - 15) Agility , +(14 - 15) Intellect"
+      },
+      {
+        "suffix": "of the Wolf",
+        "chance": 2.7,
+        "statsText": "+(14 - 15) Agility , +(14 - 15) Spirit"
+      },
+      {
+        "suffix": "of Spirit",
+        "chance": 2.7,
+        "statsText": "+(21 - 22) Spirit"
+      },
+      {
+        "suffix": "of the Gorilla",
+        "chance": 2.2,
+        "statsText": "+(14 - 15) Intellect , +(14 - 15) Strength"
+      },
+      {
+        "suffix": "of Arcane Wrath",
+        "chance": 1.4,
+        "statsText": "+(30 - 31) Arcane Spell Damage"
+      },
+      {
+        "suffix": "of Healing",
+        "chance": 1.3,
+        "statsText": "+(46 - 48) Healing Spells"
+      },
+      {
+        "suffix": "of Nature Resistance",
+        "chance": 0.6,
+        "statsText": "+(21 - 22) Nature Resistance"
+      },
+      {
+        "suffix": "of Shadow Resistance",
+        "chance": 0.3,
+        "statsText": "+(21 - 22) Shadow Resistance"
+      },
+      {
+        "suffix": "of Fire Resistance",
+        "chance": 0.2,
+        "statsText": "+(21 - 22) Fire Resistance"
+      },
+      {
+        "suffix": "of Frost Resistance",
+        "chance": 0.2,
+        "statsText": "+(21 - 22) Frost Resistance"
+      },
+      {
+        "suffix": "of Arcane Resistance",
+        "chance": 0.1,
+        "statsText": "+(21 - 22) Arcane Resistance"
+      }
+    ],
+    "chanceSum": 100.2
+  },
+  "13386": {
+    "itemId": 13386,
+    "era": "classic",
+    "scrapedAt": "2026-09-14T11:13:29.800Z",
+    "enchants": [
+      {
+        "suffix": "of the Owl",
+        "chance": 23.7,
+        "statsText": "+(9 - 10) Intellect , +(9 - 10) Spirit"
+      },
+      {
+        "suffix": "of the Eagle",
+        "chance": 14.8,
+        "statsText": "+(9 - 10) Intellect , +(9 - 10) Stamina"
+      },
+      {
+        "suffix": "of the Whale",
+        "chance": 14.1,
+        "statsText": "+(9 - 10) Spirit , +(9 - 10) Stamina"
+      },
+      {
+        "suffix": "of Intellect",
+        "chance": 7,
+        "statsText": "+15 Intellect"
+      },
+      {
+        "suffix": "of Healing",
+        "chance": 6.9,
+        "statsText": "+33 Healing Spells"
+      },
+      {
+        "suffix": "of Spirit",
+        "chance": 6.6,
+        "statsText": "+15 Spirit"
+      },
+      {
+        "suffix": "of Frozen Wrath",
+        "chance": 5.9,
+        "statsText": "+21 Frost Spell Damage"
+      },
+      {
+        "suffix": "of Stamina",
+        "chance": 5.8,
+        "statsText": "+15 Stamina"
+      },
+      {
+        "suffix": "of Shadow Wrath",
+        "chance": 5.2,
+        "statsText": "+21 Shadow Spell Damage"
+      },
+      {
+        "suffix": "of Fiery Wrath",
+        "chance": 5,
+        "statsText": "+21 Fire Spell Damage"
+      },
+      {
+        "suffix": "of Arcane Wrath",
+        "chance": 3.5,
+        "statsText": "+21 Arcane Spell Damage"
+      },
+      {
+        "suffix": "of Shadow Resistance",
+        "chance": 0.4,
+        "statsText": "+15 Shadow Resistance"
+      },
+      {
+        "suffix": "of Fire Resistance",
+        "chance": 0.3,
+        "statsText": "+15 Fire Resistance"
+      },
+      {
+        "suffix": "of Nature Resistance",
+        "chance": 0.3,
+        "statsText": "+15 Nature Resistance"
+      },
+      {
+        "suffix": "of Arcane Resistance",
+        "chance": 0.2,
+        "statsText": "+15 Arcane Resistance"
+      },
+      {
+        "suffix": "of Frost Resistance",
+        "chance": 0.2,
+        "statsText": "+15 Frost Resistance"
+      }
+    ],
+    "chanceSum": 99.9
+  }
+}

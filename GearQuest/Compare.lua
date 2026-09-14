@@ -55,7 +55,7 @@ local LOWER_ARMOR_ILVL_MARGIN = 8
 local LOWER_ARMOR_SCORE_PENALTY = 500
 
 -- Stat-based BiS reordering applies to generated sub-60 picks and notables only.
--- Level 60 Wowhead guide rows (origin="guide") and level 70 curated Data.lua rows
+-- Level 60 Wowhead guide rows (origin="guide") and hand-curated Data.lua rows
 -- (generated=false, curatedRank) keep their professional list order untouched.
 -- Weights come from GearQuest/_generated/*.weights.json (TBC stat priorities) via
 -- StatWeights.generated.lua — spec-aware from level 10, levelling_1_9 below that.

@@ -53,8 +53,8 @@ local function NormalizeFaction(input)
 end
 
 function GQ.Preview:MigrateSettings()
-    GearQuestDB.settings = GearQuestDB.settings or {}
-    local settings = GearQuestDB.settings
+    GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+    local settings = GearQuestForeverDB.settings
 
     if settings.debugAsHunter37 ~= nil then
         settings.preview = settings.preview or {}
@@ -67,9 +67,9 @@ end
 
 function GQ.Preview:GetSettings()
     self:MigrateSettings()
-    GearQuestDB.settings.preview = GearQuestDB.settings.preview or {}
+    GearQuestForeverDB.settings.preview = GearQuestForeverDB.settings.preview or {}
 
-    local preview = GearQuestDB.settings.preview
+    local preview = GearQuestForeverDB.settings.preview
     if preview.enabled == nil then
         preview.enabled = false
     end
@@ -79,7 +79,7 @@ function GQ.Preview:GetSettings()
     if not preview.level then
         preview.level = 4
     end
-    preview.level = tonumber(preview.level) or preview.level
+    preview.level = GQ:ClampPlayerLevel(preview.level)
     if not preview.faction then
         local faction = UnitFactionGroup("player")
         preview.faction = faction or "Alliance"
@@ -112,10 +112,11 @@ end
 function GQ.Preview:SetLevel(level)
     local previousLevel = self:GetSettings().level
     level = tonumber(level)
-    if not level or level < 1 or level > 70 then
-        return false, "Level must be a number between 1 and 70."
+    local maxLevel = GQ.MAX_PLAYER_LEVEL or 60
+    if not level or level < 1 or level > maxLevel then
+        return false, string.format("Level must be a number between 1 and %d.", maxLevel)
     end
-    level = math.floor(level)
+    level = GQ:ClampPlayerLevel(level)
     self:GetSettings().level = level
     self:SetEnabled(true)
     if GQ.Data and GQ.Data.InvalidatePlayerBandCache then
@@ -147,7 +148,7 @@ function GQ.Preview:ApplyCurrentCharacter()
     local preview = self:GetSettings()
     preview.enabled = true
     preview.class = classFile
-    preview.level = level
+    preview.level = GQ:ClampPlayerLevel(level)
     preview.faction = faction
 end
 
@@ -174,7 +175,7 @@ function GQ.Preview:OnPlayerLogin()
 
     local _, classFile = UnitClass("player")
     settings.class = classFile
-    settings.level = UnitLevel("player")
+    settings.level = GQ:ClampPlayerLevel(UnitLevel("player"))
     settings.faction = UnitFactionGroup("player") or "Alliance"
     return true
 end
@@ -459,8 +460,9 @@ local function SanitizeLevelInput(edit)
     end
 
     local level = tonumber(text)
-    if level and level > 70 then
-        text = "70"
+    local maxLevel = tostring(GQ.MAX_PLAYER_LEVEL or 60)
+    if level and level > tonumber(maxLevel) then
+        text = maxLevel
     end
 
     if text ~= edit:GetText() then
@@ -665,7 +667,7 @@ function GQ.Preview:EnsureDialog()
 
         local levelText = SanitizeLevelInput(dialog.levelEdit)
         if levelText == "" then
-            print("|cff66ccffGearQuest|r: Enter a level between 1 and 70.")
+            print(string.format("|cff66ccffGearQuest|r: Enter a level between 1 and %d.", GQ.MAX_PLAYER_LEVEL or 60))
             return
         end
 

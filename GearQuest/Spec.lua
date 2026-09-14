@@ -202,14 +202,14 @@ end
 
 local function GetSpecStore(previewMode)
     if previewMode then
-        GearQuestDB.settings = GearQuestDB.settings or {}
-        GearQuestDB.settings.preview = GearQuestDB.settings.preview or {}
-        GearQuestDB.settings.preview.specByClass = GearQuestDB.settings.preview.specByClass or {}
-        return GearQuestDB.settings.preview.specByClass
+        GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+        GearQuestForeverDB.settings.preview = GearQuestForeverDB.settings.preview or {}
+        GearQuestForeverDB.settings.preview.specByClass = GearQuestForeverDB.settings.preview.specByClass or {}
+        return GearQuestForeverDB.settings.preview.specByClass
     end
-    GearQuestDB.settings = GearQuestDB.settings or {}
-    GearQuestDB.settings.specByClass = GearQuestDB.settings.specByClass or {}
-    return GearQuestDB.settings.specByClass
+    GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+    GearQuestForeverDB.settings.specByClass = GearQuestForeverDB.settings.specByClass or {}
+    return GearQuestForeverDB.settings.specByClass
 end
 
 function GQ.Spec:GetSavedSpec(classFile)

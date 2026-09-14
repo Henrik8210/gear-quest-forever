@@ -42,9 +42,14 @@ Compare equipped item vs candidates by item level + simple stat relevance for cl
 - Static data file (`GearQuest/Data.lua`)
 - WoW Forever beta: `## Interface: 11507` placeholder — replace with `lastAddonVersion` from the beta `WTF/Config.wtf` after 17 Sep 2026. Do not use TBC `20505`.
 
+## Level cap
+
+WoW Forever is **1–60**. The addon uses `GQ.MAX_PLAYER_LEVEL = 60`. TBC level-70 data and tooling are out of scope; see [FOREVER-DATA-MIGRATION.md](./FOREVER-DATA-MIGRATION.md).
+
 ## Out of scope for v1
 
 - Full BiS for all classes/phases
+- TBC / level 70 endgame lists
 - Live AH pricing
 - AI / Wowhead API (addons cannot use internet)
 - Account-wide alt tracking
@@ -54,7 +59,7 @@ Compare equipped item vs candidates by item level + simple stat relevance for cl
 - Standard WoW addon (Lua; LibStub/Ace3 only if useful)
 - Hook `PaperDollFrame` / `CharacterFrame` slot buttons
 - Reuse Blizzard item tooltips (`GameTooltip:SetHyperlink`)
-- Naming: addon folder `GearQuest`, toc `GearQuest.toc`, global `GearQuest` / `GQ`
+- Repo source folder `GearQuest/`; install/CurseForge package **`GearQuestForever`** (`GearQuestForever.toc`); Lua global `GearQuest` / `GQ`
 
 ## CurseForge
 

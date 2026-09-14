@@ -1,15 +1,23 @@
-# Sync GearQuest Forever addon files to the local WoW Forever install.
+# Sync GearQuest Forever addon files to a local WoW install.
 # Run from repo root after making changes.
 #
-# Override the client folder if Battle.net uses a different name:
-#   $env:GEARQUEST_WOW_CLIENT = "_forever_"
+# Installs as Interface\AddOns\GearQuestForever (not GearQuest — that name is TBC Anniversary).
+#
+# Forever beta (default when present):
 #   .\scripts\sync-addon.ps1
+#
+# Side-by-side test on TBC Anniversary (enable "Load out of date AddOns"; different Interface):
+#   $env:GEARQUEST_WOW_CLIENT = "_anniversary_"
+#   .\scripts\sync-addon.ps1
+#
+# Custom client folder name:
+#   $env:GEARQUEST_WOW_CLIENT = "_forever_"
 
 $ErrorActionPreference = "Stop"
 
 $source = Join-Path $PSScriptRoot "..\GearQuest"
 $wowRoot = "C:\Program Files (x86)\World of Warcraft"
-$addonName = "GearQuest"
+$addonName = "GearQuestForever"
 
 $clientCandidates = @(
     $env:GEARQUEST_WOW_CLIENT,
@@ -35,12 +43,14 @@ if (-not $clientFolder) {
     }
     $list = if ($existing) { $existing -join ", " } else { "(World of Warcraft folder not found)" }
     Write-Error @"
-WoW Forever client folder not found under $wowRoot
+WoW client folder not found under $wowRoot
 Looked for: $($clientCandidates -join ", ")
 Installed folders: $list
 
-After the Sept 17 beta installs, set the folder name:
-  `$env:GEARQUEST_WOW_CLIENT = "_folder_name_"
+Forever beta: install the client, then re-run this script.
+
+To test on Anniversary next to TBC GearQuest (dev only):
+  `$env:GEARQUEST_WOW_CLIENT = "_anniversary_"
   .\scripts\sync-addon.ps1
 "@
 }
@@ -51,7 +61,12 @@ if (-not (Test-Path $source)) {
     Write-Error "Source not found: $source"
 }
 
+if (-not (Test-Path (Join-Path $source "GearQuestForever.toc"))) {
+    Write-Error "Missing GearQuestForever.toc in $source"
+}
+
 New-Item -ItemType Directory -Force -Path $target | Out-Null
 Copy-Item -Path (Join-Path $source "*") -Destination $target -Recurse -Force
 
 Write-Host "Synced GearQuest Forever -> $target"
+Write-Host "In-game addon list: GearQuest Forever (folder $addonName). TBC GearQuest is a separate addon if installed."

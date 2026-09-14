@@ -224,29 +224,29 @@ local QUEST_DETAIL_BODY_FONTS = {
 }
 
 local function GetHuntRecord(id)
-    GearQuestDB.hunts = GearQuestDB.hunts or {}
-    return GearQuestDB.hunts[id]
+    GearQuestForeverDB.hunts = GearQuestForeverDB.hunts or {}
+    return GearQuestForeverDB.hunts[id]
 end
 
 local function GetObtainedTimestamp(id)
-    GearQuestDB.obtained = GearQuestDB.obtained or {}
-    return GearQuestDB.obtained[id]
+    GearQuestForeverDB.obtained = GearQuestForeverDB.obtained or {}
+    return GearQuestForeverDB.obtained[id]
 end
 
 local function IsDismissedCompleted(id)
-    GearQuestDB.dismissedCompleted = GearQuestDB.dismissedCompleted or {}
-    return GearQuestDB.dismissedCompleted[id] == true
+    GearQuestForeverDB.dismissedCompleted = GearQuestForeverDB.dismissedCompleted or {}
+    return GearQuestForeverDB.dismissedCompleted[id] == true
 end
 
 local function EnsureHuntRecord(id)
-    GearQuestDB.hunts = GearQuestDB.hunts or {}
-    if not GearQuestDB.hunts[id] then
-        GearQuestDB.hunts[id] = {
+    GearQuestForeverDB.hunts = GearQuestForeverDB.hunts or {}
+    if not GearQuestForeverDB.hunts[id] then
+        GearQuestForeverDB.hunts[id] = {
             status = "tracked",
             trackedAt = time(),
         }
     end
-    return GearQuestDB.hunts[id]
+    return GearQuestForeverDB.hunts[id]
 end
 
 local function NormalizeHuntStatus(status)
@@ -329,8 +329,8 @@ local function PlayerOwnsItem(itemId)
 end
 
 local function GetCraftedTimestamp(itemId)
-    GearQuestDB.crafted = GearQuestDB.crafted or {}
-    return GearQuestDB.crafted[itemId]
+    GearQuestForeverDB.crafted = GearQuestForeverDB.crafted or {}
+    return GearQuestForeverDB.crafted[itemId]
 end
 
 local function ExtractItemIdFromChatMessage(msg)
@@ -774,13 +774,13 @@ local function SetupQuestLogPortrait(frame)
 end
 
 function GQ.Log:GetListTab()
-    GearQuestDB.ui = GearQuestDB.ui or {}
-    return GearQuestDB.ui.listTab or "active"
+    GearQuestForeverDB.ui = GearQuestForeverDB.ui or {}
+    return GearQuestForeverDB.ui.listTab or "active"
 end
 
 function GQ.Log:SetListTab(tab)
-    GearQuestDB.ui = GearQuestDB.ui or {}
-    GearQuestDB.ui.listTab = tab
+    GearQuestForeverDB.ui = GearQuestForeverDB.ui or {}
+    GearQuestForeverDB.ui.listTab = tab
     self.selectedHuntId = nil
     self.selectedEntry = nil
     self:ClearDetail()
@@ -811,24 +811,24 @@ end
 
 function GQ.Log:IsSlotCollapsed(slotName, cachedUpgrades)
     slotName = GQ.Data:NormalizeSlotName(slotName)
-    GearQuestDB.ui = GearQuestDB.ui or {}
-    GearQuestDB.ui.collapsedSlots = GearQuestDB.ui.collapsedSlots or {}
+    GearQuestForeverDB.ui = GearQuestForeverDB.ui or {}
+    GearQuestForeverDB.ui.collapsedSlots = GearQuestForeverDB.ui.collapsedSlots or {}
 
-    if GearQuestDB.ui.collapsedSlots[slotName] ~= nil then
-        return GearQuestDB.ui.collapsedSlots[slotName]
+    if GearQuestForeverDB.ui.collapsedSlots[slotName] ~= nil then
+        return GearQuestForeverDB.ui.collapsedSlots[slotName]
     end
 
     -- Migrate saved collapse state from old duplicate categories.
     if slotName == "Finger" then
         for _, legacy in ipairs({ "Finger0", "Finger1" }) do
-            if GearQuestDB.ui.collapsedSlots[legacy] ~= nil then
-                return GearQuestDB.ui.collapsedSlots[legacy]
+            if GearQuestForeverDB.ui.collapsedSlots[legacy] ~= nil then
+                return GearQuestForeverDB.ui.collapsedSlots[legacy]
             end
         end
     elseif slotName == "Trinket" then
         for _, legacy in ipairs({ "Trinket0", "Trinket1" }) do
-            if GearQuestDB.ui.collapsedSlots[legacy] ~= nil then
-                return GearQuestDB.ui.collapsedSlots[legacy]
+            if GearQuestForeverDB.ui.collapsedSlots[legacy] ~= nil then
+                return GearQuestForeverDB.ui.collapsedSlots[legacy]
             end
         end
     end
@@ -843,9 +843,9 @@ end
 
 function GQ.Log:SetSlotCollapsed(slotName, collapsed)
     slotName = GQ.Data:NormalizeSlotName(slotName)
-    GearQuestDB.ui = GearQuestDB.ui or {}
-    GearQuestDB.ui.collapsedSlots = GearQuestDB.ui.collapsedSlots or {}
-    GearQuestDB.ui.collapsedSlots[slotName] = collapsed
+    GearQuestForeverDB.ui = GearQuestForeverDB.ui or {}
+    GearQuestForeverDB.ui.collapsedSlots = GearQuestForeverDB.ui.collapsedSlots or {}
+    GearQuestForeverDB.ui.collapsedSlots[slotName] = collapsed
 end
 
 function GQ.Log:ToggleSlotCollapsed(slotName)
@@ -893,7 +893,7 @@ function GQ.Log:GetActiveSlotListEntries(slotName)
         addEntry(entry, true)
     end
 
-    for id, record in pairs(GearQuestDB.hunts or {}) do
+    for id, record in pairs(GearQuestForeverDB.hunts or {}) do
         if not seenId[id] and NormalizeHuntStatus(record.status) == "tracked" and not self:IsEntryObtained(id) then
             local entry = GQ.Data:GetEntryById(id)
             if entry and GQ.Data:EntryMatchesSlot(entry, slotName)
@@ -911,8 +911,8 @@ function GQ.Log:GetCompletedSlotListEntries(slotName)
     local results = {}
     local seen = {}
 
-    GearQuestDB.obtained = GearQuestDB.obtained or {}
-    for id, obtainedAt in pairs(GearQuestDB.obtained) do
+    GearQuestForeverDB.obtained = GearQuestForeverDB.obtained or {}
+    for id, obtainedAt in pairs(GearQuestForeverDB.obtained) do
         if not IsDismissedCompleted(id) then
             local entry = GQ.Data:GetEntryById(id)
             if entry and GQ.Data:EntryMatchesSlot(entry, slotName)
@@ -926,7 +926,7 @@ function GQ.Log:GetCompletedSlotListEntries(slotName)
         end
     end
 
-    for id, record in pairs(GearQuestDB.hunts or {}) do
+    for id, record in pairs(GearQuestForeverDB.hunts or {}) do
         if not seen[id] and not IsDismissedCompleted(id) and NormalizeHuntStatus(record.status) == "completed" then
             local entry = GQ.Data:GetEntryById(id)
             if entry and GQ.Data:EntryMatchesSlot(entry, slotName)
@@ -995,12 +995,12 @@ function GQ.Log:RecordCraftedItem(itemId)
         return false
     end
 
-    GearQuestDB.crafted = GearQuestDB.crafted or {}
-    if GearQuestDB.crafted[itemId] then
+    GearQuestForeverDB.crafted = GearQuestForeverDB.crafted or {}
+    if GearQuestForeverDB.crafted[itemId] then
         return false
     end
 
-    GearQuestDB.crafted[itemId] = time()
+    GearQuestForeverDB.crafted[itemId] = time()
     return true
 end
 
@@ -1065,14 +1065,14 @@ function GQ.Log:MarkEntryObtained(entry, options)
     end
 
     local now = time()
-    GearQuestDB.obtained = GearQuestDB.obtained or {}
-    GearQuestDB.obtained[entry.id] = now
+    GearQuestForeverDB.obtained = GearQuestForeverDB.obtained or {}
+    GearQuestForeverDB.obtained[entry.id] = now
 
     local record = GetHuntRecord(entry.id) or {}
     record.status = "completed"
     record.completedAt = now
     record.obtained = true
-    GearQuestDB.hunts[entry.id] = record
+    GearQuestForeverDB.hunts[entry.id] = record
 
     local showToast = not options or options.showToast ~= false
     if showToast and GQ.Toast then
@@ -1091,8 +1091,8 @@ function GQ.Log:CompleteHunt(id)
         if record then
             record.status = "completed"
             record.completedAt = time()
-            GearQuestDB.obtained = GearQuestDB.obtained or {}
-            GearQuestDB.obtained[id] = record.completedAt
+            GearQuestForeverDB.obtained = GearQuestForeverDB.obtained or {}
+            GearQuestForeverDB.obtained[id] = record.completedAt
         end
     end
 
@@ -1170,11 +1170,11 @@ function GQ.Log:UntrackHunt(id)
     local onCompletedTab = self:GetListTab() == "completed"
 
     if self:IsEntryObtained(id) and onCompletedTab then
-        GearQuestDB.dismissedCompleted = GearQuestDB.dismissedCompleted or {}
-        GearQuestDB.dismissedCompleted[id] = true
+        GearQuestForeverDB.dismissedCompleted = GearQuestForeverDB.dismissedCompleted or {}
+        GearQuestForeverDB.dismissedCompleted[id] = true
     end
 
-    GearQuestDB.hunts[id] = nil
+    GearQuestForeverDB.hunts[id] = nil
 
     if self.selectedHuntId == id and (willDisappear or onCompletedTab) then
         self.selectedHuntId = nil
@@ -1193,10 +1193,10 @@ function GQ.Log:AbandonHunt(id)
 end
 
 function GQ.Log:WipeCharacterData()
-    GearQuestDB.hunts = {}
-    GearQuestDB.obtained = {}
-    GearQuestDB.crafted = {}
-    GearQuestDB.dismissedCompleted = {}
+    GearQuestForeverDB.hunts = {}
+    GearQuestForeverDB.obtained = {}
+    GearQuestForeverDB.crafted = {}
+    GearQuestForeverDB.dismissedCompleted = {}
 
     self.selectedHuntId = nil
     self.selectedEntry = nil
@@ -1227,7 +1227,7 @@ function GQ.Log:CollectAutoCompletionCandidates()
         end
     end
 
-    for id, record in pairs(GearQuestDB.hunts or {}) do
+    for id, record in pairs(GearQuestForeverDB.hunts or {}) do
         if NormalizeHuntStatus(record.status) == "tracked" then
             add(GQ.Data:GetEntryById(id))
         end
@@ -2053,20 +2053,20 @@ function GQ.Log:BindExistingFrame(frame)
 end
 
 function GQ.Log:MigrateObtainedRecords()
-    GearQuestDB.obtained = GearQuestDB.obtained or {}
-    GearQuestDB.crafted = GearQuestDB.crafted or {}
-    GearQuestDB.dismissedCompleted = GearQuestDB.dismissedCompleted or {}
+    GearQuestForeverDB.obtained = GearQuestForeverDB.obtained or {}
+    GearQuestForeverDB.crafted = GearQuestForeverDB.crafted or {}
+    GearQuestForeverDB.dismissedCompleted = GearQuestForeverDB.dismissedCompleted or {}
 
-    for id, record in pairs(GearQuestDB.hunts or {}) do
-        if NormalizeHuntStatus(record.status) == "completed" and not GearQuestDB.obtained[id] then
-            GearQuestDB.obtained[id] = record.completedAt or record.trackedAt or time()
+    for id, record in pairs(GearQuestForeverDB.hunts or {}) do
+        if NormalizeHuntStatus(record.status) == "completed" and not GearQuestForeverDB.obtained[id] then
+            GearQuestForeverDB.obtained[id] = record.completedAt or record.trackedAt or time()
         end
     end
 
-    for id, obtainedAt in pairs(GearQuestDB.obtained) do
+    for id, obtainedAt in pairs(GearQuestForeverDB.obtained) do
         local entry = GQ.Data:GetEntryById(id)
-        if entry and entry.sourceType == "profession" and entry.itemId and not GearQuestDB.crafted[entry.itemId] then
-            GearQuestDB.crafted[entry.itemId] = obtainedAt
+        if entry and entry.sourceType == "profession" and entry.itemId and not GearQuestForeverDB.crafted[entry.itemId] then
+            GearQuestForeverDB.crafted[entry.itemId] = obtainedAt
         end
     end
 end
@@ -2523,8 +2523,8 @@ function GQ.Log:SelectHunt(id, scrollToSelection, entryOverride)
 
     local targetTab = self:IsEntryObtained(id) and "completed" or "active"
     if self:GetListTab() ~= targetTab then
-        GearQuestDB.ui = GearQuestDB.ui or {}
-        GearQuestDB.ui.listTab = targetTab
+        GearQuestForeverDB.ui = GearQuestForeverDB.ui or {}
+        GearQuestForeverDB.ui.listTab = targetTab
     end
 
     self.selectedHuntId = id

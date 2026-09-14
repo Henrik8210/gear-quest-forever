@@ -11,8 +11,22 @@ _G.GearQuest = GQ
 
 GQ.VERSION = "0.1.0-beta.1-forever"
 GQ.ADDON_NAME = ADDON_NAME
+-- WoW Forever: 1–60 Classic+ (no TBC level cap).
+GQ.MAX_PLAYER_LEVEL = 60
 
-GearQuestDB = GearQuestDB or {
+function GQ:ClampPlayerLevel(level)
+    level = tonumber(level) or 1
+    level = math.floor(level)
+    if level < 1 then
+        return 1
+    end
+    if level > self.MAX_PLAYER_LEVEL then
+        return self.MAX_PLAYER_LEVEL
+    end
+    return level
+end
+
+GearQuestForeverDB = GearQuestForeverDB or {
     hunts = {},
     obtained = {},
     crafted = {},
@@ -53,13 +67,13 @@ end
 
 function GQ:PLAYER_LOGIN()
     local ok, err = pcall(function()
-        GearQuestDB.hunts = GearQuestDB.hunts or {}
-        GearQuestDB.obtained = GearQuestDB.obtained or {}
-        GearQuestDB.crafted = GearQuestDB.crafted or {}
-        GearQuestDB.dismissedCompleted = GearQuestDB.dismissedCompleted or {}
-        GearQuestDB.settings = GearQuestDB.settings or {}
-        GearQuestDB.suffixLinks = nil
-        GearQuestDB.suffixLinksVersion = nil
+        GearQuestForeverDB.hunts = GearQuestForeverDB.hunts or {}
+        GearQuestForeverDB.obtained = GearQuestForeverDB.obtained or {}
+        GearQuestForeverDB.crafted = GearQuestForeverDB.crafted or {}
+        GearQuestForeverDB.dismissedCompleted = GearQuestForeverDB.dismissedCompleted or {}
+        GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+        GearQuestForeverDB.suffixLinks = nil
+        GearQuestForeverDB.suffixLinksVersion = nil
         self.Preview:MigrateSettings()
         self.Preview:OnPlayerLogin()
         self.Data:BuildIndex()
@@ -103,9 +117,9 @@ end
 function GQ:GetEffectiveLevel()
     self:SyncLevelOverride()
     if self._playerLevelOverride and not self:IsPreviewEnabled() then
-        return self._playerLevelOverride
+        return self:ClampPlayerLevel(self._playerLevelOverride)
     end
-    return self.Preview:GetEffectiveLevel()
+    return self:ClampPlayerLevel(self.Preview:GetEffectiveLevel())
 end
 
 function GQ:RefreshUI(opts)
@@ -191,9 +205,9 @@ function GQ:RefreshUI(opts)
 end
 
 function GQ:NotifyMilestoneOnce(key, message)
-    GearQuestDB.settings = GearQuestDB.settings or {}
-    GearQuestDB.settings.milestones = GearQuestDB.settings.milestones or {}
-    local milestones = GearQuestDB.settings.milestones
+    GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+    GearQuestForeverDB.settings.milestones = GearQuestForeverDB.settings.milestones or {}
+    local milestones = GearQuestForeverDB.settings.milestones
 
     -- Legacy key from first ring-slot message.
     if key == "ringSlot1" and milestones.ringSlots then
