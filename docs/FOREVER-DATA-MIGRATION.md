@@ -9,7 +9,7 @@ GearQuest Forever targets **WoW Forever 1–60** (Classic+). The fork inherited 
 | **Is the fork set up correctly?** | **Yes** — separate toc/package/SavedVariables, max level 60, L70 curated removed, migration phases documented. |
 | **Is all BiS data Classic-correct?** | **Not yet** — still **TBC Anniversary leveling** (`_generated` 10–69) clamped at runtime to 60; Classic suffixes only where scraped/applied; weights still TBC-derived. |
 
-**Done:** product split, `GQ.MAX_PLAYER_LEVEL`, Classic suffix scrape/apply/check tooling, partial Classic tables in `items_random.classic.json`, pick + **notable** row patches for cached items (e.g. Vice Grips +17 @ 9%).
+**Done:** product split, `GQ.MAX_PLAYER_LEVEL`, phase **2** Classic suffix cache (**610** scrapeable IDs, **100%** Classic tables), apply pass on pick + **notable** rows, **0** stale TBC +20/@7.9% fingerprint rows.
 
 **Not done:** regen **10–59** from Classic-only pool (phase 3); Classic/Forever **StatWeights**; Forever beta item deltas (phase 4). **162** suffix item IDs have no Classic Wowhead random-enchant page (TBC-era greens) — suffix metadata on those rows stays TBC until phase 3 pool regen. Do **not** copy TBC CurseForge ID `1669225` or TBC `CF_API_KEY`.
 
@@ -71,9 +71,45 @@ Fork base: GearQuest **v0.1.1-beta.3-bcc**, not a greenfield Classic regen.
 
 Era fingerprint: **Vice Grips (9640)** — Classic `of Strength` **+17 @ 9.0%**; TBC **+20 @ 7.9%**.
 
+## Phase 2 learnings (Sep 2026)
+
+Operational lessons from finishing the Classic random-enchant pass. Use this before re-scraping or re-applying.
+
+### Wowhead scraping
+
+- **Rate limits (403):** Default to slow scrapes (`GQ_SCRAPE_DELAY_MS=2500`–`3000`). Use `--retry-403`; expect multi-hour full passes on ~772 IDs.
+- **Do not run two scrapes or apply+scrape concurrently** on `items_random.classic.json` — incremental `writeFileSync` races can shrink or corrupt the cache.
+- **Never overwrite good cache rows with empty parses** — rate-limited HTML that parses as “no enchants” must not replace a row that already has `enchants`. The scraper now skips that; `--reprobe-empty` is opt-in only.
+- **Global `--refresh` without `--ids`** once wiped the whole cache (fixed: always load existing file; refresh only per forced id).
+- **404 on Classic Wowhead:** **162** suffix item IDs (mostly TBC green templates, e.g. 24xxx / 31xxx) have no Classic `/random-enchants` page. Store as `noClassicPage` and exclude from the **scrapeable** denominator; do not retry them every sync.
+- **Parser:** Wowhead suffix lines use **q2** and **q3** spans; missing q2 caused false `empty` until fixed.
+
+### Apply / verify
+
+- **Notable rows** (no `score` in the row) must use the same patch regex as picks — an early apply pass left notables on TBC suffix text until fixed.
+- When Classic **suffixRange** differs from TBC, **`suffixId` is stripped** on that row (intentional). `verify-generated-bis.mjs` accepts Classic band spot checks (e.g. 6570, 9775) without `suffixId`.
+- **`suffixId` coverage** in generated data will stay **below** the old 95% bundle target until phase 3 regen or in-client re-verification — not a phase 2 failure by itself.
+- **`apply-classic-random-enchants.mjs`** builds/refreshes `items_random.tbc.json` for score deltas; keep it with the Classic cache in git.
+
+### Pipeline / CI
+
+- **`classic-suffix-sync.mjs --phase2-gate`:** Phase 2 “done” = **≥80% of scrapeable** suffix IDs with Classic tables (not raw 772 if 404s are marked). Sep 2026 result: **610 / 610 scrapeable (100%)**, **79%** of all 772 IDs.
+- **`check-era-classic.mjs`** may hit a Node **UV_HANDLE_CLOSING** assertion on Windows after live fetch; sync treats era check as non-fatal. Prefer cache-only checks when Wowhead is rate-limited.
+- **`prune-classic-cache.mjs`:** Only when intentionally dropping bad empty rows before a refetch — never prune rows with `enchants`.
+
+### Outstanding after phase 2 (not blockers for phase 3 planning)
+
+| Item | Notes |
+|------|--------|
+| **162 suffix rows** | Still TBC suffix metadata in `_generated` until phase 3 removes/remaps those item IDs. |
+| **BiS pool / levels** | Generated picks still **10–69 TBC** pool, runtime cap **60** — phase 3. |
+| **Stat weights** | Still TBC-derived JSON in `_generated` — phase 3. |
+| **Forever client** | Interface version, tooltips, new items — phase 4. |
+| **Push hygiene** | After scrape/apply, commit **cache + generated Lua + scripts** together (see repo note above). |
+
 ## Phase 3 — Classic item pool regen (not started)
 
-When `count-stale-tbc-suffix-rows.mjs` stays at **0** and `items_random.classic.json` covers the ~772 suffix-item IDs:
+Prerequisites: `count-stale-tbc-suffix-rows.mjs` at **0** (met) and phase 2 scrapeable coverage gate (met). Then:
 
 1. Rebuild item stats/sources from **Classic** Wowhead (not wowsims-tbc).
 2. Filter to Classic 1.12 item ID set (+ Forever additions later).
