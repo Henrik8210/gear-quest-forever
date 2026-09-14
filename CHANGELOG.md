@@ -14,6 +14,12 @@ Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3
 
 - Game / CurseForge folder **`GearQuestForever`** (`GearQuestForever.toc`); saved variables **`GearQuestForeverDB`** so it can sit beside TBC **`GearQuest`** on the same client.
 
+### Data (Forever migration phase 3 — complete)
+
+- Filtered generated picks to a Classic-era pool, then re-scored **all nine classes** in-repo via `pipeline/scripts/score.py` (Classic item pool, Classic suffixes, cap 60).
+- Paladin/Warrior Alliance 1–9 stays curated; Horde 1–9 and every other class’s Early 1–9 are generated.
+- **57,202** generated rows (was 67,033 TBC; 56,576 after the filter slice). Stat weights are still TBC-derived — retune on the Forever client ([docs/FOREVER-DATA-MIGRATION.md](docs/FOREVER-DATA-MIGRATION.md#stat-weights-tbc-model--forever-client)).
+
 ### Data (Forever migration phase 2 — complete)
 
 - Classic Wowhead random-enchant scrape/apply pipeline (`classic-suffix-sync.mjs --retry-403 --phase2-gate`).

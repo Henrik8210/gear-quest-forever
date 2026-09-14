@@ -7,11 +7,11 @@ GearQuest Forever targets **WoW Forever 1–60** (Classic+). The fork inherited 
 | Question | Answer |
 |----------|--------|
 | **Is the fork set up correctly?** | **Yes** — separate toc/package/SavedVariables, max level 60, L70 curated removed, migration phases documented. |
-| **Is all BiS data Classic-correct?** | **Not yet** — still **TBC Anniversary leveling** (`_generated` 10–69) clamped at runtime to 60; Classic suffixes only where scraped/applied; weights still TBC-derived. |
+| **Is all BiS data Classic-correct?** | **Mostly** — all nine classes were re-scored on the Classic item pool (cap 60, Classic suffixes). Stat **weights** are still the TBC model. Forever-only item deltas are phase 4. |
 
-**Done:** product split, `GQ.MAX_PLAYER_LEVEL`, phase **2** Classic suffix cache (**610** scrapeable IDs, **100%** Classic tables), apply pass on pick + **notable** rows, **0** stale TBC +20/@7.9% fingerprint rows.
+**Done:** product split, `GQ.MAX_PLAYER_LEVEL`, phase **2** Classic suffix cache, phase **3** Classic `score.py` regen for all classes. **0** stale TBC +20/@7.9% fingerprint rows.
 
-**Not done:** regen **10–59** from Classic-only pool (phase 3); Classic/Forever **StatWeights**; Forever beta item deltas (phase 4). **162** suffix item IDs have no Classic Wowhead random-enchant page (TBC-era greens) — suffix metadata on those rows stays TBC until phase 3 pool regen. Do **not** copy TBC CurseForge ID `1669225` or TBC `CF_API_KEY`.
+**Not done:** Classic/Forever **StatWeights**; Forever beta item deltas (phase 4). Do **not** copy TBC CurseForge ID `1669225` or TBC `CF_API_KEY`.
 
 **Repo:** commit `scripts/`, `GearQuest/_generated/data/items_random.classic.json`, generated Lua patches, and docs together so another clone sees the same state — cache and generated files must stay in sync.
 
@@ -21,7 +21,7 @@ Fork base: GearQuest **v0.1.1-beta.3-bcc**, not a greenfield Classic regen.
 |-------|--------|--------|
 | **1** | Product scope: max level **60**, remove TBC **level 70** curated data, clamp preview/simulate | **Done** |
 | **2** | Random green suffix tables: Classic-era scrapes (not TBC R34) | **Done** — `count-suffix-coverage.mjs` **≥80% of scrapeable** IDs (Classic Wowhead 404 rows excluded via `noClassicPage`; gate: `--phase2-gate`) |
-| **3** | Regenerate 10–59 picks: Classic-only item pool + revised stat weights | **Next** — requires external `score.py` / pipeline (not in repo); see § Phase 3 |
+| **3** | Classic item pool: strip TBC/Outland IDs, cap generated bands at 60, then full re-score | **Done** — all classes re-scored via `pipeline/` (weights still TBC-derived) |
 | **4** | Forever delta: beta tooltips, retuned item IDs, new quests/items | After beta client |
 | **5** | Tag rows `forever-verified` vs `classic-assumption` as needed | Ongoing |
 
@@ -29,7 +29,7 @@ Fork base: GearQuest **v0.1.1-beta.3-bcc**, not a greenfield Classic regen.
 
 - `GQ.MAX_PLAYER_LEVEL = 60` in `Core.lua`; `/gq level` and the simulate panel cap at 60.
 - ~1,200 TBC Phase 3 (BT/Hyjal) entries removed from `GearQuest/Data.lua`.
-- Generated pipeline still covers **10–69** (TBC-era pool until phase 3); level **60** guide rows and early curated bands remain.
+- Generated lists are **10–60** Classic-pool `score.py` output; level **60** guide rows and early curated bands remain.
 - TBC level-70 import scripts (`import-atlasloot-p3-bis.mjs`, `merge-all-p3-into-data.mjs`, etc.) are **legacy** for this repo — do not re-run into `Data.lua`.
 
 ## Phase 2 — Classic random enchants (workflow)
@@ -97,25 +97,66 @@ Operational lessons from finishing the Classic random-enchant pass. Use this bef
 - **`check-era-classic.mjs`** may hit a Node **UV_HANDLE_CLOSING** assertion on Windows after live fetch; sync treats era check as non-fatal. Prefer cache-only checks when Wowhead is rate-limited.
 - **`prune-classic-cache.mjs`:** Only when intentionally dropping bad empty rows before a refetch — never prune rows with `enchants`.
 
-### Outstanding after phase 2 (not blockers for phase 3 planning)
+### Outstanding after phase 3 regen
 
 | Item | Notes |
 |------|--------|
-| **162 suffix rows** | Still TBC suffix metadata in `_generated` until phase 3 removes/remaps those item IDs. |
-| **BiS pool / levels** | Generated picks still **10–69 TBC** pool, runtime cap **60** — phase 3. |
-| **Stat weights** | Still TBC-derived JSON in `_generated` — phase 3. |
-| **Forever client** | Interface version, tooltips, new items — phase 4. |
-| **Push hygiene** | After scrape/apply, commit **cache + generated Lua + scripts** together (see repo note above). |
+| **Stat weights** | Still TBC-derived in `pipeline/data/weights.json`. See [Stat weights](#stat-weights-tbc-model--forever-client) below. Do **not** invent a full Forever scale until the beta client is in hand. |
+| **Forever client** | Interface version, tooltips, new/retuned items — phase 4. |
+| **Push hygiene** | After regen, commit **generated Lua + pipeline inputs + scripts** together. |
 
-## Phase 3 — Classic item pool regen (not started)
+## Phase 3 — Classic item pool regen (done)
 
-Prerequisites: `count-stale-tbc-suffix-rows.mjs` at **0** (met) and phase 2 scrapeable coverage gate (met). Then:
+Prerequisites: `count-stale-tbc-suffix-rows.mjs` at **0** (met) and phase 2 scrapeable coverage gate (met).
 
-1. Rebuild item stats/sources from **Classic** Wowhead (not wowsims-tbc).
-2. Filter to Classic 1.12 item ID set (+ Forever additions later).
-3. Re-run ranking (`score.py` / pipeline — lives outside this repo today) with **Classic** stat weights.
-4. Re-emit `GearQuest/_generated/*.generated.lua` and run `verify-generated-bis.mjs`.
+### Pipeline in this repo (Sep 2026)
 
-Until then, generated **10–69 TBC picks** remain the BiS database, capped at **60** in the addon.
+The TBC authoring tree is now `pipeline/` (ignored by CurseForge). Operational
+guide for beta item deltas: [../pipeline/docs/FOREVER-SCORING.md](../pipeline/docs/FOREVER-SCORING.md).
 
-See also [DATA_RULES.md](./DATA_RULES.md), [SUFFIX-RANDOM-ENCHANT.md](./SUFFIX-RANDOM-ENCHANT.md), and [PROJECT_BRIEF.md](./PROJECT_BRIEF.md).
+All nine classes were re-scored with `score.py` (Classic `classic_item_ids.json` pool,
+Classic `items_random.json`, bands **10–60**). Paladin/Warrior Alliance 1–9 stays
+curated in `Data.lua`; their Horde 1–9 files are generated. Other classes have
+both-faction Early 1–9 files.
+
+Sep 2026 counts: **57,202** generated + **287** curated = **57,489**. Relic/libram
+slots stay thin (few Classic relics have stats).
+
+The older filter (`filter-generated-classic.mjs`) is only for emergency rollback;
+do not re-run it over a Classic regen.
+
+**Honest limit:** rank order is a real Classic-pool top 3, but **stat weights** are
+still the TBC model (expertise, armour pen, TBC paladin seals). Forever-only items
+are phase 4.
+
+### Still required after phase 3
+
+1. **Stat weights** — see below. Optional Classic zero-out now; real Forever scale after the beta client.
+2. Phase 4: Forever-only item ids and tooltip retunes as the beta client shows them.
+
+Keep the pipeline **out of the CurseForge addon zip** (`.pkgmeta` already ignores `pipeline/`).
+
+## Stat weights (TBC model → Forever client)
+
+`pipeline/data/weights.json` is still the **TBC Anniversary** scale. Phase 3 re-scored the **item pool** (Classic IDs, Classic suffixes, cap 60) but did not retune what a point of each stat is worth. Level **60** rows mostly come from Wowhead Classic guides, so bad weights hurt **10–59** the most.
+
+What is TBC-specific today (not just “a bit off”):
+
+- **Expertise** and **armor penetration** are non-zero on melee specs. Classic 1–60 does not have those ratings, so leftover TBC rating lines in `items.json` can still steal ranks.
+- Paladin **`dpsWeight` 4.31** was derived from TBC seal/judgement math (including Seal of Blood). Classic seals differ.
+- Hunter ranged weight includes **TBC Steady Shot** scaling off weapon damage.
+
+**Do this on the Forever client (phase 4), not from memory:**
+
+1. After first login, note whether rating stats exist, how seals/shots/talents work, and any Forever-only stats.
+2. Edit `pipeline/data/weights.json` (and `score.py` comments such as `DPS_PER_STR` if seal math changes).
+3. Re-run `score.py` / `payload.py` / the 1–9 emitter per affected class; copy Lua into `GearQuest/_generated/`.
+4. Run `node scripts/verify-generated-bis.mjs`.
+
+Forever is Classic+, so do **not** blindly paste vanilla 1.12 weights if the combat model moved.
+
+**Optional before beta** (cheap Classic cleanup, redo after Forever): set `expertise` and `armorPen` to `0` on every spec, and stop using TBC-only weapon formulas. Do not invent a full Forever scale until you have played the client.
+
+After a Classic/`score.py` regen, do **not** run `apply-classic-random-enchants.mjs` — that patches TBC-scored Lua against Classic tables. Suffixes are already Classic in `pipeline/data/items_random.json`.
+
+See also [FOREVER-SCORING.md](../pipeline/docs/FOREVER-SCORING.md), [DATA_RULES.md](./DATA_RULES.md), [SUFFIX-RANDOM-ENCHANT.md](./SUFFIX-RANDOM-ENCHANT.md), and [PROJECT_BRIEF.md](./PROJECT_BRIEF.md).

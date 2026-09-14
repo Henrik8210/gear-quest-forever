@@ -158,8 +158,8 @@ const SOURCES = [
   },
 ];
 
-const TARGET_TOTAL = 67320;
-const TARGET_GENERATED = 67033;
+const TARGET_TOTAL = 57489;
+const TARGET_GENERATED = 57202;
 const TARGET_CURATED = TARGET_TOTAL - TARGET_GENERATED;
 
 const dataLua = read("Data.lua");
@@ -304,8 +304,8 @@ if (dupes.length > 0) {
   console.error("\nFAIL: duplicate generated ids");
   exitCode = 1;
 }
-if (maxLevel > 69) {
-  console.error("\nFAIL: generated picks exceed level 69");
+if (maxLevel > 60) {
+  console.error("\nFAIL: generated picks exceed level 60");
   exitCode = 1;
 }
 if (druidEarlyRows.filter((line) => !line.includes('faction="')).length > 0) {
@@ -349,7 +349,7 @@ const paladinBody = extractTableBody(read("_generated/Data.Paladin.generated.lua
 const sash6570Holy = paladinBody.match(/\{6570,"Waist",17,17,3,"holy"[^}]+\}/);
 console.log("\n=== Suffix id spot checks ===");
 const sash6570Classic =
-  sash6570Holy?.[0].includes('suffixRange="+11-13 Healing Spells"') &&
+  sash6570Holy?.[0].includes('suffixRange="+11-13 Healing') &&
   !sash6570Holy[0].includes("suffixId=");
 if (!sash6570Holy || (!sash6570Holy[0].includes("suffixId=2032") && !sash6570Classic)) {
   console.error(
@@ -403,7 +403,7 @@ if (withSuffixId / suffixRows < 0.95) {
 const druidText = read("_generated/Data.Druid.generated.lua");
 const bandit9775 = druidText.match(/\{9775,"Waist",14,14[^}]*suffix="of Healing"[^}]+\}/);
 const bandit9775Classic =
-  bandit9775?.[0].includes('suffixRange="+9-11 Healing Spells"') && !bandit9775[0].includes("suffixId=");
+  bandit9775?.[0].includes('suffixRange="+9-11 Healing') && !bandit9775[0].includes("suffixId=");
 if (bandit9775 && !bandit9775[0].includes("suffixId=2031") && !bandit9775Classic) {
   console.error(
     "FAIL: Bandit Cinch 9775 @14 must carry suffixId=2031 or Classic +9-11 Healing (suffixId omitted when range changed)",

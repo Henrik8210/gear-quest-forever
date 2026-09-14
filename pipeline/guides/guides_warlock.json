@@ -1,0 +1,1706 @@
+{
+ "affliction": {
+  "Head": [
+   [
+    1,
+    "Plagueheart Circlet"
+   ],
+   [
+    3,
+    "Doomcaller's Circlet"
+   ],
+   [
+    3,
+    "Mish'undare, Circlet of the Mind Flayer"
+   ],
+   [
+    4,
+    "Preceptor's Hat"
+   ],
+   [
+    4,
+    "Spellweaver's Turban"
+   ],
+   [
+    4,
+    "The Hexxer's Cover"
+   ],
+   [
+    4,
+    "Bloodvine Goggles"
+   ],
+   [
+    4,
+    "Field Marshal's Coronal"
+   ],
+   [
+    4,
+    "Warlord's Dreadweave Hood"
+   ],
+   [
+    4,
+    "Deathmist Mask"
+   ],
+   [
+    4,
+    "Champion's Dreadweave Cowl"
+   ],
+   [
+    4,
+    "Lieutenant Commander's Dreadweave Cowl"
+   ]
+  ],
+  "Shoulder": [
+   [
+    1,
+    "Plagueheart Shoulderpads"
+   ],
+   [
+    3,
+    "Rime Covered Mantle"
+   ],
+   [
+    3,
+    "Doomcaller's Mantle"
+   ],
+   [
+    3,
+    "Mantle of the Blackwing Cabal"
+   ],
+   [
+    3,
+    "Field Marshal's Dreadweave Shoulders"
+   ],
+   [
+    3,
+    "Warlord's Dreadweave Mantle"
+   ],
+   [
+    5,
+    "Lieutenant Commander's Dreadweave Spaulders"
+   ],
+   [
+    5,
+    "Champion's Dreadweave Spaulders"
+   ],
+   [
+    5,
+    "Nemesis Spaulders"
+   ],
+   [
+    5,
+    "Zandalar Demoniac's Mantle"
+   ]
+  ],
+  "Back": [
+   [
+    1,
+    "Cloak of the Necropolis"
+   ],
+   [
+    3,
+    "Cloak of the Devoured"
+   ],
+   [
+    3,
+    "Cloak of Consumption"
+   ],
+   [
+    4,
+    "Cloak of the Brood Lord"
+   ],
+   [
+    4,
+    "Veil of Eclipse"
+   ],
+   [
+    5,
+    "Cloak of the Hakkari Worshippers"
+   ],
+   [
+    5,
+    "Crystalline Threaded Cape"
+   ]
+  ],
+  "Chest": [
+   [
+    1,
+    "Plagueheart Robe"
+   ],
+   [
+    3,
+    "Bloodvine Vest"
+   ],
+   [
+    3,
+    "Crystal Webbed Robe"
+   ],
+   [
+    3,
+    "Garb of Royal Ascension"
+   ],
+   [
+    4,
+    "Doomcaller's Robes"
+   ],
+   [
+    4,
+    "Robe of Volatile Power"
+   ],
+   [
+    4,
+    "Vestments of the Shifting Sands"
+   ],
+   [
+    4,
+    "Jade Inlaid Vestments"
+   ],
+   [
+    4,
+    "Nemesis Robes"
+   ],
+   [
+    5,
+    "Robe of the Void"
+   ],
+   [
+    5,
+    "Field Marshal's Dreadweave Robe"
+   ],
+   [
+    5,
+    "Warlord's Dreadweave Robe"
+   ],
+   [
+    5,
+    "Zandalar Demoniac's Robe"
+   ]
+  ],
+  "Wrist": [
+   [
+    1,
+    "Bracers of Arcane Accuracy"
+   ],
+   [
+    3,
+    "Rockfury Bracers"
+   ],
+   [
+    3,
+    "The Soul Harvester's Bindings"
+   ],
+   [
+    4,
+    "Burrower Bracers"
+   ],
+   [
+    4,
+    "Plagueheart Bindings"
+   ],
+   [
+    4,
+    "Shackles of the Unscarred"
+   ],
+   [
+    4,
+    "Zandalar Demoniac's Wraps"
+   ]
+  ],
+  "Hands": [
+   [
+    1,
+    "Dark Storm Gauntlets"
+   ],
+   [
+    3,
+    "Plagueheart Gloves"
+   ],
+   [
+    3,
+    "Ebony Flame Gloves"
+   ],
+   [
+    4,
+    "Bloodtinged Gloves"
+   ],
+   [
+    4,
+    "Gloves of Delusional Power"
+   ],
+   [
+    4,
+    "Deathmist Wraps"
+   ],
+   [
+    4,
+    "Nemesis Gloves"
+   ],
+   [
+    4,
+    "Marshal's Dreadweave Gloves"
+   ],
+   [
+    4,
+    "General's Dreadweave Gloves"
+   ],
+   [
+    5,
+    "Hands of Power"
+   ],
+   [
+    5,
+    "Gloves of Spell Mastery"
+   ],
+   [
+    5,
+    "Felheart Gloves"
+   ]
+  ],
+  "Waist": [
+   [
+    1,
+    "Eyestalk Waist Cord"
+   ],
+   [
+    3,
+    "Plagueheart Belt"
+   ],
+   [
+    3,
+    "Angelista's Grasp"
+   ],
+   [
+    4,
+    "Mana Igniting Cord"
+   ],
+   [
+    5,
+    "Belt of Untapped Power"
+   ],
+   [
+    5,
+    "Ban'thok Sash"
+   ],
+   [
+    5,
+    "Highlander's Cloth Girdle"
+   ],
+   [
+    5,
+    "Defiler's Cloth Girdle"
+   ],
+   [
+    6,
+    "Firemaw's Clutch"
+   ],
+   [
+    6,
+    "Nemesis Belt"
+   ]
+  ],
+  "Legs": [
+   [
+    1,
+    "Leggings of Polarity"
+   ],
+   [
+    3,
+    "Plagueheart Leggings"
+   ],
+   [
+    3,
+    "Leggings of the Black Blizzard"
+   ],
+   [
+    3,
+    "Doomcaller's Trousers"
+   ],
+   [
+    4,
+    "Bloodvine Leggings"
+   ],
+   [
+    4,
+    "Fel Infused Leggings"
+   ],
+   [
+    4,
+    "Marshal's Dreadweave Leggings"
+   ],
+   [
+    4,
+    "General's Dreadweave Pants"
+   ]
+  ],
+  "Feet": [
+   [
+    1,
+    "Plagueheart Sandals"
+   ],
+   [
+    3,
+    "Bloodvine Boots"
+   ],
+   [
+    4,
+    "Boots of Epiphany"
+   ],
+   [
+    4,
+    "Snowblind Shoes"
+   ],
+   [
+    4,
+    "Doomcaller's Footwraps"
+   ]
+  ],
+  "Neck": [
+   [
+    1,
+    "Gem of Trapped Innocents"
+   ],
+   [
+    1,
+    "Amulet of Vek'nilash"
+   ],
+   [
+    3,
+    "Choker of the Fire Lord"
+   ],
+   [
+    4,
+    "Malice Stone Pendant"
+   ],
+   [
+    4,
+    "Nacreous Shell Necklace"
+   ],
+   [
+    4,
+    "Charm of the Shifting Sands"
+   ]
+  ],
+  "Finger": [
+   [
+    1,
+    "Ring of the Fallen God"
+   ],
+   [
+    1,
+    "Band of the Inevitable"
+   ],
+   [
+    3,
+    "Seal of the Damned"
+   ],
+   [
+    3,
+    "Band of Forced Concentration"
+   ],
+   [
+    3,
+    "Ring of Unspoken Names"
+   ]
+  ],
+  "Trinket": [
+   [
+    1,
+    "The Restrained Essence of Sapphiron"
+   ],
+   [
+    1,
+    "Neltharion's Tear"
+   ],
+   [
+    1,
+    "Talisman of Ephemeral Power"
+   ],
+   [
+    2,
+    "Mark of the Champion"
+   ],
+   [
+    3,
+    "Eye of Moam"
+   ],
+   [
+    5,
+    "Rune of the Dawn"
+   ]
+  ],
+  "MainHand": [
+   [
+    1,
+    "Wraith Blade"
+   ],
+   [
+    1,
+    "Atiesh, Greatstaff of the Guardian"
+   ],
+   [
+    3,
+    "Midnight Haze"
+   ],
+   [
+    3,
+    "High Warlord's Spellblade"
+   ],
+   [
+    3,
+    "Sharpened Silithid Femur"
+   ],
+   [
+    3,
+    "Brimstone Staff"
+   ],
+   [
+    3,
+    "Soulseeker"
+   ],
+   [
+    3,
+    "Blessed Qiraji Acolyte Staff"
+   ],
+   [
+    4,
+    "Azuresong Mageblade"
+   ],
+   [
+    4,
+    "Fang of the Mystics"
+   ],
+   [
+    4,
+    "Claw of Chromaggus"
+   ],
+   [
+    4,
+    "Staff of the Shadow Flame"
+   ],
+   [
+    4,
+    "Staff of the Ruins"
+   ],
+   [
+    5,
+    "Bloodcaller"
+   ],
+   [
+    5,
+    "Shadow Wing Focus Staff"
+   ],
+   [
+    5,
+    "Ironbark Staff"
+   ],
+   [
+    5,
+    "Staff of Dominance"
+   ],
+   [
+    5,
+    "Jin'do's Judgement"
+   ],
+   [
+    5,
+    "Amberseal Keeper"
+   ]
+  ],
+  "SecondaryHand": [
+   [
+    1,
+    "Sapphiron's Left Eye"
+   ],
+   [
+    3,
+    "Royal Scepter of Vek'lor"
+   ],
+   [
+    5,
+    "Grand Marshal's Tome of Power"
+   ],
+   [
+    5,
+    "High Warlord's Tome of Destruction"
+   ],
+   [
+    6,
+    "Jin'do's Bag of Whammies"
+   ],
+   [
+    6,
+    "Scepter of Interminable Focus"
+   ],
+   [
+    6,
+    "Master Dragonslayer's Orb"
+   ],
+   [
+    6,
+    "Talon of Furious Concentration"
+   ]
+  ],
+  "Ranged": [
+   [
+    1,
+    "Wand of Fates"
+   ],
+   [
+    3,
+    "Doomfinger"
+   ],
+   [
+    3,
+    "Wand of Qiraji Nobility"
+   ],
+   [
+    3,
+    "Touch of Chaos"
+   ],
+   [
+    4,
+    "Skul's Ghastly Touch"
+   ],
+   [
+    5,
+    "Bonecreeper Stylus"
+   ]
+  ]
+ },
+ "demonology": {
+  "Head": [
+   [
+    1,
+    "Plagueheart Circlet"
+   ],
+   [
+    3,
+    "Doomcaller's Circlet"
+   ],
+   [
+    3,
+    "Mish'undare, Circlet of the Mind Flayer"
+   ],
+   [
+    4,
+    "Preceptor's Hat"
+   ],
+   [
+    4,
+    "Spellweaver's Turban"
+   ],
+   [
+    4,
+    "The Hexxer's Cover"
+   ],
+   [
+    4,
+    "Bloodvine Goggles"
+   ],
+   [
+    4,
+    "Field Marshal's Coronal"
+   ],
+   [
+    4,
+    "Warlord's Dreadweave Hood"
+   ],
+   [
+    4,
+    "Deathmist Mask"
+   ],
+   [
+    4,
+    "Champion's Dreadweave Cowl"
+   ],
+   [
+    4,
+    "Lieutenant Commander's Dreadweave Cowl"
+   ]
+  ],
+  "Shoulder": [
+   [
+    1,
+    "Plagueheart Shoulderpads"
+   ],
+   [
+    3,
+    "Rime Covered Mantle"
+   ],
+   [
+    3,
+    "Doomcaller's Mantle"
+   ],
+   [
+    3,
+    "Mantle of the Blackwing Cabal"
+   ],
+   [
+    3,
+    "Field Marshal's Dreadweave Shoulders"
+   ],
+   [
+    3,
+    "Warlord's Dreadweave Mantle"
+   ],
+   [
+    5,
+    "Lieutenant Commander's Dreadweave Spaulders"
+   ],
+   [
+    5,
+    "Champion's Dreadweave Spaulders"
+   ],
+   [
+    5,
+    "Nemesis Spaulders"
+   ],
+   [
+    5,
+    "Zandalar Demoniac's Mantle"
+   ]
+  ],
+  "Back": [
+   [
+    1,
+    "Cloak of the Necropolis"
+   ],
+   [
+    3,
+    "Cloak of the Devoured"
+   ],
+   [
+    3,
+    "Cloak of Consumption"
+   ],
+   [
+    4,
+    "Cloak of the Brood Lord"
+   ],
+   [
+    4,
+    "Veil of Eclipse"
+   ],
+   [
+    5,
+    "Cloak of the Hakkari Worshippers"
+   ],
+   [
+    5,
+    "Crystalline Threaded Cape"
+   ]
+  ],
+  "Chest": [
+   [
+    1,
+    "Plagueheart Robe"
+   ],
+   [
+    3,
+    "Bloodvine Vest"
+   ],
+   [
+    3,
+    "Crystal Webbed Robe"
+   ],
+   [
+    3,
+    "Garb of Royal Ascension"
+   ],
+   [
+    4,
+    "Doomcaller's Robes"
+   ],
+   [
+    4,
+    "Robe of Volatile Power"
+   ],
+   [
+    4,
+    "Vestments of the Shifting Sands"
+   ],
+   [
+    4,
+    "Jade Inlaid Vestments"
+   ],
+   [
+    4,
+    "Nemesis Robes"
+   ],
+   [
+    5,
+    "Robe of the Void"
+   ],
+   [
+    5,
+    "Field Marshal's Dreadweave Robe"
+   ],
+   [
+    5,
+    "Warlord's Dreadweave Robe"
+   ],
+   [
+    5,
+    "Zandalar Demoniac's Robe"
+   ]
+  ],
+  "Wrist": [
+   [
+    1,
+    "Bracers of Arcane Accuracy"
+   ],
+   [
+    3,
+    "Rockfury Bracers"
+   ],
+   [
+    3,
+    "The Soul Harvester's Bindings"
+   ],
+   [
+    4,
+    "Burrower Bracers"
+   ],
+   [
+    4,
+    "Plagueheart Bindings"
+   ],
+   [
+    4,
+    "Shackles of the Unscarred"
+   ],
+   [
+    4,
+    "Zandalar Demoniac's Wraps"
+   ]
+  ],
+  "Hands": [
+   [
+    1,
+    "Dark Storm Gauntlets"
+   ],
+   [
+    3,
+    "Plagueheart Gloves"
+   ],
+   [
+    3,
+    "Ebony Flame Gloves"
+   ],
+   [
+    4,
+    "Bloodtinged Gloves"
+   ],
+   [
+    4,
+    "Gloves of Delusional Power"
+   ],
+   [
+    4,
+    "Deathmist Wraps"
+   ],
+   [
+    4,
+    "Nemesis Gloves"
+   ],
+   [
+    4,
+    "Marshal's Dreadweave Gloves"
+   ],
+   [
+    4,
+    "General's Dreadweave Gloves"
+   ],
+   [
+    5,
+    "Hands of Power"
+   ],
+   [
+    5,
+    "Gloves of Spell Mastery"
+   ],
+   [
+    5,
+    "Felheart Gloves"
+   ]
+  ],
+  "Waist": [
+   [
+    1,
+    "Eyestalk Waist Cord"
+   ],
+   [
+    3,
+    "Plagueheart Belt"
+   ],
+   [
+    3,
+    "Angelista's Grasp"
+   ],
+   [
+    4,
+    "Mana Igniting Cord"
+   ],
+   [
+    5,
+    "Belt of Untapped Power"
+   ],
+   [
+    5,
+    "Ban'thok Sash"
+   ],
+   [
+    5,
+    "Highlander's Cloth Girdle"
+   ],
+   [
+    5,
+    "Defiler's Cloth Girdle"
+   ],
+   [
+    6,
+    "Firemaw's Clutch"
+   ],
+   [
+    6,
+    "Nemesis Belt"
+   ]
+  ],
+  "Legs": [
+   [
+    1,
+    "Leggings of Polarity"
+   ],
+   [
+    3,
+    "Plagueheart Leggings"
+   ],
+   [
+    3,
+    "Leggings of the Black Blizzard"
+   ],
+   [
+    3,
+    "Doomcaller's Trousers"
+   ],
+   [
+    4,
+    "Bloodvine Leggings"
+   ],
+   [
+    4,
+    "Fel Infused Leggings"
+   ],
+   [
+    4,
+    "Marshal's Dreadweave Leggings"
+   ],
+   [
+    4,
+    "General's Dreadweave Pants"
+   ]
+  ],
+  "Feet": [
+   [
+    1,
+    "Plagueheart Sandals"
+   ],
+   [
+    3,
+    "Bloodvine Boots"
+   ],
+   [
+    4,
+    "Boots of Epiphany"
+   ],
+   [
+    4,
+    "Snowblind Shoes"
+   ],
+   [
+    4,
+    "Doomcaller's Footwraps"
+   ]
+  ],
+  "Neck": [
+   [
+    1,
+    "Gem of Trapped Innocents"
+   ],
+   [
+    1,
+    "Amulet of Vek'nilash"
+   ],
+   [
+    3,
+    "Choker of the Fire Lord"
+   ],
+   [
+    4,
+    "Malice Stone Pendant"
+   ],
+   [
+    4,
+    "Nacreous Shell Necklace"
+   ],
+   [
+    4,
+    "Charm of the Shifting Sands"
+   ]
+  ],
+  "Finger": [
+   [
+    1,
+    "Ring of the Fallen God"
+   ],
+   [
+    1,
+    "Band of the Inevitable"
+   ],
+   [
+    3,
+    "Seal of the Damned"
+   ],
+   [
+    3,
+    "Band of Forced Concentration"
+   ],
+   [
+    3,
+    "Ring of Unspoken Names"
+   ]
+  ],
+  "Trinket": [
+   [
+    1,
+    "The Restrained Essence of Sapphiron"
+   ],
+   [
+    1,
+    "Neltharion's Tear"
+   ],
+   [
+    1,
+    "Talisman of Ephemeral Power"
+   ],
+   [
+    2,
+    "Mark of the Champion"
+   ],
+   [
+    3,
+    "Eye of Moam"
+   ],
+   [
+    5,
+    "Rune of the Dawn"
+   ]
+  ],
+  "MainHand": [
+   [
+    1,
+    "Wraith Blade"
+   ],
+   [
+    1,
+    "Atiesh, Greatstaff of the Guardian"
+   ],
+   [
+    3,
+    "Midnight Haze"
+   ],
+   [
+    3,
+    "High Warlord's Spellblade"
+   ],
+   [
+    3,
+    "Sharpened Silithid Femur"
+   ],
+   [
+    3,
+    "Brimstone Staff"
+   ],
+   [
+    3,
+    "Soulseeker"
+   ],
+   [
+    3,
+    "Blessed Qiraji Acolyte Staff"
+   ],
+   [
+    4,
+    "Azuresong Mageblade"
+   ],
+   [
+    4,
+    "Fang of the Mystics"
+   ],
+   [
+    4,
+    "Claw of Chromaggus"
+   ],
+   [
+    4,
+    "Staff of the Shadow Flame"
+   ],
+   [
+    4,
+    "Staff of the Ruins"
+   ],
+   [
+    5,
+    "Bloodcaller"
+   ],
+   [
+    5,
+    "Shadow Wing Focus Staff"
+   ],
+   [
+    5,
+    "Ironbark Staff"
+   ],
+   [
+    5,
+    "Staff of Dominance"
+   ],
+   [
+    5,
+    "Jin'do's Judgement"
+   ],
+   [
+    5,
+    "Amberseal Keeper"
+   ]
+  ],
+  "SecondaryHand": [
+   [
+    1,
+    "Sapphiron's Left Eye"
+   ],
+   [
+    3,
+    "Royal Scepter of Vek'lor"
+   ],
+   [
+    5,
+    "Grand Marshal's Tome of Power"
+   ],
+   [
+    5,
+    "High Warlord's Tome of Destruction"
+   ],
+   [
+    6,
+    "Jin'do's Bag of Whammies"
+   ],
+   [
+    6,
+    "Scepter of Interminable Focus"
+   ],
+   [
+    6,
+    "Master Dragonslayer's Orb"
+   ],
+   [
+    6,
+    "Talon of Furious Concentration"
+   ]
+  ],
+  "Ranged": [
+   [
+    1,
+    "Wand of Fates"
+   ],
+   [
+    3,
+    "Doomfinger"
+   ],
+   [
+    3,
+    "Wand of Qiraji Nobility"
+   ],
+   [
+    3,
+    "Touch of Chaos"
+   ],
+   [
+    4,
+    "Skul's Ghastly Touch"
+   ],
+   [
+    5,
+    "Bonecreeper Stylus"
+   ]
+  ]
+ },
+ "destruction": {
+  "Head": [
+   [
+    1,
+    "Plagueheart Circlet"
+   ],
+   [
+    3,
+    "Doomcaller's Circlet"
+   ],
+   [
+    3,
+    "Mish'undare, Circlet of the Mind Flayer"
+   ],
+   [
+    4,
+    "Preceptor's Hat"
+   ],
+   [
+    4,
+    "Spellweaver's Turban"
+   ],
+   [
+    4,
+    "The Hexxer's Cover"
+   ],
+   [
+    4,
+    "Bloodvine Goggles"
+   ],
+   [
+    4,
+    "Field Marshal's Coronal"
+   ],
+   [
+    4,
+    "Warlord's Dreadweave Hood"
+   ],
+   [
+    4,
+    "Deathmist Mask"
+   ],
+   [
+    4,
+    "Champion's Dreadweave Cowl"
+   ],
+   [
+    4,
+    "Lieutenant Commander's Dreadweave Cowl"
+   ]
+  ],
+  "Shoulder": [
+   [
+    1,
+    "Plagueheart Shoulderpads"
+   ],
+   [
+    3,
+    "Rime Covered Mantle"
+   ],
+   [
+    3,
+    "Doomcaller's Mantle"
+   ],
+   [
+    3,
+    "Mantle of the Blackwing Cabal"
+   ],
+   [
+    3,
+    "Field Marshal's Dreadweave Shoulders"
+   ],
+   [
+    3,
+    "Warlord's Dreadweave Mantle"
+   ],
+   [
+    5,
+    "Lieutenant Commander's Dreadweave Spaulders"
+   ],
+   [
+    5,
+    "Champion's Dreadweave Spaulders"
+   ],
+   [
+    5,
+    "Nemesis Spaulders"
+   ],
+   [
+    5,
+    "Zandalar Demoniac's Mantle"
+   ]
+  ],
+  "Back": [
+   [
+    1,
+    "Cloak of the Necropolis"
+   ],
+   [
+    3,
+    "Cloak of the Devoured"
+   ],
+   [
+    3,
+    "Cloak of Consumption"
+   ],
+   [
+    4,
+    "Cloak of the Brood Lord"
+   ],
+   [
+    4,
+    "Veil of Eclipse"
+   ],
+   [
+    5,
+    "Cloak of the Hakkari Worshippers"
+   ],
+   [
+    5,
+    "Crystalline Threaded Cape"
+   ]
+  ],
+  "Chest": [
+   [
+    1,
+    "Plagueheart Robe"
+   ],
+   [
+    3,
+    "Bloodvine Vest"
+   ],
+   [
+    3,
+    "Crystal Webbed Robe"
+   ],
+   [
+    3,
+    "Garb of Royal Ascension"
+   ],
+   [
+    4,
+    "Doomcaller's Robes"
+   ],
+   [
+    4,
+    "Robe of Volatile Power"
+   ],
+   [
+    4,
+    "Vestments of the Shifting Sands"
+   ],
+   [
+    4,
+    "Jade Inlaid Vestments"
+   ],
+   [
+    4,
+    "Nemesis Robes"
+   ],
+   [
+    5,
+    "Robe of the Void"
+   ],
+   [
+    5,
+    "Field Marshal's Dreadweave Robe"
+   ],
+   [
+    5,
+    "Warlord's Dreadweave Robe"
+   ],
+   [
+    5,
+    "Zandalar Demoniac's Robe"
+   ]
+  ],
+  "Wrist": [
+   [
+    1,
+    "Bracers of Arcane Accuracy"
+   ],
+   [
+    3,
+    "Rockfury Bracers"
+   ],
+   [
+    3,
+    "The Soul Harvester's Bindings"
+   ],
+   [
+    4,
+    "Burrower Bracers"
+   ],
+   [
+    4,
+    "Plagueheart Bindings"
+   ],
+   [
+    4,
+    "Shackles of the Unscarred"
+   ],
+   [
+    4,
+    "Zandalar Demoniac's Wraps"
+   ]
+  ],
+  "Hands": [
+   [
+    1,
+    "Dark Storm Gauntlets"
+   ],
+   [
+    3,
+    "Plagueheart Gloves"
+   ],
+   [
+    3,
+    "Ebony Flame Gloves"
+   ],
+   [
+    4,
+    "Bloodtinged Gloves"
+   ],
+   [
+    4,
+    "Gloves of Delusional Power"
+   ],
+   [
+    4,
+    "Deathmist Wraps"
+   ],
+   [
+    4,
+    "Nemesis Gloves"
+   ],
+   [
+    4,
+    "Marshal's Dreadweave Gloves"
+   ],
+   [
+    4,
+    "General's Dreadweave Gloves"
+   ],
+   [
+    5,
+    "Hands of Power"
+   ],
+   [
+    5,
+    "Gloves of Spell Mastery"
+   ],
+   [
+    5,
+    "Felheart Gloves"
+   ]
+  ],
+  "Waist": [
+   [
+    1,
+    "Eyestalk Waist Cord"
+   ],
+   [
+    3,
+    "Plagueheart Belt"
+   ],
+   [
+    3,
+    "Angelista's Grasp"
+   ],
+   [
+    4,
+    "Mana Igniting Cord"
+   ],
+   [
+    5,
+    "Belt of Untapped Power"
+   ],
+   [
+    5,
+    "Ban'thok Sash"
+   ],
+   [
+    5,
+    "Highlander's Cloth Girdle"
+   ],
+   [
+    5,
+    "Defiler's Cloth Girdle"
+   ],
+   [
+    6,
+    "Firemaw's Clutch"
+   ],
+   [
+    6,
+    "Nemesis Belt"
+   ]
+  ],
+  "Legs": [
+   [
+    1,
+    "Leggings of Polarity"
+   ],
+   [
+    3,
+    "Plagueheart Leggings"
+   ],
+   [
+    3,
+    "Leggings of the Black Blizzard"
+   ],
+   [
+    3,
+    "Doomcaller's Trousers"
+   ],
+   [
+    4,
+    "Bloodvine Leggings"
+   ],
+   [
+    4,
+    "Fel Infused Leggings"
+   ],
+   [
+    4,
+    "Marshal's Dreadweave Leggings"
+   ],
+   [
+    4,
+    "General's Dreadweave Pants"
+   ]
+  ],
+  "Feet": [
+   [
+    1,
+    "Plagueheart Sandals"
+   ],
+   [
+    3,
+    "Bloodvine Boots"
+   ],
+   [
+    4,
+    "Boots of Epiphany"
+   ],
+   [
+    4,
+    "Snowblind Shoes"
+   ],
+   [
+    4,
+    "Doomcaller's Footwraps"
+   ]
+  ],
+  "Neck": [
+   [
+    1,
+    "Gem of Trapped Innocents"
+   ],
+   [
+    1,
+    "Amulet of Vek'nilash"
+   ],
+   [
+    3,
+    "Choker of the Fire Lord"
+   ],
+   [
+    4,
+    "Malice Stone Pendant"
+   ],
+   [
+    4,
+    "Nacreous Shell Necklace"
+   ],
+   [
+    4,
+    "Charm of the Shifting Sands"
+   ]
+  ],
+  "Finger": [
+   [
+    1,
+    "Ring of the Fallen God"
+   ],
+   [
+    1,
+    "Band of the Inevitable"
+   ],
+   [
+    3,
+    "Seal of the Damned"
+   ],
+   [
+    3,
+    "Band of Forced Concentration"
+   ],
+   [
+    3,
+    "Ring of Unspoken Names"
+   ]
+  ],
+  "Trinket": [
+   [
+    1,
+    "The Restrained Essence of Sapphiron"
+   ],
+   [
+    1,
+    "Neltharion's Tear"
+   ],
+   [
+    1,
+    "Talisman of Ephemeral Power"
+   ],
+   [
+    2,
+    "Mark of the Champion"
+   ],
+   [
+    3,
+    "Eye of Moam"
+   ],
+   [
+    5,
+    "Rune of the Dawn"
+   ]
+  ],
+  "MainHand": [
+   [
+    1,
+    "Wraith Blade"
+   ],
+   [
+    1,
+    "Atiesh, Greatstaff of the Guardian"
+   ],
+   [
+    3,
+    "Midnight Haze"
+   ],
+   [
+    3,
+    "High Warlord's Spellblade"
+   ],
+   [
+    3,
+    "Sharpened Silithid Femur"
+   ],
+   [
+    3,
+    "Brimstone Staff"
+   ],
+   [
+    3,
+    "Soulseeker"
+   ],
+   [
+    3,
+    "Blessed Qiraji Acolyte Staff"
+   ],
+   [
+    4,
+    "Azuresong Mageblade"
+   ],
+   [
+    4,
+    "Fang of the Mystics"
+   ],
+   [
+    4,
+    "Claw of Chromaggus"
+   ],
+   [
+    4,
+    "Staff of the Shadow Flame"
+   ],
+   [
+    4,
+    "Staff of the Ruins"
+   ],
+   [
+    5,
+    "Bloodcaller"
+   ],
+   [
+    5,
+    "Shadow Wing Focus Staff"
+   ],
+   [
+    5,
+    "Ironbark Staff"
+   ],
+   [
+    5,
+    "Staff of Dominance"
+   ],
+   [
+    5,
+    "Jin'do's Judgement"
+   ],
+   [
+    5,
+    "Amberseal Keeper"
+   ]
+  ],
+  "SecondaryHand": [
+   [
+    1,
+    "Sapphiron's Left Eye"
+   ],
+   [
+    3,
+    "Royal Scepter of Vek'lor"
+   ],
+   [
+    5,
+    "Grand Marshal's Tome of Power"
+   ],
+   [
+    5,
+    "High Warlord's Tome of Destruction"
+   ],
+   [
+    6,
+    "Jin'do's Bag of Whammies"
+   ],
+   [
+    6,
+    "Scepter of Interminable Focus"
+   ],
+   [
+    6,
+    "Master Dragonslayer's Orb"
+   ],
+   [
+    6,
+    "Talon of Furious Concentration"
+   ]
+  ],
+  "Ranged": [
+   [
+    1,
+    "Wand of Fates"
+   ],
+   [
+    3,
+    "Doomfinger"
+   ],
+   [
+    3,
+    "Wand of Qiraji Nobility"
+   ],
+   [
+    3,
+    "Touch of Chaos"
+   ],
+   [
+    4,
+    "Skul's Ghastly Touch"
+   ],
+   [
+    5,
+    "Bonecreeper Stylus"
+   ]
+  ]
+ }
+}

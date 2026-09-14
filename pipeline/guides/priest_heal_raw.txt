@@ -1,0 +1,165 @@
+Head | Best - 8/8 T2 | Halo of Transcendence
+Head | Best - Offset | Circlet of Faith
+Head | Best - Offset | Crystal Adorned Crown
+Head | Great - Offset | Don Rigoberto's Lost Hat
+Head | Good | Zulian Headdress
+Head | Good | Dustwind Turban
+Head | Good | Warlord's Satin Cowl
+Head | Good | Field Marshal's Headdress
+Head | Optional | Cassandra's Grace
+Head | Optional | Champion's Satin Hood
+Head | Optional | Lieutenant Commander's Satin Hood
+Head | Optional | Virtuous Crown
+Head | Optional | Crimson Felt Hat
+Shoulders | Best - 8/8 T2 | Pauldrons of Transcendence
+Shoulders | Best - Offset | Shoulderpads of Faith
+Shoulders | Great - Offset | Ternary Mantle
+Shoulders | Great - Offset | Zandalar Confessor's Mantle
+Shoulders | Great - PVP | Champion's Satin Mantle
+Shoulders | Great - PVP | Lieutenant Commander's Satin Mantle
+Shoulders | Great | Mantle of Lost Hope
+Shoulders | Great - PvP | Warlord's Satin Mantle
+Shoulders | Great - PvP | Field Marshal's Satin Mantle
+Shoulders | Good | Mantle of Prophecy
+Shoulders | Good | Mantle of the Scarlet Crusade
+Back | Best | Cloak of Suturing
+Back | Great | Cloak of Clarity
+Back | Great | Hide of the Wild
+Back | Great | Shroud of Pure Thought
+Back | Great | Drape of Benediction
+Back | Good | Hakkari Loa Cloak
+Back | Good | Archivist Cape of Healing
+Back | Good | Cloak of the Cosmos
+Back | Good | Battle Healer's Cloak
+Back | Good | Caretaker's Cape
+Chest | Best - 8/8 T2 | Robes of Transcendence
+Chest | Best - Offset | Robe of Faith
+Chest | Great | Robes of the Guardian Saint
+Chest | Great | Truefaith Vestments
+Chest | Great | Robes of the Exalted
+Chest | Optional | Warlord's Satin Robes
+Chest | Optional | Field Marshal's Satin Vestments
+Chest | Optional | Virtuous Robe
+Chest | Optional | Robes of Prophecy
+Chest | Optional | Legionnaire's Satin Tunic
+Chest | Optional | Knight-Captain's Satin Tunic
+Wrist | Best - 8/8 T2 | Bindings of Transcendence
+Wrist | Best - Offset | Bracelets of Royal Redemption
+Wrist | Great | Bindings of Faith
+Wrist | Great | Zandalar Confessor's Wraps
+Wrist | Good | Vambraces of Prophecy
+Wrist | Good | Dryad's Wrist Bindings
+Wrist | Optional | Virtuous Bracers
+Wrist | Optional | Sublime Wristguards
+Hands | Best - 8/8 T2 | Handguards of Transcendence
+Hands | Best - Offset | Gloves of Faith
+Hands | Great | Gloves of Dark Wisdom
+Hands | Great | Desert Bloom Gloves
+Hands | Great | Gloves of the Messiah
+Hands | Great | Gloves of Prophecy
+Hands | Great | Hands of the Exalted Herald
+Hands | Good | General's Satin Gloves
+Hands | Good | Marshal's Satin Gloves
+Hands | Good | Virtuous Gloves
+Hands | Good | Hands of Power
+Hands | Good | Blood Guard's Satin Handwraps
+Hands | Good | Knight-Lieutenant's Satin Handwraps
+Waist | Best - 8/8 T2 | Belt of Transcendence
+Waist | Best - Offset | Grasp of the Old God
+Waist | Best - Offset | Belt of Faith
+Waist | Great | Zandalar Confessor's Bindings
+Waist | Great | Firemaw's Clutch
+Waist | Great | Whipvine Cord
+Waist | Good | Girdle of Prophecy
+Waist | Optional | Virtuous Belt
+Waist | Optional | Thuzadin Sash
+Legs | Best - 8/8 T2 | Leggings of Transcendence
+Legs | Best - Offset | Empowered Leggings
+Legs | Best - Offset | Leggings of Faith
+Legs | Great | Pants of Prophecy
+Legs | Great | Padre's Trousers
+Legs | Great | Ritualistic Legguards
+Legs | Great | General's Satin Leggings
+Legs | Great | Marshal's Satin Pants
+Legs | Great | Senior Designer's Pantaloons
+Legs | Good | Virtuous Skirt
+Legs | Good | Legionnaire's Satin Legguards
+Legs | Good | Knight-Captain's Satin Legguards
+Feet | Best - 8/8 T2 | Boots of Transcendence
+Feet | Best - Offset | Boots of Pure Thought
+Feet | Best - Offset | Sandals of Faith
+Feet | Great | Treads of the Wandering Nomad
+Feet | Great | Snowblind Shoes
+Feet | Great | Betrayer's Boots
+Feet | Optional | Virtuous Sandals
+Feet | Optional | Boots of Prophecy
+Feet | Optional | Faith Healer's Boots
+Feet | Optional | Boots of the Full Moon
+Feet | Optional | General's Satin Boots
+Feet | Optional | Marshal's Satin Sandals
+Neck | Best | Necklace of Necropsy
+Neck | Best | Amulet of the Fallen God
+Neck | Great | Amulet of the Shifting Sands
+Neck | Great | Jin'do's Evil Eye
+Neck | Good | Animated Chain Necklace
+Neck | Optional | Pendant of the Fallen Dragon
+Neck | Optional | Choker of Enlightenment
+Neck | Optional | Amulet of the Redeemed
+Ring | Best | Ring of Faith
+Ring | Best | Band of Unanswered Prayers
+Ring | Best | Pure Elementium Band
+Ring | Best | Ring of the Martyr
+Ring | Great | Cauterizing Band
+Ring | Good | Primalist's Seal
+Ring | Good | Primalist's Band
+Ring | Good | Signet Ring of the Bronze Dragonflight
+Ring | Good | Rosewine Circle
+Ring | Good | Band of Mending
+Ring | Good | Fordring's Seal
+Ring | Good | Ring of Blackrock
+Trinket | Best - Throughput | Hazza'rah's Charm of Healing
+Trinket | Best - Throughput | Eye of the Dead
+Trinket | Best - Throughput | Rejuvenating Gem
+Trinket | Best - Throughput | Scarab Brooch
+Trinket | Best - Throughput | Hibernation Crystal
+Trinket | Great - Throughput | Zandalarian Hero Charm
+Trinket | Great - Throughput | Royal Seal of Eldre'Thalas
+Trinket | Great - Throughput | Draconic Infused Emblem
+Trinket | Great - Throughput | Blessed Prayer Beads
+Trinket | Great - Throughput | Briarwood Reed
+Trinket | Best - Sustain | Warmth of Forgiveness
+Trinket | Best - Sustain | Darkmoon Card: Blue Dragon
+Trinket | Great - Sustain | Shard of the Scale
+Trinket | Good - Sustain | Mindtap Talisman
+Trinket | Good - Sustain | Second Wind
+Trinket | Good - Sustain | Burst of Knowledge
+Main Hand | Best | Hammer of the Twisting Nether
+Main Hand | Great | Scepter of the False Prophet
+Main Hand | Great | The Widow's Embrace
+Main Hand | Great | High Warlord's Battle Mace
+Main Hand | Great | Grand Marshal's Warhammer
+Main Hand | Great | Fang of Korialstrasz
+Main Hand | Good | Gavel of Infinite Wisdom
+Main Hand | Good | Lok'amir il Romathis
+Main Hand | Good | Claw of Chromaggus
+Main Hand | Good | Jin'do's Hexxer
+Main Hand | Optional | Aurastone Hammer
+Main Hand | Good | Zulian Scepter of Rites
+Main Hand | Good | Wushoolay's Poker
+Main Hand | Good | The Hammer of Grace
+Off Hand | Best | Sapphiron's Right Eye
+Off Hand | Great | Noth's Frigid Heart
+Off Hand | Great | Sartura's Might
+Off Hand | Great | Lei of the Lifegiver
+Off Hand | Optional | Grand Marshal's Tome of Restoration
+Off Hand | Optional | Tome of Divine Right
+Off Hand | Optional | Drakestone of Healing
+Off Hand | Optional | Brightly Glowing Stone
+Two Hand | Best - Legendary | Atiesh, Greatstaff of the Guardian
+Two Hand | Best | Spire of Twilight
+Two Hand | Great | Blessed Qiraji Augur Staff
+Two Hand | Great | Benediction
+Two Hand | Optional | Staff of Rampant Growth
+Two Hand | Optional | Will of Arlokk
+Two Hand | Optional | Redemption
+Two Hand | Optional | Guiding Stave of Wisdom

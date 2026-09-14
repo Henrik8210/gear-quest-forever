@@ -23,3 +23,4 @@ ignore:
   - GearQuest/_generated/CURSOR-INTEGRATION-BRIEF.md
   - GearQuest/_generated/GEARQUEST-BIS-PIPELINE.md
   - GearQuest/_generated/*.json
+  - pipeline

@@ -1,0 +1,375 @@
+{
+ "retribution": {
+  "Head": [
+   "Avenger's Crown"
+  ],
+  "Neck": [
+   "Onyxia Tooth Pendant"
+  ],
+  "Shoulder": [
+   "Avenger's Pauldrons"
+  ],
+  "Back": [
+   "Shroud of Dominion",
+   "Cloak of Concentrated Hatred"
+  ],
+  "Chest": [
+   "Avenger's Breastplate"
+  ],
+  "Wrist": [
+   "Wristguards of Vengeance",
+   "Hive Defiler Wristguards"
+  ],
+  "Hands": [
+   "Gauntlets of Annihilation"
+  ],
+  "Waist": [
+   "Girdle of the Mentor",
+   "Onslaught Girdle"
+  ],
+  "Legs": [
+   "Avenger's Legguards"
+  ],
+  "Feet": [
+   "Avenger's Greaves"
+  ],
+  "Finger": [
+   "Band of Unnatural Forces",
+   "Band of Accuria",
+   "Signet Ring of the Bronze Dragonflight"
+  ],
+  "Trinket": [
+   "Hand of Justice",
+   "Drake Fang Talisman"
+  ],
+  "MainHand": [
+   "Might of Menethil",
+   "Sulfuras, Hand of Ragnaros",
+   "Dark Edge of Insanity",
+   "Corrupted Ashbringer"
+  ]
+ },
+ "holy": {
+  "Head": [
+   "Redemption Headpiece",
+   "Crystal Adorned Crown",
+   "Don Rigoberto's Lost Hat",
+   "Deviate Growth Cap",
+   "Creeping Vine Helm",
+   "Zulian Headdress",
+   "Insightful Hood",
+   "Whitesoul Helm",
+   "Crimson Felt Hat",
+   "Exalted Helmet of Healing"
+  ],
+  "Neck": [
+   "Amulet of the Fallen God",
+   "Necklace of Necropsy",
+   "Amulet of the Shifting Sands",
+   "Jin'do's Evil Eye",
+   "Animated Chain Necklace",
+   "Choker of Enlightenment",
+   "Amulet of the Redeemed"
+  ],
+  "Shoulder": [
+   "Wild Growth Spaulders",
+   "Redemption Spaulders",
+   "Mantle of the Desert Crusade",
+   "Ternary Mantle",
+   "Animist's Spaulders",
+   "Living Shoulders",
+   "Royal Cap Spaulders",
+   "Mantle of Lost Hope",
+   "Mantle of the Scarlet Crusade",
+   "Burial Shawl"
+  ],
+  "Back": [
+   "Cloak of Suturing",
+   "Cloak of Clarity",
+   "Hide of the Wild",
+   "Shroud of Pure Thought",
+   "Drape of Benediction",
+   "Hakkari Loa Cloak",
+   "Archivist Cape of Healing",
+   "Cloak of the Cosmos",
+   "Battle Healer's Cloak",
+   "Caretaker's Cape"
+  ],
+  "Chest": [
+   "Redemption Tunic",
+   "Robes of the Guardian Saint",
+   "Robes of the Exalted",
+   "Red Dragonscale Breastplate",
+   "Chestplate of Tranquility"
+  ],
+  "Wrist": [
+   "Bracelets of Royal Redemption",
+   "Redemption Wristguards",
+   "Gallant's Wristguards",
+   "Loomguard Armbraces",
+   "Dryad's Wrist Bindings",
+   "Bracers of Prosperity",
+   "Bleak Howler Armguards",
+   "Sublime Wristguards"
+  ],
+  "Hands": [
+   "Peacekeeper Gauntlets",
+   "Redemption Handguards",
+   "Wasphide Gauntlets",
+   "Harmonious Gauntlets",
+   "Gloves of Dark Wisdom",
+   "Gloves of the Messiah",
+   "Gloves of Restoration",
+   "Hands of the Exalted Herald",
+   "Hands of Power"
+  ],
+  "Waist": [
+   "Corehound Belt",
+   "Redemption Girdle",
+   "Grasp of the Old God",
+   "Regenerating Belt of Vek'nilash",
+   "Belt of the Ordained",
+   "Eyestalk Cord",
+   "Firemaw's Clutch",
+   "Belt of the Fallen Emperor",
+   "Whipvine Cord"
+  ],
+  "Legs": [
+   "Empowered Leggings",
+   "Legplates of Blazing Light",
+   "Redemption Legguards",
+   "Salamander Scale Pants",
+   "Padre's Trousers",
+   "Peacekeeper Leggings",
+   "Ghoul Skin Leggings",
+   "Senior Designer's Pantaloons",
+   "Ritualistic Legguards",
+   "Hyperion Legplates of Healing"
+  ],
+  "Feet": [
+   "Boots of Pure Thought",
+   "Redemption Boots",
+   "Boots of the Redeemed Prophecy",
+   "Treads of the Wandering Nomad",
+   "Snowblind Shoes",
+   "Betrayer's Boots",
+   "Verdant Footpads",
+   "Peacekeeper Boots",
+   "Waterspout Boots",
+   "Faith Healer's Boots"
+  ],
+  "Finger": [
+   "Pure Elementium Band",
+   "Band of Unanswered Prayers",
+   "Ring of the Martyr",
+   "Cauterizing Band",
+   "Ring of Redemption",
+   "Primalist's Seal",
+   "Primalist's Band",
+   "Rosewine Circle",
+   "Band of Mending",
+   "Fordring's Seal",
+   "Ring of Blackrock"
+  ],
+  "Trinket": [
+   "Eye of the Dead",
+   "Rejuvenating Gem",
+   "Scarab Brooch",
+   "Scrolls of Blinding Light",
+   "Hibernation Crystal",
+   "Major Recombobulator",
+   "Zandalarian Hero Charm",
+   "Draconic Infused Emblem",
+   "Briarwood Reed",
+   "Second Wind",
+   "Royal Seal of Eldre'Thalas"
+  ],
+  "MainHand": [
+   "Hammer of the Twisting Nether",
+   "Scepter of the False Prophet",
+   "The Widow's Embrace",
+   "High Warlord's Battle Mace",
+   "Grand Marshal's Warhammer",
+   "Lok'amir il Romathis",
+   "Jin'do's Hexxer",
+   "Azuresong Mageblade",
+   "Stinger of Ayamiss",
+   "Aurastone Hammer",
+   "The Hammer of Grace",
+   "Zulian Scepter of Rites",
+   "Hammer of Revitalization",
+   "Energetic Rod"
+  ],
+  "SecondaryHand": [
+   "Shield of Condemnation",
+   "Sapphiron's Right Eye",
+   "Sartura's Might",
+   "Noth's Frigid Heart",
+   "Lei of the Lifegiver",
+   "Wormscale Blocker",
+   "Death's Bargain",
+   "Red Dragonscale Protector",
+   "Tome of Divine Right",
+   "Brightly Glowing Stone",
+   "Thaurissan's Royal Scepter"
+  ]
+ },
+ "protection": {
+  "Head": [
+   "Avenger's Crown",
+   "Field Marshal's Lamellar Faceguard",
+   "Judgment Crown",
+   "Icebane Helmet",
+   "Lieutenant Commander's Lamellar Headguard",
+   "Enchanted Thorium Helm",
+   "Lightforge Helm",
+   "Gyth's Skull",
+   "Golem Skull Helm"
+  ],
+  "Neck": [
+   "Gluth's Missing Collar",
+   "Mark of C'Thun",
+   "Medallion of Steadfast Might",
+   "Master Dragonslayer's Medallion",
+   "Medallion of Grand Marshal Morris",
+   "Talisman of Protection",
+   "Evil Eye Pendant",
+   "Talisman of Evasion",
+   "Verek's Collar"
+  ],
+  "Shoulder": [
+   "Avenger's Pauldrons",
+   "Spaulders of the Grand Crusader",
+   "Judgment Spaulders",
+   "Field Marshal's Lamellar Pauldrons",
+   "Icebane Pauldrons",
+   "Bloodsoaked Pauldrons",
+   "Lieutenant Commander's Lamellar Shoulders",
+   "Stockade Pauldrons",
+   "Bile-Etched Spaulders",
+   "Wailing Nightbane Pauldrons",
+   "Stoneform Shoulders",
+   "Spaulders of Valor"
+  ],
+  "Back": [
+   "Cryptfiend Silk Cloak",
+   "Cloak of the Golden Hive",
+   "Sandstorm Cloak",
+   "Cape of Eternal Justice",
+   "Glacial Cloak",
+   "Overlord's Embrace",
+   "Redoubt Cloak",
+   "The Emperor's New Cape"
+  ],
+  "Chest": [
+   "Avenger's Breastplate",
+   "Field Marshal's Lamellar Chestplate",
+   "Judgment Breastplate",
+   "Knight-Captain's Lamellar Breastplate",
+   "Lightforge Breastplate",
+   "Deathbone Chestplate",
+   "Icebane Breastplate",
+   "Enchanted Thorium Breastplate",
+   "Ornate Adamantium Breastplate",
+   "Silithid Carapace Chestguard"
+  ],
+  "Wrist": [
+   "Wristguards of True Flight",
+   "Judgment Bindings",
+   "Icebane Bracers",
+   "Vigorsteel Vambraces",
+   "Bracers of Valor"
+  ],
+  "Hands": [
+   "Gauntlets of Steadfast Determination",
+   "Gauntlets of the Immovable",
+   "Marshal's Lamellar Gloves",
+   "Bloodsoaked Gauntlets",
+   "Knight-Lieutenant's Lamellar Gauntlets",
+   "Boneclenched Gauntlets",
+   "Deathbone Gauntlets",
+   "Stonegrip Gauntlets"
+  ],
+  "Waist": [
+   "Royal Qiraji Belt",
+   "Judgment Belt",
+   "Belt of the Sand Reaver",
+   "Unmelting Ice Girdle",
+   "Brigam Girdle",
+   "Deathbone Girdle",
+   "Stalwart Clutch",
+   "Lightforge Belt"
+  ],
+  "Legs": [
+   "Avenger's Legguards",
+   "Judgment Legplates",
+   "Marshal's Lamellar Legplates",
+   "Knight-Captain's Lamellar Leggings",
+   "Icebane Leggings",
+   "Enchanted Thorium Leggings",
+   "Lightforge Legplates",
+   "Deathbone Legguards",
+   "Legplates of the Eternal Guardian"
+  ],
+  "Feet": [
+   "Avenger's Greaves",
+   "Boots of the Unwavering Will",
+   "Core Forged Greaves",
+   "Bloodsoaked Greaves",
+   "Marshal's Lamellar Boots",
+   "Knight-Lieutenant's Lamellar Sabatons",
+   "Deathbone Sabatons",
+   "Lightforge Boots",
+   "Shalehusk Boots",
+   "Boots of Avoidance"
+  ],
+  "Finger": [
+   "Signet Ring of the Bronze Dragonflight",
+   "Angelista's Touch",
+   "Ring of Emperor Vek'lor",
+   "Ring of Eternal Justice",
+   "Heavy Dark Iron Ring",
+   "Overlord's Crimson Band",
+   "Overlord's Onyx Band",
+   "Don Julio's Band",
+   "Naglering",
+   "Hardened Stone Band",
+   "Ring of Protection",
+   "Myrmidon's Signet"
+  ],
+  "Trinket": [
+   "Styleen's Impeding Scarab",
+   "Earthstrike",
+   "Hand of Justice",
+   "Onyxia Blood Talisman",
+   "Glyph of Deflection",
+   "Force of Will",
+   "Counterattack Lodestone",
+   "Smotts' Compass",
+   "Mark of the Chosen"
+  ],
+  "MainHand": [
+   "Thunderfury, Blessed Blade of the Windseeker",
+   "The End of Dreams",
+   "Flurry Axe",
+   "Lok'amir il Romathis",
+   "Blade of Eternal Justice",
+   "Grand Marshal's Swiftblade",
+   "Quel'Serrar",
+   "Bloodlord's Defender",
+   "Mastersmith's Hammer",
+   "Arbiter's Blade"
+  ],
+  "SecondaryHand": [
+   "The Face of Death",
+   "Blessed Qiraji Bulwark",
+   "Elementium Reinforced Bulwark",
+   "Buru's Skull Fragment",
+   "Drillborer Disk",
+   "Aegis of the Blood God",
+   "Force Reactive Disk",
+   "Draconian Deflector",
+   "Malistar's Defender"
+  ]
+ }
+}

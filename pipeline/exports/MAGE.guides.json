@@ -1,0 +1,2222 @@
+{
+ "frost": {
+  "Head": [
+   [
+    1,
+    "Frostfire Circlet"
+   ],
+   [
+    3,
+    "Mish'undare, Circlet of the Mind Flayer"
+   ],
+   [
+    3,
+    "Preceptor's Hat"
+   ],
+   [
+    4,
+    "Enigma Circlet"
+   ],
+   [
+    5,
+    "Field Marshal's Coronet"
+   ],
+   [
+    5,
+    "Warlord's Silk Cowl"
+   ],
+   [
+    5,
+    "Lieutenant Commander's Silk Cowl"
+   ],
+   [
+    5,
+    "Champion's Silk Cowl"
+   ],
+   [
+    5,
+    "Spellweaver's Turban"
+   ],
+   [
+    5,
+    "Arcanist Crown"
+   ],
+   [
+    5,
+    "Netherwind Crown"
+   ],
+   [
+    5,
+    "The Hexxer's Cover"
+   ],
+   [
+    5,
+    "Crimson Felt Hat"
+   ]
+  ],
+  "Shoulder": [
+   [
+    1,
+    "Rime Covered Mantle"
+   ],
+   [
+    4,
+    "Frostfire Shoulderpads"
+   ],
+   [
+    4,
+    "Mantle of the Blackwing Cabal"
+   ],
+   [
+    4,
+    "Mantle of Phrenic Power"
+   ],
+   [
+    5,
+    "Enigma Shoulderpads"
+   ],
+   [
+    5,
+    "Lieutenant Commander's Silk Mantle"
+   ],
+   [
+    5,
+    "Champion's Silk Mantle"
+   ],
+   [
+    5,
+    "Field Marshal's Silk Spaulders"
+   ],
+   [
+    5,
+    "Warlord's Silk Amice"
+   ],
+   [
+    5,
+    "Netherwind Mantle"
+   ],
+   [
+    5,
+    "Arcanist Mantle"
+   ],
+   [
+    5,
+    "Zandalar Illusionist's Mantle"
+   ],
+   [
+    5,
+    "Kentic Amice"
+   ],
+   [
+    5,
+    "Boreal Mantle"
+   ]
+  ],
+  "Back": [
+   [
+    1,
+    "Cloak of the Necropolis"
+   ],
+   [
+    4,
+    "Cloak of the Devoured"
+   ],
+   [
+    4,
+    "Cloak of the Brood Lord"
+   ],
+   [
+    4,
+    "Veil of Eclipse"
+   ],
+   [
+    5,
+    "Cloak of Consumption"
+   ],
+   [
+    5,
+    "Cloak of the Hakkari Worshippers"
+   ],
+   [
+    5,
+    "Crystalline Threaded Cape"
+   ],
+   [
+    5,
+    "Sapphiron Drape"
+   ],
+   [
+    5,
+    "Spritecaster Cape"
+   ],
+   [
+    5,
+    "Amplifying Cloak"
+   ],
+   [
+    5,
+    "Stormpike Sage's Cloak"
+   ],
+   [
+    5,
+    "Frostwolf Advisor's Cloak"
+   ]
+  ],
+  "Chest": [
+   [
+    1,
+    "Frostfire Robe"
+   ],
+   [
+    3,
+    "Crystal Webbed Robe"
+   ],
+   [
+    4,
+    "Enigma Robes"
+   ],
+   [
+    4,
+    "Bloodvine Vest"
+   ],
+   [
+    5,
+    "Zandalar Illusionist's Robe"
+   ],
+   [
+    5,
+    "Robe of Volatile Power"
+   ],
+   [
+    5,
+    "Field Marshal's Silk Vestments"
+   ],
+   [
+    5,
+    "Warlord's Silk Raiment"
+   ],
+   [
+    5,
+    "Knight-Captain's Silk Tunic"
+   ],
+   [
+    5,
+    "Legionnaire's Silk Tunic"
+   ],
+   [
+    5,
+    "Robe of the Archmage"
+   ],
+   [
+    5,
+    "Jade Inlaid Vestments"
+   ],
+   [
+    5,
+    "Netherwind Robes"
+   ],
+   [
+    5,
+    "Robe of Everlasting Night"
+   ],
+   [
+    5,
+    "Arcanist Robes"
+   ],
+   [
+    5,
+    "Freezing Lich Robes"
+   ],
+   [
+    5,
+    "Robe of Winter Night"
+   ]
+  ],
+  "Wrist": [
+   [
+    1,
+    "The Soul Harvester's Bindings"
+   ],
+   [
+    3,
+    "Burrower Bracers"
+   ],
+   [
+    3,
+    "Frostfire Bindings"
+   ],
+   [
+    4,
+    "Rockfury Bracers"
+   ],
+   [
+    4,
+    "Black Bark Wristbands"
+   ],
+   [
+    4,
+    "Dryad's Wrist Bindings"
+   ],
+   [
+    4,
+    "Bracers of Arcane Accuracy"
+   ],
+   [
+    5,
+    "Netherwind Bindings"
+   ],
+   [
+    5,
+    "Zandalar Illusionist's Wraps"
+   ],
+   [
+    5,
+    "Arcanist Bindings"
+   ],
+   [
+    5,
+    "Sublime Wristguards"
+   ]
+  ],
+  "Hands": [
+   [
+    1,
+    "Dark Storm Gauntlets"
+   ],
+   [
+    3,
+    "Frostfire Gloves"
+   ],
+   [
+    3,
+    "Gloves of the Hypnotic Flame"
+   ],
+   [
+    4,
+    "Inferno Gloves"
+   ],
+   [
+    4,
+    "Netherwind Gloves"
+   ],
+   [
+    4,
+    "Gloves of Delusional Power"
+   ],
+   [
+    5,
+    "Bloodtinged Gloves"
+   ],
+   [
+    5,
+    "Marshal's Silk Gloves"
+   ],
+   [
+    5,
+    "General's Silk Handguards"
+   ],
+   [
+    5,
+    "Hands of Power"
+   ],
+   [
+    5,
+    "Knight-Lieutenant's Silk Handwraps"
+   ],
+   [
+    5,
+    "Blood Guard's Silk Handwraps"
+   ]
+  ],
+  "Waist": [
+   [
+    1,
+    "Eyestalk Waist Cord"
+   ],
+   [
+    4,
+    "Mana Igniting Cord"
+   ],
+   [
+    4,
+    "Firemaw's Clutch"
+   ],
+   [
+    5,
+    "Frostfire Belt"
+   ],
+   [
+    5,
+    "Belt of Untapped Power"
+   ],
+   [
+    5,
+    "Netherwind Belt"
+   ],
+   [
+    5,
+    "Highlander's Cloth Girdle"
+   ],
+   [
+    5,
+    "Defiler's Cloth Girdle"
+   ],
+   [
+    5,
+    "Ban'thok Sash"
+   ],
+   [
+    5,
+    "Stormpike Cloth Girdle"
+   ],
+   [
+    5,
+    "Frostwolf Cloth Belt"
+   ],
+   [
+    5,
+    "Arcanist Belt"
+   ],
+   [
+    6,
+    "Angelista's Grasp"
+   ]
+  ],
+  "Legs": [
+   [
+    1,
+    "Leggings of Polarity"
+   ],
+   [
+    1,
+    "Bloodvine Leggings"
+   ],
+   [
+    3,
+    "Leggings of the Festering Swarm"
+   ],
+   [
+    3,
+    "Leggings of the Black Blizzard"
+   ],
+   [
+    4,
+    "Frostfire Leggings"
+   ],
+   [
+    4,
+    "Enigma Leggings"
+   ],
+   [
+    5,
+    "Netherwind Pants"
+   ],
+   [
+    5,
+    "Knight-Captain's Silk Legguards"
+   ],
+   [
+    5,
+    "Legionnaire's Silk Legguards"
+   ],
+   [
+    5,
+    "Marshal's Silk Leggings"
+   ],
+   [
+    5,
+    "General's Silk Trousers"
+   ],
+   [
+    5,
+    "Arcanist Leggings"
+   ],
+   [
+    5,
+    "Skyshroud Leggings"
+   ],
+   [
+    5,
+    "Bloodtinged Kilt"
+   ],
+   [
+    5,
+    "Outrider's Silk Leggings"
+   ],
+   [
+    5,
+    "Sentinel's Silk Leggings"
+   ]
+  ],
+  "Feet": [
+   [
+    1,
+    "Frostfire Sandals"
+   ],
+   [
+    3,
+    "Boots of Epiphany"
+   ],
+   [
+    4,
+    "Snowblind Shoes"
+   ],
+   [
+    4,
+    "Betrayer's Boots"
+   ],
+   [
+    4,
+    "Enigma Boots"
+   ],
+   [
+    4,
+    "Netherwind Boots"
+   ],
+   [
+    4,
+    "Bloodvine Boots"
+   ],
+   [
+    5,
+    "Knight-Lieutenant's Silk Walkers"
+   ],
+   [
+    5,
+    "Blood Guard's Silk Walkers"
+   ],
+   [
+    5,
+    "Marshal's Silk Footwraps"
+   ],
+   [
+    5,
+    "General's Silk Boots"
+   ],
+   [
+    5,
+    "Arcanist Boots"
+   ],
+   [
+    5,
+    "Omnicast Boots"
+   ]
+  ],
+  "Neck": [
+   [
+    1,
+    "Amulet of Vek'nilash"
+   ],
+   [
+    1,
+    "Gem of Trapped Innocents"
+   ],
+   [
+    3,
+    "Choker of the Fire Lord"
+   ],
+   [
+    3,
+    "Malice Stone Pendant"
+   ],
+   [
+    4,
+    "Charm of the Shifting Sands"
+   ],
+   [
+    5,
+    "Orb of the Darkmoon"
+   ],
+   [
+    5,
+    "Jeklik's Opaline Talisman"
+   ],
+   [
+    5,
+    "Choker of Enlightenment"
+   ],
+   [
+    5,
+    "Arcane Crystal Pendant"
+   ],
+   [
+    6,
+    "Soul Corrupter's Necklace"
+   ],
+   [
+    6,
+    "Star of Mystaria"
+   ]
+  ],
+  "Finger": [
+   [
+    1,
+    "Ring of the Eternal Flame"
+   ],
+   [
+    1,
+    "Frostfire Ring"
+   ],
+   [
+    1,
+    "Ring of the Fallen God"
+   ],
+   [
+    3,
+    "Band of the Inevitable"
+   ],
+   [
+    3,
+    "Ritssyn's Ring of Chaos"
+   ],
+   [
+    3,
+    "Band of Forced Concentration"
+   ],
+   [
+    4,
+    "Ring of Spell Power"
+   ],
+   [
+    4,
+    "Mindtear Band"
+   ],
+   [
+    4,
+    "Seal of the Damned"
+   ],
+   [
+    4,
+    "Signet Ring of the Bronze Dragonflight"
+   ],
+   [
+    4,
+    "Rune Band of Wizardry"
+   ],
+   [
+    4,
+    "Don Mauricio's Band of Domination"
+   ]
+  ],
+  "Trinket": [
+   [
+    1,
+    "Neltharion's Tear"
+   ],
+   [
+    1,
+    "The Restrained Essence of Sapphiron"
+   ],
+   [
+    1,
+    "Mark of the Champion"
+   ],
+   [
+    1,
+    "Mind Quickening Gem"
+   ],
+   [
+    3,
+    "Zandalarian Hero Charm"
+   ],
+   [
+    3,
+    "Talisman of Ephemeral Power"
+   ],
+   [
+    5,
+    "Briarwood Reed"
+   ],
+   [
+    5,
+    "Eye of the Beast"
+   ],
+   [
+    5,
+    "Burst of Knowledge"
+   ]
+  ],
+  "MainHand": [
+   [
+    1,
+    "Atiesh, Greatstaff of the Guardian"
+   ],
+   [
+    1,
+    "Wraith Blade"
+   ],
+   [
+    3,
+    "Soulseeker"
+   ],
+   [
+    4,
+    "Brimstone Staff"
+   ],
+   [
+    4,
+    "Midnight Haze"
+   ],
+   [
+    4,
+    "Grand Marshal's Mageblade"
+   ],
+   [
+    4,
+    "High Warlord's Spellblade"
+   ],
+   [
+    4,
+    "Sharpened Silithid Femur"
+   ],
+   [
+    5,
+    "Staff of the Shadow Flame"
+   ],
+   [
+    5,
+    "Blessed Qiraji Acolyte Staff"
+   ],
+   [
+    5,
+    "Grand Marshal's Stave"
+   ],
+   [
+    5,
+    "High Warlord's War Staff"
+   ],
+   [
+    5,
+    "Ironbark Staff"
+   ],
+   [
+    5,
+    "Staff of Dominance"
+   ],
+   [
+    5,
+    "Shadow Wing Focus Staff"
+   ],
+   [
+    5,
+    "Jin'do's Judgement"
+   ],
+   [
+    5,
+    "Rod of the Ogre Magi"
+   ],
+   [
+    5,
+    "Claw of Chromaggus"
+   ],
+   [
+    5,
+    "Azuresong Mageblade"
+   ],
+   [
+    5,
+    "Fang of the Mystics"
+   ],
+   [
+    5,
+    "Sageclaw"
+   ],
+   [
+    5,
+    "Mindfang"
+   ],
+   [
+    5,
+    "Bloodcaller"
+   ],
+   [
+    5,
+    "Fang of Venoxis"
+   ],
+   [
+    6,
+    "Will of Arlokk"
+   ]
+  ]
+ },
+ "fire": {
+  "Head": [
+   [
+    1,
+    "Frostfire Circlet"
+   ],
+   [
+    3,
+    "Mish'undare, Circlet of the Mind Flayer"
+   ],
+   [
+    3,
+    "Preceptor's Hat"
+   ],
+   [
+    4,
+    "Enigma Circlet"
+   ],
+   [
+    5,
+    "Field Marshal's Coronet"
+   ],
+   [
+    5,
+    "Warlord's Silk Cowl"
+   ],
+   [
+    5,
+    "Lieutenant Commander's Silk Cowl"
+   ],
+   [
+    5,
+    "Champion's Silk Cowl"
+   ],
+   [
+    5,
+    "Spellweaver's Turban"
+   ],
+   [
+    5,
+    "Arcanist Crown"
+   ],
+   [
+    5,
+    "Netherwind Crown"
+   ],
+   [
+    5,
+    "The Hexxer's Cover"
+   ],
+   [
+    5,
+    "Crimson Felt Hat"
+   ]
+  ],
+  "Shoulder": [
+   [
+    1,
+    "Rime Covered Mantle"
+   ],
+   [
+    4,
+    "Frostfire Shoulderpads"
+   ],
+   [
+    4,
+    "Mantle of the Blackwing Cabal"
+   ],
+   [
+    4,
+    "Mantle of Phrenic Power"
+   ],
+   [
+    5,
+    "Enigma Shoulderpads"
+   ],
+   [
+    5,
+    "Lieutenant Commander's Silk Mantle"
+   ],
+   [
+    5,
+    "Champion's Silk Mantle"
+   ],
+   [
+    5,
+    "Field Marshal's Silk Spaulders"
+   ],
+   [
+    5,
+    "Warlord's Silk Amice"
+   ],
+   [
+    5,
+    "Netherwind Mantle"
+   ],
+   [
+    5,
+    "Arcanist Mantle"
+   ],
+   [
+    5,
+    "Zandalar Illusionist's Mantle"
+   ],
+   [
+    5,
+    "Kentic Amice"
+   ],
+   [
+    6,
+    "Boreal Mantle"
+   ]
+  ],
+  "Back": [
+   [
+    1,
+    "Cloak of the Necropolis"
+   ],
+   [
+    4,
+    "Cloak of the Devoured"
+   ],
+   [
+    4,
+    "Cloak of the Brood Lord"
+   ],
+   [
+    4,
+    "Veil of Eclipse"
+   ],
+   [
+    5,
+    "Cloak of Consumption"
+   ],
+   [
+    5,
+    "Cloak of the Hakkari Worshippers"
+   ],
+   [
+    5,
+    "Crystalline Threaded Cape"
+   ],
+   [
+    5,
+    "Sapphiron Drape"
+   ],
+   [
+    5,
+    "Spritecaster Cape"
+   ],
+   [
+    5,
+    "Amplifying Cloak"
+   ],
+   [
+    5,
+    "Stormpike Sage's Cloak"
+   ],
+   [
+    5,
+    "Frostwolf Advisor's Cloak"
+   ]
+  ],
+  "Chest": [
+   [
+    1,
+    "Frostfire Robe"
+   ],
+   [
+    3,
+    "Crystal Webbed Robe"
+   ],
+   [
+    4,
+    "Enigma Robes"
+   ],
+   [
+    4,
+    "Bloodvine Vest"
+   ],
+   [
+    5,
+    "Zandalar Illusionist's Robe"
+   ],
+   [
+    5,
+    "Robe of Volatile Power"
+   ],
+   [
+    5,
+    "Field Marshal's Silk Vestments"
+   ],
+   [
+    5,
+    "Warlord's Silk Raiment"
+   ],
+   [
+    5,
+    "Knight-Captain's Silk Tunic"
+   ],
+   [
+    5,
+    "Legionnaire's Silk Tunic"
+   ],
+   [
+    5,
+    "Robe of the Archmage"
+   ],
+   [
+    5,
+    "Jade Inlaid Vestments"
+   ],
+   [
+    5,
+    "Netherwind Robes"
+   ],
+   [
+    5,
+    "Robe of Everlasting Night"
+   ],
+   [
+    5,
+    "Arcanist Robes"
+   ],
+   [
+    6,
+    "Freezing Lich Robes"
+   ],
+   [
+    6,
+    "Robe of Winter Night"
+   ]
+  ],
+  "Wrist": [
+   [
+    1,
+    "The Soul Harvester's Bindings"
+   ],
+   [
+    3,
+    "Burrower Bracers"
+   ],
+   [
+    3,
+    "Frostfire Bindings"
+   ],
+   [
+    4,
+    "Rockfury Bracers"
+   ],
+   [
+    4,
+    "Black Bark Wristbands"
+   ],
+   [
+    4,
+    "Dryad's Wrist Bindings"
+   ],
+   [
+    4,
+    "Bracers of Arcane Accuracy"
+   ],
+   [
+    5,
+    "Netherwind Bindings"
+   ],
+   [
+    5,
+    "Zandalar Illusionist's Wraps"
+   ],
+   [
+    5,
+    "Arcanist Bindings"
+   ],
+   [
+    5,
+    "Sublime Wristguards"
+   ]
+  ],
+  "Hands": [
+   [
+    1,
+    "Dark Storm Gauntlets"
+   ],
+   [
+    3,
+    "Frostfire Gloves"
+   ],
+   [
+    3,
+    "Gloves of the Hypnotic Flame"
+   ],
+   [
+    4,
+    "Inferno Gloves"
+   ],
+   [
+    4,
+    "Netherwind Gloves"
+   ],
+   [
+    4,
+    "Gloves of Delusional Power"
+   ],
+   [
+    5,
+    "Bloodtinged Gloves"
+   ],
+   [
+    5,
+    "Marshal's Silk Gloves"
+   ],
+   [
+    5,
+    "General's Silk Handguards"
+   ],
+   [
+    5,
+    "Hands of Power"
+   ],
+   [
+    5,
+    "Knight-Lieutenant's Silk Handwraps"
+   ],
+   [
+    5,
+    "Blood Guard's Silk Handwraps"
+   ]
+  ],
+  "Waist": [
+   [
+    1,
+    "Eyestalk Waist Cord"
+   ],
+   [
+    4,
+    "Mana Igniting Cord"
+   ],
+   [
+    4,
+    "Firemaw's Clutch"
+   ],
+   [
+    5,
+    "Frostfire Belt"
+   ],
+   [
+    5,
+    "Belt of Untapped Power"
+   ],
+   [
+    5,
+    "Netherwind Belt"
+   ],
+   [
+    5,
+    "Highlander's Cloth Girdle"
+   ],
+   [
+    5,
+    "Defiler's Cloth Girdle"
+   ],
+   [
+    5,
+    "Ban'thok Sash"
+   ],
+   [
+    5,
+    "Stormpike Cloth Girdle"
+   ],
+   [
+    5,
+    "Frostwolf Cloth Belt"
+   ],
+   [
+    5,
+    "Arcanist Belt"
+   ],
+   [
+    6,
+    "Angelista's Grasp"
+   ]
+  ],
+  "Legs": [
+   [
+    1,
+    "Leggings of Polarity"
+   ],
+   [
+    1,
+    "Bloodvine Leggings"
+   ],
+   [
+    3,
+    "Leggings of the Festering Swarm"
+   ],
+   [
+    3,
+    "Leggings of the Black Blizzard"
+   ],
+   [
+    4,
+    "Frostfire Leggings"
+   ],
+   [
+    4,
+    "Enigma Leggings"
+   ],
+   [
+    5,
+    "Netherwind Pants"
+   ],
+   [
+    5,
+    "Knight-Captain's Silk Legguards"
+   ],
+   [
+    5,
+    "Legionnaire's Silk Legguards"
+   ],
+   [
+    5,
+    "Marshal's Silk Leggings"
+   ],
+   [
+    5,
+    "General's Silk Trousers"
+   ],
+   [
+    5,
+    "Arcanist Leggings"
+   ],
+   [
+    5,
+    "Skyshroud Leggings"
+   ],
+   [
+    5,
+    "Bloodtinged Kilt"
+   ],
+   [
+    5,
+    "Outrider's Silk Leggings"
+   ],
+   [
+    5,
+    "Sentinel's Silk Leggings"
+   ]
+  ],
+  "Feet": [
+   [
+    1,
+    "Frostfire Sandals"
+   ],
+   [
+    3,
+    "Boots of Epiphany"
+   ],
+   [
+    4,
+    "Snowblind Shoes"
+   ],
+   [
+    4,
+    "Betrayer's Boots"
+   ],
+   [
+    4,
+    "Enigma Boots"
+   ],
+   [
+    4,
+    "Netherwind Boots"
+   ],
+   [
+    4,
+    "Bloodvine Boots"
+   ],
+   [
+    5,
+    "Knight-Lieutenant's Silk Walkers"
+   ],
+   [
+    5,
+    "Blood Guard's Silk Walkers"
+   ],
+   [
+    5,
+    "Marshal's Silk Footwraps"
+   ],
+   [
+    5,
+    "General's Silk Boots"
+   ],
+   [
+    5,
+    "Arcanist Boots"
+   ],
+   [
+    5,
+    "Omnicast Boots"
+   ]
+  ],
+  "Neck": [
+   [
+    1,
+    "Amulet of Vek'nilash"
+   ],
+   [
+    1,
+    "Gem of Trapped Innocents"
+   ],
+   [
+    3,
+    "Choker of the Fire Lord"
+   ],
+   [
+    3,
+    "Malice Stone Pendant"
+   ],
+   [
+    4,
+    "Charm of the Shifting Sands"
+   ],
+   [
+    5,
+    "Orb of the Darkmoon"
+   ],
+   [
+    5,
+    "Jeklik's Opaline Talisman"
+   ],
+   [
+    5,
+    "Choker of Enlightenment"
+   ],
+   [
+    5,
+    "Arcane Crystal Pendant"
+   ],
+   [
+    6,
+    "Soul Corrupter's Necklace"
+   ],
+   [
+    6,
+    "Star of Mystaria"
+   ]
+  ],
+  "Finger": [
+   [
+    1,
+    "Ring of the Eternal Flame"
+   ],
+   [
+    1,
+    "Frostfire Ring"
+   ],
+   [
+    1,
+    "Ring of the Fallen God"
+   ],
+   [
+    3,
+    "Band of the Inevitable"
+   ],
+   [
+    3,
+    "Ritssyn's Ring of Chaos"
+   ],
+   [
+    3,
+    "Band of Forced Concentration"
+   ],
+   [
+    4,
+    "Ring of Spell Power"
+   ],
+   [
+    4,
+    "Mindtear Band"
+   ],
+   [
+    4,
+    "Seal of the Damned"
+   ],
+   [
+    4,
+    "Signet Ring of the Bronze Dragonflight"
+   ],
+   [
+    4,
+    "Rune Band of Wizardry"
+   ],
+   [
+    4,
+    "Don Mauricio's Band of Domination"
+   ]
+  ],
+  "Trinket": [
+   [
+    1,
+    "Neltharion's Tear"
+   ],
+   [
+    1,
+    "The Restrained Essence of Sapphiron"
+   ],
+   [
+    1,
+    "Mark of the Champion"
+   ],
+   [
+    1,
+    "Mind Quickening Gem"
+   ],
+   [
+    3,
+    "Zandalarian Hero Charm"
+   ],
+   [
+    3,
+    "Talisman of Ephemeral Power"
+   ],
+   [
+    5,
+    "Briarwood Reed"
+   ],
+   [
+    5,
+    "Eye of the Beast"
+   ],
+   [
+    5,
+    "Burst of Knowledge"
+   ]
+  ],
+  "MainHand": [
+   [
+    1,
+    "Atiesh, Greatstaff of the Guardian"
+   ],
+   [
+    1,
+    "Wraith Blade"
+   ],
+   [
+    3,
+    "Soulseeker"
+   ],
+   [
+    4,
+    "Brimstone Staff"
+   ],
+   [
+    4,
+    "Midnight Haze"
+   ],
+   [
+    4,
+    "Grand Marshal's Mageblade"
+   ],
+   [
+    4,
+    "High Warlord's Spellblade"
+   ],
+   [
+    4,
+    "Sharpened Silithid Femur"
+   ],
+   [
+    5,
+    "Staff of the Shadow Flame"
+   ],
+   [
+    5,
+    "Blessed Qiraji Acolyte Staff"
+   ],
+   [
+    5,
+    "Grand Marshal's Stave"
+   ],
+   [
+    5,
+    "High Warlord's War Staff"
+   ],
+   [
+    5,
+    "Ironbark Staff"
+   ],
+   [
+    5,
+    "Staff of Dominance"
+   ],
+   [
+    5,
+    "Shadow Wing Focus Staff"
+   ],
+   [
+    5,
+    "Jin'do's Judgement"
+   ],
+   [
+    5,
+    "Rod of the Ogre Magi"
+   ],
+   [
+    5,
+    "Claw of Chromaggus"
+   ],
+   [
+    5,
+    "Azuresong Mageblade"
+   ],
+   [
+    5,
+    "Fang of the Mystics"
+   ],
+   [
+    5,
+    "Sageclaw"
+   ],
+   [
+    5,
+    "Mindfang"
+   ],
+   [
+    5,
+    "Bloodcaller"
+   ],
+   [
+    5,
+    "Fang of Venoxis"
+   ],
+   [
+    6,
+    "Will of Arlokk"
+   ]
+  ]
+ },
+ "arcane": {
+  "Head": [
+   [
+    1,
+    "Frostfire Circlet"
+   ],
+   [
+    3,
+    "Mish'undare, Circlet of the Mind Flayer"
+   ],
+   [
+    3,
+    "Preceptor's Hat"
+   ],
+   [
+    4,
+    "Enigma Circlet"
+   ],
+   [
+    5,
+    "Field Marshal's Coronet"
+   ],
+   [
+    5,
+    "Warlord's Silk Cowl"
+   ],
+   [
+    5,
+    "Lieutenant Commander's Silk Cowl"
+   ],
+   [
+    5,
+    "Champion's Silk Cowl"
+   ],
+   [
+    5,
+    "Spellweaver's Turban"
+   ],
+   [
+    5,
+    "Arcanist Crown"
+   ],
+   [
+    5,
+    "Netherwind Crown"
+   ],
+   [
+    5,
+    "The Hexxer's Cover"
+   ],
+   [
+    5,
+    "Crimson Felt Hat"
+   ]
+  ],
+  "Shoulder": [
+   [
+    1,
+    "Rime Covered Mantle"
+   ],
+   [
+    4,
+    "Frostfire Shoulderpads"
+   ],
+   [
+    4,
+    "Mantle of the Blackwing Cabal"
+   ],
+   [
+    4,
+    "Mantle of Phrenic Power"
+   ],
+   [
+    5,
+    "Enigma Shoulderpads"
+   ],
+   [
+    5,
+    "Lieutenant Commander's Silk Mantle"
+   ],
+   [
+    5,
+    "Champion's Silk Mantle"
+   ],
+   [
+    5,
+    "Field Marshal's Silk Spaulders"
+   ],
+   [
+    5,
+    "Warlord's Silk Amice"
+   ],
+   [
+    5,
+    "Netherwind Mantle"
+   ],
+   [
+    5,
+    "Arcanist Mantle"
+   ],
+   [
+    5,
+    "Zandalar Illusionist's Mantle"
+   ],
+   [
+    5,
+    "Kentic Amice"
+   ],
+   [
+    6,
+    "Boreal Mantle"
+   ]
+  ],
+  "Back": [
+   [
+    1,
+    "Cloak of the Necropolis"
+   ],
+   [
+    4,
+    "Cloak of the Devoured"
+   ],
+   [
+    4,
+    "Cloak of the Brood Lord"
+   ],
+   [
+    4,
+    "Veil of Eclipse"
+   ],
+   [
+    5,
+    "Cloak of Consumption"
+   ],
+   [
+    5,
+    "Cloak of the Hakkari Worshippers"
+   ],
+   [
+    5,
+    "Crystalline Threaded Cape"
+   ],
+   [
+    5,
+    "Sapphiron Drape"
+   ],
+   [
+    5,
+    "Spritecaster Cape"
+   ],
+   [
+    5,
+    "Amplifying Cloak"
+   ],
+   [
+    5,
+    "Stormpike Sage's Cloak"
+   ],
+   [
+    5,
+    "Frostwolf Advisor's Cloak"
+   ]
+  ],
+  "Chest": [
+   [
+    1,
+    "Frostfire Robe"
+   ],
+   [
+    3,
+    "Crystal Webbed Robe"
+   ],
+   [
+    4,
+    "Enigma Robes"
+   ],
+   [
+    4,
+    "Bloodvine Vest"
+   ],
+   [
+    5,
+    "Zandalar Illusionist's Robe"
+   ],
+   [
+    5,
+    "Robe of Volatile Power"
+   ],
+   [
+    5,
+    "Field Marshal's Silk Vestments"
+   ],
+   [
+    5,
+    "Warlord's Silk Raiment"
+   ],
+   [
+    5,
+    "Knight-Captain's Silk Tunic"
+   ],
+   [
+    5,
+    "Legionnaire's Silk Tunic"
+   ],
+   [
+    5,
+    "Robe of the Archmage"
+   ],
+   [
+    5,
+    "Jade Inlaid Vestments"
+   ],
+   [
+    5,
+    "Netherwind Robes"
+   ],
+   [
+    5,
+    "Robe of Everlasting Night"
+   ],
+   [
+    5,
+    "Arcanist Robes"
+   ],
+   [
+    6,
+    "Freezing Lich Robes"
+   ],
+   [
+    6,
+    "Robe of Winter Night"
+   ]
+  ],
+  "Wrist": [
+   [
+    1,
+    "The Soul Harvester's Bindings"
+   ],
+   [
+    3,
+    "Burrower Bracers"
+   ],
+   [
+    3,
+    "Frostfire Bindings"
+   ],
+   [
+    4,
+    "Rockfury Bracers"
+   ],
+   [
+    4,
+    "Black Bark Wristbands"
+   ],
+   [
+    4,
+    "Dryad's Wrist Bindings"
+   ],
+   [
+    4,
+    "Bracers of Arcane Accuracy"
+   ],
+   [
+    5,
+    "Netherwind Bindings"
+   ],
+   [
+    5,
+    "Zandalar Illusionist's Wraps"
+   ],
+   [
+    5,
+    "Arcanist Bindings"
+   ],
+   [
+    5,
+    "Sublime Wristguards"
+   ]
+  ],
+  "Hands": [
+   [
+    1,
+    "Dark Storm Gauntlets"
+   ],
+   [
+    3,
+    "Frostfire Gloves"
+   ],
+   [
+    3,
+    "Gloves of the Hypnotic Flame"
+   ],
+   [
+    4,
+    "Inferno Gloves"
+   ],
+   [
+    4,
+    "Netherwind Gloves"
+   ],
+   [
+    4,
+    "Gloves of Delusional Power"
+   ],
+   [
+    5,
+    "Bloodtinged Gloves"
+   ],
+   [
+    5,
+    "Marshal's Silk Gloves"
+   ],
+   [
+    5,
+    "General's Silk Handguards"
+   ],
+   [
+    5,
+    "Hands of Power"
+   ],
+   [
+    5,
+    "Knight-Lieutenant's Silk Handwraps"
+   ],
+   [
+    5,
+    "Blood Guard's Silk Handwraps"
+   ]
+  ],
+  "Waist": [
+   [
+    1,
+    "Eyestalk Waist Cord"
+   ],
+   [
+    4,
+    "Mana Igniting Cord"
+   ],
+   [
+    4,
+    "Firemaw's Clutch"
+   ],
+   [
+    5,
+    "Frostfire Belt"
+   ],
+   [
+    5,
+    "Belt of Untapped Power"
+   ],
+   [
+    5,
+    "Netherwind Belt"
+   ],
+   [
+    5,
+    "Highlander's Cloth Girdle"
+   ],
+   [
+    5,
+    "Defiler's Cloth Girdle"
+   ],
+   [
+    5,
+    "Ban'thok Sash"
+   ],
+   [
+    5,
+    "Stormpike Cloth Girdle"
+   ],
+   [
+    5,
+    "Frostwolf Cloth Belt"
+   ],
+   [
+    5,
+    "Arcanist Belt"
+   ],
+   [
+    6,
+    "Angelista's Grasp"
+   ]
+  ],
+  "Legs": [
+   [
+    1,
+    "Leggings of Polarity"
+   ],
+   [
+    1,
+    "Bloodvine Leggings"
+   ],
+   [
+    3,
+    "Leggings of the Festering Swarm"
+   ],
+   [
+    3,
+    "Leggings of the Black Blizzard"
+   ],
+   [
+    4,
+    "Frostfire Leggings"
+   ],
+   [
+    4,
+    "Enigma Leggings"
+   ],
+   [
+    5,
+    "Netherwind Pants"
+   ],
+   [
+    5,
+    "Knight-Captain's Silk Legguards"
+   ],
+   [
+    5,
+    "Legionnaire's Silk Legguards"
+   ],
+   [
+    5,
+    "Marshal's Silk Leggings"
+   ],
+   [
+    5,
+    "General's Silk Trousers"
+   ],
+   [
+    5,
+    "Arcanist Leggings"
+   ],
+   [
+    5,
+    "Skyshroud Leggings"
+   ],
+   [
+    5,
+    "Bloodtinged Kilt"
+   ],
+   [
+    5,
+    "Outrider's Silk Leggings"
+   ],
+   [
+    5,
+    "Sentinel's Silk Leggings"
+   ]
+  ],
+  "Feet": [
+   [
+    1,
+    "Frostfire Sandals"
+   ],
+   [
+    3,
+    "Boots of Epiphany"
+   ],
+   [
+    4,
+    "Snowblind Shoes"
+   ],
+   [
+    4,
+    "Betrayer's Boots"
+   ],
+   [
+    4,
+    "Enigma Boots"
+   ],
+   [
+    4,
+    "Netherwind Boots"
+   ],
+   [
+    4,
+    "Bloodvine Boots"
+   ],
+   [
+    5,
+    "Knight-Lieutenant's Silk Walkers"
+   ],
+   [
+    5,
+    "Blood Guard's Silk Walkers"
+   ],
+   [
+    5,
+    "Marshal's Silk Footwraps"
+   ],
+   [
+    5,
+    "General's Silk Boots"
+   ],
+   [
+    5,
+    "Arcanist Boots"
+   ],
+   [
+    5,
+    "Omnicast Boots"
+   ]
+  ],
+  "Neck": [
+   [
+    1,
+    "Amulet of Vek'nilash"
+   ],
+   [
+    1,
+    "Gem of Trapped Innocents"
+   ],
+   [
+    3,
+    "Choker of the Fire Lord"
+   ],
+   [
+    3,
+    "Malice Stone Pendant"
+   ],
+   [
+    4,
+    "Charm of the Shifting Sands"
+   ],
+   [
+    5,
+    "Orb of the Darkmoon"
+   ],
+   [
+    5,
+    "Jeklik's Opaline Talisman"
+   ],
+   [
+    5,
+    "Choker of Enlightenment"
+   ],
+   [
+    5,
+    "Arcane Crystal Pendant"
+   ],
+   [
+    6,
+    "Soul Corrupter's Necklace"
+   ],
+   [
+    6,
+    "Star of Mystaria"
+   ]
+  ],
+  "Finger": [
+   [
+    1,
+    "Ring of the Eternal Flame"
+   ],
+   [
+    1,
+    "Frostfire Ring"
+   ],
+   [
+    1,
+    "Ring of the Fallen God"
+   ],
+   [
+    3,
+    "Band of the Inevitable"
+   ],
+   [
+    3,
+    "Ritssyn's Ring of Chaos"
+   ],
+   [
+    3,
+    "Band of Forced Concentration"
+   ],
+   [
+    4,
+    "Ring of Spell Power"
+   ],
+   [
+    4,
+    "Mindtear Band"
+   ],
+   [
+    4,
+    "Seal of the Damned"
+   ],
+   [
+    4,
+    "Signet Ring of the Bronze Dragonflight"
+   ],
+   [
+    4,
+    "Rune Band of Wizardry"
+   ],
+   [
+    4,
+    "Don Mauricio's Band of Domination"
+   ]
+  ],
+  "Trinket": [
+   [
+    1,
+    "Neltharion's Tear"
+   ],
+   [
+    1,
+    "The Restrained Essence of Sapphiron"
+   ],
+   [
+    1,
+    "Mark of the Champion"
+   ],
+   [
+    1,
+    "Mind Quickening Gem"
+   ],
+   [
+    3,
+    "Zandalarian Hero Charm"
+   ],
+   [
+    3,
+    "Talisman of Ephemeral Power"
+   ],
+   [
+    5,
+    "Briarwood Reed"
+   ],
+   [
+    5,
+    "Eye of the Beast"
+   ],
+   [
+    5,
+    "Burst of Knowledge"
+   ]
+  ],
+  "MainHand": [
+   [
+    1,
+    "Atiesh, Greatstaff of the Guardian"
+   ],
+   [
+    1,
+    "Wraith Blade"
+   ],
+   [
+    3,
+    "Soulseeker"
+   ],
+   [
+    4,
+    "Brimstone Staff"
+   ],
+   [
+    4,
+    "Midnight Haze"
+   ],
+   [
+    4,
+    "Grand Marshal's Mageblade"
+   ],
+   [
+    4,
+    "High Warlord's Spellblade"
+   ],
+   [
+    4,
+    "Sharpened Silithid Femur"
+   ],
+   [
+    5,
+    "Staff of the Shadow Flame"
+   ],
+   [
+    5,
+    "Blessed Qiraji Acolyte Staff"
+   ],
+   [
+    5,
+    "Grand Marshal's Stave"
+   ],
+   [
+    5,
+    "High Warlord's War Staff"
+   ],
+   [
+    5,
+    "Ironbark Staff"
+   ],
+   [
+    5,
+    "Staff of Dominance"
+   ],
+   [
+    5,
+    "Shadow Wing Focus Staff"
+   ],
+   [
+    5,
+    "Jin'do's Judgement"
+   ],
+   [
+    5,
+    "Rod of the Ogre Magi"
+   ],
+   [
+    5,
+    "Claw of Chromaggus"
+   ],
+   [
+    5,
+    "Azuresong Mageblade"
+   ],
+   [
+    5,
+    "Fang of the Mystics"
+   ],
+   [
+    5,
+    "Sageclaw"
+   ],
+   [
+    5,
+    "Mindfang"
+   ],
+   [
+    5,
+    "Bloodcaller"
+   ],
+   [
+    5,
+    "Fang of Venoxis"
+   ],
+   [
+    6,
+    "Will of Arlokk"
+   ]
+  ]
+ }
+}

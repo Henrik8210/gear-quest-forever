@@ -1,0 +1,1182 @@
+{
+ "combat": {
+  "Head": [
+   [
+    1,
+    "Bonescythe Helmet"
+   ],
+   [
+    3,
+    "Deathdealer's Helm"
+   ],
+   [
+    4,
+    "Darkmantle Cap"
+   ],
+   [
+    4,
+    "Bloodfang Hood"
+   ],
+   [
+    4,
+    "Field Marshal's Leather Mask"
+   ],
+   [
+    4,
+    "Warlord's Leather Helm"
+   ]
+  ],
+  "Neck": [
+   [
+    1,
+    "Prestor's Talisman of Connivery"
+   ],
+   [
+    3,
+    "Onyxia Tooth Pendant"
+   ],
+   [
+    4,
+    "Barbed Choker"
+   ],
+   [
+    4,
+    "The Eye of Hakkar"
+   ],
+   [
+    4,
+    "Fury of the Forgotten Swarm"
+   ]
+  ],
+  "Shoulder": [
+   [
+    1,
+    "Bonescythe Pauldrons"
+   ],
+   [
+    1,
+    "Deathdealer's Spaulders"
+   ],
+   [
+    3,
+    "Darkmantle Spaulders"
+   ],
+   [
+    3,
+    "Nightslayer Shoulder Pads"
+   ],
+   [
+    3,
+    "Mantle of Wicked Revenge"
+   ]
+  ],
+  "Back": [
+   [
+    1,
+    "Cloak of the Fallen God"
+   ],
+   [
+    1,
+    "Shroud of Dominion"
+   ],
+   [
+    1,
+    "Cloak of Concentrated Hatred"
+   ],
+   [
+    3,
+    "Cloak of Veiled Shadows"
+   ],
+   [
+    3,
+    "Puissant Cape"
+   ],
+   [
+    3,
+    "Earthweave Cloak"
+   ]
+  ],
+  "Chest": [
+   [
+    1,
+    "Deathdealer's Vest"
+   ],
+   [
+    1,
+    "Bonescythe Breastplate"
+   ],
+   [
+    3,
+    "Bloodfang Chestpiece"
+   ],
+   [
+    4,
+    "Vest of Swift Execution"
+   ],
+   [
+    4,
+    "Darkmantle Tunic"
+   ]
+  ],
+  "Wrist": [
+   [
+    1,
+    "Bonescythe Bracers"
+   ],
+   [
+    1,
+    "Qiraji Execution Bracers"
+   ],
+   [
+    1,
+    "Bloodfang Bracers"
+   ],
+   [
+    3,
+    "Darkmantle Bracers"
+   ],
+   [
+    4,
+    "Forest Stalker's Bracers"
+   ],
+   [
+    4,
+    "Primal Batskin Bracers"
+   ]
+  ],
+  "Hands": [
+   [
+    1,
+    "Bonescythe Gauntlets"
+   ],
+   [
+    3,
+    "Gloves of Enforcement"
+   ],
+   [
+    3,
+    "Aged Core Leather Gloves"
+   ],
+   [
+    3,
+    "Darkmantle Gloves"
+   ],
+   [
+    4,
+    "Nightslayer Gloves"
+   ],
+   [
+    4,
+    "Marshal's Leather Handgrips"
+   ],
+   [
+    4,
+    "General's Leather Mitts"
+   ]
+  ],
+  "Waist": [
+   [
+    1,
+    "Bonescythe Waistguard"
+   ],
+   [
+    1,
+    "Belt of Never-ending Agony"
+   ],
+   [
+    3,
+    "Bloodfang Belt"
+   ],
+   [
+    4,
+    "Nightslayer Belt"
+   ],
+   [
+    4,
+    "Belt of Preserved Heads"
+   ],
+   [
+    5,
+    "Darkmantle Belt"
+   ]
+  ],
+  "Legs": [
+   [
+    1,
+    "Bonescythe Legplates"
+   ],
+   [
+    3,
+    "Leggings of Apocalypse"
+   ],
+   [
+    3,
+    "Deathdealer's Leggings"
+   ],
+   [
+    3,
+    "Marshal's Leather Leggings"
+   ],
+   [
+    3,
+    "General's Leather Legguards"
+   ],
+   [
+    4,
+    "Bloodfang Pants"
+   ]
+  ],
+  "Feet": [
+   [
+    1,
+    "Bonescythe Sabatons"
+   ],
+   [
+    3,
+    "Deathdealer's Boots"
+   ],
+   [
+    4,
+    "Darkmantle Boots"
+   ],
+   [
+    4,
+    "Boots of the Shadow Flame"
+   ],
+   [
+    4,
+    "Boots of the Vanguard"
+   ]
+  ],
+  "Finger": [
+   [
+    1,
+    "Bonescythe Ring"
+   ],
+   [
+    1,
+    "Band of Unnatural Forces"
+   ],
+   [
+    3,
+    "Band of Accuria"
+   ],
+   [
+    3,
+    "Band of Reanimation"
+   ],
+   [
+    3,
+    "Signet Ring of the Bronze Dragonflight"
+   ],
+   [
+    4,
+    "Master Dragonslayer's Ring"
+   ],
+   [
+    4,
+    "Don Julio's Band"
+   ]
+  ],
+  "Trinket": [
+   [
+    1,
+    "Kiss of the Spider"
+   ],
+   [
+    1,
+    "Slayer's Crest"
+   ],
+   [
+    1,
+    "Mark of the Champion"
+   ],
+   [
+    3,
+    "Jom Gabbar"
+   ],
+   [
+    3,
+    "Earthstrike"
+   ],
+   [
+    3,
+    "Drake Fang Talisman"
+   ],
+   [
+    4,
+    "Renataki's Charm of Trickery"
+   ],
+   [
+    4,
+    "Hand of Justice"
+   ]
+  ],
+  "MainHand": [
+   [
+    1,
+    "Gressil, Dawn of Ruin"
+   ],
+   [
+    3,
+    "Grand Marshal's Longsword"
+   ],
+   [
+    3,
+    "High Warlord's Blade"
+   ],
+   [
+    3,
+    "Ancient Qiraji Ripper"
+   ],
+   [
+    3,
+    "Chromatically Tempered Sword"
+   ],
+   [
+    4,
+    "Nightmare Blade"
+   ]
+  ],
+  "SecondaryHand": [
+   [
+    2,
+    "Iblis, Blade of the Fallen Seraph"
+   ],
+   [
+    2,
+    "The Hungering Cold"
+   ],
+   [
+    3,
+    "Maladath, Runed Blade of the Black Flight"
+   ],
+   [
+    3,
+    "Thunderfury, Blessed Blade of the Windseeker"
+   ],
+   [
+    4,
+    "Widow's Remorse"
+   ],
+   [
+    4,
+    "Grand Marshal's Swiftblade"
+   ],
+   [
+    4,
+    "High Warlord's Quickblade"
+   ],
+   [
+    4,
+    "Chromatically Tempered Sword"
+   ],
+   [
+    1,
+    "Death's Sting"
+   ],
+   [
+    3,
+    "Harbinger of Doom"
+   ],
+   [
+    3,
+    "Maexxna's Fang"
+   ],
+   [
+    3,
+    "Blessed Qiraji Pugio"
+   ],
+   [
+    4,
+    "Grand Marshal's Dirk"
+   ],
+   [
+    4,
+    "High Warlord's Razor"
+   ]
+  ],
+  "Ranged": [
+   [
+    1,
+    "Nerubian Slavemaker"
+   ],
+   [
+    1,
+    "Huhuran's Stinger"
+   ],
+   [
+    1,
+    "Soulstring"
+   ],
+   [
+    1,
+    "Crossbow of Imminent Doom"
+   ],
+   [
+    1,
+    "Striker's Mark"
+   ],
+   [
+    1,
+    "Larvae of the Great Worm"
+   ],
+   [
+    3,
+    "Dragonbreath Hand Cannon"
+   ],
+   [
+    3,
+    "Precisely Calibrated Boomstick"
+   ]
+  ]
+ },
+ "assassination": {
+  "Head": [
+   [
+    1,
+    "Bonescythe Helmet"
+   ],
+   [
+    3,
+    "Deathdealer's Helm"
+   ],
+   [
+    4,
+    "Darkmantle Cap"
+   ],
+   [
+    4,
+    "Bloodfang Hood"
+   ],
+   [
+    4,
+    "Field Marshal's Leather Mask"
+   ],
+   [
+    4,
+    "Warlord's Leather Helm"
+   ]
+  ],
+  "Neck": [
+   [
+    1,
+    "Prestor's Talisman of Connivery"
+   ],
+   [
+    3,
+    "Onyxia Tooth Pendant"
+   ],
+   [
+    4,
+    "Barbed Choker"
+   ],
+   [
+    4,
+    "The Eye of Hakkar"
+   ],
+   [
+    4,
+    "Fury of the Forgotten Swarm"
+   ]
+  ],
+  "Shoulder": [
+   [
+    1,
+    "Bonescythe Pauldrons"
+   ],
+   [
+    1,
+    "Deathdealer's Spaulders"
+   ],
+   [
+    3,
+    "Darkmantle Spaulders"
+   ],
+   [
+    3,
+    "Nightslayer Shoulder Pads"
+   ],
+   [
+    3,
+    "Mantle of Wicked Revenge"
+   ]
+  ],
+  "Back": [
+   [
+    2,
+    "Cloak of the Fallen God"
+   ],
+   [
+    2,
+    "Shroud of Dominion"
+   ],
+   [
+    1,
+    "Cloak of Concentrated Hatred"
+   ],
+   [
+    3,
+    "Cloak of Veiled Shadows"
+   ],
+   [
+    3,
+    "Puissant Cape"
+   ],
+   [
+    3,
+    "Earthweave Cloak"
+   ]
+  ],
+  "Chest": [
+   [
+    1,
+    "Deathdealer's Vest"
+   ],
+   [
+    1,
+    "Bonescythe Breastplate"
+   ],
+   [
+    3,
+    "Bloodfang Chestpiece"
+   ],
+   [
+    4,
+    "Vest of Swift Execution"
+   ],
+   [
+    4,
+    "Darkmantle Tunic"
+   ]
+  ],
+  "Wrist": [
+   [
+    2,
+    "Bonescythe Bracers"
+   ],
+   [
+    1,
+    "Qiraji Execution Bracers"
+   ],
+   [
+    1,
+    "Bloodfang Bracers"
+   ],
+   [
+    3,
+    "Darkmantle Bracers"
+   ],
+   [
+    4,
+    "Forest Stalker's Bracers"
+   ],
+   [
+    4,
+    "Primal Batskin Bracers"
+   ]
+  ],
+  "Hands": [
+   [
+    1,
+    "Bonescythe Gauntlets"
+   ],
+   [
+    3,
+    "Gloves of Enforcement"
+   ],
+   [
+    3,
+    "Aged Core Leather Gloves"
+   ],
+   [
+    3,
+    "Darkmantle Gloves"
+   ],
+   [
+    4,
+    "Nightslayer Gloves"
+   ],
+   [
+    4,
+    "Marshal's Leather Handgrips"
+   ],
+   [
+    4,
+    "General's Leather Mitts"
+   ]
+  ],
+  "Waist": [
+   [
+    2,
+    "Bonescythe Waistguard"
+   ],
+   [
+    1,
+    "Belt of Never-ending Agony"
+   ],
+   [
+    3,
+    "Bloodfang Belt"
+   ],
+   [
+    4,
+    "Nightslayer Belt"
+   ],
+   [
+    4,
+    "Belt of Preserved Heads"
+   ],
+   [
+    5,
+    "Darkmantle Belt"
+   ]
+  ],
+  "Legs": [
+   [
+    1,
+    "Bonescythe Legplates"
+   ],
+   [
+    3,
+    "Leggings of Apocalypse"
+   ],
+   [
+    3,
+    "Deathdealer's Leggings"
+   ],
+   [
+    3,
+    "Marshal's Leather Leggings"
+   ],
+   [
+    3,
+    "General's Leather Legguards"
+   ],
+   [
+    4,
+    "Bloodfang Pants"
+   ]
+  ],
+  "Feet": [
+   [
+    1,
+    "Bonescythe Sabatons"
+   ],
+   [
+    3,
+    "Deathdealer's Boots"
+   ],
+   [
+    4,
+    "Darkmantle Boots"
+   ],
+   [
+    4,
+    "Boots of the Shadow Flame"
+   ],
+   [
+    4,
+    "Boots of the Vanguard"
+   ]
+  ],
+  "Finger": [
+   [
+    1,
+    "Bonescythe Ring"
+   ],
+   [
+    1,
+    "Band of Unnatural Forces"
+   ],
+   [
+    3,
+    "Band of Accuria"
+   ],
+   [
+    3,
+    "Band of Reanimation"
+   ],
+   [
+    3,
+    "Signet Ring of the Bronze Dragonflight"
+   ],
+   [
+    4,
+    "Master Dragonslayer's Ring"
+   ],
+   [
+    4,
+    "Don Julio's Band"
+   ]
+  ],
+  "Trinket": [
+   [
+    1,
+    "Kiss of the Spider"
+   ],
+   [
+    1,
+    "Slayer's Crest"
+   ],
+   [
+    1,
+    "Mark of the Champion"
+   ],
+   [
+    3,
+    "Jom Gabbar"
+   ],
+   [
+    3,
+    "Earthstrike"
+   ],
+   [
+    3,
+    "Drake Fang Talisman"
+   ],
+   [
+    4,
+    "Renataki's Charm of Trickery"
+   ],
+   [
+    4,
+    "Hand of Justice"
+   ]
+  ],
+  "SecondaryHand": [
+   [
+    1,
+    "Death's Sting"
+   ],
+   [
+    3,
+    "Harbinger of Doom"
+   ],
+   [
+    3,
+    "Maexxna's Fang"
+   ],
+   [
+    3,
+    "Blessed Qiraji Pugio"
+   ],
+   [
+    4,
+    "Grand Marshal's Dirk"
+   ],
+   [
+    4,
+    "High Warlord's Razor"
+   ]
+  ],
+  "Ranged": [
+   [
+    1,
+    "Nerubian Slavemaker"
+   ],
+   [
+    1,
+    "Huhuran's Stinger"
+   ],
+   [
+    1,
+    "Soulstring"
+   ],
+   [
+    1,
+    "Crossbow of Imminent Doom"
+   ],
+   [
+    1,
+    "Striker's Mark"
+   ],
+   [
+    1,
+    "Larvae of the Great Worm"
+   ],
+   [
+    3,
+    "Dragonbreath Hand Cannon"
+   ],
+   [
+    3,
+    "Precisely Calibrated Boomstick"
+   ]
+  ]
+ },
+ "subtlety": {
+  "Head": [
+   [
+    1,
+    "Bonescythe Helmet"
+   ],
+   [
+    3,
+    "Deathdealer's Helm"
+   ],
+   [
+    4,
+    "Darkmantle Cap"
+   ],
+   [
+    4,
+    "Bloodfang Hood"
+   ],
+   [
+    4,
+    "Field Marshal's Leather Mask"
+   ],
+   [
+    4,
+    "Warlord's Leather Helm"
+   ]
+  ],
+  "Neck": [
+   [
+    1,
+    "Prestor's Talisman of Connivery"
+   ],
+   [
+    3,
+    "Onyxia Tooth Pendant"
+   ],
+   [
+    4,
+    "Barbed Choker"
+   ],
+   [
+    4,
+    "The Eye of Hakkar"
+   ],
+   [
+    4,
+    "Fury of the Forgotten Swarm"
+   ]
+  ],
+  "Shoulder": [
+   [
+    1,
+    "Bonescythe Pauldrons"
+   ],
+   [
+    1,
+    "Deathdealer's Spaulders"
+   ],
+   [
+    3,
+    "Darkmantle Spaulders"
+   ],
+   [
+    3,
+    "Nightslayer Shoulder Pads"
+   ],
+   [
+    3,
+    "Mantle of Wicked Revenge"
+   ]
+  ],
+  "Back": [
+   [
+    2,
+    "Cloak of the Fallen God"
+   ],
+   [
+    2,
+    "Shroud of Dominion"
+   ],
+   [
+    1,
+    "Cloak of Concentrated Hatred"
+   ],
+   [
+    3,
+    "Cloak of Veiled Shadows"
+   ],
+   [
+    3,
+    "Puissant Cape"
+   ],
+   [
+    3,
+    "Earthweave Cloak"
+   ]
+  ],
+  "Chest": [
+   [
+    1,
+    "Deathdealer's Vest"
+   ],
+   [
+    1,
+    "Bonescythe Breastplate"
+   ],
+   [
+    3,
+    "Bloodfang Chestpiece"
+   ],
+   [
+    4,
+    "Vest of Swift Execution"
+   ],
+   [
+    4,
+    "Darkmantle Tunic"
+   ]
+  ],
+  "Wrist": [
+   [
+    2,
+    "Bonescythe Bracers"
+   ],
+   [
+    1,
+    "Qiraji Execution Bracers"
+   ],
+   [
+    1,
+    "Bloodfang Bracers"
+   ],
+   [
+    3,
+    "Darkmantle Bracers"
+   ],
+   [
+    4,
+    "Forest Stalker's Bracers"
+   ],
+   [
+    4,
+    "Primal Batskin Bracers"
+   ]
+  ],
+  "Hands": [
+   [
+    1,
+    "Bonescythe Gauntlets"
+   ],
+   [
+    3,
+    "Gloves of Enforcement"
+   ],
+   [
+    3,
+    "Aged Core Leather Gloves"
+   ],
+   [
+    3,
+    "Darkmantle Gloves"
+   ],
+   [
+    4,
+    "Nightslayer Gloves"
+   ],
+   [
+    4,
+    "Marshal's Leather Handgrips"
+   ],
+   [
+    4,
+    "General's Leather Mitts"
+   ]
+  ],
+  "Waist": [
+   [
+    2,
+    "Bonescythe Waistguard"
+   ],
+   [
+    1,
+    "Belt of Never-ending Agony"
+   ],
+   [
+    3,
+    "Bloodfang Belt"
+   ],
+   [
+    4,
+    "Nightslayer Belt"
+   ],
+   [
+    4,
+    "Belt of Preserved Heads"
+   ],
+   [
+    5,
+    "Darkmantle Belt"
+   ]
+  ],
+  "Legs": [
+   [
+    1,
+    "Bonescythe Legplates"
+   ],
+   [
+    3,
+    "Leggings of Apocalypse"
+   ],
+   [
+    3,
+    "Deathdealer's Leggings"
+   ],
+   [
+    3,
+    "Marshal's Leather Leggings"
+   ],
+   [
+    3,
+    "General's Leather Legguards"
+   ],
+   [
+    4,
+    "Bloodfang Pants"
+   ]
+  ],
+  "Feet": [
+   [
+    1,
+    "Bonescythe Sabatons"
+   ],
+   [
+    3,
+    "Deathdealer's Boots"
+   ],
+   [
+    4,
+    "Darkmantle Boots"
+   ],
+   [
+    4,
+    "Boots of the Shadow Flame"
+   ],
+   [
+    4,
+    "Boots of the Vanguard"
+   ]
+  ],
+  "Finger": [
+   [
+    1,
+    "Bonescythe Ring"
+   ],
+   [
+    1,
+    "Band of Unnatural Forces"
+   ],
+   [
+    3,
+    "Band of Accuria"
+   ],
+   [
+    3,
+    "Band of Reanimation"
+   ],
+   [
+    3,
+    "Signet Ring of the Bronze Dragonflight"
+   ],
+   [
+    4,
+    "Master Dragonslayer's Ring"
+   ],
+   [
+    4,
+    "Don Julio's Band"
+   ]
+  ],
+  "Trinket": [
+   [
+    1,
+    "Kiss of the Spider"
+   ],
+   [
+    1,
+    "Slayer's Crest"
+   ],
+   [
+    1,
+    "Mark of the Champion"
+   ],
+   [
+    3,
+    "Jom Gabbar"
+   ],
+   [
+    3,
+    "Earthstrike"
+   ],
+   [
+    3,
+    "Drake Fang Talisman"
+   ],
+   [
+    4,
+    "Renataki's Charm of Trickery"
+   ],
+   [
+    4,
+    "Hand of Justice"
+   ]
+  ],
+  "SecondaryHand": [
+   [
+    1,
+    "Death's Sting"
+   ],
+   [
+    3,
+    "Harbinger of Doom"
+   ],
+   [
+    3,
+    "Maexxna's Fang"
+   ],
+   [
+    3,
+    "Blessed Qiraji Pugio"
+   ],
+   [
+    4,
+    "Grand Marshal's Dirk"
+   ],
+   [
+    4,
+    "High Warlord's Razor"
+   ]
+  ],
+  "Ranged": [
+   [
+    1,
+    "Nerubian Slavemaker"
+   ],
+   [
+    1,
+    "Huhuran's Stinger"
+   ],
+   [
+    1,
+    "Soulstring"
+   ],
+   [
+    1,
+    "Crossbow of Imminent Doom"
+   ],
+   [
+    1,
+    "Striker's Mark"
+   ],
+   [
+    1,
+    "Larvae of the Great Worm"
+   ],
+   [
+    3,
+    "Dragonbreath Hand Cannon"
+   ],
+   [
+    3,
+    "Precisely Calibrated Boomstick"
+   ]
+  ]
+ }
+}

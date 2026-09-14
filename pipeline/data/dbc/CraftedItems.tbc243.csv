@@ -1,0 +1,2038 @@
+spell_id,spell_name,skill_line_id,profession,category,min_skill_rank,item_id,item_name,effect_base_points,effect_die_sides,effect_id,trivial_low,trivial_high,acquire_method
+587,Conjure Food,237,Arcane,class,1,5349,Conjured Muffin,1,1,24,0,0,0
+597,Conjure Food,237,Arcane,class,1,1113,Conjured Bread,1,1,24,0,0,0
+759,Conjure Mana Agate,237,Arcane,class,1,5514,Mana Agate,0,1,24,0,0,0
+990,Conjure Food,237,Arcane,class,1,1114,Conjured Rye,1,1,24,0,0,0
+3552,Conjure Mana Jade,237,Arcane,class,1,5513,Mana Jade,0,1,24,0,0,0
+5504,Conjure Water,237,Arcane,class,1,5350,Conjured Water,1,1,24,0,0,0
+5505,Conjure Water,237,Arcane,class,1,2288,Conjured Fresh Water,1,1,24,0,0,0
+5506,Conjure Water,237,Arcane,class,1,2136,Conjured Purified Water,1,1,24,0,0,0
+6127,Conjure Water,237,Arcane,class,1,3772,Conjured Spring Water,1,1,24,0,0,0
+6129,Conjure Food,237,Arcane,class,1,1487,Conjured Pumpernickel,1,1,24,0,0,0
+10053,Conjure Mana Citrine,237,Arcane,class,1,8007,Mana Citrine,0,1,24,0,0,0
+10054,Conjure Mana Ruby,237,Arcane,class,1,8008,Mana Ruby,0,1,24,0,0,0
+10138,Conjure Water,237,Arcane,class,1,8077,Conjured Mineral Water,1,1,24,0,0,0
+10139,Conjure Water,237,Arcane,class,1,8078,Conjured Sparkling Water,1,1,24,0,0,0
+10140,Conjure Water,237,Arcane,class,1,8079,Conjured Crystal Water,9,1,24,0,0,0
+10144,Conjure Food,237,Arcane,class,1,8075,Conjured Sourdough,1,1,24,0,0,0
+10145,Conjure Food,237,Arcane,class,1,8076,Conjured Sweet Roll,1,1,24,0,0,0
+27090,Conjure Water,237,Arcane,class,1,22018,Conjured Glacier Water,9,1,24,0,0,0
+27101,Conjure Mana Emerald,237,Arcane,class,1,22044,Mana Emerald,0,1,24,0,0,0
+28612,Conjure Food,237,Arcane,class,1,22895,Conjured Cinnamon Roll,9,1,24,0,0,0
+33717,Conjure Food,237,Arcane,class,1,22019,Conjured Croissant,9,1,24,0,0,0
+37420,Conjure Water,237,Arcane,class,1,30703,Conjured Mountain Spring Water,9,1,24,0,0,0
+693,Create Soulstone,354,Demonology,class,1,5232,Minor Soulstone,0,1,24,0,0,0
+2362,Create Spellstone,354,Demonology,class,1,5522,Spellstone,0,1,24,0,0,0
+6366,Create Firestone,354,Demonology,class,1,1254,Lesser Firestone,0,1,24,0,0,0
+17727,Create Spellstone,354,Demonology,class,1,13602,Greater Spellstone,0,1,24,0,0,0
+17728,Create Spellstone,354,Demonology,class,1,13603,Major Spellstone,0,1,24,0,0,0
+17951,Create Firestone,354,Demonology,class,1,13699,Firestone,0,1,24,0,0,0
+17952,Create Firestone,354,Demonology,class,1,13700,Greater Firestone,0,1,24,0,0,0
+17953,Create Firestone,354,Demonology,class,1,13701,Major Firestone,0,1,24,0,0,0
+20752,Create Soulstone,354,Demonology,class,1,16892,Lesser Soulstone,0,1,24,0,0,0
+20755,Create Soulstone,354,Demonology,class,1,16893,Soulstone,0,1,24,0,0,0
+20756,Create Soulstone,354,Demonology,class,1,16895,Greater Soulstone,0,1,24,0,0,0
+20757,Create Soulstone,354,Demonology,class,1,16896,Major Soulstone,0,1,24,0,0,0
+27238,Create Soulstone,354,Demonology,class,1,22116,Master Soulstone,0,1,24,0,0,0
+27250,Create Firestone,354,Demonology,class,1,22128,Master Firestone,0,1,24,0,0,0
+28172,Create Spellstone,354,Demonology,class,1,22646,Master Spellstone,0,1,24,0,0,0
+2835,Deadly Poison,40,Poisons,class,1,2892,Deadly Poison,0,1,24,175,225,0
+2837,Deadly Poison II,40,Poisons,class,1,2893,Deadly Poison II,0,1,24,215,265,0
+3420,Crippling Poison,40,Poisons,class,1,3775,Crippling Poison,0,1,24,125,175,0
+3421,Crippling Poison II,40,Poisons,class,1,3776,Crippling Poison II,0,1,24,275,325,0
+5763,Mind-numbing Poison,40,Poisons,class,1,5237,Mind-numbing Poison,0,1,24,150,200,0
+8681,Instant Poison,40,Poisons,class,1,6947,Instant Poison,0,1,24,125,175,1
+8687,Instant Poison II,40,Poisons,class,1,6949,Instant Poison II,0,1,24,165,215,0
+8691,Instant Poison III,40,Poisons,class,1,6950,Instant Poison III,0,1,24,205,255,0
+8694,Mind-numbing Poison II,40,Poisons,class,1,6951,Mind-numbing Poison II,0,1,24,215,265,0
+11341,Instant Poison IV,40,Poisons,class,1,8926,Instant Poison IV,0,1,24,245,295,0
+11342,Instant Poison V,40,Poisons,class,1,8927,Instant Poison V,0,1,24,285,335,0
+11343,Instant Poison VI,40,Poisons,class,1,8928,Instant Poison VI,0,1,24,325,375,0
+11357,Deadly Poison III,40,Poisons,class,1,8984,Deadly Poison III,0,1,24,255,305,0
+11358,Deadly Poison IV,40,Poisons,class,1,8985,Deadly Poison IV,0,1,24,295,345,0
+11400,Mind-numbing Poison III,40,Poisons,class,1,9186,Mind-numbing Poison III,0,1,24,285,335,0
+13220,Wound Poison,40,Poisons,class,1,10918,Wound Poison,0,1,24,185,235,0
+13228,Wound Poison II,40,Poisons,class,1,10920,Wound Poison II,0,1,24,225,275,0
+13229,Wound Poison III,40,Poisons,class,1,10921,Wound Poison III,0,1,24,265,315,0
+13230,Wound Poison IV,40,Poisons,class,1,10922,Wound Poison IV,0,1,24,305,355,0
+25347,Deadly Poison V,40,Poisons,class,1,20844,Deadly Poison V,0,1,24,300,350,0
+26786,Anesthetic Poison,40,Poisons,class,1,21835,Anesthetic Poison,0,1,24,340,370,0
+26892,Instant Poison VII,40,Poisons,class,1,21927,Instant Poison VII,0,1,24,365,415,0
+26969,Deadly Poison VI,40,Poisons,class,1,22053,Deadly Poison VI,0,1,24,345,385,0
+27282,Deadly Poison VII,40,Poisons,class,1,22054,Deadly Poison VII,0,1,24,385,425,0
+27283,Wound Poison V,40,Poisons,class,1,22055,Wound Poison V,0,1,24,345,395,0
+2329,Elixir of Lion's Strength,171,Alchemy,primary,1,2454,Elixir of Lion's Strength,0,1,24,55,95,1
+2330,Minor Healing Potion,171,Alchemy,primary,1,118,Minor Healing Potion,0,1,24,55,95,1
+2333,Elixir of Lesser Agility,171,Alchemy,primary,1,3390,Elixir of Lesser Agility,0,1,24,165,205,0
+3170,Weak Troll's Blood Potion,171,Alchemy,primary,1,3382,Weak Troll's Blood Potion,0,1,24,60,100,0
+3171,Elixir of Wisdom,171,Alchemy,primary,1,3383,Elixir of Wisdom,0,1,24,120,160,0
+3172,Minor Magic Resistance Potion,171,Alchemy,primary,1,3384,Minor Magic Resistance Potion,0,1,24,135,175,0
+3173,Lesser Mana Potion,171,Alchemy,primary,1,3385,Lesser Mana Potion,0,1,24,145,185,0
+3174,Potion of Curing,171,Alchemy,primary,1,3386,Potion of Curing,0,1,24,145,185,0
+3175,Limited Invulnerability Potion,171,Alchemy,primary,1,3387,Limited Invulnerability Potion,0,1,24,275,315,0
+3176,Strong Troll's Blood Potion,171,Alchemy,primary,1,3388,Strong Troll's Blood Potion,0,1,24,150,190,0
+3177,Elixir of Defense,171,Alchemy,primary,1,3389,Elixir of Defense,0,1,24,155,195,0
+3188,Elixir of Ogre's Strength,171,Alchemy,primary,1,3391,Elixir of Ogre's Strength,0,1,24,175,215,0
+3230,Elixir of Minor Agility,171,Alchemy,primary,1,2457,Elixir of Minor Agility,0,1,24,80,120,0
+3447,Healing Potion,171,Alchemy,primary,1,929,Healing Potion,0,1,24,135,175,0
+3448,Lesser Invisibility Potion,171,Alchemy,primary,1,3823,Lesser Invisibility Potion,0,1,24,185,225,0
+3449,Shadow Oil,171,Alchemy,primary,1,3824,Shadow Oil,0,1,24,190,230,0
+3450,Elixir of Fortitude,171,Alchemy,primary,1,3825,Elixir of Fortitude,0,1,24,195,235,0
+3451,Mighty Troll's Blood Potion,171,Alchemy,primary,1,3826,Mighty Troll's Blood Potion,0,1,24,200,240,0
+3452,Mana Potion,171,Alchemy,primary,1,3827,Mana Potion,0,1,24,180,220,0
+3453,Elixir of Detect Lesser Invisibility,171,Alchemy,primary,1,3828,Elixir of Detect Lesser Invisibility,0,1,24,215,255,0
+3454,Frost Oil,171,Alchemy,primary,1,3829,Frost Oil,0,1,24,220,260,0
+4508,Discolored Healing Potion,171,Alchemy,primary,1,4596,Discolored Healing Potion,0,1,24,80,120,0
+4942,Lesser Stoneshield Potion,171,Alchemy,primary,1,4623,Lesser Stoneshield Potion,0,1,24,230,270,0
+6617,Rage Potion,171,Alchemy,primary,1,5631,Rage Potion,0,1,24,90,130,0
+6618,Great Rage Potion,171,Alchemy,primary,1,5633,Great Rage Potion,0,1,24,195,235,0
+6619,Cowardly Flight Potion,171,Alchemy,primary,1,5632,Cowardly Flight Potion,0,1,24,150,190,0
+6624,Free Action Potion,171,Alchemy,primary,1,5634,Free Action Potion,0,1,24,175,215,0
+7179,Elixir of Water Breathing,171,Alchemy,primary,1,5996,Elixir of Water Breathing,0,1,24,120,160,0
+7181,Greater Healing Potion,171,Alchemy,primary,1,1710,Greater Healing Potion,0,1,24,175,215,0
+7183,Elixir of Minor Defense,171,Alchemy,primary,1,5997,Elixir of Minor Defense,0,1,24,55,95,1
+7255,Holy Protection Potion,171,Alchemy,primary,1,6051,Holy Protection Potion,0,1,24,130,170,0
+7256,Shadow Protection Potion,171,Alchemy,primary,1,6048,Shadow Protection Potion,0,1,24,160,200,0
+7257,Fire Protection Potion,171,Alchemy,primary,1,6049,Fire Protection Potion,0,1,24,210,250,0
+7258,Frost Protection Potion,171,Alchemy,primary,1,6050,Frost Protection Potion,0,1,24,205,245,0
+7259,Nature Protection Potion,171,Alchemy,primary,1,6052,Nature Protection Potion,0,1,24,210,250,0
+7836,Blackmouth Oil,171,Alchemy,primary,1,6370,Blackmouth Oil,0,1,24,80,100,0
+7837,Fire Oil,171,Alchemy,primary,1,6371,Fire Oil,0,1,24,150,170,0
+7841,Swim Speed Potion,171,Alchemy,primary,1,6372,Swim Speed Potion,0,1,24,130,170,0
+7845,Elixir of Firepower,171,Alchemy,primary,1,6373,Elixir of Firepower,0,1,24,165,205,0
+8240,Elixir of Giant Growth,171,Alchemy,primary,1,6662,Elixir of Giant Growth,0,1,24,120,160,0
+11447,Elixir of Waterwalking,171,Alchemy,primary,1,8827,Elixir of Water Walking,0,1,24,190,230,0
+11448,Greater Mana Potion,171,Alchemy,primary,1,6149,Greater Mana Potion,0,1,24,220,260,0
+11449,Elixir of Agility,171,Alchemy,primary,1,8949,Elixir of Agility,0,1,24,205,245,0
+11450,Elixir of Greater Defense,171,Alchemy,primary,1,8951,Elixir of Greater Defense,0,1,24,215,255,0
+11451,Oil of Immolation,171,Alchemy,primary,1,8956,Oil of Immolation,0,1,24,220,260,0
+11452,Restorative Potion,171,Alchemy,primary,1,9030,Restorative Potion,0,1,24,225,265,0
+11453,Magic Resistance Potion,171,Alchemy,primary,1,9036,Magic Resistance Potion,0,1,24,225,265,0
+11456,Goblin Rocket Fuel,171,Alchemy,primary,1,9061,Goblin Rocket Fuel,0,1,24,225,265,0
+11457,Superior Healing Potion,171,Alchemy,primary,1,3928,Superior Healing Potion,0,1,24,230,270,0
+11458,Wildvine Potion,171,Alchemy,primary,1,9144,Wildvine Potion,0,1,24,240,280,0
+11459,Philosopher's Stone,171,Alchemy,primary,1,9149,Philosopher's Stone,0,1,24,240,280,0
+11460,Elixir of Detect Undead,171,Alchemy,primary,1,9154,Elixir of Detect Undead,0,1,24,245,285,0
+11461,Arcane Elixir,171,Alchemy,primary,1,9155,Arcane Elixir,0,1,24,250,290,0
+11464,Invisibility Potion,171,Alchemy,primary,1,9172,Invisibility Potion,0,1,24,250,290,0
+11465,Elixir of Greater Intellect,171,Alchemy,primary,1,9179,Elixir of Greater Intellect,0,1,24,250,290,0
+11466,Gift of Arthas,171,Alchemy,primary,1,9088,Gift of Arthas,0,1,24,255,295,0
+11467,Elixir of Greater Agility,171,Alchemy,primary,1,9187,Elixir of Greater Agility,0,1,24,255,295,0
+11468,Elixir of Dream Vision,171,Alchemy,primary,1,9197,Elixir of Dream Vision,0,1,24,255,295,0
+11472,Elixir of Giants,171,Alchemy,primary,1,9206,Elixir of Giants,0,1,24,260,300,0
+11473,Ghost Dye,171,Alchemy,primary,1,9210,Ghost Dye,0,1,24,260,300,0
+11476,Elixir of Shadow Power,171,Alchemy,primary,1,9264,Elixir of Shadow Power,0,1,24,265,305,0
+11477,Elixir of Demonslaying,171,Alchemy,primary,1,9224,Elixir of Demonslaying,0,1,24,265,305,0
+11478,Elixir of Detect Demon,171,Alchemy,primary,1,9233,Elixir of Detect Demon,0,1,24,265,305,0
+11479,Transmute: Iron to Gold,171,Alchemy,primary,1,3577,Gold Bar,0,0,24,240,280,0
+11480,Transmute: Mithril to Truesilver,171,Alchemy,primary,1,6037,Truesilver Bar,0,0,24,240,280,0
+12609,Catseye Elixir,171,Alchemy,primary,1,10592,Catseye Elixir,0,1,24,220,260,0
+15833,Dreamless Sleep Potion,171,Alchemy,primary,1,12190,Dreamless Sleep Potion,0,1,24,245,285,0
+17187,Transmute: Arcanite,171,Alchemy,primary,1,12360,Arcanite Bar,0,0,24,275,290,0
+17551,Stonescale Oil,171,Alchemy,primary,1,13423,Stonescale Oil,0,1,24,250,260,0
+17552,Mighty Rage Potion,171,Alchemy,primary,1,13442,Mighty Rage Potion,0,1,24,270,310,0
+17553,Superior Mana Potion,171,Alchemy,primary,1,13443,Superior Mana Potion,0,1,24,275,315,0
+17554,Elixir of Superior Defense,171,Alchemy,primary,1,13445,Elixir of Superior Defense,0,1,24,280,320,0
+17555,Elixir of the Sages,171,Alchemy,primary,1,13447,Elixir of the Sages,0,1,24,285,325,0
+17556,Major Healing Potion,171,Alchemy,primary,1,13446,Major Healing Potion,0,1,24,290,330,0
+17557,Elixir of Brute Force,171,Alchemy,primary,1,13453,Elixir of Brute Force,0,1,24,290,330,0
+17559,Transmute: Air to Fire,171,Alchemy,primary,1,7078,Essence of Fire,0,0,24,275,290,0
+17560,Transmute: Fire to Earth,171,Alchemy,primary,1,7076,Essence of Earth,0,0,24,275,290,0
+17561,Transmute: Earth to Water,171,Alchemy,primary,1,7080,Essence of Water,0,0,24,275,290,0
+17562,Transmute: Water to Air,171,Alchemy,primary,1,7082,Essence of Air,0,0,24,275,290,0
+17563,Transmute: Undeath to Water,171,Alchemy,primary,1,7080,Essence of Water,0,0,24,275,290,0
+17564,Transmute: Water to Undeath,171,Alchemy,primary,1,12808,Essence of Undeath,0,0,24,275,290,0
+17565,Transmute: Life to Earth,171,Alchemy,primary,1,7076,Essence of Earth,0,0,24,275,290,0
+17566,Transmute: Earth to Life,171,Alchemy,primary,1,12803,Living Essence,0,0,24,275,290,0
+17570,Greater Stoneshield Potion,171,Alchemy,primary,1,13455,Greater Stoneshield Potion,0,1,24,295,335,0
+17571,Elixir of the Mongoose,171,Alchemy,primary,1,13452,Elixir of the Mongoose,0,1,24,295,335,0
+17572,Purification Potion,171,Alchemy,primary,1,13462,Purification Potion,0,1,24,300,340,0
+17573,Greater Arcane Elixir,171,Alchemy,primary,1,13454,Greater Arcane Elixir,0,1,24,300,340,0
+17574,Greater Fire Protection Potion,171,Alchemy,primary,1,13457,Greater Fire Protection Potion,0,1,24,305,345,0
+17575,Greater Frost Protection Potion,171,Alchemy,primary,1,13456,Greater Frost Protection Potion,0,1,24,305,345,0
+17576,Greater Nature Protection Potion,171,Alchemy,primary,1,13458,Greater Nature Protection Potion,0,1,24,305,345,0
+17577,Greater Arcane Protection Potion,171,Alchemy,primary,1,13461,Greater Arcane Protection Potion,0,1,24,305,345,0
+17578,Greater Shadow Protection Potion,171,Alchemy,primary,1,13459,Greater Shadow Protection Potion,0,1,24,305,345,0
+17579,Greater Holy Protection Potion,171,Alchemy,primary,1,13460,Greater Holy Protection Potion,0,1,24,305,345,0
+17580,Major Mana Potion,171,Alchemy,primary,1,13444,Major Mana Potion,0,1,24,310,350,0
+17632,Alchemist's Stone,171,Alchemy,primary,1,13503,Alchemist's Stone,0,1,24,365,380,0
+17634,Flask of Petrification,171,Alchemy,primary,1,13506,Flask of Petrification,0,1,24,315,330,0
+17635,Flask of the Titans,171,Alchemy,primary,1,13510,Flask of the Titans,0,1,24,315,330,0
+17636,Flask of Distilled Wisdom,171,Alchemy,primary,1,13511,Flask of Distilled Wisdom,0,1,24,315,330,0
+17637,Flask of Supreme Power,171,Alchemy,primary,1,13512,Flask of Supreme Power,0,1,24,315,330,0
+17638,Flask of Chromatic Resistance,171,Alchemy,primary,1,13513,Flask of Chromatic Resistance,0,1,24,315,330,0
+21923,Elixir of Frost Power,171,Alchemy,primary,1,17708,Elixir of Frost Power,0,1,24,210,250,0
+22732,Major Rejuvenation Potion,171,Alchemy,primary,1,18253,Major Rejuvenation Potion,0,1,24,310,330,0
+22808,Elixir of Greater Water Breathing,171,Alchemy,primary,1,18294,Elixir of Greater Water Breathing,0,1,24,230,270,0
+24266,Gurubashi Mojo Madness,171,Alchemy,primary,1,19931,Gurubashi Mojo Madness,2,1,24,315,330,0
+24365,Mageblood Potion,171,Alchemy,primary,1,20007,Mageblood Potion,0,1,24,290,330,0
+24366,Greater Dreamless Sleep Potion,171,Alchemy,primary,1,20002,Greater Dreamless Sleep Potion,0,1,24,290,330,0
+24367,Living Action Potion,171,Alchemy,primary,1,20008,Living Action Potion,0,1,24,300,340,0
+24368,Major Troll's Blood Potion,171,Alchemy,primary,1,20004,Major Troll's Blood Potion,0,1,24,305,345,0
+25146,Transmute: Elemental Fire,171,Alchemy,primary,1,7068,Elemental Fire,2,1,24,301,310,0
+26277,Elixir of Greater Firepower,171,Alchemy,primary,1,21546,Elixir of Greater Firepower,0,1,24,265,305,0
+28543,Elixir of Camouflage,171,Alchemy,primary,1,22823,Elixir of Camouflage,0,1,24,320,335,0
+28544,Elixir of Major Strength,171,Alchemy,primary,1,22824,Elixir of Major Strength,0,1,24,320,335,0
+28545,Elixir of Healing Power,171,Alchemy,primary,1,22825,Elixir of Healing Power,0,1,24,325,340,0
+28546,Sneaking Potion,171,Alchemy,primary,1,22826,Sneaking Potion,0,1,24,330,345,0
+28549,Elixir of Major Frost Power,171,Alchemy,primary,1,22827,Elixir of Major Frost Power,0,1,24,335,350,0
+28550,Insane Strength Potion,171,Alchemy,primary,1,22828,Insane Strength Potion,0,1,24,335,350,0
+28551,Super Healing Potion,171,Alchemy,primary,1,22829,Super Healing Potion,0,1,24,340,355,0
+28552,Elixir of the Searching Eye,171,Alchemy,primary,1,22830,Elixir of the Searching Eye,0,1,24,340,355,0
+28553,Elixir of Major Agility,171,Alchemy,primary,1,22831,Elixir of Major Agility,0,1,24,345,360,0
+28554,Shrouding Potion,171,Alchemy,primary,1,22871,Shrouding Potion,0,1,24,350,365,0
+28555,Super Mana Potion,171,Alchemy,primary,1,22832,Super Mana Potion,0,1,24,355,370,0
+28556,Elixir of Major Firepower,171,Alchemy,primary,1,22833,Elixir of Major Firepower,0,1,24,360,375,0
+28557,Elixir of Major Defense,171,Alchemy,primary,1,22834,Elixir of Major Defense,0,1,24,360,375,0
+28558,Elixir of Major Shadow Power,171,Alchemy,primary,1,22835,Elixir of Major Shadow Power,0,1,24,365,380,0
+28562,Major Dreamless Sleep Potion,171,Alchemy,primary,1,22836,Major Dreamless Sleep Potion,0,1,24,365,380,0
+28563,Heroic Potion,171,Alchemy,primary,1,22837,Heroic Potion,0,1,24,365,380,0
+28564,Haste Potion,171,Alchemy,primary,1,22838,Haste Potion,0,1,24,365,380,0
+28565,Destruction Potion,171,Alchemy,primary,1,22839,Destruction Potion,0,1,24,365,380,0
+28566,Transmute: Primal Air to Fire,171,Alchemy,primary,1,21884,Primal Fire,0,1,24,365,380,0
+28567,Transmute: Primal Earth to Water,171,Alchemy,primary,1,21885,Primal Water,0,1,24,365,380,0
+28568,Transmute: Primal Fire to Earth,171,Alchemy,primary,1,22452,Primal Earth,0,1,24,365,380,0
+28569,Transmute: Primal Water to Air,171,Alchemy,primary,1,22451,Primal Air,0,1,24,365,380,0
+28570,Elixir of Major Mageblood,171,Alchemy,primary,1,22840,Elixir of Major Mageblood,0,1,24,370,385,0
+28571,Major Fire Protection Potion,171,Alchemy,primary,1,22841,Major Fire Protection Potion,4,1,24,375,390,0
+28572,Major Frost Protection Potion,171,Alchemy,primary,1,22842,Major Frost Protection Potion,4,1,24,375,390,0
+28573,Major Nature Protection Potion,171,Alchemy,primary,1,22844,Major Nature Protection Potion,4,1,24,375,390,0
+28575,Major Arcane Protection Potion,171,Alchemy,primary,1,22845,Major Arcane Protection Potion,4,1,24,375,390,0
+28576,Major Shadow Protection Potion,171,Alchemy,primary,1,22846,Major Shadow Protection Potion,4,1,24,375,390,0
+28577,Major Holy Protection Potion,171,Alchemy,primary,1,22847,Major Holy Protection Potion,4,1,24,375,390,0
+28578,Elixir of Empowerment,171,Alchemy,primary,1,22848,Elixir of Empowerment,0,1,24,380,395,0
+28579,Ironshield Potion,171,Alchemy,primary,1,22849,Ironshield Potion,0,1,24,380,395,0
+28580,Transmute: Primal Shadow to Water,171,Alchemy,primary,1,21885,Primal Water,0,1,24,385,400,0
+28581,Transmute: Primal Water to Shadow,171,Alchemy,primary,1,22456,Primal Shadow,0,1,24,385,400,0
+28582,Transmute: Primal Mana to Fire,171,Alchemy,primary,1,21884,Primal Fire,0,1,24,385,400,0
+28583,Transmute: Primal Fire to Mana,171,Alchemy,primary,1,22457,Primal Mana,0,1,24,385,400,0
+28584,Transmute: Primal Life to Earth,171,Alchemy,primary,1,22452,Primal Earth,0,1,24,385,400,0
+28585,Transmute: Primal Earth to Life,171,Alchemy,primary,1,21886,Primal Life,0,1,24,385,400,0
+28586,Super Rejuvenation Potion,171,Alchemy,primary,1,22850,Super Rejuvenation Potion,0,1,24,390,405,0
+28587,Flask of Fortification,171,Alchemy,primary,1,22851,Flask of Fortification,0,1,24,390,405,0
+28588,Flask of Mighty Restoration,171,Alchemy,primary,1,22853,Flask of Mighty Restoration,0,1,24,390,405,0
+28589,Flask of Relentless Assault,171,Alchemy,primary,1,22854,Flask of Relentless Assault,0,1,24,390,405,0
+28590,Flask of Blinding Light,171,Alchemy,primary,1,22861,Flask of Blinding Light,0,1,24,390,405,0
+28591,Flask of Pure Death,171,Alchemy,primary,1,22866,Flask of Pure Death,0,1,24,390,405,0
+29688,Transmute: Primal Might,171,Alchemy,primary,1,23571,Primal Might,0,1,24,365,380,0
+32765,Transmute: Earthstorm Diamond,171,Alchemy,primary,1,25867,Earthstorm Diamond,0,1,24,365,380,0
+32766,Transmute: Skyfire Diamond,171,Alchemy,primary,1,25868,Skyfire Diamond,0,1,24,365,380,0
+33732,Volatile Healing Potion,171,Alchemy,primary,1,28100,Volatile Healing Potion,0,1,24,315,330,0
+33733,Unstable Mana Potion,171,Alchemy,primary,1,28101,Unstable Mana Potion,0,1,24,325,340,0
+33738,Onslaught Elixir,171,Alchemy,primary,1,28102,Onslaught Elixir,0,1,24,315,330,0
+33740,Adept's Elixir,171,Alchemy,primary,1,28103,Adept's Elixir,0,1,24,315,330,0
+33741,Elixir of Mastery,171,Alchemy,primary,1,28104,Elixir of Mastery,0,1,24,330,345,0
+38070,Mercurial Stone,171,Alchemy,primary,1,31080,Mercurial Stone,0,1,24,340,355,0
+38960,Fel Strength Elixir,171,Alchemy,primary,1,31679,Fel Strength Elixir,0,1,24,350,365,0
+38961,Fel Mana Potion,171,Alchemy,primary,1,31677,Fel Mana Potion,0,1,24,375,390,0
+38962,Fel Regeneration Potion,171,Alchemy,primary,1,31676,Fel Regeneration Potion,0,1,24,360,375,0
+39636,Elixir of Major Fortitude,171,Alchemy,primary,1,32062,Elixir of Major Fortitude,0,1,24,325,340,0
+39637,Earthen Elixir,171,Alchemy,primary,1,32063,Earthen Elixir,0,1,24,335,350,0
+39638,Elixir of Draenic Wisdom,171,Alchemy,primary,1,32067,Elixir of Draenic Wisdom,0,1,24,335,350,0
+39639,Elixir of Ironskin,171,Alchemy,primary,1,32068,Elixir of Ironskin,0,1,24,345,360,0
+41458,Cauldron of Major Arcane Protection,171,Alchemy,primary,1,32839,Cauldron of Major Arcane Protection,0,1,24,360,380,0
+41500,Cauldron of Major Fire Protection,171,Alchemy,primary,1,32849,Cauldron of Major Fire Protection,0,1,24,360,380,0
+41501,Cauldron of Major Frost Protection,171,Alchemy,primary,1,32850,Cauldron of Major Frost Protection,0,1,24,360,380,0
+41502,Cauldron of Major Nature Protection,171,Alchemy,primary,1,32851,Cauldron of Major Nature Protection,0,1,24,360,380,0
+41503,Cauldron of Major Shadow Protection,171,Alchemy,primary,1,32852,Cauldron of Major Shadow Protection,0,1,24,360,380,0
+42736,Flask of Chromatic Wonder,171,Alchemy,primary,1,33208,Flask of Chromatic Wonder,1,0,24,390,405,0
+45061,Mad Alchemist's Potion,171,Alchemy,primary,1,34440,Mad Alchemist's Potion,0,1,24,335,350,0
+47046,Guardian's Alchemist Stone,171,Alchemy,primary,1,35748,Guardian's Alchemist Stone,0,1,24,390,405,0
+47048,Sorcerer's Alchemist Stone,171,Alchemy,primary,1,35749,Sorcerer's Alchemist Stone,0,1,24,390,405,0
+47049,Redeemer's Alchemist Stone,171,Alchemy,primary,1,35750,Redeemer's Alchemist Stone,0,1,24,390,405,0
+47050,Assassin's Alchemist Stone,171,Alchemy,primary,1,35751,Assassin's Alchemist Stone,0,1,24,390,405,0
+2331,Minor Mana Potion,171,Alchemy,primary,30,2455,Minor Mana Potion,0,1,24,65,105,0
+2332,Minor Rejuvenation Potion,171,Alchemy,primary,40,2456,Minor Rejuvenation Potion,0,1,24,70,110,0
+2334,Elixir of Minor Fortitude,171,Alchemy,primary,50,2458,Elixir of Minor Fortitude,0,1,24,80,120,0
+2335,Swiftness Potion,171,Alchemy,primary,60,2459,Swiftness Potion,0,1,24,90,130,0
+2336,Elixir of Tongues,171,Alchemy,primary,70,2460,Elixir of Tongues (NYI),0,1,24,100,140,0
+2337,Lesser Healing Potion,171,Alchemy,primary,80,858,Lesser Healing Potion,0,1,24,85,125,0
+2660,Rough Sharpening Stone,164,Blacksmithing,primary,1,2862,Rough Sharpening Stone,0,1,24,15,55,1
+2663,Copper Bracers,164,Blacksmithing,primary,1,2853,Copper Bracers,0,1,24,20,60,1
+2671,Rough Bronze Bracers,164,Blacksmithing,primary,1,2867,Rough Bronze Bracers,0,1,24,145,175,0
+2673,Silvered Bronze Breastplate,164,Blacksmithing,primary,1,2869,Silvered Bronze Breastplate,0,1,24,160,190,0
+3115,Rough Weightstone,164,Blacksmithing,primary,1,3239,Rough Weightstone,0,1,24,15,55,1
+3116,Coarse Weightstone,164,Blacksmithing,primary,1,3240,Coarse Weightstone,0,1,24,65,80,0
+3117,Heavy Weightstone,164,Blacksmithing,primary,1,3241,Heavy Weightstone,0,1,24,125,140,0
+3292,Heavy Copper Broadsword,164,Blacksmithing,primary,1,3487,Heavy Copper Broadsword,0,1,24,135,175,0
+3293,Copper Battle Axe,164,Blacksmithing,primary,1,3488,Copper Battle Axe,0,1,24,75,115,0
+3294,Thick War Axe,164,Blacksmithing,primary,1,3489,Thick War Axe,0,1,24,110,150,0
+3295,Deadly Bronze Poniard,164,Blacksmithing,primary,1,3490,Deadly Bronze Poniard,0,1,24,155,185,0
+3296,Heavy Bronze Mace,164,Blacksmithing,primary,1,3491,Heavy Bronze Mace,0,1,24,160,190,0
+3297,Mighty Iron Hammer,164,Blacksmithing,primary,1,3492,Mighty Iron Hammer,0,1,24,175,205,0
+3319,Copper Chain Boots,164,Blacksmithing,primary,1,3469,Copper Chain Boots,0,1,24,60,100,0
+3320,Rough Grinding Stone,164,Blacksmithing,primary,1,3470,Rough Grinding Stone,0,1,24,45,85,0
+3321,Copper Chain Vest,164,Blacksmithing,primary,1,3471,Copper Chain Vest,0,1,24,75,115,0
+3323,Runed Copper Gauntlets,164,Blacksmithing,primary,1,3472,Runed Copper Gauntlets,0,1,24,80,120,0
+3324,Runed Copper Pants,164,Blacksmithing,primary,1,3473,Runed Copper Pants,0,1,24,85,125,0
+3325,Gemmed Copper Gauntlets,164,Blacksmithing,primary,1,3474,Gemmed Copper Gauntlets,0,1,24,100,140,0
+3326,Coarse Grinding Stone,164,Blacksmithing,primary,1,3478,Coarse Grinding Stone,0,1,24,75,100,0
+3328,Rough Bronze Shoulders,164,Blacksmithing,primary,1,3480,Rough Bronze Shoulders,0,1,24,140,170,0
+3330,Silvered Bronze Shoulders,164,Blacksmithing,primary,1,3481,Silvered Bronze Shoulders,0,1,24,155,185,0
+3331,Silvered Bronze Boots,164,Blacksmithing,primary,1,3482,Silvered Bronze Boots,0,1,24,160,190,0
+3333,Silvered Bronze Gauntlets,164,Blacksmithing,primary,1,3483,Silvered Bronze Gauntlets,0,1,24,165,195,0
+3334,Green Iron Boots,164,Blacksmithing,primary,1,3484,Green Iron Boots,0,1,24,175,205,0
+3336,Green Iron Gauntlets,164,Blacksmithing,primary,1,3485,Green Iron Gauntlets,0,1,24,180,210,0
+3337,Heavy Grinding Stone,164,Blacksmithing,primary,1,3486,Heavy Grinding Stone,0,1,24,125,150,0
+3491,Big Bronze Knife,164,Blacksmithing,primary,1,3848,Big Bronze Knife,0,1,24,135,165,0
+3492,Hardened Iron Shortsword,164,Blacksmithing,primary,1,3849,Hardened Iron Shortsword,0,1,24,185,210,0
+3493,Jade Serpentblade,164,Blacksmithing,primary,1,3850,Jade Serpentblade,0,1,24,200,225,0
+3494,Solid Iron Maul,164,Blacksmithing,primary,1,3851,Solid Iron Maul,0,1,24,180,205,0
+3495,Golden Iron Destroyer,164,Blacksmithing,primary,1,3852,Golden Iron Destroyer,0,1,24,195,220,0
+3496,Moonsteel Broadsword,164,Blacksmithing,primary,1,3853,Moonsteel Broadsword,0,1,24,205,230,0
+3497,Frost Tiger Blade,164,Blacksmithing,primary,1,3854,Frost Tiger Blade,0,1,24,225,250,0
+3498,Massive Iron Axe,164,Blacksmithing,primary,1,3855,Massive Iron Axe,0,1,24,210,235,0
+3500,Shadow Crescent Axe,164,Blacksmithing,primary,1,3856,Shadow Crescent Axe,0,1,24,225,250,0
+3501,Green Iron Bracers,164,Blacksmithing,primary,1,3835,Green Iron Bracers,0,1,24,190,215,0
+3502,Green Iron Helm,164,Blacksmithing,primary,1,3836,Green Iron Helm,0,1,24,195,220,0
+3503,Golden Scale Coif,164,Blacksmithing,primary,1,3837,Golden Scale Coif,0,1,24,215,240,0
+3504,Green Iron Shoulders,164,Blacksmithing,primary,1,3840,Green Iron Shoulders,0,1,24,185,210,0
+3505,Golden Scale Shoulders,164,Blacksmithing,primary,1,3841,Golden Scale Shoulders,0,1,24,200,225,0
+3506,Green Iron Leggings,164,Blacksmithing,primary,1,3842,Green Iron Leggings,0,1,24,180,205,0
+3507,Golden Scale Leggings,164,Blacksmithing,primary,1,3843,Golden Scale Leggings,0,1,24,195,220,0
+3508,Green Iron Hauberk,164,Blacksmithing,primary,1,3844,Green Iron Hauberk,0,1,24,205,230,0
+3511,Golden Scale Cuirass,164,Blacksmithing,primary,1,3845,Golden Scale Cuirass,0,1,24,220,245,0
+3513,Polished Steel Boots,164,Blacksmithing,primary,1,3846,Polished Steel Boots,0,1,24,210,235,0
+3515,Golden Scale Boots,164,Blacksmithing,primary,1,3847,Golden Scale Boots,0,1,24,225,250,0
+6517,Pearl-handled Dagger,164,Blacksmithing,primary,1,5540,Pearl-handled Dagger,0,1,24,140,170,0
+6518,Iridescent Hammer,164,Blacksmithing,primary,1,5541,Iridescent Hammer,0,1,24,170,200,0
+7221,Iron Shield Spike,164,Blacksmithing,primary,1,6042,Iron Shield Spike,0,1,24,180,210,0
+7222,Iron Counterweight,164,Blacksmithing,primary,1,6043,Iron Counterweight,0,1,24,190,215,0
+7223,Golden Scale Bracers,164,Blacksmithing,primary,1,6040,Golden Scale Bracers,0,1,24,210,235,0
+7224,Steel Weapon Chain,164,Blacksmithing,primary,1,6041,Steel Weapon Chain,0,1,24,215,240,0
+7408,Heavy Copper Maul,164,Blacksmithing,primary,1,6214,Heavy Copper Maul,0,1,24,105,145,0
+7817,Rough Bronze Boots,164,Blacksmithing,primary,1,6350,Rough Bronze Boots,0,1,24,125,155,0
+7818,Silver Rod,164,Blacksmithing,primary,1,6338,Silver Rod,0,1,24,105,110,0
+8366,Ironforge Chain,164,Blacksmithing,primary,1,6730,Ironforge Chain,0,1,24,110,150,0
+8367,Ironforge Breastplate,164,Blacksmithing,primary,1,6731,Ironforge Breastplate,0,1,24,140,180,0
+8368,Ironforge Gauntlets,164,Blacksmithing,primary,1,6733,Ironforge Gauntlets,0,1,24,170,200,0
+8768,Iron Buckle,164,Blacksmithing,primary,1,7071,Iron Buckle,1,1,24,150,155,0
+8880,Copper Dagger,164,Blacksmithing,primary,1,7166,Copper Dagger,0,1,24,70,110,0
+9811,Barbaric Iron Shoulders,164,Blacksmithing,primary,1,7913,Barbaric Iron Shoulders,0,1,24,185,210,0
+9813,Barbaric Iron Breastplate,164,Blacksmithing,primary,1,7914,Barbaric Iron Breastplate,0,1,24,185,210,0
+9814,Barbaric Iron Helm,164,Blacksmithing,primary,1,7915,Barbaric Iron Helm,0,1,24,200,225,0
+9818,Barbaric Iron Boots,164,Blacksmithing,primary,1,7916,Barbaric Iron Boots,0,1,24,205,230,0
+9820,Barbaric Iron Gloves,164,Blacksmithing,primary,1,7917,Barbaric Iron Gloves,0,1,24,210,235,0
+9916,Steel Breastplate,164,Blacksmithing,primary,1,7963,Steel Breastplate,0,1,24,225,250,0
+9918,Solid Sharpening Stone,164,Blacksmithing,primary,1,7964,Solid Sharpening Stone,0,1,24,200,210,0
+9920,Solid Grinding Stone,164,Blacksmithing,primary,1,7966,Solid Grinding Stone,0,1,24,200,210,0
+9921,Solid Weightstone,164,Blacksmithing,primary,1,7965,Solid Weightstone,0,1,24,200,210,0
+9926,Heavy Mithril Shoulder,164,Blacksmithing,primary,1,7918,Heavy Mithril Shoulder,0,1,24,225,245,0
+9928,Heavy Mithril Gauntlet,164,Blacksmithing,primary,1,7919,Heavy Mithril Gauntlet,0,1,24,225,245,0
+9931,Mithril Scale Pants,164,Blacksmithing,primary,1,7920,Mithril Scale Pants,0,1,24,230,250,0
+9933,Heavy Mithril Pants,164,Blacksmithing,primary,1,7921,Heavy Mithril Pants,0,1,24,230,250,0
+9935,Steel Plate Helm,164,Blacksmithing,primary,1,7922,Steel Plate Helm,0,1,24,235,255,0
+9937,Mithril Scale Bracers,164,Blacksmithing,primary,1,7924,Mithril Scale Bracers,0,1,24,235,255,0
+9939,Mithril Shield Spike,164,Blacksmithing,primary,1,7967,Mithril Shield Spike,0,1,24,235,255,0
+9942,Mithril Scale Gloves,164,Blacksmithing,primary,1,7925,Mithril Scale Gloves,0,1,24,240,260,0
+9945,Ornate Mithril Pants,164,Blacksmithing,primary,1,7926,Ornate Mithril Pants,0,1,24,240,260,0
+9950,Ornate Mithril Gloves,164,Blacksmithing,primary,1,7927,Ornate Mithril Gloves,0,1,24,240,260,0
+9952,Ornate Mithril Shoulder,164,Blacksmithing,primary,1,7928,Ornate Mithril Shoulder,0,1,24,245,265,0
+9954,Truesilver Gauntlets,164,Blacksmithing,primary,1,7938,Truesilver Gauntlets,0,1,24,245,265,0
+9957,Orcish War Leggings,164,Blacksmithing,primary,1,7929,Orcish War Leggings,0,1,24,250,270,0
+9959,Heavy Mithril Breastplate,164,Blacksmithing,primary,1,7930,Heavy Mithril Breastplate,0,1,24,250,270,0
+9961,Mithril Coif,164,Blacksmithing,primary,1,7931,Mithril Coif,0,1,24,250,270,0
+9964,Mithril Spurs,164,Blacksmithing,primary,1,7969,Mithril Spurs,0,1,24,255,275,0
+9966,Mithril Scale Shoulders,164,Blacksmithing,primary,1,7932,Mithril Scale Shoulders,0,1,24,255,275,0
+9968,Heavy Mithril Boots,164,Blacksmithing,primary,1,7933,Heavy Mithril Boots,0,1,24,255,275,0
+9970,Heavy Mithril Helm,164,Blacksmithing,primary,1,7934,Heavy Mithril Helm,0,1,24,255,275,0
+9972,Ornate Mithril Breastplate,164,Blacksmithing,primary,1,7935,Ornate Mithril Breastplate,0,1,24,260,280,0
+9974,Truesilver Breastplate,164,Blacksmithing,primary,1,7939,Truesilver Breastplate,0,1,24,265,285,0
+9979,Ornate Mithril Boots,164,Blacksmithing,primary,1,7936,Ornate Mithril Boots,0,1,24,265,285,0
+9980,Ornate Mithril Helm,164,Blacksmithing,primary,1,7937,Ornate Mithril Helm,0,1,24,265,285,0
+9983,Copper Claymore,164,Blacksmithing,primary,1,7955,Copper Claymore,0,1,24,70,110,0
+9985,Bronze Warhammer,164,Blacksmithing,primary,1,7956,Bronze Warhammer,0,1,24,155,185,0
+9986,Bronze Greatsword,164,Blacksmithing,primary,1,7957,Bronze Greatsword,0,1,24,160,190,0
+9987,Bronze Battle Axe,164,Blacksmithing,primary,1,7958,Bronze Battle Axe,0,1,24,165,195,0
+9993,Heavy Mithril Axe,164,Blacksmithing,primary,1,7941,Heavy Mithril Axe,0,1,24,235,260,0
+9995,Blue Glittering Axe,164,Blacksmithing,primary,1,7942,Blue Glittering Axe,0,1,24,245,270,0
+9997,Wicked Mithril Blade,164,Blacksmithing,primary,1,7943,Wicked Mithril Blade,0,1,24,250,275,0
+10001,Big Black Mace,164,Blacksmithing,primary,1,7945,Big Black Mace,0,1,24,255,280,0
+10003,The Shatterer,164,Blacksmithing,primary,1,7954,The Shatterer,0,1,24,260,285,0
+10005,Dazzling Mithril Rapier,164,Blacksmithing,primary,1,7944,Dazzling Mithril Rapier,0,1,24,265,290,0
+10007,Phantom Blade,164,Blacksmithing,primary,1,7961,Phantom Blade,0,1,24,270,295,0
+10009,Runed Mithril Hammer,164,Blacksmithing,primary,1,7946,Runed Mithril Hammer,0,1,24,270,295,0
+10011,Blight,164,Blacksmithing,primary,1,7959,Blight,0,1,24,275,300,0
+10013,Ebon Shiv,164,Blacksmithing,primary,1,7947,Ebon Shiv,0,1,24,280,305,0
+10015,Truesilver Champion,164,Blacksmithing,primary,1,7960,Truesilver Champion,0,1,24,285,310,0
+11454,Inlaid Mithril Cylinder,164,Blacksmithing,primary,1,9060,Inlaid Mithril Cylinder,0,1,24,225,250,0
+11643,Golden Scale Gauntlets,164,Blacksmithing,primary,1,9366,Golden Scale Gauntlets,0,1,24,225,245,0
+12259,Silvered Bronze Leggings,164,Blacksmithing,primary,1,10423,Silvered Bronze Leggings,0,1,24,180,205,0
+12260,Rough Copper Vest,164,Blacksmithing,primary,1,10421,Rough Copper Vest,0,1,24,15,55,1
+14379,Golden Rod,164,Blacksmithing,primary,1,11128,Golden Rod,0,1,24,155,160,0
+14380,Truesilver Rod,164,Blacksmithing,primary,1,11144,Truesilver Rod,0,1,24,205,210,0
+15292,Dark Iron Pulverizer,164,Blacksmithing,primary,1,11608,Dark Iron Pulverizer,0,1,24,285,305,0
+15293,Dark Iron Mail,164,Blacksmithing,primary,1,11606,Dark Iron Mail,0,1,24,290,310,0
+15294,Dark Iron Sunderer,164,Blacksmithing,primary,1,11607,Dark Iron Sunderer,0,1,24,295,315,0
+15295,Dark Iron Shoulders,164,Blacksmithing,primary,1,11605,Dark Iron Shoulders,0,1,24,300,320,0
+15296,Dark Iron Plate,164,Blacksmithing,primary,1,11604,Dark Iron Plate,0,1,24,305,325,0
+15972,Glinting Steel Dagger,164,Blacksmithing,primary,1,12259,Glinting Steel Dagger,0,1,24,205,230,0
+15973,Searing Golden Blade,164,Blacksmithing,primary,1,12260,Searing Golden Blade,0,1,24,215,240,0
+16639,Dense Grinding Stone,164,Blacksmithing,primary,1,12644,Dense Grinding Stone,0,1,24,255,260,0
+16640,Dense Weightstone,164,Blacksmithing,primary,1,12643,Dense Weightstone,0,1,24,255,260,0
+16641,Dense Sharpening Stone,164,Blacksmithing,primary,1,12404,Dense Sharpening Stone,0,1,24,255,260,0
+16642,Thorium Armor,164,Blacksmithing,primary,1,12405,Thorium Armor,0,1,24,270,290,0
+16643,Thorium Belt,164,Blacksmithing,primary,1,12406,Thorium Belt,0,1,24,270,290,0
+16644,Thorium Bracers,164,Blacksmithing,primary,1,12408,Thorium Bracers,0,1,24,275,295,0
+16645,Radiant Belt,164,Blacksmithing,primary,1,12416,Radiant Belt,0,1,24,280,300,0
+16646,Imperial Plate Shoulders,164,Blacksmithing,primary,1,12428,Imperial Plate Shoulders,0,1,24,285,305,0
+16647,Imperial Plate Belt,164,Blacksmithing,primary,1,12424,Imperial Plate Belt,0,1,24,285,305,0
+16648,Radiant Breastplate,164,Blacksmithing,primary,1,12415,Radiant Breastplate,0,1,24,290,310,0
+16649,Imperial Plate Bracers,164,Blacksmithing,primary,1,12425,Imperial Plate Bracers,0,1,24,290,310,0
+16650,Wildthorn Mail,164,Blacksmithing,primary,1,12624,Wildthorn Mail,0,1,24,290,310,0
+16651,Thorium Shield Spike,164,Blacksmithing,primary,1,12645,Thorium Shield Spike,0,1,24,295,315,0
+16652,Thorium Boots,164,Blacksmithing,primary,1,12409,Thorium Boots,0,1,24,300,320,0
+16653,Thorium Helm,164,Blacksmithing,primary,1,12410,Thorium Helm,0,1,24,300,320,0
+16654,Radiant Gloves,164,Blacksmithing,primary,1,12418,Radiant Gloves,0,1,24,305,325,0
+16655,Fiery Plate Gauntlets,164,Blacksmithing,primary,1,12631,Fiery Plate Gauntlets,0,1,24,310,330,0
+16656,Radiant Boots,164,Blacksmithing,primary,1,12419,Radiant Boots,0,1,24,310,330,0
+16657,Imperial Plate Boots,164,Blacksmithing,primary,1,12426,Imperial Plate Boots,0,1,24,315,335,0
+16658,Imperial Plate Helm,164,Blacksmithing,primary,1,12427,Imperial Plate Helm,0,1,24,315,335,0
+16659,Radiant Circlet,164,Blacksmithing,primary,1,12417,Radiant Circlet,0,1,24,315,335,0
+16659,Radiant Circlet,164,Blacksmithing,primary,1,12417,Radiant Circlet,0,1,24,315,335,0
+16660,Dawnbringer Shoulders,164,Blacksmithing,primary,1,12625,Dawnbringer Shoulders,0,1,24,310,330,0
+16661,Storm Gauntlets,164,Blacksmithing,primary,1,12632,Storm Gauntlets,0,1,24,315,335,0
+16662,Thorium Leggings,164,Blacksmithing,primary,1,12414,Thorium Leggings,0,1,24,320,340,0
+16663,Imperial Plate Chest,164,Blacksmithing,primary,1,12422,Imperial Plate Chest,0,1,24,320,340,0
+16664,Runic Plate Shoulders,164,Blacksmithing,primary,1,12610,Runic Plate Shoulders,0,1,24,320,340,0
+16665,Runic Plate Boots,164,Blacksmithing,primary,1,12611,Runic Plate Boots,0,1,24,320,340,0
+16667,Demon Forged Breastplate,164,Blacksmithing,primary,1,12628,Demon Forged Breastplate,0,1,24,305,325,0
+16724,Whitesoul Helm,164,Blacksmithing,primary,1,12633,Whitesoul Helm,0,1,24,320,340,0
+16725,Radiant Leggings,164,Blacksmithing,primary,1,12420,Radiant Leggings,0,1,24,320,340,0
+16726,Runic Plate Helm,164,Blacksmithing,primary,1,12612,Runic Plate Helm,0,1,24,320,340,0
+16728,Helm of the Great Chief,164,Blacksmithing,primary,1,12636,Helm of the Great Chief,0,1,24,320,340,0
+16729,Lionheart Helm,164,Blacksmithing,primary,1,12640,Lionheart Helm,0,1,24,320,340,0
+16730,Imperial Plate Leggings,164,Blacksmithing,primary,1,12429,Imperial Plate Leggings,0,1,24,320,340,0
+16731,Runic Breastplate,164,Blacksmithing,primary,1,12613,Runic Breastplate,0,1,24,320,340,0
+16732,Runic Plate Leggings,164,Blacksmithing,primary,1,12614,Runic Plate Leggings,0,1,24,320,340,0
+16741,Stronghold Gauntlets,164,Blacksmithing,primary,1,12639,Stronghold Gauntlets,0,1,24,320,340,0
+16742,Enchanted Thorium Helm,164,Blacksmithing,primary,1,12620,Enchanted Thorium Helm,0,1,24,320,340,0
+16744,Enchanted Thorium Leggings,164,Blacksmithing,primary,1,12619,Enchanted Thorium Leggings,0,1,24,320,340,0
+16745,Enchanted Thorium Breastplate,164,Blacksmithing,primary,1,12618,Enchanted Thorium Breastplate,0,1,24,320,340,0
+16746,Invulnerable Mail,164,Blacksmithing,primary,1,12641,Invulnerable Mail,0,1,24,320,340,0
+16960,Thorium Greatsword,164,Blacksmithing,primary,1,12764,Thorium Greatsword,0,1,24,285,310,0
+16965,Bleakwood Hew,164,Blacksmithing,primary,1,12769,Bleakwood Hew,0,1,24,295,320,0
+16967,Inlaid Thorium Hammer,164,Blacksmithing,primary,1,12772,Inlaid Thorium Hammer,0,1,24,295,320,0
+16969,Ornate Thorium Handaxe,164,Blacksmithing,primary,1,12773,Ornate Thorium Handaxe,0,1,24,300,325,0
+16970,Dawn's Edge,164,Blacksmithing,primary,1,12774,Dawn's Edge,0,1,24,300,325,0
+16971,Huge Thorium Battleaxe,164,Blacksmithing,primary,1,12775,Huge Thorium Battleaxe,0,1,24,305,330,0
+16973,Enchanted Battlehammer,164,Blacksmithing,primary,1,12776,Enchanted Battlehammer,0,1,24,305,330,0
+16978,Blazing Rapier,164,Blacksmithing,primary,1,12777,Blazing Rapier,0,1,24,305,330,0
+16980,Rune Edge,164,Blacksmithing,primary,1,12779,Rune Edge,0,1,24,310,335,0
+16983,Serenity,164,Blacksmithing,primary,1,12781,Serenity,0,1,24,310,335,0
+16984,Volcanic Hammer,164,Blacksmithing,primary,1,12792,Volcanic Hammer,0,1,24,315,340,0
+16985,Corruption,164,Blacksmithing,primary,1,12782,Corruption,0,1,24,315,340,0
+16986,Blood Talon,164,Blacksmithing,primary,1,12795,Blood Talon,0,1,24,325,350,0
+16987,Darkspear,164,Blacksmithing,primary,1,12802,Darkspear,0,1,24,325,350,0
+16988,Hammer of the Titans,164,Blacksmithing,primary,1,12796,Hammer of the Titans,0,1,24,320,340,0
+16990,Arcanite Champion,164,Blacksmithing,primary,1,12790,Arcanite Champion,0,1,24,320,340,0
+16991,Annihilator,164,Blacksmithing,primary,1,12798,Annihilator,0,1,24,320,340,0
+16992,Frostguard,164,Blacksmithing,primary,1,12797,Frostguard,0,1,24,320,340,0
+16993,Masterwork Stormhammer,164,Blacksmithing,primary,1,12794,Masterwork Stormhammer,0,1,24,320,340,0
+16994,Arcanite Reaper,164,Blacksmithing,primary,1,12784,Arcanite Reaper,0,1,24,320,340,0
+16995,Heartseeker,164,Blacksmithing,primary,1,12783,Heartseeker,0,1,24,320,340,0
+19666,Silver Skeleton Key,164,Blacksmithing,primary,1,15869,Silver Skeleton Key,1,1,24,100,120,0
+19667,Golden Skeleton Key,164,Blacksmithing,primary,1,15870,Golden Skeleton Key,1,1,24,150,170,0
+19668,Truesilver Skeleton Key,164,Blacksmithing,primary,1,15871,Truesilver Skeleton Key,1,1,24,200,220,0
+19669,Arcanite Skeleton Key,164,Blacksmithing,primary,1,15872,Arcanite Skeleton Key,1,1,24,275,285,0
+20201,Arcanite Rod,164,Blacksmithing,primary,1,16206,Arcanite Rod,0,1,24,275,285,0
+20872,Fiery Chain Girdle,164,Blacksmithing,primary,1,16989,Fiery Chain Girdle,0,1,24,315,335,0
+20873,Fiery Chain Shoulders,164,Blacksmithing,primary,1,16988,Fiery Chain Shoulders,0,1,24,320,340,0
+20874,Dark Iron Bracers,164,Blacksmithing,primary,1,17014,Dark Iron Bracers,0,1,24,315,335,0
+20876,Dark Iron Leggings,164,Blacksmithing,primary,1,17013,Dark Iron Leggings,0,1,24,320,340,0
+20890,Dark Iron Reaver,164,Blacksmithing,primary,1,17015,Dark Iron Reaver,0,1,24,320,340,0
+20897,Dark Iron Destroyer,164,Blacksmithing,primary,1,17016,Dark Iron Destroyer,0,1,24,320,340,0
+21161,Sulfuron Hammer,164,Blacksmithing,primary,1,17193,Sulfuron Hammer,0,1,24,325,350,0
+21913,Edge of Winter,164,Blacksmithing,primary,1,17704,Edge of Winter,0,1,24,215,240,0
+22757,Elemental Sharpening Stone,164,Blacksmithing,primary,1,18262,Elemental Sharpening Stone,0,1,24,300,320,0
+23628,Heavy Timbermaw Belt,164,Blacksmithing,primary,1,19043,Heavy Timbermaw Belt,0,1,24,310,330,0
+23629,Heavy Timbermaw Boots,164,Blacksmithing,primary,1,19048,Heavy Timbermaw Boots,0,1,24,320,340,0
+23632,Girdle of the Dawn,164,Blacksmithing,primary,1,19051,Girdle of the Dawn,0,1,24,310,330,0
+23633,Gloves of the Dawn,164,Blacksmithing,primary,1,19057,Gloves of the Dawn,0,1,24,320,340,0
+23636,Dark Iron Helm,164,Blacksmithing,primary,1,19148,Dark Iron Helm,0,1,24,320,340,0
+23637,Dark Iron Gauntlets,164,Blacksmithing,primary,1,19164,Dark Iron Gauntlets,0,1,24,320,340,0
+23638,Black Amnesty,164,Blacksmithing,primary,1,19166,Black Amnesty,0,1,24,320,340,0
+23639,Blackfury,164,Blacksmithing,primary,1,19167,Blackfury,0,1,24,320,340,0
+23650,Ebon Hand,164,Blacksmithing,primary,1,19170,Ebon Hand,0,1,24,320,340,0
+23652,Blackguard,164,Blacksmithing,primary,1,19168,Blackguard,0,1,24,320,340,0
+23653,Nightfall,164,Blacksmithing,primary,1,19169,Nightfall,0,1,24,320,340,0
+24136,Bloodsoul Breastplate,164,Blacksmithing,primary,1,19690,Bloodsoul Breastplate,0,1,24,320,340,0
+24137,Bloodsoul Shoulders,164,Blacksmithing,primary,1,19691,Bloodsoul Shoulders,0,1,24,320,340,0
+24138,Bloodsoul Gauntlets,164,Blacksmithing,primary,1,19692,Bloodsoul Gauntlets,0,1,24,320,340,0
+24139,Darksoul Breastplate,164,Blacksmithing,primary,1,19693,Darksoul Breastplate,0,1,24,320,340,0
+24140,Darksoul Leggings,164,Blacksmithing,primary,1,19694,Darksoul Leggings,0,1,24,320,340,0
+24141,Darksoul Shoulders,164,Blacksmithing,primary,1,19695,Darksoul Shoulders,0,1,24,320,340,0
+24399,Dark Iron Boots,164,Blacksmithing,primary,1,20039,Dark Iron Boots,0,1,24,320,340,0
+24912,Darkrune Gauntlets,164,Blacksmithing,primary,1,20549,Darkrune Gauntlets,0,1,24,320,340,0
+24913,Darkrune Helm,164,Blacksmithing,primary,1,20551,Darkrune Helm,0,1,24,320,340,0
+24914,Darkrune Breastplate,164,Blacksmithing,primary,1,20550,Darkrune Breastplate,0,1,24,320,340,0
+27585,Heavy Obsidian Belt,164,Blacksmithing,primary,1,22197,Heavy Obsidian Belt,0,1,24,320,340,0
+27586,Jagged Obsidian Shield,164,Blacksmithing,primary,1,22198,Jagged Obsidian Shield,0,1,24,320,340,0
+27587,Thick Obsidian Breastplate,164,Blacksmithing,primary,1,22196,Thick Obsidian Breastplate,0,1,24,320,340,0
+27588,Light Obsidian Belt,164,Blacksmithing,primary,1,22195,Light Obsidian Belt,0,1,24,320,340,0
+27589,Black Grasp of the Destroyer,164,Blacksmithing,primary,1,22194,Black Grasp of the Destroyer,0,1,24,320,340,0
+27590,Obsidian Mail Tunic,164,Blacksmithing,primary,1,22191,Obsidian Mail Tunic,0,1,24,320,340,0
+27829,Titanic Leggings,164,Blacksmithing,primary,1,22385,Titanic Leggings,0,1,24,320,340,0
+27830,Persuader,164,Blacksmithing,primary,1,22384,Persuader,0,1,24,320,340,0
+27832,Sageblade,164,Blacksmithing,primary,1,22383,Sageblade,0,1,24,320,340,0
+28242,Icebane Breastplate,164,Blacksmithing,primary,1,22669,Icebane Breastplate,0,1,24,320,340,0
+28243,Icebane Gauntlets,164,Blacksmithing,primary,1,22670,Icebane Gauntlets,0,1,24,320,340,0
+28244,Icebane Bracers,164,Blacksmithing,primary,1,22671,Icebane Bracers,0,1,24,320,340,0
+28461,Ironvine Breastplate,164,Blacksmithing,primary,1,22762,Ironvine Breastplate,0,1,24,320,340,0
+28462,Ironvine Gloves,164,Blacksmithing,primary,1,22763,Ironvine Gloves,0,1,24,320,340,0
+28463,Ironvine Belt,164,Blacksmithing,primary,1,22764,Ironvine Belt,0,1,24,320,340,0
+29545,Fel Iron Plate Gloves,164,Blacksmithing,primary,1,23482,Fel Iron Plate Gloves,0,1,24,310,330,0
+29547,Fel Iron Plate Belt,164,Blacksmithing,primary,1,23484,Fel Iron Plate Belt,0,1,24,315,335,0
+29548,Fel Iron Plate Boots,164,Blacksmithing,primary,1,23487,Fel Iron Plate Boots,0,1,24,325,345,0
+29549,Fel Iron Plate Pants,164,Blacksmithing,primary,1,23488,Fel Iron Plate Pants,0,1,24,325,345,0
+29550,Fel Iron Breastplate,164,Blacksmithing,primary,1,23489,Fel Iron Breastplate,0,1,24,335,355,0
+29551,Fel Iron Chain Coif,164,Blacksmithing,primary,1,23493,Fel Iron Chain Coif,0,1,24,310,330,0
+29552,Fel Iron Chain Gloves,164,Blacksmithing,primary,1,23491,Fel Iron Chain Gloves,0,1,24,320,340,0
+29553,Fel Iron Chain Bracers,164,Blacksmithing,primary,1,23494,Fel Iron Chain Bracers,0,1,24,325,345,0
+29556,Fel Iron Chain Tunic,164,Blacksmithing,primary,1,23490,Fel Iron Chain Tunic,0,1,24,330,350,0
+29557,Fel Iron Hatchet,164,Blacksmithing,primary,1,23497,Fel Iron Hatchet,0,1,24,320,340,0
+29558,Fel Iron Hammer,164,Blacksmithing,primary,1,23498,Fel Iron Hammer,0,1,24,325,345,0
+29565,Fel Iron Greatsword,164,Blacksmithing,primary,1,23499,Fel Iron Greatsword,0,1,24,330,350,0
+29566,Adamantite Maul,164,Blacksmithing,primary,1,23502,Adamantite Maul,0,1,24,335,355,0
+29568,Adamantite Cleaver,164,Blacksmithing,primary,1,23503,Adamantite Cleaver,0,1,24,340,360,0
+29569,Adamantite Dagger,164,Blacksmithing,primary,1,23504,Adamantite Dagger,0,1,24,340,360,0
+29571,Adamantite Rapier,164,Blacksmithing,primary,1,23505,Adamantite Rapier,0,1,24,345,365,0
+29603,Adamantite Plate Bracers,164,Blacksmithing,primary,1,23506,Adamantite Plate Bracers,0,1,24,345,365,0
+29605,Adamantite Plate Gloves,164,Blacksmithing,primary,1,23508,Adamantite Plate Gloves,0,1,24,345,365,0
+29606,Adamantite Breastplate,164,Blacksmithing,primary,1,23507,Adamantite Breastplate,0,1,24,350,370,0
+29608,Enchanted Adamantite Belt,164,Blacksmithing,primary,1,23510,Enchanted Adamantite Belt,0,1,24,365,385,0
+29610,Enchanted Adamantite Breastplate,164,Blacksmithing,primary,1,23509,Enchanted Adamantite Breastplate,0,1,24,370,390,0
+29611,Enchanted Adamantite Boots,164,Blacksmithing,primary,1,23511,Enchanted Adamantite Boots,0,1,24,365,385,0
+29613,Enchanted Adamantite Leggings,164,Blacksmithing,primary,1,23512,Enchanted Adamantite Leggings,0,1,24,375,395,0
+29614,Flamebane Bracers,164,Blacksmithing,primary,1,23515,Flamebane Bracers,0,1,24,360,380,0
+29615,Flamebane Helm,164,Blacksmithing,primary,1,23516,Flamebane Helm,0,1,24,365,385,0
+29616,Flamebane Gloves,164,Blacksmithing,primary,1,23514,Flamebane Gloves,0,1,24,370,390,0
+29617,Flamebane Breastplate,164,Blacksmithing,primary,1,23513,Flamebane Breastplate,0,1,24,375,395,0
+29619,Felsteel Gloves,164,Blacksmithing,primary,1,23517,Felsteel Gloves,0,1,24,370,390,0
+29620,Felsteel Leggings,164,Blacksmithing,primary,1,23518,Felsteel Leggings,0,1,24,370,390,0
+29621,Felsteel Helm,164,Blacksmithing,primary,1,23519,Felsteel Helm,0,1,24,375,395,0
+29622,Gauntlets of the Iron Tower,164,Blacksmithing,primary,1,23532,Gauntlets of the Iron Tower,0,1,24,375,395,0
+29628,Khorium Belt,164,Blacksmithing,primary,1,23524,Khorium Belt,0,1,24,370,390,0
+29629,Khorium Pants,164,Blacksmithing,primary,1,23523,Khorium Pants,0,1,24,370,390,0
+29630,Khorium Boots,164,Blacksmithing,primary,1,23525,Khorium Boots,0,1,24,375,395,0
+29642,Ragesteel Gloves,164,Blacksmithing,primary,1,23520,Ragesteel Gloves,0,1,24,375,395,0
+29643,Ragesteel Helm,164,Blacksmithing,primary,1,23521,Ragesteel Helm,0,1,24,375,395,0
+29645,Ragesteel Breastplate,164,Blacksmithing,primary,1,23522,Ragesteel Breastplate,0,1,24,380,400,0
+29648,Swiftsteel Gloves,164,Blacksmithing,primary,1,23526,Swiftsteel Gloves,0,1,24,380,400,0
+29649,Earthpeace Breastplate,164,Blacksmithing,primary,1,23527,Earthpeace Breastplate,0,1,24,380,400,0
+29654,Fel Sharpening Stone,164,Blacksmithing,primary,1,23528,Fel Sharpening Stone,0,1,24,300,310,0
+29656,Adamantite Sharpening Stone,164,Blacksmithing,primary,1,23529,Adamantite Sharpening Stone,0,1,24,350,360,0
+29657,Felsteel Shield Spike,164,Blacksmithing,primary,1,23530,Felsteel Shield Spike,0,1,24,370,390,0
+29658,Felfury Gauntlets,164,Blacksmithing,primary,1,23531,Felfury Gauntlets,0,1,24,375,395,0
+29662,Steelgrip Gauntlets,164,Blacksmithing,primary,1,23533,Steelgrip Gauntlets,0,1,24,375,395,0
+29663,Storm Helm,164,Blacksmithing,primary,1,23534,Storm Helm,0,1,24,375,395,0
+29664,Helm of the Stalwart Defender,164,Blacksmithing,primary,1,23535,Helm of the Stalwart Defender,0,1,24,375,395,0
+29668,Oathkeeper's Helm,164,Blacksmithing,primary,1,23536,Oathkeeper's Helm,0,1,24,375,395,0
+29669,Black Felsteel Bracers,164,Blacksmithing,primary,1,23537,Black Felsteel Bracers,0,1,24,375,395,0
+29671,Bracers of the Green Fortress,164,Blacksmithing,primary,1,23538,Bracers of the Green Fortress,0,1,24,375,395,0
+29672,Blessed Bracers,164,Blacksmithing,primary,1,23539,Blessed Bracers,0,1,24,375,395,0
+29692,Felsteel Longblade,164,Blacksmithing,primary,1,23540,Felsteel Longblade,0,1,24,375,395,0
+29693,Khorium Champion,164,Blacksmithing,primary,1,23541,Khorium Champion,0,1,24,375,395,0
+29694,Fel Edged Battleaxe,164,Blacksmithing,primary,1,23542,Fel Edged Battleaxe,0,1,24,375,395,0
+29695,Felsteel Reaper,164,Blacksmithing,primary,1,23543,Felsteel Reaper,0,1,24,375,395,0
+29696,Runic Hammer,164,Blacksmithing,primary,1,23544,Runic Hammer,0,1,24,375,395,0
+29697,Fel Hardened Maul,164,Blacksmithing,primary,1,23546,Fel Hardened Maul,0,1,24,375,395,0
+29698,Eternium Runed Blade,164,Blacksmithing,primary,1,23554,Eternium Runed Blade,0,1,24,375,395,0
+29699,Dirge,164,Blacksmithing,primary,1,23555,Dirge,0,1,24,375,395,0
+29700,Hand of Eternity,164,Blacksmithing,primary,1,23556,Hand of Eternity,0,1,24,375,395,0
+29728,Lesser Ward of Shielding,164,Blacksmithing,primary,1,23575,Lesser Ward of Shielding,0,1,24,340,350,0
+29729,Greater Ward of Shielding,164,Blacksmithing,primary,1,23576,Greater Ward of Shielding,0,1,24,375,375,0
+32284,Lesser Rune of Warding,164,Blacksmithing,primary,1,23559,Lesser Rune of Warding,0,1,24,325,335,0
+32285,Greater Rune of Warding,164,Blacksmithing,primary,1,25521,Greater Rune of Warding,0,1,24,350,360,0
+32655,Fel Iron Rod,164,Blacksmithing,primary,1,25843,Fel Iron Rod,0,1,24,300,310,0
+32656,Adamantite Rod,164,Blacksmithing,primary,1,25844,Adamantite Rod,0,1,24,350,360,0
+32657,Eternium Rod,164,Blacksmithing,primary,1,25845,Eternium Rod,0,1,24,375,385,0
+34529,Nether Chain Shirt,164,Blacksmithing,primary,1,23563,Nether Chain Shirt,0,1,24,360,380,0
+34530,Twisting Nether Chain Shirt,164,Blacksmithing,primary,1,23564,Twisting Nether Chain Shirt,0,1,24,385,405,0
+34533,Breastplate of Kings,164,Blacksmithing,primary,1,28483,Breastplate of Kings,0,1,24,360,380,0
+34534,Bulwark of Kings,164,Blacksmithing,primary,1,28484,Bulwark of Kings,0,1,24,385,405,0
+34535,Fireguard,164,Blacksmithing,primary,1,28425,Fireguard,0,1,24,360,380,0
+34537,Blazeguard,164,Blacksmithing,primary,1,28426,Blazeguard,0,1,24,385,405,0
+34538,Lionheart Blade,164,Blacksmithing,primary,1,28428,Lionheart Blade,0,1,24,360,380,0
+34540,Lionheart Champion,164,Blacksmithing,primary,1,28429,Lionheart Champion,0,1,24,385,405,0
+34541,The Planar Edge,164,Blacksmithing,primary,1,28431,The Planar Edge,0,1,24,360,380,0
+34542,Black Planar Edge,164,Blacksmithing,primary,1,28432,Black Planar Edge,0,1,24,385,405,0
+34543,Lunar Crescent,164,Blacksmithing,primary,1,28434,Lunar Crescent,0,1,24,360,380,0
+34544,Mooncleaver,164,Blacksmithing,primary,1,28435,Mooncleaver,0,1,24,385,405,0
+34545,Drakefist Hammer,164,Blacksmithing,primary,1,28437,Drakefist Hammer,0,1,24,360,380,0
+34546,Dragonmaw,164,Blacksmithing,primary,1,28438,Dragonmaw,0,1,24,385,405,0
+34547,Thunder,164,Blacksmithing,primary,1,28440,Thunder,0,1,24,360,380,0
+34548,Deep Thunder,164,Blacksmithing,primary,1,28441,Deep Thunder,0,1,24,385,405,0
+34607,Fel Weightstone,164,Blacksmithing,primary,1,28420,Fel Weightstone,0,1,24,300,310,0
+34608,Adamantite Weightstone,164,Blacksmithing,primary,1,28421,Adamantite Weightstone,0,1,24,350,360,0
+34979,Thick Bronze Darts,164,Blacksmithing,primary,1,29201,Thick Bronze Darts,0,1,24,130,160,0
+34981,Whirling Steel Axes,164,Blacksmithing,primary,1,29202,Whirling Steel Axes,0,1,24,220,240,0
+34982,Enchanted Thorium Blades,164,Blacksmithing,primary,1,29203,Enchanted Thorium Blades,0,1,24,320,340,0
+34983,Felsteel Whisper Knives,164,Blacksmithing,primary,1,29204,Felsteel Whisper Knives,0,1,24,360,380,0
+36122,Earthforged Leggings,164,Blacksmithing,primary,1,30069,Earthforged Leggings,0,1,24,280,300,0
+36124,Windforged Leggings,164,Blacksmithing,primary,1,30070,Windforged Leggings,0,1,24,280,300,0
+36125,Light Earthforged Blade,164,Blacksmithing,primary,1,30071,Light Earthforged Blade,0,1,24,280,300,0
+36126,Light Skyforged Axe,164,Blacksmithing,primary,1,30072,Light Skyforged Axe,0,1,24,280,300,0
+36128,Light Emberforged Hammer,164,Blacksmithing,primary,1,30073,Light Emberforged Hammer,0,1,24,280,300,0
+36129,Heavy Earthforged Breastplate,164,Blacksmithing,primary,1,30074,Heavy Earthforged Breastplate,0,1,24,340,360,0
+36130,Stormforged Hauberk,164,Blacksmithing,primary,1,30076,Stormforged Hauberk,0,1,24,340,360,0
+36131,Windforged Rapier,164,Blacksmithing,primary,1,30077,Windforged Rapier,0,1,24,340,360,0
+36133,Stoneforged Claymore,164,Blacksmithing,primary,1,30086,Stoneforged Claymore,0,1,24,340,360,0
+36134,Stormforged Axe,164,Blacksmithing,primary,1,30087,Stormforged Axe,0,1,24,340,360,0
+36135,Skyforged Great Axe,164,Blacksmithing,primary,1,30088,Skyforged Great Axe,0,1,24,340,360,0
+36136,Lavaforged Warhammer,164,Blacksmithing,primary,1,30089,Lavaforged Warhammer,0,1,24,340,360,0
+36137,Great Earthforged Hammer,164,Blacksmithing,primary,1,30093,Great Earthforged Hammer,0,1,24,340,360,0
+36256,Embrace of the Twisting Nether,164,Blacksmithing,primary,1,23565,Embrace of the Twisting Nether,0,1,24,385,405,0
+36257,Bulwark of the Ancient Kings,164,Blacksmithing,primary,1,28485,Bulwark of the Ancient Kings,0,1,24,385,405,0
+36258,Blazefury,164,Blacksmithing,primary,1,28427,Blazefury,0,1,24,385,405,0
+36259,Lionheart Executioner,164,Blacksmithing,primary,1,28430,Lionheart Executioner,0,1,24,385,405,0
+36260,Wicked Edge of the Planes,164,Blacksmithing,primary,1,28433,Wicked Edge of the Planes,0,1,24,385,405,0
+36261,Bloodmoon,164,Blacksmithing,primary,1,28436,Bloodmoon,0,1,24,385,405,0
+36262,Dragonstrike,164,Blacksmithing,primary,1,28439,Dragonstrike,0,1,24,385,405,0
+36263,Stormherald,164,Blacksmithing,primary,1,28442,Stormherald,0,1,24,385,405,0
+36389,Belt of the Guardian,164,Blacksmithing,primary,1,30034,Belt of the Guardian,0,1,24,385,405,0
+36390,Red Belt of Battle,164,Blacksmithing,primary,1,30032,Red Belt of Battle,0,1,24,385,405,0
+36391,Boots of the Protector,164,Blacksmithing,primary,1,30033,Boots of the Protector,0,1,24,385,405,0
+36392,Red Havoc Boots,164,Blacksmithing,primary,1,30031,Red Havoc Boots,0,1,24,385,405,0
+38473,Wildguard Breastplate,164,Blacksmithing,primary,1,31364,Wildguard Breastplate,0,1,24,385,405,0
+38475,Wildguard Leggings,164,Blacksmithing,primary,1,31367,Wildguard Leggings,0,1,24,385,405,0
+38476,Wildguard Helm,164,Blacksmithing,primary,1,31368,Wildguard Helm,0,1,24,385,405,0
+38477,Iceguard Breastplate,164,Blacksmithing,primary,1,31369,Iceguard Breastplate,0,1,24,385,405,0
+38478,Iceguard Leggings,164,Blacksmithing,primary,1,31370,Iceguard Leggings,0,1,24,385,405,0
+38479,Iceguard Helm,164,Blacksmithing,primary,1,31371,Iceguard Helm,0,1,24,385,405,0
+40033,Shadesteel Sabots,164,Blacksmithing,primary,1,32402,Shadesteel Sabots,0,1,24,385,405,0
+40034,Shadesteel Bracers,164,Blacksmithing,primary,1,32403,Shadesteel Bracers,0,1,24,385,405,0
+40035,Shadesteel Greaves,164,Blacksmithing,primary,1,32404,Shadesteel Greaves,0,1,24,385,405,0
+40036,Shadesteel Girdle,164,Blacksmithing,primary,1,32401,Shadesteel Girdle,0,1,24,385,405,0
+41132,Swiftsteel Bracers,164,Blacksmithing,primary,1,32568,Swiftsteel Bracers,0,1,24,385,405,0
+41133,Swiftsteel Shoulders,164,Blacksmithing,primary,1,32570,Swiftsteel Shoulders,0,1,24,385,405,0
+41134,Dawnsteel Bracers,164,Blacksmithing,primary,1,32571,Dawnsteel Bracers,0,1,24,385,405,0
+41135,Dawnsteel Shoulders,164,Blacksmithing,primary,1,32573,Dawnsteel Shoulders,0,1,24,385,405,0
+42662,Ragesteel Shoulders,164,Blacksmithing,primary,1,33173,Ragesteel Shoulders,0,1,24,375,395,0
+42688,Adamantite Weapon Chain,164,Blacksmithing,primary,1,33185,Adamantite Weapon Chain,0,1,24,345,355,0
+43549,Heavy Copper Longsword,164,Blacksmithing,primary,1,33791,Heavy Copper Longsword,0,1,24,75,115,0
+43846,Hammer of Righteous Might,164,Blacksmithing,primary,1,32854,Hammer of Righteous Might,0,1,24,375,395,0
+46140,Sunblessed Gauntlets,164,Blacksmithing,primary,1,34380,Sunblessed Gauntlets,0,1,24,375,410,0
+46141,Hard Khorium Battlefists,164,Blacksmithing,primary,1,34378,Hard Khorium Battlefists,0,1,24,375,410,0
+46142,Sunblessed Breastplate,164,Blacksmithing,primary,1,34379,Sunblessed Breastplate,0,1,24,375,410,0
+46144,Hard Khorium Battleplate,164,Blacksmithing,primary,1,34377,Hard Khorium Battleplate,0,1,24,375,410,0
+2737,Copper Mace,164,Blacksmithing,primary,30,2844,Copper Mace,0,1,24,55,95,0
+2738,Copper Axe,164,Blacksmithing,primary,35,2845,Copper Axe,0,1,24,60,100,0
+2662,Copper Chain Pants,164,Blacksmithing,primary,40,2852,Copper Chain Pants,0,1,24,50,90,0
+2739,Copper Shortsword,164,Blacksmithing,primary,40,2847,Copper Shortsword,0,1,24,65,105,0
+2661,Copper Chain Belt,164,Blacksmithing,primary,55,2851,Copper Chain Belt,0,1,24,75,115,0
+2664,Runed Copper Bracers,164,Blacksmithing,primary,65,2854,Runed Copper Bracers,0,1,24,115,140,0
+2665,Coarse Sharpening Stone,164,Blacksmithing,primary,75,2863,Coarse Sharpening Stone,0,1,24,65,80,0
+2740,Bronze Mace,164,Blacksmithing,primary,75,2848,Bronze Mace,0,1,24,140,170,0
+2666,Runed Copper Belt,164,Blacksmithing,primary,80,2857,Runed Copper Belt,0,1,24,110,150,0
+2741,Bronze Axe,164,Blacksmithing,primary,85,2849,Bronze Axe,0,1,24,145,175,0
+2667,Runed Copper Breastplate,164,Blacksmithing,primary,90,2864,Runed Copper Breastplate,0,1,24,120,160,0
+2668,Rough Bronze Leggings,164,Blacksmithing,primary,95,2865,Rough Bronze Leggings,0,1,24,145,175,0
+2742,Bronze Shortsword,164,Blacksmithing,primary,95,2850,Bronze Shortsword,0,1,24,150,180,0
+2670,Rough Bronze Cuirass,164,Blacksmithing,primary,105,2866,Rough Bronze Cuirass,0,1,24,145,175,0
+2672,Patterned Bronze Bracers,164,Blacksmithing,primary,120,2868,Patterned Bronze Bracers,0,1,24,150,180,0
+2674,Heavy Sharpening Stone,164,Blacksmithing,primary,125,2871,Heavy Sharpening Stone,0,1,24,125,140,0
+2675,Shining Silver Breastplate,164,Blacksmithing,primary,135,2870,Shining Silver Breastplate,0,1,24,175,205,0
+7421,Runed Copper Rod,333,Enchanting,primary,1,6218,Runed Copper Rod,0,1,24,5,10,1
+7795,Runed Silver Rod,333,Enchanting,primary,1,6339,Runed Silver Rod,0,1,24,130,170,0
+13628,Runed Golden Rod,333,Enchanting,primary,1,11130,Runed Golden Rod,0,1,24,175,215,0
+13702,Runed Truesilver Rod,333,Enchanting,primary,1,11145,Runed Truesilver Rod,0,1,24,220,260,0
+14293,Lesser Magic Wand,333,Enchanting,primary,1,11287,Lesser Magic Wand,0,1,24,75,115,0
+14807,Greater Magic Wand,333,Enchanting,primary,1,11288,Greater Magic Wand,0,1,24,110,150,0
+14809,Lesser Mystic Wand,333,Enchanting,primary,1,11289,Lesser Mystic Wand,0,1,24,175,215,0
+14810,Greater Mystic Wand,333,Enchanting,primary,1,11290,Greater Mystic Wand,0,1,24,195,235,0
+15596,Smoking Heart of the Mountain,333,Enchanting,primary,1,11811,Smoking Heart of the Mountain,0,1,24,285,325,0
+17180,Enchanted Thorium,333,Enchanting,primary,1,12655,Enchanted Thorium Bar,0,1,24,250,260,0
+17181,Enchanted Leather,333,Enchanting,primary,1,12810,Enchanted Leather,0,1,24,250,260,0
+20051,Runed Arcanite Rod,333,Enchanting,primary,1,16207,Runed Arcanite Rod,0,1,24,305,340,0
+25124,Minor Wizard Oil,333,Enchanting,primary,1,20744,Minor Wizard Oil,0,0,24,55,75,0
+25125,Minor Mana Oil,333,Enchanting,primary,1,20745,Minor Mana Oil,0,0,24,160,180,0
+25126,Lesser Wizard Oil,333,Enchanting,primary,1,20746,Lesser Wizard Oil,0,0,24,210,230,0
+25127,Lesser Mana Oil,333,Enchanting,primary,1,20747,Lesser Mana Oil,0,0,24,260,280,0
+25128,Wizard Oil,333,Enchanting,primary,1,20750,Wizard Oil,0,0,24,285,305,0
+25129,Brilliant Wizard Oil,333,Enchanting,primary,1,20749,Brilliant Wizard Oil,0,0,24,310,330,0
+25130,Brilliant Mana Oil,333,Enchanting,primary,1,20748,Brilliant Mana Oil,0,0,24,310,330,0
+28016,Superior Mana Oil,333,Enchanting,primary,1,22521,Superior Mana Oil,0,0,24,310,330,0
+28019,Superior Wizard Oil,333,Enchanting,primary,1,22522,Superior Wizard Oil,0,0,24,340,360,0
+28021,Arcane Dust,333,Enchanting,primary,1,22445,Arcane Dust,2,1,24,335,355,0
+28022,Large Prismatic Shard,333,Enchanting,primary,1,22449,Large Prismatic Shard,0,1,24,5,10,0
+28027,Prismatic Sphere,333,Enchanting,primary,1,22460,Prismatic Sphere,0,1,24,325,335,0
+28028,Void Sphere,333,Enchanting,primary,1,22459,Void Sphere,0,1,24,360,390,0
+32664,Runed Fel Iron Rod,333,Enchanting,primary,1,22461,Runed Fel Iron Rod,0,1,24,310,340,0
+32665,Runed Adamantite Rod,333,Enchanting,primary,1,22462,Runed Adamantite Rod,0,1,24,360,390,0
+32667,Runed Eternium Rod,333,Enchanting,primary,1,22463,Runed Eternium Rod,0,1,24,370,400,0
+42613,Nexus Transformation,333,Enchanting,primary,1,22448,Small Prismatic Shard,0,1,24,295,305,0
+42615,Small Prismatic Shard,333,Enchanting,primary,1,22448,Small Prismatic Shard,2,1,24,315,335,0
+45765,Void Shatter,333,Enchanting,primary,1,22449,Large Prismatic Shard,1,1,24,360,365,0
+3918,Rough Blasting Powder,202,Engineering,primary,1,4357,Rough Blasting Powder,0,1,24,20,40,1
+3919,Rough Dynamite,202,Engineering,primary,1,4358,Rough Dynamite,1,1,24,30,60,1
+3920,Crafted Light Shot,202,Engineering,primary,1,8067,Crafted Light Shot,199,1,24,30,60,1
+3922,Handful of Copper Bolts,202,Engineering,primary,1,4359,Handful of Copper Bolts,0,1,24,45,60,0
+3923,Rough Copper Bomb,202,Engineering,primary,1,4360,Rough Copper Bomb,1,1,24,60,90,0
+3924,Copper Tube,202,Engineering,primary,1,4361,Copper Tube,0,1,24,80,110,0
+3925,Rough Boomstick,202,Engineering,primary,1,4362,Rough Boomstick,0,1,24,80,110,0
+3926,Copper Modulator,202,Engineering,primary,1,4363,Copper Modulator,0,1,24,95,125,0
+3928,Mechanical Squirrel,202,Engineering,primary,1,4401,Mechanical Squirrel Box,0,1,24,105,135,0
+3929,Coarse Blasting Powder,202,Engineering,primary,1,4364,Coarse Blasting Powder,0,1,24,85,95,0
+3930,Crafted Heavy Shot,202,Engineering,primary,1,8068,Crafted Heavy Shot,199,1,24,85,95,0
+3931,Coarse Dynamite,202,Engineering,primary,1,4365,Coarse Dynamite,0,3,24,90,105,0
+3932,Target Dummy,202,Engineering,primary,1,4366,Target Dummy,0,1,24,115,145,0
+3933,Small Seaforium Charge,202,Engineering,primary,1,4367,Small Seaforium Charge,0,1,24,130,160,0
+3934,Flying Tiger Goggles,202,Engineering,primary,1,4368,Flying Tiger Goggles,0,1,24,130,160,0
+3936,Deadly Blunderbuss,202,Engineering,primary,1,4369,Deadly Blunderbuss,0,1,24,130,155,0
+3937,Large Copper Bomb,202,Engineering,primary,1,4370,Large Copper Bomb,1,3,24,105,155,0
+3938,Bronze Tube,202,Engineering,primary,1,4371,Bronze Tube,0,1,24,105,155,0
+3939,Lovingly Crafted Boomstick,202,Engineering,primary,1,4372,Lovingly Crafted Boomstick,0,1,24,145,170,0
+3940,Shadow Goggles,202,Engineering,primary,1,4373,Shadow Goggles,0,1,24,145,170,0
+3941,Small Bronze Bomb,202,Engineering,primary,1,4374,Small Bronze Bomb,0,3,24,120,170,0
+3942,Whirring Bronze Gizmo,202,Engineering,primary,1,4375,Whirring Bronze Gizmo,0,1,24,125,175,0
+3944,Flame Deflector,202,Engineering,primary,1,4376,Flame Deflector,0,1,24,125,175,0
+3945,Heavy Blasting Powder,202,Engineering,primary,1,4377,Heavy Blasting Powder,0,1,24,125,145,0
+3946,Heavy Dynamite,202,Engineering,primary,1,4378,Heavy Dynamite,0,5,24,125,145,0
+3947,Crafted Solid Shot,202,Engineering,primary,1,8069,Crafted Solid Shot,199,1,24,125,145,0
+3949,Silver-plated Shotgun,202,Engineering,primary,1,4379,Silver-plated Shotgun,0,1,24,155,180,0
+3950,Big Bronze Bomb,202,Engineering,primary,1,4380,Big Bronze Bomb,1,3,24,140,190,0
+3952,Minor Recombobulator,202,Engineering,primary,1,4381,Minor Recombobulator,0,1,24,165,190,0
+3953,Bronze Framework,202,Engineering,primary,1,4382,Bronze Framework,0,1,24,145,195,0
+3954,Moonsight Rifle,202,Engineering,primary,1,4383,Moonsight Rifle,0,1,24,170,195,0
+3955,Explosive Sheep,202,Engineering,primary,1,4384,Explosive Sheep,0,1,24,175,200,0
+3956,Green Tinted Goggles,202,Engineering,primary,1,4385,Green Tinted Goggles,0,1,24,175,200,0
+3957,Ice Deflector,202,Engineering,primary,1,4386,Ice Deflector,0,1,24,175,195,0
+3958,Iron Strut,202,Engineering,primary,1,4387,Iron Strut,0,1,24,160,180,0
+3959,Discombobulator Ray,202,Engineering,primary,1,4388,Discombobulator Ray,0,1,24,180,200,0
+3960,Portable Bronze Mortar,202,Engineering,primary,1,4403,Portable Bronze Mortar,0,1,24,185,205,0
+3961,Gyrochronatom,202,Engineering,primary,1,4389,Gyrochronatom,0,1,24,170,210,0
+3962,Iron Grenade,202,Engineering,primary,1,4390,Iron Grenade,1,3,24,175,215,0
+3963,Compact Harvest Reaper Kit,202,Engineering,primary,1,4391,Compact Harvest Reaper Kit,0,1,24,175,215,0
+3965,Advanced Target Dummy,202,Engineering,primary,1,4392,Advanced Target Dummy,0,1,24,185,225,0
+3966,Craftsman's Monocle,202,Engineering,primary,1,4393,Craftsman's Monocle,0,1,24,205,225,0
+3967,Big Iron Bomb,202,Engineering,primary,1,4394,Big Iron Bomb,1,1,24,190,230,0
+3968,Goblin Land Mine,202,Engineering,primary,1,4395,Goblin Land Mine,0,1,24,215,235,0
+3969,Mechanical Dragonling,202,Engineering,primary,1,4396,Mechanical Dragonling,0,1,24,220,240,0
+3971,Gnomish Cloaking Device,202,Engineering,primary,1,4397,Gnomish Cloaking Device,0,1,24,220,240,0
+3972,Large Seaforium Charge,202,Engineering,primary,1,4398,Large Seaforium Charge,0,1,24,200,240,0
+3973,Silver Contact,202,Engineering,primary,1,4404,Silver Contact,4,1,24,110,140,0
+3977,Crude Scope,202,Engineering,primary,1,4405,Crude Scope,0,1,24,90,120,0
+3978,Standard Scope,202,Engineering,primary,1,4406,Standard Scope,0,1,24,135,160,0
+3979,Accurate Scope,202,Engineering,primary,1,4407,Accurate Scope,0,1,24,200,220,0
+6458,Ornate Spyglass,202,Engineering,primary,1,5507,Ornate Spyglass,0,1,24,160,185,0
+7430,Arclight Spanner,202,Engineering,primary,1,6219,Arclight Spanner,0,1,24,70,90,0
+8243,Flash Bomb,202,Engineering,primary,1,4852,Flash Bomb,0,1,24,185,225,0
+8334,Practice Lock,202,Engineering,primary,1,6712,Practice Lock,0,1,24,115,130,0
+8339,EZ-Thro Dynamite,202,Engineering,primary,1,6714,Ez-Thro Dynamite,0,3,24,115,130,0
+8895,Goblin Rocket Boots,202,Engineering,primary,1,7189,Goblin Rocket Boots,0,1,24,245,265,0
+9269,Gnomish Universal Remote,202,Engineering,primary,1,7506,Gnomish Universal Remote,0,1,24,150,175,0
+9271,Aquadynamic Fish Attractor,202,Engineering,primary,1,6533,Aquadynamic Fish Attractor,2,1,24,150,170,0
+9273,Goblin Jumper Cables,202,Engineering,primary,1,7148,Goblin Jumper Cables,0,1,24,160,200,0
+12584,Gold Power Core,202,Engineering,primary,1,10558,Gold Power Core,2,1,24,150,190,0
+12585,Solid Blasting Powder,202,Engineering,primary,1,10505,Solid Blasting Powder,0,1,24,175,195,0
+12586,Solid Dynamite,202,Engineering,primary,1,10507,Solid Dynamite,1,1,24,175,195,0
+12587,Bright-Eye Goggles,202,Engineering,primary,1,10499,Bright-Eye Goggles,0,1,24,195,215,0
+12589,Mithril Tube,202,Engineering,primary,1,10559,Mithril Tube,0,1,24,195,235,0
+12590,Gyromatic Micro-Adjustor,202,Engineering,primary,1,10498,Gyromatic Micro-Adjustor,0,1,24,175,215,0
+12591,Unstable Trigger,202,Engineering,primary,1,10560,Unstable Trigger,0,1,24,200,240,0
+12594,Fire Goggles,202,Engineering,primary,1,10500,Fire Goggles,0,1,24,225,245,0
+12595,Mithril Blunderbuss,202,Engineering,primary,1,10508,Mithril Blunderbuss,0,1,24,225,245,0
+12596,Hi-Impact Mithril Slugs,202,Engineering,primary,1,10512,Hi-Impact Mithril Slugs,199,1,24,210,250,0
+12597,Deadly Scope,202,Engineering,primary,1,10546,Deadly Scope,0,1,24,230,250,0
+12599,Mithril Casing,202,Engineering,primary,1,10561,Mithril Casing,0,1,24,215,255,0
+12603,Mithril Frag Bomb,202,Engineering,primary,1,10514,Mithril Frag Bomb,2,1,24,215,255,0
+12607,Catseye Ultra Goggles,202,Engineering,primary,1,10501,Catseye Ultra Goggles,0,1,24,240,260,0
+12614,Mithril Heavy-bore Rifle,202,Engineering,primary,1,10510,Mithril Heavy-bore Rifle,0,1,24,240,260,0
+12615,Spellpower Goggles Xtreme,202,Engineering,primary,1,10502,Spellpower Goggles Xtreme,0,1,24,245,265,0
+12616,Parachute Cloak,202,Engineering,primary,1,10518,Parachute Cloak,0,1,24,245,265,0
+12617,Deepdive Helmet,202,Engineering,primary,1,10506,Deepdive Helmet,0,1,24,250,270,0
+12618,Rose Colored Goggles,202,Engineering,primary,1,10503,Rose Colored Goggles,0,1,24,250,270,0
+12619,Hi-Explosive Bomb,202,Engineering,primary,1,10562,Hi-Explosive Bomb,3,1,24,235,275,0
+12620,Sniper Scope,202,Engineering,primary,1,10548,Sniper Scope,0,1,24,260,280,0
+12621,Mithril Gyro-Shot,202,Engineering,primary,1,10513,Mithril Gyro-Shot,199,1,24,245,285,0
+12622,Green Lens,202,Engineering,primary,1,10504,Green Lens,0,1,24,265,285,0
+12624,Mithril Mechanical Dragonling,202,Engineering,primary,1,10576,Mithril Mechanical Dragonling,0,1,24,270,290,0
+12715,Goblin Rocket Fuel Recipe,202,Engineering,primary,1,10644,Recipe: Goblin Rocket Fuel,0,1,24,205,205,0
+12716,Goblin Mortar,202,Engineering,primary,1,10577,Goblin Mortar,0,1,24,225,245,0
+12717,Goblin Mining Helmet,202,Engineering,primary,1,10542,Goblin Mining Helmet,0,1,24,225,245,0
+12718,Goblin Construction Helmet,202,Engineering,primary,1,10543,Goblin Construction Helmet,0,1,24,225,245,0
+12719,Explosive Arrow,202,Engineering,primary,1,10579,Explosive Arrow,99,1,24,210,250,0
+12720,"Goblin ""Boom"" Box",202,Engineering,primary,1,10580,"Goblin ""Boom"" Box",0,1,24,235,255,0
+12722,Goblin Radio,202,Engineering,primary,1,10585,Goblin Radio,0,1,24,240,260,0
+12754,The Big One,202,Engineering,primary,1,10586,The Big One,1,1,24,235,275,0
+12755,Goblin Bomb Dispenser,202,Engineering,primary,1,10587,Goblin Bomb Dispenser,0,1,24,230,270,0
+12758,Goblin Rocket Helmet,202,Engineering,primary,1,10588,Goblin Rocket Helmet,0,1,24,265,285,0
+12759,Gnomish Death Ray,202,Engineering,primary,1,10645,Gnomish Death Ray,0,1,24,260,280,0
+12760,Goblin Sapper Charge,202,Engineering,primary,1,10646,Goblin Sapper Charge,0,1,24,205,245,0
+12895,Inlaid Mithril Cylinder Plans,202,Engineering,primary,1,10713,Plans: Inlaid Mithril Cylinder,0,1,24,205,205,0
+12897,Gnomish Goggles,202,Engineering,primary,1,10545,Gnomish Goggles,0,1,24,230,250,0
+12899,Gnomish Shrink Ray,202,Engineering,primary,1,10716,Gnomish Shrink Ray,0,1,24,225,245,0
+12900,Mobile Alarm,202,Engineering,primary,1,10719,Mobile Alarm,0,1,24,205,245,0
+12902,Gnomish Net-o-Matic Projector,202,Engineering,primary,1,10720,Gnomish Net-o-Matic Projector,0,1,24,230,250,0
+12903,Gnomish Harm Prevention Belt,202,Engineering,primary,1,10721,Gnomish Harm Prevention Belt,0,1,24,235,255,0
+12904,Gnomish Ham Radio,202,Engineering,primary,1,10723,Gnomish Ham Radio,0,1,24,240,260,0
+12905,Gnomish Rocket Boots,202,Engineering,primary,1,10724,Gnomish Rocket Boots,0,1,24,245,265,0
+12906,Gnomish Battle Chicken,202,Engineering,primary,1,10725,Gnomish Battle Chicken,0,1,24,250,270,0
+12907,Gnomish Mind Control Cap,202,Engineering,primary,1,10726,Gnomish Mind Control Cap,0,1,24,255,275,0
+12908,Goblin Dragon Gun,202,Engineering,primary,1,10727,Goblin Dragon Gun,0,1,24,260,280,0
+13240,The Mortar: Reloaded,202,Engineering,primary,1,10577,Goblin Mortar,0,1,24,1,1,0
+15255,Mechanical Repair Kit,202,Engineering,primary,1,11590,Mechanical Repair Kit,0,1,24,200,240,0
+15628,Pet Bombling,202,Engineering,primary,1,11825,Pet Bombling,0,1,24,205,205,0
+15633,Lil' Smoky,202,Engineering,primary,1,11826,Lil' Smoky,0,1,24,205,205,0
+19567,Salt Shaker,202,Engineering,primary,1,15846,Salt Shaker,0,1,24,270,290,0
+19788,Dense Blasting Powder,202,Engineering,primary,1,15992,Dense Blasting Powder,0,1,24,250,260,0
+19790,Thorium Grenade,202,Engineering,primary,1,15993,Thorium Grenade,2,1,24,280,300,0
+19791,Thorium Widget,202,Engineering,primary,1,15994,Thorium Widget,0,1,24,280,300,0
+19792,Thorium Rifle,202,Engineering,primary,1,15995,Thorium Rifle,0,1,24,280,300,0
+19793,Lifelike Mechanical Toad,202,Engineering,primary,1,15996,Lifelike Mechanical Toad,0,1,24,285,305,0
+19794,Spellpower Goggles Xtreme Plus,202,Engineering,primary,1,15999,Spellpower Goggles Xtreme Plus,0,1,24,290,310,0
+19795,Thorium Tube,202,Engineering,primary,1,16000,Thorium Tube,0,1,24,295,315,0
+19796,Dark Iron Rifle,202,Engineering,primary,1,16004,Dark Iron Rifle,0,1,24,295,315,0
+19799,Dark Iron Bomb,202,Engineering,primary,1,16005,Dark Iron Bomb,2,1,24,305,325,0
+19800,Thorium Shells,202,Engineering,primary,1,15997,Thorium Shells,199,1,24,295,305,0
+19814,Masterwork Target Dummy,202,Engineering,primary,1,16023,Masterwork Target Dummy,0,1,24,295,315,0
+19815,Delicate Arcanite Converter,202,Engineering,primary,1,16006,Delicate Arcanite Converter,0,1,24,305,325,0
+19819,Voice Amplification Modulator,202,Engineering,primary,1,16009,Voice Amplification Modulator,0,1,24,310,330,0
+19825,Master Engineer's Goggles,202,Engineering,primary,1,16008,Master Engineer's Goggles,0,1,24,310,330,0
+19830,Arcanite Dragonling,202,Engineering,primary,1,16022,Arcanite Dragonling,0,1,24,320,340,0
+19831,Arcane Bomb,202,Engineering,primary,1,16040,Arcane Bomb,2,1,24,320,340,0
+19833,Flawless Arcanite Rifle,202,Engineering,primary,1,16007,Flawless Arcanite Rifle,0,1,24,320,340,0
+21940,Snowmaster 9000,202,Engineering,primary,1,17716,Snowmaster 9000,0,1,24,190,230,0
+22704,Field Repair Bot 74A,202,Engineering,primary,1,18232,Field Repair Bot 74A,0,1,24,320,340,0
+22793,Biznicks 247x128 Accurascope,202,Engineering,primary,1,18283,Biznicks 247x128 Accurascope,0,1,24,320,340,0
+22795,Core Marksman Rifle,202,Engineering,primary,1,18282,Core Marksman Rifle,0,1,24,320,340,0
+22797,Force Reactive Disk,202,Engineering,primary,1,18168,Force Reactive Disk,0,1,24,320,340,0
+23066,Red Firework,202,Engineering,primary,1,9318,Red Firework,2,1,24,150,175,0
+23067,Blue Firework,202,Engineering,primary,1,9312,Blue Firework,2,1,24,150,175,0
+23068,Green Firework,202,Engineering,primary,1,9313,Green Firework,2,1,24,150,175,0
+23069,EZ-Thro Dynamite II,202,Engineering,primary,1,18588,Ez-Thro Dynamite II,0,1,24,200,220,0
+23070,Dense Dynamite,202,Engineering,primary,1,18641,Dense Dynamite,1,1,24,250,270,0
+23071,Truesilver Transformer,202,Engineering,primary,1,18631,Truesilver Transformer,0,1,24,270,280,0
+23077,Gyrofreeze Ice Reflector,202,Engineering,primary,1,18634,Gyrofreeze Ice Reflector,0,1,24,280,300,0
+23078,Goblin Jumper Cables XL,202,Engineering,primary,1,18587,Goblin Jumper Cables XL,0,1,24,285,305,0
+23079,Major Recombobulator,202,Engineering,primary,1,18637,Major Recombobulator,0,1,24,285,295,0
+23080,Powerful Seaforium Charge,202,Engineering,primary,1,18594,Powerful Seaforium Charge,0,1,24,275,295,0
+23081,Hyper-Radiant Flame Reflector,202,Engineering,primary,1,18638,Hyper-Radiant Flame Reflector,0,1,24,310,330,0
+23082,Ultra-Flash Shadow Reflector,202,Engineering,primary,1,18639,Ultra-Flash Shadow Reflector,0,1,24,320,340,0
+23096,Alarm-O-Bot,202,Engineering,primary,1,18645,Gnomish Alarm-O-Bot,0,1,24,275,285,0
+23129,World Enlarger,202,Engineering,primary,1,18660,World Enlarger,0,1,24,260,270,0
+23486,Dimensional Ripper - Everlook,202,Engineering,primary,1,18984,Dimensional Ripper - Everlook,0,1,24,285,305,0
+23489,Ultrasafe Transporter - Gadgetzan,202,Engineering,primary,1,18986,Ultrasafe Transporter: Gadgetzan,0,1,24,285,305,0
+23507,Snake Burst Firework,202,Engineering,primary,1,19026,Snake Burst Firework,3,1,24,250,270,0
+24356,Bloodvine Goggles,202,Engineering,primary,1,19999,Bloodvine Goggles,0,1,24,320,340,0
+24357,Bloodvine Lens,202,Engineering,primary,1,19998,Bloodvine Lens,0,1,24,320,340,0
+26011,Tranquil Mechanical Yeti,202,Engineering,primary,1,21277,Tranquil Mechanical Yeti,0,1,24,320,340,0
+26416,Small Blue Rocket,202,Engineering,primary,1,21558,Small Blue Rocket,2,1,24,125,150,0
+26417,Small Green Rocket,202,Engineering,primary,1,21559,Small Green Rocket,2,1,24,125,150,0
+26418,Small Red Rocket,202,Engineering,primary,1,21557,Small Red Rocket,2,1,24,125,150,0
+26420,Large Blue Rocket,202,Engineering,primary,1,21589,Large Blue Rocket,2,1,24,175,200,0
+26421,Large Green Rocket,202,Engineering,primary,1,21590,Large Green Rocket,2,1,24,175,200,0
+26422,Large Red Rocket,202,Engineering,primary,1,21592,Large Red Rocket,2,1,24,175,200,0
+26423,Blue Rocket Cluster,202,Engineering,primary,1,21571,Blue Rocket Cluster,2,1,24,225,250,0
+26424,Green Rocket Cluster,202,Engineering,primary,1,21574,Green Rocket Cluster,2,1,24,225,250,0
+26425,Red Rocket Cluster,202,Engineering,primary,1,21576,Red Rocket Cluster,2,1,24,225,250,0
+26426,Large Blue Rocket Cluster,202,Engineering,primary,1,21714,Large Blue Rocket Cluster,2,1,24,275,285,0
+26427,Large Green Rocket Cluster,202,Engineering,primary,1,21716,Large Green Rocket Cluster,2,1,24,275,285,0
+26428,Large Red Rocket Cluster,202,Engineering,primary,1,21718,Large Red Rocket Cluster,2,1,24,275,285,0
+26442,Firework Launcher,202,Engineering,primary,1,21569,Firework Launcher,0,1,24,245,265,0
+26443,Firework Cluster Launcher,202,Engineering,primary,1,21570,Cluster Launcher,0,1,24,295,315,0
+28327,Steam Tonk Controller,202,Engineering,primary,1,22728,Steam Tonk Controller,0,1,24,275,285,0
+30303,Elemental Blasting Powder,202,Engineering,primary,1,23781,Elemental Blasting Powder,3,1,24,300,320,0
+30304,Fel Iron Casing,202,Engineering,primary,1,23782,Fel Iron Casing,0,1,24,300,320,0
+30305,Handful of Fel Iron Bolts,202,Engineering,primary,1,23783,Handful of Fel Iron Bolts,0,1,24,300,310,0
+30306,Adamantite Frame,202,Engineering,primary,1,23784,Adamantite Frame,0,1,24,325,335,0
+30307,Hardened Adamantite Tube,202,Engineering,primary,1,23785,Hardened Adamantite Tube,0,1,24,350,370,0
+30308,Khorium Power Core,202,Engineering,primary,1,23786,Khorium Power Core,0,1,24,350,370,0
+30309,Felsteel Stabilizer,202,Engineering,primary,1,23787,Felsteel Stabilizer,0,1,24,350,370,0
+30310,Fel Iron Bomb,202,Engineering,primary,1,23736,Fel Iron Bomb,3,1,24,320,340,0
+30311,Adamantite Grenade,202,Engineering,primary,1,23737,Adamantite Grenade,2,1,24,335,355,0
+30312,Fel Iron Musket,202,Engineering,primary,1,23742,Fel Iron Musket,0,1,24,330,350,0
+30313,Adamantite Rifle,202,Engineering,primary,1,23746,Adamantite Rifle,0,1,24,360,380,0
+30314,Felsteel Boomstick,202,Engineering,primary,1,23747,Felsteel Boomstick,0,1,24,370,390,0
+30315,Ornate Khorium Rifle,202,Engineering,primary,1,23748,Ornate Khorium Rifle,0,1,24,385,405,0
+30316,Cogspinner Goggles,202,Engineering,primary,1,23758,Cogspinner Goggles,0,1,24,350,370,0
+30317,Power Amplification Goggles,202,Engineering,primary,1,23761,Power Amplification Goggles,0,1,24,350,370,0
+30318,Ultra-Spectropic Detection Goggles,202,Engineering,primary,1,23762,Ultra-Spectropic Detection Goggles,0,1,24,360,380,0
+30325,Hyper-Vision Goggles,202,Engineering,primary,1,23763,Hyper-Vision Goggles,0,1,24,370,390,0
+30329,Adamantite Scope,202,Engineering,primary,1,23764,Adamantite Scope,0,1,24,345,365,0
+30332,Khorium Scope,202,Engineering,primary,1,23765,Khorium Scope,0,1,24,370,390,0
+30334,Stabilized Eternium Scope,202,Engineering,primary,1,23766,Stabilized Eternium Scope,0,1,24,385,405,0
+30337,Crashin' Thrashin' Robot,202,Engineering,primary,1,23767,Crashin' Thrashin' Robot,0,1,24,335,355,0
+30341,White Smoke Flare,202,Engineering,primary,1,23768,White Smoke Flare,2,1,24,335,355,0
+30342,Red Smoke Flare,202,Engineering,primary,1,23769,Red Smoke Flare,2,1,24,335,355,0
+30343,Blue Smoke Flare,202,Engineering,primary,1,23770,Blue Smoke Flare,2,1,24,335,355,0
+30344,Green Smoke Flare,202,Engineering,primary,1,23771,Green Smoke Flare,2,1,24,335,355,0
+30346,Fel Iron Shells,202,Engineering,primary,1,23772,Fel Iron Shells,199,1,24,310,330,0
+30347,Adamantite Shell Machine,202,Engineering,primary,1,34504,Adamantite Shell Machine,0,1,24,335,355,0
+30348,Fel Iron Toolbox,202,Engineering,primary,1,23774,Fel Iron Toolbox,0,1,24,325,345,0
+30349,Khorium Toolbox,202,Engineering,primary,1,23775,Khorium Toolbox,0,1,24,360,380,0
+30547,Elemental Seaforium Charge,202,Engineering,primary,1,23819,Elemental Seaforium Charge,1,1,24,350,360,0
+30548,Zapthrottle Mote Extractor,202,Engineering,primary,1,23821,Zapthrottle Mote Extractor,0,1,24,305,325,0
+30549,Critter Enlarger,202,Engineering,primary,1,23820,Critter Enlarger,0,1,24,325,345,0
+30551,Healing Potion Injector,202,Engineering,primary,1,33092,Healing Potion Injector,19,1,24,330,350,0
+30552,Mana Potion Injector,202,Engineering,primary,1,33093,Mana Potion Injector,19,1,24,345,365,0
+30556,Rocket Boots Xtreme,202,Engineering,primary,1,23824,Rocket Boots Xtreme,0,1,24,365,385,0
+30558,The Bigger One,202,Engineering,primary,1,23826,The Bigger One,2,1,24,325,345,0
+30560,Super Sapper Charge,202,Engineering,primary,1,23827,Super Sapper Charge,1,1,24,340,360,0
+30561,Goblin Tonk Controller,202,Engineering,primary,1,23831,Goblin Tonk Controller,0,1,24,325,335,0
+30563,Goblin Rocket Launcher,202,Engineering,primary,1,23836,Goblin Rocket Launcher,0,1,24,360,380,0
+30565,Foreman's Enchanted Helmet,202,Engineering,primary,1,23838,Foreman's Enchanted Helmet,0,1,24,375,395,0
+30566,Foreman's Reinforced Helmet,202,Engineering,primary,1,23839,Foreman's Reinforced Helmet,0,1,24,375,395,0
+30568,Gnomish Flame Turret,202,Engineering,primary,1,23841,Gnomish Flame Turret,2,1,24,335,355,0
+30569,Gnomish Poultryizer,202,Engineering,primary,1,23835,Gnomish Poultryizer,0,1,24,360,380,0
+30570,Nigh-Invulnerability Belt,202,Engineering,primary,1,23825,Nigh Invulnerability Belt,0,1,24,360,380,0
+30573,Gnomish Tonk Controller,202,Engineering,primary,1,23832,Gnomish Tonk Controller,0,1,24,325,335,0
+30574,Gnomish Power Goggles,202,Engineering,primary,1,23828,Gnomish Power Goggles,0,1,24,375,395,0
+30575,Gnomish Battle Goggles,202,Engineering,primary,1,23829,Gnomish Battle Goggles,0,1,24,375,395,0
+32814,Purple Smoke Flare,202,Engineering,primary,1,25886,Purple Smoke Flare,2,1,24,335,355,0
+36954,Dimensional Ripper - Area 52,202,Engineering,primary,1,30542,Dimensional Ripper - Area 52,0,1,24,350,370,0
+36955,Ultrasafe Transporter - Toshley's Station,202,Engineering,primary,1,30544,Ultrasafe Transporter: Toshley's Station,0,1,24,350,370,0
+39895,Fused Wiring,202,Engineering,primary,1,7191,Fused Wiring,0,1,24,275,285,0
+39971,Icy Blasting Primers,202,Engineering,primary,1,32423,Icy Blasting Primers,9,1,24,335,345,0
+39973,Frost Grenades,202,Engineering,primary,1,32413,Frost Grenade,4,1,24,345,365,0
+40274,Furious Gizmatic Goggles,202,Engineering,primary,1,32461,Furious Gizmatic Goggles,0,1,24,370,390,0
+41307,Gyro-balanced Khorium Destroyer,202,Engineering,primary,1,32756,Gyro-Balanced Khorium Destroyer,0,1,24,375,410,0
+41311,Justicebringer 2000 Specs,202,Engineering,primary,1,32472,Justicebringer 2000 Specs,0,1,24,370,390,0
+41312,Tankatronic Goggles,202,Engineering,primary,1,32473,Tankatronic Goggles,0,1,24,370,390,0
+41314,Surestrike Goggles v2.0,202,Engineering,primary,1,32474,Surestrike Goggles v2.0,0,1,24,370,390,0
+41315,Gadgetstorm Goggles,202,Engineering,primary,1,32476,Gadgetstorm Goggles,0,1,24,370,390,0
+41316,Living Replicator Specs,202,Engineering,primary,1,32475,Living Replicator Specs,0,1,24,370,390,0
+41317,Deathblow X11 Goggles,202,Engineering,primary,1,32478,Deathblow X11 Goggles,0,1,24,370,390,0
+41318,Wonderheal XT40 Shades,202,Engineering,primary,1,32479,Wonderheal XT40 Shades,0,1,24,370,390,0
+41319,Magnified Moon Specs,202,Engineering,primary,1,32480,Magnified Moon Specs,0,1,24,370,390,0
+41320,Destruction Holo-gogs,202,Engineering,primary,1,32494,Destruction Holo-gogs,0,1,24,370,390,0
+41321,Powerheal 4000 Lens,202,Engineering,primary,1,32495,Powerheal 4000 Lens,0,1,24,370,390,0
+43676,Adamantite Arrow Maker,202,Engineering,primary,1,20475,Adamantite Arrow Maker,0,1,24,335,355,0
+44155,Flying Machine,202,Engineering,primary,1,34060,Flying Machine Control,0,1,24,375,385,0
+44157,Turbo-Charged Flying Machine,202,Engineering,primary,1,34061,Turbo-Charged Flying Machine Control,0,1,24,385,395,0
+44391,Field Repair Bot 110G,202,Engineering,primary,1,34113,Field Repair Bot 110G,4,1,24,370,390,0
+46106,Wonderheal XT68 Shades,202,Engineering,primary,1,35183,Wonderheal XT68 Shades,0,1,24,390,430,0
+46107,Justicebringer 3000 Specs,202,Engineering,primary,1,35185,Justicebringer 3000 Specs,0,1,24,390,430,0
+46108,Powerheal 9000 Lens,202,Engineering,primary,1,35181,Powerheal 9000 Lens,0,1,24,390,430,0
+46109,Hyper-Magnified Moon Specs,202,Engineering,primary,1,35182,Hyper-Magnified Moon Specs,0,1,24,390,430,0
+46110,Primal-Attuned Goggles,202,Engineering,primary,1,35184,Primal-Attuned Goggles,0,1,24,390,430,0
+46111,Annihilator Holo-Gogs,202,Engineering,primary,1,34847,Annihilator Holo-Gogs,0,1,24,390,430,0
+46112,Lightning Etched Specs,202,Engineering,primary,1,34355,Lightning Etched Specs,0,1,24,390,430,0
+46113,Surestrike Goggles v3.0,202,Engineering,primary,1,34356,Surestrike Goggles v3.0,0,1,24,390,430,0
+46114,Mayhem Projection Goggles,202,Engineering,primary,1,34354,Mayhem Projection Goggles,0,1,24,390,430,0
+46115,Hard Khorium Goggles,202,Engineering,primary,1,34357,Hard Khorium Goggles,0,1,24,390,430,0
+46116,Quad Deathblow X44 Goggles,202,Engineering,primary,1,34353,Quad Deathblow X44 Goggles,0,1,24,390,430,0
+46697,Rocket Boots Xtreme Lite,202,Engineering,primary,1,35581,Rocket Boots Xtreme Lite,0,1,24,365,385,0
+25255,Delicate Copper Wire,755,Jewelcrafting,primary,1,20816,Delicate Copper Wire,0,1,24,20,50,1
+25278,Bronze Setting,755,Jewelcrafting,primary,1,20817,Bronze Setting,0,1,24,70,90,0
+25280,Elegant Silver Ring,755,Jewelcrafting,primary,1,20818,Elegant Silver Ring,0,1,24,80,110,0
+25283,Inlaid Malachite Ring,755,Jewelcrafting,primary,1,20821,Inlaid Malachite Ring,0,1,24,60,90,0
+25284,Simple Pearl Ring,755,Jewelcrafting,primary,1,20820,Simple Pearl Ring,0,1,24,90,120,0
+25287,Gloom Band,755,Jewelcrafting,primary,1,20823,Gloom Band,0,1,24,100,130,0
+25305,Heavy Silver Ring,755,Jewelcrafting,primary,1,20826,Heavy Silver Ring,0,1,24,120,150,0
+25317,Ring of Silver Might,755,Jewelcrafting,primary,1,20827,Ring of Silver Might,0,1,24,110,140,0
+25318,Ring of Twilight Shadows,755,Jewelcrafting,primary,1,20828,Ring of Twilight Shadows,0,1,24,130,160,0
+25320,Heavy Golden Necklace of Battle,755,Jewelcrafting,primary,1,20831,Heavy Golden Necklace of Battle,0,1,24,180,210,0
+25321,Moonsoul Crown,755,Jewelcrafting,primary,1,20832,Moonsoul Crown,0,1,24,150,180,0
+25323,Wicked Moonstone Ring,755,Jewelcrafting,primary,1,20833,Wicked Moonstone Ring,0,1,24,155,185,0
+25339,Amulet of the Moon,755,Jewelcrafting,primary,1,20830,Amulet of the Moon,0,1,24,140,170,0
+25490,Solid Bronze Ring,755,Jewelcrafting,primary,1,20907,Solid Bronze Ring,0,1,24,80,110,0
+25493,Braided Copper Ring,755,Jewelcrafting,primary,1,20906,Braided Copper Ring,0,1,24,30,60,1
+25498,Barbaric Iron Collar,755,Jewelcrafting,primary,1,20909,Barbaric Iron Collar,0,1,24,140,170,0
+25610,Pendant of the Agate Shield,755,Jewelcrafting,primary,1,20950,Pendant of the Agate Shield,0,1,24,150,180,0
+25612,Heavy Iron Knuckles,755,Jewelcrafting,primary,1,20954,Heavy Iron Knuckles,0,1,24,155,185,0
+25613,Golden Dragon Ring,755,Jewelcrafting,primary,1,20955,Golden Dragon Ring,0,1,24,165,195,0
+25614,Silver Rose Pendant,755,Jewelcrafting,primary,1,20956,Silver Rose Pendant,0,1,24,175,205,0
+25615,Mithril Filigree,755,Jewelcrafting,primary,1,20963,Mithril Filigree,0,1,24,170,190,0
+25617,Blazing Citrine Ring,755,Jewelcrafting,primary,1,20958,Blazing Citrine Ring,0,1,24,180,210,0
+25618,Jade Pendant of Blasting,755,Jewelcrafting,primary,1,20966,Jade Pendant of Blasting,0,1,24,190,220,0
+25619,The Jade Eye,755,Jewelcrafting,primary,1,20959,The Jade Eye,0,1,24,200,230,0
+25620,Engraved Truesilver Ring,755,Jewelcrafting,primary,1,20960,Engraved Truesilver Ring,0,1,24,200,230,0
+25621,Citrine Ring of Rapid Healing,755,Jewelcrafting,primary,1,20961,Citrine Ring of Rapid Healing,0,1,24,210,240,0
+25622,Citrine Pendant of Golden Healing,755,Jewelcrafting,primary,1,20967,Citrine Pendant of Golden Healing,0,1,24,220,250,0
+26872,Figurine - Jade Owl,755,Jewelcrafting,primary,1,21748,Figurine - Jade Owl,0,1,24,225,255,0
+26873,Figurine - Golden Hare,755,Jewelcrafting,primary,1,21756,Figurine - Golden Hare,0,1,24,225,255,0
+26874,Aquamarine Signet,755,Jewelcrafting,primary,1,20964,Aquamarine Signet,0,1,24,235,265,0
+26875,Figurine - Black Pearl Panther,755,Jewelcrafting,primary,1,21758,Figurine - Black Pearl Panther,0,1,24,240,270,0
+26876,Aquamarine Pendant of the Warrior,755,Jewelcrafting,primary,1,21755,Aquamarine Pendant of the Warrior,0,1,24,245,275,0
+26878,Ruby Crown of Restoration,755,Jewelcrafting,primary,1,20969,Ruby Crown of Restoration,0,1,24,250,280,0
+26880,Thorium Setting,755,Jewelcrafting,primary,1,21752,Thorium Setting,0,1,24,235,255,0
+26881,Figurine - Truesilver Crab,755,Jewelcrafting,primary,1,21760,Figurine - Truesilver Crab,0,1,24,250,280,0
+26882,Figurine - Truesilver Boar,755,Jewelcrafting,primary,1,21763,Figurine - Truesilver Boar,0,1,24,260,290,0
+26883,Ruby Pendant of Fire,755,Jewelcrafting,primary,1,21764,Ruby Pendant of Fire,0,1,24,260,290,0
+26885,Truesilver Healing Ring,755,Jewelcrafting,primary,1,21765,Truesilver Healing Ring,0,1,24,265,295,0
+26887,The Aquamarine Ward,755,Jewelcrafting,primary,1,21754,The Aquamarine Ward,0,1,24,270,300,0
+26896,Gem Studded Band,755,Jewelcrafting,primary,1,21753,Gem Studded Band,0,1,24,275,305,0
+26897,Opal Necklace of Impact,755,Jewelcrafting,primary,1,21766,Opal Necklace of Impact,0,1,24,275,305,0
+26900,Figurine - Ruby Serpent,755,Jewelcrafting,primary,1,21769,Figurine - Ruby Serpent,0,1,24,280,300,0
+26902,Simple Opal Ring,755,Jewelcrafting,primary,1,21767,Simple Opal Ring,0,1,24,280,300,0
+26903,Sapphire Signet,755,Jewelcrafting,primary,1,21768,Sapphire Signet,0,1,24,285,305,0
+26906,Emerald Crown of Destruction,755,Jewelcrafting,primary,1,21774,Emerald Crown of Destruction,0,1,24,285,305,0
+26907,Onslaught Ring,755,Jewelcrafting,primary,1,21775,Onslaught Ring,0,1,24,290,310,0
+26908,Sapphire Pendant of Winter Night,755,Jewelcrafting,primary,1,21790,Sapphire Pendant of Winter Night,0,1,24,290,310,0
+26909,Figurine - Emerald Owl,755,Jewelcrafting,primary,1,21777,Figurine - Emerald Owl,0,1,24,295,315,0
+26910,Ring of Bitter Shadows,755,Jewelcrafting,primary,1,21778,Ring of Bitter Shadows,0,1,24,295,315,0
+26911,Living Emerald Pendant,755,Jewelcrafting,primary,1,21791,Living Emerald Pendant,0,1,24,300,320,0
+26912,Figurine - Black Diamond Crab,755,Jewelcrafting,primary,1,21784,Figurine - Black Diamond Crab,0,1,24,310,330,0
+26914,Figurine - Dark Iron Scorpid,755,Jewelcrafting,primary,1,21789,Figurine - Dark Iron Scorpid,0,1,24,310,330,0
+26915,Necklace of the Diamond Tower,755,Jewelcrafting,primary,1,21792,Necklace of the Diamond Tower,0,1,24,315,335,0
+26916,Band of Natural Fire,755,Jewelcrafting,primary,1,21779,Band of Natural Fire,0,1,24,320,340,0
+26918,Arcanite Sword Pendant,755,Jewelcrafting,primary,1,21793,Arcanite Sword Pendant,0,1,24,325,345,0
+26920,Blood Crown,755,Jewelcrafting,primary,1,21780,Blood Crown,0,1,24,335,355,0
+26925,Woven Copper Ring,755,Jewelcrafting,primary,1,21931,Woven Copper Ring,0,1,24,30,60,1
+26926,Heavy Copper Ring,755,Jewelcrafting,primary,1,21932,Heavy Copper Ring,0,1,24,35,65,0
+26927,Thick Bronze Necklace,755,Jewelcrafting,primary,1,21933,Thick Bronze Necklace,0,1,24,80,110,0
+26928,Ornate Tigerseye Necklace,755,Jewelcrafting,primary,1,21934,Ornate Tigerseye Necklace,0,1,24,60,90,0
+28903,Teardrop Blood Garnet,755,Jewelcrafting,primary,1,23094,Teardrop Blood Garnet,0,1,24,300,340,0
+28905,Bold Blood Garnet,755,Jewelcrafting,primary,1,23095,Bold Blood Garnet,0,1,24,305,345,0
+28906,Runed Blood Garnet,755,Jewelcrafting,primary,1,23096,Runed Blood Garnet,0,1,24,315,355,0
+28907,Delicate Blood Garnet,755,Jewelcrafting,primary,1,23097,Delicate Blood Garnet,0,1,24,325,355,0
+28910,Inscribed Flame Spessarite,755,Jewelcrafting,primary,1,23098,Inscribed Flame Spessarite,0,1,24,300,340,0
+28912,Luminous Flame Spessarite,755,Jewelcrafting,primary,1,23099,Luminous Flame Spessarite,0,1,24,305,345,0
+28914,Glinting Flame Spessarite,755,Jewelcrafting,primary,1,23100,Glinting Flame Spessarite,0,1,24,315,355,0
+28915,Potent Flame Spessarite,755,Jewelcrafting,primary,1,23101,Potent Flame Spessarite,0,1,24,325,355,0
+28916,Radiant Deep Peridot,755,Jewelcrafting,primary,1,23103,Radiant Deep Peridot,0,1,24,300,340,0
+28917,Jagged Deep Peridot,755,Jewelcrafting,primary,1,23104,Jagged Deep Peridot,0,1,24,305,345,0
+28918,Enduring Deep Peridot,755,Jewelcrafting,primary,1,23105,Enduring Deep Peridot,0,1,24,315,355,0
+28924,Dazzling Deep Peridot,755,Jewelcrafting,primary,1,23106,Dazzling Deep Peridot,0,1,24,325,355,0
+28925,Glowing Shadow Draenite,755,Jewelcrafting,primary,1,23108,Glowing Shadow Draenite,0,1,24,300,340,0
+28927,Royal Shadow Draenite,755,Jewelcrafting,primary,1,23109,Royal Shadow Draenite,0,1,24,305,345,0
+28933,Shifting Shadow Draenite,755,Jewelcrafting,primary,1,23110,Shifting Shadow Draenite,0,1,24,315,355,0
+28936,Sovereign Shadow Draenite,755,Jewelcrafting,primary,1,23111,Sovereign Shadow Draenite,0,1,24,325,355,0
+28938,Brilliant Golden Draenite,755,Jewelcrafting,primary,1,23113,Brilliant Golden Draenite,0,1,24,300,340,0
+28944,Gleaming Golden Draenite,755,Jewelcrafting,primary,1,23114,Gleaming Golden Draenite,0,1,24,305,345,0
+28947,Thick Golden Draenite,755,Jewelcrafting,primary,1,23115,Thick Golden Draenite,0,1,24,315,355,0
+28948,Rigid Golden Draenite,755,Jewelcrafting,primary,1,23116,Rigid Golden Draenite,0,1,24,325,355,0
+28950,Solid Azure Moonstone,755,Jewelcrafting,primary,1,23118,Solid Azure Moonstone,0,1,24,300,340,0
+28953,Sparkling Azure Moonstone,755,Jewelcrafting,primary,1,23119,Sparkling Azure Moonstone,0,1,24,305,345,0
+28955,Stormy Azure Moonstone,755,Jewelcrafting,primary,1,23120,Stormy Azure Moonstone,0,1,24,315,355,0
+28957,Lustrous Azure Moonstone,755,Jewelcrafting,primary,1,23121,Lustrous Azure Moonstone,0,1,24,325,355,0
+31048,Fel Iron Blood Ring,755,Jewelcrafting,primary,1,24074,Fel Iron Blood Ring,0,1,24,320,340,0
+31049,Golden Draenite Ring,755,Jewelcrafting,primary,1,24075,Golden Draenite Ring,0,1,24,320,350,0
+31050,Azure Moonstone Ring,755,Jewelcrafting,primary,1,24076,Azure Moonstone Ring,0,1,24,330,350,0
+31051,Thick Adamantite Necklace,755,Jewelcrafting,primary,1,24077,Thick Adamantite Necklace,0,1,24,345,365,0
+31052,Heavy Adamantite Ring,755,Jewelcrafting,primary,1,24078,Heavy Adamantite Ring,0,1,24,345,365,0
+31053,Khorium Band of Shadows,755,Jewelcrafting,primary,1,24079,Khorium Band of Shadows,0,1,24,360,380,0
+31054,Khorium Band of Frost,755,Jewelcrafting,primary,1,24080,Khorium Band of Frost,0,1,24,365,385,0
+31055,Khorium Inferno Band,755,Jewelcrafting,primary,1,24082,Khorium Inferno Band,0,1,24,365,385,0
+31056,Khorium Band of Leaves,755,Jewelcrafting,primary,1,24085,Khorium Band of Leaves,0,1,24,370,390,0
+31057,Arcane Khorium Band,755,Jewelcrafting,primary,1,24086,Arcane Khorium Band,0,1,24,375,395,0
+31058,Heavy Felsteel Ring,755,Jewelcrafting,primary,1,24087,Heavy Felsteel Ring,0,1,24,355,375,0
+31060,Delicate Eternium Ring,755,Jewelcrafting,primary,1,24088,Delicate Eternium Ring,0,1,24,365,385,0
+31061,Blazing Eternium Band,755,Jewelcrafting,primary,1,24089,Blazing Eternium Band,0,1,24,375,395,0
+31062,Pendant of Frozen Flame,755,Jewelcrafting,primary,1,24092,Pendant of Frozen Flame,0,1,24,370,390,0
+31063,Pendant of Thawing,755,Jewelcrafting,primary,1,24093,Pendant of Thawing,0,1,24,370,390,0
+31064,Pendant of Withering,755,Jewelcrafting,primary,1,24095,Pendant of Withering,0,1,24,370,390,0
+31065,Pendant of Shadow's End,755,Jewelcrafting,primary,1,24097,Pendant of Shadow's End,0,1,24,370,390,0
+31066,Pendant of the Null Rune,755,Jewelcrafting,primary,1,24098,Pendant of the Null Rune,0,1,24,370,390,0
+31067,Thick Felsteel Necklace,755,Jewelcrafting,primary,1,24106,Thick Felsteel Necklace,0,1,24,365,385,0
+31068,Living Ruby Pendant,755,Jewelcrafting,primary,1,24110,Living Ruby Pendant,0,1,24,365,385,0
+31070,Braided Eternium Chain,755,Jewelcrafting,primary,1,24114,Braided Eternium Chain,0,1,24,370,390,0
+31071,Eye of the Night,755,Jewelcrafting,primary,1,24116,Eye of the Night,0,1,24,370,390,0
+31072,Embrace of the Dawn,755,Jewelcrafting,primary,1,24117,Embrace of the Dawn,0,1,24,375,395,0
+31076,Chain of the Twilight Owl,755,Jewelcrafting,primary,1,24121,Chain of the Twilight Owl,0,1,24,375,395,0
+31077,Coronet of the Verdant Flame,755,Jewelcrafting,primary,1,24122,Coronet of Verdant Flame,0,1,24,380,400,0
+31078,Circlet of Arcane Might,755,Jewelcrafting,primary,1,24123,Circlet of Arcane Might,0,1,24,380,400,0
+31079,Figurine - Felsteel Boar,755,Jewelcrafting,primary,1,24124,Figurine - Felsteel Boar,0,1,24,380,400,0
+31080,Figurine - Dawnstone Crab,755,Jewelcrafting,primary,1,24125,Figurine - Dawnstone Crab,0,1,24,380,400,0
+31081,Figurine - Living Ruby Serpent,755,Jewelcrafting,primary,1,24126,Figurine - Living Ruby Serpent,0,1,24,380,400,0
+31082,Figurine - Talasite Owl,755,Jewelcrafting,primary,1,24127,Figurine - Talasite Owl,0,1,24,380,400,0
+31083,Figurine - Nightseye Panther,755,Jewelcrafting,primary,1,24128,Figurine - Nightseye Panther,0,1,24,380,400,0
+31084,Bold Living Ruby,755,Jewelcrafting,primary,1,24027,Bold Living Ruby,0,1,24,350,380,0
+31085,Delicate Living Ruby,755,Jewelcrafting,primary,1,24028,Delicate Living Ruby,0,1,24,350,380,0
+31087,Teardrop Living Ruby,755,Jewelcrafting,primary,1,24029,Teardrop Living Ruby,0,1,24,350,380,0
+31088,Runed Living Ruby,755,Jewelcrafting,primary,1,24030,Runed Living Ruby,0,1,24,350,380,0
+31089,Bright Living Ruby,755,Jewelcrafting,primary,1,24031,Bright Living Ruby,0,1,24,350,380,0
+31090,Subtle Living Ruby,755,Jewelcrafting,primary,1,24032,Subtle Living Ruby,0,1,24,350,380,0
+31091,Flashing Living Ruby,755,Jewelcrafting,primary,1,24036,Flashing Living Ruby,0,1,24,350,380,0
+31092,Solid Star of Elune,755,Jewelcrafting,primary,1,24033,Solid Star of Elune,0,1,24,350,380,0
+31094,Lustrous Star of Elune,755,Jewelcrafting,primary,1,24037,Lustrous Star of Elune,0,1,24,350,380,0
+31095,Stormy Star of Elune,755,Jewelcrafting,primary,1,24039,Stormy Star of Elune,0,1,24,350,380,0
+31096,Brilliant Dawnstone,755,Jewelcrafting,primary,1,24047,Brilliant Dawnstone,0,1,24,350,380,0
+31097,Smooth Dawnstone,755,Jewelcrafting,primary,1,24048,Smooth Dawnstone,0,1,24,350,380,0
+31098,Rigid Dawnstone,755,Jewelcrafting,primary,1,24051,Rigid Dawnstone,0,1,24,350,380,0
+31099,Gleaming Dawnstone,755,Jewelcrafting,primary,1,24050,Gleaming Dawnstone,0,1,24,350,380,0
+31100,Thick Dawnstone,755,Jewelcrafting,primary,1,24052,Thick Dawnstone,0,1,24,350,380,0
+31101,Mystic Dawnstone,755,Jewelcrafting,primary,1,24053,Mystic Dawnstone,0,1,24,350,380,0
+31102,Sovereign Nightseye,755,Jewelcrafting,primary,1,24054,Sovereign Nightseye,0,1,24,350,380,0
+31103,Shifting Nightseye,755,Jewelcrafting,primary,1,24055,Shifting Nightseye,0,1,24,350,380,0
+31104,Glowing Nightseye,755,Jewelcrafting,primary,1,24056,Glowing Nightseye,0,1,24,350,380,0
+31105,Royal Nightseye,755,Jewelcrafting,primary,1,24057,Royal Nightseye,0,1,24,350,380,0
+31106,Inscribed Noble Topaz,755,Jewelcrafting,primary,1,24058,Inscribed Noble Topaz,0,1,24,350,380,0
+31107,Potent Noble Topaz,755,Jewelcrafting,primary,1,24059,Potent Noble Topaz,0,1,24,350,380,0
+31108,Luminous Noble Topaz,755,Jewelcrafting,primary,1,24060,Luminous Noble Topaz,0,1,24,350,380,0
+31109,Glinting Noble Topaz,755,Jewelcrafting,primary,1,24061,Glinting Noble Topaz,0,1,24,350,380,0
+31110,Enduring Talasite,755,Jewelcrafting,primary,1,24062,Enduring Talasite,0,1,24,350,380,0
+31111,Radiant Talasite,755,Jewelcrafting,primary,1,24066,Radiant Talasite,0,1,24,350,380,0
+31112,Dazzling Talasite,755,Jewelcrafting,primary,1,24065,Dazzling Talasite,0,1,24,350,380,0
+31113,Jagged Talasite,755,Jewelcrafting,primary,1,24067,Jagged Talasite,0,1,24,350,380,0
+31149,Sparkling Star of Elune,755,Jewelcrafting,primary,1,24035,Sparkling Star of Elune,0,1,24,350,380,0
+32178,Malachite Pendant,755,Jewelcrafting,primary,1,25438,Malachite Pendant,0,1,24,50,80,0
+32179,Tigerseye Band,755,Jewelcrafting,primary,1,25439,Tigerseye Band,0,1,24,50,80,0
+32259,Rough Stone Statue,755,Jewelcrafting,primary,1,25498,Rough Stone Statue,0,1,24,30,50,1
+32801,Coarse Stone Statue,755,Jewelcrafting,primary,1,25880,Coarse Stone Statue,0,1,24,70,90,0
+32807,Heavy Stone Statue,755,Jewelcrafting,primary,1,25881,Heavy Stone Statue,0,1,24,120,140,0
+32808,Solid Stone Statue,755,Jewelcrafting,primary,1,25882,Solid Stone Statue,0,1,24,175,195,0
+32809,Dense Stone Statue,755,Jewelcrafting,primary,1,25883,Dense Stone Statue,0,1,24,225,245,0
+32810,Primal Stone Statue,755,Jewelcrafting,primary,1,25884,Primal Stone Statue,0,1,24,300,320,0
+32866,Powerful Earthstorm Diamond,755,Jewelcrafting,primary,1,25896,Powerful Earthstorm Diamond,0,1,24,375,395,0
+32867,Bracing Earthstorm Diamond,755,Jewelcrafting,primary,1,25897,Bracing Earthstorm Diamond,0,1,24,375,395,0
+32868,Tenacious Earthstorm Diamond,755,Jewelcrafting,primary,1,25898,Tenacious Earthstorm Diamond,0,1,24,375,395,0
+32869,Brutal Earthstorm Diamond,755,Jewelcrafting,primary,1,25899,Brutal Earthstorm Diamond,0,1,24,375,395,0
+32870,Insightful Earthstorm Diamond,755,Jewelcrafting,primary,1,25901,Insightful Earthstorm Diamond,0,1,24,375,395,0
+32871,Destructive Skyfire Diamond,755,Jewelcrafting,primary,1,25890,Destructive Skyfire Diamond,0,1,24,375,395,0
+32872,Mystical Skyfire Diamond,755,Jewelcrafting,primary,1,25893,Mystical Skyfire Diamond,0,1,24,375,395,0
+32873,Swift Skyfire Diamond,755,Jewelcrafting,primary,1,25894,Swift Skyfire Diamond,0,1,24,375,395,0
+32874,Enigmatic Skyfire Diamond,755,Jewelcrafting,primary,1,25895,Enigmatic Skyfire Diamond,0,1,24,375,395,0
+34069,Smooth Golden Draenite,755,Jewelcrafting,primary,1,28290,Smooth Golden Draenite,0,1,24,325,355,0
+34590,Bright Blood Garnet,755,Jewelcrafting,primary,1,28595,Bright Blood Garnet,0,1,24,305,345,0
+34955,Golden Ring of Power,755,Jewelcrafting,primary,1,29157,Golden Ring of Power,0,1,24,190,210,0
+34959,Truesilver Commander's Ring,755,Jewelcrafting,primary,1,29158,Truesilver Commander's Ring,0,1,24,210,230,0
+34960,Glowing Thorium Band,755,Jewelcrafting,primary,1,29159,Glowing Thorium Band,0,1,24,290,310,0
+34961,Emerald Lion Ring,755,Jewelcrafting,primary,1,29160,Emerald Lion Ring,0,1,24,300,320,0
+36523,Brilliant Necklace,755,Jewelcrafting,primary,1,30419,Brilliant Necklace,0,1,24,105,135,0
+36524,Heavy Jade Ring,755,Jewelcrafting,primary,1,30420,Heavy Jade Ring,0,1,24,135,165,0
+36525,Red Ring of Destruction,755,Jewelcrafting,primary,1,30421,Red Ring of Destruction,0,1,24,255,285,0
+36526,Diamond Focus Ring,755,Jewelcrafting,primary,1,30422,Diamond Focus Ring,0,1,24,285,305,0
+37818,Bronze Band of Force,755,Jewelcrafting,primary,1,30804,Bronze Band of Force,0,1,24,95,125,0
+37855,Ring of Arcane Shielding,755,Jewelcrafting,primary,1,30825,Ring of Arcane Shielding,0,1,24,370,390,0
+38068,Mercurial Adamantite,755,Jewelcrafting,primary,1,31079,Mercurial Adamantite,0,1,24,325,345,0
+38175,Bronze Torc,755,Jewelcrafting,primary,1,31154,Bronze Torc,0,1,24,110,140,0
+38503,The Frozen Eye,755,Jewelcrafting,primary,1,31398,The Frozen Eye,0,1,24,385,405,0
+38504,The Natural Ward,755,Jewelcrafting,primary,1,31399,The Natural Ward,0,1,24,385,405,0
+39451,Great Golden Draenite,755,Jewelcrafting,primary,1,31860,Great Golden Draenite,0,1,24,325,355,0
+39452,Great Dawnstone,755,Jewelcrafting,primary,1,31861,Great Dawnstone,0,1,24,350,380,0
+39455,Balanced Shadow Draenite,755,Jewelcrafting,primary,1,31862,Balanced Shadow Draenite,0,1,24,325,355,0
+39458,Infused Shadow Draenite,755,Jewelcrafting,primary,1,31864,Infused Shadow Draenite,0,1,24,325,355,0
+39462,Infused Nightseye,755,Jewelcrafting,primary,1,31865,Infused Nightseye,0,1,24,350,380,0
+39463,Balanced Nightseye,755,Jewelcrafting,primary,1,31863,Balanced Nightseye,0,1,24,350,380,0
+39466,Veiled Flame Spessarite,755,Jewelcrafting,primary,1,31866,Veiled Flame Spessarite,0,1,24,325,355,0
+39467,Wicked Flame Spessarite,755,Jewelcrafting,primary,1,31869,Wicked Flame Spessarite,0,1,24,325,355,0
+39470,Veiled Noble Topaz,755,Jewelcrafting,primary,1,31867,Veiled Noble Topaz,0,1,24,350,380,0
+39471,Wicked Noble Topaz,755,Jewelcrafting,primary,1,31868,Wicked Noble Topaz,0,1,24,350,380,0
+39705,Bold Crimson Spinel,755,Jewelcrafting,primary,1,32193,Bold Crimson Spinel,0,1,24,375,400,0
+39706,Delicate Crimson Spinel,755,Jewelcrafting,primary,1,32194,Delicate Crimson Spinel,0,1,24,375,400,0
+39710,Teardrop Crimson Spinel,755,Jewelcrafting,primary,1,32195,Teardrop Crimson Spinel,0,1,24,375,400,0
+39711,Runed Crimson Spinel,755,Jewelcrafting,primary,1,32196,Runed Crimson Spinel,0,1,24,375,400,0
+39712,Bright Crimson Spinel,755,Jewelcrafting,primary,1,32197,Bright Crimson Spinel,0,1,24,375,400,0
+39713,Subtle Crimson Spinel,755,Jewelcrafting,primary,1,32198,Subtle Crimson Spinel,0,1,24,375,400,0
+39714,Flashing Crimson Spinel,755,Jewelcrafting,primary,1,32199,Flashing Crimson Spinel,0,1,24,375,400,0
+39715,Solid Empyrean Sapphire,755,Jewelcrafting,primary,1,32200,Solid Empyrean Sapphire,0,1,24,375,400,0
+39716,Sparkling Empyrean Sapphire,755,Jewelcrafting,primary,1,32201,Sparkling Empyrean Sapphire,0,1,24,375,400,0
+39717,Lustrous Empyrean Sapphire,755,Jewelcrafting,primary,1,32202,Lustrous Empyrean Sapphire,0,1,24,375,400,0
+39718,Stormy Empyrean Sapphire,755,Jewelcrafting,primary,1,32203,Stormy Empyrean Sapphire,0,1,24,375,400,0
+39719,Brilliant Lionseye,755,Jewelcrafting,primary,1,32204,Brilliant Lionseye,0,1,24,375,400,0
+39720,Smooth Lionseye,755,Jewelcrafting,primary,1,32205,Smooth Lionseye,0,1,24,375,400,0
+39721,Rigid Lionseye,755,Jewelcrafting,primary,1,32206,Rigid Lionseye,0,1,24,375,400,0
+39722,Gleaming Lionseye,755,Jewelcrafting,primary,1,32207,Gleaming Lionseye,0,1,24,375,400,0
+39723,Thick Lionseye,755,Jewelcrafting,primary,1,32208,Thick Lionseye,0,1,24,375,400,0
+39724,Mystic Lionseye,755,Jewelcrafting,primary,1,32209,Mystic Lionseye,0,1,24,375,400,0
+39725,Great Lionseye,755,Jewelcrafting,primary,1,32210,Great Lionseye,0,1,24,375,400,0
+39727,Sovereign Shadowsong Amethyst,755,Jewelcrafting,primary,1,32211,Sovereign Shadowsong Amethyst,0,1,24,375,400,0
+39728,Shifting Shadowsong Amethyst,755,Jewelcrafting,primary,1,32212,Shifting Shadowsong Amethyst,0,1,24,375,400,0
+39729,Balanced Shadowsong Amethyst,755,Jewelcrafting,primary,1,32213,Balanced Shadowsong Amethyst,0,1,24,375,400,0
+39730,Infused Shadowsong Amethyst,755,Jewelcrafting,primary,1,32214,Infused Shadowsong Amethyst,0,1,24,375,400,0
+39731,Glowing Shadowsong Amethyst,755,Jewelcrafting,primary,1,32215,Glowing Shadowsong Amethyst,0,1,24,375,400,0
+39732,Royal Shadowsong Amethyst,755,Jewelcrafting,primary,1,32216,Royal Shadowsong Amethyst,0,1,24,375,400,0
+39733,Inscribed Pyrestone,755,Jewelcrafting,primary,1,32217,Inscribed Pyrestone,0,1,24,375,400,0
+39734,Potent Pyrestone,755,Jewelcrafting,primary,1,32218,Potent Pyrestone,0,1,24,375,400,0
+39735,Luminous Pyrestone,755,Jewelcrafting,primary,1,32219,Luminous Pyrestone,0,1,24,375,400,0
+39736,Glinting Pyrestone,755,Jewelcrafting,primary,1,32220,Glinting Pyrestone,0,1,24,375,400,0
+39737,Veiled Pyrestone,755,Jewelcrafting,primary,1,32221,Veiled Pyrestone,0,1,24,375,400,0
+39738,Wicked Pyrestone,755,Jewelcrafting,primary,1,32222,Wicked Pyrestone,0,1,24,375,400,0
+39739,Enduring Seaspray Emerald,755,Jewelcrafting,primary,1,32223,Enduring Seaspray Emerald,0,1,24,375,400,0
+39740,Radiant Seaspray Emerald,755,Jewelcrafting,primary,1,32224,Radiant Seaspray Emerald,0,1,24,375,400,0
+39741,Dazzling Seaspray Emerald,755,Jewelcrafting,primary,1,32225,Dazzling Seaspray Emerald,0,1,24,375,400,0
+39742,Jagged Seaspray Emerald,755,Jewelcrafting,primary,1,32226,Jagged Seaspray Emerald,0,1,24,375,400,0
+39961,Relentless Earthstorm Diamond,755,Jewelcrafting,primary,1,32409,Relentless Earthstorm Diamond,0,1,24,375,395,0
+39963,Thundering Skyfire Diamond,755,Jewelcrafting,primary,1,32410,Thundering Skyfire Diamond,0,1,24,375,395,0
+40514,Necklace of the Deep,755,Jewelcrafting,primary,1,32508,Necklace of the Deep,0,1,24,340,370,0
+41414,Brilliant Pearl Band,755,Jewelcrafting,primary,1,32772,Brilliant Pearl Band,0,1,24,335,355,0
+41415,The Black Pearl,755,Jewelcrafting,primary,1,32774,The Black Pearl,0,1,24,340,360,0
+41418,Crown of the Sea Witch,755,Jewelcrafting,primary,1,32776,Crown of the Sea Witch,0,1,24,375,395,0
+41420,Purified Jaggal Pearl,755,Jewelcrafting,primary,1,32833,Purified Jaggal Pearl,0,1,24,325,340,0
+41429,Purified Shadow Pearl,755,Jewelcrafting,primary,1,32836,Purified Shadow Pearl,0,1,24,350,380,0
+42558,Don Julio's Heart,755,Jewelcrafting,primary,1,33133,Don Julio's Heart,0,1,24,365,375,0
+42588,Kailee's Rose,755,Jewelcrafting,primary,1,33134,Kailee's Rose,0,1,24,365,375,0
+42589,Crimson Sun,755,Jewelcrafting,primary,1,33131,Crimson Sun,0,1,24,365,375,0
+42590,Falling Star,755,Jewelcrafting,primary,1,33135,Falling Star,0,1,24,365,375,0
+42591,Stone of Blades,755,Jewelcrafting,primary,1,33143,Stone of Blades,0,1,24,365,375,0
+42592,Blood of Amber,755,Jewelcrafting,primary,1,33140,Blood of Amber,0,1,24,365,375,0
+42593,Facet of Eternity,755,Jewelcrafting,primary,1,33144,Facet of Eternity,0,1,24,365,375,0
+43493,Steady Talasite,755,Jewelcrafting,primary,1,33782,Steady Talasite,0,1,24,350,380,0
+44794,Chaotic Skyfire Diamond,755,Jewelcrafting,primary,1,34220,Chaotic Skyfire Diamond,0,1,24,375,395,0
+46122,Loop of Forged Power,755,Jewelcrafting,primary,1,34362,Loop of Forged Power,0,1,24,375,410,0
+46123,Ring of Flowing Life,755,Jewelcrafting,primary,1,34363,Ring of Flowing Life,0,1,24,375,410,0
+46124,Hard Khorium Band,755,Jewelcrafting,primary,1,34361,Hard Khorium Band,0,1,24,375,410,0
+46125,Pendant of Sunfire,755,Jewelcrafting,primary,1,34359,Pendant of Sunfire,0,1,24,375,410,0
+46126,Amulet of Flowing Life,755,Jewelcrafting,primary,1,34360,Amulet of Flowing Life,0,1,24,375,410,0
+46127,Hard Khorium Choker,755,Jewelcrafting,primary,1,34358,Hard Khorium Choker,0,1,24,375,410,0
+46403,Quick Dawnstone,755,Jewelcrafting,primary,1,35315,Quick Dawnstone,0,1,24,350,380,0
+46404,Reckless Noble Topaz,755,Jewelcrafting,primary,1,35316,Reckless Noble Topaz,0,1,24,350,380,0
+46405,Forceful Talasite,755,Jewelcrafting,primary,1,35318,Forceful Talasite,0,1,24,350,380,0
+46597,Eternal Earthstorm Diamond,755,Jewelcrafting,primary,1,35501,Eternal Earthstorm Diamond,0,1,24,380,400,0
+46601,Ember Skyfire Diamond,755,Jewelcrafting,primary,1,35503,Ember Skyfire Diamond,0,1,24,380,400,0
+46775,Figurine - Empyrean Tortoise,755,Jewelcrafting,primary,1,35693,Figurine - Empyrean Tortoise,0,1,24,375,400,0
+46776,Figurine - Khorium Boar,755,Jewelcrafting,primary,1,35694,Figurine - Khorium Boar,0,1,24,375,400,0
+46777,Figurine - Crimson Serpent,755,Jewelcrafting,primary,1,35700,Figurine - Crimson Serpent,0,1,24,375,400,0
+46778,Figurine - Shadowsong Panther,755,Jewelcrafting,primary,1,35702,Figurine - Shadowsong Panther,0,1,24,375,400,0
+46779,Figurine - Seaspray Albatross,755,Jewelcrafting,primary,1,35703,Figurine - Seaspray Albatross,0,1,24,375,400,0
+46803,Regal Nightseye,755,Jewelcrafting,primary,1,35707,Regal Nightseye,0,1,24,350,380,0
+47053,Forceful Seaspray Emerald,755,Jewelcrafting,primary,1,35759,Forceful Seaspray Emerald,0,1,24,375,400,0
+47054,Steady Seaspray Emerald,755,Jewelcrafting,primary,1,35758,Steady Seaspray Emerald,0,1,24,375,400,0
+47055,Reckless Pyrestone,755,Jewelcrafting,primary,1,35760,Reckless Pyrestone,0,1,24,375,400,0
+47056,Quick Lionseye,755,Jewelcrafting,primary,1,35761,Quick Lionseye,0,1,24,375,400,0
+47280,Brilliant Glass,755,Jewelcrafting,primary,1,191061,,0,1,24,350,380,0
+48789,Purified Shadowsong Amethyst,755,Jewelcrafting,primary,1,37503,Purified Shadowsong Amethyst,0,1,24,375,400,0
+2149,Handstitched Leather Boots,165,Leatherworking,primary,1,2302,Handstitched Leather Boots,0,1,24,40,70,1
+2152,Light Armor Kit,165,Leatherworking,primary,1,2304,Light Armor Kit,0,1,24,30,60,1
+2159,Fine Leather Cloak,165,Leatherworking,primary,1,2308,Fine Leather Cloak,0,1,24,105,135,0
+2881,Light Leather,165,Leatherworking,primary,1,2318,Light Leather,0,1,24,20,40,1
+3753,Handstitched Leather Belt,165,Leatherworking,primary,1,4237,Handstitched Leather Belt,0,1,24,55,85,0
+3756,Embossed Leather Gloves,165,Leatherworking,primary,1,4239,Embossed Leather Gloves,0,1,24,85,115,0
+3759,Embossed Leather Pants,165,Leatherworking,primary,1,4242,Embossed Leather Pants,0,1,24,105,135,0
+3760,Hillman's Cloak,165,Leatherworking,primary,1,3719,Hillman's Cloak,0,1,24,170,190,0
+3761,Fine Leather Tunic,165,Leatherworking,primary,1,4243,Fine Leather Tunic,0,1,24,115,145,0
+3762,Hillman's Leather Vest,165,Leatherworking,primary,1,4244,Hillman's Leather Vest,0,1,24,125,150,0
+3763,Fine Leather Belt,165,Leatherworking,primary,1,4246,Fine Leather Belt,0,1,24,110,140,0
+3764,Hillman's Leather Gloves,165,Leatherworking,primary,1,4247,Hillman's Leather Gloves,0,1,24,170,195,0
+3765,Dark Leather Gloves,165,Leatherworking,primary,1,4248,Dark Leather Gloves,0,1,24,155,180,0
+3766,Dark Leather Belt,165,Leatherworking,primary,1,4249,Dark Leather Belt,0,1,24,150,175,0
+3767,Hillman's Belt,165,Leatherworking,primary,1,4250,Hillman's Belt,0,1,24,145,170,0
+3768,Hillman's Shoulders,165,Leatherworking,primary,1,4251,Hillman's Shoulders,0,1,24,155,180,0
+3769,Dark Leather Shoulders,165,Leatherworking,primary,1,4252,Dark Leather Shoulders,0,1,24,165,190,0
+3770,Toughened Leather Gloves,165,Leatherworking,primary,1,4253,Toughened Leather Gloves,0,1,24,160,185,0
+3771,Barbaric Gloves,165,Leatherworking,primary,1,4254,Barbaric Gloves,0,1,24,170,190,0
+3772,Green Leather Armor,165,Leatherworking,primary,1,4255,Green Leather Armor,0,1,24,175,195,0
+3773,Guardian Armor,165,Leatherworking,primary,1,4256,Guardian Armor,0,1,24,195,215,0
+3774,Green Leather Belt,165,Leatherworking,primary,1,4257,Green Leather Belt,0,1,24,180,200,0
+3775,Guardian Belt,165,Leatherworking,primary,1,4258,Guardian Belt,0,1,24,190,210,0
+3776,Green Leather Bracers,165,Leatherworking,primary,1,4259,Green Leather Bracers,0,1,24,200,220,0
+3777,Guardian Leather Bracers,165,Leatherworking,primary,1,4260,Guardian Leather Bracers,0,1,24,215,235,0
+3778,Gem-studded Leather Belt,165,Leatherworking,primary,1,4262,Gem-studded Leather Belt,0,1,24,205,225,0
+3779,Barbaric Belt,165,Leatherworking,primary,1,4264,Barbaric Belt,0,1,24,220,240,0
+3780,Heavy Armor Kit,165,Leatherworking,primary,1,4265,Heavy Armor Kit,0,1,24,170,190,0
+3816,Cured Light Hide,165,Leatherworking,primary,1,4231,Cured Light Hide,0,1,24,55,75,0
+3817,Cured Medium Hide,165,Leatherworking,primary,1,4233,Cured Medium Hide,0,1,24,115,130,0
+3818,Cured Heavy Hide,165,Leatherworking,primary,1,4236,Cured Heavy Hide,0,1,24,160,170,0
+4096,Raptor Hide Harness,165,Leatherworking,primary,1,4455,Raptor Hide Harness,0,1,24,185,205,0
+4097,Raptor Hide Belt,165,Leatherworking,primary,1,4456,Raptor Hide Belt,0,1,24,185,205,0
+5244,Kodo Hide Bag,165,Leatherworking,primary,1,5081,Kodo Hide Bag,0,1,24,70,100,0
+6661,Barbaric Harness,165,Leatherworking,primary,1,5739,Barbaric Harness,0,1,24,210,230,0
+6702,Murloc Scale Belt,165,Leatherworking,primary,1,5780,Murloc Scale Belt,0,1,24,120,150,0
+6703,Murloc Scale Breastplate,165,Leatherworking,primary,1,5781,Murloc Scale Breastplate,0,1,24,125,155,0
+6704,Thick Murloc Armor,165,Leatherworking,primary,1,5782,Thick Murloc Armor,0,1,24,190,210,0
+6705,Murloc Scale Bracers,165,Leatherworking,primary,1,5783,Murloc Scale Bracers,0,1,24,210,230,0
+7126,Handstitched Leather Vest,165,Leatherworking,primary,1,5957,Handstitched Leather Vest,0,1,24,40,70,1
+7133,Fine Leather Pants,165,Leatherworking,primary,1,5958,Fine Leather Pants,0,1,24,130,155,0
+7135,Dark Leather Pants,165,Leatherworking,primary,1,5961,Dark Leather Pants,0,1,24,140,165,0
+7147,Guardian Pants,165,Leatherworking,primary,1,5962,Guardian Pants,0,1,24,180,200,0
+7149,Barbaric Leggings,165,Leatherworking,primary,1,5963,Barbaric Leggings,0,1,24,190,210,0
+7151,Barbaric Shoulders,165,Leatherworking,primary,1,5964,Barbaric Shoulders,0,1,24,195,215,0
+7153,Guardian Cloak,165,Leatherworking,primary,1,5965,Guardian Cloak,0,1,24,205,225,0
+7156,Guardian Gloves,165,Leatherworking,primary,1,5966,Guardian Gloves,0,1,24,210,230,0
+7953,Deviate Scale Cloak,165,Leatherworking,primary,1,6466,Deviate Scale Cloak,0,1,24,120,150,0
+7954,Deviate Scale Gloves,165,Leatherworking,primary,1,6467,Deviate Scale Gloves,0,1,24,130,155,0
+7955,Deviate Scale Belt,165,Leatherworking,primary,1,6468,Deviate Scale Belt,0,1,24,140,165,0
+8322,Moonglow Vest,165,Leatherworking,primary,1,6709,Moonglow Vest,0,1,24,115,145,0
+9058,Handstitched Leather Cloak,165,Leatherworking,primary,1,7276,Handstitched Leather Cloak,0,1,24,40,70,1
+9059,Handstitched Leather Bracers,165,Leatherworking,primary,1,7277,Handstitched Leather Bracers,0,1,24,40,70,1
+9060,Light Leather Quiver,165,Leatherworking,primary,1,7278,Light Leather Quiver,0,1,24,60,90,0
+9062,Small Leather Ammo Pouch,165,Leatherworking,primary,1,7279,Small Leather Ammo Pouch,0,1,24,60,90,0
+9064,Rugged Leather Pants,165,Leatherworking,primary,1,7280,Rugged Leather Pants,0,1,24,65,95,0
+9065,Light Leather Bracers,165,Leatherworking,primary,1,7281,Light Leather Bracers,0,1,24,100,130,0
+9068,Light Leather Pants,165,Leatherworking,primary,1,7282,Light Leather Pants,0,1,24,125,155,0
+9070,Black Whelp Cloak,165,Leatherworking,primary,1,7283,Black Whelp Cloak,0,1,24,125,150,0
+9072,Red Whelp Gloves,165,Leatherworking,primary,1,7284,Red Whelp Gloves,0,1,24,145,170,0
+9074,Nimble Leather Gloves,165,Leatherworking,primary,1,7285,Nimble Leather Gloves,0,1,24,145,170,0
+9145,Fletcher's Gloves,165,Leatherworking,primary,1,7348,Fletcher's Gloves,0,1,24,150,175,0
+9146,Herbalist's Gloves,165,Leatherworking,primary,1,7349,Herbalist's Gloves,0,1,24,160,185,0
+9147,Earthen Leather Shoulders,165,Leatherworking,primary,1,7352,Earthen Leather Shoulders,0,1,24,160,185,0
+9148,Pilferer's Gloves,165,Leatherworking,primary,1,7358,Pilferer's Gloves,0,1,24,165,190,0
+9149,Heavy Earthen Gloves,165,Leatherworking,primary,1,7359,Heavy Earthen Gloves,0,1,24,170,195,0
+9193,Heavy Quiver,165,Leatherworking,primary,1,7371,Heavy Quiver,0,1,24,170,190,0
+9194,Heavy Leather Ammo Pouch,165,Leatherworking,primary,1,7372,Heavy Leather Ammo Pouch,0,1,24,170,190,0
+9195,Dusky Leather Leggings,165,Leatherworking,primary,1,7373,Dusky Leather Leggings,0,1,24,185,205,0
+9196,Dusky Leather Armor,165,Leatherworking,primary,1,7374,Dusky Leather Armor,0,1,24,195,215,0
+9197,Green Whelp Armor,165,Leatherworking,primary,1,7375,Green Whelp Armor,0,1,24,195,215,0
+9198,Frost Leather Cloak,165,Leatherworking,primary,1,7377,Frost Leather Cloak,0,1,24,200,220,0
+9201,Dusky Bracers,165,Leatherworking,primary,1,7378,Dusky Bracers,0,1,24,205,225,0
+9202,Green Whelp Bracers,165,Leatherworking,primary,1,7386,Green Whelp Bracers,0,1,24,210,230,0
+9206,Dusky Belt,165,Leatherworking,primary,1,7387,Dusky Belt,0,1,24,215,235,0
+9207,Dusky Boots,165,Leatherworking,primary,1,7390,Dusky Boots,0,1,24,220,240,0
+9208,Swift Boots,165,Leatherworking,primary,1,7391,Swift Boots,0,1,24,220,240,0
+10482,Cured Thick Hide,165,Leatherworking,primary,1,8172,Cured Thick Hide,0,1,24,200,200,0
+10487,Thick Armor Kit,165,Leatherworking,primary,1,8173,Thick Armor Kit,0,1,24,220,240,0
+10490,Comfortable Leather Hat,165,Leatherworking,primary,1,8174,Comfortable Leather Hat,0,1,24,220,240,0
+10499,Nightscape Tunic,165,Leatherworking,primary,1,8175,Nightscape Tunic,0,1,24,225,245,0
+10507,Nightscape Headband,165,Leatherworking,primary,1,8176,Nightscape Headband,0,1,24,225,245,0
+10509,Turtle Scale Gloves,165,Leatherworking,primary,1,8187,Turtle Scale Gloves,0,1,24,225,245,0
+10511,Turtle Scale Breastplate,165,Leatherworking,primary,1,8189,Turtle Scale Breastplate,0,1,24,230,250,0
+10516,Nightscape Shoulders,165,Leatherworking,primary,1,8192,Nightscape Shoulders,0,1,24,230,250,0
+10518,Turtle Scale Bracers,165,Leatherworking,primary,1,8198,Turtle Scale Bracers,0,1,24,230,250,0
+10520,Big Voodoo Robe,165,Leatherworking,primary,1,8200,Big Voodoo Robe,0,1,24,235,255,0
+10525,Tough Scorpid Breastplate,165,Leatherworking,primary,1,8203,Tough Scorpid Breastplate,0,1,24,240,260,0
+10529,Wild Leather Shoulders,165,Leatherworking,primary,1,8210,Wild Leather Shoulders,0,1,24,240,260,0
+10531,Big Voodoo Mask,165,Leatherworking,primary,1,8201,Big Voodoo Mask,0,1,24,240,260,0
+10533,Tough Scorpid Bracers,165,Leatherworking,primary,1,8205,Tough Scorpid Bracers,0,1,24,240,260,0
+10542,Tough Scorpid Gloves,165,Leatherworking,primary,1,8204,Tough Scorpid Gloves,0,1,24,245,265,0
+10544,Wild Leather Vest,165,Leatherworking,primary,1,8211,Wild Leather Vest,0,1,24,245,265,0
+10546,Wild Leather Helmet,165,Leatherworking,primary,1,8214,Wild Leather Helmet,0,1,24,245,265,0
+10548,Nightscape Pants,165,Leatherworking,primary,1,8193,Nightscape Pants,0,1,24,250,270,0
+10550,Nightscape Cloak,165,Leatherworking,primary,1,8195,Nightscape Cloak,0,1,24,250,270,0
+10552,Turtle Scale Helm,165,Leatherworking,primary,1,8191,Turtle Scale Helm,0,1,24,250,270,0
+10554,Tough Scorpid Boots,165,Leatherworking,primary,1,8209,Tough Scorpid Boots,0,1,24,255,275,0
+10556,Turtle Scale Leggings,165,Leatherworking,primary,1,8185,Turtle Scale Leggings,0,1,24,255,275,0
+10558,Nightscape Boots,165,Leatherworking,primary,1,8197,Nightscape Boots,0,1,24,255,275,0
+10560,Big Voodoo Pants,165,Leatherworking,primary,1,8202,Big Voodoo Pants,0,1,24,260,280,0
+10562,Big Voodoo Cloak,165,Leatherworking,primary,1,8216,Big Voodoo Cloak,0,1,24,260,280,0
+10564,Tough Scorpid Shoulders,165,Leatherworking,primary,1,8207,Tough Scorpid Shoulders,0,1,24,260,280,0
+10566,Wild Leather Boots,165,Leatherworking,primary,1,8213,Wild Leather Boots,0,1,24,265,285,0
+10568,Tough Scorpid Leggings,165,Leatherworking,primary,1,8206,Tough Scorpid Leggings,0,1,24,265,285,0
+10570,Tough Scorpid Helm,165,Leatherworking,primary,1,8208,Tough Scorpid Helm,0,1,24,270,290,0
+10572,Wild Leather Leggings,165,Leatherworking,primary,1,8212,Wild Leather Leggings,0,1,24,270,290,0
+10574,Wild Leather Cloak,165,Leatherworking,primary,1,8215,Wild Leather Cloak,0,1,24,270,290,0
+10619,Dragonscale Gauntlets,165,Leatherworking,primary,1,8347,Dragonscale Gauntlets,0,1,24,245,265,0
+10621,Wolfshead Helm,165,Leatherworking,primary,1,8345,Wolfshead Helm,0,1,24,245,265,0
+10630,Gauntlets of the Sea,165,Leatherworking,primary,1,8346,Gauntlets of the Sea,0,1,24,250,270,0
+10632,Helm of Fire,165,Leatherworking,primary,1,8348,Helm of Fire,0,1,24,270,290,0
+10647,Feathered Breastplate,165,Leatherworking,primary,1,8349,Feathered Breastplate,0,1,24,270,290,0
+10650,Dragonscale Breastplate,165,Leatherworking,primary,1,8367,Dragonscale Breastplate,0,1,24,275,295,0
+14930,Quickdraw Quiver,165,Leatherworking,primary,1,8217,Quickdraw Quiver,0,1,24,245,265,0
+14932,Thick Leather Ammo Pouch,165,Leatherworking,primary,1,8218,Thick Leather Ammo Pouch,0,1,24,245,265,0
+19047,Cured Rugged Hide,165,Leatherworking,primary,1,15407,Cured Rugged Hide,0,1,24,250,260,0
+19048,Heavy Scorpid Bracers,165,Leatherworking,primary,1,15077,Heavy Scorpid Bracers,0,1,24,275,295,0
+19049,Wicked Leather Gauntlets,165,Leatherworking,primary,1,15083,Wicked Leather Gauntlets,0,1,24,280,300,0
+19050,Green Dragonscale Breastplate,165,Leatherworking,primary,1,15045,Green Dragonscale Breastplate,0,1,24,280,300,0
+19051,Heavy Scorpid Vest,165,Leatherworking,primary,1,15076,Heavy Scorpid Vest,0,1,24,285,305,0
+19052,Wicked Leather Bracers,165,Leatherworking,primary,1,15084,Wicked Leather Bracers,0,1,24,285,305,0
+19053,Chimeric Gloves,165,Leatherworking,primary,1,15074,Chimeric Gloves,0,1,24,285,305,0
+19054,Red Dragonscale Breastplate,165,Leatherworking,primary,1,15047,Red Dragonscale Breastplate,0,1,24,320,340,0
+19055,Runic Leather Gauntlets,165,Leatherworking,primary,1,15091,Runic Leather Gauntlets,0,1,24,290,310,0
+19058,Rugged Armor Kit,165,Leatherworking,primary,1,15564,Rugged Armor Kit,0,1,24,250,270,0
+19059,Volcanic Leggings,165,Leatherworking,primary,1,15054,Volcanic Leggings,0,1,24,290,310,0
+19060,Green Dragonscale Leggings,165,Leatherworking,primary,1,15046,Green Dragonscale Leggings,0,1,24,290,310,0
+19061,Living Shoulders,165,Leatherworking,primary,1,15061,Living Shoulders,0,1,24,290,310,0
+19062,Ironfeather Shoulders,165,Leatherworking,primary,1,15067,Ironfeather Shoulders,0,1,24,290,310,0
+19063,Chimeric Boots,165,Leatherworking,primary,1,15073,Chimeric Boots,0,1,24,295,315,0
+19064,Heavy Scorpid Gauntlets,165,Leatherworking,primary,1,15078,Heavy Scorpid Gauntlet,0,1,24,295,315,0
+19065,Runic Leather Bracers,165,Leatherworking,primary,1,15092,Runic Leather Bracers,0,1,24,295,315,0
+19066,Frostsaber Boots,165,Leatherworking,primary,1,15071,Frostsaber Boots,0,1,24,295,315,0
+19067,Stormshroud Pants,165,Leatherworking,primary,1,15057,Stormshroud Pants,0,1,24,295,315,0
+19068,Warbear Harness,165,Leatherworking,primary,1,15064,Warbear Harness,0,1,24,295,315,0
+19070,Heavy Scorpid Belt,165,Leatherworking,primary,1,15082,Heavy Scorpid Belt,0,1,24,300,320,0
+19071,Wicked Leather Headband,165,Leatherworking,primary,1,15086,Wicked Leather Headband,0,1,24,300,320,0
+19072,Runic Leather Belt,165,Leatherworking,primary,1,15093,Runic Leather Belt,0,1,24,300,320,0
+19073,Chimeric Leggings,165,Leatherworking,primary,1,15072,Chimeric Leggings,0,1,24,300,320,0
+19074,Frostsaber Leggings,165,Leatherworking,primary,1,15069,Frostsaber Leggings,0,1,24,305,325,0
+19075,Heavy Scorpid Leggings,165,Leatherworking,primary,1,15079,Heavy Scorpid Leggings,0,1,24,305,325,0
+19076,Volcanic Breastplate,165,Leatherworking,primary,1,15053,Volcanic Breastplate,0,1,24,305,325,0
+19077,Blue Dragonscale Breastplate,165,Leatherworking,primary,1,15048,Blue Dragonscale Breastplate,0,1,24,305,325,0
+19078,Living Leggings,165,Leatherworking,primary,1,15060,Living Leggings,0,1,24,305,325,0
+19079,Stormshroud Armor,165,Leatherworking,primary,1,15056,Stormshroud Armor,0,1,24,305,325,0
+19080,Warbear Woolies,165,Leatherworking,primary,1,15065,Warbear Woolies,0,1,24,305,325,0
+19081,Chimeric Vest,165,Leatherworking,primary,1,15075,Chimeric Vest,0,1,24,310,330,0
+19082,Runic Leather Headband,165,Leatherworking,primary,1,15094,Runic Leather Headband,0,1,24,310,330,0
+19083,Wicked Leather Pants,165,Leatherworking,primary,1,15087,Wicked Leather Pants,0,1,24,310,330,0
+19084,Devilsaur Gauntlets,165,Leatherworking,primary,1,15063,Devilsaur Gauntlets,0,1,24,310,330,0
+19085,Black Dragonscale Breastplate,165,Leatherworking,primary,1,15050,Black Dragonscale Breastplate,0,1,24,310,330,0
+19086,Ironfeather Breastplate,165,Leatherworking,primary,1,15066,Ironfeather Breastplate,0,1,24,310,330,0
+19087,Frostsaber Gloves,165,Leatherworking,primary,1,15070,Frostsaber Gloves,0,1,24,315,335,0
+19088,Heavy Scorpid Helm,165,Leatherworking,primary,1,15080,Heavy Scorpid Helm,0,1,24,315,335,0
+19089,Blue Dragonscale Shoulders,165,Leatherworking,primary,1,15049,Blue Dragonscale Shoulders,0,1,24,315,335,0
+19090,Stormshroud Shoulders,165,Leatherworking,primary,1,15058,Stormshroud Shoulders,0,1,24,315,335,0
+19091,Runic Leather Pants,165,Leatherworking,primary,1,15095,Runic Leather Pants,0,1,24,320,340,0
+19092,Wicked Leather Belt,165,Leatherworking,primary,1,15088,Wicked Leather Belt,0,1,24,320,340,0
+19093,Onyxia Scale Cloak,165,Leatherworking,primary,1,15138,Onyxia Scale Cloak,0,1,24,320,340,0
+19094,Black Dragonscale Shoulders,165,Leatherworking,primary,1,15051,Black Dragonscale Shoulders,0,1,24,320,340,0
+19095,Living Breastplate,165,Leatherworking,primary,1,15059,Living Breastplate,0,1,24,320,340,0
+19097,Devilsaur Leggings,165,Leatherworking,primary,1,15062,Devilsaur Leggings,0,1,24,320,340,0
+19098,Wicked Leather Armor,165,Leatherworking,primary,1,15085,Wicked Leather Armor,0,1,24,320,340,0
+19100,Heavy Scorpid Shoulders,165,Leatherworking,primary,1,15081,Heavy Scorpid Shoulders,0,1,24,320,340,0
+19101,Volcanic Shoulders,165,Leatherworking,primary,1,15055,Volcanic Shoulders,0,1,24,320,340,0
+19102,Runic Leather Armor,165,Leatherworking,primary,1,15090,Runic Leather Armor,0,1,24,320,340,0
+19103,Runic Leather Shoulders,165,Leatherworking,primary,1,15096,Runic Leather Shoulders,0,1,24,320,340,0
+19104,Frostsaber Tunic,165,Leatherworking,primary,1,15068,Frostsaber Tunic,0,1,24,320,340,0
+19106,Onyxia Scale Breastplate,165,Leatherworking,primary,1,15141,Onyxia Scale Breastplate,0,1,24,320,340,0
+19107,Black Dragonscale Leggings,165,Leatherworking,primary,1,15052,Black Dragonscale Leggings,0,1,24,320,340,0
+20648,Medium Leather,165,Leatherworking,primary,1,2319,Medium Leather,0,1,24,100,110,0
+20649,Heavy Leather,165,Leatherworking,primary,1,4234,Heavy Leather,0,1,24,150,160,0
+20650,Thick Leather,165,Leatherworking,primary,1,4304,Thick Leather,0,1,24,200,205,0
+20853,Corehound Boots,165,Leatherworking,primary,1,16982,Corehound Boots,0,1,24,315,335,0
+20854,Molten Helm,165,Leatherworking,primary,1,16983,Molten Helm,0,1,24,320,340,0
+20855,Black Dragonscale Boots,165,Leatherworking,primary,1,16984,Black Dragonscale Boots,0,1,24,320,340,0
+21943,Gloves of the Greatfather,165,Leatherworking,primary,1,17721,Gloves of the Greatfather,0,1,24,210,230,0
+22331,Rugged Leather,165,Leatherworking,primary,1,8170,Rugged Leather,0,1,24,250,250,0
+22711,Shadowskin Gloves,165,Leatherworking,primary,1,18238,Shadowskin Gloves,0,1,24,210,230,0
+22727,Core Armor Kit,165,Leatherworking,primary,1,18251,Core Armor Kit,0,1,24,320,340,0
+22815,Gordok Ogre Suit,165,Leatherworking,primary,1,18258,Gordok Ogre Suit,0,1,24,285,295,0
+22921,Girdle of Insight,165,Leatherworking,primary,1,18504,Girdle of Insight,0,1,24,320,340,0
+22922,Mongoose Boots,165,Leatherworking,primary,1,18506,Mongoose Boots,0,1,24,320,340,0
+22923,Swift Flight Bracers,165,Leatherworking,primary,1,18508,Swift Flight Bracers,0,1,24,320,340,0
+22926,Chromatic Cloak,165,Leatherworking,primary,1,18509,Chromatic Cloak,0,1,24,320,340,0
+22927,Hide of the Wild,165,Leatherworking,primary,1,18510,Hide of the Wild,0,1,24,320,340,0
+22928,Shifting Cloak,165,Leatherworking,primary,1,18511,Shifting Cloak,0,1,24,320,340,0
+23190,Heavy Leather Ball,165,Leatherworking,primary,1,18662,Heavy Leather Ball,0,1,24,150,160,0
+23399,Barbaric Bracers,165,Leatherworking,primary,1,18948,Barbaric Bracers,0,1,24,175,195,0
+23703,Might of the Timbermaw,165,Leatherworking,primary,1,19044,Might of the Timbermaw,0,1,24,310,330,0
+23704,Timbermaw Brawlers,165,Leatherworking,primary,1,19049,Timbermaw Brawlers,0,1,24,320,340,0
+23705,Dawn Treaders,165,Leatherworking,primary,1,19052,Dawn Treaders,0,1,24,310,330,0
+23706,Golden Mantle of the Dawn,165,Leatherworking,primary,1,19058,Golden Mantle of the Dawn,0,1,24,320,340,0
+23707,Lava Belt,165,Leatherworking,primary,1,19149,Lava Belt,0,1,24,320,340,0
+23708,Chromatic Gauntlets,165,Leatherworking,primary,1,19157,Chromatic Gauntlets,0,1,24,320,340,0
+23709,Corehound Belt,165,Leatherworking,primary,1,19162,Corehound Belt,0,1,24,320,340,0
+23710,Molten Belt,165,Leatherworking,primary,1,19163,Molten Belt,0,1,24,320,340,0
+24121,Primal Batskin Jerkin,165,Leatherworking,primary,1,19685,Primal Batskin Jerkin,0,1,24,320,340,0
+24122,Primal Batskin Gloves,165,Leatherworking,primary,1,19686,Primal Batskin Gloves,0,1,24,320,340,0
+24123,Primal Batskin Bracers,165,Leatherworking,primary,1,19687,Primal Batskin Bracers,0,1,24,320,340,0
+24124,Blood Tiger Breastplate,165,Leatherworking,primary,1,19688,Blood Tiger Breastplate,0,1,24,320,340,0
+24125,Blood Tiger Shoulders,165,Leatherworking,primary,1,19689,Blood Tiger Shoulders,0,1,24,320,340,0
+24654,Blue Dragonscale Leggings,165,Leatherworking,primary,1,20295,Blue Dragonscale Leggings,0,1,24,320,340,0
+24655,Green Dragonscale Gauntlets,165,Leatherworking,primary,1,20296,Green Dragonscale Gauntlets,0,1,24,300,320,0
+24703,Dreamscale Breastplate,165,Leatherworking,primary,1,20380,Dreamscale Breastplate,0,1,24,320,340,0
+24846,Spitfire Bracers,165,Leatherworking,primary,1,20481,Spitfire Bracers,0,1,24,320,340,0
+24847,Spitfire Gauntlets,165,Leatherworking,primary,1,20480,Spitfire Gauntlets,0,1,24,320,340,0
+24848,Spitfire Breastplate,165,Leatherworking,primary,1,20479,Spitfire Breastplate,0,1,24,320,340,0
+24849,Sandstalker Bracers,165,Leatherworking,primary,1,20476,Sandstalker Bracers,0,1,24,320,340,0
+24850,Sandstalker Gauntlets,165,Leatherworking,primary,1,20477,Sandstalker Gauntlets,0,1,24,320,340,0
+24851,Sandstalker Breastplate,165,Leatherworking,primary,1,20478,Sandstalker Breastplate,0,1,24,320,340,0
+24940,Black Whelp Tunic,165,Leatherworking,primary,1,20575,Black Whelp Tunic,0,1,24,125,150,0
+26279,Stormshroud Gloves,165,Leatherworking,primary,1,21278,Stormshroud Gloves,0,1,24,320,340,0
+28219,Polar Tunic,165,Leatherworking,primary,1,22661,Polar Tunic,0,1,24,320,340,0
+28220,Polar Gloves,165,Leatherworking,primary,1,22662,Polar Gloves,0,1,24,320,340,0
+28221,Polar Bracers,165,Leatherworking,primary,1,22663,Polar Bracers,0,1,24,320,340,0
+28222,Icy Scale Breastplate,165,Leatherworking,primary,1,22664,Icy Scale Breastplate,0,1,24,320,340,0
+28223,Icy Scale Gauntlets,165,Leatherworking,primary,1,22666,Icy Scale Gauntlets,0,1,24,320,340,0
+28224,Icy Scale Bracers,165,Leatherworking,primary,1,22665,Icy Scale Bracers,0,1,24,320,340,0
+28472,Bramblewood Helm,165,Leatherworking,primary,1,22759,Bramblewood Helm,0,1,24,320,340,0
+28473,Bramblewood Boots,165,Leatherworking,primary,1,22760,Bramblewood Boots,0,1,24,320,340,0
+28474,Bramblewood Belt,165,Leatherworking,primary,1,22761,Bramblewood Belt,0,1,24,320,340,0
+32454,Knothide Leather,165,Leatherworking,primary,1,21887,Knothide Leather,0,1,24,300,310,0
+32455,Heavy Knothide Leather,165,Leatherworking,primary,1,23793,Heavy Knothide Leather,0,1,24,325,335,0
+32456,Knothide Armor Kit,165,Leatherworking,primary,1,25650,Knothide Armor Kit,0,1,24,310,340,0
+32457,Vindicator's Armor Kit,165,Leatherworking,primary,1,25651,Vindicator's Armor Kit,0,1,24,335,345,0
+32458,Magister's Armor Kit,165,Leatherworking,primary,1,25652,Magister's Armor Kit,0,1,24,335,345,0
+32461,Riding Crop,165,Leatherworking,primary,1,25653,Riding Crop,0,1,24,360,380,0
+32462,Felscale Gloves,165,Leatherworking,primary,1,25654,Felscale Gloves,0,1,24,310,330,0
+32463,Felscale Boots,165,Leatherworking,primary,1,25655,Felscale Boots,0,1,24,320,340,0
+32464,Felscale Pants,165,Leatherworking,primary,1,25656,Felscale Pants,0,1,24,330,350,0
+32465,Felscale Breastplate,165,Leatherworking,primary,1,25657,Felscale Breastplate,0,1,24,345,365,0
+32466,Scaled Draenic Pants,165,Leatherworking,primary,1,25662,Scaled Draenic Pants,0,1,24,310,330,0
+32467,Scaled Draenic Gloves,165,Leatherworking,primary,1,25661,Scaled Draenic Gloves,0,1,24,320,340,0
+32468,Scaled Draenic Vest,165,Leatherworking,primary,1,25660,Scaled Draenic Vest,0,1,24,335,355,0
+32469,Scaled Draenic Boots,165,Leatherworking,primary,1,25659,Scaled Draenic Boots,0,1,24,345,365,0
+32470,Thick Draenic Gloves,165,Leatherworking,primary,1,25669,Thick Draenic Gloves,0,1,24,310,330,0
+32471,Thick Draenic Pants,165,Leatherworking,primary,1,25670,Thick Draenic Pants,0,1,24,325,345,0
+32472,Thick Draenic Boots,165,Leatherworking,primary,1,25668,Thick Draenic Boots,0,1,24,330,350,0
+32473,Thick Draenic Vest,165,Leatherworking,primary,1,25671,Thick Draenic Vest,0,1,24,340,360,0
+32478,Wild Draenish Boots,165,Leatherworking,primary,1,25673,Wild Draenish Boots,0,1,24,310,330,0
+32479,Wild Draenish Gloves,165,Leatherworking,primary,1,25674,Wild Draenish Gloves,0,1,24,320,340,0
+32480,Wild Draenish Leggings,165,Leatherworking,primary,1,25675,Wild Draenish Leggings,0,1,24,330,350,0
+32481,Wild Draenish Vest,165,Leatherworking,primary,1,25676,Wild Draenish Vest,0,1,24,340,360,0
+32482,Comfortable Insoles,165,Leatherworking,primary,1,25679,Comfortable Insoles,0,1,24,300,310,0
+32485,Stylin' Purple Hat,165,Leatherworking,primary,1,25680,Stylin' Purple Hat,0,1,24,360,380,0
+32487,Stylin' Adventure Hat,165,Leatherworking,primary,1,25681,Stylin' Adventure Hat,0,1,24,360,380,0
+32488,Stylin' Crimson Hat,165,Leatherworking,primary,1,25683,Stylin' Crimson Hat,0,1,24,360,380,0
+32489,Stylin' Jungle Hat,165,Leatherworking,primary,1,25682,Stylin' Jungle Hat,0,1,24,360,380,0
+32490,Fel Leather Gloves,165,Leatherworking,primary,1,25685,Fel Leather Gloves,0,1,24,350,370,0
+32493,Fel Leather Boots,165,Leatherworking,primary,1,25686,Fel Leather Boots,0,1,24,360,380,0
+32494,Fel Leather Leggings,165,Leatherworking,primary,1,25687,Fel Leather Leggings,0,1,24,360,380,0
+32495,Heavy Clefthoof Vest,165,Leatherworking,primary,1,25689,Heavy Clefthoof Vest,0,1,24,370,390,0
+32496,Heavy Clefthoof Leggings,165,Leatherworking,primary,1,25690,Heavy Clefthoof Leggings,0,1,24,365,385,0
+32497,Heavy Clefthoof Boots,165,Leatherworking,primary,1,25691,Heavy Clefthoof Boots,0,1,24,365,385,0
+32498,Felstalker Belt,165,Leatherworking,primary,1,25695,Felstalker Belt,0,1,24,360,380,0
+32499,Felstalker Bracer,165,Leatherworking,primary,1,25697,Felstalker Bracers,0,1,24,370,390,0
+32500,Felstalker Breastplate,165,Leatherworking,primary,1,25696,Felstalker Breastplate,0,1,24,370,390,0
+32501,Netherfury Belt,165,Leatherworking,primary,1,25694,Netherfury Belt,0,1,24,350,370,0
+32502,Netherfury Leggings,165,Leatherworking,primary,1,25692,Netherfury Leggings,0,1,24,350,370,0
+32503,Netherfury Boots,165,Leatherworking,primary,1,25693,Netherfury Boots,0,1,24,360,380,0
+35520,Shadow Armor Kit,165,Leatherworking,primary,1,29483,Shadow Armor Kit,0,1,24,350,360,0
+35521,Flame Armor Kit,165,Leatherworking,primary,1,29485,Flame Armor Kit,0,1,24,350,360,0
+35522,Frost Armor Kit,165,Leatherworking,primary,1,29486,Frost Armor Kit,0,1,24,350,360,0
+35523,Nature Armor Kit,165,Leatherworking,primary,1,29487,Nature Armor Kit,0,1,24,350,360,0
+35524,Arcane Armor Kit,165,Leatherworking,primary,1,29488,Arcane Armor Kit,0,1,24,350,360,0
+35525,Enchanted Felscale Leggings,165,Leatherworking,primary,1,29489,Enchanted Felscale Leggings,0,1,24,360,380,0
+35526,Enchanted Felscale Gloves,165,Leatherworking,primary,1,29490,Enchanted Felscale Gloves,0,1,24,360,380,0
+35527,Enchanted Felscale Boots,165,Leatherworking,primary,1,29491,Enchanted Felscale Boots,0,1,24,360,380,0
+35528,Flamescale Boots,165,Leatherworking,primary,1,29493,Flamescale Boots,0,1,24,360,380,0
+35529,Flamescale Leggings,165,Leatherworking,primary,1,29492,Flamescale Leggings,0,1,24,360,380,0
+35530,Reinforced Mining Bag,165,Leatherworking,primary,1,29540,Reinforced Mining Bag,0,1,24,335,345,0
+35531,Flamescale Belt,165,Leatherworking,primary,1,29494,Flamescale Belt,0,1,24,360,380,0
+35532,Enchanted Clefthoof Leggings,165,Leatherworking,primary,1,29495,Enchanted Clefthoof Leggings,0,1,24,360,380,0
+35533,Enchanted Clefthoof Gloves,165,Leatherworking,primary,1,29496,Enchanted Clefthoof Gloves,0,1,24,360,380,0
+35534,Enchanted Clefthoof Boots,165,Leatherworking,primary,1,29497,Enchanted Clefthoof Boots,0,1,24,360,380,0
+35535,Blastguard Pants,165,Leatherworking,primary,1,29498,Blastguard Pants,0,1,24,360,380,0
+35536,Blastguard Boots,165,Leatherworking,primary,1,29499,Blastguard Boots,0,1,24,360,380,0
+35537,Blastguard Belt,165,Leatherworking,primary,1,29500,Blastguard Belt,0,1,24,360,380,0
+35538,Drums of Panic,165,Leatherworking,primary,1,29532,Drums of Panic,0,1,24,370,385,0
+35539,Drums of Restoration,165,Leatherworking,primary,1,29531,Drums of Restoration,0,1,24,350,365,0
+35540,Drums of War,165,Leatherworking,primary,1,29528,Drums of War,0,1,24,340,355,0
+35543,Drums of Battle,165,Leatherworking,primary,1,29529,Drums of Battle,0,1,24,365,380,0
+35544,Drums of Speed,165,Leatherworking,primary,1,29530,Drums of Speed,0,1,24,345,360,0
+35549,Cobrahide Leg Armor,165,Leatherworking,primary,1,29533,Cobrahide Leg Armor,0,1,24,335,355,0
+35554,Nethercobra Leg Armor,165,Leatherworking,primary,1,29535,Nethercobra Leg Armor,0,1,24,365,385,0
+35555,Clefthide Leg Armor,165,Leatherworking,primary,1,29534,Clefthide Leg Armor,0,1,24,335,355,0
+35557,Nethercleft Leg Armor,165,Leatherworking,primary,1,29536,Nethercleft Leg Armor,0,1,24,365,385,0
+35558,Cobrascale Hood,165,Leatherworking,primary,1,29502,Cobrascale Hood,0,1,24,375,395,0
+35559,Cobrascale Gloves,165,Leatherworking,primary,1,29503,Cobrascale Gloves,0,1,24,375,395,0
+35560,Windscale Hood,165,Leatherworking,primary,1,29504,Windscale Hood,0,1,24,375,395,0
+35561,Hood of Primal Life,165,Leatherworking,primary,1,29505,Hood of Primal Life,0,1,24,375,395,0
+35562,Gloves of the Living Touch,165,Leatherworking,primary,1,29506,Gloves of the Living Touch,0,1,24,375,395,0
+35563,Windslayer Wraps,165,Leatherworking,primary,1,29507,Windslayer Wraps,0,1,24,375,395,0
+35564,Living Dragonscale Helm,165,Leatherworking,primary,1,29508,Living Dragonscale Helm,0,1,24,375,395,0
+35567,Earthen Netherscale Boots,165,Leatherworking,primary,1,29512,Earthen Netherscale Boots,0,1,24,375,395,0
+35568,Windstrike Gloves,165,Leatherworking,primary,1,29509,Windstrike Gloves,0,1,24,375,395,0
+35572,Netherdrake Helm,165,Leatherworking,primary,1,29510,Netherdrake Helm,0,1,24,375,395,0
+35573,Netherdrake Gloves,165,Leatherworking,primary,1,29511,Netherdrake Gloves,0,1,24,375,395,0
+35574,Thick Netherscale Breastplate,165,Leatherworking,primary,1,29514,Thick Netherscale Breastplate,0,1,24,375,395,0
+35575,Ebon Netherscale Breastplate,165,Leatherworking,primary,1,29515,Ebon Netherscale Breastplate,0,1,24,385,405,0
+35576,Ebon Netherscale Belt,165,Leatherworking,primary,1,29516,Ebon Netherscale Belt,0,1,24,385,405,0
+35577,Ebon Netherscale Bracers,165,Leatherworking,primary,1,29517,Ebon Netherscale Bracers,0,1,24,385,405,0
+35580,Netherstrike Breastplate,165,Leatherworking,primary,1,29519,Netherstrike Breastplate,0,1,24,385,405,0
+35582,Netherstrike Belt,165,Leatherworking,primary,1,29520,Netherstrike Belt,0,1,24,385,405,0
+35584,Netherstrike Bracers,165,Leatherworking,primary,1,29521,Netherstrike Bracers,0,1,24,385,405,0
+35585,Windhawk Hauberk,165,Leatherworking,primary,1,29522,Windhawk Hauberk,0,1,24,385,405,0
+35587,Windhawk Belt,165,Leatherworking,primary,1,29524,Windhawk Belt,0,1,24,385,405,0
+35588,Windhawk Bracers,165,Leatherworking,primary,1,29523,Windhawk Bracers,0,1,24,385,405,0
+35589,Primalstrike Vest,165,Leatherworking,primary,1,29525,Primalstrike Vest,0,1,24,385,405,0
+35590,Primalstrike Belt,165,Leatherworking,primary,1,29526,Primalstrike Belt,0,1,24,385,405,0
+35591,Primalstrike Bracers,165,Leatherworking,primary,1,29527,Primalstrike Bracers,0,1,24,385,405,0
+36074,Blackstorm Leggings,165,Leatherworking,primary,1,29964,Blackstorm Leggings,0,1,24,280,300,0
+36075,Wildfeather Leggings,165,Leatherworking,primary,1,29970,Wildfeather Leggings,0,1,24,280,300,0
+36076,Dragonstrike Leggings,165,Leatherworking,primary,1,29971,Dragonstrike Leggings,0,1,24,280,300,0
+36077,Primalstorm Breastplate,165,Leatherworking,primary,1,29973,Primalstorm Breastplate,0,1,24,350,370,0
+36078,Living Crystal Breastplate,165,Leatherworking,primary,1,29974,Living Crystal Breastplate,0,1,24,350,370,0
+36079,Golden Dragonstrike Breastplate,165,Leatherworking,primary,1,29975,Golden Dragonstrike Breastplate,0,1,24,350,370,0
+36349,Belt of Natural Power,165,Leatherworking,primary,1,30042,Belt of Natural Power,0,1,24,385,405,0
+36351,Belt of Deep Shadow,165,Leatherworking,primary,1,30040,Belt of Deep Shadow,0,1,24,385,405,0
+36352,Belt of the Black Eagle,165,Leatherworking,primary,1,30046,Belt of the Black Eagle,0,1,24,385,405,0
+36353,Monsoon Belt,165,Leatherworking,primary,1,30044,Monsoon Belt,0,1,24,385,405,0
+36355,Boots of Natural Grace,165,Leatherworking,primary,1,30041,Boots of Natural Grace,0,1,24,385,405,0
+36357,Boots of Utter Darkness,165,Leatherworking,primary,1,30039,Boots of Utter Darkness,0,1,24,385,405,0
+36358,Boots of the Crimson Hawk,165,Leatherworking,primary,1,30045,Boots of the Crimson Hawk,0,1,24,385,405,0
+36359,Hurricane Boots,165,Leatherworking,primary,1,30043,Hurricane Boots,0,1,24,385,405,0
+39997,Boots of Shackled Souls,165,Leatherworking,primary,1,32398,Boots of Shackled Souls,0,1,24,385,405,0
+40000,Bracers of Shackled Souls,165,Leatherworking,primary,1,32399,Bracers of Shackled Souls,0,1,24,385,405,0
+40001,Greaves of Shackled Souls,165,Leatherworking,primary,1,32400,Greaves of Shackled Souls,0,1,24,385,405,0
+40002,Waistguard of Shackled Souls,165,Leatherworking,primary,1,32397,Waistguard of Shackled Souls,0,1,24,385,405,0
+40003,Redeemed Soul Moccasins,165,Leatherworking,primary,1,32394,Redeemed Soul Moccasins,0,1,24,385,405,0
+40004,Redeemed Soul Wristguards,165,Leatherworking,primary,1,32395,Redeemed Soul Wristguards,0,1,24,385,405,0
+40005,Redeemed Soul Legguards,165,Leatherworking,primary,1,32396,Redeemed Soul Legguards,0,1,24,385,405,0
+40006,Redeemed Soul Cinch,165,Leatherworking,primary,1,32393,Redeemed Soul Cinch,0,1,24,385,405,0
+41156,Bracers of Renewed Life,165,Leatherworking,primary,1,32582,Bracers of Renewed Life,0,1,24,385,405,0
+41157,Shoulderpads of Renewed Life,165,Leatherworking,primary,1,32583,Shoulderpads of Renewed Life,0,1,24,385,405,0
+41158,Swiftstrike Bracers,165,Leatherworking,primary,1,32580,Swiftstrike Bracers,0,1,24,385,405,0
+41160,Swiftstrike Shoulders,165,Leatherworking,primary,1,32581,Swiftstrike Shoulders,0,1,24,385,405,0
+41161,Bindings of Lightning Reflexes,165,Leatherworking,primary,1,32574,Bindings of Lightning Reflexes,0,1,24,385,405,0
+41162,Shoulders of Lightning Reflexes,165,Leatherworking,primary,1,32575,Shoulders of Lightning Reflexes,0,1,24,385,405,0
+41163,Living Earth Bindings,165,Leatherworking,primary,1,32577,Living Earth Bindings,0,1,24,385,405,0
+41164,Living Earth Shoulders,165,Leatherworking,primary,1,32579,Living Earth Shoulders,0,1,24,385,405,0
+42546,Cloak of Darkness,165,Leatherworking,primary,1,33122,Cloak of Darkness,0,1,24,370,390,0
+42731,Shadowprowler's Chestguard,165,Leatherworking,primary,1,33204,Shadowprowler's Chestguard,0,1,24,375,395,0
+44343,Knothide Ammo Pouch,165,Leatherworking,primary,1,34099,Knothide Ammo Pouch,0,1,24,325,345,0
+44344,Knothide Quiver,165,Leatherworking,primary,1,34100,Knothide Quiver,0,1,24,325,345,0
+44359,Quiver of a Thousand Feathers,165,Leatherworking,primary,1,34105,Quiver of a Thousand Feathers,0,1,24,360,380,0
+44768,Netherscale Ammo Pouch,165,Leatherworking,primary,1,34106,Netherscale Ammo Pouch,0,1,24,360,380,0
+44770,Glove Reinforcements,165,Leatherworking,primary,1,34207,Glove Reinforcements,0,1,24,355,365,0
+44953,Winter Boots,165,Leatherworking,primary,1,34086,Winter Boots,0,1,24,285,285,0
+44970,Heavy Knothide Armor Kit,165,Leatherworking,primary,1,34330,Heavy Knothide Armor Kit,0,1,24,355,365,0
+45100,Leatherworker's Satchel,165,Leatherworking,primary,1,34482,Leatherworker's Satchel,0,1,24,310,330,0
+45117,Bag of Many Hides,165,Leatherworking,primary,1,34490,Bag of Many Hides,0,1,24,370,390,0
+46132,Leather Gauntlets of the Sun,165,Leatherworking,primary,1,34372,Leather Gauntlets of the Sun,0,1,24,375,410,0
+46133,Fletcher's Gloves of the Phoenix,165,Leatherworking,primary,1,34374,Fletcher's Gloves of the Phoenix,0,1,24,375,410,0
+46134,Gloves of Immortal Dusk,165,Leatherworking,primary,1,34370,Gloves of Immortal Dusk,0,1,24,375,410,0
+46135,Sun-Drenched Scale Gloves,165,Leatherworking,primary,1,34376,Sun-Drenched Scale Gloves,0,1,24,375,410,0
+46136,Leather Chestguard of the Sun,165,Leatherworking,primary,1,34371,Leather Chestguard of the Sun,0,1,24,375,410,0
+46137,Embrace of the Phoenix,165,Leatherworking,primary,1,34373,Embrace of the Phoenix,0,1,24,375,410,0
+46138,Carapace of Sun and Shadow,165,Leatherworking,primary,1,34369,Carapace of Sun and Shadow,0,1,24,375,410,0
+46139,Sun-Drenched Scale Chestguard,165,Leatherworking,primary,1,34375,Sun-Drenched Scale Chestguard,0,1,24,375,410,0
+351766,Greater Drums of War,165,Leatherworking,primary,1,185852,,0,1,24,340,355,0
+351768,Greater Drums of Speed,165,Leatherworking,primary,1,185851,,0,1,24,345,360,0
+351769,Greater Drums of Restoration,165,Leatherworking,primary,1,185850,,0,1,24,350,365,0
+351770,Greater Drums of Panic,165,Leatherworking,primary,1,185849,,0,1,24,370,385,0
+351771,Greater Drums of Battle,165,Leatherworking,primary,1,185848,,0,1,24,365,380,0
+2153,Handstitched Leather Pants,165,Leatherworking,primary,30,2303,Handstitched Leather Pants,0,1,24,45,75,0
+2158,Fine Leather Boots,165,Leatherworking,primary,45,2307,Fine Leather Boots,0,1,24,120,150,0
+2160,Embossed Leather Vest,165,Leatherworking,primary,50,2300,Embossed Leather Vest,0,1,24,70,100,0
+2161,Embossed Leather Boots,165,Leatherworking,primary,65,2309,Embossed Leather Boots,0,1,24,85,115,0
+2162,Embossed Leather Cloak,165,Leatherworking,primary,65,2310,Embossed Leather Cloak,0,1,24,90,120,0
+2163,White Leather Jerkin,165,Leatherworking,primary,70,2311,White Leather Jerkin,0,1,24,90,120,0
+2164,Fine Leather Gloves,165,Leatherworking,primary,70,2312,Fine Leather Gloves,0,1,24,105,135,0
+2165,Medium Armor Kit,165,Leatherworking,primary,75,2313,Medium Armor Kit,0,1,24,115,130,0
+2167,Dark Leather Boots,165,Leatherworking,primary,100,2315,Dark Leather Boots,0,1,24,125,150,0
+2169,Dark Leather Tunic,165,Leatherworking,primary,100,2317,Dark Leather Tunic,0,1,24,125,150,0
+2168,Dark Leather Cloak,165,Leatherworking,primary,110,2316,Dark Leather Cloak,0,1,24,135,160,0
+2166,Toughened Leather Armor,165,Leatherworking,primary,125,2314,Toughened Leather Armor,0,1,24,145,170,0
+2657,Smelt Copper,186,Mining,primary,1,2840,Copper Bar,0,1,24,25,70,1
+2658,Smelt Silver,186,Mining,primary,1,2842,Silver Bar,0,1,24,115,130,0
+2659,Smelt Bronze,186,Mining,primary,1,2841,Bronze Bar,1,1,24,65,115,0
+3304,Smelt Tin,186,Mining,primary,1,3576,Tin Bar,0,1,24,65,75,0
+3307,Smelt Iron,186,Mining,primary,1,3575,Iron Bar,0,1,24,130,160,0
+3308,Smelt Gold,186,Mining,primary,1,3577,Gold Bar,0,1,24,170,185,0
+3569,Smelt Steel,186,Mining,primary,1,3859,Steel Bar,0,1,24,165,165,0
+10097,Smelt Mithril,186,Mining,primary,1,3860,Mithril Bar,0,1,24,175,230,0
+10098,Smelt Truesilver,186,Mining,primary,1,6037,Truesilver Bar,0,1,24,235,250,0
+14891,Smelt Dark Iron,186,Mining,primary,1,11371,Dark Iron Bar,0,1,24,300,310,0
+16153,Smelt Thorium,186,Mining,primary,1,12359,Thorium Bar,0,1,24,250,290,0
+22967,Smelt Elementium,186,Mining,primary,1,17771,Elementium Bar,0,1,24,350,375,0
+29356,Smelt Fel Iron,186,Mining,primary,1,23445,Fel Iron Bar,0,1,24,300,315,0
+29358,Smelt Adamantite,186,Mining,primary,1,23446,Adamantite Bar,0,1,24,325,340,0
+29359,Smelt Eternium,186,Mining,primary,1,23447,Eternium Bar,0,1,24,350,365,0
+29360,Smelt Felsteel,186,Mining,primary,1,23448,Felsteel Bar,0,1,24,355,380,0
+29361,Smelt Khorium,186,Mining,primary,1,23449,Khorium Bar,0,1,24,375,375,0
+29686,Smelt Hardened Adamantite,186,Mining,primary,1,23573,Hardened Adamantite Bar,0,1,24,375,375,0
+35750,Earth Shatter,186,Mining,primary,1,22573,Mote of Earth,9,1,24,300,300,0
+35751,Fire Sunder,186,Mining,primary,1,22574,Mote of Fire,9,1,24,300,300,0
+46353,Smelt Hardened Khorium,186,Mining,primary,1,35128,Hardened Khorium,0,1,24,375,375,0
+2385,Brown Linen Vest,197,Tailoring,primary,1,2568,Brown Linen Vest,0,1,24,45,70,0
+2386,Linen Boots,197,Tailoring,primary,1,2569,Linen Boots,0,1,24,90,125,0
+2387,Linen Cloak,197,Tailoring,primary,1,2570,Linen Cloak,0,1,24,35,60,1
+2389,Red Linen Robe,197,Tailoring,primary,1,2572,Red Linen Robe,0,1,24,65,100,0
+2392,Red Linen Shirt,197,Tailoring,primary,1,2575,Red Linen Shirt,0,1,24,65,100,0
+2393,White Linen Shirt,197,Tailoring,primary,1,2576,White Linen Shirt,0,1,24,35,60,0
+2394,Blue Linen Shirt,197,Tailoring,primary,1,2577,Blue Linen Shirt,0,1,24,65,100,0
+2395,Barbaric Linen Vest,197,Tailoring,primary,1,2578,Barbaric Linen Vest,0,1,24,95,130,0
+2396,Green Linen Shirt,197,Tailoring,primary,1,2579,Green Linen Shirt,0,1,24,95,130,0
+2397,Reinforced Linen Cape,197,Tailoring,primary,1,2580,Reinforced Linen Cape,0,1,24,85,120,0
+2399,Green Woolen Vest,197,Tailoring,primary,1,2582,Green Woolen Vest,0,1,24,110,145,0
+2401,Woolen Boots,197,Tailoring,primary,1,2583,Woolen Boots,0,1,24,120,155,0
+2402,Woolen Cape,197,Tailoring,primary,1,2584,Woolen Cape,0,1,24,100,135,0
+2403,Gray Woolen Robe,197,Tailoring,primary,1,2585,Gray Woolen Robe,0,1,24,130,165,0
+2406,Gray Woolen Shirt,197,Tailoring,primary,1,2587,Gray Woolen Shirt,0,1,24,110,130,0
+2963,Bolt of Linen Cloth,197,Tailoring,primary,1,2996,Bolt of Linen Cloth,0,1,24,25,50,1
+2964,Bolt of Woolen Cloth,197,Tailoring,primary,1,2997,Bolt of Woolen Cloth,0,1,24,90,105,0
+3755,Linen Bag,197,Tailoring,primary,1,4238,Linen Bag,0,1,24,70,105,0
+3757,Woolen Bag,197,Tailoring,primary,1,4240,Woolen Bag,0,1,24,105,140,0
+3758,Green Woolen Bag,197,Tailoring,primary,1,4241,Green Woolen Bag,0,1,24,120,155,0
+3813,Small Silk Pack,197,Tailoring,primary,1,4245,Small Silk Pack,0,1,24,170,200,0
+3839,Bolt of Silk Cloth,197,Tailoring,primary,1,4305,Bolt of Silk Cloth,0,1,24,135,145,0
+3840,Heavy Linen Gloves,197,Tailoring,primary,1,4307,Heavy Linen Gloves,0,1,24,60,95,0
+3841,Green Linen Bracers,197,Tailoring,primary,1,4308,Green Linen Bracers,0,1,24,85,120,0
+3842,Handstitched Linen Britches,197,Tailoring,primary,1,4309,Handstitched Linen Britches,0,1,24,95,130,0
+3843,Heavy Woolen Gloves,197,Tailoring,primary,1,4310,Heavy Woolen Gloves,0,1,24,110,145,0
+3844,Heavy Woolen Cloak,197,Tailoring,primary,1,4311,Heavy Woolen Cloak,0,1,24,125,160,0
+3845,Soft-soled Linen Boots,197,Tailoring,primary,1,4312,Soft-soled Linen Boots,0,1,24,105,140,0
+3847,Red Woolen Boots,197,Tailoring,primary,1,4313,Red Woolen Boots,0,1,24,120,155,0
+3848,Double-stitched Woolen Shoulders,197,Tailoring,primary,1,4314,Double-stitched Woolen Shoulders,0,1,24,135,170,0
+3849,Reinforced Woolen Shoulders,197,Tailoring,primary,1,4315,Reinforced Woolen Shoulders,0,1,24,145,180,0
+3850,Heavy Woolen Pants,197,Tailoring,primary,1,4316,Heavy Woolen Pants,0,1,24,135,170,0
+3851,Phoenix Pants,197,Tailoring,primary,1,4317,Phoenix Pants,0,1,24,150,185,0
+3852,Gloves of Meditation,197,Tailoring,primary,1,4318,Gloves of Meditation,0,1,24,150,180,0
+3854,Azure Silk Gloves,197,Tailoring,primary,1,4319,Azure Silk Gloves,0,1,24,165,195,0
+3855,Spidersilk Boots,197,Tailoring,primary,1,4320,Spidersilk Boots,0,1,24,150,185,0
+3856,Spider Silk Slippers,197,Tailoring,primary,1,4321,Spider Silk Slippers,0,1,24,160,190,0
+3857,Enchanter's Cowl,197,Tailoring,primary,1,4322,Enchanter's Cowl,0,1,24,185,215,0
+3858,Shadow Hood,197,Tailoring,primary,1,4323,Shadow Hood,0,1,24,190,220,0
+3859,Azure Silk Vest,197,Tailoring,primary,1,4324,Azure Silk Vest,0,1,24,170,200,0
+3860,Boots of the Enchanter,197,Tailoring,primary,1,4325,Boots of the Enchanter,0,1,24,195,225,0
+3861,Long Silken Cloak,197,Tailoring,primary,1,4326,Long Silken Cloak,0,1,24,205,235,0
+3862,Icy Cloak,197,Tailoring,primary,1,4327,Icy Cloak,0,1,24,220,250,0
+3863,Spider Belt,197,Tailoring,primary,1,4328,Spider Belt,0,1,24,200,230,0
+3864,Star Belt,197,Tailoring,primary,1,4329,Star Belt,0,1,24,220,250,0
+3865,Bolt of Mageweave,197,Tailoring,primary,1,4339,Bolt of Mageweave,0,1,24,180,185,0
+3866,Stylish Red Shirt,197,Tailoring,primary,1,4330,Stylish Red Shirt,0,1,24,135,170,0
+3868,Phoenix Gloves,197,Tailoring,primary,1,4331,Phoenix Gloves,0,1,24,150,185,0
+3869,Bright Yellow Shirt,197,Tailoring,primary,1,4332,Bright Yellow Shirt,0,1,24,145,155,0
+3870,Dark Silk Shirt,197,Tailoring,primary,1,4333,Dark Silk Shirt,0,1,24,165,175,0
+3871,Formal White Shirt,197,Tailoring,primary,1,4334,Formal White Shirt,0,1,24,180,190,0
+3872,Rich Purple Silk Shirt,197,Tailoring,primary,1,4335,Rich Purple Silk Shirt,0,1,24,195,205,0
+3873,Black Swashbuckler's Shirt,197,Tailoring,primary,1,4336,Black Swashbuckler's Shirt,0,1,24,210,220,0
+3914,Brown Linen Pants,197,Tailoring,primary,1,4343,Brown Linen Pants,0,1,24,55,90,0
+3915,Brown Linen Shirt,197,Tailoring,primary,1,4344,Brown Linen Shirt,0,1,24,35,60,1
+6521,Pearl-clasped Cloak,197,Tailoring,primary,1,5542,Pearl-clasped Cloak,0,1,24,115,150,0
+6686,Red Linen Bag,197,Tailoring,primary,1,5762,Red Linen Bag,0,1,24,95,130,0
+6688,Red Woolen Bag,197,Tailoring,primary,1,5763,Red Woolen Bag,0,1,24,140,175,0
+6690,Lesser Wizard's Robe,197,Tailoring,primary,1,5766,Lesser Wizard's Robe,0,1,24,155,185,0
+6692,Robes of Arcana,197,Tailoring,primary,1,5770,Robes of Arcana,0,1,24,170,200,0
+6693,Green Silk Pack,197,Tailoring,primary,1,5764,Green Silk Pack,0,1,24,195,225,0
+6695,Black Silk Pack,197,Tailoring,primary,1,5765,Black Silk Pack,0,1,24,205,235,0
+7623,Brown Linen Robe,197,Tailoring,primary,1,6238,Brown Linen Robe,0,1,24,55,90,0
+7624,White Linen Robe,197,Tailoring,primary,1,6241,White Linen Robe,0,1,24,55,90,0
+7629,Red Linen Vest,197,Tailoring,primary,1,6239,Red Linen Vest,0,1,24,80,115,0
+7630,Blue Linen Vest,197,Tailoring,primary,1,6240,Blue Linen Vest,0,1,24,80,115,0
+7633,Blue Linen Robe,197,Tailoring,primary,1,6242,Blue Linen Robe,0,1,24,95,130,0
+7636,Green Woolen Robe,197,Tailoring,primary,1,6243,Green Woolen Robe,0,1,24,115,150,0
+7639,Blue Overalls,197,Tailoring,primary,1,6263,Blue Overalls,0,1,24,125,160,0
+7643,Greater Adept's Robe,197,Tailoring,primary,1,6264,Greater Adept's Robe,0,1,24,140,175,0
+7892,Stylish Blue Shirt,197,Tailoring,primary,1,6384,Stylish Blue Shirt,0,1,24,145,180,0
+7893,Stylish Green Shirt,197,Tailoring,primary,1,6385,Stylish Green Shirt,0,1,24,145,180,0
+8465,Simple Dress,197,Tailoring,primary,1,6786,Simple Dress,0,1,24,65,100,0
+8467,White Woolen Dress,197,Tailoring,primary,1,6787,White Woolen Dress,0,1,24,135,170,0
+8483,White Swashbuckler's Shirt,197,Tailoring,primary,1,6795,White Swashbuckler's Shirt,0,1,24,170,180,0
+8489,Red Swashbuckler's Shirt,197,Tailoring,primary,1,6796,Red Swashbuckler's Shirt,0,1,24,185,195,0
+8758,Azure Silk Pants,197,Tailoring,primary,1,7046,Azure Silk Pants,0,1,24,160,190,0
+8760,Azure Silk Hood,197,Tailoring,primary,1,7048,Azure Silk Hood,0,1,24,155,165,0
+8762,Silk Headband,197,Tailoring,primary,1,7050,Silk Headband,0,1,24,170,180,0
+8764,Earthen Vest,197,Tailoring,primary,1,7051,Earthen Vest,0,1,24,190,220,0
+8766,Azure Silk Belt,197,Tailoring,primary,1,7052,Azure Silk Belt,0,1,24,195,225,0
+8770,Robe of Power,197,Tailoring,primary,1,7054,Robe of Power,0,1,24,210,240,0
+8772,Crimson Silk Belt,197,Tailoring,primary,1,7055,Crimson Silk Belt,0,1,24,195,225,0
+8774,Green Silken Shoulders,197,Tailoring,primary,1,7057,Green Silken Shoulders,0,1,24,200,230,0
+8776,Linen Belt,197,Tailoring,primary,1,7026,Linen Belt,0,1,24,50,85,0
+8778,Boots of Darkness,197,Tailoring,primary,1,7027,Boots of Darkness,0,1,24,160,190,0
+8780,Hands of Darkness,197,Tailoring,primary,1,7047,Hands of Darkness,0,1,24,165,195,0
+8782,Truefaith Gloves,197,Tailoring,primary,1,7049,Truefaith Gloves,0,1,24,170,200,0
+8784,Green Silk Armor,197,Tailoring,primary,1,7065,Green Silk Armor,0,1,24,185,215,0
+8786,Azure Silk Cloak,197,Tailoring,primary,1,7053,Azure Silk Cloak,0,1,24,195,225,0
+8789,Crimson Silk Cloak,197,Tailoring,primary,1,7056,Crimson Silk Cloak,0,1,24,200,230,0
+8791,Crimson Silk Vest,197,Tailoring,primary,1,7058,Crimson Silk Vest,0,1,24,205,225,0
+8793,Crimson Silk Shoulders,197,Tailoring,primary,1,7059,Crimson Silk Shoulders,0,1,24,210,240,0
+8795,Azure Shoulders,197,Tailoring,primary,1,7060,Azure Shoulders,0,1,24,210,240,0
+8797,Earthen Silk Belt,197,Tailoring,primary,1,7061,Earthen Silk Belt,0,1,24,215,245,0
+8799,Crimson Silk Pantaloons,197,Tailoring,primary,1,7062,Crimson Silk Pantaloons,0,1,24,215,235,0
+8802,Crimson Silk Robe,197,Tailoring,primary,1,7063,Crimson Silk Robe,0,1,24,220,250,0
+8804,Crimson Silk Gloves,197,Tailoring,primary,1,7064,Crimson Silk Gloves,0,1,24,225,255,0
+12044,Simple Linen Pants,197,Tailoring,primary,1,10045,Simple Linen Pants,0,1,24,35,60,1
+12045,Simple Linen Boots,197,Tailoring,primary,1,10046,Simple Linen Boots,0,1,24,50,85,0
+12046,Simple Kilt,197,Tailoring,primary,1,10047,Simple Kilt,0,1,24,100,135,0
+12047,Colorful Kilt,197,Tailoring,primary,1,10048,Colorful Kilt,0,1,24,145,180,0
+12048,Black Mageweave Vest,197,Tailoring,primary,1,9998,Black Mageweave Vest,0,1,24,220,250,0
+12049,Black Mageweave Leggings,197,Tailoring,primary,1,9999,Black Mageweave Leggings,0,1,24,220,250,0
+12050,Black Mageweave Robe,197,Tailoring,primary,1,10001,Black Mageweave Robe,0,1,24,225,255,0
+12052,Shadoweave Pants,197,Tailoring,primary,1,10002,Shadoweave Pants,0,1,24,225,255,0
+12053,Black Mageweave Gloves,197,Tailoring,primary,1,10003,Black Mageweave Gloves,0,1,24,230,260,0
+12055,Shadoweave Robe,197,Tailoring,primary,1,10004,Shadoweave Robe,0,1,24,230,260,0
+12056,Red Mageweave Vest,197,Tailoring,primary,1,10007,Red Mageweave Vest,0,1,24,230,260,0
+12059,White Bandit Mask,197,Tailoring,primary,1,10008,White Bandit Mask,0,1,24,220,230,0
+12060,Red Mageweave Pants,197,Tailoring,primary,1,10009,Red Mageweave Pants,0,1,24,230,260,0
+12061,Orange Mageweave Shirt,197,Tailoring,primary,1,10056,Orange Mageweave Shirt,0,1,24,220,230,0
+12062,Stormcloth Pants,197,Tailoring,primary,1,10010,Stormcloth Pants,0,1,24,235,265,0
+12063,Stormcloth Gloves,197,Tailoring,primary,1,10011,Stormcloth Gloves,0,1,24,235,265,0
+12064,Orange Martial Shirt,197,Tailoring,primary,1,10052,Orange Martial Shirt,0,1,24,225,235,0
+12065,Mageweave Bag,197,Tailoring,primary,1,10050,Mageweave Bag,0,1,24,240,270,0
+12066,Red Mageweave Gloves,197,Tailoring,primary,1,10018,Red Mageweave Gloves,0,1,24,240,270,0
+12067,Dreamweave Gloves,197,Tailoring,primary,1,10019,Dreamweave Gloves,0,1,24,240,270,0
+12068,Stormcloth Vest,197,Tailoring,primary,1,10020,Stormcloth Vest,0,1,24,240,270,0
+12069,Cindercloth Robe,197,Tailoring,primary,1,10042,Cindercloth Robe,0,1,24,240,270,0
+12070,Dreamweave Vest,197,Tailoring,primary,1,10021,Dreamweave Vest,0,1,24,240,270,0
+12071,Shadoweave Gloves,197,Tailoring,primary,1,10023,Shadoweave Gloves,0,1,24,240,270,0
+12072,Black Mageweave Headband,197,Tailoring,primary,1,10024,Black Mageweave Headband,0,1,24,245,275,0
+12073,Black Mageweave Boots,197,Tailoring,primary,1,10026,Black Mageweave Boots,0,1,24,245,275,0
+12074,Black Mageweave Shoulders,197,Tailoring,primary,1,10027,Black Mageweave Shoulders,0,1,24,245,275,0
+12075,Lavender Mageweave Shirt,197,Tailoring,primary,1,10054,Lavender Mageweave Shirt,0,1,24,235,245,0
+12076,Shadoweave Shoulders,197,Tailoring,primary,1,10028,Shadoweave Shoulders,0,1,24,250,280,0
+12077,Simple Black Dress,197,Tailoring,primary,1,10053,Simple Black Dress,0,1,24,240,250,0
+12078,Red Mageweave Shoulders,197,Tailoring,primary,1,10029,Red Mageweave Shoulders,0,1,24,250,280,0
+12079,Red Mageweave Bag,197,Tailoring,primary,1,10051,Red Mageweave Bag,0,1,24,250,280,0
+12080,Pink Mageweave Shirt,197,Tailoring,primary,1,10055,Pink Mageweave Shirt,0,1,24,240,250,0
+12081,Admiral's Hat,197,Tailoring,primary,1,10030,Admiral's Hat,0,1,24,255,285,0
+12082,Shadoweave Boots,197,Tailoring,primary,1,10031,Shadoweave Boots,0,1,24,255,285,0
+12083,Stormcloth Headband,197,Tailoring,primary,1,10032,Stormcloth Headband,0,1,24,255,285,0
+12084,Red Mageweave Headband,197,Tailoring,primary,1,10033,Red Mageweave Headband,0,1,24,255,285,0
+12085,Tuxedo Shirt,197,Tailoring,primary,1,10034,Tuxedo Shirt,0,1,24,245,255,0
+12086,Shadoweave Mask,197,Tailoring,primary,1,10025,Shadoweave Mask,0,1,24,260,290,0
+12087,Stormcloth Shoulders,197,Tailoring,primary,1,10038,Stormcloth Shoulders,0,1,24,260,290,0
+12088,Cindercloth Boots,197,Tailoring,primary,1,10044,Cindercloth Boots,0,1,24,260,290,0
+12089,Tuxedo Pants,197,Tailoring,primary,1,10035,Tuxedo Pants,0,1,24,250,260,0
+12090,Stormcloth Boots,197,Tailoring,primary,1,10039,Stormcloth Boots,0,1,24,265,295,0
+12091,White Wedding Dress,197,Tailoring,primary,1,10040,White Wedding Dress,0,1,24,255,265,0
+12092,Dreamweave Circlet,197,Tailoring,primary,1,10041,Dreamweave Circlet,0,1,24,265,295,0
+12093,Tuxedo Jacket,197,Tailoring,primary,1,10036,Tuxedo Jacket,0,1,24,265,295,0
+18401,Bolt of Runecloth,197,Tailoring,primary,1,14048,Bolt of Runecloth,0,1,24,255,260,0
+18402,Runecloth Belt,197,Tailoring,primary,1,13856,Runecloth Belt,0,1,24,270,300,0
+18403,Frostweave Tunic,197,Tailoring,primary,1,13869,Frostweave Tunic,0,1,24,270,300,0
+18404,Frostweave Robe,197,Tailoring,primary,1,13868,Frostweave Robe,0,1,24,270,300,0
+18405,Runecloth Bag,197,Tailoring,primary,1,14046,Runecloth Bag,0,1,24,275,305,0
+18406,Runecloth Robe,197,Tailoring,primary,1,13858,Runecloth Robe,0,1,24,275,305,0
+18407,Runecloth Tunic,197,Tailoring,primary,1,13857,Runecloth Tunic,0,1,24,275,305,0
+18408,Cindercloth Vest,197,Tailoring,primary,1,14042,Cindercloth Vest,0,1,24,275,305,0
+18409,Runecloth Cloak,197,Tailoring,primary,1,13860,Runecloth Cloak,0,1,24,280,310,0
+18410,Ghostweave Belt,197,Tailoring,primary,1,14143,Ghostweave Belt,0,1,24,280,310,0
+18411,Frostweave Gloves,197,Tailoring,primary,1,13870,Frostweave Gloves,0,1,24,280,310,0
+18412,Cindercloth Gloves,197,Tailoring,primary,1,14043,Cindercloth Gloves,0,1,24,285,315,0
+18413,Ghostweave Gloves,197,Tailoring,primary,1,14142,Ghostweave Gloves,0,1,24,285,315,0
+18414,Brightcloth Robe,197,Tailoring,primary,1,14100,Brightcloth Robe,0,1,24,285,315,0
+18415,Brightcloth Gloves,197,Tailoring,primary,1,14101,Brightcloth Gloves,0,1,24,285,315,0
+18416,Ghostweave Vest,197,Tailoring,primary,1,14141,Ghostweave Vest,0,1,24,290,320,0
+18417,Runecloth Gloves,197,Tailoring,primary,1,13863,Runecloth Gloves,0,1,24,290,320,0
+18418,Cindercloth Cloak,197,Tailoring,primary,1,14044,Cindercloth Cloak,0,1,24,290,320,0
+18419,Felcloth Pants,197,Tailoring,primary,1,14107,Felcloth Pants,0,1,24,290,320,0
+18420,Brightcloth Cloak,197,Tailoring,primary,1,14103,Brightcloth Cloak,0,1,24,290,320,0
+18421,Wizardweave Leggings,197,Tailoring,primary,1,14132,Wizardweave Leggings,0,1,24,290,320,0
+18422,Cloak of Fire,197,Tailoring,primary,1,14134,Cloak of Fire,0,1,24,290,320,0
+18423,Runecloth Boots,197,Tailoring,primary,1,13864,Runecloth Boots,0,1,24,295,325,0
+18424,Frostweave Pants,197,Tailoring,primary,1,13871,Frostweave Pants,0,1,24,295,325,0
+18434,Cindercloth Pants,197,Tailoring,primary,1,14045,Cindercloth Pants,0,1,24,295,325,0
+18436,Robe of Winter Night,197,Tailoring,primary,1,14136,Robe of Winter Night,0,1,24,300,330,0
+18437,Felcloth Boots,197,Tailoring,primary,1,14108,Felcloth Boots,0,1,24,300,330,0
+18438,Runecloth Pants,197,Tailoring,primary,1,13865,Runecloth Pants,0,1,24,300,330,0
+18439,Brightcloth Pants,197,Tailoring,primary,1,14104,Brightcloth Pants,0,1,24,305,335,0
+18440,Mooncloth Leggings,197,Tailoring,primary,1,14137,Mooncloth Leggings,0,1,24,305,335,0
+18441,Ghostweave Pants,197,Tailoring,primary,1,14144,Ghostweave Pants,0,1,24,305,335,0
+18442,Felcloth Hood,197,Tailoring,primary,1,14111,Felcloth Hood,0,1,24,305,335,0
+18444,Runecloth Headband,197,Tailoring,primary,1,13866,Runecloth Headband,0,1,24,310,340,0
+18445,Mooncloth Bag,197,Tailoring,primary,1,14155,Mooncloth Bag,0,1,24,315,345,0
+18446,Wizardweave Robe,197,Tailoring,primary,1,14128,Wizardweave Robe,0,1,24,315,345,0
+18447,Mooncloth Vest,197,Tailoring,primary,1,14138,Mooncloth Vest,0,1,24,315,345,0
+18448,Mooncloth Shoulders,197,Tailoring,primary,1,14139,Mooncloth Shoulders,0,1,24,315,345,0
+18449,Runecloth Shoulders,197,Tailoring,primary,1,13867,Runecloth Shoulders,0,1,24,315,345,0
+18450,Wizardweave Turban,197,Tailoring,primary,1,14130,Wizardweave Turban,0,1,24,315,345,0
+18451,Felcloth Robe,197,Tailoring,primary,1,14106,Felcloth Robe,0,1,24,315,345,0
+18452,Mooncloth Circlet,197,Tailoring,primary,1,14140,Mooncloth Circlet,0,1,24,315,345,0
+18453,Felcloth Shoulders,197,Tailoring,primary,1,14112,Felcloth Shoulders,0,1,24,315,345,0
+18454,Gloves of Spell Mastery,197,Tailoring,primary,1,14146,Gloves of Spell Mastery,0,1,24,315,345,0
+18455,Bottomless Bag,197,Tailoring,primary,1,14156,Bottomless Bag,0,1,24,315,345,0
+18456,Truefaith Vestments,197,Tailoring,primary,1,14154,Truefaith Vestments,0,1,24,315,345,0
+18457,Robe of the Archmage,197,Tailoring,primary,1,14152,Robe of the Archmage,0,1,24,315,345,0
+18458,Robe of the Void,197,Tailoring,primary,1,14153,Robe of the Void,0,1,24,315,345,0
+18560,Mooncloth,197,Tailoring,primary,1,14342,Mooncloth,0,1,24,290,320,0
+19435,Mooncloth Boots,197,Tailoring,primary,1,15802,Mooncloth Boots,0,1,24,295,325,0
+20848,Flarecore Mantle,197,Tailoring,primary,1,16980,Flarecore Mantle,0,1,24,315,345,0
+20849,Flarecore Gloves,197,Tailoring,primary,1,16979,Flarecore Gloves,0,1,24,315,345,0
+21945,Green Holiday Shirt,197,Tailoring,primary,1,17723,Green Holiday Shirt,0,1,24,200,210,0
+22759,Flarecore Wraps,197,Tailoring,primary,1,18263,Flarecore Wraps,0,1,24,320,350,0
+22813,Gordok Ogre Suit,197,Tailoring,primary,1,18258,Gordok Ogre Suit,0,1,24,285,295,0
+22866,Belt of the Archmage,197,Tailoring,primary,1,18405,Belt of the Archmage,0,1,24,315,345,0
+22867,Felcloth Gloves,197,Tailoring,primary,1,18407,Felcloth Gloves,0,1,24,315,345,0
+22868,Inferno Gloves,197,Tailoring,primary,1,18408,Inferno Gloves,0,1,24,315,345,0
+22869,Mooncloth Gloves,197,Tailoring,primary,1,18409,Mooncloth Gloves,0,1,24,315,345,0
+22870,Cloak of Warding,197,Tailoring,primary,1,18413,Cloak of Warding,0,1,24,315,345,0
+22902,Mooncloth Robe,197,Tailoring,primary,1,18486,Mooncloth Robe,0,1,24,315,345,0
+23662,Wisdom of the Timbermaw,197,Tailoring,primary,1,19047,Wisdom of the Timbermaw,0,1,24,305,335,0
+23663,Mantle of the Timbermaw,197,Tailoring,primary,1,19050,Mantle of the Timbermaw,0,1,24,315,345,0
+23664,Argent Boots,197,Tailoring,primary,1,19056,Argent Boots,0,1,24,305,335,0
+23665,Argent Shoulders,197,Tailoring,primary,1,19059,Argent Shoulders,0,1,24,315,345,0
+23666,Flarecore Robe,197,Tailoring,primary,1,19156,Flarecore Robe,0,1,24,315,345,0
+23667,Flarecore Leggings,197,Tailoring,primary,1,19165,Flarecore Leggings,0,1,24,315,345,0
+24091,Bloodvine Vest,197,Tailoring,primary,1,19682,Bloodvine Vest,0,1,24,315,345,0
+24092,Bloodvine Leggings,197,Tailoring,primary,1,19683,Bloodvine Leggings,0,1,24,315,345,0
+24093,Bloodvine Boots,197,Tailoring,primary,1,19684,Bloodvine Boots,0,1,24,315,345,0
+24901,Runed Stygian Leggings,197,Tailoring,primary,1,20538,Runed Stygian Leggings,0,1,24,315,345,0
+24902,Runed Stygian Belt,197,Tailoring,primary,1,20539,Runed Stygian Belt,0,1,24,315,345,0
+24903,Runed Stygian Boots,197,Tailoring,primary,1,20537,Runed Stygian Boots,0,1,24,315,345,0
+26085,Soul Pouch,197,Tailoring,primary,1,21340,Soul Pouch,0,1,24,275,305,0
+26086,Felcloth Bag,197,Tailoring,primary,1,21341,Felcloth Bag,0,1,24,300,330,0
+26087,Core Felcloth Bag,197,Tailoring,primary,1,21342,Core Felcloth Bag,0,1,24,315,345,0
+26403,Festival Dress,197,Tailoring,primary,1,21154,Festival Dress,0,1,24,265,295,0
+26407,Festive Red Pant Suit,197,Tailoring,primary,1,21542,Festival Suit,0,1,24,265,295,0
+26745,Bolt of Netherweave,197,Tailoring,primary,1,21840,Bolt of Netherweave,0,1,24,305,325,0
+26746,Netherweave Bag,197,Tailoring,primary,1,21841,Netherweave Bag,0,1,24,320,340,0
+26747,Bolt of Imbued Netherweave,197,Tailoring,primary,1,21842,Bolt of Imbued Netherweave,0,1,24,330,340,0
+26749,Imbued Netherweave Bag,197,Tailoring,primary,1,21843,Imbued Netherweave Bag,0,1,24,340,350,0
+26750,Bolt of Soulcloth,197,Tailoring,primary,1,21844,Bolt of Soulcloth,0,1,24,345,355,0
+26751,Primal Mooncloth,197,Tailoring,primary,1,21845,Primal Mooncloth,0,1,24,350,360,0
+26752,Spellfire Belt,197,Tailoring,primary,1,21846,Spellfire Belt,0,1,24,365,375,0
+26753,Spellfire Gloves,197,Tailoring,primary,1,21847,Spellfire Gloves,0,1,24,375,385,0
+26754,Spellfire Robe,197,Tailoring,primary,1,21848,Spellfire Robe,0,1,24,385,395,0
+26755,Spellfire Bag,197,Tailoring,primary,1,21858,Spellfire Bag,0,1,24,385,395,0
+26756,Frozen Shadoweave Shoulders,197,Tailoring,primary,1,21869,Frozen Shadoweave Shoulders,0,1,24,365,375,0
+26757,Frozen Shadoweave Boots,197,Tailoring,primary,1,21870,Frozen Shadoweave Boots,0,1,24,375,385,0
+26758,Frozen Shadoweave Robe,197,Tailoring,primary,1,21871,Frozen Shadoweave Robe,0,1,24,385,395,0
+26759,Ebon Shadowbag,197,Tailoring,primary,1,21872,Ebon Shadowbag,0,1,24,385,395,0
+26760,Primal Mooncloth Belt,197,Tailoring,primary,1,21873,Primal Mooncloth Belt,0,1,24,365,375,0
+26761,Primal Mooncloth Shoulders,197,Tailoring,primary,1,21874,Primal Mooncloth Shoulders,0,1,24,375,385,0
+26762,Primal Mooncloth Robe,197,Tailoring,primary,1,21875,Primal Mooncloth Robe,0,1,24,385,395,0
+26763,Primal Mooncloth Bag,197,Tailoring,primary,1,21876,Primal Mooncloth Bag,0,1,24,385,395,0
+26764,Netherweave Bracers,197,Tailoring,primary,1,21849,Netherweave Bracers,0,1,24,320,330,0
+26765,Netherweave Belt,197,Tailoring,primary,1,21850,Netherweave Belt,0,1,24,320,330,0
+26770,Netherweave Gloves,197,Tailoring,primary,1,21851,Netherweave Gloves,0,1,24,330,340,0
+26771,Netherweave Pants,197,Tailoring,primary,1,21852,Netherweave Pants,0,1,24,335,345,0
+26772,Netherweave Boots,197,Tailoring,primary,1,21853,Netherweave Boots,0,1,24,345,355,0
+26773,Netherweave Robe,197,Tailoring,primary,1,21854,Netherweave Robe,0,1,24,350,360,0
+26774,Netherweave Tunic,197,Tailoring,primary,1,21855,Netherweave Tunic,0,1,24,355,365,0
+26775,Imbued Netherweave Pants,197,Tailoring,primary,1,21859,Imbued Netherweave Pants,0,1,24,350,360,0
+26776,Imbued Netherweave Boots,197,Tailoring,primary,1,21860,Imbued Netherweave Boots,0,1,24,360,370,0
+26777,Imbued Netherweave Robe,197,Tailoring,primary,1,21861,Imbued Netherweave Robe,0,1,24,370,380,0
+26778,Imbued Netherweave Tunic,197,Tailoring,primary,1,21862,Imbued Netherweave Tunic,0,1,24,370,380,0
+26779,Soulcloth Gloves,197,Tailoring,primary,1,21863,Soulcloth Gloves,0,1,24,365,375,0
+26780,Soulcloth Shoulders,197,Tailoring,primary,1,21864,Soulcloth Shoulders,0,1,24,375,385,0
+26781,Soulcloth Vest,197,Tailoring,primary,1,21865,Soulcloth Vest,0,1,24,385,395,0
+26782,Arcanoweave Bracers,197,Tailoring,primary,1,21866,Arcanoweave Bracers,0,1,24,360,370,0
+26783,Arcanoweave Boots,197,Tailoring,primary,1,21867,Arcanoweave Boots,0,1,24,370,380,0
+26784,Arcanoweave Robe,197,Tailoring,primary,1,21868,Arcanoweave Robe,0,1,24,380,390,0
+27658,Enchanted Mageweave Pouch,197,Tailoring,primary,1,22246,Enchanted Mageweave Pouch,0,1,24,240,270,0
+27659,Enchanted Runecloth Bag,197,Tailoring,primary,1,22248,Enchanted Runecloth Bag,0,1,24,290,320,0
+27660,Big Bag of Enchantment,197,Tailoring,primary,1,22249,Big Bag of Enchantment,0,1,24,315,345,0
+27724,Cenarion Herb Bag,197,Tailoring,primary,1,22251,Cenarion Herb Bag,0,1,24,290,320,0
+27725,Satchel of Cenarius,197,Tailoring,primary,1,22252,Satchel of Cenarius,0,1,24,315,345,0
+28205,Glacial Gloves,197,Tailoring,primary,1,22654,Glacial Gloves,0,1,24,315,345,0
+28207,Glacial Vest,197,Tailoring,primary,1,22652,Glacial Vest,0,1,24,315,345,0
+28208,Glacial Cloak,197,Tailoring,primary,1,22658,Glacial Cloak,0,1,24,315,345,0
+28209,Glacial Wrists,197,Tailoring,primary,1,22655,Glacial Wrists,0,1,24,315,345,0
+28210,Gaea's Embrace,197,Tailoring,primary,1,22660,Gaea's Embrace,0,1,24,315,345,0
+28480,Sylvan Vest,197,Tailoring,primary,1,22756,Sylvan Vest,0,1,24,315,345,0
+28481,Sylvan Crown,197,Tailoring,primary,1,22757,Sylvan Crown,0,1,24,315,345,0
+28482,Sylvan Shoulders,197,Tailoring,primary,1,22758,Sylvan Shoulders,0,1,24,315,345,0
+31373,Spellcloth,197,Tailoring,primary,1,24271,Spellcloth,0,1,24,350,360,0
+31430,Mystic Spellthread,197,Tailoring,primary,1,24273,Mystic Spellthread,0,1,24,345,355,0
+31431,Silver Spellthread,197,Tailoring,primary,1,24275,Silver Spellthread,0,1,24,345,355,0
+31432,Runic Spellthread,197,Tailoring,primary,1,24274,Runic Spellthread,0,1,24,385,395,0
+31433,Golden Spellthread,197,Tailoring,primary,1,24276,Golden Spellthread,0,1,24,385,395,0
+31434,Unyielding Bracers,197,Tailoring,primary,1,24249,Unyielding Bracers,0,1,24,360,370,0
+31435,Bracers of Havok,197,Tailoring,primary,1,24250,Bracers of Havok,0,1,24,360,370,0
+31437,Blackstrike Bracers,197,Tailoring,primary,1,24251,Blackstrike Bracers,0,1,24,360,370,0
+31438,Cloak of the Black Void,197,Tailoring,primary,1,24252,Cloak of the Black Void,0,1,24,360,370,0
+31440,Cloak of Eternity,197,Tailoring,primary,1,24253,Cloak of Eternity,0,1,24,360,370,0
+31441,White Remedy Cape,197,Tailoring,primary,1,24254,White Remedy Cape,0,1,24,360,370,0
+31442,Unyielding Girdle,197,Tailoring,primary,1,24255,Unyielding Girdle,0,1,24,375,385,0
+31443,Girdle of Ruination,197,Tailoring,primary,1,24256,Girdle of Ruination,0,1,24,375,385,0
+31444,Black Belt of Knowledge,197,Tailoring,primary,1,24257,Black Belt of Knowledge,0,1,24,375,385,0
+31448,Resolute Cape,197,Tailoring,primary,1,24258,Resolute Cape,0,1,24,375,385,0
+31449,Vengeance Wrap,197,Tailoring,primary,1,24259,Vengeance Wrap,0,1,24,375,385,0
+31450,Manaweave Cloak,197,Tailoring,primary,1,24260,Manaweave Cloak,0,1,24,375,385,0
+31451,Whitemend Pants,197,Tailoring,primary,1,24261,Whitemend Pants,0,1,24,385,395,0
+31452,Spellstrike Pants,197,Tailoring,primary,1,24262,Spellstrike Pants,0,1,24,385,395,0
+31453,Battlecast Pants,197,Tailoring,primary,1,24263,Battlecast Pants,0,1,24,385,395,0
+31454,Whitemend Hood,197,Tailoring,primary,1,24264,Whitemend Hood,0,1,24,385,395,0
+31455,Spellstrike Hood,197,Tailoring,primary,1,24266,Spellstrike Hood,0,1,24,385,395,0
+31456,Battlecast Hood,197,Tailoring,primary,1,24267,Battlecast Hood,0,1,24,385,395,0
+31459,Bag of Jewels,197,Tailoring,primary,1,24270,Bag of Jewels,0,1,24,350,360,0
+31460,Netherweave Net,197,Tailoring,primary,1,24268,Netherweave Net,1,1,24,300,320,0
+31461,Heavy Netherweave Net,197,Tailoring,primary,1,24269,Heavy Netherweave Net,1,1,24,325,335,0
+36315,Belt of Blasting,197,Tailoring,primary,1,30038,Belt of Blasting,0,1,24,385,395,0
+36316,Belt of the Long Road,197,Tailoring,primary,1,30036,Belt of the Long Road,0,1,24,385,395,0
+36317,Boots of Blasting,197,Tailoring,primary,1,30037,Boots of Blasting,0,1,24,385,395,0
+36318,Boots of the Long Road,197,Tailoring,primary,1,30035,Boots of the Long Road,0,1,24,385,395,0
+36665,Netherflame Robe,197,Tailoring,primary,1,30459,Netherflame Robe,0,1,24,365,375,0
+36667,Netherflame Belt,197,Tailoring,primary,1,30460,Netherflame Belt,0,1,24,365,375,0
+36668,Netherflame Boots,197,Tailoring,primary,1,30461,Netherflame Boots,0,1,24,365,375,0
+36669,Lifeblood Leggings,197,Tailoring,primary,1,30465,Lifeblood Leggings,0,1,24,365,375,0
+36670,Lifeblood Belt,197,Tailoring,primary,1,30463,Lifeblood Belt,0,1,24,365,375,0
+36672,Lifeblood Bracers,197,Tailoring,primary,1,30464,Lifeblood Bracers,0,1,24,365,375,0
+36686,Shadowcloth,197,Tailoring,primary,1,24272,Shadowcloth,0,1,24,350,360,0
+37873,Cloak of Arcane Evasion,197,Tailoring,primary,1,30831,Cloak of Arcane Evasion,0,1,24,360,370,0
+37882,Flameheart Bracers,197,Tailoring,primary,1,30837,Flameheart Bracers,0,1,24,360,370,0
+37883,Flameheart Gloves,197,Tailoring,primary,1,30838,Flameheart Gloves,0,1,24,370,380,0
+37884,Flameheart Vest,197,Tailoring,primary,1,30839,Flameheart Vest,0,1,24,380,390,0
+40020,Soulguard Slippers,197,Tailoring,primary,1,32391,Soulguard Slippers,0,1,24,385,395,0
+40021,Soulguard Bracers,197,Tailoring,primary,1,32392,Soulguard Bracers,0,1,24,385,395,0
+40023,Soulguard Leggings,197,Tailoring,primary,1,32389,Soulguard Leggings,0,1,24,385,395,0
+40024,Soulguard Girdle,197,Tailoring,primary,1,32390,Soulguard Girdle,0,1,24,385,395,0
+40060,Night's End,197,Tailoring,primary,1,32420,Night's End,0,1,24,385,395,0
+41205,Bracers of Nimble Thought,197,Tailoring,primary,1,32586,Bracers of Nimble Thought,0,1,24,385,395,0
+41206,Mantle of Nimble Thought,197,Tailoring,primary,1,32587,Mantle of Nimble Thought,0,1,24,385,395,0
+41207,Swiftheal Wraps,197,Tailoring,primary,1,32584,Swiftheal Wraps,0,1,24,385,395,0
+41208,Swiftheal Mantle,197,Tailoring,primary,1,32585,Swiftheal Mantle,0,1,24,385,395,0
+44950,Green Winter Clothes,197,Tailoring,primary,1,34087,Green Winter Clothes,0,1,24,250,250,0
+44958,Red Winter Clothes,197,Tailoring,primary,1,34085,Red Winter Clothes,0,1,24,250,250,0
+46128,Sunfire Handwraps,197,Tailoring,primary,1,34366,Sunfire Handwraps,0,1,24,375,410,0
+46129,Hands of Eternal Light,197,Tailoring,primary,1,34367,Hands of Eternal Light,0,1,24,375,410,0
+46130,Sunfire Robe,197,Tailoring,primary,1,34364,Sunfire Robe,0,1,24,375,410,0
+46131,Robe of Eternal Light,197,Tailoring,primary,1,34365,Robe of Eternal Light,0,1,24,375,410,0
+49677,Dress Shoes,197,Tailoring,primary,1,6836,Dress Shoes,0,1,24,255,285,0
+50194,Mycah's Botanical Bag,197,Tailoring,primary,1,38225,Mycah's Botanical Bag,0,1,24,385,395,0
+50644,Haliscan Jacket,197,Tailoring,primary,1,38277,Haliscan Jacket,0,1,24,265,295,0
+50647,Haliscan Pantaloons,197,Tailoring,primary,1,38278,Haliscan Pantaloons,0,1,24,250,260,0
+2538,Charred Wolf Meat,185,Cooking,secondary,1,2679,Charred Wolf Meat,0,1,24,45,85,1
+2540,Roasted Boar Meat,185,Cooking,secondary,1,2681,Roasted Boar Meat,0,1,24,45,85,1
+3370,Crocolisk Steak,185,Cooking,secondary,1,3662,Crocolisk Steak,0,1,24,120,160,0
+3371,Blood Sausage,185,Cooking,secondary,1,3220,Blood Sausage,1,1,24,100,140,0
+3372,Murloc Fin Soup,185,Cooking,secondary,1,3663,Murloc Fin Soup,0,1,24,130,170,0
+3373,Crocolisk Gumbo,185,Cooking,secondary,1,3664,Crocolisk Gumbo,0,1,24,160,200,0
+3376,Curiously Tasty Omelet,185,Cooking,secondary,1,3665,Curiously Tasty Omelet,0,1,24,170,210,0
+3377,Gooey Spider Cake,185,Cooking,secondary,1,3666,Gooey Spider Cake,0,1,24,150,190,0
+3397,Big Bear Steak,185,Cooking,secondary,1,3726,Big Bear Steak,0,1,24,150,190,0
+3398,Hot Lion Chops,185,Cooking,secondary,1,3727,Hot Lion Chops,0,1,24,175,215,0
+3399,Tasty Lion Steak,185,Cooking,secondary,1,3728,Tasty Lion Steak,0,1,24,190,230,0
+3400,Soothing Turtle Bisque,185,Cooking,secondary,1,3729,Soothing Turtle Bisque,0,1,24,215,255,0
+4094,Barbecued Buzzard Wing,185,Cooking,secondary,1,4457,Barbecued Buzzard Wing,0,1,24,215,255,0
+6412,Kaldorei Spider Kabob,185,Cooking,secondary,1,5472,Kaldorei Spider Kabob,0,1,24,50,90,0
+6413,Scorpid Surprise,185,Cooking,secondary,1,5473,Scorpid Surprise,0,1,24,60,100,0
+6414,Roasted Kodo Meat,185,Cooking,secondary,1,5474,Roasted Kodo Meat,1,1,24,75,115,0
+6415,Fillet of Frenzy,185,Cooking,secondary,1,5476,Fillet of Frenzy,1,1,24,90,130,0
+6416,Strider Stew,185,Cooking,secondary,1,5477,Strider Stew,1,1,24,90,130,0
+6417,Dig Rat Stew,185,Cooking,secondary,1,5478,Dig Rat Stew,1,1,24,130,170,0
+6418,Crispy Lizard Tail,185,Cooking,secondary,1,5479,Crispy Lizard Tail,1,1,24,140,180,0
+6419,Lean Venison,185,Cooking,secondary,1,5480,Lean Venison,1,1,24,150,190,0
+6499,Boiled Clams,185,Cooking,secondary,1,5525,Boiled Clams,0,1,24,90,130,0
+6500,Goblin Deviled Clams,185,Cooking,secondary,1,5527,Goblin Deviled Clams,0,1,24,165,205,0
+6501,Clam Chowder,185,Cooking,secondary,1,5526,Clam Chowder,0,1,24,130,170,0
+7213,Giant Clam Scorcho,185,Cooking,secondary,1,6038,Giant Clam Scorcho,0,1,24,215,255,0
+7751,Brilliant Smallfish,185,Cooking,secondary,1,6290,Brilliant Smallfish,0,1,24,45,85,0
+7752,Slitherskin Mackerel,185,Cooking,secondary,1,787,Slitherskin Mackerel,0,1,24,45,85,0
+7753,Longjaw Mud Snapper,185,Cooking,secondary,1,4592,Longjaw Mud Snapper,0,1,24,90,130,0
+7754,Loch Frenzy Delight,185,Cooking,secondary,1,6316,Loch Frenzy Delight,0,1,24,90,130,0
+7755,Bristle Whisker Catfish,185,Cooking,secondary,1,4593,Bristle Whisker Catfish,0,1,24,140,180,0
+7827,Rainbow Fin Albacore,185,Cooking,secondary,1,5095,Rainbow Fin Albacore,0,1,24,90,130,0
+7828,Rockscale Cod,185,Cooking,secondary,1,4594,Rockscale Cod,0,1,24,190,230,0
+8238,Savory Deviate Delight,185,Cooking,secondary,1,6657,Savory Deviate Delight,0,1,24,125,165,0
+8604,Herb Baked Egg,185,Cooking,secondary,1,6888,Herb Baked Egg,0,1,24,45,85,1
+8607,Smoked Bear Meat,185,Cooking,secondary,1,6890,Smoked Bear Meat,0,1,24,80,120,0
+9513,Thistle Tea,185,Cooking,secondary,1,7676,Thistle Tea,0,1,24,100,140,0
+13028,Goldthorn Tea,185,Cooking,secondary,1,10841,Goldthorn Tea,3,1,24,175,205,0
+15853,Lean Wolf Steak,185,Cooking,secondary,1,12209,Lean Wolf Steak,0,1,24,165,205,0
+15855,Roast Raptor,185,Cooking,secondary,1,12210,Roast Raptor,0,1,24,215,255,0
+15856,Hot Wolf Ribs,185,Cooking,secondary,1,13851,Hot Wolf Ribs,0,1,24,215,255,0
+15861,Jungle Stew,185,Cooking,secondary,1,12212,Jungle Stew,1,1,24,215,255,0
+15863,Carrion Surprise,185,Cooking,secondary,1,12213,Carrion Surprise,0,1,24,215,255,0
+15865,Mystery Stew,185,Cooking,secondary,1,12214,Mystery Stew,0,1,24,215,255,0
+15906,Dragonbreath Chili,185,Cooking,secondary,1,12217,Dragonbreath Chili,0,1,24,225,250,0
+15910,Heavy Kodo Stew,185,Cooking,secondary,1,12215,Heavy Kodo Stew,1,1,24,225,250,0
+15915,Spiced Chili Crab,185,Cooking,secondary,1,12216,Spiced Chili Crab,0,1,24,250,275,0
+15933,Monster Omelet,185,Cooking,secondary,1,12218,Monster Omelet,0,1,24,250,275,0
+15935,Crispy Bat Wing,185,Cooking,secondary,1,12224,Crispy Bat Wing,0,1,24,45,85,0
+18238,Spotted Yellowtail,185,Cooking,secondary,1,6887,Spotted Yellowtail,0,1,24,250,275,0
+18239,Cooked Glossy Mightfish,185,Cooking,secondary,1,13927,Cooked Glossy Mightfish,0,1,24,250,275,0
+18240,Grilled Squid,185,Cooking,secondary,1,13928,Grilled Squid,0,1,24,265,290,0
+18241,Filet of Redgill,185,Cooking,secondary,1,13930,Filet of Redgill,0,1,24,250,275,0
+18242,Hot Smoked Bass,185,Cooking,secondary,1,13929,Hot Smoked Bass,0,1,24,265,290,0
+18243,Nightfin Soup,185,Cooking,secondary,1,13931,Nightfin Soup,0,1,24,275,295,0
+18244,Poached Sunscale Salmon,185,Cooking,secondary,1,13932,Poached Sunscale Salmon,0,1,24,275,295,0
+18245,Lobster Stew,185,Cooking,secondary,1,13933,Lobster Stew,0,1,24,300,325,0
+18246,Mightfish Steak,185,Cooking,secondary,1,13934,Mightfish Steak,0,1,24,300,325,0
+18247,Baked Salmon,185,Cooking,secondary,1,13935,Baked Salmon,0,1,24,300,325,0
+20626,Undermine Clam Chowder,185,Cooking,secondary,1,16766,Undermine Clam Chowder,1,1,24,250,275,0
+20916,Mithril Headed Trout,185,Cooking,secondary,1,8364,Mithril Head Trout,0,1,24,215,255,0
+21143,Gingerbread Cookie,185,Cooking,secondary,1,17197,Gingerbread Cookie,0,1,24,45,85,0
+21144,Egg Nog,185,Cooking,secondary,1,17198,Egg Nog,0,1,24,75,115,0
+21175,Spider Sausage,185,Cooking,secondary,1,17222,Spider Sausage,0,1,24,225,250,0
+22480,Tender Wolf Steak,185,Cooking,secondary,1,18045,Tender Wolf Steak,0,1,24,250,275,0
+22761,Runn Tum Tuber Surprise,185,Cooking,secondary,1,18254,Runn Tum Tuber Surprise,0,1,24,300,325,0
+24418,Heavy Crocolisk Stew,185,Cooking,secondary,1,20074,Heavy Crocolisk Stew,0,1,24,160,200,0
+24801,Smoked Desert Dumplings,185,Cooking,secondary,1,20452,Smoked Desert Dumplings,0,1,24,310,335,0
+25659,Dirge's Kickin' Chimaerok Chops,185,Cooking,secondary,1,21023,Dirge's Kickin' Chimaerok Chops,4,1,24,325,350,0
+25704,Smoked Sagefish,185,Cooking,secondary,1,21072,Smoked Sagefish,0,1,24,120,160,0
+25954,Sagefish Delight,185,Cooking,secondary,1,21217,Sagefish Delight,0,1,24,215,255,0
+28267,Crunchy Spider Surprise,185,Cooking,secondary,1,22645,Crunchy Spider Surprise,0,1,24,100,140,0
+33276,Lynx Steak,185,Cooking,secondary,1,27635,Lynx Steak,0,1,24,45,85,0
+33277,Roasted Moongraze Tenderloin,185,Cooking,secondary,1,24105,Roasted Moongraze Tenderloin,0,1,24,45,85,0
+33278,Bat Bites,185,Cooking,secondary,1,27636,Bat Bites,0,1,24,90,130,0
+33279,Buzzard Bites,185,Cooking,secondary,1,27651,Buzzard Bites,0,1,24,320,340,0
+33284,Ravager Dog,185,Cooking,secondary,1,27655,Ravager Dog,0,1,24,320,340,0
+33285,Sporeling Snack,185,Cooking,secondary,1,27656,Sporeling Snack,0,1,24,330,350,0
+33286,Blackened Basilisk,185,Cooking,secondary,1,27657,Blackened Basilisk,0,1,24,335,355,0
+33287,Roasted Clefthoof,185,Cooking,secondary,1,27658,Roasted Clefthoof,0,1,24,345,365,0
+33288,Warp Burger,185,Cooking,secondary,1,27659,Warp Burger,0,1,24,345,365,0
+33289,Talbuk Steak,185,Cooking,secondary,1,27660,Talbuk Steak,0,1,24,345,365,0
+33290,Blackened Trout,185,Cooking,secondary,1,27661,Blackened Trout,0,1,24,320,340,0
+33291,Feltail Delight,185,Cooking,secondary,1,27662,Feltail Delight,0,1,24,320,340,0
+33292,Blackened Sporefish,185,Cooking,secondary,1,27663,Blackened Sporefish,0,1,24,330,350,0
+33293,Grilled Mudfish,185,Cooking,secondary,1,27664,Grilled Mudfish,0,1,24,340,360,0
+33294,Poached Bluefish,185,Cooking,secondary,1,27665,Poached Bluefish,0,1,24,340,360,0
+33295,Golden Fish Sticks,185,Cooking,secondary,1,27666,Golden Fish Sticks,0,1,24,345,365,0
+33296,Spicy Crawdad,185,Cooking,secondary,1,27667,Spicy Crawdad,0,1,24,370,390,0
+36210,Clam Bar,185,Cooking,secondary,1,30155,Clam Bar,0,1,24,320,340,0
+37836,Spice Bread,185,Cooking,secondary,1,30816,Spice Bread,0,1,24,30,40,0
+38867,Mok'Nathal Shortribs,185,Cooking,secondary,1,31672,Mok'Nathal Shortribs,0,1,24,355,375,0
+38868,Crunchy Serpent,185,Cooking,secondary,1,31673,Crunchy Serpent,0,1,24,355,375,0
+42296,Stewed Trout,185,Cooking,secondary,1,33048,Stewed Trout,0,1,24,335,355,0
+42302,Fisherman's Feast,185,Cooking,secondary,1,33052,Fisherman's Feast,5,1,24,375,385,0
+42305,Hot Buttered Trout,185,Cooking,secondary,1,33053,Hot Buttered Trout,1,1,24,375,385,0
+43707,Skullfish Soup,185,Cooking,secondary,1,33825,Skullfish Soup,0,1,24,335,355,0
+43758,Stormchops,185,Cooking,secondary,1,33866,Stormchops,0,1,24,320,340,0
+43761,Broiled Bloodfin,185,Cooking,secondary,1,33867,Broiled Bloodfin,0,1,24,320,340,0
+43765,Spicy Hot Talbuk,185,Cooking,secondary,1,33872,Spicy Hot Talbuk,0,1,24,335,355,0
+43772,Kibler's Bits,185,Cooking,secondary,1,33874,Kibler's Bits,0,1,24,345,365,0
+43779,Delicious Chocolate Cake,185,Cooking,secondary,1,33924,Delicious Chocolate Cake,0,1,24,50,75,0
+45022,Hot Apple Cider,185,Cooking,secondary,1,34411,Hot Apple Cider,1,1,24,325,325,0
+45695,Captain Rumsey's Lager,185,Cooking,secondary,1,34832,Captain Rumsey's Lager,4,1,24,100,110,0
+46684,Charred Bear Kabobs,185,Cooking,secondary,1,35563,Charred Bear Kabobs,0,1,24,275,295,0
+46688,Juicy Bear Burger,185,Cooking,secondary,1,35565,Juicy Bear Burger,0,1,24,275,295,0
+2539,Spiced Wolf Meat,185,Cooking,secondary,30,2680,Spiced Wolf Meat,0,1,24,50,90,0
+2795,Beer Basted Boar Ribs,185,Cooking,secondary,40,2888,Beer Basted Boar Ribs,0,1,24,60,100,0
+2541,Coyote Steak,185,Cooking,secondary,65,2684,Coyote Steak,0,1,24,90,130,0
+2542,Goretusk Liver Pie,185,Cooking,secondary,65,724,Goretusk Liver Pie,0,1,24,90,130,0
+2543,Westfall Stew,185,Cooking,secondary,75,733,Westfall Stew,0,1,24,115,155,0
+2544,Crab Cake,185,Cooking,secondary,75,2683,Crab Cake,0,1,24,115,155,0
+2545,Cooked Crab Claw,185,Cooking,secondary,85,2682,Cooked Crab Claw,0,1,24,125,165,0
+2546,Dry Pork Ribs,185,Cooking,secondary,110,2687,Dry Pork Ribs,0,1,24,120,160,0
+2547,Redridge Goulash,185,Cooking,secondary,125,1082,Redridge Goulash,0,1,24,135,175,0
+2548,Succulent Pork Ribs,185,Cooking,secondary,135,2685,Succulent Pork Ribs,0,1,24,130,170,0
+2549,Seasoned Wolf Kabob,185,Cooking,secondary,135,1017,Seasoned Wolf Kabob,2,1,24,140,180,0
+3275,Linen Bandage,129,First Aid,secondary,1,1251,Linen Bandage,0,1,24,30,60,1
+3276,Heavy Linen Bandage,129,First Aid,secondary,1,2581,Heavy Linen Bandage,0,1,24,50,100,0
+3277,Wool Bandage,129,First Aid,secondary,1,3530,Wool Bandage,0,1,24,80,150,0
+3278,Heavy Wool Bandage,129,First Aid,secondary,1,3531,Heavy Wool Bandage,0,1,24,115,185,0
+7928,Silk Bandage,129,First Aid,secondary,1,6450,Silk Bandage,0,1,24,150,210,0
+7929,Heavy Silk Bandage,129,First Aid,secondary,1,6451,Heavy Silk Bandage,0,1,24,180,240,0
+7934,Anti-Venom,129,First Aid,secondary,1,6452,Anti-Venom,2,1,24,80,150,0
+7935,Strong Anti-Venom,129,First Aid,secondary,1,6453,Strong Anti-Venom,2,1,24,130,200,0
+10840,Mageweave Bandage,129,First Aid,secondary,1,8544,Mageweave Bandage,0,1,24,210,270,0
+10841,Heavy Mageweave Bandage,129,First Aid,secondary,1,8545,Heavy Mageweave Bandage,0,1,24,240,300,0
+18629,Runecloth Bandage,129,First Aid,secondary,1,14529,Runecloth Bandage,0,1,24,260,320,0
+18630,Heavy Runecloth Bandage,129,First Aid,secondary,1,14530,Heavy Runecloth Bandage,0,1,24,290,350,0
+23787,Powerful Anti-Venom,129,First Aid,secondary,1,19440,Powerful Anti-Venom,0,1,24,300,360,0
+27032,Netherweave Bandage,129,First Aid,secondary,1,21990,Netherweave Bandage,0,1,24,330,390,0
+27033,Heavy Netherweave Bandage,129,First Aid,secondary,1,21991,Heavy Netherweave Bandage,0,1,24,360,410,0
+30021,Crystal Infused Bandage,129,First Aid,secondary,1,23684,Crystal Infused Bandage,3,1,24,300,360,0

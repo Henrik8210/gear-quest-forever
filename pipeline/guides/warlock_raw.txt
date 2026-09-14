@@ -1,0 +1,134 @@
+Head | Best | Plagueheart Circlet
+Head | Great | Doomcaller's Circlet
+Head | Great | Mish'undare, Circlet of the Mind Flayer
+Head | Good | Preceptor's Hat
+Head | Good | Spellweaver's Turban
+Head | Good | The Hexxer's Cover
+Head | Good | Bloodvine Goggles
+Head | Good | Field Marshal's Coronal
+Head | Good | Warlord's Dreadweave Hood
+Head | Good | Deathmist Mask
+Head | Good | Champion's Dreadweave Cowl
+Head | Good | Lieutenant Commander's Dreadweave Cowl
+Shoulders | Best | Plagueheart Shoulderpads
+Shoulders | Great | Rime Covered Mantle
+Shoulders | Great | Doomcaller's Mantle
+Shoulders | Great | Mantle of the Blackwing Cabal
+Shoulders | Great | Field Marshal's Dreadweave Shoulders
+Shoulders | Great | Warlord's Dreadweave Mantle
+Shoulders | Good - 2 Set Bonus | Lieutenant Commander's Dreadweave Spaulders
+Shoulders | Good - 2 Set Bonus | Champion's Dreadweave Spaulders
+Shoulders | Okay | Nemesis Spaulders
+Shoulders | Okay | Zandalar Demoniac's Mantle
+Back | Best | Cloak of the Necropolis
+Back | Great | Cloak of the Devoured
+Back | Great | Cloak of Consumption
+Back | Good | Cloak of the Brood Lord
+Back | Good | Veil of Eclipse
+Back | Okay | Cloak of the Hakkari Worshipers
+Back | Okay | Crystalline Threaded Cape
+Chest | Best | Plagueheart Robe
+Chest | Great | Bloodvine Vest
+Chest | Great | Crystal Webbed Robe
+Chest | Great | Garb of Royal Ascension
+Chest | Good | Doomcaller's Robes
+Chest | Good | Robe of Volatile Power
+Chest | Good | Vestments of the Shifting Sands
+Chest | Good | Jade Inlaid Vestments
+Chest | Good | Nemesis Robes
+Chest | Okay | Robe of the Void
+Chest | Okay | Field Marshal's Dreadweave Robe
+Chest | Okay | Warlord's Dreadweave Robe
+Chest | Okay | Zandalar Demoniac's Robe
+Wrists | Best | Bracers of Arcane Accuracy
+Wrists | Great | Rockfury Bracers
+Wrists | Great | The Soul Harvester's Bindings
+Wrists | Good | Burrower Bracers
+Wrists | Good | Plagueheart Bindings
+Wrists | Good | Shackles of the Unscarred
+Wrists | Good | Zandalar Demoniac's Wraps
+Hands | Best | Dark Storm Gauntlets
+Hands | Great | Plagueheart Gloves
+Hands | Great | Ebony Flame Gloves
+Hands | Good | Bloodtinged Gloves
+Hands | Good | Gloves of Delusional Power
+Hands | Good | Deathmist Wraps
+Hands | Good | Nemesis Gloves
+Hands | Good | Marshal's Dreadweave Gloves
+Hands | Good | General's Dreadweave Gloves
+Hands | Okay | Hands of Power
+Hands | Okay | Gloves of Spell Mastery
+Hands | Okay | Felheart Gloves
+Waist | Best | Eyestalk Waist Cord
+Waist | Great | Plagueheart Belt
+Waist | Great | Angelista's Grasp
+Waist | Good | Mana Igniting Cord
+Waist | Mediocre | Firemaw's Clutch
+Waist | Mediocre | Nemesis Belt
+Waist | Okay | Belt of Untapped Power
+Waist | Okay | Ban'thok Sash
+Waist | Okay | Highlander's Cloth Girdle
+Waist | Okay | Defiler's Cloth Girdle
+Legs | Best | Leggings of Polarity
+Legs | Great | Plagueheart Leggings
+Legs | Great | Leggings of the Black Blizzard
+Legs | Great | Doomcaller's Trousers
+Legs | Good | Bloodvine Leggings
+Legs | Good | Fel Infused Leggings
+Legs | Good | Marshal's Dreadweave Leggings
+Legs | Good | General's Dreadweave Pants
+Feet | Best | Plagueheart Sandals
+Feet | Great | Bloodvine Boots
+Feet | Good | Boots of Epiphany
+Feet | Good | Snowblind Shoes
+Feet | Good | Doomcaller's Footwraps
+Neck | Best | Gem of Trapped Innocents
+Neck | Best | Amulet of Vek'nilash
+Neck | Great | Choker of the Fire Lord
+Neck | Good | Malice Stone Pendant
+Neck | Good | Nacreous Shell Necklace
+Neck | Good | Charm of the Shifting Sands
+Ring | Best | Ring of the Fallen God
+Ring | Best | Band of the Inevitable
+Ring | Great | Seal of the Damned
+Ring | Great | Band of Forced Concentration
+Ring | Great | Ring of Unspoken Names
+Trinket | Best - Undead | Mark of the Champion
+Trinket | Best | The Restrained Essence of Sapphiron
+Trinket | Best | Neltharion's Tear
+Trinket | Best | Talisman of Ephemeral Power
+Trinket | Great | Eye of Moam
+Trinket | Good - Undead | Rune of the Dawn
+Main Hand | Best | Wraith Blade
+Main Hand | Great | Midnight Haze
+Main Hand | Great | High Warlord's Spellblade
+Main Hand | Great | Sharpened Silithid Femur
+Main Hand | Good | Azuresong Mageblade
+Main Hand | Good | Fang of the Mystics
+Main Hand | Good | Claw of Chromaggus
+Main Hand | Okay | Bloodcaller
+Off Hand | Best | Sapphiron's Left Eye
+Off Hand | Great | Royal Scepter of Vek'lor
+Off Hand | Mediocre | Jin'do's Bag of Whammies
+Off Hand | Mediocre | Scepter of Interminable Focus
+Off Hand | Mediocre | Master Dragonslayer's Orb
+Off Hand | Mediocre | Talon of Furious Concentration
+Off Hand | Okay | Grand Marshal's Tome of Power
+Off Hand | Okay | High Warlord's Tome of Destruction
+Two-Hand | Best | Atiesh, Greatstaff of the Guardian
+Two-Hand | Great | Brimstone Staff
+Two-Hand | Great | Soulseeker
+Two-Hand | Great | Blessed Qiraji Acolyte Staff
+Two-Hand | Good | Staff of the Shadow Flame
+Two-Hand | Good | Staff of the Ruins
+Two-Hand | Okay | Shadow Wing Focus Staff
+Two-Hand | Okay | Ironbark Staff
+Two-Hand | Okay | Staff of Dominance
+Two-Hand | Okay | Jin'do's Judgement
+Two-Hand | Okay | Amberseal Keeper
+Wand | Best | Wand of Fates
+Wand | Great | Doomfinger
+Wand | Great | Wand of Qiraji Nobility
+Wand | Great | Touch of Chaos
+Wand | Good | Skul's Ghastly Touch
+Wand | Okay | Bonecreeper Stylus

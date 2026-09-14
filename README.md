@@ -57,6 +57,7 @@ $env:GEARQUEST_WOW_CLIENT = "_anniversary_"
 - Project brief: [docs/PROJECT_BRIEF.md](docs/PROJECT_BRIEF.md)
 - Data rules: [docs/DATA_RULES.md](docs/DATA_RULES.md)
 - Changelog: [CHANGELOG.md](CHANGELOG.md)
+- BiS scorer (authors only, not in CurseForge zip): [pipeline/README.md](pipeline/README.md) — adding Forever beta items: [pipeline/docs/FOREVER-SCORING.md](pipeline/docs/FOREVER-SCORING.md)
 - CurseForge: [RELEASE.md](RELEASE.md)
 
 ## CurseForge

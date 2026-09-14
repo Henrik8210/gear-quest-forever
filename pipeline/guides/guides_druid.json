@@ -1,0 +1,1308 @@
+{
+ "bear": {
+  "Head": [
+   [
+    1,
+    "Field Marshal's Dragonhide Helmet"
+   ],
+   [
+    1,
+    "Warlord's Dragonhide Helmet"
+   ],
+   [
+    2,
+    "Wolfshead Helm"
+   ],
+   [
+    5,
+    "Southwind Helm"
+   ]
+  ],
+  "Shoulder": [
+   [
+    1,
+    "Mantle of Wicked Revenge"
+   ],
+   [
+    5,
+    "Chitinous Shoulderguards"
+   ]
+  ],
+  "Back": [
+   [
+    1,
+    "Cloak of the Fallen God"
+   ],
+   [
+    6,
+    "Cloak of Concentrated Hatred"
+   ],
+   [
+    5,
+    "Shroud of Dominion"
+   ],
+   [
+    5,
+    "Puissant Cape"
+   ]
+  ],
+  "Chest": [
+   [
+    1,
+    "Ghoul Skin Tunic"
+   ],
+   [
+    5,
+    "Vest of Swift Execution"
+   ]
+  ],
+  "Wrist": [
+   [
+    1,
+    "Qiraji Execution Bracers"
+   ],
+   [
+    5,
+    "Wristguards of Stability"
+   ]
+  ],
+  "Hands": [
+   [
+    1,
+    "Marshal's Dragonhide Gauntlets"
+   ],
+   [
+    1,
+    "General's Dragonhide Gloves"
+   ],
+   [
+    5,
+    "Gloves of Enforcement"
+   ],
+   [
+    5,
+    "Gloves of the Hidden Temple"
+   ],
+   [
+    5,
+    "Devilsaur Gauntlets"
+   ]
+  ],
+  "Waist": [
+   [
+    1,
+    "Belt of Never-ending Agony"
+   ],
+   [
+    5,
+    "Belt of Preserved Heads"
+   ]
+  ],
+  "Legs": [
+   [
+    1,
+    "Leggings of Apocalypse"
+   ],
+   [
+    5,
+    "Devilsaur Leggings"
+   ]
+  ],
+  "Feet": [
+   [
+    1,
+    "Boots of the Vanguard"
+   ],
+   [
+    1,
+    "Boots of the Shadow Flame"
+   ]
+  ],
+  "Neck": [
+   [
+    1,
+    "Stormrage's Talisman of Seething"
+   ],
+   [
+    2,
+    "Prestor's Talisman of Connivery"
+   ],
+   [
+    5,
+    "Barbed Choker"
+   ],
+   [
+    5,
+    "Onyxia Tooth Pendant"
+   ]
+  ],
+  "Finger": [
+   [
+    1,
+    "Band of Unnatural Forces"
+   ],
+   [
+    1,
+    "Signet Ring of the Bronze Dragonflight"
+   ],
+   [
+    1,
+    "Band of Accuria"
+   ],
+   [
+    5,
+    "Quick Strike Ring"
+   ],
+   [
+    5,
+    "Ring of the Qiraji Fury"
+   ],
+   [
+    5,
+    "Master Dragonslayer's Ring"
+   ],
+   [
+    5,
+    "Circle of Applied Force"
+   ]
+  ],
+  "Trinket": [
+   [
+    1,
+    "Kiss of the Spider"
+   ],
+   [
+    1,
+    "Slayer's Crest"
+   ],
+   [
+    5,
+    "Drake Fang Talisman"
+   ],
+   [
+    5,
+    "Earthstrike"
+   ]
+  ],
+  "MainHand": [
+   [
+    1,
+    "Manual Crowd Pummeler"
+   ],
+   [
+    1,
+    "Atiesh, Greatstaff of the Guardian"
+   ],
+   [
+    7,
+    "Blessed Qiraji War Hammer"
+   ],
+   [
+    7,
+    "Hammer of Bestial Fury"
+   ]
+  ],
+  "Ranged": [
+   [
+    1,
+    "Idol of Brutality"
+   ]
+  ]
+ },
+ "feral": {
+  "Head": [
+   [
+    1,
+    "Wolfshead Helm"
+   ],
+   [
+    5,
+    "Southwind Helm"
+   ]
+  ],
+  "Shoulder": [
+   [
+    1,
+    "Mantle of Wicked Revenge"
+   ],
+   [
+    5,
+    "Chitinous Shoulderguards"
+   ]
+  ],
+  "Back": [
+   [
+    1,
+    "Cloak of Concentrated Hatred"
+   ],
+   [
+    1,
+    "Shroud of Dominion"
+   ],
+   [
+    5,
+    "Cloak of the Fallen God"
+   ],
+   [
+    5,
+    "Puissant Cape"
+   ]
+  ],
+  "Chest": [
+   [
+    1,
+    "Vest of Swift Execution"
+   ],
+   [
+    5,
+    "Ghoul Skin Tunic"
+   ]
+  ],
+  "Wrist": [
+   [
+    1,
+    "Qiraji Execution Bracers"
+   ],
+   [
+    5,
+    "Wristguards of Stability"
+   ]
+  ],
+  "Hands": [
+   [
+    1,
+    "Gloves of Enforcement"
+   ],
+   [
+    1,
+    "Devilsaur Gauntlets"
+   ]
+  ],
+  "Waist": [
+   [
+    1,
+    "Belt of Never-ending Agony"
+   ],
+   [
+    5,
+    "Belt of Preserved Heads"
+   ]
+  ],
+  "Legs": [
+   [
+    1,
+    "Leggings of Apocalypse"
+   ],
+   [
+    5,
+    "Marshal's Dragonhide Legguards"
+   ],
+   [
+    5,
+    "General's Dragonhide Leggings"
+   ],
+   [
+    5,
+    "Devilsaur Leggings"
+   ]
+  ],
+  "Feet": [
+   [
+    1,
+    "Boots of the Vanguard"
+   ],
+   [
+    5,
+    "Boots of the Shadow Flame"
+   ]
+  ],
+  "Neck": [
+   [
+    1,
+    "Prestor's Talisman of Connivery"
+   ],
+   [
+    5,
+    "Stormrage's Talisman of Seething"
+   ],
+   [
+    5,
+    "Barbed Choker"
+   ],
+   [
+    5,
+    "Onyxia Tooth Pendant"
+   ]
+  ],
+  "Finger": [
+   [
+    1,
+    "Band of Unnatural Forces"
+   ],
+   [
+    1,
+    "Signet Ring of the Bronze Dragonflight"
+   ],
+   [
+    1,
+    "Band of Accuria"
+   ],
+   [
+    5,
+    "Quick Strike Ring"
+   ],
+   [
+    5,
+    "Ring of the Qiraji Fury"
+   ],
+   [
+    5,
+    "Master Dragonslayer's Ring"
+   ],
+   [
+    5,
+    "Circle of Applied Force"
+   ]
+  ],
+  "Trinket": [
+   [
+    1,
+    "Slayer's Crest"
+   ],
+   [
+    1,
+    "Drake Fang Talisman"
+   ],
+   [
+    1,
+    "Mark of the Champion"
+   ],
+   [
+    1,
+    "Kiss of the Spider"
+   ],
+   [
+    5,
+    "Badge of the Swarmguard"
+   ],
+   [
+    5,
+    "Earthstrike"
+   ]
+  ],
+  "MainHand": [
+   [
+    1,
+    "Manual Crowd Pummeler"
+   ],
+   [
+    1,
+    "Atiesh, Greatstaff of the Guardian"
+   ]
+  ],
+  "Ranged": [
+   [
+    1,
+    "Idol of Ferocity"
+   ]
+  ]
+ },
+ "restoration": {
+  "Head": [
+   [
+    2,
+    "Stormrage Cover"
+   ],
+   [
+    2,
+    "Crystal Adorned Crown"
+   ],
+   [
+    2,
+    "Dreamwalker Headpiece"
+   ],
+   [
+    3,
+    "Deviate Growth Cap"
+   ],
+   [
+    3,
+    "Don Rigoberto's Lost Hat"
+   ],
+   [
+    3,
+    "Creeping Vine Helm"
+   ],
+   [
+    4,
+    "Zulian Headdress"
+   ],
+   [
+    5,
+    "Cassandra's Grace"
+   ],
+   [
+    5,
+    "Crimson Felt Hat"
+   ]
+  ],
+  "Shoulder": [
+   [
+    2,
+    "Stormrage Pauldrons"
+   ],
+   [
+    2,
+    "Wild Growth Spaulders"
+   ],
+   [
+    2,
+    "Dreamwalker Spaulders"
+   ],
+   [
+    3,
+    "Ternary Mantle"
+   ],
+   [
+    3,
+    "Animist's Spaulders"
+   ],
+   [
+    4,
+    "Living Shoulders"
+   ],
+   [
+    4,
+    "Mantle of Lost Hope"
+   ],
+   [
+    4,
+    "Mantle of the Scarlet Crusade"
+   ]
+  ],
+  "Back": [
+   [
+    1,
+    "Cloak of Suturing"
+   ],
+   [
+    3,
+    "Cloak of Clarity"
+   ],
+   [
+    3,
+    "Hide of the Wild"
+   ],
+   [
+    3,
+    "Shroud of Pure Thought"
+   ],
+   [
+    3,
+    "Drape of Benediction"
+   ],
+   [
+    4,
+    "Hakkari Loa Cloak"
+   ],
+   [
+    4,
+    "Archivist Cape"
+   ],
+   [
+    4,
+    "Cloak of the Cosmos"
+   ],
+   [
+    4,
+    "Battle Healer's Cloak"
+   ],
+   [
+    4,
+    "Caretaker's Cape"
+   ],
+   [
+    7,
+    "Shroud of Arcane Mastery"
+   ]
+  ],
+  "Chest": [
+   [
+    2,
+    "Stormrage Chestguard"
+   ],
+   [
+    2,
+    "Dreamwalker Tunic"
+   ],
+   [
+    3,
+    "Robes of the Guardian Saint"
+   ],
+   [
+    3,
+    "Robes of the Exalted"
+   ],
+   [
+    5,
+    "Forest's Embrace"
+   ]
+  ],
+  "Wrist": [
+   [
+    2,
+    "Stormrage Bracers"
+   ],
+   [
+    2,
+    "Dreamwalker Wristguards"
+   ],
+   [
+    3,
+    "Bracelets of Royal Redemption"
+   ],
+   [
+    4,
+    "Zandalar Haruspex's Bracers"
+   ],
+   [
+    4,
+    "Dryad's Wrist Bindings"
+   ],
+   [
+    5,
+    "Bracers of Prosperity"
+   ],
+   [
+    5,
+    "Bleak Howler Armguards"
+   ],
+   [
+    5,
+    "Sublime Wristguards"
+   ]
+  ],
+  "Hands": [
+   [
+    2,
+    "Stormrage Handguards"
+   ],
+   [
+    2,
+    "Dreamwalker Handguards"
+   ],
+   [
+    3,
+    "Wasphide Gauntlets"
+   ],
+   [
+    4,
+    "Gloves of Dark Wisdom"
+   ],
+   [
+    4,
+    "Gloves of the Messiah"
+   ],
+   [
+    4,
+    "Gloves of Restoration"
+   ],
+   [
+    4,
+    "Hands of the Exalted Herald"
+   ],
+   [
+    4,
+    "Hands of Power"
+   ],
+   [
+    4,
+    "Atal'ai Gloves"
+   ]
+  ],
+  "Waist": [
+   [
+    2,
+    "Stormrage Belt"
+   ],
+   [
+    2,
+    "Dreamwalker Girdle"
+   ],
+   [
+    3,
+    "Corehound Belt"
+   ],
+   [
+    3,
+    "Regenerating Belt of Vek'nilash"
+   ],
+   [
+    3,
+    "Grasp of the Old God"
+   ],
+   [
+    4,
+    "Eyestalk Cord"
+   ],
+   [
+    4,
+    "Firemaw's Clutch"
+   ],
+   [
+    4,
+    "Whipvine Cord"
+   ],
+   [
+    7,
+    "Angelista's Grasp"
+   ],
+   [
+    7,
+    "Ban'thok Sash"
+   ]
+  ],
+  "Legs": [
+   [
+    2,
+    "Stormrage Legguards"
+   ],
+   [
+    2,
+    "Empowered Leggings"
+   ],
+   [
+    2,
+    "Dreamwalker Legguards"
+   ],
+   [
+    3,
+    "Salamander Scale Pants"
+   ],
+   [
+    3,
+    "Ghoul Skin Leggings"
+   ],
+   [
+    3,
+    "Padre's Trousers"
+   ],
+   [
+    3,
+    "Senior Designer's Pantaloons"
+   ],
+   [
+    3,
+    "Ritualistic Legguards"
+   ]
+  ],
+  "Feet": [
+   [
+    2,
+    "Stormrage Boots"
+   ],
+   [
+    2,
+    "Boots of Pure Thought"
+   ],
+   [
+    2,
+    "Dreamwalker Boots"
+   ],
+   [
+    3,
+    "Verdant Footpads"
+   ],
+   [
+    3,
+    "Treads of the Wandering Nomad"
+   ],
+   [
+    3,
+    "Snowblind Shoes"
+   ],
+   [
+    3,
+    "Betrayer's Boots"
+   ],
+   [
+    5,
+    "Waterspout Boots"
+   ],
+   [
+    5,
+    "Faith Healer's Boots"
+   ],
+   [
+    5,
+    "Boots of the Full Moon"
+   ]
+  ],
+  "Neck": [
+   [
+    1,
+    "Necklace of Necropsy"
+   ],
+   [
+    1,
+    "Amulet of the Fallen God"
+   ],
+   [
+    3,
+    "Amulet of the Shifting Sands"
+   ],
+   [
+    3,
+    "Jin'do's Evil Eye"
+   ],
+   [
+    4,
+    "Animated Chain Necklace"
+   ],
+   [
+    5,
+    "Pendant of the Fallen Dragon"
+   ],
+   [
+    5,
+    "Choker of Enlightenment"
+   ],
+   [
+    5,
+    "Amulet of the Redeemed"
+   ]
+  ],
+  "Finger": [
+   [
+    1,
+    "Band of Unanswered Prayers"
+   ],
+   [
+    1,
+    "Pure Elementium Band"
+   ],
+   [
+    1,
+    "Ring of the Martyr"
+   ],
+   [
+    3,
+    "Cauterizing Band"
+   ],
+   [
+    4,
+    "Primalist's Seal"
+   ],
+   [
+    4,
+    "Primalist's Band"
+   ],
+   [
+    4,
+    "Rosewine Circle"
+   ],
+   [
+    4,
+    "Band of Mending"
+   ],
+   [
+    4,
+    "Fordring's Seal"
+   ],
+   [
+    4,
+    "Ring of Blackrock"
+   ],
+   [
+    7,
+    "Rune Band of Wizardry"
+   ]
+  ],
+  "Trinket": [
+   [
+    1,
+    "Wushoolay's Charm of Nature"
+   ],
+   [
+    1,
+    "Eye of the Dead"
+   ],
+   [
+    1,
+    "Rejuvenating Gem"
+   ],
+   [
+    1,
+    "Hibernation Crystal"
+   ],
+   [
+    3,
+    "Zandalarian Hero Charm"
+   ],
+   [
+    3,
+    "Royal Seal of Eldre'Thalas"
+   ],
+   [
+    3,
+    "Briarwood Reed"
+   ],
+   [
+    3,
+    "Draconic Infused Emblem"
+   ],
+   [
+    3,
+    "Scarab Brooch"
+   ],
+   [
+    5,
+    "Second Wind"
+   ],
+   [
+    5,
+    "Burst of Knowledge"
+   ]
+  ],
+  "MainHand": [
+   [
+    1,
+    "Hammer of the Twisting Nether"
+   ],
+   [
+    3,
+    "Scepter of the False Prophet"
+   ],
+   [
+    3,
+    "The Widow's Embrace"
+   ],
+   [
+    3,
+    "High Warlord's Battle Mace"
+   ],
+   [
+    3,
+    "Grand Marshal's Warhammer"
+   ],
+   [
+    3,
+    "Fang of Korialstrasz"
+   ],
+   [
+    4,
+    "Lok'amir il Romathis"
+   ],
+   [
+    4,
+    "Claw of Chromaggus"
+   ],
+   [
+    4,
+    "Jin'do's Hexxer"
+   ],
+   [
+    5,
+    "Aurastone Hammer"
+   ],
+   [
+    5,
+    "The Hammer of Grace"
+   ],
+   [
+    1,
+    "Atiesh, Greatstaff of the Guardian"
+   ],
+   [
+    1,
+    "Spire of Twilight"
+   ],
+   [
+    3,
+    "Blessed Qiraji Augur Staff"
+   ],
+   [
+    5,
+    "Staff of Rampant Growth"
+   ],
+   [
+    5,
+    "Will of Arlokk"
+   ],
+   [
+    5,
+    "Redemption"
+   ],
+   [
+    5,
+    "Guiding Stave of Wisdom"
+   ],
+   [
+    5,
+    "Staff of Metanoia"
+   ]
+  ],
+  "SecondaryHand": [
+   [
+    1,
+    "Sapphiron's Right Eye"
+   ],
+   [
+    3,
+    "Noth's Frigid Heart"
+   ],
+   [
+    3,
+    "Sartura's Might"
+   ],
+   [
+    3,
+    "Lei of the Lifegiver"
+   ],
+   [
+    5,
+    "Grand Marshal's Tome of Restoration"
+   ],
+   [
+    5,
+    "Tome of Divine Right"
+   ],
+   [
+    5,
+    "Drakestone"
+   ],
+   [
+    5,
+    "Brightly Glowing Stone"
+   ],
+   [
+    7,
+    "Scepter of Interminable Focus"
+   ]
+  ],
+  "Ranged": [
+   [
+    1,
+    "Idol of Health"
+   ],
+   [
+    1,
+    "Idol of Rejuvenation"
+   ],
+   [
+    5,
+    "Idol of Longevity"
+   ]
+  ]
+ },
+ "balance": {
+  "Head": [
+   [
+    1,
+    "Mish'undare, Circlet of the Mind Flayer"
+   ],
+   [
+    1,
+    "Preceptor's Hat"
+   ],
+   [
+    3,
+    "Spellweaver's Turban"
+   ],
+   [
+    6,
+    "The Hexxer's Cover"
+   ]
+  ],
+  "Neck": [
+   [
+    1,
+    "Gem of Trapped Innocents"
+   ],
+   [
+    1,
+    "Amulet of Vek'nilash"
+   ],
+   [
+    3,
+    "Choker of the Fire Lord"
+   ],
+   [
+    6,
+    "Malice Stone Pendant"
+   ],
+   [
+    6,
+    "Pristine Enchanted South Seas Kelp"
+   ]
+  ],
+  "Shoulder": [
+   [
+    1,
+    "Rime Covered Mantle"
+   ],
+   [
+    4,
+    "Mantle of the Blackwing Cabal"
+   ],
+   [
+    6,
+    "Abyssal Cloth Amice"
+   ],
+   [
+    6,
+    "Adventurer's Shoulders"
+   ]
+  ],
+  "Back": [
+   [
+    1,
+    "Cloak of the Necropolis"
+   ],
+   [
+    3,
+    "Cloak of the Devoured"
+   ],
+   [
+    4,
+    "Cloak of Consumption"
+   ],
+   [
+    6,
+    "Cloak of the Brood Lord"
+   ],
+   [
+    6,
+    "Veil of Eclipse"
+   ]
+  ],
+  "Chest": [
+   [
+    1,
+    "Garb of Royal Ascension"
+   ],
+   [
+    1,
+    "Bloodvine Vest"
+   ],
+   [
+    1,
+    "Crystal Webbed Robe"
+   ],
+   [
+    3,
+    "Robe of Undead Cleansing"
+   ],
+   [
+    4,
+    "Jade Inlaid Vestments"
+   ]
+  ],
+  "Wrist": [
+   [
+    1,
+    "Rockfury Bracers"
+   ],
+   [
+    3,
+    "Bracers of Arcane Accuracy"
+   ],
+   [
+    6,
+    "Burrower Bracers"
+   ],
+   [
+    6,
+    "The Soul Harvester's Bindings"
+   ],
+   [
+    6,
+    "Bracers of Undead Cleansing"
+   ]
+  ],
+  "Hands": [
+   [
+    1,
+    "Dark Storm Gauntlets"
+   ],
+   [
+    6,
+    "Gloves of Undead Cleansing"
+   ],
+   [
+    6,
+    "Gloves of Ebru"
+   ],
+   [
+    6,
+    "Bloodtinged Gloves"
+   ],
+   [
+    6,
+    "Slaghide Gauntlets"
+   ]
+  ],
+  "Waist": [
+   [
+    1,
+    "Eyestalk Waist Cord"
+   ],
+   [
+    6,
+    "Firemaw's Clutch"
+   ],
+   [
+    6,
+    "Mana Igniting Cord"
+   ],
+   [
+    6,
+    "Belt of Untapped Power"
+   ],
+   [
+    6,
+    "Angelista's Grasp"
+   ]
+  ],
+  "Legs": [
+   [
+    1,
+    "Bloodvine Leggings"
+   ],
+   [
+    1,
+    "Leggings of Polarity"
+   ],
+   [
+    4,
+    "Leggings of the Black Blizzard"
+   ],
+   [
+    6,
+    "Flarecore Leggings"
+   ]
+  ],
+  "Feet": [
+   [
+    1,
+    "Bloodvine Boots"
+   ],
+   [
+    3,
+    "Boots of Epiphany"
+   ],
+   [
+    3,
+    "Boots of Fright"
+   ],
+   [
+    3,
+    "Snowblind Shoes"
+   ],
+   [
+    4,
+    "Betrayer's Boots"
+   ]
+  ],
+  "Finger": [
+   [
+    1,
+    "Ring of the Fallen God"
+   ],
+   [
+    1,
+    "Band of the Inevitable"
+   ],
+   [
+    3,
+    "Seal of the Damned"
+   ],
+   [
+    4,
+    "Band of Forced Concentration"
+   ],
+   [
+    4,
+    "Ritssyn's Ring of Chaos"
+   ]
+  ],
+  "Trinket": [
+   [
+    1,
+    "Mark of the Champion"
+   ],
+   [
+    1,
+    "Neltharion's Tear"
+   ],
+   [
+    1,
+    "The Restrained Essence of Sapphiron"
+   ],
+   [
+    6,
+    "Zandalarian Hero Charm"
+   ],
+   [
+    6,
+    "Rune of the Dawn"
+   ]
+  ],
+  "MainHand": [
+   [
+    1,
+    "Brimstone Staff"
+   ],
+   [
+    3,
+    "Soulseeker"
+   ],
+   [
+    6,
+    "Blessed Qiraji Acolyte Staff"
+   ],
+   [
+    6,
+    "Staff of the Shadow Flame"
+   ],
+   [
+    1,
+    "The End of Dreams"
+   ],
+   [
+    4,
+    "Lok'amir il Romathis"
+   ],
+   [
+    4,
+    "Midnight Haze"
+   ],
+   [
+    6,
+    "Claw of Chromaggus"
+   ]
+  ],
+  "SecondaryHand": [
+   [
+    1,
+    "Sapphiron's Left Eye"
+   ],
+   [
+    3,
+    "Royal Scepter of Vek'lor"
+   ],
+   [
+    6,
+    "Jin'do's Bag of Whammies"
+   ],
+   [
+    6,
+    "Scepter of Interminable Focus"
+   ],
+   [
+    6,
+    "Talon of Furious Concentration"
+   ]
+  ]
+ }
+}

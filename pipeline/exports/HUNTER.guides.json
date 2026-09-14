@@ -1,0 +1,592 @@
+{
+ "Head": [
+  [
+   1,
+   "Cryptstalker Headpiece"
+  ],
+  [
+   2,
+   "Field Marshal's Chain Helm"
+  ],
+  [
+   2,
+   "Warlord's Chain Helmet"
+  ],
+  [
+   4,
+   "Lieutenant Commander's Chain Helm"
+  ],
+  [
+   4,
+   "Champion's Chain Helm"
+  ],
+  [
+   3,
+   "Striker's Diadem"
+  ],
+  [
+   3,
+   "Giantstalker's Helmet"
+  ],
+  [
+   3,
+   "Bloodstained Coif"
+  ],
+  [
+   3,
+   "Beastmaster's Cap"
+  ],
+  [
+   4,
+   "Blooddrenched Mask"
+  ],
+  [
+   5,
+   "Backwood Helm"
+  ],
+  [
+   5,
+   "Crown of Tyranny"
+  ]
+ ],
+ "Shoulder": [
+  [
+   1,
+   "Cryptstalker Spaulders"
+  ],
+  [
+   3,
+   "Field Marshal's Chain Spaulders"
+  ],
+  [
+   3,
+   "Warlord's Chain Shoulders"
+  ],
+  [
+   3,
+   "Dragonstalker's Spaulders"
+  ],
+  [
+   3,
+   "Mantle of Wicked Revenge"
+  ],
+  [
+   4,
+   "Chitinous Shoulderguards"
+  ],
+  [
+   4,
+   "Barrage Shoulders"
+  ],
+  [
+   4,
+   "Lieutenant Commander's Chain Shoulders"
+  ],
+  [
+   4,
+   "Champion's Chain Shoulders"
+  ],
+  [
+   4,
+   "Giantstalker's Epaulets"
+  ],
+  [
+   4,
+   "Truestrike Shoulders"
+  ],
+  [
+   5,
+   "Wyrmhide Spaulders"
+  ],
+  [
+   5,
+   "Wyrmtongue Shoulders"
+  ]
+ ],
+ "Back": [
+  [
+   1,
+   "Cloak of the Fallen God"
+  ],
+  [
+   1,
+   "Shroud of Dominion"
+  ],
+  [
+   4,
+   "Cloak of the Unseen Path"
+  ],
+  [
+   4,
+   "Cloak of Concentrated Hatred"
+  ],
+  [
+   4,
+   "Earthweave Cloak"
+  ],
+  [
+   4,
+   "Cloak of the Shrouded Mists"
+  ],
+  [
+   4,
+   "Cape of the Black Baron"
+  ],
+  [
+   4,
+   "Cloak of Draconic Might"
+  ],
+  [
+   4,
+   "Zulian Tigerhide Cloak"
+  ],
+  [
+   5,
+   "Dark Phantom Cape"
+  ],
+  [
+   5,
+   "Blackveil Cape"
+  ]
+ ],
+ "Chest": [
+  [
+   1,
+   "Cryptstalker Tunic"
+  ],
+  [
+   4,
+   "Striker's Hauberk"
+  ],
+  [
+   6,
+   "Dragonstalker's Breastplate"
+  ],
+  [
+   6,
+   "Field Marshal's Chain Breastplate"
+  ],
+  [
+   6,
+   "Warlord's Chain Chestpiece"
+  ],
+  [
+   6,
+   "Legionnaire's Chain Hauberk"
+  ]
+ ],
+ "Wrist": [
+  [
+   1,
+   "Cryptstalker Wristguards"
+  ],
+  [
+   3,
+   "Wristguards of True Flight"
+  ],
+  [
+   3,
+   "Dragonstalker's Bracers"
+  ],
+  [
+   4,
+   "Giantstalker's Bracers"
+  ],
+  [
+   5,
+   "Primal Batskin Bracers"
+  ],
+  [
+   5,
+   "Beastmaster's Bindings"
+  ],
+  [
+   5,
+   "Slashclaw Bracers"
+  ],
+  [
+   5,
+   "Bracers of the Eclipse"
+  ]
+ ],
+ "Hands": [
+  [
+   1,
+   "Marshal's Chain Grips"
+  ],
+  [
+   1,
+   "General's Chain Gloves"
+  ],
+  [
+   3,
+   "Cryptstalker Handguards"
+  ],
+  [
+   3,
+   "Vek'lor's Gloves of Devastation"
+  ],
+  [
+   4,
+   "Dragonstalker's Gauntlets"
+  ],
+  [
+   4,
+   "Giantstalker's Gloves"
+  ],
+  [
+   4,
+   "Gloves of the Tormented"
+  ],
+  [
+   4,
+   "Devilsaur Gauntlets"
+  ]
+ ],
+ "Waist": [
+  [
+   1,
+   "Cryptstalker Girdle"
+  ],
+  [
+   3,
+   "Ossirian's Binding"
+  ],
+  [
+   4,
+   "Dragonstalker's Belt"
+  ],
+  [
+   4,
+   "Giantstalker's Belt"
+  ],
+  [
+   4,
+   "Zandalar Predator's Belt"
+  ],
+  [
+   4,
+   "Warpwood Binding"
+  ],
+  [
+   4,
+   "Marksman's Girdle"
+  ]
+ ],
+ "Legs": [
+  [
+   1,
+   "Leggings of Apocalypse"
+  ],
+  [
+   1,
+   "Cryptstalker Legguards"
+  ],
+  [
+   3,
+   "Sentinel's Chain Leggings"
+  ],
+  [
+   3,
+   "Outrider's Chain Leggings"
+  ],
+  [
+   3,
+   "Marshal's Chain Legguards"
+  ],
+  [
+   3,
+   "General's Chain Legguards"
+  ],
+  [
+   4,
+   "Dragonstalker's Legguards"
+  ],
+  [
+   4,
+   "Striker's Leggings"
+  ],
+  [
+   4,
+   "Giantstalker's Leggings"
+  ],
+  [
+   4,
+   "Bloodstained Legplates"
+  ],
+  [
+   4,
+   "Beastmaster's Pants"
+  ],
+  [
+   5,
+   "Devilsaur Leggings"
+  ]
+ ],
+ "Feet": [
+  [
+   1,
+   "Cryptstalker Boots"
+  ],
+  [
+   3,
+   "Marshal's Chain Boots"
+  ],
+  [
+   3,
+   "General's Chain Sabatons"
+  ],
+  [
+   3,
+   "Striker's Footguards"
+  ],
+  [
+   4,
+   "Dragonstalker's Greaves"
+  ],
+  [
+   4,
+   "Giantstalker's Boots"
+  ],
+  [
+   5,
+   "Beastmaster's Boots"
+  ],
+  [
+   5,
+   "Mongoose Boots"
+  ],
+  [
+   5,
+   "Bloodstained Greaves"
+  ],
+  [
+   5,
+   "Windreaver Greaves"
+  ]
+ ],
+ "Neck": [
+  [
+   1,
+   "Prestor's Talisman of Connivery"
+  ],
+  [
+   3,
+   "Stormrage's Talisman of Seething"
+  ],
+  [
+   3,
+   "Onyxia Tooth Pendant"
+  ],
+  [
+   4,
+   "Barbed Choker"
+  ],
+  [
+   4,
+   "Mark of Fordring"
+  ],
+  [
+   5,
+   "Imperial Jewel"
+  ],
+  [
+   5,
+   "Will of the Martyr"
+  ]
+ ],
+ "Finger": [
+  [
+   1,
+   "Band of Unnatural Forces"
+  ],
+  [
+   1,
+   "Band of Reanimation"
+  ],
+  [
+   1,
+   "Ring of the Cryptstalker"
+  ],
+  [
+   3,
+   "Signet Ring of the Bronze Dragonflight"
+  ],
+  [
+   3,
+   "Band of Accuria"
+  ],
+  [
+   3,
+   "Ring of the Godslayer"
+  ],
+  [
+   4,
+   "Ring of the Qiraji Fury"
+  ],
+  [
+   4,
+   "Don Julio's Band"
+  ],
+  [
+   4,
+   "Master Dragonslayer's Ring"
+  ],
+  [
+   5,
+   "Band of Jin"
+  ],
+  [
+   5,
+   "Seal of Jin"
+  ],
+  [
+   5,
+   "Tarnished Elven Ring"
+  ],
+  [
+   5,
+   "Blackstone Ring"
+  ],
+  [
+   5,
+   "Painweaver Band"
+  ]
+ ],
+ "Trinket": [
+  [
+   1,
+   "Mark of the Champion"
+  ],
+  [
+   1,
+   "Renataki's Charm of Beasts"
+  ],
+  [
+   1,
+   "Drake Fang Talisman"
+  ],
+  [
+   3,
+   "Kiss of the Spider"
+  ],
+  [
+   3,
+   "Jom Gabbar"
+  ],
+  [
+   4,
+   "Blackhand's Breadth"
+  ],
+  [
+   4,
+   "Seal of the Dawn"
+  ]
+ ],
+ "Ranged": [
+  [
+   1,
+   "Nerubian Slavemaker"
+  ],
+  [
+   4,
+   "Ashjre'thul, Crossbow of Smiting"
+  ],
+  [
+   4,
+   "Soulstring"
+  ],
+  [
+   4,
+   "Larvae of the Great Worm"
+  ],
+  [
+   6,
+   "Grand Marshal's Hand Cannon"
+  ],
+  [
+   6,
+   "High Warlord's Street Sweeper"
+  ],
+  [
+   6,
+   "Grand Marshal's Repeater"
+  ],
+  [
+   6,
+   "High Warlord's Crossbow"
+  ]
+ ],
+ "MainHand": [
+  [
+   1,
+   "The Eye of Nerub"
+  ],
+  [
+   4,
+   "Severance"
+  ],
+  [
+   3,
+   "Barb of the Sand Reaver"
+  ],
+  [
+   3,
+   "Corrupted Ashbringer"
+  ],
+  [
+   5,
+   "Gri'lek's Carver"
+  ],
+  [
+   4,
+   "Claymore of Unholy Might"
+  ],
+  [
+   1,
+   "Kingsfall"
+  ],
+  [
+   1,
+   "Harbinger of Doom"
+  ],
+  [
+   4,
+   "Iblis, Blade of the Fallen Seraph"
+  ],
+  [
+   4,
+   "Blessed Qiraji Pugio"
+  ],
+  [
+   4,
+   "Hatchet of Sundered Bone"
+  ]
+ ],
+ "SecondaryHand": [
+  [
+   1,
+   "Claw of the Frost Wyrm"
+  ],
+  [
+   1,
+   "Kingsfall"
+  ],
+  [
+   4,
+   "Hatchet of Sundered Bone"
+  ],
+  [
+   4,
+   "Harbinger of Doom"
+  ],
+  [
+   4,
+   "Iblis, Blade of the Fallen Seraph"
+  ],
+  [
+   4,
+   "Blessed Qiraji Pugio"
+  ]
+ ]
+}

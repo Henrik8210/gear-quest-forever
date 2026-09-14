@@ -1,0 +1,159 @@
+Head | Best | Frostfire Circlet
+Head | Great | Mish'undare, Circlet of the Mind Flayer
+Head | Great | Preceptor's Hat
+Head | Good | Enigma Circlet
+Head | Optional | Field Marshal's Coronet / Warlord's Silk Cowl
+Head | Optional | Lieutenant Commander's Silk Cowl / Champion's Silk Cowl
+Head | Optional | Spellweaver's Turban
+Head | Optional | Arcanist Crown
+Head | Optional | Netherwind Crown
+Head | Optional | The Hexxer's Cover
+Head | Optional | Crimson Felt Hat
+Shoulders | Best | Rime Covered Mantle
+Shoulders | Good | Frostfire Shoulderpads
+Shoulders | Good | Mantle of the Blackwing Cabal
+Shoulders | Good | Mantle of Phrenic Power
+Shoulders | Optional | Enigma Shoulderpads
+Shoulders | Optional | Lieutenant Commander's Silk Mantle / Champion's Silk Mantle
+Shoulders | Optional | Field Marshal's Silk Spaulders / Warlord's Silk Amice
+Shoulders | Optional | Netherwind Mantle
+Shoulders | Optional | Arcanist Mantle
+Shoulders | Optional | Zandalar Illusionist's Mantle
+Shoulders | Optional | Kentic Amice
+Shoulders | Optional - Frost | Boreal Mantle
+Back | Best | Cloak of the Necropolis
+Back | Good | Cloak of the Devoured
+Back | Good | Cloak of the Brood Lord
+Back | Good | Veil of Eclipse
+Back | Optional | Cloak of Consumption
+Back | Optional | Cloak of the Hakkari Worshipers
+Back | Optional | Crystalline Threaded Cape
+Back | Optional | Sapphiron Drape
+Back | Optional | Spritecaster Cape
+Back | Optional | Amplifying Cloak
+Back | Optional | Stormpike Sage's Cloak / Frostwolf Advisor's Cloak
+Chest | Best | Frostfire Robe
+Chest | Great | Crystal Webbed Robe
+Chest | Good | Enigma Robes
+Chest | Good | Bloodvine Vest
+Chest | Optional | Zandalar Illusionist's Robe
+Chest | Optional | Robe of Volatile Power
+Chest | Optional | Field Marshal's Silk Vestments / Warlord's Silk Raiment
+Chest | Optional | Knight-Captain's Silk Tunic / Legionnaire's Silk Tunic
+Chest | Optional | Robe of the Archmage
+Chest | Optional | Jade Inlaid Vestments
+Chest | Optional | Netherwind Robes
+Chest | Optional | Robe of Everlasting Night
+Chest | Optional | Arcanist Robes
+Chest | Optional - Frost | Freezing Lich Robes
+Chest | Optional - Frost | Robe of Winter Night
+Wrists | Best | The Soul Harvester's Bindings
+Wrists | Great | Burrower Bracers
+Wrists | Great | Frostfire Bindings
+Wrists | Good | Rockfury Bracers
+Wrists | Good | Black Bark Wristbands
+Wrists | Good | Dryad's Wrist Bindings
+Wrists | Good | Bracers of Arcane Accuracy
+Wrists | Optional | Netherwind Bindings
+Wrists | Optional | Zandalar Illusionist's Wraps
+Wrists | Optional | Arcanist Bindings
+Wrists | Optional | Sublime Wristguards
+Hands | Best | Dark Storm Gauntlets
+Hands | Great | Frostfire Gloves
+Hands | Great | Gloves of the Hypnotic Flame
+Hands | Good | Inferno Gloves
+Hands | Good | Netherwind Gloves
+Hands | Good | Gloves of Delusional Power
+Hands | Optional | Bloodtinged Gloves
+Hands | Optional | Marshal's Silk Gloves / General's Silk Handguards
+Hands | Optional | Hands of Power
+Hands | Optional | Knight-Lieutenant's Silk Handwraps / Blood Guard's Silk Handwraps
+Waist | Best | Eyestalk Waist Cord
+Waist | Good | Mana Igniting Cord
+Waist | Good | Firemaw's Clutch
+Waist | Optional | Frostfire Belt
+Waist | Optional | Belt of Untapped Power
+Waist | Optional | Netherwind Belt
+Waist | Optional | Highlander's Cloth Girdle / Defiler's Cloth Girdle
+Waist | Optional | Ban'thok Sash
+Waist | Optional | Stormpike Cloth Girdle / Frostwolf Cloth Belt
+Waist | Optional | Arcanist Belt
+Waist | Optional - Hit | Angelista's Grasp
+Legs | Best | Leggings of Polarity
+Legs | Great | Leggings of the Festering Swarm
+Legs | Great | Leggings of the Black Blizzard
+Legs | Good | Frostfire Leggings
+Legs | Good | Enigma Leggings
+Legs | Best | Bloodvine Leggings
+Legs | Optional | Netherwind Pants
+Legs | Optional | Knight-Captain's Silk Legguards / Legionnaire's Silk Legguards
+Legs | Optional | Marshal's Silk Leggings / General's Silk Trousers
+Legs | Optional | Arcanist Leggings
+Legs | Optional | Skyshroud Leggings
+Legs | Optional | Bloodtinged Kilt
+Legs | Optional | Outrider's Silk Leggings / Sentinel's Silk Leggings
+Feet | Best | Frostfire Sandals
+Feet | Great | Boots of Epiphany
+Feet | Good | Snowblind Shoes
+Feet | Good | Betrayer's Boots
+Feet | Good | Enigma Boots
+Feet | Good | Netherwind Boots
+Feet | Good | Bloodvine Boots
+Feet | Optional | Knight-Lieutenant's Silk Walkers / Blood Guard's Silk Walkers
+Feet | Optional | Marshal's Silk Footwraps / General's Silk Boots
+Feet | Optional | Arcanist Boots
+Feet | Optional | Omnicast Boots
+Neck | Best | Amulet of Vek'nilash
+Neck | Best | Gem of Trapped Innocents
+Neck | Great | Choker of the Fire Lord
+Neck | Great | Malice Stone Pendant
+Neck | Good | Charm of the Shifting Sands
+Neck | Optional | Orb of the Darkmoon
+Neck | Optional | Jeklik's Opaline Talisman
+Neck | Optional | Choker of Enlightenment
+Neck | Optional | Arcane Crystal Pendant
+Neck | Optional - Hit | Soul Corrupter's Necklace
+Neck | Optional - Hit | Star of Mystaria
+Ring | Best | Ring of the Eternal Flame
+Ring | Best | Frostfire Ring
+Ring | Best | Ring of the Fallen God
+Ring | Great | Band of the Inevitable
+Ring | Great | Ritssyn's Ring of Chaos
+Ring | Great | Band of Forced Concentration
+Ring | Good | Ring of Spell Power
+Ring | Good | Mindtear Band
+Ring | Good | Seal of the Damned
+Ring | Good | Signet Ring of the Bronze Dragonflight
+Ring | Good | Rune Band of Wizardry
+Ring | Good | Don Mauricio's Band of Domination
+Trinket | Best | Neltharion's Tear
+Trinket | Best | The Restrained Essence of Sapphiron
+Trinket | Best | Mark of the Champion
+Trinket | Best | Mind Quickening Gem
+Trinket | Great | Zandalarian Hero Charm
+Trinket | Great | Talisman of Ephemeral Power
+Trinket | Optional | Briarwood Reed
+Trinket | Optional | Eye of the Beast
+Trinket | Optional | Burst of Knowledge
+Two-Hand | Best | Atiesh, Greatstaff of the Guardian
+Two-Hand | Great | Soulseeker
+Two-Hand | Good | Brimstone Staff
+Two-Hand | Optional | Staff of the Shadow Flame
+Two-Hand | Optional | Blessed Qiraji Acolyte Staff
+Two-Hand | Optional | Grand Marshal's Stave / High Warlord's War Staff
+Two-Hand | Optional | Ironbark Staff
+Two-Hand | Optional | Staff of Dominance
+Two-Hand | Optional | Shadow Wing Focus Staff
+Two-Hand | Optional | Jin'do's Judgement
+Two-Hand | Optional | Rod of the Ogre Magi
+Two-Hand | Optional - Mana sustain | Will of Arlokk
+Main Hand | Best | Wraith Blade
+Main Hand | Good | Midnight Haze
+Main Hand | Good | Grand Marshal's Mageblade / High Warlord's Spellblade
+Main Hand | Good | Sharpened Silithid Femur
+Main Hand | Optional | Claw of Chromaggus
+Main Hand | Optional | Azuresong Mageblade
+Main Hand | Optional | Fang of the Mystics
+Main Hand | Optional | Sageclaw / Mindfang
+Main Hand | Optional | Bloodcaller
+Main Hand | Optional | Fang of Venoxis

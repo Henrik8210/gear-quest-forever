@@ -1,0 +1,94 @@
+Head | Best | Bonescythe Helmet
+Head | Great | Deathdealer's Helm
+Head | Good | Darkmantle Cap
+Head | Good | Bloodfang Hood
+Head | Good | Field Marshal's Leather Mask / Warlord's Leather Helm
+Neck | Best | Prestor's Talisman of Connivery
+Neck | Great | Onyxia Tooth Pendant
+Neck | Good | Barbed Choker
+Neck | Good | The Eye of Hakkar
+Neck | Good | Fury of the Forgotten Swarm
+Shoulder | Best | Bonescythe Pauldrons
+Shoulder | Best | Deathdealer's Spaulders
+Shoulder | Great | Darkmantle Spaulders
+Shoulder | Great | Nightslayer Shoulder Pads
+Shoulder | Great | Mantle of Wicked Revenge
+Back | Swords Best | Cloak of the Fallen God
+Back | Swords Best | Shroud of Dominion
+Back | Daggers Best | Cloak of Concentrated Hatred
+Back | Great | Cloak of Veiled Shadows
+Back | Great | Puissant Cape
+Back | Great | Earthweave Cloak
+Chest | Best | Deathdealer's Vest
+Chest | Best | Bonescythe Breastplate
+Chest | Great | Bloodfang Chestpiece
+Chest | Good | Vest of Swift Execution
+Chest | Good | Darkmantle Tunic
+Wrist | Swords Best | Bonescythe Bracers
+Wrist | Daggers Best | Qiraji Execution Bracers
+Wrist | Best | Bloodfang Bracers
+Wrist | Great | Darkmantle Bracers
+Wrist | Good | Forest Stalker's Bracers
+Wrist | Good | Primal Batskin Bracers
+Hands | Best | Bonescythe Gauntlets
+Hands | Great | Gloves of Enforcement
+Hands | Great | Aged Core Leather Gloves
+Hands | Great | Darkmantle Gloves
+Hands | Good | Nightslayer Gloves
+Hands | Good | Marshal's Leather Handgrips / General's Leather Mitts
+Waist | Swords Best | Bonescythe Waistguard
+Waist | Daggers Best | Belt of Never-ending Agony
+Waist | Great | Bloodfang Belt
+Waist | Good | Nightslayer Belt
+Waist | Good | Belt of Preserved Heads
+Waist | Optional | Darkmantle Belt
+Legs | Best | Bonescythe Legplates
+Legs | Great | Leggings of Apocalypse
+Legs | Great | Deathdealer's Leggings
+Legs | Great | Marshal's Leather Leggings / General's Leather Legguards
+Legs | Good | Bloodfang Pants
+Feet | Best | Bonescythe Sabatons
+Feet | Great | Deathdealer's Boots
+Feet | Good | Darkmantle Boots
+Feet | Good | Boots of the Shadow Flame
+Feet | Good | Boots of the Vanguard
+Ring 1 | Best | Bonescythe Ring
+Ring 1 | Best | Band of Unnatural Forces
+Ring 1 | Great | Band of Accuria
+Ring 1 | Great | Band of Reanimation
+Ring 1 | Great | Signet Ring of the Bronze Dragonflight
+Ring 1 | Good | Master Dragonslayer's Ring
+Ring 1 | Good | Don Julio's Band
+Trinket 1 | Best | Kiss of the Spider
+Trinket 1 | Best | Slayer's Crest
+Trinket 1 | Best | Mark of the Champion
+Trinket 1 | Great | Jom Gabbar
+Trinket 1 | Great | Earthstrike
+Trinket 1 | Great | Drake Fang Talisman
+Trinket 1 | Good | Renataki's Charm of Trickery
+Trinket 1 | Good | Hand of Justice
+Main Hand (Swords) | Best | Gressil, Dawn of Ruin
+Main Hand (Swords) | Great | Grand Marshal's Longsword / High Warlord's Blade
+Main Hand (Swords) | Great | Ancient Qiraji Ripper
+Main Hand (Swords) | Great | Chromatically Tempered Sword
+Main Hand (Swords) | Good | Nightmare Blade
+Off Hand (Swords) | Human Best | Iblis, Blade of the Fallen Seraph
+Off Hand (Swords) | Non-Human Best | The Hungering Cold
+Off Hand (Swords) | Great | Maladath, Runed Blade of the Black Flight
+Off Hand (Swords) | Great | Thunderfury, Blessed Blade of the Windseeker
+Off Hand (Swords) | Good | Widow's Remorse
+Off Hand (Swords) | Good | Grand Marshal's Swiftblade / High Warlord's Quickblade
+Off Hand (Swords) | Good | Chromatically Tempered Sword
+Off Hand (Daggers) | Best | Death's Sting
+Off Hand (Daggers) | Great | Harbinger of Doom
+Off Hand (Daggers) | Great | Maexxna's Fang
+Off Hand (Daggers) | Great | Blessed Qiraji Pugio
+Off Hand (Daggers) | Good | Grand Marshal's Dirk / High Warlord's Razor
+Ranged | Best | Nerubian Slavemaker
+Ranged | Best | Huhuran's Stinger
+Ranged | Best | Soulstring
+Ranged | Best | Crossbow of Imminent Doom
+Ranged | Best | Striker's Mark
+Ranged | Best | Larvae of the Great Worm
+Ranged | Great | Dragonbreath Hand Cannon
+Ranged | Great | Precisely Calibrated Boomstick

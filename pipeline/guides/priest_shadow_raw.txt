@@ -1,0 +1,129 @@
+Head | Best | Preceptor's Hat
+Head | Good | Tiara of the Oracle
+Head | Good | The Hexxer's Cover
+Head | Good | Mish'undare, Circlet of the Mind Flayer
+Head | Optional | Field Marshal's Headdress
+Head | Optional | Warlord's Satin Cowl
+Head | Optional | Spellweaver's Turban
+Shoulders | Best | Rime Covered Mantle
+Shoulders | Good | Mantle of the Blackwing Cabal
+Shoulders | Good | Mantle of the Oracle
+Shoulders | Optional | Field Marshal's Satin Mantle
+Shoulders | Optional | Warlord's Satin Mantle
+Shoulders | Optional | Felcloth Shoulders
+Back | Best | Cloak of the Devoured
+Back | Good | Veil of Eclipse
+Back | Good | Cloak of the Necropolis
+Back | Good | Cloak of Consumption
+Back | Optional | Cloak of the Brood Lord
+Back | Optional | Archivist Cape of Shadow Wrath
+Back | Optional | Sapphiron Drape
+Chest | Best | Crystal Webbed Robe
+Chest | Good | Vestments of the Oracle
+Chest | Good | Jade Inlaid Vestments
+Chest | Good | Necro-Knight's Garb
+Chest | Good | Garb of Royal Ascension
+Chest | Good | Robes of the Battleguard
+Chest | Optional | Vestments of the Shifting Sands
+Chest | Optional | Bloodvine Vest
+Chest | Optional | Robe of Winter Night
+Chest | Optional | Field Marshal's Satin Vestments
+Chest | Optional | Warlord's Satin Robes
+Chest | Optional | Robe of Volatile Power
+Wrist | Best | Burrower Bracers
+Wrist | Good | Rockfury Bracers
+Wrist | Good | Bracers of Arcane Accuracy
+Wrist | Good | Black Bark Wristbands
+Wrist | Optional | Flameweave Cuffs of Shadow Wrath
+Wrist | Optional | Tearfall Bracers of Shadow Wrath
+Wrist | Optional | Dryad's Wrist Bindings
+Hands | Best | Dark Storm Gauntlets
+Hands | Good | Ebony Flame Gloves
+Hands | Optional | Felcloth Gloves
+Hands | Optional | Marshal's Satin Gloves
+Hands | Optional | General's Satin Gloves
+Waist | Best | Eyestalk Waist Cord
+Waist | Good | Firemaw's Clutch
+Waist | Optional | Sash of Whispered Secrets
+Waist | Optional | Mana Igniting Cord
+Waist | Optional | Ban'thok Sash
+Legs | Best | Fel Infused Leggings
+Legs | Good | Leggings of Polarity
+Legs | Good | Flarecore Leggings
+Legs | Good | Bloodvine Leggings
+Legs | Good | Trousers of the Oracle
+Legs | Good | Leggings of the Black Blizzard
+Legs | Optional | Leggings of Torment
+Legs | Optional | Marshal's Satin Pants
+Legs | Optional | General's Satin Leggings
+Feet | Best | Boots of Epiphany
+Feet | Good | Snowblind Shoes
+Feet | Good | Betrayer's Boots
+Feet | Good | Maleki's Footwraps
+Feet | Optional | Footwraps of the Oracle
+Feet | Optional | Bloodvine Boots
+Feet | Optional | Marshal's Satin Sandals
+Feet | Optional | General's Satin Boots
+Neck | Best | Choker of the Fire Lord
+Neck | Good | Malice Stone Pendant
+Neck | Good | Amulet of Vek'nilash
+Neck | Good | Charm of the Shifting Sands
+Neck | Optional | Orb of the Darkmoon
+Neck | Optional | Nacreous Shell Necklace
+Neck | Optional | Dark Advisor's Pendant
+Neck | Optional | Chains of the Lich
+Ring | Best | Ring of the Fallen God
+Ring | Best | Band of the Inevitable
+Ring | Good | Signet Ring of the Bronze Dragonflight
+Ring | Good | Wrath of Cenarius
+Ring | Good | Band of Dark Dominion
+Ring | Good | Band of Forced Concentration
+Ring | Optional | Ring of Spell Power
+Ring | Optional | Rune Band of Wizardry
+Trinket | Best | Neltharion's Tear
+Trinket | Best | The Restrained Essence of Sapphiron
+Trinket | Best - Undead | Mark of the Champion
+Trinket | Good | Talisman of Ephemeral Power
+Trinket | Good | Zandalarian Hero Charm
+Trinket | Optional | Briarwood Reed
+Trinket | Optional | Burst of Knowledge
+Trinket | Optional | Shard of the Scale
+Main Hand | Best | The End of Dreams
+Main Hand | Good | Midnight Haze
+Main Hand | Good | Lok'amir il Romathis
+Main Hand | Good | Grand Marshal's Mageblade
+Main Hand | Good | High Warlord's Spellblade
+Main Hand | Optional | Claw of Chromaggus
+Main Hand | Optional | Stinger of Ayamiss
+Main Hand | Optional | Fang of Venoxis
+Main Hand | Optional | Fang of the Mystics
+Main Hand | Optional | Sageclaw
+Main Hand | Optional | Mindfang
+Main Hand | Optional | Aurastone Hammer
+Off Hand | Best | Tome of Shadow Force
+Off Hand | Good | Sapphiron's Left Eye
+Off Hand | Good | Master Dragonslayer's Orb
+Off Hand | Good | Royal Scepter of Vek'lor
+Off Hand | Good | Talon of Furious Concentration
+Off Hand | Optional | Gem of Nerubis
+Off Hand | Optional | Trance Stone
+Off Hand | Optional | Jin'do's Bag of Whammies
+Off Hand | Optional | Drakestone of Shadow Wrath
+Two-Hand | Best | Soulseeker
+Two-Hand | Good | Brimstone Staff
+Two-Hand | Good | Staff of the Shadow Flame
+Two-Hand | Good | Blessed Qiraji Acolyte Staff
+Two-Hand | Good | Grand Marshal's Stave
+Two-Hand | Good | High Warlord's War Staff
+Two-Hand | Good | Staff of the Ruins
+Two-Hand | Good | Staff of the Qiraji Prophets
+Two-Hand | Optional | Anathema
+Two-Hand | Optional | Shadow Wing Focus Staff
+Wand | Best | Wand of Qiraji Nobility
+Wand | Good | Doomfinger
+Wand | Good | Wand of Fates
+Wand | Good | Touch of Chaos
+Wand | Optional | Skul's Ghastly Touch
+Wand | Optional | Bonecreeper Stylus
+Wand | Optional | Ritssyn's Wand of Bad Mojo
+Wand | Optional | Woestave

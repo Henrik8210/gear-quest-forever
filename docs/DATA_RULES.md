@@ -2,7 +2,7 @@
 
 Rules for adding, importing, and maintaining gear quest entries in `GearQuest/Data.lua`. Follow these when curating data from Wowhead, in-game research, or leveling guides.
 
-**GearQuest Forever — target vs today:** Forever’s **target** is Classic 1–60 (+ Forever deltas). **Today**, generated data is still the inherited **TBC Anniversary 10–69 pipeline** (see [FOREVER-DATA-MIGRATION.md](./FOREVER-DATA-MIGRATION.md)); the addon caps display at level 60. Do not assume suffixes or item pools are globally Classic until phase 2–3 complete.
+**GearQuest Forever — target vs today:** Forever’s **target** is Classic 1–60 (+ Forever deltas). **Today**, all nine classes are Classic `score.py` regens (pool + suffixes + cap 60). Stat weights are still TBC-derived. See [FOREVER-DATA-MIGRATION.md](./FOREVER-DATA-MIGRATION.md).
 
 ## Data sources (read this first)
 
@@ -11,17 +11,17 @@ GearQuest uses **two different pipelines**. Do not apply one pipeline’s rules 
 | Source | Levels | Classes | How it gets in | Authoritative doc |
 |--------|--------|---------|----------------|-------------------|
 | **Curated** (`Data.lua`) | 1–9 Alliance bands, seasonal/event items, hand-picked Paladin quest chains | Early Alliance mail melee; not full-class 1–60 yet | Manual curation | This file (§ Curation workflow) |
-| **Generated** (`_generated/*.lua` → `DataAdapter.lua`) | **10–69 only** | **Seven classes** (+ Mage/Warlock generated tables) | Stat-weight pipeline + Wowhead/cmangos (TBC-era until Forever migration) | [`GearQuest/_generated/GEARQUEST-BIS-PIPELINE.md`](../GearQuest/_generated/GEARQUEST-BIS-PIPELINE.md) |
+| **Generated** (`_generated/*.lua` → `DataAdapter.lua`) | **10–60 only** | **Nine classes** | Classic pool `score.py` regen (`pipeline/`); weights still TBC-derived | [`pipeline/docs/FOREVER-SCORING.md`](../pipeline/docs/FOREVER-SCORING.md), [`GearQuest/_generated/GEARQUEST-BIS-PIPELINE.md`](../GearQuest/_generated/GEARQUEST-BIS-PIPELINE.md) |
 
-**Forever max level is 60** (`GQ.MAX_PLAYER_LEVEL` in `Core.lua`). TBC **level 70** curated data was removed; do not re-import Phase 3 AtlasLoot into this repo. The generated pipeline still stops at **69** by design (rule R1). Migration phases: [FOREVER-DATA-MIGRATION.md](./FOREVER-DATA-MIGRATION.md).
+**Forever max level is 60** (`GQ.MAX_PLAYER_LEVEL` in `Core.lua`). TBC **level 70** curated data was removed; do not re-import Phase 3 AtlasLoot into this repo. Generated bands are capped at **60**. Migration phases: [FOREVER-DATA-MIGRATION.md](./FOREVER-DATA-MIGRATION.md).
 
-**Paladin 10–69** comes from the generated pipeline (`paladinPicks` + `paladinHorde1to9`). All seven classes merge into `GQ.Data.entries` at load time via `DataAdapter.lua`. Sanity check:
+**Paladin 10–60** comes from the generated pipeline (`paladinPicks` + `paladinHorde1to9`). All seven classes merge into `GQ.Data.entries` at load time via `DataAdapter.lua`. Sanity check:
 
 ```powershell
 node scripts/verify-generated-bis.mjs
 ```
 
-Expected total: **67,320** entries (**287 curated + 67,033 generated**) — always use the script, not a stale figure.
+Expected total: **57,489** entries (**287 curated + 57,202 generated**) — always use the script, not a stale figure. All nine classes are Classic `score.py` regens (weights still TBC-derived).
 
 ### Ranking philosophy by source
 

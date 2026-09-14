@@ -30,3 +30,7 @@ _lore-v2-import/
 _route-import/
 _rootcause-import/
 _suffixids-import/
+pipeline/out/*
+!pipeline/out/.gitkeep
+__pycache__/
+*.pyc

@@ -9,8 +9,8 @@ local _, GQ = ...
 --                  covers (warrior, paladin), so those ship a Horde-only file;
 --                  a class in neither table (hunter) ships BOTH factions, and its
 --                  rows carry their own faction field.
---   10-69          <class>Picks            (expanded here)
---   70             curated in Data.lua (AtlasLoot Phase 3)
+--   10-60          <class>Picks            (expanded here)
+--   70             not used (Forever cap is 60; TBC L70 curated was stripped)
 
 local FACTION = { Alliance = { Alliance = true }, Horde = { Horde = true } }
 
