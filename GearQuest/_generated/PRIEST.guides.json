@@ -1,0 +1,1930 @@
+{
+ "holy": {
+  "Head": [
+   [
+    2,
+    "Halo of Transcendence"
+   ],
+   [
+    2,
+    "Circlet of Faith"
+   ],
+   [
+    2,
+    "Crystal Adorned Crown"
+   ],
+   [
+    4,
+    "Don Rigoberto's Lost Hat"
+   ],
+   [
+    4,
+    "Zulian Headdress"
+   ],
+   [
+    4,
+    "Dustwind Turban"
+   ],
+   [
+    4,
+    "Warlord's Satin Cowl"
+   ],
+   [
+    4,
+    "Field Marshal's Headdress"
+   ],
+   [
+    5,
+    "Cassandra's Grace"
+   ],
+   [
+    5,
+    "Champion's Satin Hood"
+   ],
+   [
+    5,
+    "Lieutenant Commander's Satin Hood"
+   ],
+   [
+    5,
+    "Virtuous Crown"
+   ],
+   [
+    5,
+    "Crimson Felt Hat"
+   ]
+  ],
+  "Shoulder": [
+   [
+    2,
+    "Pauldrons of Transcendence"
+   ],
+   [
+    2,
+    "Shoulderpads of Faith"
+   ],
+   [
+    3,
+    "Champion's Satin Mantle"
+   ],
+   [
+    3,
+    "Lieutenant Commander's Satin Mantle"
+   ],
+   [
+    3,
+    "Mantle of Lost Hope"
+   ],
+   [
+    3,
+    "Warlord's Satin Mantle"
+   ],
+   [
+    3,
+    "Field Marshal's Satin Mantle"
+   ],
+   [
+    4,
+    "Ternary Mantle"
+   ],
+   [
+    4,
+    "Zandalar Confessor's Mantle"
+   ],
+   [
+    4,
+    "Mantle of Prophecy"
+   ],
+   [
+    4,
+    "Mantle of the Scarlet Crusade"
+   ]
+  ],
+  "Back": [
+   [
+    1,
+    "Cloak of Suturing"
+   ],
+   [
+    3,
+    "Cloak of Clarity"
+   ],
+   [
+    3,
+    "Hide of the Wild"
+   ],
+   [
+    3,
+    "Shroud of Pure Thought"
+   ],
+   [
+    3,
+    "Drape of Benediction"
+   ],
+   [
+    4,
+    "Hakkari Loa Cloak"
+   ],
+   [
+    4,
+    "Archivist Cape"
+   ],
+   [
+    4,
+    "Cloak of the Cosmos"
+   ],
+   [
+    4,
+    "Battle Healer's Cloak"
+   ],
+   [
+    4,
+    "Caretaker's Cape"
+   ]
+  ],
+  "Chest": [
+   [
+    2,
+    "Robes of Transcendence"
+   ],
+   [
+    2,
+    "Robe of Faith"
+   ],
+   [
+    3,
+    "Robes of the Guardian Saint"
+   ],
+   [
+    3,
+    "Truefaith Vestments"
+   ],
+   [
+    3,
+    "Robes of the Exalted"
+   ],
+   [
+    5,
+    "Warlord's Satin Robes"
+   ],
+   [
+    5,
+    "Field Marshal's Satin Vestments"
+   ],
+   [
+    5,
+    "Virtuous Robe"
+   ],
+   [
+    5,
+    "Robes of Prophecy"
+   ],
+   [
+    5,
+    "Legionnaire's Satin Tunic"
+   ],
+   [
+    5,
+    "Knight-Captain's Satin Tunic"
+   ]
+  ],
+  "Wrist": [
+   [
+    2,
+    "Bindings of Transcendence"
+   ],
+   [
+    2,
+    "Bracelets of Royal Redemption"
+   ],
+   [
+    3,
+    "Bindings of Faith"
+   ],
+   [
+    3,
+    "Zandalar Confessor's Wraps"
+   ],
+   [
+    4,
+    "Vambraces of Prophecy"
+   ],
+   [
+    4,
+    "Dryad's Wrist Bindings"
+   ],
+   [
+    5,
+    "Virtuous Bracers"
+   ],
+   [
+    5,
+    "Sublime Wristguards"
+   ]
+  ],
+  "Hands": [
+   [
+    2,
+    "Handguards of Transcendence"
+   ],
+   [
+    2,
+    "Gloves of Faith"
+   ],
+   [
+    3,
+    "Gloves of Dark Wisdom"
+   ],
+   [
+    3,
+    "Desert Bloom Gloves"
+   ],
+   [
+    3,
+    "Gloves of the Messiah"
+   ],
+   [
+    3,
+    "Gloves of Prophecy"
+   ],
+   [
+    3,
+    "Hands of the Exalted Herald"
+   ],
+   [
+    4,
+    "General's Satin Gloves"
+   ],
+   [
+    4,
+    "Marshal's Satin Gloves"
+   ],
+   [
+    4,
+    "Virtuous Gloves"
+   ],
+   [
+    4,
+    "Hands of Power"
+   ],
+   [
+    4,
+    "Blood Guard's Satin Handwraps"
+   ],
+   [
+    4,
+    "Knight-Lieutenant's Satin Handwraps"
+   ]
+  ],
+  "Waist": [
+   [
+    2,
+    "Belt of Transcendence"
+   ],
+   [
+    2,
+    "Grasp of the Old God"
+   ],
+   [
+    2,
+    "Belt of Faith"
+   ],
+   [
+    3,
+    "Zandalar Confessor's Bindings"
+   ],
+   [
+    3,
+    "Firemaw's Clutch"
+   ],
+   [
+    3,
+    "Whipvine Cord"
+   ],
+   [
+    4,
+    "Girdle of Prophecy"
+   ],
+   [
+    5,
+    "Virtuous Belt"
+   ],
+   [
+    5,
+    "Thuzadin Sash"
+   ]
+  ],
+  "Legs": [
+   [
+    2,
+    "Leggings of Transcendence"
+   ],
+   [
+    2,
+    "Empowered Leggings"
+   ],
+   [
+    2,
+    "Leggings of Faith"
+   ],
+   [
+    3,
+    "Pants of Prophecy"
+   ],
+   [
+    3,
+    "Padre's Trousers"
+   ],
+   [
+    3,
+    "Ritualistic Legguards"
+   ],
+   [
+    3,
+    "General's Satin Leggings"
+   ],
+   [
+    3,
+    "Marshal's Satin Pants"
+   ],
+   [
+    3,
+    "Senior Designer's Pantaloons"
+   ],
+   [
+    4,
+    "Virtuous Skirt"
+   ],
+   [
+    4,
+    "Legionnaire's Satin Legguards"
+   ],
+   [
+    4,
+    "Knight-Captain's Satin Legguards"
+   ]
+  ],
+  "Feet": [
+   [
+    2,
+    "Boots of Transcendence"
+   ],
+   [
+    2,
+    "Boots of Pure Thought"
+   ],
+   [
+    2,
+    "Sandals of Faith"
+   ],
+   [
+    3,
+    "Treads of the Wandering Nomad"
+   ],
+   [
+    3,
+    "Snowblind Shoes"
+   ],
+   [
+    3,
+    "Betrayer's Boots"
+   ],
+   [
+    5,
+    "Virtuous Sandals"
+   ],
+   [
+    5,
+    "Boots of Prophecy"
+   ],
+   [
+    5,
+    "Faith Healer's Boots"
+   ],
+   [
+    5,
+    "Boots of the Full Moon"
+   ],
+   [
+    5,
+    "General's Satin Boots"
+   ],
+   [
+    5,
+    "Marshal's Satin Sandals"
+   ]
+  ],
+  "Neck": [
+   [
+    1,
+    "Necklace of Necropsy"
+   ],
+   [
+    1,
+    "Amulet of the Fallen God"
+   ],
+   [
+    3,
+    "Amulet of the Shifting Sands"
+   ],
+   [
+    3,
+    "Jin'do's Evil Eye"
+   ],
+   [
+    4,
+    "Animated Chain Necklace"
+   ],
+   [
+    5,
+    "Pendant of the Fallen Dragon"
+   ],
+   [
+    5,
+    "Choker of Enlightenment"
+   ],
+   [
+    5,
+    "Amulet of the Redeemed"
+   ]
+  ],
+  "Finger": [
+   [
+    1,
+    "Ring of Faith"
+   ],
+   [
+    1,
+    "Band of Unanswered Prayers"
+   ],
+   [
+    1,
+    "Pure Elementium Band"
+   ],
+   [
+    1,
+    "Ring of the Martyr"
+   ],
+   [
+    3,
+    "Cauterizing Band"
+   ],
+   [
+    4,
+    "Primalist's Seal"
+   ],
+   [
+    4,
+    "Primalist's Band"
+   ],
+   [
+    4,
+    "Signet Ring of the Bronze Dragonflight"
+   ],
+   [
+    4,
+    "Rosewine Circle"
+   ],
+   [
+    4,
+    "Band of Mending"
+   ],
+   [
+    4,
+    "Fordring's Seal"
+   ],
+   [
+    4,
+    "Ring of Blackrock"
+   ]
+  ],
+  "Trinket": [
+   [
+    1,
+    "Hazza'rah's Charm of Healing"
+   ],
+   [
+    1,
+    "Eye of the Dead"
+   ],
+   [
+    1,
+    "Rejuvenating Gem"
+   ],
+   [
+    1,
+    "Scarab Brooch"
+   ],
+   [
+    1,
+    "Hibernation Crystal"
+   ],
+   [
+    2,
+    "Warmth of Forgiveness"
+   ],
+   [
+    2,
+    "Darkmoon Card: Blue Dragon"
+   ],
+   [
+    3,
+    "Zandalarian Hero Charm"
+   ],
+   [
+    3,
+    "Royal Seal of Eldre'Thalas"
+   ],
+   [
+    3,
+    "Draconic Infused Emblem"
+   ],
+   [
+    3,
+    "Blessed Prayer Beads"
+   ],
+   [
+    3,
+    "Briarwood Reed"
+   ],
+   [
+    4,
+    "Shard of the Scale"
+   ],
+   [
+    5,
+    "Mindtap Talisman"
+   ],
+   [
+    5,
+    "Second Wind"
+   ],
+   [
+    5,
+    "Burst of Knowledge"
+   ]
+  ],
+  "MainHand": [
+   [
+    1,
+    "Hammer of the Twisting Nether"
+   ],
+   [
+    1,
+    "Atiesh, Greatstaff of the Guardian"
+   ],
+   [
+    1,
+    "Spire of Twilight"
+   ],
+   [
+    3,
+    "Scepter of the False Prophet"
+   ],
+   [
+    3,
+    "The Widow's Embrace"
+   ],
+   [
+    3,
+    "High Warlord's Battle Mace"
+   ],
+   [
+    3,
+    "Grand Marshal's Warhammer"
+   ],
+   [
+    3,
+    "Fang of Korialstrasz"
+   ],
+   [
+    3,
+    "Blessed Qiraji Augur Staff"
+   ],
+   [
+    3,
+    "Benediction"
+   ],
+   [
+    4,
+    "Gavel of Infinite Wisdom"
+   ],
+   [
+    4,
+    "Lok'amir il Romathis"
+   ],
+   [
+    4,
+    "Claw of Chromaggus"
+   ],
+   [
+    4,
+    "Jin'do's Hexxer"
+   ],
+   [
+    4,
+    "Zulian Scepter of Rites"
+   ],
+   [
+    4,
+    "Wushoolay's Poker"
+   ],
+   [
+    4,
+    "The Hammer of Grace"
+   ],
+   [
+    5,
+    "Aurastone Hammer"
+   ],
+   [
+    5,
+    "Staff of Rampant Growth"
+   ],
+   [
+    5,
+    "Will of Arlokk"
+   ],
+   [
+    5,
+    "Redemption"
+   ],
+   [
+    5,
+    "Guiding Stave of Wisdom"
+   ]
+  ],
+  "SecondaryHand": [
+   [
+    1,
+    "Sapphiron's Right Eye"
+   ],
+   [
+    3,
+    "Noth's Frigid Heart"
+   ],
+   [
+    3,
+    "Sartura's Might"
+   ],
+   [
+    3,
+    "Lei of the Lifegiver"
+   ],
+   [
+    5,
+    "Grand Marshal's Tome of Restoration"
+   ],
+   [
+    5,
+    "Tome of Divine Right"
+   ],
+   [
+    5,
+    "Drakestone"
+   ],
+   [
+    5,
+    "Brightly Glowing Stone"
+   ]
+  ]
+ },
+ "discipline": {
+  "Head": [
+   [
+    2,
+    "Halo of Transcendence"
+   ],
+   [
+    2,
+    "Circlet of Faith"
+   ],
+   [
+    2,
+    "Crystal Adorned Crown"
+   ],
+   [
+    4,
+    "Don Rigoberto's Lost Hat"
+   ],
+   [
+    4,
+    "Zulian Headdress"
+   ],
+   [
+    4,
+    "Dustwind Turban"
+   ],
+   [
+    4,
+    "Warlord's Satin Cowl"
+   ],
+   [
+    4,
+    "Field Marshal's Headdress"
+   ],
+   [
+    5,
+    "Cassandra's Grace"
+   ],
+   [
+    5,
+    "Champion's Satin Hood"
+   ],
+   [
+    5,
+    "Lieutenant Commander's Satin Hood"
+   ],
+   [
+    5,
+    "Virtuous Crown"
+   ],
+   [
+    5,
+    "Crimson Felt Hat"
+   ]
+  ],
+  "Shoulder": [
+   [
+    2,
+    "Pauldrons of Transcendence"
+   ],
+   [
+    2,
+    "Shoulderpads of Faith"
+   ],
+   [
+    3,
+    "Champion's Satin Mantle"
+   ],
+   [
+    3,
+    "Lieutenant Commander's Satin Mantle"
+   ],
+   [
+    3,
+    "Mantle of Lost Hope"
+   ],
+   [
+    3,
+    "Warlord's Satin Mantle"
+   ],
+   [
+    3,
+    "Field Marshal's Satin Mantle"
+   ],
+   [
+    4,
+    "Ternary Mantle"
+   ],
+   [
+    4,
+    "Zandalar Confessor's Mantle"
+   ],
+   [
+    4,
+    "Mantle of Prophecy"
+   ],
+   [
+    4,
+    "Mantle of the Scarlet Crusade"
+   ]
+  ],
+  "Back": [
+   [
+    1,
+    "Cloak of Suturing"
+   ],
+   [
+    3,
+    "Cloak of Clarity"
+   ],
+   [
+    3,
+    "Hide of the Wild"
+   ],
+   [
+    3,
+    "Shroud of Pure Thought"
+   ],
+   [
+    3,
+    "Drape of Benediction"
+   ],
+   [
+    4,
+    "Hakkari Loa Cloak"
+   ],
+   [
+    4,
+    "Archivist Cape"
+   ],
+   [
+    4,
+    "Cloak of the Cosmos"
+   ],
+   [
+    4,
+    "Battle Healer's Cloak"
+   ],
+   [
+    4,
+    "Caretaker's Cape"
+   ]
+  ],
+  "Chest": [
+   [
+    2,
+    "Robes of Transcendence"
+   ],
+   [
+    2,
+    "Robe of Faith"
+   ],
+   [
+    3,
+    "Robes of the Guardian Saint"
+   ],
+   [
+    3,
+    "Truefaith Vestments"
+   ],
+   [
+    3,
+    "Robes of the Exalted"
+   ],
+   [
+    5,
+    "Warlord's Satin Robes"
+   ],
+   [
+    5,
+    "Field Marshal's Satin Vestments"
+   ],
+   [
+    5,
+    "Virtuous Robe"
+   ],
+   [
+    5,
+    "Robes of Prophecy"
+   ],
+   [
+    5,
+    "Legionnaire's Satin Tunic"
+   ],
+   [
+    5,
+    "Knight-Captain's Satin Tunic"
+   ]
+  ],
+  "Wrist": [
+   [
+    2,
+    "Bindings of Transcendence"
+   ],
+   [
+    2,
+    "Bracelets of Royal Redemption"
+   ],
+   [
+    3,
+    "Bindings of Faith"
+   ],
+   [
+    3,
+    "Zandalar Confessor's Wraps"
+   ],
+   [
+    4,
+    "Vambraces of Prophecy"
+   ],
+   [
+    4,
+    "Dryad's Wrist Bindings"
+   ],
+   [
+    5,
+    "Virtuous Bracers"
+   ],
+   [
+    5,
+    "Sublime Wristguards"
+   ]
+  ],
+  "Hands": [
+   [
+    2,
+    "Handguards of Transcendence"
+   ],
+   [
+    2,
+    "Gloves of Faith"
+   ],
+   [
+    3,
+    "Gloves of Dark Wisdom"
+   ],
+   [
+    3,
+    "Desert Bloom Gloves"
+   ],
+   [
+    3,
+    "Gloves of the Messiah"
+   ],
+   [
+    3,
+    "Gloves of Prophecy"
+   ],
+   [
+    3,
+    "Hands of the Exalted Herald"
+   ],
+   [
+    4,
+    "General's Satin Gloves"
+   ],
+   [
+    4,
+    "Marshal's Satin Gloves"
+   ],
+   [
+    4,
+    "Virtuous Gloves"
+   ],
+   [
+    4,
+    "Hands of Power"
+   ],
+   [
+    4,
+    "Blood Guard's Satin Handwraps"
+   ],
+   [
+    4,
+    "Knight-Lieutenant's Satin Handwraps"
+   ]
+  ],
+  "Waist": [
+   [
+    2,
+    "Belt of Transcendence"
+   ],
+   [
+    2,
+    "Grasp of the Old God"
+   ],
+   [
+    2,
+    "Belt of Faith"
+   ],
+   [
+    3,
+    "Zandalar Confessor's Bindings"
+   ],
+   [
+    3,
+    "Firemaw's Clutch"
+   ],
+   [
+    3,
+    "Whipvine Cord"
+   ],
+   [
+    4,
+    "Girdle of Prophecy"
+   ],
+   [
+    5,
+    "Virtuous Belt"
+   ],
+   [
+    5,
+    "Thuzadin Sash"
+   ]
+  ],
+  "Legs": [
+   [
+    2,
+    "Leggings of Transcendence"
+   ],
+   [
+    2,
+    "Empowered Leggings"
+   ],
+   [
+    2,
+    "Leggings of Faith"
+   ],
+   [
+    3,
+    "Pants of Prophecy"
+   ],
+   [
+    3,
+    "Padre's Trousers"
+   ],
+   [
+    3,
+    "Ritualistic Legguards"
+   ],
+   [
+    3,
+    "General's Satin Leggings"
+   ],
+   [
+    3,
+    "Marshal's Satin Pants"
+   ],
+   [
+    3,
+    "Senior Designer's Pantaloons"
+   ],
+   [
+    4,
+    "Virtuous Skirt"
+   ],
+   [
+    4,
+    "Legionnaire's Satin Legguards"
+   ],
+   [
+    4,
+    "Knight-Captain's Satin Legguards"
+   ]
+  ],
+  "Feet": [
+   [
+    2,
+    "Boots of Transcendence"
+   ],
+   [
+    2,
+    "Boots of Pure Thought"
+   ],
+   [
+    2,
+    "Sandals of Faith"
+   ],
+   [
+    3,
+    "Treads of the Wandering Nomad"
+   ],
+   [
+    3,
+    "Snowblind Shoes"
+   ],
+   [
+    3,
+    "Betrayer's Boots"
+   ],
+   [
+    5,
+    "Virtuous Sandals"
+   ],
+   [
+    5,
+    "Boots of Prophecy"
+   ],
+   [
+    5,
+    "Faith Healer's Boots"
+   ],
+   [
+    5,
+    "Boots of the Full Moon"
+   ],
+   [
+    5,
+    "General's Satin Boots"
+   ],
+   [
+    5,
+    "Marshal's Satin Sandals"
+   ]
+  ],
+  "Neck": [
+   [
+    1,
+    "Necklace of Necropsy"
+   ],
+   [
+    1,
+    "Amulet of the Fallen God"
+   ],
+   [
+    3,
+    "Amulet of the Shifting Sands"
+   ],
+   [
+    3,
+    "Jin'do's Evil Eye"
+   ],
+   [
+    4,
+    "Animated Chain Necklace"
+   ],
+   [
+    5,
+    "Pendant of the Fallen Dragon"
+   ],
+   [
+    5,
+    "Choker of Enlightenment"
+   ],
+   [
+    5,
+    "Amulet of the Redeemed"
+   ]
+  ],
+  "Finger": [
+   [
+    1,
+    "Ring of Faith"
+   ],
+   [
+    1,
+    "Band of Unanswered Prayers"
+   ],
+   [
+    1,
+    "Pure Elementium Band"
+   ],
+   [
+    1,
+    "Ring of the Martyr"
+   ],
+   [
+    3,
+    "Cauterizing Band"
+   ],
+   [
+    4,
+    "Primalist's Seal"
+   ],
+   [
+    4,
+    "Primalist's Band"
+   ],
+   [
+    4,
+    "Signet Ring of the Bronze Dragonflight"
+   ],
+   [
+    4,
+    "Rosewine Circle"
+   ],
+   [
+    4,
+    "Band of Mending"
+   ],
+   [
+    4,
+    "Fordring's Seal"
+   ],
+   [
+    4,
+    "Ring of Blackrock"
+   ]
+  ],
+  "Trinket": [
+   [
+    1,
+    "Hazza'rah's Charm of Healing"
+   ],
+   [
+    1,
+    "Eye of the Dead"
+   ],
+   [
+    1,
+    "Rejuvenating Gem"
+   ],
+   [
+    1,
+    "Scarab Brooch"
+   ],
+   [
+    1,
+    "Hibernation Crystal"
+   ],
+   [
+    2,
+    "Warmth of Forgiveness"
+   ],
+   [
+    2,
+    "Darkmoon Card: Blue Dragon"
+   ],
+   [
+    3,
+    "Zandalarian Hero Charm"
+   ],
+   [
+    3,
+    "Royal Seal of Eldre'Thalas"
+   ],
+   [
+    3,
+    "Draconic Infused Emblem"
+   ],
+   [
+    3,
+    "Blessed Prayer Beads"
+   ],
+   [
+    3,
+    "Briarwood Reed"
+   ],
+   [
+    4,
+    "Shard of the Scale"
+   ],
+   [
+    5,
+    "Mindtap Talisman"
+   ],
+   [
+    5,
+    "Second Wind"
+   ],
+   [
+    5,
+    "Burst of Knowledge"
+   ]
+  ],
+  "MainHand": [
+   [
+    1,
+    "Hammer of the Twisting Nether"
+   ],
+   [
+    1,
+    "Atiesh, Greatstaff of the Guardian"
+   ],
+   [
+    1,
+    "Spire of Twilight"
+   ],
+   [
+    3,
+    "Scepter of the False Prophet"
+   ],
+   [
+    3,
+    "The Widow's Embrace"
+   ],
+   [
+    3,
+    "High Warlord's Battle Mace"
+   ],
+   [
+    3,
+    "Grand Marshal's Warhammer"
+   ],
+   [
+    3,
+    "Fang of Korialstrasz"
+   ],
+   [
+    3,
+    "Blessed Qiraji Augur Staff"
+   ],
+   [
+    3,
+    "Benediction"
+   ],
+   [
+    4,
+    "Gavel of Infinite Wisdom"
+   ],
+   [
+    4,
+    "Lok'amir il Romathis"
+   ],
+   [
+    4,
+    "Claw of Chromaggus"
+   ],
+   [
+    4,
+    "Jin'do's Hexxer"
+   ],
+   [
+    4,
+    "Zulian Scepter of Rites"
+   ],
+   [
+    4,
+    "Wushoolay's Poker"
+   ],
+   [
+    4,
+    "The Hammer of Grace"
+   ],
+   [
+    5,
+    "Aurastone Hammer"
+   ],
+   [
+    5,
+    "Staff of Rampant Growth"
+   ],
+   [
+    5,
+    "Will of Arlokk"
+   ],
+   [
+    5,
+    "Redemption"
+   ],
+   [
+    5,
+    "Guiding Stave of Wisdom"
+   ]
+  ],
+  "SecondaryHand": [
+   [
+    1,
+    "Sapphiron's Right Eye"
+   ],
+   [
+    3,
+    "Noth's Frigid Heart"
+   ],
+   [
+    3,
+    "Sartura's Might"
+   ],
+   [
+    3,
+    "Lei of the Lifegiver"
+   ],
+   [
+    5,
+    "Grand Marshal's Tome of Restoration"
+   ],
+   [
+    5,
+    "Tome of Divine Right"
+   ],
+   [
+    5,
+    "Drakestone"
+   ],
+   [
+    5,
+    "Brightly Glowing Stone"
+   ]
+  ]
+ },
+ "shadow": {
+  "Head": [
+   [
+    1,
+    "Preceptor's Hat"
+   ],
+   [
+    4,
+    "Tiara of the Oracle"
+   ],
+   [
+    4,
+    "The Hexxer's Cover"
+   ],
+   [
+    4,
+    "Mish'undare, Circlet of the Mind Flayer"
+   ],
+   [
+    5,
+    "Field Marshal's Headdress"
+   ],
+   [
+    5,
+    "Warlord's Satin Cowl"
+   ],
+   [
+    5,
+    "Spellweaver's Turban"
+   ]
+  ],
+  "Shoulder": [
+   [
+    1,
+    "Rime Covered Mantle"
+   ],
+   [
+    4,
+    "Mantle of the Blackwing Cabal"
+   ],
+   [
+    4,
+    "Mantle of the Oracle"
+   ],
+   [
+    5,
+    "Field Marshal's Satin Mantle"
+   ],
+   [
+    5,
+    "Warlord's Satin Mantle"
+   ],
+   [
+    5,
+    "Felcloth Shoulders"
+   ]
+  ],
+  "Back": [
+   [
+    1,
+    "Cloak of the Devoured"
+   ],
+   [
+    4,
+    "Veil of Eclipse"
+   ],
+   [
+    4,
+    "Cloak of the Necropolis"
+   ],
+   [
+    4,
+    "Cloak of Consumption"
+   ],
+   [
+    5,
+    "Cloak of the Brood Lord"
+   ],
+   [
+    5,
+    "Archivist Cape"
+   ],
+   [
+    5,
+    "Sapphiron Drape"
+   ]
+  ],
+  "Chest": [
+   [
+    1,
+    "Crystal Webbed Robe"
+   ],
+   [
+    4,
+    "Vestments of the Oracle"
+   ],
+   [
+    4,
+    "Jade Inlaid Vestments"
+   ],
+   [
+    4,
+    "Necro-Knight's Garb"
+   ],
+   [
+    4,
+    "Garb of Royal Ascension"
+   ],
+   [
+    4,
+    "Robes of the Battleguard"
+   ],
+   [
+    5,
+    "Vestments of the Shifting Sands"
+   ],
+   [
+    5,
+    "Bloodvine Vest"
+   ],
+   [
+    5,
+    "Robe of Winter Night"
+   ],
+   [
+    5,
+    "Field Marshal's Satin Vestments"
+   ],
+   [
+    5,
+    "Warlord's Satin Robes"
+   ],
+   [
+    5,
+    "Robe of Volatile Power"
+   ]
+  ],
+  "Wrist": [
+   [
+    1,
+    "Burrower Bracers"
+   ],
+   [
+    4,
+    "Rockfury Bracers"
+   ],
+   [
+    4,
+    "Bracers of Arcane Accuracy"
+   ],
+   [
+    4,
+    "Black Bark Wristbands"
+   ],
+   [
+    5,
+    "Flameweave Cuffs"
+   ],
+   [
+    5,
+    "Tearfall Bracers"
+   ],
+   [
+    5,
+    "Dryad's Wrist Bindings"
+   ]
+  ],
+  "Hands": [
+   [
+    1,
+    "Dark Storm Gauntlets"
+   ],
+   [
+    4,
+    "Ebony Flame Gloves"
+   ],
+   [
+    5,
+    "Felcloth Gloves"
+   ],
+   [
+    5,
+    "Marshal's Satin Gloves"
+   ],
+   [
+    5,
+    "General's Satin Gloves"
+   ]
+  ],
+  "Waist": [
+   [
+    1,
+    "Eyestalk Waist Cord"
+   ],
+   [
+    4,
+    "Firemaw's Clutch"
+   ],
+   [
+    5,
+    "Sash of Whispered Secrets"
+   ],
+   [
+    5,
+    "Mana Igniting Cord"
+   ],
+   [
+    5,
+    "Ban'thok Sash"
+   ]
+  ],
+  "Legs": [
+   [
+    1,
+    "Fel Infused Leggings"
+   ],
+   [
+    4,
+    "Leggings of Polarity"
+   ],
+   [
+    4,
+    "Flarecore Leggings"
+   ],
+   [
+    4,
+    "Bloodvine Leggings"
+   ],
+   [
+    4,
+    "Trousers of the Oracle"
+   ],
+   [
+    4,
+    "Leggings of the Black Blizzard"
+   ],
+   [
+    5,
+    "Leggings of Torment"
+   ],
+   [
+    5,
+    "Marshal's Satin Pants"
+   ],
+   [
+    5,
+    "General's Satin Leggings"
+   ]
+  ],
+  "Feet": [
+   [
+    1,
+    "Boots of Epiphany"
+   ],
+   [
+    4,
+    "Snowblind Shoes"
+   ],
+   [
+    4,
+    "Betrayer's Boots"
+   ],
+   [
+    4,
+    "Maleki's Footwraps"
+   ],
+   [
+    5,
+    "Footwraps of the Oracle"
+   ],
+   [
+    5,
+    "Bloodvine Boots"
+   ],
+   [
+    5,
+    "Marshal's Satin Sandals"
+   ],
+   [
+    5,
+    "General's Satin Boots"
+   ]
+  ],
+  "Neck": [
+   [
+    1,
+    "Choker of the Fire Lord"
+   ],
+   [
+    4,
+    "Malice Stone Pendant"
+   ],
+   [
+    4,
+    "Amulet of Vek'nilash"
+   ],
+   [
+    4,
+    "Charm of the Shifting Sands"
+   ],
+   [
+    5,
+    "Orb of the Darkmoon"
+   ],
+   [
+    5,
+    "Nacreous Shell Necklace"
+   ],
+   [
+    5,
+    "Dark Advisor's Pendant"
+   ],
+   [
+    5,
+    "Chains of the Lich"
+   ]
+  ],
+  "Finger": [
+   [
+    1,
+    "Ring of the Fallen God"
+   ],
+   [
+    1,
+    "Band of the Inevitable"
+   ],
+   [
+    4,
+    "Signet Ring of the Bronze Dragonflight"
+   ],
+   [
+    4,
+    "Wrath of Cenarius"
+   ],
+   [
+    4,
+    "Band of Dark Dominion"
+   ],
+   [
+    4,
+    "Band of Forced Concentration"
+   ],
+   [
+    5,
+    "Ring of Spell Power"
+   ],
+   [
+    5,
+    "Rune Band of Wizardry"
+   ]
+  ],
+  "Trinket": [
+   [
+    1,
+    "Neltharion's Tear"
+   ],
+   [
+    1,
+    "The Restrained Essence of Sapphiron"
+   ],
+   [
+    2,
+    "Mark of the Champion"
+   ],
+   [
+    4,
+    "Talisman of Ephemeral Power"
+   ],
+   [
+    4,
+    "Zandalarian Hero Charm"
+   ],
+   [
+    5,
+    "Briarwood Reed"
+   ],
+   [
+    5,
+    "Burst of Knowledge"
+   ],
+   [
+    5,
+    "Shard of the Scale"
+   ]
+  ],
+  "MainHand": [
+   [
+    1,
+    "The End of Dreams"
+   ],
+   [
+    1,
+    "Soulseeker"
+   ],
+   [
+    4,
+    "Midnight Haze"
+   ],
+   [
+    4,
+    "Lok'amir il Romathis"
+   ],
+   [
+    4,
+    "Grand Marshal's Mageblade"
+   ],
+   [
+    4,
+    "High Warlord's Spellblade"
+   ],
+   [
+    4,
+    "Brimstone Staff"
+   ],
+   [
+    4,
+    "Staff of the Shadow Flame"
+   ],
+   [
+    4,
+    "Blessed Qiraji Acolyte Staff"
+   ],
+   [
+    4,
+    "Grand Marshal's Stave"
+   ],
+   [
+    4,
+    "High Warlord's War Staff"
+   ],
+   [
+    4,
+    "Staff of the Ruins"
+   ],
+   [
+    4,
+    "Staff of the Qiraji Prophets"
+   ],
+   [
+    5,
+    "Claw of Chromaggus"
+   ],
+   [
+    5,
+    "Stinger of Ayamiss"
+   ],
+   [
+    5,
+    "Fang of Venoxis"
+   ],
+   [
+    5,
+    "Fang of the Mystics"
+   ],
+   [
+    5,
+    "Sageclaw"
+   ],
+   [
+    5,
+    "Mindfang"
+   ],
+   [
+    5,
+    "Aurastone Hammer"
+   ],
+   [
+    5,
+    "Anathema"
+   ],
+   [
+    5,
+    "Shadow Wing Focus Staff"
+   ]
+  ],
+  "SecondaryHand": [
+   [
+    1,
+    "Tome of Shadow Force"
+   ],
+   [
+    4,
+    "Sapphiron's Left Eye"
+   ],
+   [
+    4,
+    "Master Dragonslayer's Orb"
+   ],
+   [
+    4,
+    "Royal Scepter of Vek'lor"
+   ],
+   [
+    4,
+    "Talon of Furious Concentration"
+   ],
+   [
+    5,
+    "Gem of Nerubis"
+   ],
+   [
+    5,
+    "Trance Stone"
+   ],
+   [
+    5,
+    "Jin'do's Bag of Whammies"
+   ],
+   [
+    5,
+    "Drakestone"
+   ]
+  ],
+  "Ranged": [
+   [
+    1,
+    "Wand of Qiraji Nobility"
+   ],
+   [
+    4,
+    "Doomfinger"
+   ],
+   [
+    4,
+    "Wand of Fates"
+   ],
+   [
+    4,
+    "Touch of Chaos"
+   ],
+   [
+    5,
+    "Skul's Ghastly Touch"
+   ],
+   [
+    5,
+    "Bonecreeper Stylus"
+   ],
+   [
+    5,
+    "Ritssyn's Wand of Bad Mojo"
+   ],
+   [
+    5,
+    "Woestave"
+   ]
+  ]
+ }
+}

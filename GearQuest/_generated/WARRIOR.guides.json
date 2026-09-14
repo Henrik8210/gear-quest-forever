@@ -1,0 +1,1420 @@
+{
+ "arms": {
+  "Head": [
+   [
+    1,
+    "Lionheart Helm"
+   ],
+   [
+    3,
+    "Helm of Endless Rage"
+   ],
+   [
+    3,
+    "Conqueror's Crown"
+   ],
+   [
+    3,
+    "Southwind Helm"
+   ],
+   [
+    3,
+    "Crown of Destruction"
+   ],
+   [
+    3,
+    "Field Marshal's Plate Helm"
+   ],
+   [
+    3,
+    "Warlord's Plate Headpiece"
+   ],
+   [
+    3,
+    "Lizardscale Eyepatch"
+   ],
+   [
+    4,
+    "Lieutenant Commander's Plate Helm"
+   ],
+   [
+    4,
+    "Champion's Plate Helm"
+   ]
+  ],
+  "Neck": [
+   [
+    1,
+    "Stormrage's Talisman of Seething"
+   ],
+   [
+    3,
+    "Barbed Choker"
+   ],
+   [
+    3,
+    "The Eye of Hakkar"
+   ],
+   [
+    3,
+    "Onyxia Tooth Pendant"
+   ],
+   [
+    4,
+    "Fury of the Forgotten Swarm"
+   ]
+  ],
+  "Shoulder": [
+   [
+    1,
+    "Conqueror's Spaulders"
+   ],
+   [
+    1,
+    "Mantle of Wicked Revenge"
+   ],
+   [
+    3,
+    "Field Marshal's Plate Shoulderguards"
+   ],
+   [
+    3,
+    "Warlord's Plate Shoulders"
+   ],
+   [
+    3,
+    "Drake Talon Pauldrons"
+   ],
+   [
+    4,
+    "Lieutenant Commander's Plate Shoulders"
+   ],
+   [
+    4,
+    "Champion's Plate Shoulders"
+   ]
+  ],
+  "Back": [
+   [
+    1,
+    "Shroud of Dominion"
+   ],
+   [
+    3,
+    "Cloak of the Fallen God"
+   ],
+   [
+    3,
+    "Cloak of Draconic Might"
+   ],
+   [
+    3,
+    "Cloak of Concentrated Hatred"
+   ],
+   [
+    3,
+    "Drape of Unyielding Strength"
+   ],
+   [
+    3,
+    "Puissant Cape"
+   ]
+  ],
+  "Chest": [
+   [
+    1,
+    "Plated Abomination Ribcage"
+   ],
+   [
+    1,
+    "Ghoul Skin Tunic"
+   ],
+   [
+    3,
+    "Breastplate of Annihilation"
+   ],
+   [
+    3,
+    "Conqueror's Breastplate"
+   ],
+   [
+    3,
+    "Vest of Swift Execution"
+   ],
+   [
+    4,
+    "Savage Gladiator Chain"
+   ]
+  ],
+  "Wrist": [
+   [
+    1,
+    "Wristguards of Vengeance"
+   ],
+   [
+    1,
+    "Hive Defiler Wristguards"
+   ],
+   [
+    3,
+    "Qiraji Execution Bracers"
+   ],
+   [
+    3,
+    "Bracers of Brutality"
+   ],
+   [
+    4,
+    "Deeprock Bracers"
+   ]
+  ],
+  "Hands": [
+   [
+    1,
+    "Gauntlets of Annihilation"
+   ],
+   [
+    1,
+    "Edgemaster's Handguards"
+   ],
+   [
+    3,
+    "Gloves of Enforcement"
+   ],
+   [
+    4,
+    "Sacrificial Gauntlets"
+   ]
+  ],
+  "Waist": [
+   [
+    1,
+    "Girdle of the Mentor"
+   ],
+   [
+    1,
+    "Onslaught Girdle"
+   ],
+   [
+    3,
+    "Belt of Never-ending Agony"
+   ],
+   [
+    3,
+    "Triad Girdle"
+   ],
+   [
+    4,
+    "Zandalar Vindicator's Belt"
+   ]
+  ],
+  "Legs": [
+   [
+    1,
+    "Legplates of Carnage"
+   ],
+   [
+    3,
+    "Leggings of Apocalypse"
+   ],
+   [
+    4,
+    "Conqueror's Legguards"
+   ],
+   [
+    4,
+    "Titanic Leggings"
+   ],
+   [
+    4,
+    "Marshal's Plate Legguards"
+   ],
+   [
+    4,
+    "General's Plate Leggings"
+   ],
+   [
+    4,
+    "Scaled Sand Reaver Leggings"
+   ]
+  ],
+  "Feet": [
+   [
+    1,
+    "Chromatic Boots"
+   ],
+   [
+    3,
+    "Boots of the Vanguard"
+   ],
+   [
+    3,
+    "Boots of the Fallen Hero"
+   ],
+   [
+    3,
+    "Marshal's Plate Boots"
+   ],
+   [
+    3,
+    "General's Plate Boots"
+   ],
+   [
+    3,
+    "Slime Kickers"
+   ]
+  ],
+  "Finger": [
+   [
+    0,
+    "Band of Unnatural Forces"
+   ],
+   [
+    1,
+    "Quick Strike Ring"
+   ],
+   [
+    1,
+    "Ring of the Qiraji Fury"
+   ],
+   [
+    1,
+    "Circle of Applied Force"
+   ],
+   [
+    3,
+    "Master Dragonslayer's Ring"
+   ],
+   [
+    3,
+    "Don Julio's Band"
+   ],
+   [
+    3,
+    "Band of Earthen Might"
+   ],
+   [
+    3,
+    "Signet of Unyielding Strength"
+   ],
+   [
+    3,
+    "Signet Ring of the Bronze Dragonflight"
+   ],
+   [
+    5,
+    "Band of Accuria"
+   ]
+  ],
+  "Trinket": [
+   [
+    0,
+    "Kiss of the Spider"
+   ],
+   [
+    1,
+    "Mark of the Champion"
+   ],
+   [
+    1,
+    "Slayer's Crest"
+   ],
+   [
+    3,
+    "Diamond Flask"
+   ],
+   [
+    3,
+    "Jom Gabbar"
+   ],
+   [
+    4,
+    "Earthstrike"
+   ],
+   [
+    4,
+    "Drake Fang Talisman"
+   ],
+   [
+    4,
+    "Hand of Justice"
+   ],
+   [
+    6,
+    "Badge of the Swarmguard"
+   ],
+   [
+    6,
+    "Fetish of the Sand Reaver"
+   ]
+  ],
+  "Ranged": [
+   [
+    1,
+    "Nerubian Slavemaker"
+   ],
+   [
+    1,
+    "Soulstring"
+   ],
+   [
+    1,
+    "Larvae of the Great Worm"
+   ],
+   [
+    3,
+    "Crossbow of Imminent Doom"
+   ],
+   [
+    3,
+    "Striker's Mark"
+   ],
+   [
+    3,
+    "Gurubashi Dwarf Destroyer"
+   ],
+   [
+    3,
+    "Bloodseeker"
+   ],
+   [
+    3,
+    "Blastershot Launcher"
+   ],
+   [
+    3,
+    "The Purifier"
+   ]
+  ],
+  "MainHand": [
+   [
+    1,
+    "Might of Menethil"
+   ],
+   [
+    1,
+    "Bonereaver's Edge"
+   ],
+   [
+    1,
+    "Dark Edge of Insanity"
+   ],
+   [
+    1,
+    "High Warlord's Greatsword"
+   ],
+   [
+    1,
+    "High Warlord's Battle Axe"
+   ]
+  ]
+ },
+ "fury": {
+  "Head": [
+   [
+    1,
+    "Lionheart Helm"
+   ],
+   [
+    3,
+    "Helm of Endless Rage"
+   ],
+   [
+    3,
+    "Conqueror's Crown"
+   ],
+   [
+    3,
+    "Southwind Helm"
+   ],
+   [
+    3,
+    "Crown of Destruction"
+   ],
+   [
+    3,
+    "Field Marshal's Plate Helm"
+   ],
+   [
+    3,
+    "Warlord's Plate Headpiece"
+   ],
+   [
+    3,
+    "Lizardscale Eyepatch"
+   ],
+   [
+    4,
+    "Lieutenant Commander's Plate Helm"
+   ],
+   [
+    4,
+    "Champion's Plate Helm"
+   ]
+  ],
+  "Neck": [
+   [
+    1,
+    "Stormrage's Talisman of Seething"
+   ],
+   [
+    3,
+    "Barbed Choker"
+   ],
+   [
+    3,
+    "The Eye of Hakkar"
+   ],
+   [
+    3,
+    "Onyxia Tooth Pendant"
+   ],
+   [
+    4,
+    "Fury of the Forgotten Swarm"
+   ]
+  ],
+  "Shoulder": [
+   [
+    1,
+    "Conqueror's Spaulders"
+   ],
+   [
+    1,
+    "Mantle of Wicked Revenge"
+   ],
+   [
+    3,
+    "Field Marshal's Plate Shoulderguards"
+   ],
+   [
+    3,
+    "Warlord's Plate Shoulders"
+   ],
+   [
+    3,
+    "Drake Talon Pauldrons"
+   ],
+   [
+    4,
+    "Lieutenant Commander's Plate Shoulders"
+   ],
+   [
+    4,
+    "Champion's Plate Shoulders"
+   ]
+  ],
+  "Back": [
+   [
+    1,
+    "Shroud of Dominion"
+   ],
+   [
+    3,
+    "Cloak of the Fallen God"
+   ],
+   [
+    3,
+    "Cloak of Draconic Might"
+   ],
+   [
+    3,
+    "Cloak of Concentrated Hatred"
+   ],
+   [
+    3,
+    "Drape of Unyielding Strength"
+   ],
+   [
+    3,
+    "Puissant Cape"
+   ]
+  ],
+  "Chest": [
+   [
+    1,
+    "Plated Abomination Ribcage"
+   ],
+   [
+    1,
+    "Ghoul Skin Tunic"
+   ],
+   [
+    3,
+    "Breastplate of Annihilation"
+   ],
+   [
+    3,
+    "Conqueror's Breastplate"
+   ],
+   [
+    3,
+    "Vest of Swift Execution"
+   ],
+   [
+    4,
+    "Savage Gladiator Chain"
+   ]
+  ],
+  "Wrist": [
+   [
+    1,
+    "Wristguards of Vengeance"
+   ],
+   [
+    1,
+    "Hive Defiler Wristguards"
+   ],
+   [
+    3,
+    "Qiraji Execution Bracers"
+   ],
+   [
+    3,
+    "Bracers of Brutality"
+   ],
+   [
+    4,
+    "Deeprock Bracers"
+   ]
+  ],
+  "Hands": [
+   [
+    1,
+    "Gauntlets of Annihilation"
+   ],
+   [
+    1,
+    "Edgemaster's Handguards"
+   ],
+   [
+    3,
+    "Gloves of Enforcement"
+   ],
+   [
+    4,
+    "Sacrificial Gauntlets"
+   ]
+  ],
+  "Waist": [
+   [
+    1,
+    "Girdle of the Mentor"
+   ],
+   [
+    1,
+    "Onslaught Girdle"
+   ],
+   [
+    3,
+    "Belt of Never-ending Agony"
+   ],
+   [
+    3,
+    "Triad Girdle"
+   ],
+   [
+    4,
+    "Zandalar Vindicator's Belt"
+   ]
+  ],
+  "Legs": [
+   [
+    1,
+    "Legplates of Carnage"
+   ],
+   [
+    3,
+    "Leggings of Apocalypse"
+   ],
+   [
+    4,
+    "Conqueror's Legguards"
+   ],
+   [
+    4,
+    "Titanic Leggings"
+   ],
+   [
+    4,
+    "Marshal's Plate Legguards"
+   ],
+   [
+    4,
+    "General's Plate Leggings"
+   ],
+   [
+    4,
+    "Scaled Sand Reaver Leggings"
+   ]
+  ],
+  "Feet": [
+   [
+    1,
+    "Chromatic Boots"
+   ],
+   [
+    3,
+    "Boots of the Vanguard"
+   ],
+   [
+    3,
+    "Boots of the Fallen Hero"
+   ],
+   [
+    3,
+    "Marshal's Plate Boots"
+   ],
+   [
+    3,
+    "General's Plate Boots"
+   ],
+   [
+    3,
+    "Slime Kickers"
+   ]
+  ],
+  "Finger": [
+   [
+    0,
+    "Band of Unnatural Forces"
+   ],
+   [
+    1,
+    "Quick Strike Ring"
+   ],
+   [
+    1,
+    "Ring of the Qiraji Fury"
+   ],
+   [
+    1,
+    "Circle of Applied Force"
+   ],
+   [
+    3,
+    "Master Dragonslayer's Ring"
+   ],
+   [
+    3,
+    "Don Julio's Band"
+   ],
+   [
+    3,
+    "Band of Earthen Might"
+   ],
+   [
+    3,
+    "Signet of Unyielding Strength"
+   ],
+   [
+    3,
+    "Signet Ring of the Bronze Dragonflight"
+   ],
+   [
+    5,
+    "Band of Accuria"
+   ]
+  ],
+  "Trinket": [
+   [
+    0,
+    "Kiss of the Spider"
+   ],
+   [
+    1,
+    "Mark of the Champion"
+   ],
+   [
+    1,
+    "Slayer's Crest"
+   ],
+   [
+    3,
+    "Diamond Flask"
+   ],
+   [
+    3,
+    "Jom Gabbar"
+   ],
+   [
+    4,
+    "Earthstrike"
+   ],
+   [
+    4,
+    "Drake Fang Talisman"
+   ],
+   [
+    4,
+    "Hand of Justice"
+   ],
+   [
+    6,
+    "Badge of the Swarmguard"
+   ],
+   [
+    6,
+    "Fetish of the Sand Reaver"
+   ]
+  ],
+  "Ranged": [
+   [
+    1,
+    "Nerubian Slavemaker"
+   ],
+   [
+    1,
+    "Soulstring"
+   ],
+   [
+    1,
+    "Larvae of the Great Worm"
+   ],
+   [
+    3,
+    "Crossbow of Imminent Doom"
+   ],
+   [
+    3,
+    "Striker's Mark"
+   ],
+   [
+    3,
+    "Gurubashi Dwarf Destroyer"
+   ],
+   [
+    3,
+    "Bloodseeker"
+   ],
+   [
+    3,
+    "Blastershot Launcher"
+   ],
+   [
+    3,
+    "The Purifier"
+   ]
+  ],
+  "MainHand": [
+   [
+    1,
+    "Gressil, Dawn of Ruin"
+   ],
+   [
+    1,
+    "Hatchet of Sundered Bone"
+   ],
+   [
+    3,
+    "The Castigator"
+   ],
+   [
+    3,
+    "Empyrean Demolisher"
+   ],
+   [
+    3,
+    "Misplaced Servo Arm"
+   ],
+   [
+    3,
+    "Iblis, Blade of the Fallen Seraph"
+   ],
+   [
+    3,
+    "High Warlord's Cleaver"
+   ],
+   [
+    3,
+    "Blessed Qiraji War Axe"
+   ],
+   [
+    3,
+    "The Hungering Cold"
+   ],
+   [
+    3,
+    "Crul'shorukh, Edge of Chaos"
+   ],
+   [
+    4,
+    "Grand Marshal's Longsword"
+   ],
+   [
+    4,
+    "Chromatically Tempered Sword"
+   ],
+   [
+    4,
+    "Ancient Qiraji Ripper"
+   ],
+   [
+    4,
+    "Deathbringer"
+   ]
+  ],
+  "SecondaryHand": [
+   [
+    1,
+    "The Hungering Cold"
+   ],
+   [
+    3,
+    "The Castigator"
+   ],
+   [
+    3,
+    "Iblis, Blade of the Fallen Seraph"
+   ],
+   [
+    3,
+    "High Warlord's Cleaver"
+   ],
+   [
+    3,
+    "Crul'shorukh, Edge of Chaos"
+   ],
+   [
+    3,
+    "Blessed Qiraji War Axe"
+   ],
+   [
+    4,
+    "Grand Marshal's Swiftblade"
+   ],
+   [
+    4,
+    "Chromatically Tempered Sword"
+   ],
+   [
+    4,
+    "Maladath, Runed Blade of the Black Flight"
+   ],
+   [
+    4,
+    "Misplaced Servo Arm"
+   ],
+   [
+    4,
+    "Anubisath Warhammer"
+   ],
+   [
+    4,
+    "Ancient Qiraji Ripper"
+   ],
+   [
+    4,
+    "Brutality Blade"
+   ],
+   [
+    4,
+    "Doom's Edge"
+   ],
+   [
+    4,
+    "Zulian Hacker"
+   ],
+   [
+    4,
+    "Sickle of Unyielding Strength"
+   ]
+  ]
+ },
+ "protection": {
+  "Head": [
+   [
+    1,
+    "Conqueror's Crown"
+   ],
+   [
+    2,
+    "Dreadnaught Helmet"
+   ],
+   [
+    3,
+    "Field Marshal's Plate Helm"
+   ],
+   [
+    3,
+    "Warlord's Plate Headpiece"
+   ],
+   [
+    3,
+    "Helm of Endless Rage"
+   ],
+   [
+    4,
+    "Helm of Domination"
+   ]
+  ],
+  "Neck": [
+   [
+    1,
+    "Sadist's Collar"
+   ],
+   [
+    1,
+    "Stormrage's Talisman of Seething"
+   ],
+   [
+    3,
+    "Pendant of the Qiraji Guardian"
+   ],
+   [
+    3,
+    "Pendant of the Shifting Sands"
+   ],
+   [
+    3,
+    "Amulet of the Darkmoon"
+   ],
+   [
+    2,
+    "Mark of C'Thun"
+   ],
+   [
+    5,
+    "Onyxia Tooth Pendant"
+   ]
+  ],
+  "Shoulder": [
+   [
+    1,
+    "Conqueror's Spaulders"
+   ],
+   [
+    3,
+    "Field Marshal's Plate Shoulderguards"
+   ],
+   [
+    3,
+    "Warlord's Plate Shoulders"
+   ],
+   [
+    3,
+    "Dreadnaught Pauldrons"
+   ],
+   [
+    3,
+    "Drake Talon Pauldrons"
+   ],
+   [
+    2,
+    "Pauldrons of the Unrelenting"
+   ]
+  ],
+  "Back": [
+   [
+    1,
+    "Cloak of the Fallen God"
+   ],
+   [
+    2,
+    "Cloak of the Golden Hive"
+   ],
+   [
+    3,
+    "Cloak of the Scourge"
+   ],
+   [
+    3,
+    "Cloak of Concentrated Hatred"
+   ],
+   [
+    5,
+    "Drape of Unyielding Strength"
+   ],
+   [
+    2,
+    "Elementium Threaded Cloak"
+   ],
+   [
+    2,
+    "Cryptfiend Silk Cloak"
+   ]
+  ],
+  "Chest": [
+   [
+    1,
+    "Conqueror's Breastplate"
+   ],
+   [
+    3,
+    "Dreadnaught Breastplate"
+   ],
+   [
+    3,
+    "Field Marshal's Plate Armor"
+   ],
+   [
+    3,
+    "Warlord's Plate Armor"
+   ],
+   [
+    3,
+    "Breastplate of Annihilation"
+   ],
+   [
+    4,
+    "Zandalar Vindicator's Breastplate"
+   ]
+  ],
+  "Wrist": [
+   [
+    1,
+    "Dreadnaught Bracers"
+   ],
+   [
+    3,
+    "Bracers of Brutality"
+   ],
+   [
+    3,
+    "Bracelets of Wrath"
+   ],
+   [
+    3,
+    "Hive Defiler Wristguards"
+   ],
+   [
+    4,
+    "Berserker Bracers"
+   ],
+   [
+    4,
+    "Zandalar Vindicator's Armguards"
+   ],
+   [
+    5,
+    "Qiraji Execution Bracers"
+   ]
+  ],
+  "Hands": [
+   [
+    1,
+    "Gauntlets of Annihilation"
+   ],
+   [
+    1,
+    "Gauntlets of Steadfast Determination"
+   ],
+   [
+    2,
+    "Edgemaster's Handguards"
+   ],
+   [
+    2,
+    "Aged Core Leather Gloves"
+   ],
+   [
+    3,
+    "Marshal's Plate Gauntlets"
+   ],
+   [
+    3,
+    "General's Plate Gauntlets"
+   ],
+   [
+    2,
+    "Dreadnaught Gauntlets"
+   ]
+  ],
+  "Waist": [
+   [
+    1,
+    "Girdle of the Mentor"
+   ],
+   [
+    3,
+    "Onslaught Girdle"
+   ],
+   [
+    3,
+    "Triad Girdle"
+   ],
+   [
+    2,
+    "Royal Qiraji Belt"
+   ],
+   [
+    2,
+    "Dreadnaught Waistguard"
+   ]
+  ],
+  "Legs": [
+   [
+    1,
+    "Conqueror's Legguards"
+   ],
+   [
+    3,
+    "Marshal's Plate Legguards"
+   ],
+   [
+    3,
+    "General's Plate Leggings"
+   ],
+   [
+    2,
+    "Dreadnaught Legplates"
+   ]
+  ],
+  "Feet": [
+   [
+    1,
+    "Dreadnaught Sabatons"
+   ],
+   [
+    3,
+    "Conqueror's Greaves"
+   ],
+   [
+    3,
+    "Marshal's Plate Boots"
+   ],
+   [
+    3,
+    "General's Plate Boots"
+   ],
+   [
+    3,
+    "Chromatic Boots"
+   ],
+   [
+    5,
+    "Boots of the Fallen Hero"
+   ]
+  ],
+  "Finger": [
+   [
+    1,
+    "Master Dragonslayer's Ring"
+   ],
+   [
+    1,
+    "Circle of Applied Force"
+   ],
+   [
+    1,
+    "Ring of the Godslayer"
+   ],
+   [
+    2,
+    "Archimtiros' Ring of Reckoning"
+   ],
+   [
+    5,
+    "Ring of the Dreadnaught"
+   ],
+   [
+    5,
+    "Signet of the Fallen Defender"
+   ],
+   [
+    5,
+    "Ring of Emperor Vek'lor"
+   ],
+   [
+    5,
+    "Signet Ring of the Bronze Dragonflight"
+   ],
+   [
+    5,
+    "Band of Accuria"
+   ],
+   [
+    5,
+    "Don Julio's Band"
+   ]
+  ],
+  "Trinket": [
+   [
+    1,
+    "Kiss of the Spider"
+   ],
+   [
+    1,
+    "Mark of the Champion"
+   ],
+   [
+    3,
+    "Earthstrike"
+   ],
+   [
+    3,
+    "Drake Fang Talisman"
+   ],
+   [
+    3,
+    "Jom Gabbar"
+   ],
+   [
+    3,
+    "Diamond Flask"
+   ],
+   [
+    3,
+    "Hand of Justice"
+   ],
+   [
+    6,
+    "Lifegiving Gem"
+   ],
+   [
+    6,
+    "Nat Pagle's Broken Reel"
+   ]
+  ],
+  "MainHand": [
+   [
+    1,
+    "The Hungering Cold"
+   ],
+   [
+    1,
+    "Thunderfury, Blessed Blade of the Windseeker"
+   ],
+   [
+    3,
+    "Iblis, Blade of the Fallen Seraph"
+   ],
+   [
+    3,
+    "Widow's Remorse"
+   ],
+   [
+    4,
+    "Grand Marshal's Swiftblade"
+   ],
+   [
+    4,
+    "High Warlord's Quickblade"
+   ],
+   [
+    4,
+    "Warblade of the Hakkari"
+   ],
+   [
+    4,
+    "Ravencrest's Legacy"
+   ],
+   [
+    4,
+    "Maladath, Runed Blade of the Black Flight"
+   ],
+   [
+    4,
+    "Blackguard"
+   ],
+   [
+    1,
+    "Kingsfall"
+   ],
+   [
+    1,
+    "Death's Sting"
+   ],
+   [
+    1,
+    "Harbinger of Doom"
+   ],
+   [
+    3,
+    "Maexxna's Fang"
+   ],
+   [
+    3,
+    "Blessed Qiraji Pugio"
+   ],
+   [
+    4,
+    "Shadowsong's Sorrow"
+   ],
+   [
+    4,
+    "Grand Marshal's Dirk"
+   ],
+   [
+    4,
+    "High Warlord's Razor"
+   ]
+  ],
+  "SecondaryHand": [
+   [
+    1,
+    "The Face of Death"
+   ],
+   [
+    3,
+    "Grand Marshal's Aegis"
+   ],
+   [
+    3,
+    "High Warlord's Shield Wall"
+   ],
+   [
+    3,
+    "The Plague Bearer"
+   ],
+   [
+    4,
+    "Blessed Qiraji Bulwark"
+   ],
+   [
+    4,
+    "Elementium Reinforced Bulwark"
+   ],
+   [
+    6,
+    "Force Reactive Disk"
+   ]
+  ],
+  "Ranged": [
+   [
+    1,
+    "Crossbow of Imminent Doom"
+   ],
+   [
+    1,
+    "Soulstring"
+   ],
+   [
+    1,
+    "Toxin Injector"
+   ],
+   [
+    1,
+    "Heartstriker"
+   ],
+   [
+    3,
+    "Dragonbreath Hand Cannon"
+   ],
+   [
+    3,
+    "Mandokir's Sting"
+   ],
+   [
+    3,
+    "Polished Ironwood Crossbow"
+   ],
+   [
+    3,
+    "Blastershot Launcher"
+   ],
+   [
+    5,
+    "Striker's Mark"
+   ],
+   [
+    5,
+    "Blackcrow"
+   ],
+   [
+    5,
+    "Satyr's Bow"
+   ]
+  ]
+ }
+}

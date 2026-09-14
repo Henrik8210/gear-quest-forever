@@ -1,0 +1,36 @@
+---
+description: CurseForge releases use git tags + GitHub Actions — only push tags when the user explicitly asks
+alwaysApply: true
+---
+
+# CurseForge release tags (GearQuest Forever)
+
+Full workflow: [RELEASE.md](../../RELEASE.md).
+
+This is a **separate** CurseForge project from TBC Anniversary GearQuest. Never copy `X-Curse-Project-ID` or GitHub `CF_API_KEY` from that repo.
+
+## The right way
+
+Publishing is **GitHub Actions**, not the CurseForge webhook (webhook must stay **inactive**):
+
+1. User must have **`CF_API_KEY`** set in **this** repo's Secrets (CurseForge API token).
+2. Push a version tag (`v0.1.0`) → `.github/workflows/release.yml` runs.
+3. Workflow uses `.pkgmeta` → `BigWigsMods/packager@v2` uploads to CurseForge.
+4. Verify **GitHub Actions → Release** succeeds; check CurseForge **Files**.
+
+Pushing to `main` alone is **not** a release. Do **not** delete/re-push tags to retry — bump patch version instead.
+
+## Do not tag unless asked
+
+Never create or push a CurseForge release tag unless the user **explicitly** requests publishing (e.g. "release to CurseForge", "push v0.1.0 to CurseForge").
+
+## When the user asks for CurseForge
+
+1. Bump `GearQuest/GearQuest.toc` `## Version:` and `GearQuest/Core.lua` `GQ.VERSION`.
+2. Add `## vX.Y.Z` to `CHANGELOG.md`.
+3. Confirm `## X-Curse-Project-ID:` is the **Forever** project, not TBC GearQuest (`1669225`).
+4. Commit and push to `main`.
+5. `git tag v<version>` and `git push origin v<version>` (tag matches toc, with `v` prefix).
+6. Confirm GitHub Actions **Release** job succeeded; remind user to check CurseForge **Files**.
+
+Do **not** tag when the user only asked to commit, push, or update docs.

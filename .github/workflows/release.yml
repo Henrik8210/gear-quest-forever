@@ -1,0 +1,29 @@
+# Package and upload to CurseForge on version tag push (BigWigs packager + Upload API).
+# Add repo secret CF_API_KEY from https://authors.curseforge.com/#/settings/api-tokens
+# Docs: https://support.curseforge.com/support/solutions/articles/9000197321-curseforge-api
+#
+# This is the GearQuest Forever project. Do not reuse the TBC Anniversary
+# CurseForge project ID or that repo's secrets.
+#
+# After the Sept 17 beta, set packager -g to Forever's game version if
+# CurseForge/BigWigs has a flavor for it. Until then, let the TOC Interface
+# drive detection — do not pass -g 2.5.6 (that is TBC).
+
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: BigWigsMods/packager@v2
+        env:
+          CF_API_KEY: ${{ secrets.CF_API_KEY }}

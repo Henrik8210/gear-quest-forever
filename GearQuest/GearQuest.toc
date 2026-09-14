@@ -1,0 +1,42 @@
+## Interface: 11507
+## Title: GearQuest Forever
+## Notes: Leveling gear upgrades for WoW Forever - click a slot, pick a hunt, track it in the log.
+## Author: Henrik8210
+## Version: 0.1.0-beta.1-forever
+## SavedVariables: GearQuestDB
+
+Core.lua
+Spec.lua
+Preview.lua
+Equip.lua
+Data.lua
+_generated\Data.Paladin.generated.lua
+_generated\Data.Paladin.Horde.1to9.generated.lua
+_generated\Data.Warrior.generated.lua
+_generated\Data.Warrior.Horde.1to9.generated.lua
+_generated\Data.Hunter.generated.lua
+_generated\Data.Hunter.Early.1to9.generated.lua
+_generated\Data.Druid.generated.lua
+_generated\Data.Druid.Early.1to9.generated.lua
+_generated\Data.Shaman.generated.lua
+_generated\Data.Shaman.Early.1to9.generated.lua
+_generated\Data.Rogue.generated.lua
+_generated\Data.Rogue.Early.1to9.generated.lua
+_generated\Data.Priest.generated.lua
+_generated\Data.Priest.Early.1to9.generated.lua
+_generated\Data.Warlock.generated.lua
+_generated\Data.Warlock.Early.1to9.generated.lua
+_generated\Data.Mage.generated.lua
+_generated\Data.Mage.Early.1to9.generated.lua
+_generated/StatWeights.generated.lua
+_generated/CraftSkills.generated.lua
+DataAdapter.lua
+Compare.lua
+Indicator.lua
+Log.lua
+Toast.lua
+Tracker.lua
+Popup.lua
+PaperDoll.lua
+Minimap.lua
+Commands.lua
