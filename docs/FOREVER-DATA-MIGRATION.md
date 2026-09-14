@@ -11,7 +11,7 @@ GearQuest Forever targets **WoW Forever 1–60** (Classic+). The fork inherited 
 
 **Done:** product split, `GQ.MAX_PLAYER_LEVEL`, Classic suffix scrape/apply/check tooling, partial Classic tables in `items_random.classic.json`, pick + **notable** row patches for cached items (e.g. Vice Grips +17 @ 9%).
 
-**Not done:** finish Classic scrape for **~400+** suffix-item IDs (`count-suffix-coverage.mjs`); regen **10–59** from Classic-only pool (phase 3); Classic/Forever **StatWeights**; Forever beta item deltas (phase 4). Do **not** copy TBC CurseForge ID `1669225` or TBC `CF_API_KEY`.
+**Not done:** regen **10–59** from Classic-only pool (phase 3); Classic/Forever **StatWeights**; Forever beta item deltas (phase 4). **162** suffix item IDs have no Classic Wowhead random-enchant page (TBC-era greens) — suffix metadata on those rows stays TBC until phase 3 pool regen. Do **not** copy TBC CurseForge ID `1669225` or TBC `CF_API_KEY`.
 
 **Repo:** commit `scripts/`, `GearQuest/_generated/data/items_random.classic.json`, generated Lua patches, and docs together so another clone sees the same state — cache and generated files must stay in sync.
 
@@ -20,8 +20,8 @@ Fork base: GearQuest **v0.1.1-beta.3-bcc**, not a greenfield Classic regen.
 | Phase | Scope | Status |
 |-------|--------|--------|
 | **1** | Product scope: max level **60**, remove TBC **level 70** curated data, clamp preview/simulate | **Done** |
-| **2** | Random green suffix tables: Classic-era scrapes (not TBC R34) | **Partial** — not done until `count-suffix-coverage.mjs` shows most of ~400+ suffix item IDs with Classic tables (target **≥80%** before calling phase 2 complete) |
-| **3** | Regenerate 10–59 picks: Classic-only item pool + revised stat weights | **Next after suffix cache complete** — requires external `score.py` / pipeline (not in repo); see § Phase 3 |
+| **2** | Random green suffix tables: Classic-era scrapes (not TBC R34) | **Done** — `count-suffix-coverage.mjs` **≥80% of scrapeable** IDs (Classic Wowhead 404 rows excluded via `noClassicPage`; gate: `--phase2-gate`) |
+| **3** | Regenerate 10–59 picks: Classic-only item pool + revised stat weights | **Next** — requires external `score.py` / pipeline (not in repo); see § Phase 3 |
 | **4** | Forever delta: beta tooltips, retuned item IDs, new quests/items | After beta client |
 | **5** | Tag rows `forever-verified` vs `classic-assumption` as needed | Ongoing |
 
@@ -43,6 +43,7 @@ Fork base: GearQuest **v0.1.1-beta.3-bcc**, not a greenfield Classic regen.
    node scripts/scrape-classic-random-enchants.mjs --retry-403
    # Or one shot: scrape → apply → stale count
    node scripts/classic-suffix-sync.mjs --retry-403
+   node scripts/classic-suffix-sync.mjs --retry-403 --phase2-gate   # exit 1 if scrapeable coverage below 80%
    ```
 
    Parser accepts Wowhead **q2** and **q3** suffix lines. Pass `--reprobe-empty` only when intentionally refetching stale **empty** cache rows (sync does **not** enable it by default). The scraper **never** replaces an existing enchant table with an empty parse. **Do not** use global `--refresh` without `--ids` unless you mean to re-fetch every item.

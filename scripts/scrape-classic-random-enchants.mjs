@@ -123,6 +123,10 @@ for (let i = 0; i < idList.length; i++) {
     skip++;
     continue;
   }
+  if (!force && cache[key]?.noClassicPage) {
+    skip++;
+    continue;
+  }
   if (reprobeEmpty && cache[key]?.empty) {
     delete cache[key];
   }
@@ -142,8 +146,18 @@ for (let i = 0; i < idList.length; i++) {
     }
   } catch (e) {
     console.error(`FAIL ${id}:`, e.message);
-    if (String(e.message).includes("403") && !cache[key]?.enchants?.length) {
-      cache[key] = { itemId: id, failed403: true, scrapedAt: new Date().toISOString() };
+    const msg = String(e.message);
+    if (!cache[key]?.enchants?.length) {
+      if (msg.includes("403")) {
+        cache[key] = { itemId: id, failed403: true, scrapedAt: new Date().toISOString() };
+      } else if (msg.includes("404")) {
+        cache[key] = {
+          itemId: id,
+          era: "classic",
+          noClassicPage: true,
+          scrapedAt: new Date().toISOString(),
+        };
+      }
     }
     fail++;
   }

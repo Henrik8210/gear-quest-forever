@@ -14,14 +14,12 @@ Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3
 
 - Game / CurseForge folder **`GearQuestForever`** (`GearQuestForever.toc`); saved variables **`GearQuestForeverDB`** so it can sit beside TBC **`GearQuest`** on the same client.
 
-### Data (Forever migration phase 2 — partial)
+### Data (Forever migration phase 2 — complete)
 
-- Classic Wowhead random-enchant scrape/apply pipeline (`scripts/scrape-classic-random-enchants.mjs`, `apply-classic-random-enchants.mjs`, `classic-suffix-sync.mjs`, `check-era-classic.mjs`).
-- Cache: `GearQuest/_generated/data/items_random.classic.json` — run `node scripts/classic-suffix-sync.mjs --retry-403` with `GQ_SCRAPE_DELAY_MS=2500` (add `--reprobe-empty` only when intentionally refetching stale empties).
-- Scraper no longer overwrites cached enchant tables with empty rows on parse/rate-limit failures.
-- Generated picks/notables patched for Classic suffix chance, range, and score where cache has tables (Vice Grips **9640**: **+17 @ 9%**); `suffixId` dropped when Classic range differs from TBC.
-- Apply script patches **notable** rows as well as scored pick rows.
-- Phase 2 target: `count-suffix-coverage.mjs` ≥80% (re-run sync after Wowhead 403/404 bursts; many high-id green templates 404 on Classic).
+- Classic Wowhead random-enchant scrape/apply pipeline (`classic-suffix-sync.mjs --retry-403 --phase2-gate`).
+- Cache: `items_random.classic.json` — **610** scrapeable suffix items with Classic tables; **162** TBC-era IDs marked `noClassicPage` (Classic Wowhead 404).
+- Scraper preserves existing enchant rows; records 404 as non-scrapeable; `--phase2-gate` enforces ≥80% scrapeable coverage.
+- Generated picks/notables patched for Classic suffix metadata where tables exist (e.g. **9640** +17 @ 9%); **0** stale TBC +20/@7.9% rows.
 
 ### Data (Forever migration phase 1)
 

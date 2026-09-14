@@ -1,5 +1,6 @@
 /**
  * How many generated suffix-item IDs have Classic enchant tables in cache?
+ * Phase 2 gate uses scrapeable IDs (excludes Wowhead Classic 404 / noClassicPage).
  */
 import fs from "fs";
 import path from "path";
@@ -26,22 +27,32 @@ if (fs.existsSync(cachePath)) {
 let withClassic = 0;
 let empty = 0;
 let missing = 0;
+let noClassicPage = 0;
 for (const id of ids) {
   const row = cache[id];
   if (!row) missing++;
   else if (row.enchants?.length) withClassic++;
+  else if (row.noClassicPage) noClassicPage++;
   else empty++;
 }
 
-console.log("Generated rows reference suffix on", ids.size, "unique item IDs");
+const total = ids.size;
+const scrapeable = total - noClassicPage;
+const pctAll = total ? ((100 * withClassic) / total).toFixed(1) : "0";
+const pctScrapeable = scrapeable ? ((100 * withClassic) / scrapeable).toFixed(1) : "0";
+
+console.log("Generated rows reference suffix on", total, "unique item IDs");
 console.log("Classic cache: keys", Object.keys(cache).length);
 console.log("  overlap with enchants:", withClassic);
+console.log("  no Classic Wowhead page (404):", noClassicPage);
 console.log("  overlap empty/failed:", empty);
 console.log("  not in cache:", missing);
-const pct = ids.size ? ((100 * withClassic) / ids.size).toFixed(1) : "0";
-console.log("Classic-backed suffix items:", pct + "%");
+console.log("Classic-backed suffix items (all IDs):", pctAll + "%");
+console.log("Scrapeable suffix items:", scrapeable, "(total minus 404)");
+console.log("Classic-backed (of scrapeable):", pctScrapeable + "%");
+
 const MIN_PCT = Number(process.env.GQ_SUFFIX_COVERAGE_MIN || 0);
-if (MIN_PCT > 0 && withClassic / ids.size < MIN_PCT / 100) {
-  console.error(`FAIL: coverage below GQ_SUFFIX_COVERAGE_MIN=${MIN_PCT}%`);
+if (MIN_PCT > 0 && scrapeable > 0 && withClassic / scrapeable < MIN_PCT / 100) {
+  console.error(`FAIL: scrapeable coverage below GQ_SUFFIX_COVERAGE_MIN=${MIN_PCT}%`);
   process.exit(1);
 }
