@@ -1713,6 +1713,10 @@ GQ.Data.entries = {
         classes = MAIL_MELEE,
         curatedRank = 1,
         sourceType = "world_drop",
+        suffix = "of Strength",
+        suffixChance = 6.1,
+        suffixId = 97,
+        suffixRange = "+3-4 Strength",
         instructions = "Training Sword (req 5) is a green two-handed sword world drop. Train Two-Handed Swords from a weapon master first.",
         zone = "Elwynn Forest",
     },
@@ -1725,6 +1729,10 @@ GQ.Data.entries = {
         classes = MAIL_MELEE,
         curatedRank = 2,
         sourceType = "world_drop",
+        suffix = "of Strength",
+        suffixChance = 6.2,
+        suffixId = 97,
+        suffixRange = "+3-4 Strength",
         instructions = "Severing Axe (req 5) is a green two-handed axe world drop. Train Two-Handed Axes from a weapon master first.",
         zone = "Elwynn Forest",
     },
@@ -2004,6 +2012,9 @@ GQ.Data.entries = {
         factions = ALLIANCE,
         curatedRank = 2,
         sourceType = "world_drop",
+        suffix = "of Strength",
+        suffixChance = 8.8,
+        suffixRange = "+1-2 Strength",
         instructions = "Charger's Armor (req 6) is a green mail world drop in starter zones.",
         zone = "Elwynn Forest",
     },
@@ -2085,6 +2096,10 @@ GQ.Data.entries = {
         classes = MAIL_MELEE,
         curatedRank = 2,
         sourceType = "world_drop",
+        suffix = "of Strength",
+        suffixChance = 6.1,
+        suffixId = 97,
+        suffixRange = "+3-4 Strength",
         instructions = "Training Sword (req 5) is a green two-handed sword world drop. Train Two-Handed Swords from a weapon master first.",
         zone = "Elwynn Forest",
     },
@@ -2097,6 +2112,10 @@ GQ.Data.entries = {
         classes = MAIL_MELEE,
         curatedRank = 3,
         sourceType = "world_drop",
+        suffix = "of Strength",
+        suffixChance = 6.2,
+        suffixId = 97,
+        suffixRange = "+3-4 Strength",
         instructions = "Severing Axe (req 5) is a green two-handed axe world drop. Train Two-Handed Axes from a weapon master first.",
         zone = "Elwynn Forest",
     },
@@ -2111,6 +2130,10 @@ GQ.Data.entries = {
         classes = MAIL_MELEE,
         curatedRank = 1,
         sourceType = "world_drop",
+        suffix = "of Strength",
+        suffixChance = 9.6,
+        suffixId = 6,
+        suffixRange = "+1 Strength",
         instructions = "Infantry Shield (req 6) is a green mail shield world drop with random stat bonuses.",
         zone = "Elwynn Forest",
     },
@@ -2450,6 +2473,10 @@ GQ.Data.entries = {
         classes = MAIL_MELEE,
         curatedRank = 2,
         sourceType = "world_drop",
+        suffix = "of Strength",
+        suffixChance = 6.1,
+        suffixId = 97,
+        suffixRange = "+3-4 Strength",
         instructions = "Short Bastard Sword (req 7) is a green two-handed sword world drop. Train Two-Handed Swords from a weapon master first.",
         zone = "Elwynn Forest",
     },
@@ -2478,6 +2505,10 @@ GQ.Data.entries = {
         classes = MAIL_MELEE,
         curatedRank = 1,
         sourceType = "world_drop",
+        suffix = "of Strength",
+        suffixChance = 9.6,
+        suffixId = 6,
+        suffixRange = "+1 Strength",
         instructions = "Gypsy Buckler (req 7) is a green shield world drop with random stat bonuses.",
         zone = "Elwynn Forest",
     },
@@ -2490,6 +2521,10 @@ GQ.Data.entries = {
         classes = MAIL_MELEE,
         curatedRank = 2,
         sourceType = "world_drop",
+        suffix = "of Strength",
+        suffixChance = 9.6,
+        suffixId = 6,
+        suffixRange = "+1 Strength",
         instructions = "War-torn Shield (req 7) is a green shield world drop from humanoids in low-level zones.",
         zone = "Elwynn Forest",
     },
@@ -2502,6 +2537,10 @@ GQ.Data.entries = {
         classes = MAIL_MELEE,
         curatedRank = 3,
         sourceType = "world_drop",
+        suffix = "of Strength",
+        suffixChance = 9.6,
+        suffixId = 6,
+        suffixRange = "+1 Strength",
         instructions = "Infantry Shield (req 6) is a green mail shield world drop with random stat bonuses.",
         zone = "Elwynn Forest",
     },
@@ -2570,6 +2609,10 @@ GQ.Data.entries = {
         factions = ALLIANCE,
         curatedRank = 2,
         sourceType = "world_drop",
+        suffix = "of Strength",
+        suffixChance = 9.7,
+        suffixId = 23,
+        suffixRange = "+1-2 Strength",
         instructions = "Infantry Leggings (req 7) are a green mail world drop in starter zones.",
         zone = "Elwynn Forest",
     },
@@ -2718,7 +2761,11 @@ GQ.Data.entries = {
         factions = ALLIANCE,
         curatedRank = 1,
         sourceType = "world_drop",
-        instructions = "Infantry Tunic (req 8) is a green mail world drop with random Strength or Stamina bonuses.",
+        suffix = "of Strength",
+        suffixChance = 9.8,
+        suffixId = 97,
+        suffixRange = "+3-4 Strength",
+        instructions = "Infantry Tunic of Strength (req 8) is a green mail world drop (+3-4 Strength, ~9.8% of rolls).",
         zone = "Elwynn Forest",
     },
     {
@@ -2800,7 +2847,11 @@ GQ.Data.entries = {
         classes = MAIL_MELEE,
         curatedRank = 1,
         sourceType = "world_drop",
-        instructions = "Spiked Club (req 8) is a green two-handed mace world drop with random stat bonuses. Train Two-Handed Maces first.",
+        suffix = "of Strength",
+        suffixChance = 5.9,
+        suffixId = 97,
+        suffixRange = "+3-4 Strength",
+        instructions = "Spiked Club of Strength (req 8) is a green two-handed mace world drop (+3-4 Strength, ~5.9% of rolls). Train Two-Handed Maces first.",
         zone = "Westfall",
     },
     {
@@ -2840,6 +2891,9 @@ GQ.Data.entries = {
         classes = MAIL_MELEE,
         curatedRank = 1,
         sourceType = "world_drop",
+        suffix = "of Strength",
+        suffixChance = 9.4,
+        suffixRange = "+1-2 Strength",
         instructions = "Cadet Shield (req 8) is a green shield world drop with random stat bonuses.",
         zone = "Elwynn Forest",
     },
@@ -2864,6 +2918,10 @@ GQ.Data.entries = {
         classes = MAIL_MELEE,
         curatedRank = 3,
         sourceType = "world_drop",
+        suffix = "of Strength",
+        suffixChance = 9.6,
+        suffixId = 6,
+        suffixRange = "+1 Strength",
         instructions = "Gypsy Buckler (req 7) is a green shield world drop with random stat bonuses.",
         zone = "Elwynn Forest",
     },
@@ -2946,6 +3004,10 @@ GQ.Data.entries = {
         factions = ALLIANCE,
         curatedRank = 3,
         sourceType = "world_drop",
+        suffix = "of Strength",
+        suffixChance = 9.7,
+        suffixId = 23,
+        suffixRange = "+1-2 Strength",
         instructions = "Infantry Leggings (req 7) are a green mail world drop in starter zones.",
         zone = "Elwynn Forest",
     },
@@ -3130,7 +3192,11 @@ GQ.Data.entries = {
         specs = SPEC_MELEE,
         curatedRank = 1,
         sourceType = "world_drop",
-        instructions = "Infantry Tunic (req 8) is a green mail world drop with random Strength or Stamina bonuses.",
+        suffix = "of Strength",
+        suffixChance = 9.8,
+        suffixId = 97,
+        suffixRange = "+3-4 Strength",
+        instructions = "Infantry Tunic of Strength (req 8) is a green mail world drop (+3-4 Strength, ~9.8% of rolls).",
         zone = "Elwynn Forest",
     },
     {
@@ -3237,7 +3303,11 @@ GQ.Data.entries = {
         specs = SPEC_MELEE,
         curatedRank = 2,
         sourceType = "world_drop",
-        instructions = "Spiked Club (req 8) is a green two-handed mace world drop with random stat bonuses. Train Two-Handed Maces first.",
+        suffix = "of Strength",
+        suffixChance = 5.9,
+        suffixId = 97,
+        suffixRange = "+3-4 Strength",
+        instructions = "Spiked Club of Strength (req 8) is a green two-handed mace world drop (+3-4 Strength, ~5.9% of rolls). Train Two-Handed Maces first.",
         zone = "Westfall",
     },
     {
@@ -3297,6 +3367,9 @@ GQ.Data.entries = {
         specs = SPEC_MELEE,
         curatedRank = 3,
         sourceType = "world_drop",
+        suffix = "of Strength",
+        suffixChance = 9.4,
+        suffixRange = "+1-2 Strength",
         instructions = "Cadet Shield (req 8) is a green shield world drop with random stat bonuses.",
         zone = "Elwynn Forest",
     },
@@ -3407,6 +3480,10 @@ GQ.Data.entries = {
         specs = SPEC_MELEE,
         curatedRank = 1,
         sourceType = "world_drop",
+        suffix = "of Strength",
+        suffixChance = 9.8,
+        suffixId = 97,
+        suffixRange = "+3-4 Strength",
         instructions = "War-Torn Pants (req 9) are a green mail world drop from humanoids in low-level zones.",
         zone = "Elwynn Forest",
     },
@@ -3421,6 +3498,10 @@ GQ.Data.entries = {
         specs = SPEC_MELEE,
         curatedRank = 2,
         sourceType = "world_drop",
+        suffix = "of Strength",
+        suffixChance = 9.8,
+        suffixId = 97,
+        suffixRange = "+3-4 Strength",
         instructions = "Cadet Leggings (req 9) are a common mail world drop from humanoids in low-level zones.",
         zone = "Elwynn Forest",
     },
@@ -3628,6 +3709,10 @@ GQ.Data.entries = {
         specs = SPEC_RET,
         curatedRank = 1,
         sourceType = "world_drop",
+        suffix = "of Strength",
+        suffixChance = 9.8,
+        suffixId = 97,
+        suffixRange = "+3-4 Strength",
         instructions = "Cadet Vest (req 10) is a common mail world drop from humanoids in low-level zones.",
         zone = "Elwynn Forest",
     },
@@ -3673,6 +3758,9 @@ GQ.Data.entries = {
         specs = SPEC_RET,
         curatedRank = 1,
         sourceType = "world_drop",
+        suffix = "of Strength",
+        suffixChance = 9.3,
+        suffixRange = "+1-2 Strength",
         instructions = "Bloodspattered Wristbands (req 10) are a green mail world drop from humanoids in low-level zones.",
         zone = "Westfall",
     },
@@ -3686,6 +3774,9 @@ GQ.Data.entries = {
         specs = SPEC_RET,
         curatedRank = 2,
         sourceType = "world_drop",
+        suffix = "of Strength",
+        suffixChance = 9.3,
+        suffixRange = "+1-2 Strength",
         instructions = "Soldier's Wristguards (req 10) are a common mail world drop from humanoids in low-level zones.",
         zone = "Elwynn Forest",
     },
@@ -3730,6 +3821,10 @@ GQ.Data.entries = {
         specs = SPEC_RET,
         curatedRank = 2,
         sourceType = "world_drop",
+        suffix = "of Strength",
+        suffixChance = 5.9,
+        suffixId = 97,
+        suffixRange = "+3-4 Strength",
         instructions = "Birchwood Maul (req 10) is a green two-handed mace world drop. Train Two-Handed Maces first.",
         zone = "Loch Modan",
     },
@@ -3791,6 +3886,9 @@ GQ.Data.entries = {
         specs = SPEC_MELEE,
         curatedRank = 3,
         sourceType = "world_drop",
+        suffix = "of Strength",
+        suffixChance = 9.4,
+        suffixRange = "+1-2 Strength",
         instructions = "Cadet Shield (req 8) is a green shield world drop with random stat bonuses.",
         zone = "Elwynn Forest",
     },
@@ -3917,6 +4015,10 @@ GQ.Data.entries = {
         specs = SPEC_RET,
         curatedRank = 2,
         sourceType = "world_drop",
+        suffix = "of Strength",
+        suffixChance = 9.8,
+        suffixId = 97,
+        suffixRange = "+3-4 Strength",
         instructions = "War-Torn Pants (req 9) are a green mail world drop from humanoids in low-level zones.",
         zone = "Elwynn Forest",
     },
@@ -3931,6 +4033,10 @@ GQ.Data.entries = {
         specs = SPEC_RET,
         curatedRank = 3,
         sourceType = "world_drop",
+        suffix = "of Strength",
+        suffixChance = 9.8,
+        suffixId = 97,
+        suffixRange = "+3-4 Strength",
         instructions = "Cadet Leggings (req 9) are a common mail world drop from humanoids in low-level zones.",
         zone = "Elwynn Forest",
     },
@@ -3946,6 +4052,10 @@ GQ.Data.entries = {
         specs = SPEC_RET,
         curatedRank = 1,
         sourceType = "world_drop",
+        suffix = "of Strength",
+        suffixChance = 9.6,
+        suffixId = 24,
+        suffixRange = "+2-3 Strength",
         instructions = "Bloodspattered Sash (req 10) is a green mail world drop from humanoids in low-level zones.",
         zone = "Westfall",
     },
@@ -4003,6 +4113,10 @@ GQ.Data.entries = {
         specs = SPEC_RET,
         curatedRank = 2,
         sourceType = "profession",
+        suffix = "of Strength",
+        suffixChance = 9.2,
+        suffixId = 24,
+        suffixRange = "+2-3 Strength",
         profession = "Blacksmithing",
         instructions = "Learn Gemmed Copper Gauntlets from a Blacksmithing trainer and craft at an anvil (Blacksmithing 25). +2 Strength.",
         zone = "Stormwind City",
@@ -4017,6 +4131,10 @@ GQ.Data.entries = {
         specs = SPEC_RET,
         curatedRank = 3,
         sourceType = "world_drop",
+        suffix = "of Strength",
+        suffixChance = 9.2,
+        suffixId = 24,
+        suffixRange = "+2-3 Strength",
         instructions = "Bloodspattered Gloves (req 10) are a green mail world drop from humanoids in low-level zones.",
         zone = "Westfall",
     },
@@ -4297,6 +4415,28 @@ function GQ.Data:EntryDisplayNameReady(entry)
     return true
 end
 
+function GQ.Data:SanitizeText(text)
+    if text == nil or text == "" then
+        return text
+    end
+
+    text = tostring(text)
+    -- WoW fonts lack these glyphs and draw them as empty boxes.
+    text = text:gsub("\226\128\148", "-") -- em dash
+    text = text:gsub("\226\128\147", "-") -- en dash
+    text = text:gsub("\226\128\146", "-") -- figure dash
+    text = text:gsub("\194\183", ", ") -- middle dot
+    text = text:gsub("\226\128\166", "...") -- ellipsis
+    text = text:gsub("\226\128\156", "\"")
+    text = text:gsub("\226\128\157", "\"")
+    text = text:gsub("\226\128\152", "'")
+    text = text:gsub("\226\128\153", "'")
+    text = text:gsub("\194\160", " ")
+    text = text:gsub(" +", " ")
+    text = text:gsub(" ,", ",")
+    return text
+end
+
 function GQ.Data:GetSuffixHint(entry)
     if not entry or not entry.suffix then
         return nil
@@ -4308,11 +4448,13 @@ function GQ.Data:GetSuffixHint(entry)
     elseif entry.suffixId then
         parts[#parts + 1] = "tier " .. tostring(entry.suffixId)
     end
+
+    local hint = table.concat(parts, ", ")
     if entry.suffixChance then
-        parts[#parts + 1] = "~" .. tostring(entry.suffixChance) .. "% on drop"
+        hint = hint .. " (~" .. tostring(entry.suffixChance) .. "% on drop)"
     end
 
-    return table.concat(parts, " · ")
+    return hint
 end
 
 -- Novelty on-use effects (fall damage/speed, drunk, party-only buffs, etc.) are not

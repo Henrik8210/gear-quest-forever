@@ -29,10 +29,10 @@ Current BiS data is still largely the Classic/TBC **leveling** snapshot from Gea
 | `/gq spec holy` | Set preview specialization |
 | `/gq faction alliance` | Set preview faction |
 | `/gq set on` / `/gq set off` | Enable or disable preview mode |
-| `/gq set me` | Copy your real character into preview (Reset in simulate panel) |
+| `/gq set me` | Copy your real character into preview (Reset on the Simulator tab) |
 | `/gq help` | List commands |
 
-**Minimap:** left-click → log; right-click → simulate panel (class, spec, level).
+**Minimap:** any click opens GearQuest. Use the **Simulator** handle tab (class, faction, spec, level 1–60). Reset = `/gq set me`.
 
 ## Local WoW install
 
@@ -62,7 +62,7 @@ $env:GEARQUEST_WOW_CLIENT = "_anniversary_"
 
 ## CurseForge
 
-Create a **new** project on [authors.curseforge.com](https://authors.curseforge.com/) for GearQuest Forever, then follow [RELEASE.md](RELEASE.md). The TBC project ID `1669225` must not appear in this toc.
+CurseForge project **1698950** (`## X-Curse-Project-ID: 1698950`). Follow [RELEASE.md](RELEASE.md). Never use TBC GearQuest `1669225`.
 
 ## License
 

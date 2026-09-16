@@ -11,7 +11,7 @@ GearQuest Forever targets **WoW Forever 1–60** (Classic+). The fork inherited 
 
 **Done:** product split, `GQ.MAX_PLAYER_LEVEL`, phase **2** Classic suffix cache, phase **3** Classic `score.py` regen for all classes. **0** stale TBC +20/@7.9% fingerprint rows.
 
-**Not done:** Classic/Forever **StatWeights**; Forever beta item deltas (phase 4). Do **not** copy TBC CurseForge ID `1669225` or TBC `CF_API_KEY`.
+**Not done:** Classic/Forever **StatWeights**; Forever beta item deltas (phase 4). CurseForge project is **1698950**. Do **not** copy TBC CurseForge ID `1669225` or TBC `CF_API_KEY`.
 
 **Repo:** commit `scripts/`, `GearQuest/_generated/data/items_random.classic.json`, generated Lua patches, and docs together so another clone sees the same state — cache and generated files must stay in sync.
 
@@ -22,8 +22,23 @@ Fork base: GearQuest **v0.1.1-beta.3-bcc**, not a greenfield Classic regen.
 | **1** | Product scope: max level **60**, remove TBC **level 70** curated data, clamp preview/simulate | **Done** |
 | **2** | Random green suffix tables: Classic-era scrapes (not TBC R34) | **Done** — `count-suffix-coverage.mjs` **≥80% of scrapeable** IDs (Classic Wowhead 404 rows excluded via `noClassicPage`; gate: `--phase2-gate`) |
 | **3** | Classic item pool: strip TBC/Outland IDs, cap generated bands at 60, then full re-score | **Done** — all classes re-scored via `pipeline/` (weights still TBC-derived) |
-| **4** | Forever delta: beta tooltips, retuned item IDs, new quests/items | After beta client |
+| **4** | Forever delta: beta tooltips, retuned item IDs, new quests/items, new zones | After beta client |
 | **5** | Tag rows `forever-verified` vs `classic-assumption` as needed | Ongoing |
+
+### Phase 4 watch list (do not invent Data.lua rows)
+
+Forever-only loot stays out of the addon until an item ID and tooltip exist in-game. Wowhead `/forever/` item pages still often show Classic data. Blizzard intends item stats to stay hidden until the item drops.
+
+New zones to attach hunts to later ([Wowhead zone guide](https://www.wowhead.com/forever/guide/zones-maps-locations-rewards)):
+
+| Zone | Band / notes |
+|------|----------------|
+| **Zephras Isle** | Skyborne start **1–12**. Faction (Alliance/Horde) is chosen at 1. Starter weapon **models** are datamined; no item IDs/stats yet. |
+| **Riverglades** | Frontier **35–45**. Steamwheedle boat to **Powderfuse Port**. |
+| **Shen'Dralas** | Between Mulgore and Desolace (Shen'dralar / Dire Maul). Quests send you to Razorfen Downs and Maraudon. |
+| **Mount Hyjal** | **Level 60** after Archimonde. First 20-player raid **Hyjal Summit** in December. |
+
+Curated Alliance paladin/warrior 1–9 greens need the same `suffix` / `suffixChance` / `suffixRange` fields as generated rows, or the log shows the base name with no roll. Runtime `Data:SanitizeText` replaces em-dash / middle-dot (WoW fonts cannot draw them). Pipeline world-drop copy uses ASCII hyphens.
 
 ## Phase 1 details
 

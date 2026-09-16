@@ -1,30 +1,56 @@
-local _, GQ = ...
+local ADDON_NAME, GQ = ...
 
 GQ.Log = GQ.Log or {}
 
-local FRAME_WIDTH = 384
+local FRAME_WIDTH = 768
 local FRAME_HEIGHT = 512
 local ROW_HEIGHT = 16
-local TAB_HEIGHT = 22
-local TAB_BAR_PAD = 2
+local TAB_HEIGHT = 24
+local TAB_BAR_PAD = 4
 local TAB_ROW_HEIGHT = TAB_HEIGHT + TAB_BAR_PAD
-local TAB_TOP_OFFSET = 54
-local LIST_TOP_OFFSET = TAB_TOP_OFFSET + TAB_ROW_HEIGHT
-local PORTRAIT_TEXTURE = "Interface\\AddOns\\GearQuest\\Art\\GearQuest-Portrait"
+local TAB_TOP_OFFSET = 56
+local PORTRAIT_TEXTURE = "Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Art\\GearQuest-Portrait"
 local PORTRAIT_DISPLAY_SIZE = 56
 
 -- Content area below title bar and above footer buttons.
 local HEADER_OFFSET = 74
-local FOOTER_OFFSET = 38
-local CONTENT_HEIGHT = FRAME_HEIGHT - HEADER_OFFSET - FOOTER_OFFSET
-local LIST_SECTION_HEIGHT = math.max(120, math.floor(CONTENT_HEIGHT * 0.40) - 20)
-local CONTENT_LEFT = 4
-local CONTENT_RIGHT_GUTTER = 30
-local PANEL_WIDTH = FRAME_WIDTH - CONTENT_LEFT - CONTENT_RIGHT_GUTTER
-local PANEL_INSET = 2
+local FOOTER_OFFSET = 40
+local CONTENT_LEFT = 14
+local CONTENT_RIGHT_GUTTER = 14
+local COLUMN_GAP = 8
+local USABLE_WIDTH = FRAME_WIDTH - CONTENT_LEFT - CONTENT_RIGHT_GUTTER
+local LEFT_COLUMN_WIDTH = math.floor((USABLE_WIDTH - COLUMN_GAP) / 2)
+local RIGHT_COLUMN_WIDTH = USABLE_WIDTH - COLUMN_GAP - LEFT_COLUMN_WIDTH
+local PANEL_WIDTH = LEFT_COLUMN_WIDTH
+local PANEL_INSET = 4
 local GUTTER_INSET = 6
+local PAGE_TAB_LOG_WIDTH = 108
+local PAGE_TAB_SIM_WIDTH = 92
+local FILTER_TAB_WIDTH = 84
+local PAGE_GROUP_WIDTH = PAGE_TAB_LOG_WIDTH + PAGE_TAB_SIM_WIDTH + 4
+local FILTER_TAB_OVERLAP = 3
+local FILTER_TAB_LEFT = 12
+local LOG_SECTION_TOP = -(TAB_HEIGHT - FILTER_TAB_OVERLAP)
+local SIDE_TAB_HEIGHT = 53
+local SIDE_TAB_WIDTH = 53
+local SIDE_TAB_OVERLAP = 8
+local SIDE_TAB_GAP = 10
+local SIDE_TAB_ICON_SIZE = 22
+local SIDE_TAB_ICON_PAD = 8
+local SIDE_TAB_TOP = -(TAB_TOP_OFFSET - LOG_SECTION_TOP)
+local TAB_BORDER_EDGE = 12
+local FILTER_BORDER_EDGE = 8
+local LOG_TAB_ICON = "Interface\\GossipFrame\\AvailableQuestIcon"
+local SIM_TAB_ICON = "Interface\\Icons\\Trade_Engineering"
 local SECTION_DIVIDER_HEIGHT = 3
 local METAL_EDGE = "Interface\\Tooltips\\UI-Tooltip-Border"
+local GOLD = { 0.90, 0.75, 0.28 }
+local GOLD_DIM = { 0.55, 0.45, 0.22 }
+local FRAME_METAL = { 0.78, 0.72, 0.58 }
+local FRAME_METAL_DIM = { 0.42, 0.38, 0.30 }
+local PANEL_BG = { 0.14, 0.10, 0.06, 1 }
+local LIST_BG = { 0.02, 0.02, 0.02, 1 }
+local WHEEL_STEP = ROW_HEIGHT * 4
 local REWARD_ICON_SIZE = 44
 local REWARD_NAME_MIN_WIDTH = 150
 local REWARD_NAME_PAD = 16
@@ -60,7 +86,8 @@ local LIST_ROW_NOTABLE_LEFT = 24
 local LIST_NEW_LABEL = " |cffFFD200New|r"
 local LIST_TOOLTIP_X_GAP = 20
 local NOTABLE_LIST_ICON = "Interface\\GossipFrame\\AvailableQuestIcon"
-local SCROLLBAR_INSET = 22
+local SCROLLBAR_WIDTH = 18
+local SCROLLBAR_INSET = SCROLLBAR_WIDTH + 8
 
 local function SafeGetItemIcon(itemId)
     if not itemId then
@@ -77,7 +104,7 @@ end
 local function GetListRowTextMaxWidth(row, leftInset)
     local width = row:GetWidth()
     if not width or width <= 0 then
-        width = PANEL_WIDTH - (PANEL_INSET * 2)
+        width = LEFT_COLUMN_WIDTH - (PANEL_INSET * 2)
     end
     return math.max(40, width - leftInset - LIST_ROW_RIGHT_PAD)
 end
@@ -205,6 +232,10 @@ local function BringLogWindowToFront(frame)
     ApplyLogWindowLayer(frame)
     if frame and frame.Raise then
         frame:Raise()
+    end
+    local log = _G.GearQuest and _G.GearQuest.Log
+    if log and log.LayoutSideTabs then
+        log:LayoutSideTabs(frame)
     end
 end
 local TAB_GROUP_WIDTH = (88 * 2) + 4
@@ -543,7 +574,7 @@ local function CreateFontStringWithFallback(parent, candidates)
     return parent:CreateFontString(nil, "ARTWORK", "GameFontNormal")
 end
 
-local PARCHMENT_TEXTURE = "Interface\\AddOns\\GearQuest\\Textures\\GQ-Parchment.png"
+local PARCHMENT_TEXTURE = "Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Textures\\GQ-Parchment.png"
 
 local function ApplyParchmentBackground(parent)
     if parent.parchmentApplied then
@@ -557,27 +588,611 @@ local function ApplyParchmentBackground(parent)
     -- Stretch once so clean top/left and worn bottom/right stay anchored to the panel.
 end
 
+local function ApplyFill(parent, color)
+    if not parent.blackBg then
+        local bg = parent:CreateTexture(nil, "BACKGROUND", nil, -8)
+        bg:SetAllPoints()
+        parent.blackBg = bg
+    end
+    parent.blackBg:SetColorTexture(color[1], color[2], color[3], color[4] or 1)
+end
+
 local function ApplyBlackBackground(parent)
-    if parent.blackBg then
+    ApplyFill(parent, LIST_BG)
+end
+
+local function ApplyPanelBackground(parent)
+    ApplyFill(parent, PANEL_BG)
+end
+
+local function EnsureBackdrop(frame)
+    if not frame then
+        return false
+    end
+    if frame.SetBackdrop then
+        return true
+    end
+    if Mixin and BackdropTemplateMixin then
+        Mixin(frame, BackdropTemplateMixin)
+        if frame.OnBackdropLoaded then
+            pcall(frame.OnBackdropLoaded, frame)
+        end
+    end
+    return frame.SetBackdrop ~= nil
+end
+
+local function ApplyDrawnGoldBorder(frame)
+    if frame.gqBorderTop then
         return
     end
-    local bg = parent:CreateTexture(nil, "BACKGROUND", nil, -8)
-    bg:SetAllPoints()
-    bg:SetColorTexture(0.02, 0.02, 0.02, 1)
-    parent.blackBg = bg
+    local function makeEdge()
+        local tex = frame:CreateTexture(nil, "OVERLAY")
+        tex:SetColorTexture(GOLD[1], GOLD[2], GOLD[3], 0.95)
+        return tex
+    end
+    frame.gqBorderTop = makeEdge()
+    frame.gqBorderTop:SetHeight(1)
+    frame.gqBorderTop:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, 0)
+    frame.gqBorderTop:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 0, 0)
+    frame.gqBorderBottom = makeEdge()
+    frame.gqBorderBottom:SetHeight(1)
+    frame.gqBorderBottom:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 0, 0)
+    frame.gqBorderBottom:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 0, 0)
+    frame.gqBorderLeft = makeEdge()
+    frame.gqBorderLeft:SetWidth(1)
+    frame.gqBorderLeft:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, 0)
+    frame.gqBorderLeft:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 0, 0)
+    frame.gqBorderRight = makeEdge()
+    frame.gqBorderRight:SetWidth(1)
+    frame.gqBorderRight:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 0, 0)
+    frame.gqBorderRight:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 0, 0)
 end
 
 local function ApplyMetalEdge(frame, edgeSize)
-    if not frame or not frame.SetBackdrop then
+    if not frame then
+        return
+    end
+    if not EnsureBackdrop(frame) then
+        ApplyDrawnGoldBorder(frame)
         return
     end
     frame:SetBackdrop({
         edgeFile = METAL_EDGE,
         tile = true,
         tileSize = 16,
-        edgeSize = edgeSize or 12,
-        insets = { left = 2, right = 2, top = 2, bottom = 2 },
+        edgeSize = edgeSize or 16,
+        insets = { left = 3, right = 3, top = 3, bottom = 3 },
     })
+    if frame.SetBackdropBorderColor then
+        frame:SetBackdropBorderColor(GOLD[1], GOLD[2], GOLD[3], 1)
+    end
+end
+
+local function HideRegion(obj)
+    if obj and obj.Hide then
+        obj:Hide()
+    end
+end
+
+local SetupQuestLogPortrait
+
+local function HideDefaultFrameArt(frame)
+    if not frame then
+        return
+    end
+
+    -- Keep PortraitFrame metal sides and the portrait circle.
+    -- Strip only the default interior fills so we can tint the panel warmer.
+    for _, key in ipairs({
+        "NineSlice", "Bg", "TitleBg", "TopTileStreaks", "Inset", "OverlayElements",
+    }) do
+        HideRegion(frame[key])
+    end
+
+    local name = frame.GetName and frame:GetName()
+    if name then
+        for _, suffix in ipairs({
+            "TitleBg", "Bg", "TopTileStreaks", "Inset",
+        }) do
+            HideRegion(_G[name .. suffix])
+        end
+    end
+
+    if frame.gqBookIcon then
+        frame.gqBookIcon:Hide()
+    end
+end
+
+local function ApplyModernChrome(frame)
+    if not frame then
+        return
+    end
+
+    HideDefaultFrameArt(frame)
+    ApplyPanelBackground(frame)
+    if SetupQuestLogPortrait then
+        SetupQuestLogPortrait(frame)
+    end
+
+    local title = frame.TitleText or (frame.GetName and _G[frame:GetName() .. "TitleText"])
+    if title then
+        title:ClearAllPoints()
+        title:SetPoint("TOP", frame, "TOP", 0, -8)
+        if title.SetJustifyH then
+            title:SetJustifyH("CENTER")
+        end
+        title:SetTextColor(GOLD[1], GOLD[2], GOLD[3])
+    end
+
+    if frame.gqHeaderLine then
+        frame.gqHeaderLine:Hide()
+    end
+end
+
+local function StripDefaultButtonArt(btn)
+    if not btn then
+        return
+    end
+    local getters = {
+        btn.GetNormalTexture,
+        btn.GetPushedTexture,
+        btn.GetHighlightTexture,
+        btn.GetDisabledTexture,
+    }
+    for _, getter in ipairs(getters) do
+        if getter then
+            HideRegion(getter(btn))
+        end
+    end
+    local name = btn.GetName and btn:GetName()
+    if name then
+        for _, part in ipairs({
+            "Left", "Middle", "Right",
+            "LeftDisabled", "MiddleDisabled", "RightDisabled",
+            "HighlightLeft", "HighlightMiddle", "HighlightRight",
+        }) do
+            HideRegion(_G[name .. part])
+        end
+    end
+end
+
+local function BackdropFrameTemplate()
+    if BackdropTemplateMixin then
+        return "BackdropTemplate"
+    end
+    return nil
+end
+
+local function HideTabEdges(btn)
+    if not btn then
+        return
+    end
+    for _, key in ipairs({ "gqEdgeTop", "gqEdgeBottom", "gqEdgeLeft", "gqEdgeRight" }) do
+        if btn[key] then
+            btn[key]:Hide()
+        end
+    end
+end
+
+local function EnsureTabChrome(btn)
+    if not btn then
+        return
+    end
+    if not btn.gqFill then
+        btn.gqFill = btn:CreateTexture(nil, "BACKGROUND")
+        btn.gqFill:SetAllPoints()
+    end
+    if not btn.gqOpenCover then
+        local cover = btn:CreateTexture(nil, "OVERLAY")
+        cover:SetDrawLayer("OVERLAY", 7)
+        btn.gqOpenCover = cover
+    end
+    HideTabEdges(btn)
+end
+
+local function LayoutOpenCover(btn, opts, fill, edgeSize)
+    local cover = btn.gqOpenCover
+    if not cover then
+        return
+    end
+    cover:SetColorTexture(fill[1], fill[2], fill[3], fill[4] or 1)
+    cover:ClearAllPoints()
+    local coverSize = math.max(3, math.floor(edgeSize * 0.7))
+    if opts.hideLeft then
+        cover:SetPoint("TOPLEFT", btn, "TOPLEFT", 0, 0)
+        cover:SetPoint("BOTTOMLEFT", btn, "BOTTOMLEFT", 0, 0)
+        cover:SetWidth(coverSize)
+        cover:Show()
+    elseif opts.hideBottom then
+        cover:SetPoint("BOTTOMLEFT", btn, "BOTTOMLEFT", 0, 0)
+        cover:SetPoint("BOTTOMRIGHT", btn, "BOTTOMRIGHT", 0, 0)
+        cover:SetHeight(coverSize)
+        cover:Show()
+    else
+        cover:Hide()
+    end
+end
+
+local function LayoutTabChrome(btn, opts)
+    if not btn then
+        return
+    end
+
+    EnsureTabChrome(btn)
+    opts = opts or {}
+    local fill = opts.fill or LIST_BG
+    local border = opts.border or GOLD
+    local edgeSize = opts.edgeSize or TAB_BORDER_EDGE
+    local thick = opts.thick or 1
+
+    if EnsureBackdrop(btn) then
+        if btn.gqFill then
+            btn.gqFill:Hide()
+        end
+        HideTabEdges(btn)
+        btn:SetBackdrop({
+            bgFile = "Interface\\Buttons\\WHITE8X8",
+            edgeFile = METAL_EDGE,
+            tile = true,
+            tileSize = 8,
+            edgeSize = edgeSize,
+            insets = { left = 2, right = 2, top = 2, bottom = 2 },
+        })
+        if btn.SetBackdropColor then
+            btn:SetBackdropColor(fill[1], fill[2], fill[3], fill[4] or 1)
+        end
+        if btn.SetBackdropBorderColor then
+            btn:SetBackdropBorderColor(border[1], border[2], border[3], border[4] or 1)
+        end
+        LayoutOpenCover(btn, opts, fill, edgeSize)
+        return
+    end
+
+    if btn.gqFill then
+        btn.gqFill:Show()
+        btn.gqFill:SetColorTexture(fill[1], fill[2], fill[3], fill[4] or 1)
+    end
+
+    local function ensureEdge(key)
+        if not btn[key] then
+            btn[key] = btn:CreateTexture(nil, "OVERLAY")
+        end
+        return btn[key]
+    end
+
+    local function paint(edge, shown)
+        if not edge then
+            return
+        end
+        edge:SetColorTexture(border[1], border[2], border[3], border[4] or 1)
+        if shown then
+            edge:Show()
+        else
+            edge:Hide()
+        end
+    end
+
+    local top = ensureEdge("gqEdgeTop")
+    top:ClearAllPoints()
+    top:SetHeight(thick)
+    top:SetPoint("TOPLEFT", btn, "TOPLEFT", 0, 0)
+    top:SetPoint("TOPRIGHT", btn, "TOPRIGHT", 0, 0)
+    paint(top, not opts.hideTop)
+
+    local bottom = ensureEdge("gqEdgeBottom")
+    bottom:ClearAllPoints()
+    bottom:SetHeight(thick)
+    bottom:SetPoint("BOTTOMLEFT", btn, "BOTTOMLEFT", 0, 0)
+    bottom:SetPoint("BOTTOMRIGHT", btn, "BOTTOMRIGHT", 0, 0)
+    paint(bottom, not opts.hideBottom)
+
+    local left = ensureEdge("gqEdgeLeft")
+    left:ClearAllPoints()
+    left:SetWidth(thick)
+    left:SetPoint("TOPLEFT", btn, "TOPLEFT", 0, 0)
+    left:SetPoint("BOTTOMLEFT", btn, "BOTTOMLEFT", 0, 0)
+    paint(left, not opts.hideLeft)
+
+    local right = ensureEdge("gqEdgeRight")
+    right:ClearAllPoints()
+    right:SetWidth(thick)
+    right:SetPoint("TOPRIGHT", btn, "TOPRIGHT", 0, 0)
+    right:SetPoint("BOTTOMRIGHT", btn, "BOTTOMRIGHT", 0, 0)
+    paint(right, not opts.hideRight)
+
+    LayoutOpenCover(btn, opts, fill, thick + 2)
+end
+
+local function StyleGoldTab(btn, selected)
+    if not btn then
+        return
+    end
+
+    StripDefaultButtonArt(btn)
+    btn:EnableMouse(true)
+    if btn.SetEnabled then
+        btn:SetEnabled(true)
+    end
+
+    if btn.gqTabBg then
+        btn.gqTabBg:Hide()
+    end
+    if btn.gqTabTop then
+        btn.gqTabTop:Hide()
+    end
+    if btn.gqTabBottom then
+        btn.gqTabBottom:Hide()
+    end
+
+    local fs = btn:GetFontString()
+    if not fs then
+        fs = btn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        fs:SetPoint("CENTER")
+        btn:SetFontString(fs)
+    end
+    fs:Show()
+
+    if selected then
+        btn:SetHeight(TAB_HEIGHT)
+        LayoutTabChrome(btn, {
+            fill = LIST_BG,
+            border = GOLD,
+            hideBottom = true,
+            edgeSize = FILTER_BORDER_EDGE,
+        })
+        fs:SetTextColor(GOLD[1], GOLD[2], GOLD[3])
+    else
+        btn:SetHeight(TAB_HEIGHT)
+        LayoutTabChrome(btn, {
+            fill = { 0.05, 0.05, 0.05, 1 },
+            border = GOLD_DIM,
+            hideBottom = true,
+            edgeSize = FILTER_BORDER_EDGE,
+        })
+        fs:SetTextColor(GOLD_DIM[1], GOLD_DIM[2], GOLD_DIM[3])
+    end
+end
+
+local function CreateGoldTab(parent, name, label, width)
+    local btn = CreateFrame("Button", name, parent, BackdropFrameTemplate())
+    btn:SetSize(width, TAB_HEIGHT)
+    local fs = btn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    fs:SetPoint("CENTER")
+    fs:SetText(label)
+    btn:SetFontString(fs)
+    StyleGoldTab(btn, false)
+    return btn
+end
+
+local function StyleHandleTab(btn, selected)
+    if not btn then
+        return
+    end
+
+    StripDefaultButtonArt(btn)
+    btn:EnableMouse(true)
+    if btn.SetEnabled then
+        btn:SetEnabled(true)
+    end
+    btn:SetSize(SIDE_TAB_WIDTH, SIDE_TAB_HEIGHT)
+
+    local fs = btn:GetFontString()
+    if fs then
+        fs:Hide()
+    end
+    if btn.gqTabBg then
+        btn.gqTabBg:Hide()
+    end
+    if btn.gqTabTop then
+        btn.gqTabTop:Hide()
+    end
+    if btn.gqTabBottom then
+        btn.gqTabBottom:Hide()
+    end
+    if btn.gqTabRight then
+        btn.gqTabRight:Hide()
+    end
+
+    if btn.gqMetalHost then
+        btn.gqMetalHost:Hide()
+    end
+    if btn.gqHandleFill then
+        btn.gqHandleFill:Hide()
+    end
+    for _, key in ipairs({
+        "gqMetalTL", "gqMetalTR", "gqMetalBL", "gqMetalBR",
+        "gqMetalTop", "gqMetalBottom", "gqMetalLeft", "gqMetalRight",
+    }) do
+        if btn[key] then
+            btn[key]:Hide()
+        end
+    end
+
+    if not btn.gqIcon then
+        btn.gqIcon = btn:CreateTexture(nil, "OVERLAY")
+    end
+    btn.gqIcon:SetDrawLayer("OVERLAY", 6)
+    btn.gqIcon:ClearAllPoints()
+    btn.gqIcon:SetSize(SIDE_TAB_ICON_SIZE, SIDE_TAB_ICON_SIZE)
+    btn.gqIcon:SetPoint("CENTER", btn, "CENTER", 0, 0)
+    if btn.gqIconPath then
+        btn.gqIcon:SetTexture(btn.gqIconPath)
+    end
+    btn.gqIcon:Show()
+
+    if selected then
+        LayoutTabChrome(btn, {
+            fill = PANEL_BG,
+            border = FRAME_METAL,
+            hideLeft = true,
+            edgeSize = TAB_BORDER_EDGE,
+        })
+        btn.gqIcon:SetVertexColor(1, 1, 1, 1)
+    else
+        LayoutTabChrome(btn, {
+            fill = { 0.05, 0.04, 0.03, 1 },
+            border = FRAME_METAL_DIM,
+            edgeSize = TAB_BORDER_EDGE,
+        })
+        btn.gqIcon:SetVertexColor(0.42, 0.38, 0.32, 1)
+    end
+end
+
+local function CreateHandleTab(parent, name, label, iconPath)
+    local btn = CreateFrame("Button", name, parent, BackdropFrameTemplate())
+    btn:SetSize(SIDE_TAB_WIDTH, SIDE_TAB_HEIGHT)
+    btn.gqLabel = label
+    btn.gqIconPath = iconPath
+    StyleHandleTab(btn, false)
+    btn:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+        GameTooltip:SetText(self.gqLabel or "", 1, 1, 1)
+        GameTooltip:Show()
+    end)
+    btn:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+    return btn
+end
+
+local function GetScrollRange(scroll)
+    if not scroll then
+        return 0
+    end
+    if scroll.GetVerticalScrollRange then
+        local range = scroll:GetVerticalScrollRange()
+        if range and range > 0 then
+            return range
+        end
+    end
+    local scrollName = scroll.GetName and scroll:GetName()
+    local bar = scroll.ScrollBar or (scrollName and _G[scrollName .. "ScrollBar"])
+    if bar and bar.GetMinMaxValues then
+        local minVal, maxVal = bar:GetMinMaxValues()
+        return math.max(0, (maxVal or 0) - (minVal or 0))
+    end
+    return 0
+end
+
+local function ScrollFrameOnMouseWheel(scroll, delta)
+    if not scroll or not scroll.IsShown or not scroll:IsShown() then
+        return
+    end
+
+    local range = GetScrollRange(scroll)
+    if not range or range <= 0 then
+        return
+    end
+
+    local current = 0
+    if scroll.GetVerticalScroll then
+        current = scroll:GetVerticalScroll() or 0
+    end
+    local dest = current - (delta * WHEEL_STEP)
+    if dest < 0 then
+        dest = 0
+    elseif dest > range then
+        dest = range
+    end
+
+    if scroll.SetVerticalScroll then
+        scroll:SetVerticalScroll(dest)
+    end
+
+    local scrollName = scroll.GetName and scroll:GetName()
+    local bar = scroll.ScrollBar or (scrollName and _G[scrollName .. "ScrollBar"])
+    if bar and bar.SetValue then
+        bar:SetValue(dest)
+    end
+end
+
+local function ApplyScrollBarVisibility(scroll)
+    if not scroll then
+        return
+    end
+    local scrollName = scroll.GetName and scroll:GetName()
+    local bar = scroll.ScrollBar or (scrollName and _G[scrollName .. "ScrollBar"])
+    if not bar then
+        return
+    end
+    if GetScrollRange(scroll) > 0 then
+        bar:Show()
+    else
+        if scroll.SetVerticalScroll then
+            scroll:SetVerticalScroll(0)
+        end
+        if bar.SetValue then
+            bar:SetValue(0)
+        end
+        bar:Hide()
+    end
+end
+
+local function WireLogWindowMouseWheel(frame)
+    if not frame or not frame.EnableMouseWheel then
+        return
+    end
+    frame:EnableMouseWheel(true)
+    frame:SetScript("OnMouseWheel", function(self, delta)
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if not log or log:GetPageTab() ~= "log" then
+            return
+        end
+        if self.detailBg and self.detailBg.IsMouseOver and self.detailBg:IsMouseOver() then
+            ScrollFrameOnMouseWheel(self.detailScroll, delta)
+        else
+            ScrollFrameOnMouseWheel(self.scroll, delta)
+        end
+    end)
+end
+
+local function WireMouseWheel(frame, scroll)
+    if not frame or not scroll or not frame.EnableMouseWheel then
+        return
+    end
+    frame:EnableMouseWheel(true)
+    frame:SetScript("OnMouseWheel", function(_, delta)
+        ScrollFrameOnMouseWheel(scroll, delta)
+    end)
+end
+
+local function LayoutColumnScroll(scroll, host)
+    if not scroll or not host then
+        return
+    end
+
+    scroll:SetParent(host)
+    scroll:ClearAllPoints()
+    scroll:SetPoint("TOPLEFT", host, "TOPLEFT", PANEL_INSET, -PANEL_INSET)
+    scroll:SetPoint("BOTTOMRIGHT", host, "BOTTOMRIGHT", -(PANEL_INSET + SCROLLBAR_WIDTH + 6), PANEL_INSET)
+
+    local scrollName = scroll.GetName and scroll:GetName()
+    local bar = scrollName and _G[scrollName .. "ScrollBar"]
+    if bar then
+        if bar.gqTrackBg then
+            bar.gqTrackBg:Hide()
+        end
+        -- Keep the bar parented to the scroll frame so UIPanelScrollBar OnValueChanged works.
+        if bar.SetFrameLevel then
+            bar:SetFrameLevel(scroll:GetFrameLevel() + 5)
+        end
+        ApplyScrollBarVisibility(scroll)
+    end
+
+    if scrollName then
+        for _, suffix in ipairs({ "Top", "Bottom", "Middle" }) do
+            local tex = _G[scrollName .. suffix]
+            if tex and tex.Show then
+                tex:Show()
+            end
+        end
+    end
+
+    WireMouseWheel(scroll, scroll)
+    WireMouseWheel(host, scroll)
+    if scroll.GetScrollChild then
+        WireMouseWheel(scroll:GetScrollChild(), scroll)
+    end
 end
 
 local function CreateSectionDivider(parent)
@@ -610,31 +1225,13 @@ local function ConfigurePanelScrollBar(scroll)
         return
     end
 
-    local scrollName = scroll:GetName()
-
-    for _, suffix in ipairs({ "Top", "Bottom", "Middle", "Left", "Right" }) do
-        local piece = _G[scrollName .. suffix]
-        if piece then
-            if piece.SetAlpha then
-                piece:SetAlpha(1)
-            end
-            piece:Show()
+    local scrollBar = _G[scroll:GetName() .. "ScrollBar"]
+    if scrollBar then
+        if scrollBar.gqTrackBg then
+            scrollBar.gqTrackBg:Hide()
         end
+        scrollBar:Show()
     end
-
-    local scrollBar = _G[scrollName .. "ScrollBar"]
-    if not scrollBar then
-        return
-    end
-
-    if not scrollBar.gqTrackBg then
-        local trackBg = scrollBar:CreateTexture(nil, "BACKGROUND", nil, -8)
-        trackBg:SetAllPoints()
-        trackBg:SetColorTexture(0, 0, 0, 1)
-        scrollBar.gqTrackBg = trackBg
-    end
-
-    scrollBar:Show()
 end
 
 local function LayoutDetailScroll(frame)
@@ -642,15 +1239,17 @@ local function LayoutDetailScroll(frame)
         return
     end
 
-    -- Parent to the log frame (not detailBg) so clipping/backdrop on the parchment
-    -- panel does not hide the Blizzard scrollbar chrome.
-    frame.detailScroll:SetParent(frame)
-    frame.detailScroll:ClearAllPoints()
-    frame.detailScroll:SetPoint("TOPLEFT", frame.detailBg, "TOPLEFT", PANEL_INSET, -PANEL_INSET)
-    frame.detailScroll:SetPoint("BOTTOMRIGHT", frame.detailBg, "BOTTOMRIGHT", -PANEL_INSET, PANEL_INSET)
-    frame.detailScroll:SetFrameLevel(frame.detailBg:GetFrameLevel() + 10)
-    frame.detailScroll:Show()
-    ConfigurePanelScrollBar(frame.detailScroll)
+    LayoutColumnScroll(frame.detailScroll, frame.detailBg)
+    local log = _G.GearQuest and _G.GearQuest.Log
+    if log and log.GetPageTab and log:GetPageTab() == "simulator" then
+        frame.detailScroll:Hide()
+        local bar = frame.detailScroll.GetName and _G[frame.detailScroll:GetName() .. "ScrollBar"]
+        if bar then
+            bar:Hide()
+        end
+    else
+        frame.detailScroll:Show()
+    end
 end
 
 local function CreatePanelScrollFrame(name, parent)
@@ -689,6 +1288,9 @@ local function GetPortraitTexture(frame)
         return nil
     end
 
+    if frame.portrait then
+        return frame.portrait
+    end
     local container = frame.PortraitContainer or (frame.GetName and _G[frame:GetName() .. "PortraitContainer"])
     if container and container.portrait then
         return container.portrait
@@ -730,13 +1332,26 @@ local function EnsureFallbackPortraitIcon(frame, container)
     return icon, holder
 end
 
-local function SetupQuestLogPortrait(frame)
+function SetupQuestLogPortrait(frame)
     if frame.gqBookIcon then
         frame.gqBookIcon:Hide()
     end
 
-    if frame.gqPortraitHolder then
-        frame.gqPortraitHolder:Hide()
+    local name = frame.GetName and frame:GetName()
+    if name then
+        for _, suffix in ipairs({
+            "Portrait", "PortraitContainer", "TopLeft", "TopRight", "Top",
+            "BottomLeft", "BottomRight", "Bottom", "Left", "Right",
+        }) do
+            local region = _G[name .. suffix]
+            if region and region.Show then
+                region:Show()
+            end
+        end
+    end
+
+    if frame.portrait and frame.portrait.Show then
+        frame.portrait:Show()
     end
 
     local container = frame.PortraitContainer
@@ -747,6 +1362,9 @@ local function SetupQuestLogPortrait(frame)
 
     local tex = GetPortraitTexture(frame)
     if tex then
+        if frame.gqPortraitHolder then
+            frame.gqPortraitHolder:Hide()
+        end
         ApplyPortraitTexture(tex, PORTRAIT_TEXTURE)
         return
     end
@@ -785,6 +1403,23 @@ function GQ.Log:SetListTab(tab)
     self.selectedEntry = nil
     self:ClearDetail()
     self:Refresh()
+end
+
+function GQ.Log:GetPageTab()
+    GearQuestForeverDB.ui = GearQuestForeverDB.ui or {}
+    return GearQuestForeverDB.ui.pageTab or "log"
+end
+
+function GQ.Log:SetPageTab(tab)
+    GearQuestForeverDB.ui = GearQuestForeverDB.ui or {}
+    GearQuestForeverDB.ui.pageTab = tab or "log"
+    self:HideSpecPicker()
+    self:ApplyPageTab()
+    if self:GetPageTab() == "simulator" then
+        self:RefreshSimulator()
+    else
+        self:Refresh()
+    end
 end
 
 function GQ.Log:EntryMatchesTrackedHunt(entry)
@@ -1439,14 +2074,20 @@ function GQ.Log:MeasureDetailContentHeight()
 end
 
 function GQ.Log:UpdateDetailScrollHeight()
-    if not self.frame or not self.frame.detailScroll then
+    if not self.frame or not self.frame.detailScroll or not self.frame.detailChild then
         return
     end
 
     local contentHeight = self:MeasureDetailContentHeight()
     local visibleHeight = self.frame.detailScroll:GetHeight() or 120
-    self.frame.detailChild:SetHeight(math.max(contentHeight, visibleHeight))
+    if contentHeight > visibleHeight then
+        self.frame.detailChild:SetHeight(contentHeight)
+    else
+        self.frame.detailChild:SetHeight(visibleHeight)
+        self.frame.detailScroll:SetVerticalScroll(0)
+    end
     UpdateScrollChildRect(self.frame.detailScroll)
+    ApplyScrollBarVisibility(self.frame.detailScroll)
 end
 
 function GQ.Log:CreateListRow(index)
@@ -1481,6 +2122,13 @@ function GQ.Log:CreateListRow(index)
     row:SetScript("OnLeave", function(self)
         HideItemTooltip()
         UpdateListRowHighlight(self)
+    end)
+    row:EnableMouseWheel(true)
+    row:SetScript("OnMouseWheel", function(_, delta)
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if log and log.frame and log.frame.scroll then
+            ScrollFrameOnMouseWheel(log.frame.scroll, delta)
+        end
     end)
 
     return row
@@ -1739,11 +2387,11 @@ function GQ.Log:ApplySpecArrowStyle(arrowFrame, iconFrame)
         arrowFrame.text:Hide()
     end
 
-    if arrowFrame.SetNormalTexture then
-        arrowFrame:SetNormalTexture(nil)
-        arrowFrame:SetPushedTexture(nil)
-        arrowFrame:SetDisabledTexture(nil)
-        arrowFrame:SetHighlightTexture(nil)
+    if arrowFrame.GetNormalTexture then
+        HideRegion(arrowFrame:GetNormalTexture())
+        HideRegion(arrowFrame.GetPushedTexture and arrowFrame:GetPushedTexture())
+        HideRegion(arrowFrame.GetDisabledTexture and arrowFrame:GetDisabledTexture())
+        HideRegion(arrowFrame.GetHighlightTexture and arrowFrame:GetHighlightTexture())
     end
 
     if not arrowFrame.arrow then
@@ -1795,7 +2443,7 @@ function GQ.Log:EnsureSpecControl(frame)
         frame.tabSpec:SetScript("OnClick", nil)
     end
 
-    local tabBar = frame.tabBar or frame
+    local tabBar = frame.pageBar or frame.tabBar or frame
     local control = CreateFrame("Frame", "GearQuestLogSpecControl", tabBar)
     control:SetSize(SPEC_CONTROL_WIDTH, SPEC_CONTROL_HEIGHT)
     control:Hide()
@@ -1824,6 +2472,14 @@ function GQ.Log:EnsureSpecControl(frame)
     iconFrame:SetScript("OnLeave", function()
         GameTooltip:Hide()
     end)
+    iconFrame:SetScript("OnMouseDown", function(self, button)
+        if button == "LeftButton" then
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if log then
+                log:ToggleSpecPicker(self)
+            end
+        end
+    end)
 
     local arrowFrame = CreateFrame("Frame", nil, control)
     frame.tabSpecArrow = arrowFrame
@@ -1836,34 +2492,33 @@ function GQ.Log:EnsureSpecControl(frame)
 end
 
 function GQ.Log:RepositionSpecButton(frame)
-    if not frame or not frame.tabBar then
+    if not frame then
         return
     end
 
-    local tabBar = frame.tabBar
-    local tabGroup = tabBar.tabGroup
-    if not tabGroup then
+    self:EnsureLogPages(frame)
+    local logPage = frame.logPage
+    if not logPage then
         return
     end
-
-    tabBar:SetHeight(TAB_HEIGHT)
-
-    if tabGroup:GetParent() ~= tabBar then
-        tabGroup:SetParent(tabBar)
-    end
-
-    tabGroup:ClearAllPoints()
-    tabGroup:SetSize(TAB_GROUP_WIDTH, TAB_HEIGHT)
-    tabGroup:SetPoint("CENTER", tabBar, "CENTER", 0, 0)
 
     self:EnsureSpecControl(frame)
     local control = frame.tabSpecControl
-    if control then
-        if control:GetParent() ~= tabBar then
-            control:SetParent(tabBar)
-        end
-        control:ClearAllPoints()
-        control:SetPoint("BOTTOMRIGHT", tabBar, "TOPRIGHT", -8, -SPEC_ROW_GAP)
+    if not control then
+        return
+    end
+
+    if control:GetParent() ~= logPage then
+        control:SetParent(logPage)
+    end
+    control:ClearAllPoints()
+    if frame.detailBg then
+        control:SetPoint("BOTTOMRIGHT", frame.detailBg, "TOPRIGHT", -2, 4)
+    else
+        control:SetPoint("TOPRIGHT", logPage, "TOPRIGHT", 0, 0)
+    end
+    if control.SetFrameLevel then
+        control:SetFrameLevel(logPage:GetFrameLevel() + 8)
     end
 end
 
@@ -1873,10 +2528,29 @@ function GQ.Log:UpdateTabVisuals()
     end
 
     local tab = self:GetListTab()
-    local activeSelected = tab == "active"
-    self.frame.tabActive:SetEnabled(not activeSelected)
-    self.frame.tabCompleted:SetEnabled(activeSelected)
+    StyleGoldTab(self.frame.tabActive, tab == "active")
+    StyleGoldTab(self.frame.tabCompleted, tab == "completed")
+    local listLevel = (self.frame.listInset and self.frame.listInset:GetFrameLevel()) or (self.frame:GetFrameLevel() + 2)
+    self.frame.tabActive:SetFrameLevel(tab == "active" and (listLevel + 8) or math.max(1, listLevel - 1))
+    self.frame.tabCompleted:SetFrameLevel(tab == "completed" and (listLevel + 8) or math.max(1, listLevel - 1))
+    self:UpdatePageTabVisuals()
     self:UpdateSpecButton()
+end
+
+function GQ.Log:UpdatePageTabVisuals()
+    if not self.frame or not self.frame.tabLog then
+        return
+    end
+
+    local page = self:GetPageTab()
+    self:LayoutSideTabs(self.frame)
+    if self.frame.tabBar then
+        if page == "log" then
+            self.frame.tabBar:Show()
+        else
+            self.frame.tabBar:Hide()
+        end
+    end
 end
 
 function GQ.Log:UpdateSpecButton()
@@ -1890,9 +2564,9 @@ function GQ.Log:UpdateSpecButton()
         return
     end
 
-    if GQ.Spec and GQ.Spec.IsActive and GQ.Spec:IsActive() then
+    if GQ.Spec and GQ.Spec.HasSpecs and GQ.Spec:HasSpecs() then
         control:Show()
-        local specId = GQ.Spec:GetEffectiveSpec()
+        local specId = GQ.Spec.GetDisplaySpec and GQ.Spec:GetDisplaySpec() or GQ.Spec:GetEffectiveSpec()
         if self.frame.tabSpecIcon and self.frame.tabSpecIcon.icon then
             self.frame.tabSpecIcon.icon:SetTexture(GQ.Spec:GetSpecIcon(specId, GQ:GetEffectiveClass()))
         end
@@ -1904,6 +2578,19 @@ end
 
 function GQ.Log:UpdateFooterButtons()
     if not self.frame then
+        return
+    end
+
+    if self:GetPageTab() == "simulator" then
+        if self.frame.trackBtn then
+            self.frame.trackBtn:Hide()
+        end
+        if self.frame.untrackBtn then
+            self.frame.untrackBtn:Hide()
+        end
+        if self.frame.exitBtn then
+            self.frame.exitBtn:Show()
+        end
         return
     end
 
@@ -1933,27 +2620,317 @@ function GQ.Log:UpdateFooterButtons()
     end
 end
 
+function GQ.Log:EnsurePageBar(frame)
+    if not frame.pageBar then
+        local pageBar = CreateFrame("Frame", nil, frame)
+        pageBar:SetHeight(math.max(TAB_HEIGHT, SPEC_CONTROL_HEIGHT))
+        frame.pageBar = pageBar
+    end
+    if frame.pageBar.tabGroup then
+        frame.pageBar.tabGroup:Hide()
+    end
+    return frame.pageBar
+end
+
+function GQ.Log:EnsureSideTabs(frame)
+    if not frame.sideTabRail then
+        frame.sideTabRail = CreateFrame("Frame", nil, frame)
+        frame.sideTabRail:SetSize(SIDE_TAB_WIDTH, (SIDE_TAB_HEIGHT * 2) + SIDE_TAB_GAP)
+    end
+    local rail = frame.sideTabRail
+
+    if not frame.tabLog then
+        frame.tabLog = CreateHandleTab(rail, "GearQuestPageTabLog", "GearQuest Log", LOG_TAB_ICON)
+        frame.tabLog:SetScript("OnClick", function()
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if log then
+                log:SetPageTab("log")
+            end
+        end)
+    else
+        frame.tabLog:SetParent(rail)
+        frame.tabLog.gqLabel = frame.tabLog.gqLabel or "GearQuest Log"
+        frame.tabLog.gqIconPath = LOG_TAB_ICON
+        frame.tabLog:SetSize(SIDE_TAB_WIDTH, SIDE_TAB_HEIGHT)
+        if not frame.tabLog:GetScript("OnClick") then
+            frame.tabLog:SetScript("OnClick", function()
+                local log = _G.GearQuest and _G.GearQuest.Log
+                if log then
+                    log:SetPageTab("log")
+                end
+            end)
+        end
+    end
+
+    if not frame.tabSimulator then
+        frame.tabSimulator = CreateHandleTab(rail, "GearQuestPageTabSimulator", "Simulator", SIM_TAB_ICON)
+        frame.tabSimulator:SetScript("OnClick", function()
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if log then
+                log:SetPageTab("simulator")
+            end
+        end)
+    else
+        frame.tabSimulator:SetParent(rail)
+        frame.tabSimulator.gqLabel = frame.tabSimulator.gqLabel or "Simulator"
+        frame.tabSimulator.gqIconPath = SIM_TAB_ICON
+        frame.tabSimulator:SetSize(SIDE_TAB_WIDTH, SIDE_TAB_HEIGHT)
+        if not frame.tabSimulator:GetScript("OnClick") then
+            frame.tabSimulator:SetScript("OnClick", function()
+                local log = _G.GearQuest and _G.GearQuest.Log
+                if log then
+                    log:SetPageTab("simulator")
+                end
+            end)
+        end
+    end
+
+    return rail
+end
+
+function GQ.Log:LayoutSideTabs(frame)
+    if not frame then
+        return
+    end
+
+    local rail = self:EnsureSideTabs(frame)
+    if rail:GetParent() ~= UIParent then
+        rail:SetParent(UIParent)
+    end
+    if rail.SetFrameStrata then
+        rail:SetFrameStrata(LOG_FRAME_STRATA)
+    end
+
+    local frameLevel = frame:GetFrameLevel() or LOG_FRAME_LEVEL
+    local behindLevel = math.max(1, frameLevel - 2)
+    local frontLevel = frameLevel + 25
+    rail:SetFrameLevel(behindLevel)
+    rail:ClearAllPoints()
+    rail:SetPoint("TOPLEFT", frame, "TOPRIGHT", -SIDE_TAB_OVERLAP, SIDE_TAB_TOP)
+    rail:SetSize(SIDE_TAB_WIDTH, (SIDE_TAB_HEIGHT * 2) + SIDE_TAB_GAP)
+    if frame:IsShown() then
+        rail:Show()
+    else
+        rail:Hide()
+    end
+
+    if not frame.gqRailHideWired then
+        frame.gqRailHideWired = true
+        local prevHide = frame:GetScript("OnHide")
+        frame:SetScript("OnHide", function(self, ...)
+            if self.sideTabRail then
+                self.sideTabRail:Hide()
+            end
+            if prevHide then
+                prevHide(self, ...)
+            end
+        end)
+    end
+
+    local page = self:GetPageTab()
+    local logSelected = page == "log"
+    frame.tabLog:ClearAllPoints()
+    frame.tabLog:SetPoint("TOPLEFT", rail, "TOPLEFT", 0, 0)
+    frame.tabSimulator:ClearAllPoints()
+    frame.tabSimulator:SetPoint("TOPLEFT", rail, "TOPLEFT", 0, -(SIDE_TAB_HEIGHT + SIDE_TAB_GAP))
+    frame.tabLog:Show()
+    frame.tabSimulator:Show()
+    frame.tabLog:SetFrameLevel(logSelected and frontLevel or (behindLevel + 1))
+    frame.tabSimulator:SetFrameLevel(logSelected and (behindLevel + 1) or frontLevel)
+    StyleHandleTab(frame.tabLog, logSelected)
+    StyleHandleTab(frame.tabSimulator, not logSelected)
+end
+
+function GQ.Log:EnsureLogPages(frame)
+    if not frame.logPage then
+        frame.logPage = CreateFrame("Frame", nil, frame)
+    end
+    if not frame.simPage then
+        frame.simPage = CreateFrame("Frame", nil, frame)
+    end
+    return frame.logPage, frame.simPage
+end
+
+function GQ.Log:LayoutMainWindow(frame)
+    if not frame then
+        return
+    end
+
+    local pageBar = self:EnsurePageBar(frame)
+    local logPage, simPage = self:EnsureLogPages(frame)
+    self:EnsureSideTabs(frame)
+
+    logPage:ClearAllPoints()
+    logPage:SetPoint("TOPLEFT", frame, "TOPLEFT", CONTENT_LEFT, -TAB_TOP_OFFSET)
+    logPage:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -CONTENT_RIGHT_GUTTER, 0)
+
+    simPage:ClearAllPoints()
+    simPage:SetPoint("TOPLEFT", logPage, "TOPLEFT", 0, 0)
+    simPage:SetPoint("BOTTOMRIGHT", logPage, "BOTTOMRIGHT", 0, 0)
+
+    if pageBar:GetParent() ~= logPage then
+        pageBar:SetParent(logPage)
+    end
+    pageBar:SetHeight(TAB_HEIGHT)
+    pageBar:ClearAllPoints()
+    pageBar:SetPoint("TOPLEFT", logPage, "TOPLEFT", 0, 0)
+    pageBar:SetWidth(LEFT_COLUMN_WIDTH)
+    pageBar:Show()
+
+    self:LayoutSideTabs(frame)
+    self:LayoutLogColumns(frame)
+    self:RepositionSpecButton(frame)
+    self:LayoutSimulatorPage(frame)
+    self:LayoutFooterButtons(frame)
+    self:ApplyPageTab()
+end
+
+function GQ.Log:LayoutLogColumns(frame)
+    local logPage = frame.logPage
+    if not logPage then
+        return
+    end
+
+    local filterHeight = math.max(TAB_HEIGHT, SPEC_CONTROL_HEIGHT)
+    local listTop = LOG_SECTION_TOP
+
+    if frame.listInset then
+        if frame.listInset:GetParent() ~= logPage then
+            frame.listInset:SetParent(logPage)
+        end
+        frame.listInset:ClearAllPoints()
+        frame.listInset:SetPoint("TOPLEFT", logPage, "TOPLEFT", 0, listTop)
+        frame.listInset:SetPoint("BOTTOMLEFT", logPage, "BOTTOMLEFT", 0, FOOTER_OFFSET)
+        frame.listInset:SetWidth(LEFT_COLUMN_WIDTH)
+        ApplyBlackBackground(frame.listInset)
+        ApplyMetalEdge(frame.listInset, 16)
+    end
+
+    if frame.scroll and frame.listInset then
+        LayoutColumnScroll(frame.scroll, frame.listInset)
+    end
+
+    if frame.scrollChild then
+        frame.scrollChild:SetWidth(LEFT_COLUMN_WIDTH - (PANEL_INSET * 2) - SCROLLBAR_INSET)
+    end
+
+    if frame.sectionDivider then
+        frame.sectionDivider:Hide()
+    end
+
+    if frame.listGutter then
+        frame.listGutter:Hide()
+    end
+    if frame.detailGutter then
+        frame.detailGutter:Hide()
+    end
+
+    if frame.detailBg then
+        if frame.detailBg:GetParent() ~= logPage then
+            frame.detailBg:SetParent(logPage)
+        end
+        frame.detailBg:ClearAllPoints()
+        frame.detailBg:SetPoint("TOPLEFT", logPage, "TOPLEFT", LEFT_COLUMN_WIDTH + COLUMN_GAP, listTop)
+        frame.detailBg:SetPoint("BOTTOMRIGHT", logPage, "BOTTOMRIGHT", 0, FOOTER_OFFSET)
+        ApplyMetalEdge(frame.detailBg, 16)
+    end
+
+    if frame.detailChild then
+        frame.detailChild:SetWidth(RIGHT_COLUMN_WIDTH - (PANEL_INSET * 2) - SCROLLBAR_INSET - 8)
+    end
+
+    LayoutDetailScroll(frame)
+end
+
+function GQ.Log:LayoutFooterButtons(frame)
+    if not frame.trackBtn then
+        return
+    end
+
+    frame.trackBtn:ClearAllPoints()
+    frame.trackBtn:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", CONTENT_LEFT, 12)
+
+    frame.untrackBtn:ClearAllPoints()
+    frame.untrackBtn:SetPoint("LEFT", frame.trackBtn, "RIGHT", 4, 0)
+
+    if frame.exitBtn then
+        frame.exitBtn:ClearAllPoints()
+        frame.exitBtn:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -CONTENT_RIGHT_GUTTER, 12)
+    end
+end
+
+function GQ.Log:ApplyPageTab()
+    if not self.frame then
+        return
+    end
+
+    local page = self:GetPageTab()
+    if self.frame.logPage then
+        if page == "log" then
+            self.frame.logPage:Show()
+        else
+            self.frame.logPage:Hide()
+        end
+    end
+    if self.frame.detailScroll then
+        if page == "log" then
+            self.frame.detailScroll:Show()
+        else
+            self.frame.detailScroll:Hide()
+        end
+        local detailBar = self.frame.detailScroll.GetName and _G[self.frame.detailScroll:GetName() .. "ScrollBar"]
+        if page == "log" then
+            ApplyScrollBarVisibility(self.frame.detailScroll)
+        elseif detailBar then
+            detailBar:Hide()
+        end
+    end
+    if self.frame.scroll then
+        local listBar = self.frame.scroll.GetName and _G[self.frame.scroll:GetName() .. "ScrollBar"]
+        if page == "log" then
+            self.frame.scroll:Show()
+            ApplyScrollBarVisibility(self.frame.scroll)
+        else
+            if listBar then
+                listBar:Hide()
+            end
+        end
+    end
+    if self.frame.simPage then
+        if page == "simulator" then
+            self.frame.simPage:Show()
+        else
+            self.frame.simPage:Hide()
+        end
+    end
+
+    self:UpdatePageTabVisuals()
+    self:UpdateFooterButtons()
+    if page == "log" then
+        self:UpdateSpecButton()
+    elseif self.frame.tabSpecControl then
+        self.frame.tabSpecControl:Hide()
+    end
+end
+
 function GQ.Log:EnsureTabBar(frame)
+    local pageBar = self:EnsurePageBar(frame)
+    self:EnsureLogPages(frame)
+
     if not frame.tabBar then
-        local tabBar = CreateFrame("Frame", nil, frame)
+        local tabBar = CreateFrame("Frame", nil, pageBar)
         tabBar:SetHeight(TAB_HEIGHT)
+        tabBar:SetWidth(FILTER_TAB_WIDTH * 2 + 4)
+        tabBar:SetPoint("TOPLEFT", pageBar, "TOPLEFT", FILTER_TAB_LEFT, 0)
         frame.tabBar = tabBar
+        tabBar.tabGroup = tabBar
 
-        local tabGroup = CreateFrame("Frame", nil, tabBar)
-        tabGroup:SetSize(TAB_GROUP_WIDTH, TAB_HEIGHT)
-        tabGroup:SetPoint("CENTER", tabBar, "CENTER", 0, 0)
-        tabBar.tabGroup = tabGroup
-
-        local tabActive = CreateFrame("Button", "GearQuestLogTabActive", tabGroup, "UIPanelButtonTemplate")
-        tabActive:SetSize(88, TAB_HEIGHT)
-        tabActive:SetPoint("LEFT", tabGroup, "LEFT", 0, 0)
-        tabActive:SetText("Active")
+        local tabActive = CreateGoldTab(tabBar, "GearQuestLogTabActive", "Active", FILTER_TAB_WIDTH)
+        tabActive:SetPoint("TOPLEFT", tabBar, "TOPLEFT", 0, 0)
         frame.tabActive = tabActive
 
-        local tabCompleted = CreateFrame("Button", "GearQuestLogTabCompleted", tabGroup, "UIPanelButtonTemplate")
-        tabCompleted:SetSize(88, TAB_HEIGHT)
-        tabCompleted:SetPoint("LEFT", tabActive, "RIGHT", 4, 0)
-        tabCompleted:SetText("Completed")
+        local tabCompleted = CreateGoldTab(tabBar, "GearQuestLogTabCompleted", "Completed", FILTER_TAB_WIDTH)
+        tabCompleted:SetPoint("TOPLEFT", tabActive, "TOPRIGHT", 4, 0)
         frame.tabCompleted = tabCompleted
 
         tabActive:SetScript("OnClick", function()
@@ -1971,41 +2948,431 @@ function GQ.Log:EnsureTabBar(frame)
                 log:SetListTab("completed")
             end
         end)
+    else
+        if frame.tabBar:GetParent() ~= pageBar then
+            frame.tabBar:SetParent(pageBar)
+        end
+        frame.tabBar:ClearAllPoints()
+        frame.tabBar:SetPoint("TOPLEFT", pageBar, "TOPLEFT", FILTER_TAB_LEFT, 0)
+        StyleGoldTab(frame.tabActive, self:GetListTab() == "active")
+        StyleGoldTab(frame.tabCompleted, self:GetListTab() == "completed")
     end
 
-    if frame.tabBar and not frame.tabSpecControl then
-        self:EnsureSpecControl(frame)
-    end
-
-    self:RepositionSpecButton(frame)
-
-    frame.tabBar:ClearAllPoints()
-    if frame.tabBar:GetParent() ~= frame then
-        frame.tabBar:SetParent(frame)
-    end
-    frame.tabBar:SetPoint("TOPLEFT", frame, "TOPLEFT", CONTENT_LEFT, -TAB_TOP_OFFSET)
-    frame.tabBar:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -CONTENT_RIGHT_GUTTER, -TAB_TOP_OFFSET)
-
-    if frame.listInset then
-        frame.listInset:ClearAllPoints()
-        frame.listInset:SetPoint("TOPLEFT", frame.tabBar, "BOTTOMLEFT", 0, -TAB_BAR_PAD)
-        frame.listInset:SetSize(PANEL_WIDTH, LIST_SECTION_HEIGHT)
-    end
-
-    if frame.scroll and frame.listInset then
-        frame.scroll:ClearAllPoints()
-        frame.scroll:SetPoint("TOPLEFT", frame.listInset, "TOPLEFT", PANEL_INSET, -PANEL_INSET)
-        frame.scroll:SetPoint("BOTTOMRIGHT", frame.listInset, "BOTTOMRIGHT", -PANEL_INSET, PANEL_INSET)
-        ConfigurePanelScrollBar(frame.scroll)
-    end
-
-    if frame.listGutter and frame.listInset then
-        frame.listGutter:ClearAllPoints()
-        frame.listGutter:SetPoint("TOPLEFT", frame.listInset, "TOPRIGHT", 0, 0)
-        frame.listGutter:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT", -GUTTER_INSET, -(LIST_TOP_OFFSET + LIST_SECTION_HEIGHT))
-    end
-
+    self:EnsureSimulatorPage(frame)
+    self:LayoutMainWindow(frame)
     self:UpdateTabVisuals()
+end
+
+function GQ.Log:EnsureSimulatorPage(frame)
+    self:EnsureLogPages(frame)
+    local simPage = frame.simPage
+    if simPage.simReady then
+        return simPage
+    end
+    simPage.simReady = true
+
+    local classInset = CreateFrame("Frame", nil, simPage)
+    ApplyBlackBackground(classInset)
+    ApplyMetalEdge(classInset, 12)
+    frame.simClassInset = classInset
+
+    local classTitle = classInset:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    classTitle:SetPoint("TOPLEFT", classInset, "TOPLEFT", 10, -8)
+    classTitle:SetText("Classes")
+    frame.simClassTitle = classTitle
+
+    frame.simClassButtons = {}
+    local classOrder = (GQ.Preview and GQ.Preview.CLASS_ORDER) or {
+        "WARRIOR", "PALADIN", "HUNTER", "ROGUE", "PRIEST", "SHAMAN", "MAGE", "WARLOCK", "DRUID",
+    }
+    local previous
+    for i, classFile in ipairs(classOrder) do
+        local btn = CreateFrame("Button", "GearQuestSimClass" .. classFile, classInset)
+        btn:SetHeight(22)
+        if previous then
+            btn:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, -1)
+            btn:SetPoint("TOPRIGHT", previous, "BOTTOMRIGHT", 0, -1)
+        else
+            btn:SetPoint("TOPLEFT", classTitle, "BOTTOMLEFT", -4, -8)
+            btn:SetPoint("TOPRIGHT", classInset, "TOPRIGHT", -8, -30)
+        end
+
+        btn.highlight = btn:CreateTexture(nil, "BACKGROUND")
+        btn.highlight:SetAllPoints()
+        btn.highlight:SetColorTexture(0.28, 0.22, 0.08, 0.55)
+        btn.highlight:Hide()
+
+        btn.text = btn:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+        btn.text:SetPoint("LEFT", btn, "LEFT", 12, 0)
+        btn.text:SetJustifyH("LEFT")
+        local label = (GQ.Preview and GQ.Preview.FormatClassName and GQ.Preview:FormatClassName(classFile)) or classFile
+        btn.text:SetText(label)
+        local colors = _G.RAID_CLASS_COLORS and _G.RAID_CLASS_COLORS[classFile]
+        if colors then
+            btn.text:SetTextColor(colors.r, colors.g, colors.b)
+        end
+
+        btn.classFile = classFile
+        btn:SetScript("OnClick", function(self)
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if log then
+                log:SelectSimulatorClass(self.classFile)
+            end
+        end)
+        btn:SetScript("OnEnter", function(self)
+            if not self.selected then
+                self.highlight:Show()
+            end
+        end)
+        btn:SetScript("OnLeave", function(self)
+            if not self.selected then
+                self.highlight:Hide()
+            end
+        end)
+
+        frame.simClassButtons[i] = btn
+        previous = btn
+    end
+
+    local simDetail = CreateFrame("Frame", nil, simPage)
+    EnableClipping(simDetail)
+    ApplyParchmentBackground(simDetail)
+    ApplyMetalEdge(simDetail, 12)
+    frame.simDetail = simDetail
+
+    local title = CreateFontStringWithFallback(simDetail, QUEST_DETAIL_TITLE_FONTS)
+    title:SetPoint("TOPLEFT", simDetail, "TOPLEFT", 16, -16)
+    title:SetPoint("RIGHT", simDetail, "RIGHT", -16, 0)
+    title:SetJustifyH("LEFT")
+    title:SetText("SIMULATOR")
+    title:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    frame.simTitle = title
+
+    local body = CreateFontStringWithFallback(simDetail, QUEST_DETAIL_BODY_FONTS)
+    body:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -10)
+    body:SetPoint("RIGHT", simDetail, "RIGHT", -16, 0)
+    body:SetJustifyH("LEFT")
+    body:SetWordWrap(true)
+    body:SetText("Pick a class on the left, then set faction, specialization, and level. Simulate to browse that character's upgrades in the log.")
+    body:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    frame.simBody = body
+
+    local factionHeader = CreateFontStringWithFallback(simDetail, QUEST_DETAIL_HEADER_FONTS)
+    factionHeader:SetPoint("TOPLEFT", body, "BOTTOMLEFT", 0, -16)
+    factionHeader:SetText("FACTION")
+    factionHeader:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    frame.simFactionHeader = factionHeader
+
+    local allianceBtn = CreateFrame("Button", "GearQuestSimFactionAlliance", simDetail, "UIPanelButtonTemplate")
+    allianceBtn:SetSize(96, 22)
+    allianceBtn:SetPoint("TOPLEFT", factionHeader, "BOTTOMLEFT", 0, -6)
+    allianceBtn:SetText("Alliance")
+    frame.simAllianceBtn = allianceBtn
+
+    local hordeBtn = CreateFrame("Button", "GearQuestSimFactionHorde", simDetail, "UIPanelButtonTemplate")
+    hordeBtn:SetSize(96, 22)
+    hordeBtn:SetPoint("LEFT", allianceBtn, "RIGHT", 6, 0)
+    hordeBtn:SetText("Horde")
+    frame.simHordeBtn = hordeBtn
+
+    allianceBtn:SetScript("OnClick", function()
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if log then
+            log.simFaction = "Alliance"
+            log:RefreshSimulator()
+        end
+    end)
+    hordeBtn:SetScript("OnClick", function()
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if log then
+            log.simFaction = "Horde"
+            log:RefreshSimulator()
+        end
+    end)
+
+    local specHeader = CreateFontStringWithFallback(simDetail, QUEST_DETAIL_HEADER_FONTS)
+    specHeader:SetPoint("TOPLEFT", allianceBtn, "BOTTOMLEFT", 0, -16)
+    specHeader:SetText("SPECIALIZATION")
+    specHeader:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    frame.simSpecHeader = specHeader
+
+    frame.simSpecButtons = {}
+    for i = 1, 4 do
+        local specBtn = CreateFrame("Button", "GearQuestSimSpec" .. i, simDetail, "UIPanelButtonTemplate")
+        specBtn:SetSize(150, 22)
+        if i == 1 then
+            specBtn:SetPoint("TOPLEFT", specHeader, "BOTTOMLEFT", 0, -6)
+        elseif i == 2 then
+            specBtn:SetPoint("LEFT", frame.simSpecButtons[1], "RIGHT", 6, 0)
+        elseif i == 3 then
+            specBtn:SetPoint("TOPLEFT", frame.simSpecButtons[1], "BOTTOMLEFT", 0, -4)
+        else
+            specBtn:SetPoint("LEFT", frame.simSpecButtons[3], "RIGHT", 6, 0)
+        end
+        specBtn:Hide()
+        specBtn:SetScript("OnClick", function(self)
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if not log then
+                return
+            end
+            log.simSpec = self.specId
+            if GQ.Preview and GQ.Preview.IsEnabled and GQ.Preview:IsEnabled() and GQ.Spec and self.specId then
+                GQ.Spec:SetSelectedSpec(self.specId, log.simClass)
+            end
+            log:RefreshSimulator()
+        end)
+        frame.simSpecButtons[i] = specBtn
+    end
+
+    local levelHeader = CreateFontStringWithFallback(simDetail, QUEST_DETAIL_HEADER_FONTS)
+    levelHeader:SetPoint("TOPLEFT", specHeader, "BOTTOMLEFT", 0, -72)
+    levelHeader:SetText("LEVEL")
+    levelHeader:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    frame.simLevelHeader = levelHeader
+
+    local levelEdit = CreateFrame("EditBox", "GearQuestSimLevelEdit", simDetail, "InputBoxTemplate")
+    levelEdit:SetSize(64, 20)
+    levelEdit:SetPoint("LEFT", levelHeader, "RIGHT", 12, 0)
+    levelEdit:SetAutoFocus(false)
+    levelEdit:SetMaxLetters(2)
+    frame.simLevelEdit = levelEdit
+    levelEdit:SetScript("OnTextChanged", function(self)
+        if GQ.Preview and GQ.Preview.SanitizeLevelEdit then
+            GQ.Preview:SanitizeLevelEdit(self)
+        end
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if log and log.RefreshSimulator then
+            log:RefreshSimulator()
+        end
+    end)
+    levelEdit:SetScript("OnEnterPressed", function()
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if log then
+            log:ApplySimulator()
+        end
+    end)
+    levelEdit:SetScript("OnEscapePressed", function(self)
+        self:ClearFocus()
+    end)
+
+    local status = CreateFontStringWithFallback(simDetail, QUEST_DETAIL_BODY_FONTS)
+    status:SetPoint("TOPLEFT", levelHeader, "BOTTOMLEFT", 0, -18)
+    status:SetPoint("RIGHT", simDetail, "RIGHT", -16, 0)
+    status:SetJustifyH("LEFT")
+    status:SetWordWrap(true)
+    status:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    frame.simStatus = status
+
+    local simulateBtn = CreateFrame("Button", "GearQuestSimApplyButton", simDetail, "UIPanelButtonTemplate")
+    simulateBtn:SetSize(106, 22)
+    simulateBtn:SetPoint("BOTTOMLEFT", simDetail, "BOTTOMLEFT", 16, 14)
+    simulateBtn:SetText("Simulate")
+    frame.simApplyBtn = simulateBtn
+    simulateBtn:SetScript("OnClick", function()
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if log then
+            log:ApplySimulator()
+        end
+    end)
+
+    local resetBtn = CreateFrame("Button", "GearQuestSimResetButton", simDetail, "UIPanelButtonTemplate")
+    resetBtn:SetSize(80, 22)
+    resetBtn:SetPoint("LEFT", simulateBtn, "RIGHT", 6, 0)
+    resetBtn:SetText("Reset")
+    frame.simResetBtn = resetBtn
+    resetBtn:SetScript("OnClick", function()
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if log then
+            log:ResetSimulator()
+        end
+    end)
+
+    return simPage
+end
+
+function GQ.Log:LayoutSimulatorPage(frame)
+    if not frame.simPage or not frame.simClassInset or not frame.simDetail then
+        return
+    end
+
+    frame.simClassInset:ClearAllPoints()
+    frame.simClassInset:SetPoint("TOPLEFT", frame.simPage, "TOPLEFT", 0, LOG_SECTION_TOP)
+    frame.simClassInset:SetPoint("BOTTOMLEFT", frame.simPage, "BOTTOMLEFT", 0, FOOTER_OFFSET)
+    frame.simClassInset:SetWidth(LEFT_COLUMN_WIDTH)
+    ApplyBlackBackground(frame.simClassInset)
+    ApplyMetalEdge(frame.simClassInset, 16)
+
+    frame.simDetail:ClearAllPoints()
+    frame.simDetail:SetPoint("TOPLEFT", frame.simPage, "TOPLEFT", LEFT_COLUMN_WIDTH + COLUMN_GAP, LOG_SECTION_TOP)
+    frame.simDetail:SetPoint("BOTTOMRIGHT", frame.simPage, "BOTTOMRIGHT", 0, FOOTER_OFFSET)
+    ApplyMetalEdge(frame.simDetail, 16)
+end
+
+function GQ.Log:SelectSimulatorClass(classFile)
+    self.simClass = classFile
+    if GQ.Spec then
+        local options = GQ.Spec:GetOptions(classFile) or {}
+        local stillValid = false
+        for _, opt in ipairs(options) do
+            if opt.id == self.simSpec and GQ.Spec:IsSpecSelectable(opt.id, classFile) then
+                stillValid = true
+                break
+            end
+        end
+        if not stillValid then
+            self.simSpec = GQ.Spec:GetDefaultSpec(classFile)
+        end
+    end
+    self:RefreshSimulator()
+end
+
+function GQ.Log:RefreshSimulator()
+    if not self.frame or not self.frame.simClassButtons then
+        return
+    end
+
+    if not self.simClass then
+        self.simClass = GQ:GetEffectiveClass()
+    end
+    if not self.simFaction then
+        self.simFaction = GQ:GetEffectiveFaction() or "Alliance"
+    end
+    if self.frame.simLevelEdit then
+        local focused = false
+        if self.frame.simLevelEdit.HasFocus then
+            focused = self.frame.simLevelEdit:HasFocus()
+        end
+        local text = self.frame.simLevelEdit:GetText() or ""
+        if not focused and text == "" then
+            self.frame.simLevelEdit:SetText(tostring(GQ:GetEffectiveLevel() or 1))
+        end
+    end
+
+    for _, btn in ipairs(self.frame.simClassButtons) do
+        local selected = btn.classFile == self.simClass
+        btn.selected = selected
+        if selected then
+            btn.highlight:Show()
+        else
+            btn.highlight:Hide()
+        end
+    end
+
+    if self.frame.simAllianceBtn then
+        self.frame.simAllianceBtn:SetEnabled(self.simFaction ~= "Alliance")
+        self.frame.simHordeBtn:SetEnabled(self.simFaction ~= "Horde")
+    end
+
+    local level = tonumber(self.frame.simLevelEdit and self.frame.simLevelEdit:GetText()) or GQ:GetEffectiveLevel() or 1
+    local specOptions = {}
+    if GQ.Spec and GQ.Spec.GetOptions then
+        for _, opt in ipairs(GQ.Spec:GetOptions(self.simClass) or {}) do
+            if GQ.Spec:IsSpecSelectable(opt.id, self.simClass) then
+                specOptions[#specOptions + 1] = opt
+            end
+        end
+    end
+
+    local specValid = false
+    for _, opt in ipairs(specOptions) do
+        if opt.id == self.simSpec then
+            specValid = true
+            break
+        end
+    end
+    if not specValid then
+        self.simSpec = specOptions[1] and specOptions[1].id or nil
+    end
+
+    if self.frame.simSpecHeader then
+        if #specOptions > 0 then
+            self.frame.simSpecHeader:Show()
+        else
+            self.frame.simSpecHeader:Hide()
+        end
+    end
+
+    for i, specBtn in ipairs(self.frame.simSpecButtons) do
+        local opt = specOptions[i]
+        if opt then
+            specBtn:Show()
+            specBtn:SetText(opt.label)
+            specBtn.specId = opt.id
+            specBtn:SetEnabled(self.simSpec ~= opt.id)
+        else
+            specBtn:Hide()
+            specBtn.specId = nil
+        end
+    end
+
+    local className = (GQ.Preview and GQ.Preview.FormatClassName and GQ.Preview:FormatClassName(self.simClass)) or self.simClass
+    local specLabel = ""
+    if self.simSpec and GQ.Spec then
+        for _, opt in ipairs(specOptions) do
+            if opt.id == self.simSpec then
+                specLabel = ", " .. opt.label
+                break
+            end
+        end
+    end
+
+    local viewing = string.format(
+        "Simulate a level %s %s %s%s, then open the log to hunt their upgrades.",
+        tostring(level),
+        self.simFaction or "Alliance",
+        className,
+        specLabel
+    )
+    if self.frame.simStatus then
+        self.frame.simStatus:SetText(viewing)
+    end
+end
+
+function GQ.Log:ApplySimulator()
+    if not GQ.Preview then
+        return
+    end
+
+    local levelText = ""
+    if self.frame.simLevelEdit and GQ.Preview.SanitizeLevelEdit then
+        levelText = GQ.Preview:SanitizeLevelEdit(self.frame.simLevelEdit)
+    elseif self.frame.simLevelEdit then
+        levelText = tostring(self.frame.simLevelEdit:GetText() or ""):gsub("%D", "")
+    end
+    if levelText == "" then
+        print(string.format("|cff66ccffGearQuest|r: Enter a level between 1 and %d.", GQ.MAX_PLAYER_LEVEL or 60))
+        return
+    end
+
+    local ok, err = GQ.Preview:ApplySimulation(self.simClass, levelText, self.simSpec, self.simFaction)
+    if not ok then
+        print("|cff66ccffGearQuest|r: " .. (err or "Could not simulate."))
+        return
+    end
+
+    self:SetPageTab("log")
+end
+
+function GQ.Log:ResetSimulator()
+    if not GQ.Preview then
+        return
+    end
+    GQ.Preview:ApplyCurrentCharacter()
+    GQ.Preview:SetEnabled(false)
+    GQ.Preview:PrintNowViewing()
+    self.simClass = GQ:GetEffectiveClass()
+    self.simFaction = GQ:GetEffectiveFaction()
+    self.simSpec = (GQ.Spec and GQ.Spec.GetDisplaySpec and GQ.Spec:GetDisplaySpec())
+        or (GQ.Spec and GQ.Spec:GetEffectiveSpec())
+        or nil
+    if self.frame and self.frame.simLevelEdit then
+        self.frame.simLevelEdit:SetText(tostring(GQ:GetEffectiveLevel() or 1))
+    end
+    if GQ.RefreshUI then
+        GQ:RefreshUI()
+    end
+    self:RefreshSimulator()
+    self:SetPageTab("log")
 end
 
 function GQ.Log:WireControls(frame)
@@ -2034,6 +3401,8 @@ end
 function GQ.Log:BindExistingFrame(frame)
     self.frame = frame
     ApplyLogWindowLayer(frame)
+    ApplyModernChrome(frame)
+    WireLogWindowMouseWheel(frame)
     self.listRows = {}
     self.selectedHuntId = nil
     self.selectedEntry = nil
@@ -2114,15 +3483,18 @@ function GQ.Log:Init()
     frame:SetScript("OnShow", function(self)
         BringLogWindowToFront(self)
     end)
+    WireLogWindowMouseWheel(frame)
     ApplyLogWindowLayer(frame)
     frame:Hide()
     tinsert(UISpecialFrames, frame:GetName())
 
-    SetFrameTitle(frame, "GearQuest Log")
-    SetupQuestLogPortrait(frame)
+    SetFrameTitle(frame, "GearQuest")
+    ApplyModernChrome(frame)
+    self.frame = frame
+    self:EnsureLogPages(frame)
 
-    frame.listInset = CreateFrame("Frame", nil, frame)
-    frame.listInset:SetSize(PANEL_WIDTH, LIST_SECTION_HEIGHT)
+    frame.listInset = CreateFrame("Frame", nil, frame.logPage)
+    frame.listInset:SetSize(LEFT_COLUMN_WIDTH, 200)
     ApplyBlackBackground(frame.listInset)
     ApplyMetalEdge(frame.listInset, 12)
 
@@ -2131,19 +3503,17 @@ function GQ.Log:Init()
     frame.scroll:SetPoint("BOTTOMRIGHT", frame.listInset, "BOTTOMRIGHT", -PANEL_INSET, PANEL_INSET)
 
     frame.scrollChild = CreateFrame("Frame", "GearQuestLogListScrollChild", frame.scroll)
-    frame.scrollChild:SetWidth(PANEL_WIDTH - (PANEL_INSET * 2) - SCROLLBAR_INSET)
+    frame.scrollChild:SetWidth(LEFT_COLUMN_WIDTH - (PANEL_INSET * 2) - SCROLLBAR_INSET)
     frame.scrollChild:SetHeight(1)
     frame.scroll:SetScrollChild(frame.scrollChild)
 
     frame.listGutter = CreateFrame("Frame", nil, frame)
+    frame.listGutter:Hide()
 
     frame.sectionDivider = CreateSectionDivider(frame)
-    frame.sectionDivider:SetPoint("TOPLEFT", frame.listInset, "BOTTOMLEFT", 0, 0)
-    frame.sectionDivider:SetPoint("TOPRIGHT", frame.listInset, "BOTTOMRIGHT", 0, 0)
+    frame.sectionDivider:Hide()
 
-    frame.detailBg = CreateFrame("Frame", nil, frame)
-    frame.detailBg:SetPoint("TOPLEFT", frame.sectionDivider, "BOTTOMLEFT", 0, 0)
-    frame.detailBg:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -CONTENT_RIGHT_GUTTER, FOOTER_OFFSET)
+    frame.detailBg = CreateFrame("Frame", nil, frame.logPage)
     EnableClipping(frame.detailBg)
     ApplyParchmentBackground(frame.detailBg)
     ApplyMetalEdge(frame.detailBg, 12)
@@ -2152,12 +3522,11 @@ function GQ.Log:Init()
     LayoutDetailScroll(frame)
 
     frame.detailChild = CreateFrame("Frame", "GearQuestLogDetailScrollChild", frame.detailScroll)
-    frame.detailChild:SetWidth(PANEL_WIDTH - (PANEL_INSET * 2) - SCROLLBAR_INSET - 8)
+    frame.detailChild:SetWidth(RIGHT_COLUMN_WIDTH - (PANEL_INSET * 2) - SCROLLBAR_INSET - 8)
     frame.detailScroll:SetScrollChild(frame.detailChild)
 
     frame.detailGutter = CreateFrame("Frame", nil, frame)
-    frame.detailGutter:SetPoint("TOPLEFT", frame.detailBg, "TOPRIGHT", 0, 0)
-    frame.detailGutter:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -GUTTER_INSET, FOOTER_OFFSET)
+    frame.detailGutter:Hide()
 
     ConfigurePanelScrollBar(frame.scroll)
 
@@ -2211,7 +3580,7 @@ function GQ.Log:Init()
 
     frame.exitBtn = CreateFrame("Button", "GearQuestLogExitButton", frame, "UIPanelButtonTemplate")
     frame.exitBtn:SetSize(106, 22)
-    frame.exitBtn:SetPoint("LEFT", frame.untrackBtn, "RIGHT", 2, 0)
+    frame.exitBtn:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -CONTENT_RIGHT_GUTTER, 12)
     frame.exitBtn:SetText("Exit")
 
     self:WireControls(frame)
@@ -2219,7 +3588,6 @@ function GQ.Log:Init()
     self:EnsureTabBar(frame)
 
     self.listRows = {}
-    self.frame = frame
     self.selectedHuntId = nil
     self.selectedEntry = nil
     self:ClearDetail()
@@ -2370,7 +3738,7 @@ function GQ.Log:ScrollListToRow(layoutIndex)
         return
     end
 
-    local visibleHeight = scroll:GetHeight() or LIST_SECTION_HEIGHT
+    local visibleHeight = scroll:GetHeight() or 200
     local contentHeight = scrollChild:GetHeight() or 0
     local maxScroll = math.max(0, contentHeight - visibleHeight)
     if maxScroll <= 0 then
@@ -2409,7 +3777,7 @@ function GQ.Log:BuildDetailLines(entry)
     end
 
     if GQ.Data:ShouldDisplayAsNotable(entry, entry and entry.slot) and entry.proc then
-        table.insert(lines, "\nWorth considering — the proc is the point.")
+        table.insert(lines, "\nWorth considering - the proc is the point.")
     end
 
     if entry.origin == "guide" then
@@ -2496,7 +3864,7 @@ function GQ.Log:ApplyEntryDetail(entry)
     local lore = entry.lore
     if self.frame.detailLore then
         if lore and lore ~= "" then
-            self.frame.detailLore:SetText(lore)
+            self.frame.detailLore:SetText(GQ.Data:SanitizeText(lore) or lore)
             self.frame.detailLore:Show()
             self.frame.detailHeader:ClearAllPoints()
             self.frame.detailHeader:SetPoint("TOPLEFT", self.frame.detailLore, "BOTTOMLEFT", 0, -12)
@@ -2509,7 +3877,11 @@ function GQ.Log:ApplyEntryDetail(entry)
     end
 
     local lines = self:BuildDetailLines(entry)
-    self.frame.detailBody:SetText(table.concat(lines, "\n"))
+    local body = table.concat(lines, "\n")
+    if GQ.Data and GQ.Data.SanitizeText then
+        body = GQ.Data:SanitizeText(body) or body
+    end
+    self.frame.detailBody:SetText(body)
 
     self:UpdateDetailReward(entry)
     self:UpdateDetailScrollHeight()
@@ -2623,14 +3995,9 @@ function GQ.Log:Refresh()
     UpdateScrollChildRect(self.frame.scroll)
 
     ConfigurePanelScrollBar(self.frame.scroll)
-
-    local detailVisible = self.frame.detailScroll:GetHeight() or 0
-    local detailContent = self.frame.detailChild:GetHeight() or 0
-    if detailContent < detailVisible then
-        self.frame.detailChild:SetHeight(detailVisible + 2)
-        UpdateScrollChildRect(self.frame.detailScroll)
-    end
+    self:UpdateDetailScrollHeight()
     LayoutDetailScroll(self.frame)
+    self:ApplyPageTab()
 
     if self.scrollListToSelected and selectedLayoutIndex then
         local layoutIndex = selectedLayoutIndex
@@ -2673,11 +4040,13 @@ function GQ.Log:Show()
         return
     end
 
-    SetupQuestLogPortrait(self.frame)
+    ApplyModernChrome(self.frame)
     ApplyParchmentBackground(self.frame.detailBg)
+    self:LayoutMainWindow(self.frame)
     LayoutDetailScroll(self.frame)
     BringLogWindowToFront(self.frame)
     self.frame:Show()
+    self:LayoutSideTabs(self.frame)
 
     local refreshOk, refreshErr = pcall(function()
         self:Refresh()
@@ -2692,6 +4061,9 @@ end
 function GQ.Log:Hide()
     self:HideSpecPicker()
     if self.frame then
+        if self.frame.sideTabRail then
+            self.frame.sideTabRail:Hide()
+        end
         self.frame:Hide()
     end
 end

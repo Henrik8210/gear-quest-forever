@@ -193,11 +193,35 @@ end
 
 function GQ.Spec:GetSpecIcon(specId, classFile)
     classFile = classFile or GQ:GetEffectiveClass()
+    if not specId then
+        specId = self:GetDisplaySpec(classFile)
+    end
     local opt = self:GetSpecOption(specId, classFile)
     if opt and opt.icon then
         return opt.icon
     end
     return "Interface\\Icons\\INV_Misc_QuestionMark"
+end
+
+function GQ.Spec:GetDisplaySpec(classFile)
+    classFile = classFile or GQ:GetEffectiveClass()
+    if not self:HasSpecs(classFile) then
+        return nil
+    end
+
+    local saved = self:GetSavedSpec(classFile)
+    if saved and self:IsSpecSelectable(saved, classFile) then
+        return saved
+    end
+
+    if not (GQ.IsPreviewEnabled and GQ:IsPreviewEnabled()) then
+        local fromTalents = self:DetectSpecFromTalents(classFile)
+        if fromTalents and self:IsSpecSelectable(fromTalents, classFile) then
+            return fromTalents
+        end
+    end
+
+    return self:GetDefaultSpec(classFile)
 end
 
 local function GetSpecStore(previewMode)
@@ -323,13 +347,14 @@ function GQ.Spec:DetectSpecFromTalents(classFile)
 end
 
 function GQ.Spec:GetEffectiveSpec()
-    local level = tonumber(GQ:GetEffectiveLevel()) or 0
-    if level < self.TALENT_LEVEL then
+    local classFile = GQ:GetEffectiveClass()
+    if not self:HasSpecs(classFile) then
         return nil
     end
 
-    local classFile = GQ:GetEffectiveClass()
-    if not self:HasSpecs(classFile) then
+    local previewMode = GQ.IsPreviewEnabled and GQ:IsPreviewEnabled()
+    local level = tonumber(GQ:GetEffectiveLevel()) or 0
+    if not previewMode and level < self.TALENT_LEVEL then
         return nil
     end
 
@@ -356,6 +381,6 @@ end
 
 function GQ.Spec:GetSelectedSpecLabel()
     local classFile = GQ:GetEffectiveClass()
-    local specId = self:GetEffectiveSpec()
+    local specId = self:GetDisplaySpec(classFile) or self:GetEffectiveSpec()
     return self:GetSpecLabel(specId, classFile) or "Specialization"
 end

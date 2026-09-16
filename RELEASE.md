@@ -6,12 +6,12 @@ Publishing uses **GitHub Actions**, not the CurseForge webhook. Keep any CurseFo
 
 ## One-time setup
 
-1. **Create a new CurseForge project** at [authors.curseforge.com](https://authors.curseforge.com/) named **GearQuest Forever** (WoW Forever / Classic+). Do not attach it to the existing TBC GearQuest project.
-2. Copy the **Project ID** from CurseForge → Overview → paste into `GearQuest/GearQuestForever.toc` as `## X-Curse-Project-ID:`.
+1. **Create a new CurseForge project** at [authors.curseforge.com](https://authors.curseforge.com/) named **GearQuest Forever** (WoW Forever / Classic+). Do not attach it to the existing TBC GearQuest project. **Done:** [project 1698950](https://authors.curseforge.com/#/projects/1698950).
+2. Copy the **Project ID** from CurseForge → Overview → paste into `GearQuest/GearQuestForever.toc` as `## X-Curse-Project-ID:`. **Done:** `1698950` (not TBC `1669225`).
 3. **API token:** [authors.curseforge.com → API tokens](https://authors.curseforge.com/#/settings/api-tokens) → create a token (or reuse your author token — it is account-level, not project-level).
 4. **GitHub secret:** this repo → Settings → Secrets and variables → Actions → New repository secret:
    - Name: `CF_API_KEY`
-   - Value: your CurseForge API token
+   - Value: your CurseForge API token. **Done** on `gear-quest-forever` (do not copy the TBC repo secret).
 5. **CurseForge Source (optional):** Link this GitHub repo for metadata only. Uploads come from Actions.
 6. After the Forever beta client exists, set `## Interface:` from `WTF/Config.wtf` `lastAddonVersion` (see [README.md](README.md)).
 
@@ -35,11 +35,11 @@ Only when explicitly publishing:
 
 ## First upload
 
-After `CF_API_KEY` is set and the **new** CurseForge project ID is in the toc:
+After `CF_API_KEY` is set and the **new** CurseForge project ID is in the toc. Tag must match `## Version:` with a `v` prefix (beta strings keep CurseForge on the beta channel):
 
 ```powershell
-git tag v0.1.0
-git push origin v0.1.0
+git tag v0.1.0-beta.1-forever
+git push origin v0.1.0-beta.1-forever
 ```
 
 Then confirm the Release workflow and CurseForge Files tab.

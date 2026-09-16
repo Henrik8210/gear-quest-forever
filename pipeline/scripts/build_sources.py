@@ -248,7 +248,7 @@ for k,it in items.items():
           # market this addon cannot see -- on a quiet realm a world drop can be absent
           # from the auction house entirely, or priced above what it is worth. Stating
           # availability is true; stating it is cheapest is a guess dressed as advice.
-          instructions="World drop — drops from %d creature types%s. Also found on the auction house."%(
+          instructions="World drop - drops from %d creature types%s. Also found on the auction house."%(
             ncre," around level %d-%d"%(min(lv),max(lv)) if lv else ""))
     elif g:
         gid,p=max(g,key=lambda x:x[1]); nm=gnames.get(gid,"a container")

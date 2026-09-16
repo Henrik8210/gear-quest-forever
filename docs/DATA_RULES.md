@@ -279,20 +279,21 @@ Players can browse another class/level/spec without changing their character:
 
 | Method | Action |
 |--------|--------|
-| **Minimap** | **Right-click** GearQuest minimap icon → simulate panel (class, specialization, level 1–60). **Left-click** opens the log. **Reset** = `/gq set me`. |
+| **Minimap** | Any click opens GearQuest. Simulator is the **Simulator** handle tab (class, faction, specialization, level 1–60). **Reset** = `/gq set me`. |
 | **Chat** | `/gq class hunter`, `/gq level 37`, `/gq spec holy`, `/gq set on` / `/gq set off`, `/gq set me` |
 
-Preview state lives in `GearQuestDB.settings.preview` (class, level, faction, `specByClass`). Spec choice in preview does not overwrite the live character’s saved spec.
+Preview state lives in `GearQuestForeverDB.settings.preview` (class, level, faction, `specByClass`). Spec choice in preview does not overwrite the live character’s saved spec. Simulator spec is stored there and overrides the log spec until Reset.
 
 **Character login:** preview is account-wide. On `PLAYER_LOGIN`, if the character GUID differs from `settings.preview.loginCharacterKey`, preview mode turns off and class/level/faction sync to the new toon. Same-character `/reload` does not reset an active simulation.
 
 ### Player controls
 
-- **Log UI (level 10+):** top-right of the tab bar — current spec **icon** plus a **dropdown arrow**. Only the arrow opens the picker. Active/Completed stay centered below.
-- **Spec picker:** same metal border + black background as the quest log list panel. Unavailable specs are greyed, labelled `(coming later)`, and not clickable.
+- **Log UI:** two columns — hunt list left, parchment right. **GearQuest Log** / **Simulator** are square handle tabs on the right of the frame (active handle shares the frame edge; inactive sits behind and darkened). **Active** / **Completed** sit on the quest-list gold border (selected toggle shares that edge).
+- **Spec picker:** above the parchment, far right — current spec **icon** plus a **dropdown arrow**. Only the arrow opens the picker. Uses `GetDisplaySpec()` so the chosen spec icon shows even below talent level 10. The Simulator tab has the same control; simulation spec overrides the log spec until Reset.
+- **Spec picker chrome:** same metal border + black background as the quest log list panel. Unavailable specs are greyed, labelled `(coming later)`, and not clickable.
 - **Chat:** `/gq spec ret` (aliases: `spec`, `specialization`, `talent`). Only selectable specs work; others return *"… is coming later."*
-- **Persistence:** choice is saved per class in `GearQuestDB.settings.specByClass`. In **preview mode** (`/gq set on`), spec choice is stored in `settings.preview.specByClass` so preview browsing does not overwrite your real character’s saved spec.
-- **Icons:** spec picker uses curated icons from `CLASS_SPECS` in `Spec.lua` (do not read `GetTalentTabInfo` for icons — it reflects the **live player’s** talent trees, not the preview/effective class).
+- **Persistence:** choice is saved per class in `GearQuestForeverDB.settings.specByClass`. In **preview mode** (`/gq set on` or Simulator), spec choice is stored in `settings.preview.specByClass` so preview browsing does not overwrite your real character’s saved spec.
+- **Icons:** spec picker uses curated icons from `CLASS_SPECS` in `Spec.lua` (do not read `GetTalentTabInfo` for icons — it reflects the **live player’s** talent trees, not the preview/effective class). Texture paths must use `ADDON_NAME` (`GearQuestForever`), not a hard-coded `GearQuest` folder.
 - **Talent detection:** `DetectSpecFromTalents` reads `pointsSpent` from `GetTalentTabInfo` — **5th return** on TBC Anniversary / modern Classic (`id, name, description, icon, pointsSpent, …`); legacy clients use the 3rd return. Always `tonumber()` before comparing.
 - **Live characters:** if no saved choice, GearQuest infers spec from talent points **when that spec is selectable**; otherwise defaults to the class default.
 
@@ -340,6 +341,10 @@ Do **not** mention Holy/Protection availability in the message — the picker al
     sourceType = "quest_reward",            -- or vendor, world_drop, boss_drop, seasonal_quest, profession, auction_house
     curatedRank = 1,                        -- optional; 1 = best in slot for this band (preserves your order)
     profession = "Blacksmithing",           -- optional; use with sourceType = "profession"
+    suffix = "of Strength",                 -- required on random-enchant greens; omit on whites/quest-fixed
+    suffixChance = 9.8,                     -- from pipeline/data/items_random.json
+    suffixId = 97,                          -- Classic ItemRandomProperties id when present
+    suffixRange = "+3-4 Strength",
     instructions = "Short how-to for the player.",
     zone = "Elwynn Forest",
     npc = "Optional NPC name",
@@ -362,6 +367,8 @@ Do **not** mention Holy/Protection availability in the message — the picker al
 - [ ] Faction and spec filters are correct or omitted
 - [ ] If a spec is not yet selectable, `comingLater = true` is set in `Spec.lua` (not just missing data)
 - [ ] Instructions match the source type and zone
+- [ ] Random-enchant greens have `suffix` / `suffixChance` / `suffixRange` (and `suffixId` when Classic data has one) — otherwise the log shows the base name with no roll
+- [ ] `instructions` use ASCII hyphen/quotes only — WoW fonts draw em-dash/middle-dot as boxes or stray periods (`Data:SanitizeText` is the runtime backstop)
 - [ ] Test in-game at `/gq preview set class paladin level N` (or on a real character) and confirm top 3 look sane
 
 ---
@@ -415,7 +422,7 @@ When adding quests, these player-facing rules explain **what shows up where** an
 | Description | `instructions` + zone / quest / **NPC:** / source |
 | **REWARD** | Always show reward block: item icon + dark name strip; hover = item tooltip; Shift+click = chat link |
 | BoE world drops | Detail text may note Auction House when bind-on-equip |
-| Fonts | Use vanilla quest-log fonts (`QuestFont`, `QuestFont_Large`). Do **not** add outline/heavy post-processing on parchment body text. |
+| Fonts | Use vanilla quest-log fonts (`QuestFont`, `QuestFont_Large`). Do **not** add outline/heavy post-processing on parchment body text. Run `instructions` through `Data:SanitizeText` — em-dash becomes `[]` and middle-dot wraps like a stray period. |
 
 ### List row labels
 
@@ -714,7 +721,7 @@ Classic **Phase 6 (Naxx)** BiS is **not** in the Hoizame AtlasLoot zip. AtlasLoo
 | `Compare.lua` | Level-60 guide bands re-sorted by runtime score | `origin="guide"` keeps pipeline `curatedRank` |
 | `Compare.lua` | Priest staff lost to ilvl vs 1H+off-hand | Pipeline rank preserved for Priest/Mage/Warlock |
 | `Data.lua` | Rogue item facts missing from `GetItemFact` | Added `rogueItemFacts` / `rogueEarly1to9Facts` |
-| `Preview.lua` / `Minimap.lua` | Preview only via slash commands | Right-click minimap simulate panel (class/spec/level) |
+| `Preview.lua` / `Minimap.lua` | Preview only via slash commands | Simulator handle tab (class/faction/spec/level); minimap any-click opens GearQuest |
 | `Preview.lua` / `Core.lua` | Preview persisted across character logins | Reset preview on new character GUID at login |
 | `Spec.lua` | `GetTalentTabInfo` 3rd return treated as points | Read 5th return on Anniversary; `tonumber` guard |
 

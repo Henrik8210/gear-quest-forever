@@ -1,8 +1,8 @@
-local _, GQ = ...
+local ADDON_NAME, GQ = ...
 
 GQ.Minimap = GQ.Minimap or {}
 
-local MINIMAP_TEXTURE = "Interface\\AddOns\\GearQuest\\Art\\GearQuest-Icon"
+local MINIMAP_TEXTURE = "Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Art\\GearQuest-Icon"
 local MINIMAP_ICON_SIZE = 20
 local BUTTON_SIZE = 31
 local MINIMAP_RADIUS = 80
@@ -56,33 +56,9 @@ local function RegisterButtonClicks(button)
     pcall(function() button:RegisterForClicks("LeftButton", "RightButton") end)
 end
 
-local function IsRightClick(mouseButton)
-    return mouseButton == "RightButton" or mouseButton == "RightButtonUp"
-end
-
-local function IsLeftClick(mouseButton)
-    return mouseButton == "LeftButton" or mouseButton == "LeftButtonUp" or mouseButton == nil
-end
-
-local function OpenSimulateDialog(button)
+local function OnMinimapClick()
     local gq = _G.GearQuest
-    if gq and gq.Preview and gq.Preview.ShowDialog then
-        gq.Preview:ShowDialog(button)
-    end
-end
-
-local function OnMinimapClick(button, mouseButton)
-    local gq = _G.GearQuest
-    if not gq then
-        return
-    end
-
-    if IsRightClick(mouseButton) then
-        OpenSimulateDialog(button)
-        return
-    end
-
-    if IsLeftClick(mouseButton) and gq.Log then
+    if gq and gq.Log then
         gq.Log:Toggle()
     end
 end
@@ -91,10 +67,15 @@ local function WireMinimapButton(button)
     EnsureMinimapIcon(button)
     RegisterButtonClicks(button)
     button:SetScript("OnClick", OnMinimapClick)
-    button:SetScript("OnMouseUp", function(self, mouseButton)
-        if IsRightClick(mouseButton) then
-            OpenSimulateDialog(self)
-        end
+    button:SetScript("OnMouseUp", nil)
+    button:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+        GameTooltip:SetText("GearQuest", 0.90, 0.75, 0.28)
+        GameTooltip:AddLine("Click to open GearQuest", 1, 1, 1)
+        GameTooltip:Show()
+    end)
+    button:SetScript("OnLeave", function()
+        GameTooltip:Hide()
     end)
 end
 
@@ -145,19 +126,6 @@ function GQ.Minimap:Init()
     button:SetScript("OnDragStop", function(self)
         self:UnlockHighlight()
         self:SetScript("OnUpdate", nil)
-    end)
-
-    button:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_LEFT")
-        GameTooltip:SetText("GearQuest", 1, 1, 1)
-        GameTooltip:AddLine("Left-click: open the hunt log.", 1, 0.82, 0)
-        GameTooltip:AddLine("Right-click: simulate another class or level.", 1, 0.82, 0)
-        GameTooltip:AddLine("Drag to move icon.", 1, 0.82, 0)
-        GameTooltip:Show()
-    end)
-
-    button:SetScript("OnLeave", function()
-        GameTooltip:Hide()
     end)
 
     UpdatePosition(button)

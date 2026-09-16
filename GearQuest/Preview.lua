@@ -426,6 +426,8 @@ local CLASS_ORDER = {
     "DRUID",
 }
 
+GQ.Preview.CLASS_ORDER = CLASS_ORDER
+
 local function ApplySimDialogChrome(frame)
     if not frame.blackBg then
         local bg = frame:CreateTexture(nil, "BACKGROUND", nil, -8)
@@ -471,6 +473,10 @@ local function SanitizeLevelInput(edit)
     end
 
     return text
+end
+
+function GQ.Preview:SanitizeLevelEdit(edit)
+    return SanitizeLevelInput(edit)
 end
 
 local function GetDialogSpecOptions(classFile)
@@ -562,7 +568,7 @@ function GQ.Preview:RefreshDialogSpecDropdown()
     end)
 end
 
-function GQ.Preview:ApplySimulation(classFile, level, specId)
+function GQ.Preview:ApplySimulation(classFile, level, specId, faction)
     local okClass, errClass = self:SetClass(classFile)
     if not okClass then
         return false, errClass
@@ -573,7 +579,14 @@ function GQ.Preview:ApplySimulation(classFile, level, specId)
         return false, errLevel
     end
 
-    if specId and GQ.Spec and tonumber(level) and tonumber(level) >= GQ.Spec.TALENT_LEVEL then
+    if faction then
+        local okFaction, errFaction = self:SetFaction(faction)
+        if not okFaction then
+            return false, errFaction
+        end
+    end
+
+    if specId and GQ.Spec then
         local okSpec, errSpec = GQ.Spec:SetSelectedSpec(specId, classFile)
         if not okSpec then
             return false, errSpec
@@ -753,6 +766,15 @@ function GQ.Preview:HideDialog()
 end
 
 function GQ.Preview:ShowDialog(anchor)
+    if GQ.Log then
+        if not GQ.Log.frame then
+            GQ.Log:Init()
+        end
+        GQ.Log:SetPageTab("simulator")
+        GQ.Log:Show()
+        return
+    end
+
     local dialog = self:EnsureDialog()
 
     self:RefreshDialogFields()

@@ -538,6 +538,9 @@ function GQ.Tracker:LayoutEntries(entries, descWordLimit)
         if entry.sourceType == "profession" and GQ.Data and GQ.Data.GetProfessionInstructions then
             instructions = GQ.Data:GetProfessionInstructions(entry)
         end
+        if GQ.Data and GQ.Data.SanitizeText then
+            instructions = GQ.Data:SanitizeText(instructions) or instructions
+        end
         local desc = FirstWords(instructions, descWordLimit)
 
         row.name:SetText(itemName)

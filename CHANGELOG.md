@@ -4,6 +4,14 @@ Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3
 
 ## v0.1.0-beta.1-forever
 
+First CurseForge beta. Project **1698950** (`X-Curse-Project-ID`). Not TBC GearQuest (`1669225`).
+
+- Two-column GearQuest log: hunt list on the left, parchment description on the right. **GearQuest Log** and **Simulator** are handle tabs on the right of the frame.
+- **Active** / **Completed** sit on the quest-list border. Spec picker sits above the parchment (far right). The Simulator tab has its own spec; while simulation is on it overrides the log spec until Reset (`/gq set me`).
+- Click the minimap button to open GearQuest (any click). Right-click a character-panel slot for upgrades.
+- Simulator and `/gq level` cap at **60**. Art paths use the `GearQuestForever` folder name.
+- Random-enchant greens in curated Alliance paladin/warrior 1–9 now carry Classic suffix rolls (e.g. Infantry Tunic / Spiked Club of Strength). Suffix hints use commas, not middle dots. Player-facing text strips em-dashes and other glyphs WoW fonts cannot draw.
+
 - New repo and CurseForge packaging for WoW Forever (beta 17 Sep 2026).
 - In-game title **GearQuest Forever**; slash commands stay `/gq` and `/gearquest`.
 - `## Interface: 11507` is a placeholder until the beta client reports `lastAddonVersion`.
