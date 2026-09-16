@@ -2,10 +2,10 @@
 # Add repo secret CF_API_KEY from https://authors.curseforge.com/#/settings/api-tokens
 #
 # WoW Forever is its own CurseForge game (1.60.1). BigWigs packager still maps
-# 1.x → Classic Era and 16xxx → Retail, so we zip with packager (-d = no upload)
-# then attach the file to Forever 1.60.1 ourselves.
+# 1.x → Classic Era and 16xxx → Retail, and move-folders fights package-as, so
+# we zip GearQuest/ as GearQuestForever ourselves and upload to 1.60.1.
 #
-# Do not pass -g 2.5.6 (TBC) or -g 1.15.7 (Classic Era).
+# Do not pass packager -g 2.5.6 (TBC) or -g 1.15.7 (Classic Era).
 
 name: Release
 
@@ -22,11 +22,19 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: BigWigsMods/packager@v2.5.1
-        with:
-          args: -d
-        env:
-          CF_API_KEY: ${{ secrets.CF_API_KEY }}
+      - name: Zip GearQuestForever
+        run: |
+          set -euo pipefail
+          mkdir -p .release/GearQuestForever
+          rsync -a \
+            --exclude '_generated/*.json' \
+            --exclude '_generated/*.md' \
+            GearQuest/ .release/GearQuestForever/
+          (
+            cd .release
+            zip -X -r "GearQuestForever-${GITHUB_REF_NAME}.zip" GearQuestForever
+          )
+          unzip -l ".release/GearQuestForever-${GITHUB_REF_NAME}.zip" | head -n 20
 
       - name: Upload zip to CurseForge (WoW Forever 1.60.1)
         env:

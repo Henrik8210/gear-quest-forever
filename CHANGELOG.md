@@ -2,6 +2,11 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
+## v0.1.0-beta.3-forever
+
+- Target CurseForge **WoW Forever 1.60.1** (`## Interface: 16001`).
+- Zip `GearQuest/` as `GearQuestForever` and upload to the Forever game version directly (BigWigs packager still treats 1.x as Classic Era).
+
 ## v0.1.0-beta.2-forever
 
 - Target CurseForge **WoW Forever 1.60.1** (`## Interface: 16001`).
