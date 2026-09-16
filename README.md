@@ -4,17 +4,15 @@
 
 This is a **new repo and a new CurseForge project**. The TBC Anniversary addon stays at [Henrik8210/gear-quest](https://github.com/Henrik8210/gear-quest). Do not copy that project's CurseForge ID or GitHub `CF_API_KEY` secret into this repo.
 
-Click a gear slot on your character panel (right-click), browse from the log, or **right-click the minimap icon** to simulate another class/level/spec.
+Click a gear slot on your character panel (right-click), browse from the log, or click the minimap icon to open GearQuest.
 
 ## WoW Forever beta (17 September 2026)
 
-Forever is a new 1–60 Classic+ client (original continents, before Molten Core). The beta client is not on this machine yet, so two values are placeholders until first login:
-
-1. **`## Interface:`** in `GearQuest/GearQuestForever.toc` is currently `11507` (closest public 1–60 interface). After you launch the beta once, copy `lastAddonVersion` from:
+Forever is a new 1–60 Classic+ client (original continents, before Molten Core). TOC interface is **16001** (CurseForge game version **1.60.1**). After you launch the client, confirm `lastAddonVersion` in:
 
    `World of Warcraft\<forever-folder>\WTF\Config.wtf`
 
-2. **Install folder** is expected to be something like `_forever_` beside `_anniversary_`. `scripts/sync-addon.ps1` looks for a few likely names, or set `$env:GEARQUEST_WOW_CLIENT`.
+Install folder is expected to be something like `_forever_` beside `_anniversary_`. `scripts/sync-addon.ps1` looks for a few likely names, or set `$env:GEARQUEST_WOW_CLIENT`.
 
 Current BiS data is still largely the Classic/TBC **leveling** snapshot from GearQuest (generated 10–69, curated 1–9 Alliance bands). **Max level is 60** — TBC level-70 endgame lists were removed. Forever has new quests, races, and item tweaks; see [docs/FOREVER-DATA-MIGRATION.md](docs/FOREVER-DATA-MIGRATION.md) for the data pass plan after beta.
 
@@ -53,7 +51,7 @@ $env:GEARQUEST_WOW_CLIENT = "_anniversary_"
 
 - Source in repo: `GearQuest/`; game folder / CurseForge package: **`GearQuestForever`** (`GearQuestForever.toc`)
 - In-game title: **GearQuest Forever**
-- Interface placeholder: `## Interface: 11507` — update from the beta client
+- Interface: `## Interface: 16001` (CurseForge **WoW Forever 1.60.1**)
 - Project brief: [docs/PROJECT_BRIEF.md](docs/PROJECT_BRIEF.md)
 - Data rules: [docs/DATA_RULES.md](docs/DATA_RULES.md)
 - Changelog: [CHANGELOG.md](CHANGELOG.md)

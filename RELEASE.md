@@ -13,7 +13,7 @@ Publishing uses **GitHub Actions**, not the CurseForge webhook. Keep any CurseFo
    - Name: `CF_API_KEY`
    - Value: your CurseForge API token. **Done** on `gear-quest-forever` (do not copy the TBC repo secret).
 5. **CurseForge Source (optional):** Link this GitHub repo for metadata only. Uploads come from Actions.
-6. After the Forever beta client exists, set `## Interface:` from `WTF/Config.wtf` `lastAddonVersion` (see [README.md](README.md)).
+6. TOC `## Interface:` is **16001** for CurseForge **WoW Forever 1.60.1**. Confirm `lastAddonVersion` in the beta `WTF/Config.wtf` after first login.
 
 ## Release steps
 
@@ -38,8 +38,8 @@ Only when explicitly publishing:
 After `CF_API_KEY` is set and the **new** CurseForge project ID is in the toc. Tag must match `## Version:` with a `v` prefix (beta strings keep CurseForge on the beta channel):
 
 ```powershell
-git tag v0.1.0-beta.1-forever
-git push origin v0.1.0-beta.1-forever
+git tag v0.1.0-beta.2-forever
+git push origin v0.1.0-beta.2-forever
 ```
 
 Then confirm the Release workflow and CurseForge Files tab.

@@ -1,13 +1,11 @@
-# Package and upload to CurseForge on version tag push (BigWigs packager + Upload API).
+# Package and upload to CurseForge on version tag push.
 # Add repo secret CF_API_KEY from https://authors.curseforge.com/#/settings/api-tokens
-# Docs: https://support.curseforge.com/support/solutions/articles/9000197321-curseforge-api
 #
-# This is the GearQuest Forever project. Do not reuse the TBC Anniversary
-# CurseForge project ID or that repo's secrets.
+# WoW Forever is its own CurseForge game (1.60.1). BigWigs packager still maps
+# 1.x → Classic Era and 16xxx → Retail, so we zip with packager (-d = no upload)
+# then attach the file to Forever 1.60.1 ourselves.
 #
-# After the Sept 17 beta, set packager -g to Forever's game version if
-# CurseForge/BigWigs has a flavor for it. Until then, let the TOC Interface
-# drive detection — do not pass -g 2.5.6 (that is TBC).
+# Do not pass -g 2.5.6 (TBC) or -g 1.15.7 (Classic Era).
 
 name: Release
 
@@ -24,6 +22,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: BigWigsMods/packager@v2
+      - uses: BigWigsMods/packager@v2.5.1
+        with:
+          args: -d
         env:
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
+
+      - name: Upload zip to CurseForge (WoW Forever 1.60.1)
+        env:
+          CF_API_KEY: ${{ secrets.CF_API_KEY }}
+          CF_PROJECT_ID: "1698950"
+          CF_GAME_VERSION: "1.60.1"
+        run: python3 scripts/upload-curseforge-forever.py

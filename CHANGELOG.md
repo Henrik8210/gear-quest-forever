@@ -2,6 +2,11 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
+## v0.1.0-beta.2-forever
+
+- Target CurseForge **WoW Forever 1.60.1** (`## Interface: 16001`).
+- First successful packaging pass: zip as `GearQuestForever` (the previous `move-folders` step emptied the archive).
+
 ## v0.1.0-beta.1-forever
 
 First CurseForge beta. Project **1698950** (`X-Curse-Project-ID`). Not TBC GearQuest (`1669225`).
