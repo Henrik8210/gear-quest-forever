@@ -2,6 +2,11 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
+## v0.1.0-beta.5-forever
+
+- Same Horde Forever deltas and item notebook as beta.4 (that tag did not reach CurseForge).
+- Fix CurseForge upload metadata so changelog punctuation cannot break the multipart field.
+
 ## v0.1.0-beta.4-forever
 
 - Horde **phase-4 Forever deltas** for all nine classes in `Data.lua` (`foreverDelta`). Zephras Isle quest whites and Shen'dar crafts (sashes, copper boots, mageweave slippers, shaman totem, druid idol) compete across generated per-level bands; Compare still shows the top 3.

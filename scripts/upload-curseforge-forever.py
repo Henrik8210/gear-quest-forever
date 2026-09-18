@@ -7,6 +7,7 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 SKIP_TYPES = {517, 67408, 73246, 73713, 77522, 79434, 81212}
@@ -82,26 +83,37 @@ def main() -> int:
         }
     )
 
-    result = subprocess.run(
-        [
-            "curl",
-            "-sS",
-            "-w",
-            "\n%{http_code}",
-            "-X",
-            "POST",
-            f"https://wow.curseforge.com/api/projects/{project}/upload-file",
-            "-H",
-            f"X-Api-Token: {token}",
-            "-F",
-            f"metadata={metadata}",
-            "-F",
-            f"file=@{zip_path}",
-        ],
-        check=True,
-        capture_output=True,
-        text=True,
-    )
+    # curl -F treats ";" as extra parameters (type=, filename=). Write JSON to a
+    # file so changelog punctuation cannot break the multipart field.
+    with tempfile.NamedTemporaryFile(
+        "w", encoding="utf-8", suffix=".json", delete=False
+    ) as fh:
+        fh.write(metadata)
+        meta_path = fh.name
+
+    try:
+        result = subprocess.run(
+            [
+                "curl",
+                "-sS",
+                "-w",
+                "\n%{http_code}",
+                "-X",
+                "POST",
+                f"https://wow.curseforge.com/api/projects/{project}/upload-file",
+                "-H",
+                f"X-Api-Token: {token}",
+                "-F",
+                f"metadata=<{meta_path}",
+                "-F",
+                f"file=@{zip_path}",
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    finally:
+        Path(meta_path).unlink(missing_ok=True)
     body, _, code = result.stdout.rpartition("\n")
     print(body)
     print("HTTP", code)
