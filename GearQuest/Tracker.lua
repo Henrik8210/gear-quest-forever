@@ -1268,7 +1268,7 @@ function GQ.Tracker:Init()
     self:RestorePosition()
 
     local listener = CreateFrame("Frame")
-    listener:RegisterEvent("GET_ITEM_INFO_RECEIVED")
+    GQ.RegisterEvent(listener, "GET_ITEM_INFO_RECEIVED")
     listener:SetScript("OnEvent", function()
         if GQ.Tracker.frame and GQ.Tracker.frame:IsShown() and not GQ.Tracker:IsCollapsed() then
             GQ.Tracker:Refresh()

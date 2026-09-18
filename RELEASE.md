@@ -38,8 +38,8 @@ Only when explicitly publishing:
 After `CF_API_KEY` is set and the **new** CurseForge project ID is in the toc. Tag must match `## Version:` with a `v` prefix (beta strings keep CurseForge on the beta channel):
 
 ```powershell
-git tag v0.1.0-beta.3-forever
-git push origin v0.1.0-beta.3-forever
+git tag v0.1.0-beta.4-forever
+git push origin v0.1.0-beta.4-forever
 ```
 
 Then confirm the Release workflow and CurseForge Files tab.

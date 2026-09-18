@@ -9,10 +9,60 @@ end
 GQ = GQ or {}
 _G.GearQuest = GQ
 
-GQ.VERSION = "0.1.0-beta.3-forever"
+GQ.VERSION = "0.1.0-beta.4-forever"
 GQ.ADDON_NAME = ADDON_NAME
 -- WoW Forever: 1–60 Classic+ (no TBC level cap).
 GQ.MAX_PLAYER_LEVEL = 60
+
+-- Forever's Interface 16001 client namespaced item APIs (10.2.6+). The old
+-- globals can be nil and would crash PLAYER_LOGIN at Equip.lua:PrimeItem.
+do
+    local item = C_Item
+    if item then
+        if type(GetItemInfo) ~= "function" and item.GetItemInfo then
+            GetItemInfo = item.GetItemInfo
+        end
+        if type(GetItemInfoInstant) ~= "function" and item.GetItemInfoInstant then
+            GetItemInfoInstant = item.GetItemInfoInstant
+        end
+        if type(GetItemStats) ~= "function" and item.GetItemStats then
+            GetItemStats = item.GetItemStats
+        end
+        if type(GetItemIcon) ~= "function" and (item.GetItemIconByID or item.GetItemIcon) then
+            GetItemIcon = item.GetItemIconByID or item.GetItemIcon
+        end
+        if type(GetItemQualityColor) ~= "function" and item.GetItemQualityColor then
+            GetItemQualityColor = item.GetItemQualityColor
+        end
+        if type(IsEquippableItem) ~= "function" and item.IsEquippableItem then
+            IsEquippableItem = item.IsEquippableItem
+        end
+        if type(GetItemCount) ~= "function" and item.GetItemCount then
+            GetItemCount = item.GetItemCount
+        end
+        if type(GetItemFamily) ~= "function" and item.GetItemFamily then
+            GetItemFamily = item.GetItemFamily
+        end
+    end
+    if type(GetItemQualityColor) ~= "function" then
+        GetItemQualityColor = function(quality)
+            local c = ITEM_QUALITY_COLORS and ITEM_QUALITY_COLORS[quality or 1]
+            if c then
+                return c.r, c.g, c.b
+            end
+            return 1, 1, 1
+        end
+    end
+end
+
+-- Forever dropped some Classic events (TRADE_SKILL_UPDATE, CRAFT_*). Registering
+-- an unknown event throws and would abort the rest of PLAYER_LOGIN (no minimap).
+function GQ.RegisterEvent(frame, event)
+    if not frame or not event or type(frame.RegisterEvent) ~= "function" then
+        return false
+    end
+    return pcall(frame.RegisterEvent, frame, event)
+end
 
 function GQ:ClampPlayerLevel(level)
     level = tonumber(level) or 1
@@ -66,7 +116,15 @@ function GQ:GetSourceTag(sourceType)
 end
 
 function GQ:PLAYER_LOGIN()
-    local ok, err = pcall(function()
+    local function run(label, fn)
+        local ok, err = pcall(fn)
+        if not ok then
+            print("|cffff0000GearQuest|r: " .. label .. " failed: " .. tostring(err))
+        end
+        return ok
+    end
+
+    run("startup", function()
         GearQuestForeverDB.hunts = GearQuestForeverDB.hunts or {}
         GearQuestForeverDB.obtained = GearQuestForeverDB.obtained or {}
         GearQuestForeverDB.crafted = GearQuestForeverDB.crafted or {}
@@ -78,26 +136,29 @@ function GQ:PLAYER_LOGIN()
         self.Preview:OnPlayerLogin()
         self.Data:BuildIndex()
         self.Data:CacheContainerItemLinks()
-        self.Indicator:Init()
-        self.Log:Init()
-        self.Toast:Init()
-        self.Tracker:Init()
-        self.Popup:Init()
-        self.PaperDoll:Init()
-        self.Minimap:Init()
-        self.Commands:Init()
     end)
 
-    if not ok then
-        print("|cffff0000GearQuest failed to load:|r " .. tostring(err))
-        return
-    end
+    run("Indicator", function() self.Indicator:Init() end)
+    run("Log", function() self.Log:Init() end)
+    run("Toast", function() self.Toast:Init() end)
+    run("Tracker", function() self.Tracker:Init() end)
+    run("Popup", function() self.Popup:Init() end)
+    run("PaperDoll", function() self.PaperDoll:Init() end)
+    run("Minimap", function() self.Minimap:Init() end)
+    run("Collector", function() self.Collector:Init() end)
+    run("Commands", function() self.Commands:Init() end)
 
     local previewNote = self.Preview:IsEnabled() and (" (" .. self:GetPreviewLabel() .. ")") or ""
     print("|cff66ccffGearQuest|r v" .. self.VERSION .. " By Weber8210 loaded" .. previewNote .. ". Right-click a gear slot on your character panel, or |cff00ff00/gq|r.")
     print("|cff66ccffGearQuest|r: Click the minimap icon to open GearQuest.")
-    self:CheckLevelMilestones(nil, self:GetEffectiveLevel())
-    self.Log:ScheduleAutoCompletionCheck()
+    run("milestones", function()
+        self:CheckLevelMilestones(nil, self:GetEffectiveLevel())
+    end)
+    if self.Log and self.Log.ScheduleAutoCompletionCheck then
+        run("auto-complete", function()
+            self.Log:ScheduleAutoCompletionCheck()
+        end)
+    end
 end
 
 function GQ:SyncLevelOverride()

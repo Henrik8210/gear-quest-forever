@@ -2140,12 +2140,17 @@ function GQ.Log:EnsureTrackerEvents()
     end
 
     local tracker = CreateFrame("Frame")
-    tracker:RegisterEvent("BAG_UPDATE")
-    tracker:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
-    tracker:RegisterEvent("MERCHANT_CLOSED")
-    tracker:RegisterEvent("GET_ITEM_INFO_RECEIVED")
-    tracker:RegisterEvent("CHAT_MSG_SKILL")
-    tracker:RegisterEvent("CHAT_MSG_LOOT")
+    local events = {
+        "BAG_UPDATE",
+        "PLAYER_EQUIPMENT_CHANGED",
+        "MERCHANT_CLOSED",
+        "GET_ITEM_INFO_RECEIVED",
+        "CHAT_MSG_SKILL",
+        "CHAT_MSG_LOOT",
+    }
+    for i = 1, #events do
+        GQ.RegisterEvent(tracker, events[i])
+    end
     tracker:SetScript("OnEvent", function(_, event, msg)
         local log = _G.GearQuest and _G.GearQuest.Log
         if not log then
@@ -3826,7 +3831,7 @@ function GQ.Log:EnsureItemInfoListener()
     end
 
     local frame = CreateFrame("Frame")
-    frame:RegisterEvent("GET_ITEM_INFO_RECEIVED")
+    GQ.RegisterEvent(frame, "GET_ITEM_INFO_RECEIVED")
     frame:SetScript("OnEvent", function()
         local log = _G.GearQuest and _G.GearQuest.Log
         if not log or not log.frame or not log.frame:IsShown() then

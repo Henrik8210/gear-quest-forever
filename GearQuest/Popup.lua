@@ -175,7 +175,7 @@ function GQ.Popup:EnsureItemInfoListener()
     end
 
     local refreshFrame = CreateFrame("Frame")
-    refreshFrame:RegisterEvent("GET_ITEM_INFO_RECEIVED")
+    GQ.RegisterEvent(refreshFrame, "GET_ITEM_INFO_RECEIVED")
     refreshFrame:SetScript("OnEvent", function()
         local popup = _G.GearQuest and _G.GearQuest.Popup
         if not popup or not popup.container or not popup.container:IsShown() then

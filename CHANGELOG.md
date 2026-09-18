@@ -2,6 +2,12 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
+## v0.1.0-beta.4-forever
+
+- Horde **phase-4 Forever deltas** for all nine classes in `Data.lua` (`foreverDelta`). Zephras Isle quest whites and Shen'dar crafts (sashes, copper boots, mageweave slippers, shaman totem, druid idol) compete across generated per-level bands; Compare still shows the top 3.
+- Local item notebook (`GQ.Collector` / `/gq seen`) records unique equippable items this client has seen so Forever IDs can be ingested without inventing rows.
+- `scripts/sync-addon.ps1` prefers `_classic_beta_` (Forever) and can still target `_anniversary_` for side-by-side UI tests.
+
 ## v0.1.0-beta.3-forever
 
 - Target CurseForge **WoW Forever 1.60.1** (`## Interface: 16001`).

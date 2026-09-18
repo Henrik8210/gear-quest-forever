@@ -7,11 +7,11 @@ GearQuest Forever targets **WoW Forever 1–60** (Classic+). The fork inherited 
 | Question | Answer |
 |----------|--------|
 | **Is the fork set up correctly?** | **Yes** — separate toc/package/SavedVariables, max level 60, L70 curated removed, migration phases documented. |
-| **Is all BiS data Classic-correct?** | **Mostly** — all nine classes were re-scored on the Classic item pool (cap 60, Classic suffixes). Stat **weights** are still the TBC model. Forever-only item deltas are phase 4. |
+| **Is all BiS data Classic-correct?** | **Mostly** — all nine classes were re-scored on the Classic item pool (cap 60, Classic suffixes). Stat **weights** are still the TBC model. Horde Forever deltas are in `Data.lua`; Alliance Forever items are still outstanding. |
 
 **Done:** product split, `GQ.MAX_PLAYER_LEVEL`, phase **2** Classic suffix cache, phase **3** Classic `score.py` regen for all classes. **0** stale TBC +20/@7.9% fingerprint rows.
 
-**Not done:** Classic/Forever **StatWeights**; Forever beta item deltas (phase 4). CurseForge project is **1698950**. Do **not** copy TBC CurseForge ID `1669225` or TBC `CF_API_KEY`.
+**Not done:** Classic/Forever **StatWeights**; Alliance Forever deltas; more notebook items as they drop. CurseForge project is **1698950**. Do **not** copy TBC CurseForge ID `1669225` or TBC `CF_API_KEY`.
 
 **Repo:** commit `scripts/`, `GearQuest/_generated/data/items_random.classic.json`, generated Lua patches, and docs together so another clone sees the same state — cache and generated files must stay in sync.
 
@@ -22,23 +22,43 @@ Fork base: GearQuest **v0.1.1-beta.3-bcc**, not a greenfield Classic regen.
 | **1** | Product scope: max level **60**, remove TBC **level 70** curated data, clamp preview/simulate | **Done** |
 | **2** | Random green suffix tables: Classic-era scrapes (not TBC R34) | **Done** — `count-suffix-coverage.mjs` **≥80% of scrapeable** IDs (Classic Wowhead 404 rows excluded via `noClassicPage`; gate: `--phase2-gate`) |
 | **3** | Classic item pool: strip TBC/Outland IDs, cap generated bands at 60, then full re-score | **Done** — all classes re-scored via `pipeline/` (weights still TBC-derived) |
-| **4** | Forever delta: beta tooltips, retuned item IDs, new quests/items, new zones | After beta client |
+| **4** | Forever delta: beta tooltips, retuned item IDs, new quests/items, new zones | **Horde done** (all nine classes, `foreverDelta` in `Data.lua`). Alliance not started. |
 | **5** | Tag rows `forever-verified` vs `classic-assumption` as needed | Ongoing |
 
 ### Phase 4 watch list (do not invent Data.lua rows)
 
 Forever-only loot stays out of the addon until an item ID and tooltip exist in-game. Wowhead `/forever/` item pages still often show Classic data. Blizzard intends item stats to stay hidden until the item drops.
 
+**Local notebook (author beta):** `GQ.Collector` writes unique equippable items this client has seen to `GearQuestForeverDB.seenItems` (loot window, own loot chat, bags, equipped, quest rewards). Nothing is uploaded. `/gq seen` prints the count. After `/reload` or logout, copy `WTF\<account>\SavedVariables\GearQuestForever.lua` and ingest `seenItems` into `pipeline/data/items.json`. `/gq wipe data` does not clear this table.
+
 New zones to attach hunts to later ([Wowhead zone guide](https://www.wowhead.com/forever/guide/zones-maps-locations-rewards)):
 
 | Zone | Band / notes |
 |------|----------------|
-| **Zephras Isle** | Skyborne start **1–12**. Faction (Alliance/Horde) is chosen at 1. Starter weapon **models** are datamined; no item IDs/stats yet. |
+| **Zephras Isle** | Skyborne start **1–12**. Faction (Alliance/Horde) is chosen at 1. Horde quest/craft IDs from the beta notebook are in `Data.lua`; Alliance starter items still need seen tooltips. |
 | **Riverglades** | Frontier **35–45**. Steamwheedle boat to **Powderfuse Port**. |
 | **Shen'Dralas** | Between Mulgore and Desolace (Shen'dralar / Dire Maul). Quests send you to Razorfen Downs and Maraudon. |
 | **Mount Hyjal** | **Level 60** after Archimonde. First 20-player raid **Hyjal Summit** in December. |
 
 Curated Alliance paladin/warrior 1–9 greens need the same `suffix` / `suffixChance` / `suffixRange` fields as generated rows, or the log shows the base name with no roll. Runtime `Data:SanitizeText` replaces em-dash / middle-dot (WoW fonts cannot draw them). Pipeline world-drop copy uses ASCII hyphens.
+
+### Phase 4 — Horde notebook (done)
+
+Horde `foreverDelta` rows in `Data.lua` were scored from beta `seenItems` tooltips against generated #1 until they lose. Compare still shows the top 3. Do not invent IDs or stats.
+
+| Class | What landed |
+|-------|-------------|
+| **Shaman** | Windcarved totem, Skychain / Ranger shoes / Highlands mail 1–9, ele/resto sashes, copper boots |
+| **Mage** | Sashes plus Frothing / Fiery / Golden / Gilded slippers |
+| **Warlock** | Sashes, Black / Gilded / Fiery dest crafts |
+| **Druid** | Windcharged Leaf idol, balance/resto sashes, Gilded resto/balance |
+| **Rogue** | Bandit’s Jerkin, Vuldren wrist (leather only) |
+| **Priest** | Ardent / Arcanist / Gilded / Black sashes by spec |
+| **Hunter** | Mail 1–9 plus Gemmed / Glowing copper at 10 |
+| **Paladin** | Short mail 1–2/3, holy healer crafts, ret/prot copper; no Forever libram yet |
+| **Warrior** | Mail 1–2/3 + Watcher L1, Gemmed 10–15, Strange prot r2 |
+
+Alliance Forever items stay out until the notebook has IDs and tooltips.
 
 ## Phase 1 details
 
@@ -134,15 +154,15 @@ Classic `items_random.json`, bands **10–60**). Paladin/Warrior Alliance 1–9 
 curated in `Data.lua`; their Horde 1–9 files are generated. Other classes have
 both-faction Early 1–9 files.
 
-Sep 2026 counts: **57,202** generated + **287** curated = **57,489**. Relic/libram
+Sep 2026 counts: **57,202** generated + **368** curated = **57,570**. Relic/libram
 slots stay thin (few Classic relics have stats).
 
 The older filter (`filter-generated-classic.mjs`) is only for emergency rollback;
 do not re-run it over a Classic regen.
 
 **Honest limit:** rank order is a real Classic-pool top 3, but **stat weights** are
-still the TBC model (expertise, armour pen, TBC paladin seals). Forever-only items
-are phase 4.
+still the TBC model (expertise, armour pen, TBC paladin seals). Horde Forever items
+are overlaid as `foreverDelta`; Alliance Forever items are still phase 4.
 
 ### Still required after phase 3
 

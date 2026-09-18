@@ -54,8 +54,16 @@ function GQ.Equip:PlayerHasWeaponSkill(itemId)
 end
 
 function GQ.Equip:PrimeItem(itemId)
-    if itemId then
+    if not itemId then
+        return
+    end
+    if C_Item and C_Item.RequestLoadItemDataByID then
+        C_Item.RequestLoadItemDataByID(itemId)
+    end
+    if type(GetItemInfo) == "function" then
         GetItemInfo(itemId)
+    elseif C_Item and C_Item.GetItemInfo then
+        C_Item.GetItemInfo(itemId)
     end
 end
 
@@ -73,10 +81,12 @@ function GQ.Equip:GetItemBindType(itemId)
         return nil
     end
 
-    local bindType = select(14, GetItemInfo(itemId))
+    local bindType
+    if type(GetItemInfo) == "function" then
+        bindType = select(14, GetItemInfo(itemId))
+    end
     if bindType == nil and C_Item and C_Item.GetItemInfo then
-        local info = C_Item.GetItemInfo(itemId)
-        bindType = info and info.bindType
+        bindType = select(14, C_Item.GetItemInfo(itemId))
     end
 
     return bindType

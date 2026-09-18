@@ -1536,21 +1536,29 @@ function GQ.Indicator:Init()
     self:EnsureTrainerHooks()
 
     local eventFrame = CreateFrame("Frame")
-    eventFrame:RegisterEvent("ADDON_LOADED")
-    eventFrame:RegisterEvent("START_LOOT_ROLL")
-    eventFrame:RegisterEvent("LOOT_OPENED")
-    eventFrame:RegisterEvent("LOOT_CLOSED")
-    eventFrame:RegisterEvent("MERCHANT_SHOW")
-    eventFrame:RegisterEvent("MERCHANT_UPDATE")
-    eventFrame:RegisterEvent("TRADE_SKILL_SHOW")
-    eventFrame:RegisterEvent("TRADE_SKILL_UPDATE")
-    eventFrame:RegisterEvent("CRAFT_SHOW")
-    eventFrame:RegisterEvent("CRAFT_UPDATE")
-    eventFrame:RegisterEvent("TRAINER_SHOW")
-    eventFrame:RegisterEvent("TRAINER_UPDATE")
-    eventFrame:RegisterEvent("TRAINER_DESCRIPTION_UPDATE")
-    eventFrame:RegisterEvent("GET_ITEM_INFO_RECEIVED")
-    eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+    local events = {
+        "ADDON_LOADED",
+        "START_LOOT_ROLL",
+        "LOOT_OPENED",
+        "LOOT_CLOSED",
+        "MERCHANT_SHOW",
+        "MERCHANT_UPDATE",
+        "TRADE_SKILL_SHOW",
+        "TRADE_SKILL_UPDATE",
+        "TRADE_SKILL_LIST_UPDATE",
+        "TRADE_SKILL_DATA_SOURCE_CHANGED",
+        "TRADE_SKILL_DETAILS_UPDATE",
+        "CRAFT_SHOW",
+        "CRAFT_UPDATE",
+        "TRAINER_SHOW",
+        "TRAINER_UPDATE",
+        "TRAINER_DESCRIPTION_UPDATE",
+        "GET_ITEM_INFO_RECEIVED",
+        "PLAYER_ENTERING_WORLD",
+    }
+    for i = 1, #events do
+        GQ.RegisterEvent(eventFrame, events[i])
+    end
     eventFrame:SetScript("OnEvent", function(_, event, arg1, arg2)
         if event == "ADDON_LOADED" and (arg1 == "Blizzard_TrainerUI" or arg1 == "Blizzard_TradeSkillUI") then
             GQ.Indicator:EnsureTrainerHooks()
@@ -1575,6 +1583,8 @@ function GQ.Indicator:Init()
         end
 
         if event == "TRADE_SKILL_SHOW" or event == "TRADE_SKILL_UPDATE"
+            or event == "TRADE_SKILL_LIST_UPDATE" or event == "TRADE_SKILL_DATA_SOURCE_CHANGED"
+            or event == "TRADE_SKILL_DETAILS_UPDATE"
             or event == "CRAFT_SHOW" or event == "CRAFT_UPDATE"
         then
             GQ.Indicator:RebuildCache()

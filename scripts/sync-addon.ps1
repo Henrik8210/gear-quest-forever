@@ -21,6 +21,7 @@ $addonName = "GearQuestForever"
 
 $clientCandidates = @(
     $env:GEARQUEST_WOW_CLIENT,
+    "_classic_beta_",
     "_forever_",
     "_forever_beta_",
     "_wow_forever_",

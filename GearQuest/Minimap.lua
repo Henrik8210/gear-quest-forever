@@ -5,7 +5,17 @@ GQ.Minimap = GQ.Minimap or {}
 local MINIMAP_TEXTURE = "Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Art\\GearQuest-Icon"
 local MINIMAP_ICON_SIZE = 20
 local BUTTON_SIZE = 31
-local MINIMAP_RADIUS = 80
+-- Sit on the circular rim. Hardcoded 80px sat outside Forever's minimap border.
+local MINIMAP_BORDER_INSET = 2
+
+local function GetRadius()
+    if not Minimap then
+        return 70
+    end
+    local w = Minimap:GetWidth() or 140
+    local h = Minimap:GetHeight() or w
+    return (math.min(w, h) / 2) - MINIMAP_BORDER_INSET
+end
 
 local function ApplyMinimapIcon(icon)
     if not icon then
@@ -38,9 +48,13 @@ local function SetAngle(angle)
 end
 
 local function UpdatePosition(button)
+    if not button or not Minimap then
+        return
+    end
+    local radius = GetRadius()
     local angle = math.rad(GetAngle())
-    local x = math.cos(angle) * MINIMAP_RADIUS
-    local y = math.sin(angle) * MINIMAP_RADIUS
+    local x = math.cos(angle) * radius
+    local y = math.sin(angle) * radius
     button:ClearAllPoints()
     button:SetPoint("CENTER", Minimap, "CENTER", x, y)
 end
@@ -89,6 +103,7 @@ function GQ.Minimap:Init()
         self.button = self.button or _G.GearQuestMinimapButton
         if self.button then
             WireMinimapButton(self.button)
+            UpdatePosition(self.button)
         end
         return
     end
@@ -131,4 +146,14 @@ function GQ.Minimap:Init()
     UpdatePosition(button)
     button:Show()
     self.button = button
+
+    if Minimap.HookScript then
+        pcall(function()
+            Minimap:HookScript("OnSizeChanged", function()
+                if GQ.Minimap.button then
+                    UpdatePosition(GQ.Minimap.button)
+                end
+            end)
+        end)
+    end
 end

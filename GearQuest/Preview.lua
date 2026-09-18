@@ -268,6 +268,8 @@ function GQ.Preview:PrintHelp()
     print("  |cff00ff00/gq spec enhancement|r — set specialization (level 10+)")
     print("  |cff00ff00/gq log|r — toggle GearQuest log window")
     print("  |cff00ff00/gq wipe data|r — reset hunt progress (for testing obtain/toast)")
+    print("  |cff00ff00/gq seen|r — list unique equip items this client has recorded (loot, bags, vendors, hovered tooltips)")
+    print("  |cff00ff00/gq seen wipe|r — clear that notebook")
 end
 
 function GQ.Preview:PrintStatus()
