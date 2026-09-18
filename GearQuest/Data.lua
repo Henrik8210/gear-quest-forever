@@ -7906,19 +7906,24 @@ function GQ.Data:IsSlotUnlocked(slotName)
     return GQ:GetEffectiveLevel() >= self:GetSlotUnlockLevel(slotName)
 end
 
+function GQ.Data:SlotHasHunts(slotName)
+    local candidates = self:GetCandidatesForSlot(slotName)
+    return candidates and #candidates > 0
+end
+
 function GQ.Data:GetSlotsForClass(classFile)
     local slots = {}
     local seen = {}
 
     for _, slotName in ipairs(self.BASE_SLOTS) do
         slotName = self:NormalizeSlotName(slotName)
-        if not seen[slotName] and self:IsSlotUnlocked(slotName) then
+        if not seen[slotName] and self:IsSlotUnlocked(slotName) and self:SlotHasHunts(slotName) then
             seen[slotName] = true
             table.insert(slots, slotName)
         end
     end
 
-    if self.CLASS_RANGED[classFile] and not seen.Ranged then
+    if self.CLASS_RANGED[classFile] and not seen.Ranged and self:SlotHasHunts("Ranged") then
         table.insert(slots, "Ranged")
     end
 

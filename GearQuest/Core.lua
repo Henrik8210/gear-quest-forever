@@ -9,7 +9,7 @@ end
 GQ = GQ or {}
 _G.GearQuest = GQ
 
-GQ.VERSION = "0.2.0-forever-beta"
+GQ.VERSION = "0.2.1-beta"
 GQ.ADDON_NAME = ADDON_NAME
 -- WoW Forever: 1–60 Classic+ (no TBC level cap).
 GQ.MAX_PLAYER_LEVEL = 60
@@ -321,21 +321,22 @@ function GQ:CheckLevelMilestones(previousLevel, newLevel)
 
     previousLevel = previousLevel or 0
 
-    -- Level 9 band: one Finger entry (Minor Channeling Ring) — first ring slot.
-    if newLevel >= 9 and previousLevel < 9 then
+    -- Finger milestones follow this character's hunts, not the Alliance paladin
+    -- level-9 band. Horde shaman has no Finger rows until later; do not toast an empty slot.
+    local fingerHunts = GQ.Data and GQ.Data.GetTopUpgradesForSlot and GQ.Data:GetTopUpgradesForSlot("Finger", 3)
+    local fingerCount = fingerHunts and #fingerHunts or 0
+    if fingerCount > 0 then
         self:NotifyMilestoneOnce(
             "ringSlot1",
-            "|cff66ccffGearQuest|r: You've reached level 9 — one of your ring slots is now eligible for an upgrade! Open |cff00ff00/gq log|r to browse finger upgrades."
+            "|cff66ccffGearQuest|r: You've reached level " .. newLevel .. " — one of your ring slots is now eligible for an upgrade! Open |cff00ff00/gq log|r to browse finger upgrades."
         )
-    end
-
-    -- Set GQ.Data.RING_SLOT_2_MILESTONE_LEVEL when a second Finger upgrade is added to Data.lua.
-    local ringSlot2Level = GQ.Data and GQ.Data.RING_SLOT_2_MILESTONE_LEVEL
-    if ringSlot2Level and newLevel >= ringSlot2Level and previousLevel < ringSlot2Level then
-        self:NotifyMilestoneOnce(
-            "ringSlot2",
-            "|cff66ccffGearQuest|r: You've reached level " .. ringSlot2Level .. " — your other ring slot is now eligible for an upgrade! Open |cff00ff00/gq log|r to browse finger upgrades."
-        )
+        local ringSlot2Level = GQ.Data.RING_SLOT_2_MILESTONE_LEVEL
+        if fingerCount >= 2 and ringSlot2Level and newLevel >= ringSlot2Level then
+            self:NotifyMilestoneOnce(
+                "ringSlot2",
+                "|cff66ccffGearQuest|r: You've reached level " .. newLevel .. " — your other ring slot is now eligible for an upgrade! Open |cff00ff00/gq log|r to browse finger upgrades."
+            )
+        end
     end
 
     -- Level 10: talent specs — log button and /gq spec filter gear lists.

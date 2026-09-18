@@ -19,10 +19,10 @@ Publishing uses **GitHub Actions**, not the CurseForge webhook. Keep any CurseFo
 
 Only when explicitly publishing:
 
-1. Bump `## Version:` in `GearQuest/GearQuestForever.toc` and `GearQuest/Core.lua` (`GQ.VERSION`) to **`X.Y.Z-forever-beta`** (e.g. `0.2.0-forever-beta`). Do not use `0.1.0-beta.7-forever`.
-2. Add a `## vX.Y.Z-forever-beta` section to `CHANGELOG.md`.
+1. Bump `## Version:` in `GearQuest/GearQuestForever.toc` and `GearQuest/Core.lua` (`GQ.VERSION`) to **`X.Y.Z-beta`** (e.g. `0.2.1-beta`).
+2. Add a `## vX.Y.Z-beta` section to `CHANGELOG.md`.
 3. Commit and push to `main`.
-4. Tag and push: `git tag vX.Y.Z-forever-beta` then `git push origin vX.Y.Z-forever-beta` (tag matches toc, with `v` prefix). CurseForge **Files** shows `X.Y.Z-forever-beta` (the `v` is stripped). Uploads stay on the **beta** channel until `CF_RELEASE_TYPE` is changed to `release`.
+4. Tag and push: `git tag vX.Y.Z-beta` then `git push origin vX.Y.Z-beta`. CurseForge **Files** shows **`vX.Y.Z-beta`** (keep the `v`). Uploads stay on the **beta** channel until `CF_RELEASE_TYPE` is changed to `release`.
 5. Verify **GitHub Actions → Release** succeeds.
 6. Check CurseForge → **Files** — new file appears as Processing, then Approved.
 
@@ -35,6 +35,6 @@ Only when explicitly publishing:
 
 ## Next upload
 
-Version string is **`X.Y.Z-forever-beta`**. Do not use `0.1.0-beta.N-forever`.
+Version string is **`X.Y.Z-beta`**. CurseForge file name is **`vX.Y.Z-beta`**.
 
-After `v0.2.0-forever-beta`, bump the patch (e.g. `0.2.1-forever-beta`) rather than deleting the tag.
+After `v0.2.1-beta`, bump the patch (e.g. `0.2.2-beta`) rather than deleting the tag.

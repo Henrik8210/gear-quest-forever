@@ -72,7 +72,11 @@ def main() -> int:
         changelog = ("## " + parts[1]).strip() if len(parts) > 1 else text[:4000]
 
     tag = os.environ.get("GITHUB_REF_NAME") or zip_path.stem
-    display = tag[1:] if tag.lower().startswith("v") else tag
+    if tag.lower().startswith("gearquestforever-"):
+        tag = tag.split("-", 1)[1]
+    if not tag.lower().startswith("v"):
+        tag = "v" + tag
+    display = tag
     release_type = (os.environ.get("CF_RELEASE_TYPE") or "beta").lower()
     if release_type not in {"alpha", "beta", "release"}:
         release_type = "beta"

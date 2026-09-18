@@ -50,6 +50,8 @@ Show **three hunts per slot** for the player’s **class, faction, spec, and lev
 
 Wowhead’s Forever item list and tooltips are still filling in. GearQuest will **scrape and ingest Wowhead many times over the coming months** (`scripts/scrape-forever-wowhead-items.mjs` → `pipeline/scripts/ingest_forever_wowhead.py` → re-score → copy `_generated/`). Each pass should add missing ids, retuned stats, and replacements for classic ids that 404 on `nether.wowhead.com/forever/tooltip/item/{id}`. Do not treat one ingest as finished product.
 
+**18 Sep 2026:** 3,244 → 3,245 items. Only new gear: **Mirror of Rath'mael** (271213). Classic rings **The 1 Ring (8350)** and **Woven Copper Ring (21931)** still 404 — Horde shaman Finger hunts start ~15, not at the level-9 Alliance paladin toast.
+
 Classic ids that 404 are pruned from hunts at load (`GQ.Data:PruneMissingForever`). Items that exist but have no combat stats, suffixes, or effect lines show **Has not been datamined yet** — hunt source text is not a tooltip.
 
 ## Curation workflow (primary)
@@ -507,7 +509,7 @@ Match the message to **how many upgrades exist for that slot at that level**, no
 
 | Level | Slot | Unlock | Milestone key | Notes |
 |-------|------|--------|---------------|--------|
-| 9 | Finger | yes | `ringSlot1` | One ring in band (`Minor Channeling Ring`). |
+| 9 | Finger | yes | `ringSlot1` | Alliance paladin/warrior curated rings only. Milestone fires only if **this character** has Finger hunts; Horde shaman has none until ~15 (The 1 Ring 8350 is missing on Forever). |
 | 9 | Shoulder | yes | — | No separate milestone yet; shoulder shares level 9 band with ring. Add a `shoulderSlot1` message if you want an explicit shoulder callout. |
 | TBD | Finger #2 | — | `ringSlot2` | Set `GQ.Data.RING_SLOT_2_MILESTONE_LEVEL` when second `Finger` entry is added. |
 | TBD | Trinket | — | `trinketSlot1` / `trinketSlot2` | Same pattern as rings when trinket data is curated. |

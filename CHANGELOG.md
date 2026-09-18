@@ -2,6 +2,14 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
+## v0.2.1-beta
+
+Wowhead re-scrape, Horde ring toast fix, and CurseForge files named `vX.Y.Z-beta`.
+
+- **Wowhead (18 Sep 2026):** catalog 3,244 → 3,245. Only new item: **Mirror of Rath'mael** (271213), a level-19 rare shield. Paladin / warrior / shaman re-scored.
+- **Finger at 9:** the “ring slot eligible” toast was Alliance paladin/warrior data. Horde shaman has no Finger hunts at 9 (The 1 Ring 8350 and Woven Copper Ring 21931 404 on Forever; Barrens/Silverpine rings land ~15). Toast and log now require hunts for this character.
+- CurseForge **Files** name is **`v0.2.1-beta`**.
+
 ## v0.2.0-forever-beta
 
 Nine-class re-score after Forever Wowhead hunt audit and the Horde trinket gap.

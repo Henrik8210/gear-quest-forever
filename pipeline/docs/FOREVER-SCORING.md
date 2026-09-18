@@ -116,6 +116,10 @@ Then `score.py` / `reemit_all.py` and copy `pipeline/out/Data.*.generated.lua` i
 
 Hunt-id probe (`pipeline/scripts/probe_forever_hunt_tooltips.py`) labels 200 vs 404. Missing classic ids are pruned at runtime; existing items with no combat stats get the datamine notice.
 
+**18 Sep 2026 scrape:** 3,244 → 3,245 Forever items. Only new id: **271213 Mirror of Rath'mael** (rare shield, ilvl 24, rlvl 19, +4 Str/+4 Sta/+3 Int). Wowhead has no drop source yet. Shield `block` is parsed from tooltips on ingest.
+
+**Finger gap (Horde, levels 9–14):** curated level-9 rings are Alliance paladin/warrior only. Generated shaman Finger starts at 10 with **The 1 Ring (8350)**, which 404s on Forever and is pruned. **Woven Copper Ring (21931)** also 404s. Horde enhancement rings that exist are Bounty Hunter's Ring (5351, Barrens) and Ring of Scorn (3235, Silverpine) around 15. Do not toast “ring slot eligible” unless `SlotHasHunts("Finger")`.
+
 ## What is already wired
 
 - Paths are repo-relative (`gq_paths.py`). No `/home/claude/gq/`.

@@ -14,7 +14,7 @@ This is a **separate** CurseForge project from TBC Anniversary GearQuest. Never 
 Publishing is **GitHub Actions**, not the CurseForge webhook (webhook must stay **inactive**):
 
 1. User must have **`CF_API_KEY`** set in **this** repo's Secrets (CurseForge API token).
-2. Push a version tag (`v0.2.0-forever-beta`) → `.github/workflows/release.yml` runs.
+2. Push a version tag (`v0.2.1-beta`) → `.github/workflows/release.yml` runs.
 3. Workflow uses `.pkgmeta` → `BigWigsMods/packager@v2` uploads to CurseForge.
 4. Verify **GitHub Actions → Release** succeeds; check CurseForge **Files**.
 
@@ -26,11 +26,11 @@ Never create or push a CurseForge release tag unless the user **explicitly** req
 
 ## When the user asks for CurseForge
 
-1. Bump `GearQuest/GearQuestForever.toc` `## Version:` and `GearQuest/Core.lua` `GQ.VERSION` to `X.Y.Z-forever-beta` (e.g. `0.2.0-forever-beta`). Never use `0.1.0-beta.N-forever`.
-2. Add `## vX.Y.Z-forever-beta` to `CHANGELOG.md`.
+1. Bump `GearQuest/GearQuestForever.toc` `## Version:` and `GearQuest/Core.lua` `GQ.VERSION` to `X.Y.Z-beta` (e.g. `0.2.1-beta`). File name on CurseForge is **`vX.Y.Z-beta`**.
+2. Add `## vX.Y.Z-beta` to `CHANGELOG.md`.
 3. Confirm `## X-Curse-Project-ID:` is the **Forever** project, not TBC GearQuest (`1669225`).
 4. Commit and push to `main`.
-5. `git tag v<version>` and `git push origin v<version>` (tag matches toc, with `v` prefix). Upload stays on the CurseForge **beta** channel; the file name is `X.Y.Z-forever-beta`.
+5. `git tag v<version>` and `git push origin v<version>` (tag is `vX.Y.Z-beta`). Upload stays on the CurseForge **beta** channel; the file name is `vX.Y.Z-beta`.
 6. Confirm GitHub Actions **Release** job succeeded; remind user to check CurseForge **Files**.
 
 Do **not** tag when the user only asked to commit, push, or update docs.

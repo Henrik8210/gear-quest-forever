@@ -113,6 +113,9 @@ def parse_tooltip(t):
     m = re.search(r"<!--amr-->(\d+)", t)
     if m:
         add("armor", int(m.group(1)))
+    m = re.search(r"(\d+)\s+Block\b", plain(t))
+    if m:
+        o["block"] = int(m.group(1))
     m = re.search(r"<!--dmg-->([\d.]+) - ([\d.]+)", t)
     if m:
         o["dmgMin"], o["dmgMax"] = float(m.group(1)), float(m.group(2))
@@ -263,7 +266,7 @@ def build_item(row, tip):
         "randSuffix": 0,
         "reqSkill": 0,
         "reqSkillRank": 0,
-        "block": 0,
+        "block": parsed.get("block") or 0,
         "delay": int(round((parsed.get("speed") or 0) * 1000)) if parsed.get("speed") else 0,
         "itemset": 0,
         "bonding": 1 if parsed.get("bind") == "BoP" else 2 if parsed.get("bind") == "BoE" else 0,

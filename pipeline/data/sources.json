@@ -359513,5 +359513,21 @@
     "seasonal": false,
     "obtainable": true,
     "excludedBecause": null
+  },
+  "271213": {
+    "sourceType": "world_drop",
+    "instructions": "Indexed from Wowhead Forever. Source not listed yet.",
+    "zone": null,
+    "npc": null,
+    "questName": null,
+    "profession": null,
+    "dropChance": null,
+    "alts": [],
+    "gateLevel": 19,
+    "questClasses": 0,
+    "questRaces": 0,
+    "seasonal": false,
+    "obtainable": true,
+    "excludedBecause": null
   }
 }
