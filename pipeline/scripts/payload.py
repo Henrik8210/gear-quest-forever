@@ -75,7 +75,12 @@ def lua(v):
     if v is None: return "nil"
     if isinstance(v,bool): return "true" if v else "false"
     if isinstance(v,(int,float)): return repr(v)
-    return '"'+str(v).replace("\\","\\\\").replace('"','\\"').replace("\n"," ")+'"'
+    s=str(v).replace("\\","\\\\").replace('"','\\"').replace("\n"," ")
+    for a,b in (("\u201c","'"),("\u201d","'"),("\u2018","'"),("\u2019","'"),
+                ("\u2014","-"),("\u2013","-"),("\u2026","..."),("\u00a0"," "),
+                ("\ufffd","'")):
+        s=s.replace(a,b)
+    return '"'+s+'"'
 
 facts=[]
 allused=set()
@@ -96,7 +101,11 @@ for iid in sorted(allused):
     if LORE.get(str(iid)): kv.append(f'lore={lua(LORE[str(iid)])}')
     pr=(it.get("procs") or [])
     if pr: kv.append(f'proc={lua(pr[0][:180])}')
-    facts.append(f'    [{iid}]={{name={lua(it["name"])},{",".join(kv)}}},')
+    extra=[]
+    if it.get("quality") is not None: extra.append(f'quality={int(it["quality"])}')
+    if it.get("ilvl"): extra.append(f'ilvl={int(it["ilvl"])}')
+    if it.get("rlvl"): extra.append(f'reqLevel={int(it["rlvl"])}')
+    facts.append(f'    [{iid}]={{name={lua(it["name"])},{",".join(extra+kv)}}},')
 
 rows=[]
 # Identity map over whatever specs this class actually has. It used to be a
@@ -106,10 +115,10 @@ SPEC={k:k for k in gen if k!="levelling_1_9"}
 for sp,blob in gen.items():
     spec=SPEC.get(sp)
     for b in blob["bands"]:
-        # Levels 1-9 are handled outside this file entirely, so nothing overlaps:
         # Alliance 1-9 is Henrik's hand-made data, Horde 1-9 ships as its own file.
-        # This file is levels 10-60.
+        # This file is levels 10-60. Per-spec 1-9 ships in the Early/Horde 1-9 file.
         if sp=="levelling_1_9": continue
+        if b.get("hi", 60) <= 9: continue
         for rank,p in enumerate(b["picks"][:3],1):
             extra=""
             if p.get("suffix"):

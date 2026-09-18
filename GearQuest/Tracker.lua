@@ -171,7 +171,7 @@ function GQ.Tracker:GetTrackedEntries()
         if NormalizeHuntStatus(record.status) == "tracked" then
             local entry = GQ.Data:GetEntryById(id)
             if entry
-                and GQ.Data:EntryMatchesPlayerBand(entry)
+                and GQ.Data:EntryMatchesPlayer(entry)
                 and GQ.Log:EntryMatchesTrackedHunt(entry)
                 and not GQ.Log:IsEntryObtained(id) then
                 results[#results + 1] = {
@@ -1270,9 +1270,6 @@ function GQ.Tracker:Init()
     local listener = CreateFrame("Frame")
     GQ.RegisterEvent(listener, "GET_ITEM_INFO_RECEIVED")
     listener:SetScript("OnEvent", function()
-        if GQ.Tracker.frame and GQ.Tracker.frame:IsShown() and not GQ.Tracker:IsCollapsed() then
-            GQ.Tracker:Refresh()
-        end
     end)
     self.itemInfoListener = listener
 

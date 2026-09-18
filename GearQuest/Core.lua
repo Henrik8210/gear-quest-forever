@@ -9,7 +9,7 @@ end
 GQ = GQ or {}
 _G.GearQuest = GQ
 
-GQ.VERSION = "0.1.0-beta.5-forever"
+GQ.VERSION = "0.1.0-beta.6-forever"
 GQ.ADDON_NAME = ADDON_NAME
 -- WoW Forever: 1–60 Classic+ (no TBC level cap).
 GQ.MAX_PLAYER_LEVEL = 60
@@ -64,6 +64,33 @@ function GQ.RegisterEvent(frame, event)
     return pcall(frame.RegisterEvent, frame, event)
 end
 
+-- Forever/Midnight can mark tooltip FontString text as a secret string.
+-- Comparing or pattern-matching that value while tainted throws.
+function GQ.PublicText(value)
+    if value == nil then
+        return nil
+    end
+    if issecretvalue then
+        local ok, secret = pcall(issecretvalue, value)
+        if ok and secret then
+            return nil
+        end
+    end
+    if canaccessvalue then
+        local ok, accessible = pcall(canaccessvalue, value)
+        if ok and not accessible then
+            return nil
+        end
+    end
+    local ok, public = pcall(function()
+        return type(value) == "string" and value ~= "" and value or nil
+    end)
+    if not ok then
+        return nil
+    end
+    return public
+end
+
 function GQ:ClampPlayerLevel(level)
     level = tonumber(level) or 1
     level = math.floor(level)
@@ -79,10 +106,13 @@ end
 GearQuestForeverDB = GearQuestForeverDB or {
     hunts = {},
     obtained = {},
+    obtainedItems = {},
     crafted = {},
     dismissedCompleted = {},
     settings = {},
 }
+
+GearQuestForeverCharDB = GearQuestForeverCharDB or {}
 
 local SOURCE_LABELS = {
     world_drop = "World drop",
@@ -127,6 +157,7 @@ function GQ:PLAYER_LOGIN()
     run("startup", function()
         GearQuestForeverDB.hunts = GearQuestForeverDB.hunts or {}
         GearQuestForeverDB.obtained = GearQuestForeverDB.obtained or {}
+        GearQuestForeverDB.obtainedItems = GearQuestForeverDB.obtainedItems or {}
         GearQuestForeverDB.crafted = GearQuestForeverDB.crafted or {}
         GearQuestForeverDB.dismissedCompleted = GearQuestForeverDB.dismissedCompleted or {}
         GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
@@ -145,7 +176,6 @@ function GQ:PLAYER_LOGIN()
     run("Popup", function() self.Popup:Init() end)
     run("PaperDoll", function() self.PaperDoll:Init() end)
     run("Minimap", function() self.Minimap:Init() end)
-    run("Collector", function() self.Collector:Init() end)
     run("Commands", function() self.Commands:Init() end)
 
     local previewNote = self.Preview:IsEnabled() and (" (" .. self:GetPreviewLabel() .. ")") or ""

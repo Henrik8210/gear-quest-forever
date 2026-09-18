@@ -21,7 +21,7 @@ GearQuest uses **two different pipelines**. Do not apply one pipeline’s rules 
 node scripts/verify-generated-bis.mjs
 ```
 
-Expected total: **57,570** entries (**368 curated + 57,202 generated**) — always use the script, not a stale figure. All nine classes are Classic `score.py` regens (weights still TBC-derived). Horde Forever deltas in `Data.lua` use `foreverDelta = true` so they compete across generated per-level bands; Compare still shows the top 3.
+Expected total: **59,771** entries (**368 curated + 59,403 generated**) — always use the script, not a stale figure. All nine classes are Classic `score.py` regens with the Forever Wowhead pool (id ≥ 200000) merged in. Levels 1–9 are scored **per spec**. Weights are still TBC-derived. Horde Forever deltas in `Data.lua` use `foreverDelta = true` so they compete across generated per-level bands; Compare still shows the top 3.
 
 ### Ranking philosophy by source
 

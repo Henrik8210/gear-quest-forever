@@ -46,6 +46,13 @@ pipeline inputs, re-score the class, then copy Lua back.
 3. **Pool** — append the numeric id to `pipeline/data/classic_item_ids.json`.
    `score.py` only considers ids in that list (TBC/Outland stays out).
 
+   Forever-only items (id ≥ 200000) come from Wowhead `/forever/items`:
+
+   ```powershell
+   node scripts/scrape-forever-wowhead-items.mjs
+   python pipeline/scripts/ingest_forever_wowhead.py
+   ```
+
 4. **Random green?** — scrape Classic/Forever suffix tables, then convert:
 
    ```powershell

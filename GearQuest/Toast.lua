@@ -175,6 +175,7 @@ end
 function GQ.Toast:ApplyEntryVisuals(entry)
     local frame = EnsureFrame()
     frame.entryId = entry and entry.id or nil
+    frame.itemId = entry and entry.itemId or nil
 
     if not entry then
         frame.subtitle:SetText("")
@@ -185,9 +186,12 @@ function GQ.Toast:ApplyEntryVisuals(entry)
     local itemName = GQ.Data:GetEntryDisplayName(entry) or ("Item " .. entry.itemId)
     frame.subtitle:SetText(itemName)
 
-    local _, _, _, _, _, _, _, _, _, texture = GetItemInfo(entry.itemId)
+    if GQ.Data and GQ.Data.RequestItemInfo then
+        GQ.Data:RequestItemInfo(entry.itemId)
+    end
+    local texture = GQ.Equip and GQ.Equip.GetItemIconTexture and GQ.Equip:GetItemIconTexture(entry.itemId)
     if not texture then
-        GetItemInfo(entry.itemId)
+        texture = select(10, GetItemInfo(entry.itemId))
     end
     frame.icon:SetTexture(texture or "Interface\\Icons\\INV_Misc_QuestionMark")
 end
@@ -293,13 +297,13 @@ function GQ.Toast:ShowForEntry(entry)
     self:Init()
 
     for _, queued in ipairs(queue) do
-        if queued.id == entry.id then
+        if queued.id == entry.id or (entry.itemId and queued.itemId == entry.itemId) then
             return
         end
     end
 
     local frame = toastFrame
-    if frame and frame:IsShown() and frame.entryId == entry.id then
+    if frame and frame:IsShown() and (frame.entryId == entry.id or (entry.itemId and frame.itemId == entry.itemId)) then
         return
     end
 

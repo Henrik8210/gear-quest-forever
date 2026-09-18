@@ -11,36 +11,44 @@ def lua(v):
     if v is None: return "nil"
     if isinstance(v,bool): return "true" if v else "false"
     if isinstance(v,(int,float)): return repr(v)
-    return '"'+str(v).replace("\\","\\\\").replace('"','\\"').replace("\n"," ")+'"'
+    s=str(v)
+    for a,b in (("\u201c","'"),("\u201d","'"),("\u2018","'"),("\u2019","'"),
+                ("\u2014","-"),("\u2013","-"),("\u2026","..."),("\u00a0"," "),
+                ("\ufffd","'")):
+        s=s.replace(a,b)
+    s=s.replace("\\","\\\\").replace('"','\\"').replace("\n"," ")
+    return '"'+s+'"'
 
 # Which factions this class needs a 1-9 file for. Paladin and warrior are Horde-only
 # because Henrik's curated Data.lua covers Alliance for both by hand (ALLIANCE_MAIL /
 # MAIL_MELEE). Hunter is in neither table, so it has no curated early data at all and
 # needs BOTH factions.
 FACTIONS=[f.strip() for f in os.environ.get("GQ_FACTIONS","Horde").split(",")]
-bands=[b for b in gen["levelling_1_9"]["bands"] if b["faction"] in FACTIONS]
-assert bands and all(b["hi"]<=9 for b in bands), "band range guard"
 used=set()
 rows=[]
-for b in bands:
-    for rank,p in enumerate(b["picks"][:3],1):
-        used.add(p["id"])
-        extra=""
-        if p.get("suffix"):
-            # suffixId and suffixRange are what let the addon print the actual numbers
-            # instead of just the suffix name. payload.py has emitted them since the
-            # random-enchant fix; these two 1-9 emitters were missed, so EVERY random
-            # enchant below level 10 -- 137 rows across the nine files -- shipped with
-            # no id and no range, and the tooltip could only say "of Strength ~10% on
-            # drop" with no stats. Henrik found it on a level 6 paladin.
-            extra=(f',suffix={lua(p["suffix"])},suffixChance={p.get("chanceAny") or 0}')
-            if p.get("suffixId"):    extra+=f',suffixId={p["suffixId"]}'
-            if p.get("suffixRange"): extra+=f',suffixRange={lua(p["suffixRange"])}'
-        if b.get("route"):
-            extra+=f',route={lua(b["route"])}'
-        fac = "" if len(FACTIONS)==1 else ',faction=%s'%lua(b["faction"])
-        rows.append('    {%d,%s,%d,%d,%d,%s%s%s},'%(p["id"],lua(b["slot"]),b["lo"],b["hi"],rank,
-                                                  lua(p["score"]),fac,extra))
+bands=[]
+for sp, blob in gen.items():
+    if sp == "levelling_1_9":
+        continue
+    for b in blob.get("bands") or []:
+        if b.get("hi", 9) > 9 or b.get("lo", 1) > 9:
+            continue
+        if b.get("faction") not in FACTIONS:
+            continue
+        bands.append((sp, b))
+        for rank,p in enumerate(b["picks"][:3],1):
+            used.add(p["id"])
+            extra=""
+            if p.get("suffix"):
+                extra=(f',suffix={lua(p["suffix"])},suffixChance={p.get("chanceAny") or 0}')
+                if p.get("suffixId"):    extra+=f',suffixId={p["suffixId"]}'
+                if p.get("suffixRange"): extra+=f',suffixRange={lua(p["suffixRange"])}'
+            if b.get("route"):
+                extra+=f',route={lua(b["route"])}'
+            rows.append('    {%d,%s,%d,%d,%d,%s,%s,%s%s},'%(
+                p["id"], lua(b["slot"]), b["lo"], b["hi"], rank,
+                lua(sp), lua(b["faction"]), p["score"], extra))
+assert bands and all(b["hi"]<=9 for _, b in bands), "band range guard"
 facts=[]
 for iid in sorted(used):
     s=srcs[str(iid)]; it=items[str(iid)]
@@ -51,7 +59,11 @@ for iid in sorted(used):
     # Flavour shown under the item's name -- canonical quest text, a note about the boss,
     # or hand-written for a legendary. See build_lore.py. Absent where there is no story.
     if LORE.get(str(iid)): kv.append(f'lore={lua(LORE[str(iid)])}')
-    facts.append(f'    [{iid}]={{name={lua(it["name"])},{",".join(kv)}}},')
+    extra=[]
+    if it.get("quality") is not None: extra.append(f'quality={int(it["quality"])}')
+    if it.get("ilvl"): extra.append(f'ilvl={int(it["ilvl"])}')
+    if it.get("rlvl"): extra.append(f'reqLevel={int(it["rlvl"])}')
+    facts.append(f'    [{iid}]={{name={lua(it["name"])},{",".join(extra+kv)}}},')
 
 TAG = FACTIONS[0] if len(FACTIONS)==1 else "Early"
 out=os.path.join(OUT,"Data.%s.%s.1to9.generated.lua"%(CLS.title(),TAG))
@@ -68,10 +80,10 @@ GQ.Data = GQ.Data or {}
 -- faction-exclusive zones are gated by name -- a vendor standing in Darnassus is
 -- not race-restricted, the city is.
 --
--- No spec column. """+CLS.title()+"""s have no talents before level 10, so one list serves all
--- three specs across this range.
+-- Spec column: GearQuest lets the player pick a spec before talents, so 1-9
+-- is scored per spec (enhancement agility vs resto intellect, etc.).
 --
--- row = { itemId, slot, minLevel, maxLevel, rank, score }
+-- row = { itemId, slot, minLevel, maxLevel, rank, spec, faction, score }
 --   optional: suffix, suffixChance  (random-enchantment items -- score assumes the
 --   best roll, and suffixChance is the odds of getting any roll of that suffix)
 
@@ -84,5 +96,5 @@ GQ.Data."""+LC+TAG+"""1to9 = {
 }
 """)
 print(f"{os.path.basename(out)}  {os.path.getsize(out)/1024:.0f} KB  {len(rows)} picks, {len(facts)} items")
-slots=sorted({b["slot"] for b in bands})
+slots=sorted({b["slot"] for _, b in bands})
 print("slots:", ", ".join(slots))

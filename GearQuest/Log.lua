@@ -10,11 +10,14 @@ local TAB_BAR_PAD = 4
 local TAB_ROW_HEIGHT = TAB_HEIGHT + TAB_BAR_PAD
 local TAB_TOP_OFFSET = 56
 local PORTRAIT_TEXTURE = "Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Art\\GearQuest-Portrait"
-local PORTRAIT_DISPLAY_SIZE = 56
+local PORTRAIT_DISPLAY_SIZE = 61
+local PORTRAIT_OFFSET_X = -6
+local PORTRAIT_OFFSET_Y = 7
 
 -- Content area below title bar and above footer buttons.
 local HEADER_OFFSET = 74
-local FOOTER_OFFSET = 40
+local FOOTER_OFFSET = 42
+local FOOTER_BUTTON_Y = 14
 local CONTENT_LEFT = 14
 local CONTENT_RIGHT_GUTTER = 14
 local COLUMN_GAP = 8
@@ -93,11 +96,12 @@ local function SafeGetItemIcon(itemId)
     if not itemId then
         return nil
     end
-
+    if GQ.Equip and GQ.Equip.GetItemIconTexture then
+        return GQ.Equip:GetItemIconTexture(itemId)
+    end
     if type(GetItemIcon) == "function" then
         return GetItemIcon(itemId)
     end
-
     return select(10, GetItemInfo(itemId))
 end
 
@@ -142,19 +146,22 @@ local function AnchorListRow(row, scrollChild, scroll, yOffset)
 end
 
 local function GetListItemQualityColor(itemId)
-    if not itemId or not GetItemInfo then
-        return GetItemQualityColor(1)
+    if not itemId then
+        return 1, 0.82, 0
     end
 
-    GetItemInfo(itemId)
-    local _, _, quality = GetItemInfo(itemId)
-    return GetItemQualityColor(quality or 1)
+    local quality = GQ.Data and GQ.Data.GetItemQualityForDisplay and GQ.Data:GetItemQualityForDisplay(itemId)
+    if not quality then
+        return 1, 0.82, 0
+    end
+    local c = ITEM_QUALITY_COLORS and ITEM_QUALITY_COLORS[quality]
+    if c then
+        return c.r, c.g, c.b
+    end
+    return GetItemQualityColor(quality)
 end
 
 local function PrimeListEntryItemInfo(entry)
-    if entry and entry.itemId and GetItemInfo then
-        GetItemInfo(entry.itemId)
-    end
 end
 
 local function BuildListItemTags(entry, status, includeNewLabel, slotName)
@@ -309,7 +316,13 @@ local function ItemLinkToId(link)
     if not link then
         return nil
     end
-    return tonumber(link:match("item:(%d+)"))
+    local ok, id = pcall(function()
+        return tonumber(link:match("item:(%d+)"))
+    end)
+    if not ok then
+        return nil
+    end
+    return id
 end
 
 local function GetBagItemLink(bag, slot)
@@ -450,6 +463,9 @@ local function ShowItemTooltipForRow(row)
 end
 
 local function HideItemTooltip()
+    if GQ.Data and GQ.Data.ClearPendingItemTooltip then
+        GQ.Data:ClearPendingItemTooltip(GameTooltip)
+    end
     GameTooltip:Hide()
 end
 
@@ -681,10 +697,10 @@ local function HideDefaultFrameArt(frame)
         return
     end
 
-    -- Keep PortraitFrame metal sides and the portrait circle.
-    -- Strip only the default interior fills so we can tint the panel warmer.
+    -- Keep PortraitFrame metal (NineSlice) and the circular portrait well.
+    -- Strip only interior fills so the panel can be tinted warmer.
     for _, key in ipairs({
-        "NineSlice", "Bg", "TitleBg", "TopTileStreaks", "Inset", "OverlayElements",
+        "Bg", "TitleBg", "TopTileStreaks", "Inset",
     }) do
         HideRegion(frame[key])
     end
@@ -701,6 +717,125 @@ local function HideDefaultFrameArt(frame)
     if frame.gqBookIcon then
         frame.gqBookIcon:Hide()
     end
+    if frame.gqHeaderBar then
+        frame.gqHeaderBar:Hide()
+    end
+    if frame.gqOuterBorder then
+        frame.gqOuterBorder:Hide()
+    end
+end
+
+local PORTRAIT_NINESLICE_LAYOUTS = {
+    "PortraitFrameTemplate",
+    "PortraitFrameTemplateMinimizable",
+}
+
+local function HideNineSliceCenter(container)
+    if container and container.Center then
+        container.Center:SetAlpha(0)
+        HideRegion(container.Center)
+    end
+end
+
+local function TryApplyPortraitFrameLayout(container)
+    if not container or not NineSliceUtil then
+        return false
+    end
+    local apply = NineSliceUtil.ApplyLayout
+    local applyByName = NineSliceUtil.ApplyLayoutByName
+    if not apply and not applyByName then
+        return false
+    end
+
+    for _, layoutName in ipairs(PORTRAIT_NINESLICE_LAYOUTS) do
+        if applyByName then
+            local ok = pcall(applyByName, container, layoutName)
+            if ok then
+                HideNineSliceCenter(container)
+                return true
+            end
+        end
+        if apply and NineSliceLayouts and NineSliceLayouts[layoutName] then
+            local ok = pcall(apply, container, NineSliceLayouts[layoutName])
+            if ok then
+                HideNineSliceCenter(container)
+                return true
+            end
+        end
+    end
+    return false
+end
+
+local function GetFrameTitle(frame)
+    if frame.TitleContainer and frame.TitleContainer.TitleText then
+        return frame.TitleContainer.TitleText
+    end
+    if frame.TitleText then
+        return frame.TitleText
+    end
+    local name = frame.GetName and frame:GetName()
+    return name and _G[name .. "TitleText"] or nil
+end
+
+local function GetFrameCloseButton(frame)
+    if frame.CloseButton then
+        return frame.CloseButton
+    end
+    local name = frame.GetName and frame:GetName()
+    return name and _G[name .. "CloseButton"] or nil
+end
+
+local function ApplyOuterWindowBorder(frame)
+    if not frame then
+        return
+    end
+
+    if frame.gqOuterBorder then
+        frame.gqOuterBorder:Hide()
+    end
+    if frame.gqHeaderBar then
+        frame.gqHeaderBar:Hide()
+    end
+
+    local ns = frame.NineSlice
+    local hasMetal = false
+    if ns then
+        ns:Show()
+        ns:SetFrameLevel((frame:GetFrameLevel() or 1) + 2)
+        TryApplyPortraitFrameLayout(ns)
+        HideNineSliceCenter(ns)
+        hasMetal = ns.TopLeftCorner or ns.TopEdge or ns.LeftEdge
+    else
+        hasMetal = TryApplyPortraitFrameLayout(frame)
+        HideNineSliceCenter(frame)
+    end
+
+    if not hasMetal then
+        if not frame.gqOuterBorder then
+            local ok, created = pcall(CreateFrame, "Frame", nil, frame, "BackdropTemplate")
+            frame.gqOuterBorder = (ok and created) or CreateFrame("Frame", nil, frame)
+            frame.gqOuterBorder:SetAllPoints(frame)
+            frame.gqOuterBorder:EnableMouse(false)
+        end
+        frame.gqOuterBorder:Show()
+        frame.gqOuterBorder:SetFrameLevel((frame:GetFrameLevel() or 1) + 2)
+        ApplyMetalEdge(frame.gqOuterBorder, 16)
+    end
+
+    if frame.OverlayElements and frame.OverlayElements.Show then
+        frame.OverlayElements:Show()
+    end
+
+    local close = GetFrameCloseButton(frame)
+    if close then
+        close:SetParent(frame)
+        close:ClearAllPoints()
+        close:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 4, 4)
+        if close.SetFrameLevel then
+            close:SetFrameLevel((frame:GetFrameLevel() or 1) + 10)
+        end
+        close:Show()
+    end
 end
 
 local function ApplyModernChrome(frame)
@@ -710,18 +845,34 @@ local function ApplyModernChrome(frame)
 
     HideDefaultFrameArt(frame)
     ApplyPanelBackground(frame)
+    ApplyOuterWindowBorder(frame)
     if SetupQuestLogPortrait then
         SetupQuestLogPortrait(frame)
     end
 
-    local title = frame.TitleText or (frame.GetName and _G[frame:GetName() .. "TitleText"])
+    local title = GetFrameTitle(frame)
+    if frame.TitleContainer then
+        frame.TitleContainer:Show()
+        frame.TitleContainer:ClearAllPoints()
+        frame.TitleContainer:SetPoint("TOPLEFT", frame, "TOPLEFT", 58, -1)
+        frame.TitleContainer:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -30, -1)
+        frame.TitleContainer:SetHeight(22)
+    end
     if title then
-        title:ClearAllPoints()
-        title:SetPoint("TOP", frame, "TOP", 0, -8)
+        if frame.TitleContainer then
+            title:SetParent(frame.TitleContainer)
+            title:ClearAllPoints()
+            title:SetPoint("CENTER", frame.TitleContainer, "CENTER", 0, 0)
+        else
+            title:SetParent(frame)
+            title:ClearAllPoints()
+            title:SetPoint("TOP", frame, "TOP", 0, -12)
+        end
         if title.SetJustifyH then
             title:SetJustifyH("CENTER")
         end
         title:SetTextColor(GOLD[1], GOLD[2], GOLD[3])
+        title:Show()
     end
 
     if frame.gqHeaderLine then
@@ -1025,16 +1176,17 @@ local function StyleHandleTab(btn, selected)
             fill = PANEL_BG,
             border = FRAME_METAL,
             hideLeft = true,
-            edgeSize = TAB_BORDER_EDGE,
+            edgeSize = FILTER_BORDER_EDGE,
         })
         btn.gqIcon:SetVertexColor(1, 1, 1, 1)
     else
         LayoutTabChrome(btn, {
             fill = { 0.05, 0.04, 0.03, 1 },
-            border = FRAME_METAL_DIM,
-            edgeSize = TAB_BORDER_EDGE,
+            border = FRAME_METAL,
+            hideLeft = true,
+            edgeSize = FILTER_BORDER_EDGE,
         })
-        btn.gqIcon:SetVertexColor(0.42, 0.38, 0.32, 1)
+        btn.gqIcon:SetVertexColor(0.55, 0.50, 0.42, 1)
     end
 end
 
@@ -1308,15 +1460,94 @@ local function GetPortraitTexture(frame)
     return nil
 end
 
-local function ApplyPortraitTexture(tex, texturePath)
+local CIRCLE_MASKS = {
+    "Interface\\Masks\\CircleMaskScalable",
+    "Interface\\CharacterFrame\\TempPortraitAlphaMask",
+}
+
+local function CollectPortraitMasks(tex, owner)
+    local masks = {}
+    local seen = {}
+    local function add(mask)
+        if mask and not seen[mask] then
+            seen[mask] = true
+            masks[#masks + 1] = mask
+        end
+    end
+    if owner then
+        add(owner.CircleMask)
+    end
+    add(tex.gqCircleMask)
+    local okCount, count = pcall(function()
+        return tex.GetNumMaskTextures and tex:GetNumMaskTextures()
+    end)
+    if okCount and count and tex.GetMaskTexture then
+        for i = 1, count do
+            local okMask, mask = pcall(tex.GetMaskTexture, tex, i)
+            if okMask then
+                add(mask)
+            end
+        end
+    end
+    return masks
+end
+
+local function ApplyCircleMask(tex, owner)
+    if not tex then
+        return
+    end
+    if owner and owner.CircleMask and tex.AddMaskTexture then
+        pcall(tex.AddMaskTexture, tex, owner.CircleMask)
+        return
+    end
+    if tex.gqCircleMask or (owner and owner.CircleMask) then
+        return
+    end
+    if not owner or not owner.CreateMaskTexture then
+        return
+    end
+    for _, maskPath in ipairs(CIRCLE_MASKS) do
+        local mask = owner:CreateMaskTexture()
+        mask:SetAllPoints(tex)
+        if pcall(mask.SetTexture, mask, maskPath) then
+            tex:AddMaskTexture(mask)
+            tex.gqCircleMask = mask
+            return
+        end
+        HideRegion(mask)
+    end
+end
+
+local function ApplyPortraitTexture(tex, texturePath, owner)
     if not tex or not texturePath then
         return
+    end
+
+    owner = owner or (tex.GetParent and tex:GetParent())
+    local masks = CollectPortraitMasks(tex, owner)
+    if tex.RemoveMaskTexture then
+        for _, mask in ipairs(masks) do
+            pcall(tex.RemoveMaskTexture, tex, mask)
+        end
     end
 
     tex:Show()
     tex:SetTexture(texturePath)
     -- WoW TGA rows are bottom-up; flip V so the portrait is right-side up.
-    tex:SetTexCoord(0, 1, 1, 0)
+    -- SetTexCoord is illegal while a mask is attached (PortraitFrame CircleMask).
+    pcall(tex.SetTexCoord, tex, 0, 1, 1, 0)
+
+    local restored = false
+    if tex.AddMaskTexture then
+        for _, mask in ipairs(masks) do
+            if pcall(tex.AddMaskTexture, tex, mask) then
+                restored = true
+            end
+        end
+    end
+    if not restored then
+        ApplyCircleMask(tex, owner)
+    end
 end
 
 local function EnsureFallbackPortraitIcon(frame, container)
@@ -1332,32 +1563,38 @@ local function EnsureFallbackPortraitIcon(frame, container)
     return icon, holder
 end
 
+local function PlacePortraitOnFrame(region, frame)
+    region:ClearAllPoints()
+    region:SetSize(PORTRAIT_DISPLAY_SIZE, PORTRAIT_DISPLAY_SIZE)
+    region:SetPoint("TOPLEFT", frame, "TOPLEFT", PORTRAIT_OFFSET_X, PORTRAIT_OFFSET_Y)
+    if region.SetFrameLevel and frame.GetFrameLevel then
+        region:SetFrameLevel(frame:GetFrameLevel() + 8)
+    end
+    region:Show()
+end
+
 function SetupQuestLogPortrait(frame)
     if frame.gqBookIcon then
         frame.gqBookIcon:Hide()
     end
+    if frame.gqHeaderBar then
+        frame.gqHeaderBar:Hide()
+    end
 
     local name = frame.GetName and frame:GetName()
-    if name then
-        for _, suffix in ipairs({
-            "Portrait", "PortraitContainer", "TopLeft", "TopRight", "Top",
-            "BottomLeft", "BottomRight", "Bottom", "Left", "Right",
-        }) do
-            local region = _G[name .. suffix]
-            if region and region.Show then
-                region:Show()
-            end
-        end
+    local container = frame.PortraitContainer or (name and _G[name .. "PortraitContainer"])
+    if container then
+        PlacePortraitOnFrame(container, frame)
     end
 
-    if frame.portrait and frame.portrait.Show then
+    if frame.portrait then
         frame.portrait:Show()
     end
-
-    local container = frame.PortraitContainer
-        or (frame.GetName and _G[frame:GetName() .. "PortraitContainer"])
-    if container then
-        container:Show()
+    if name then
+        local named = _G[name .. "Portrait"]
+        if named and named.Show then
+            named:Show()
+        end
     end
 
     local tex = GetPortraitTexture(frame)
@@ -1365,29 +1602,24 @@ function SetupQuestLogPortrait(frame)
         if frame.gqPortraitHolder then
             frame.gqPortraitHolder:Hide()
         end
-        ApplyPortraitTexture(tex, PORTRAIT_TEXTURE)
+        if container then
+            tex:ClearAllPoints()
+            tex:SetAllPoints(container)
+        else
+            PlacePortraitOnFrame(tex, frame)
+        end
+        ApplyPortraitTexture(tex, PORTRAIT_TEXTURE, container or frame)
         return
     end
 
-    local icon, holder = EnsureFallbackPortraitIcon(frame, container)
-    local parent = container or frame
-    if holder:GetParent() ~= parent then
-        holder:SetParent(parent)
+    local icon, holder = EnsureFallbackPortraitIcon(frame, frame)
+    if holder:GetParent() ~= frame then
+        holder:SetParent(frame)
     end
-
-    holder:ClearAllPoints()
-    if container then
-        holder:SetAllPoints(container)
-        holder:SetFrameLevel(container:GetFrameLevel() + 1)
-    else
-        holder:SetSize(PORTRAIT_DISPLAY_SIZE, PORTRAIT_DISPLAY_SIZE)
-        holder:SetFrameLevel(frame:GetFrameLevel() + 5)
-        holder:SetPoint("TOPLEFT", frame, "TOPLEFT", 7, -7)
-    end
-
+    PlacePortraitOnFrame(holder, frame)
     icon:ClearAllPoints()
     icon:SetAllPoints(holder)
-    ApplyPortraitTexture(icon, PORTRAIT_TEXTURE)
+    ApplyPortraitTexture(icon, PORTRAIT_TEXTURE, holder)
     holder:Show()
 end
 
@@ -1532,7 +1764,7 @@ function GQ.Log:GetActiveSlotListEntries(slotName)
         if not seenId[id] and NormalizeHuntStatus(record.status) == "tracked" and not self:IsEntryObtained(id) then
             local entry = GQ.Data:GetEntryById(id)
             if entry and GQ.Data:EntryMatchesSlot(entry, slotName)
-                and GQ.Data:EntryMatchesPlayerBand(entry)
+                and GQ.Data:EntryMatchesPlayer(entry)
                 and self:EntryMatchesTrackedHunt(entry) then
                 addEntry(entry, entry.notable == true)
             end
@@ -1650,6 +1882,15 @@ function GQ.Log:HandleCraftChatMessage(msg)
     end
 end
 
+function GQ.Log:HasObtainedItemId(itemId)
+    if not itemId then
+        return false
+    end
+    GearQuestForeverDB.obtainedItems = GearQuestForeverDB.obtainedItems or {}
+    return GearQuestForeverDB.obtainedItems[itemId]
+        or GearQuestForeverDB.obtainedItems[tostring(itemId)]
+end
+
 function GQ.Log:IsEntryObtained(id)
     if not id then
         return false
@@ -1658,16 +1899,30 @@ function GQ.Log:IsEntryObtained(id)
         return true
     end
     local record = GetHuntRecord(id)
-    return record and NormalizeHuntStatus(record.status) == "completed"
+    if record and NormalizeHuntStatus(record.status) == "completed" then
+        return true
+    end
+    local entry = GQ.Data and GQ.Data.GetEntryById and GQ.Data:GetEntryById(id)
+    if entry and self:HasObtainedItemId(entry.itemId) then
+        return true
+    end
+    return false
 end
 
 function GQ.Log:IsItemIdObtained(itemId)
     if not itemId then
         return false
     end
+    if self:HasObtainedItemId(itemId) then
+        return true
+    end
 
     for _, entry in ipairs(GQ.Data:GetEntriesByItemId(itemId)) do
-        if GQ.Data:EntryMatchesPlayer(entry) and self:IsEntryObtained(entry.id) then
+        if GQ.Data:EntryMatchesPlayer(entry) and GetObtainedTimestamp(entry.id) then
+            return true
+        end
+        local record = GetHuntRecord(entry.id)
+        if GQ.Data:EntryMatchesPlayer(entry) and record and NormalizeHuntStatus(record.status) == "completed" then
             return true
         end
     end
@@ -1676,7 +1931,7 @@ function GQ.Log:IsItemIdObtained(itemId)
 end
 
 function GQ.Log:ShouldAutoCompleteOnObtain(entry)
-    if not entry or self:IsEntryObtained(entry.id) then
+    if not entry or self:IsEntryObtained(entry.id) or self:HasObtainedItemId(entry.itemId) then
         return false
     end
 
@@ -1694,24 +1949,58 @@ function GQ.Log:ShouldAutoCompleteOnObtain(entry)
     return false
 end
 
+function GQ.Log:RememberObtainedEntry(entry, now)
+    if not entry or not entry.id then
+        return
+    end
+
+    now = now or time()
+    GearQuestForeverDB.obtained = GearQuestForeverDB.obtained or {}
+    GearQuestForeverDB.obtainedItems = GearQuestForeverDB.obtainedItems or {}
+    GearQuestForeverDB.hunts = GearQuestForeverDB.hunts or {}
+
+    GearQuestForeverDB.obtained[entry.id] = GearQuestForeverDB.obtained[entry.id] or now
+    if entry.itemId then
+        GearQuestForeverDB.obtainedItems[tostring(entry.itemId)] = GearQuestForeverDB.obtainedItems[tostring(entry.itemId)] or now
+    end
+
+    local record = GetHuntRecord(entry.id) or {}
+    record.status = "completed"
+    record.completedAt = record.completedAt or now
+    record.obtained = true
+    GearQuestForeverDB.hunts[entry.id] = record
+end
+
 function GQ.Log:MarkEntryObtained(entry, options)
     if not entry or not entry.id or self:IsEntryObtained(entry.id) then
         return false
     end
 
     local now = time()
-    GearQuestForeverDB.obtained = GearQuestForeverDB.obtained or {}
-    GearQuestForeverDB.obtained[entry.id] = now
+    local alreadyHadItem = self:HasObtainedItemId(entry.itemId)
+        or (entry.itemId and self.ownedAtLogin and self.ownedAtLogin[entry.itemId])
+    self:RememberObtainedEntry(entry, now)
 
-    local record = GetHuntRecord(entry.id) or {}
-    record.status = "completed"
-    record.completedAt = now
-    record.obtained = true
-    GearQuestForeverDB.hunts[entry.id] = record
+    if entry.itemId and GQ.Data and GQ.Data.GetEntriesByItemId then
+        for _, sibling in ipairs(GQ.Data:GetEntriesByItemId(entry.itemId)) do
+            if sibling and sibling.id then
+                self:RememberObtainedEntry(sibling, now)
+            end
+        end
+    end
 
-    local showToast = not options or options.showToast ~= false
-    if showToast and GQ.Toast then
-        GQ.Toast:ShowForEntry(entry)
+    local announce = not options or (options.showToast ~= false and options.announce ~= false)
+    if announce and not alreadyHadItem and self.obtainToastsEnabled then
+        if GQ.Toast then
+            GQ.Toast:ShowForEntry(entry)
+        end
+        local itemName = (GQ.Data and GQ.Data.GetEntryDisplayName and GQ.Data:GetEntryDisplayName(entry))
+            or ("Item " .. tostring(entry.itemId))
+        if entry.sourceType == "profession" then
+            print("|cff66ccffGearQuest|r: Completed — " .. itemName .. " crafted.")
+        else
+            print("|cff66ccffGearQuest|r: Completed — " .. itemName .. " obtained.")
+        end
     end
 
     return true
@@ -1830,8 +2119,10 @@ end
 function GQ.Log:WipeCharacterData()
     GearQuestForeverDB.hunts = {}
     GearQuestForeverDB.obtained = {}
+    GearQuestForeverDB.obtainedItems = {}
     GearQuestForeverDB.crafted = {}
     GearQuestForeverDB.dismissedCompleted = {}
+    self.ownedAtLogin = {}
 
     self.selectedHuntId = nil
     self.selectedEntry = nil
@@ -1856,7 +2147,9 @@ function GQ.Log:CollectAutoCompletionCandidates()
     local candidates = {}
 
     local function add(entry)
-        if entry and entry.id and not seen[entry.id] and not self:IsEntryObtained(entry.id) then
+        if entry and entry.id and not seen[entry.id]
+            and not self:IsEntryObtained(entry.id)
+            and not self:HasObtainedItemId(entry.itemId) then
             seen[entry.id] = true
             table.insert(candidates, entry)
         end
@@ -1892,12 +2185,6 @@ function GQ.Log:CheckAutoCompletion()
             then
                 if self:MarkEntryObtained(entry) then
                     changed = true
-                    local itemName = GQ.Data:GetEntryDisplayName(entry) or ("Item " .. entry.itemId)
-                    if entry.sourceType == "profession" then
-                        print("|cff66ccffGearQuest|r: Completed — " .. itemName .. " crafted.")
-                    else
-                        print("|cff66ccffGearQuest|r: Completed — " .. itemName .. " obtained.")
-                    end
                 end
             end
         end
@@ -1935,12 +2222,62 @@ function GQ.Log:ScheduleListRefresh()
         return
     end
     self._listRefreshScheduled = true
-    C_Timer.After(0, function()
+    C_Timer.After(0.15, function()
         self._listRefreshScheduled = false
         if self.frame and self.frame:IsShown() then
             self:Refresh()
         end
     end)
+end
+
+function GQ.Log:UnionOwnedAtLogin()
+    self.ownedAtLogin = self.ownedAtLogin or {}
+
+    local function add(link)
+        local id = ItemLinkToId(link)
+        if id then
+            self.ownedAtLogin[id] = true
+        end
+    end
+
+    pcall(function()
+        for invSlot = 1, 19 do
+            add(GetInventoryItemLink("player", invSlot))
+        end
+
+        local numBags = NUM_BAG_SLOTS or 4
+        for bag = 0, numBags do
+            local numSlots = GetBagSlotCount(bag)
+            for slot = 1, numSlots do
+                add(GetBagItemLink(bag, slot))
+            end
+        end
+    end)
+end
+
+function GQ.Log:BeginLoginObtainScan()
+    self.obtainToastsEnabled = false
+    self:UnionOwnedAtLogin()
+    self:ScheduleAutoCompletionCheck()
+
+    if self.loginObtainScanTimer then
+        return
+    end
+    self.loginObtainScanTimer = true
+    if C_Timer and C_Timer.After then
+        C_Timer.After(2.5, function()
+            local log = GQ.Log
+            if not log then
+                return
+            end
+            log:UnionOwnedAtLogin()
+            log.completionPending = false
+            log:CheckAutoCompletion()
+            log.obtainToastsEnabled = true
+        end)
+    else
+        self.obtainToastsEnabled = true
+    end
 end
 
 function GQ.Log:ScheduleAutoCompletionCheck()
@@ -2026,6 +2363,10 @@ function GQ.Log:UpdateDetailReward(entryOrItemId)
         icon.itemId = nil
         icon.entry = nil
         return
+    end
+
+    if GQ.Data and GQ.Data.RequestItemInfo then
+        GQ.Data:RequestItemInfo(itemId)
     end
 
     header:Show()
@@ -2143,8 +2484,8 @@ function GQ.Log:EnsureTrackerEvents()
     local events = {
         "BAG_UPDATE",
         "PLAYER_EQUIPMENT_CHANGED",
+        "PLAYER_ENTERING_WORLD",
         "MERCHANT_CLOSED",
-        "GET_ITEM_INFO_RECEIVED",
         "CHAT_MSG_SKILL",
         "CHAT_MSG_LOOT",
     }
@@ -2157,17 +2498,23 @@ function GQ.Log:EnsureTrackerEvents()
             return
         end
 
+        if event == "PLAYER_ENTERING_WORLD" then
+            log:BeginLoginObtainScan()
+            return
+        end
+
         if event == "CHAT_MSG_SKILL" or event == "CHAT_MSG_LOOT" then
             log:HandleCraftChatMessage(msg)
             return
         end
 
-        if event == "BAG_UPDATE" and GQ.Data and GQ.Data.CacheContainerItemLinks then
-            GQ.Data:CacheContainerItemLinks()
-        end
-
-        if event == "GET_ITEM_INFO_RECEIVED" then
-            log:ScheduleListRefresh()
+        if event == "BAG_UPDATE" then
+            if GQ.Data and GQ.Data.CacheContainerItemLinks then
+                GQ.Data:CacheContainerItemLinks()
+            end
+            if not log.obtainToastsEnabled then
+                log:UnionOwnedAtLogin()
+            end
         end
 
         log:ScheduleAutoCompletionCheck()
@@ -2707,9 +3054,10 @@ function GQ.Log:LayoutSideTabs(frame)
     end
 
     local frameLevel = frame:GetFrameLevel() or LOG_FRAME_LEVEL
-    local behindLevel = math.max(1, frameLevel - 2)
-    local frontLevel = frameLevel + 25
-    rail:SetFrameLevel(behindLevel)
+    local railLevel = frameLevel + 5
+    local frontLevel = frameLevel + 12
+    local backLevel = frameLevel + 6
+    rail:SetFrameLevel(railLevel)
     rail:ClearAllPoints()
     rail:SetPoint("TOPLEFT", frame, "TOPRIGHT", -SIDE_TAB_OVERLAP, SIDE_TAB_TOP)
     rail:SetSize(SIDE_TAB_WIDTH, (SIDE_TAB_HEIGHT * 2) + SIDE_TAB_GAP)
@@ -2740,8 +3088,8 @@ function GQ.Log:LayoutSideTabs(frame)
     frame.tabSimulator:SetPoint("TOPLEFT", rail, "TOPLEFT", 0, -(SIDE_TAB_HEIGHT + SIDE_TAB_GAP))
     frame.tabLog:Show()
     frame.tabSimulator:Show()
-    frame.tabLog:SetFrameLevel(logSelected and frontLevel or (behindLevel + 1))
-    frame.tabSimulator:SetFrameLevel(logSelected and (behindLevel + 1) or frontLevel)
+    frame.tabLog:SetFrameLevel(logSelected and frontLevel or backLevel)
+    frame.tabSimulator:SetFrameLevel(logSelected and backLevel or frontLevel)
     StyleHandleTab(frame.tabLog, logSelected)
     StyleHandleTab(frame.tabSimulator, not logSelected)
 end
@@ -2852,15 +3200,19 @@ function GQ.Log:LayoutFooterButtons(frame)
         return
     end
 
+    local chromeLevel = (frame.gqOuterBorder and frame.gqOuterBorder.GetFrameLevel and frame.gqOuterBorder:GetFrameLevel() or (frame:GetFrameLevel() or 1)) + 2
+    frame.trackBtn:SetFrameLevel(chromeLevel)
     frame.trackBtn:ClearAllPoints()
-    frame.trackBtn:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", CONTENT_LEFT, 12)
+    frame.trackBtn:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", CONTENT_LEFT, FOOTER_BUTTON_Y)
 
+    frame.untrackBtn:SetFrameLevel(chromeLevel)
     frame.untrackBtn:ClearAllPoints()
     frame.untrackBtn:SetPoint("LEFT", frame.trackBtn, "RIGHT", 4, 0)
 
     if frame.exitBtn then
+        frame.exitBtn:SetFrameLevel(chromeLevel)
         frame.exitBtn:ClearAllPoints()
-        frame.exitBtn:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -CONTENT_RIGHT_GUTTER, 12)
+        frame.exitBtn:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -CONTENT_RIGHT_GUTTER, FOOTER_BUTTON_Y)
     end
 end
 
@@ -3428,6 +3780,7 @@ end
 
 function GQ.Log:MigrateObtainedRecords()
     GearQuestForeverDB.obtained = GearQuestForeverDB.obtained or {}
+    GearQuestForeverDB.obtainedItems = GearQuestForeverDB.obtainedItems or {}
     GearQuestForeverDB.crafted = GearQuestForeverDB.crafted or {}
     GearQuestForeverDB.dismissedCompleted = GearQuestForeverDB.dismissedCompleted or {}
 
@@ -3439,6 +3792,12 @@ function GQ.Log:MigrateObtainedRecords()
 
     for id, obtainedAt in pairs(GearQuestForeverDB.obtained) do
         local entry = GQ.Data:GetEntryById(id)
+        if entry and entry.itemId then
+            local key = tostring(entry.itemId)
+            if not GearQuestForeverDB.obtainedItems[key] then
+                GearQuestForeverDB.obtainedItems[key] = obtainedAt
+            end
+        end
         if entry and entry.sourceType == "profession" and entry.itemId and not GearQuestForeverDB.crafted[entry.itemId] then
             GearQuestForeverDB.crafted[entry.itemId] = obtainedAt
         end
@@ -3446,7 +3805,9 @@ function GQ.Log:MigrateObtainedRecords()
 end
 
 function GQ.Log:Init()
+    self.obtainToastsEnabled = false
     self:MigrateObtainedRecords()
+    self:BeginLoginObtainScan()
 
     if self.frame then
         return
@@ -3832,23 +4193,19 @@ function GQ.Log:EnsureItemInfoListener()
 
     local frame = CreateFrame("Frame")
     GQ.RegisterEvent(frame, "GET_ITEM_INFO_RECEIVED")
-    frame:SetScript("OnEvent", function()
+    frame:SetScript("OnEvent", function(_, _, itemId)
         local log = _G.GearQuest and _G.GearQuest.Log
         if not log or not log.frame or not log.frame:IsShown() then
             return
         end
 
-        log:ScheduleListRefresh()
-
+        itemId = tonumber(itemId)
         local entry = log.selectedEntry or GQ.Data:GetEntryById(log.selectedHuntId)
-        if not entry then
+        if not entry or not itemId or entry.itemId ~= itemId then
             return
         end
 
         log:UpdateDetailReward(entry)
-        if entry.sourceType == "world_drop" then
-            log:SelectHunt(log.selectedHuntId, false, entry)
-        end
     end)
     self.itemInfoListener = frame
 end

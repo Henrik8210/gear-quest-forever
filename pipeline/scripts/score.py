@@ -775,56 +775,59 @@ if __name__=="__main__":
         # Phase 3 lists for 70 in Data.lua. Generated picks there would only
         # compete with better data. Measured: 0/44 exact, 0.55/3 overlap.
         # Forever / Classic: stop at 60 (was 69 for TBC Anniversary).
-        lv=range(1,10) if spec=="levelling_1_9" else range(10,61)
-        per,cfg,notable,full60=run(cls,spec,lv)
-        slots=sorted({k[2] for k in per})
-        bands=collapse(per,("Alliance","Horde"),slots,lv)
-        out[spec]={"label":cfg["label"],"bands":[]}
-        def emit(faction,sl,lo,hi,rows,origins=None):
-            out[spec]["bands"].append({"faction":faction,"slot":sl,"lo":lo,"hi":hi,
-              "picks":[{"id":r[1]["id"],"name":r[1]["name"],"q":r[1]["quality"],
-                        "ilvl":r[1]["ilvl"],"rlvl":r[1]["rlvl"],"req":eff_req(r[1]),"bind":r[1].get("bonding"),"kind":r[1]["kind"],
-                        "score":round(r[0],2),"suffix":r[2],"chance":r[3],"chanceAny":r[5],
-                        "suffixRange":(r[7] if len(r)>7 else None),"suffixId":(r[8] if len(r)>8 else None),
-                        "dps":r[1]["dps"],"speed":r[1]["speed"],
-                        "stats":r[4],"src":srcs[str(r[1]["id"])],"seasonal":srcs[str(r[1]["id"])].get("seasonal",False),
-                        "effects":r[1].get("effects") or [],
-                        "reqSkills":r[1].get("reqSkills") or [],"reqRep":r[1].get("reqRep") or []} for r in rows]})
-            if origins: out[spec]["bands"][-1]["origins"]=origins
-            # Keyed on the band's top level, the same way the notable shelf is.
-            if sl in ("MainHand","SecondaryHand") and cfg["weaponStyle"] in AMBIGUOUS_STYLES:
-                rt=route_for(per,faction,hi)
-                if rt:
-                    out[spec]["bands"][-1]["route"]=rt[0]
-                    out[spec]["bands"][-1]["routeTwoHand"]=rt[1]
-                    out[spec]["bands"][-1]["routeOneHand"]=rt[2]
-            nbs=notable.get((faction,hi,sl)) or []
-            # Only the first three picks reach the addon, so "already shown" means the
-            # top 3 -- not all eight rows kept for review. Filtering against all eight
-            # silently swallowed every notable item the model ranked 4th to 8th, which
-            # is exactly where a jackpot-roll hunt target sits.
-            shown={p["id"] for p in out[spec]["bands"][-1]["picks"][:3]}
-            nbs=[r for r in nbs if r[1]["id"] not in shown]
-            if nbs:
-                out[spec]["bands"][-1]["notableEffects"]=[{
-                  "id":r[1]["id"],"name":r[1]["name"],"q":r[1]["quality"],
-                  "ilvl":r[1]["ilvl"],"rlvl":r[1]["rlvl"],"kind":r[1]["kind"],
-                  "score":round(r[0],2),"stats":r[4],"effects":r[1].get("procs") or r[1].get("effects") or [],
-                  "suffix":r[2],"chance":r[3],"chanceAny":r[5],
-                  "suffixRange":(r[7] if len(r)>7 else None),"suffixId":(r[8] if len(r)>8 else None),
-                  "jackpot":round(r[6],2) if len(r)>6 else None,
-                  "src":srcs[str(r[1]["id"])]} for r in nbs]
+        # Score 1-9 per real spec (not only levelling_1_9) so enhancement/arms/etc.
+        # get their own early BiS. Collapse 1-9 and 10-60 separately so a stable
+        # top-3 cannot fuse into a band that crosses the talent breakpoint.
+        level_ranges = [range(1,10)] if spec=="levelling_1_9" else [range(1,10), range(10,61)]
+        out[spec]=None
+        for lv in level_ranges:
+            per,cfg,notable,full60=run(cls,spec,lv)
+            if out[spec] is None:
+                out[spec]={"label":cfg["label"],"bands":[]}
+            slots=sorted({k[2] for k in per})
+            bands=collapse(per,("Alliance","Horde"),slots,lv)
+            early_band = max(lv)==9
+            def emit(faction,sl,lo,hi,rows,origins=None, _spec=spec, _notable=notable):
+                out[_spec]["bands"].append({"faction":faction,"slot":sl,"lo":lo,"hi":hi,
+                  "picks":[{"id":r[1]["id"],"name":r[1]["name"],"q":r[1]["quality"],
+                            "ilvl":r[1]["ilvl"],"rlvl":r[1]["rlvl"],"req":eff_req(r[1]),"bind":r[1].get("bonding"),"kind":r[1]["kind"],
+                            "score":round(r[0],2),"suffix":r[2],"chance":r[3],"chanceAny":r[5],
+                            "suffixRange":(r[7] if len(r)>7 else None),"suffixId":(r[8] if len(r)>8 else None),
+                            "dps":r[1]["dps"],"speed":r[1]["speed"],
+                            "stats":r[4],"src":srcs[str(r[1]["id"])],"seasonal":srcs[str(r[1]["id"])].get("seasonal",False),
+                            "effects":r[1].get("effects") or [],
+                            "reqSkills":r[1].get("reqSkills") or [],"reqRep":r[1].get("reqRep") or []} for r in rows]})
+                if origins: out[_spec]["bands"][-1]["origins"]=origins
+                if sl in ("MainHand","SecondaryHand") and cfg["weaponStyle"] in AMBIGUOUS_STYLES:
+                    rt=route_for(per,faction,hi)
+                    if rt:
+                        out[_spec]["bands"][-1]["route"]=rt[0]
+                        out[_spec]["bands"][-1]["routeTwoHand"]=rt[1]
+                        out[_spec]["bands"][-1]["routeOneHand"]=rt[2]
+                nbs=_notable.get((faction,hi,sl)) or []
+                shown={p["id"] for p in out[_spec]["bands"][-1]["picks"][:3]}
+                nbs=[r for r in nbs if r[1]["id"] not in shown]
+                if nbs:
+                    out[_spec]["bands"][-1]["notableEffects"]=[{
+                      "id":r[1]["id"],"name":r[1]["name"],"q":r[1]["quality"],
+                      "ilvl":r[1]["ilvl"],"rlvl":r[1]["rlvl"],"kind":r[1]["kind"],
+                      "score":round(r[0],2),"stats":r[4],"effects":r[1].get("procs") or r[1].get("effects") or [],
+                      "suffix":r[2],"chance":r[3],"chanceAny":r[5],
+                      "suffixRange":(r[7] if len(r)>7 else None),"suffixId":(r[8] if len(r)>8 else None),
+                      "jackpot":round(r[6],2) if len(r)>6 else None,
+                      "src":srcs[str(r[1]["id"])]} for r in nbs]
 
-        for faction,sl,lo,hi,key,rows in bands:
-            if not (lo<=60<=hi) or spec=="levelling_1_9":
-                emit(faction,sl,lo,hi,rows); continue
-            # split the band so level 60 can carry the guide's answer on its own
-            r60=full60.get((faction,sl)) or per.get((faction,60,sl)) or rows
-            ov=guide_override(spec,sl,faction,r60,cls)
-            if lo<60: emit(faction,sl,lo,59,per.get((faction,59,sl)) or rows)
-            if ov: emit(faction,sl,60,60,ov[0],ov[1])
-            else:   emit(faction,sl,60,60,r60[:8])
-        print(f"{spec:<16} slots={len(slots):<3} bands={len(bands)}")
+            for faction,sl,lo,hi,key,rows in bands:
+                if early_band or spec=="levelling_1_9":
+                    emit(faction,sl,lo,hi,rows); continue
+                if not (lo<=60<=hi):
+                    emit(faction,sl,lo,hi,rows); continue
+                r60=full60.get((faction,sl)) or per.get((faction,60,sl)) or rows
+                ov=guide_override(spec,sl,faction,r60,cls)
+                if lo<60: emit(faction,sl,lo,59,per.get((faction,59,sl)) or rows)
+                if ov: emit(faction,sl,60,60,ov[0],ov[1])
+                else:   emit(faction,sl,60,60,r60[:8])
+        print(f"{spec:<16} slots={len(slots):<3} bands={len(out[spec]['bands'])}")
     if _displaced:
         print(f"level-60 guide override: {len(_displaced)} slot(s) where the model beat the guide by >{int(DISPLACE_MARGIN*100)}%")
         for d in _displaced[:14]:

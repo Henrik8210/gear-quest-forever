@@ -352,12 +352,8 @@ function GQ.Spec:GetEffectiveSpec()
         return nil
     end
 
-    local previewMode = GQ.IsPreviewEnabled and GQ:IsPreviewEnabled()
-    local level = tonumber(GQ:GetEffectiveLevel()) or 0
-    if not previewMode and level < self.TALENT_LEVEL then
-        return nil
-    end
-
+    -- Spec is selectable in the log before talents (level 10). Ranking must
+    -- follow that pick so enhancement does not share a hybrid 1–9 list with resto.
     local spec
 
     local saved = self:GetSavedSpec(classFile)

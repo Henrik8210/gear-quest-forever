@@ -2,6 +2,35 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
+## v0.1.0-beta.6-forever
+
+Forever beta client pass: profession-style window, per-spec early BiS, and Wowhead as the item-fact source.
+
+### Window and portrait
+
+- GearQuest log uses `PortraitFrameTemplate` (profession-style metal chrome and circular portrait well).
+- Portrait sits in the socket (61px, offset -6 / 7). `SetTexCoord` is skipped while the CircleMask is attached.
+
+### Hunts and item info (no more login freeze)
+
+- Do not bulk-request item data for every list row. `RequestLoadItemDataByID` runs only on hover.
+- Hunt names and colors come from pipeline facts (`quality`, `ilvl`, `reqLevel`) plus `ITEM_QUALITY_COLORS`, not from unidentified client stubs (quality 0 / gold “Retrieving item information”).
+- Hover falls back to the fact tooltip when the client has no item payload. Classic ids that 404 on Wowhead Forever (e.g. Bands of Serra'kis, 6902) still show that way until the community catalogs a replacement.
+
+### Descriptions
+
+- Curly quotes, em dashes, and replacement characters are folded to ASCII so WoW fonts no longer draw empty `[]` boxes (`quest 'The Den'` instead of `[]The Den[]`).
+
+### Early BiS
+
+- Generated 1–9 is scored **per spec** (enhancement vs resto, arms vs fury, …) instead of one hybrid `levelling_1_9` list.
+
+### Data source
+
+- Forever item facts come from Wowhead `/forever/items` (ids ≥ 200000) via `scripts/scrape-forever-wowhead-items.mjs` and `pipeline/scripts/ingest_forever_wowhead.py`.
+- The in-game seen-item notebook is retired: Collector is not started, `/gq seen` prints that Wowhead is the source, and `sync-addon.ps1` no longer backs up `notebook/seenItems/`.
+- New or retuned Forever items will land as Wowhead’s catalog grows; lists can still include classic ids that this client cannot identify.
+
 ## v0.1.0-beta.5-forever
 
 - Same Horde Forever deltas and item notebook as beta.4 (that tag did not reach CurseForge).

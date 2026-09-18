@@ -337,7 +337,11 @@ function GQ.Indicator:PrimeUpgradeItemInfo()
     end
 
     for itemId in pairs(self.upgradeItems) do
-        GetItemInfo(itemId)
+        if GQ.Data and GQ.Data.RequestItemInfo then
+            GQ.Data:RequestItemInfo(itemId)
+        else
+            GetItemInfo(itemId)
+        end
     end
 end
 
@@ -994,6 +998,35 @@ function GQ.Indicator:UpdateButton(button, link)
     end
 end
 
+local REBUILD_DEBOUNCE = 0.35
+
+function GQ.Indicator:ScheduleRebuildCache()
+    if self._rebuildDebounce then
+        return
+    end
+    self._rebuildDebounce = true
+    local function fire()
+        self._rebuildDebounce = false
+        if self.RebuildCacheAsync then
+            self:RebuildCacheAsync(function()
+                if ClassTrainerFrame and ClassTrainerFrame:IsShown() then
+                    self:ScheduleTrainerRefresh()
+                else
+                    self:RefreshAll()
+                end
+            end)
+        else
+            self:RebuildCache()
+            self:RefreshAll()
+        end
+    end
+    if C_Timer and C_Timer.After then
+        C_Timer.After(REBUILD_DEBOUNCE, fire)
+    else
+        fire()
+    end
+end
+
 function GQ.Indicator:RebuildCache()
     self.upgradeItems = {}
     self.upgradeItemNames = {}
@@ -1033,6 +1066,8 @@ function GQ.Indicator:RebuildCacheForSlot(slotName)
             if itemName then
                 self.itemNameCache[entry.itemId] = itemName
                 self.upgradeItemNames[itemName:lower()] = entry.itemId
+            elseif GQ.Data and GQ.Data.RequestItemInfo then
+                GQ.Data:RequestItemInfo(entry.itemId)
             else
                 GetItemInfo(entry.itemId)
             end
@@ -1607,14 +1642,6 @@ function GQ.Indicator:Init()
                 if name then
                     GQ.Indicator.itemNameCache[itemId] = name
                 end
-            end
-
-            GQ.Indicator:RebuildCache()
-
-            if ClassTrainerFrame and ClassTrainerFrame:IsShown() then
-                GQ.Indicator:ScheduleTrainerRefresh()
-            else
-                GQ.Indicator:RefreshAll()
             end
             return
         end

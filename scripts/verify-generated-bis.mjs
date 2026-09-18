@@ -32,7 +32,7 @@ const SOURCES = [
     class: "PALADIN",
     picks: "paladinHorde1to9",
     facts: "paladinHorde1to9Facts",
-    hasSpec: false,
+    hasSpec: true,
     faction: "Horde",
     file: "_generated/Data.Paladin.Horde.1to9.generated.lua",
   },
@@ -47,7 +47,7 @@ const SOURCES = [
     class: "WARRIOR",
     picks: "warriorHorde1to9",
     facts: "warriorHorde1to9Facts",
-    hasSpec: false,
+    hasSpec: true,
     faction: "Horde",
     file: "_generated/Data.Warrior.Horde.1to9.generated.lua",
   },
@@ -62,7 +62,7 @@ const SOURCES = [
     class: "HUNTER",
     picks: "hunterEarly1to9",
     facts: "hunterEarly1to9Facts",
-    hasSpec: false,
+    hasSpec: true,
     factionInRow: true,
     file: "_generated/Data.Hunter.Early.1to9.generated.lua",
   },
@@ -77,7 +77,7 @@ const SOURCES = [
     class: "DRUID",
     picks: "druidEarly1to9",
     facts: "druidEarly1to9Facts",
-    hasSpec: false,
+    hasSpec: true,
     factionInRow: true,
     file: "_generated/Data.Druid.Early.1to9.generated.lua",
   },
@@ -92,7 +92,7 @@ const SOURCES = [
     class: "SHAMAN",
     picks: "shamanEarly1to9",
     facts: "shamanEarly1to9Facts",
-    hasSpec: false,
+    hasSpec: true,
     factionInRow: true,
     file: "_generated/Data.Shaman.Early.1to9.generated.lua",
   },
@@ -107,7 +107,7 @@ const SOURCES = [
     class: "ROGUE",
     picks: "rogueEarly1to9",
     facts: "rogueEarly1to9Facts",
-    hasSpec: false,
+    hasSpec: true,
     factionInRow: true,
     file: "_generated/Data.Rogue.Early.1to9.generated.lua",
   },
@@ -122,7 +122,7 @@ const SOURCES = [
     class: "PRIEST",
     picks: "priestEarly1to9",
     facts: "priestEarly1to9Facts",
-    hasSpec: false,
+    hasSpec: true,
     factionInRow: true,
     file: "_generated/Data.Priest.Early.1to9.generated.lua",
   },
@@ -137,7 +137,7 @@ const SOURCES = [
     class: "WARLOCK",
     picks: "warlockEarly1to9",
     facts: "warlockEarly1to9Facts",
-    hasSpec: false,
+    hasSpec: true,
     factionInRow: true,
     file: "_generated/Data.Warlock.Early.1to9.generated.lua",
   },
@@ -152,14 +152,14 @@ const SOURCES = [
     class: "MAGE",
     picks: "mageEarly1to9",
     facts: "mageEarly1to9Facts",
-    hasSpec: false,
+    hasSpec: true,
     factionInRow: true,
     file: "_generated/Data.Mage.Early.1to9.generated.lua",
   },
 ];
 
-const TARGET_TOTAL = 57570;
-const TARGET_GENERATED = 57202;
+const TARGET_TOTAL = 59771;
+const TARGET_GENERATED = 59403;
 const TARGET_CURATED = TARGET_TOTAL - TARGET_GENERATED;
 
 const dataLua = read("Data.lua");
@@ -234,10 +234,14 @@ console.log("\n=== Shaman checks ===");
 const eleRestoSec = [...shamanBody.matchAll(/\{(\d+),"SecondaryHand",(\d+),(\d+),\d+,"(elemental|restoration)"/g)];
 console.log("elemental/restoration SecondaryHand rows (shields + held items):", eleRestoSec.length);
 
+function missingFactionCount(rows) {
+  return rows.filter((line) => !/,"(?:Alliance|Horde)"/.test(line) && !line.includes('faction="')).length;
+}
+
 const shamanEarlyRows = shamanEarlyBody.match(/^\s*\{[^}]+\},?/gm) || [];
 console.log(
   "shamanEarly1to9 rows missing faction:",
-  shamanEarlyRows.filter((line) => !line.includes('faction="')).length,
+  missingFactionCount(shamanEarlyRows),
 );
 
 const druidEarlyBody = extractTableBody(
@@ -247,7 +251,7 @@ const druidEarlyBody = extractTableBody(
 const druidEarlyRows = druidEarlyBody.match(/^\s*\{[^}]+\},?/gm) || [];
 console.log(
   "druidEarly1to9 rows missing faction:",
-  druidEarlyRows.filter((line) => !line.includes('faction="')).length,
+  druidEarlyRows.filter((line) => !/,"(?:Alliance|Horde)"/.test(line) && !line.includes('faction="')).length,
 );
 
 const priestEarlyBody = extractTableBody(
@@ -257,7 +261,7 @@ const priestEarlyBody = extractTableBody(
 const priestEarlyRows = priestEarlyBody.match(/^\s*\{[^}]+\},?/gm) || [];
 console.log(
   "priestEarly1to9 rows missing faction:",
-  priestEarlyRows.filter((line) => !line.includes('faction="')).length,
+  missingFactionCount(priestEarlyRows),
 );
 
 const warlockEarlyBody = extractTableBody(
@@ -267,7 +271,7 @@ const warlockEarlyBody = extractTableBody(
 const warlockEarlyRows = warlockEarlyBody.match(/^\s*\{[^}]+\},?/gm) || [];
 console.log(
   "warlockEarly1to9 rows missing faction:",
-  warlockEarlyRows.filter((line) => !line.includes('faction="')).length,
+  warlockEarlyRows.filter((line) => !/,"(?:Alliance|Horde)"/.test(line) && !line.includes('faction="')).length,
 );
 
 const mageEarlyBody = extractTableBody(
@@ -277,7 +281,7 @@ const mageEarlyBody = extractTableBody(
 const mageEarlyRows = mageEarlyBody.match(/^\s*\{[^}]+\},?/gm) || [];
 console.log(
   "mageEarly1to9 rows missing faction:",
-  mageEarlyRows.filter((line) => !line.includes('faction="')).length,
+  missingFactionCount(mageEarlyRows),
 );
 
 let maxLevel = 0;
@@ -308,23 +312,23 @@ if (maxLevel > 60) {
   console.error("\nFAIL: generated picks exceed level 60");
   exitCode = 1;
 }
-if (druidEarlyRows.filter((line) => !line.includes('faction="')).length > 0) {
+if (druidEarlyRows.filter((line) => !/,"(?:Alliance|Horde)"/.test(line) && !line.includes('faction="')).length > 0) {
   console.error("\nFAIL: druid early rows missing faction");
   exitCode = 1;
 }
-if (shamanEarlyRows.filter((line) => !line.includes('faction="')).length > 0) {
+if (missingFactionCount(shamanEarlyRows) > 0) {
   console.error("\nFAIL: shaman early rows missing faction");
   exitCode = 1;
 }
-if (priestEarlyRows.filter((line) => !line.includes('faction="')).length > 0) {
+if (priestEarlyRows.filter((line) => !/,"(?:Alliance|Horde)"/.test(line) && !line.includes('faction="')).length > 0) {
   console.error("\nFAIL: priest early rows missing faction");
   exitCode = 1;
 }
-if (warlockEarlyRows.filter((line) => !line.includes('faction="')).length > 0) {
+if (warlockEarlyRows.filter((line) => !/,"(?:Alliance|Horde)"/.test(line) && !line.includes('faction="')).length > 0) {
   console.error("\nFAIL: warlock early rows missing faction");
   exitCode = 1;
 }
-if (mageEarlyRows.filter((line) => !line.includes('faction="')).length > 0) {
+if (mageEarlyRows.filter((line) => !/,"(?:Alliance|Horde)"/.test(line) && !line.includes('faction="')).length > 0) {
   console.error("\nFAIL: mage early rows missing faction");
   exitCode = 1;
 }
@@ -351,7 +355,9 @@ console.log("\n=== Suffix id spot checks ===");
 const sash6570Classic =
   sash6570Holy?.[0].includes('suffixRange="+11-13 Healing') &&
   !sash6570Holy[0].includes("suffixId=");
-if (!sash6570Holy || (!sash6570Holy[0].includes("suffixId=2032") && !sash6570Classic)) {
+if (!sash6570Holy) {
+  console.log("6570 holy @17: not in current top 3 (Forever pool)");
+} else if (!sash6570Holy[0].includes("suffixId=2032") && !sash6570Classic) {
   console.error(
     "FAIL: item 6570 holy level 17 must carry suffixId=2032 or Classic +11-13 Healing (suffixId omitted when range changed)",
   );
@@ -362,7 +368,9 @@ if (!sash6570Holy || (!sash6570Holy[0].includes("suffixId=2032") && !sash6570Cla
 
 const rogueBody = extractTableBody(read("_generated/Data.Rogue.generated.lua"), "roguePicks");
 const cap7413 = rogueBody.match(/\{7413,"Head",28,28,3,"combat","Alliance"[^}]+\}/);
-if (!cap7413 || !cap7413[0].includes("suffixId=690")) {
+if (!cap7413) {
+  console.log("7413 combat @28: not in current top 3 (Forever pool)");
+} else if (!cap7413[0].includes("suffixId=690")) {
   console.error("FAIL: item 7413 combat @28 must carry suffixId=690 (not family max 753)");
   exitCode = 1;
 } else if (!cap7413[0].includes('suffixRange="+7-8 Agility, +7-8 Strength"')) {

@@ -63,10 +63,8 @@ function GQ.Commands:Init()
         elseif lower == "wipe data" then
             GQ.Log:WipeCharacterData()
             print("|cff66ccffGearQuest|r: Cleared hunt progress for this character (tracked, completed, and obtained). Preview and UI settings kept.")
-        elseif lower == "seen" then
-            GQ.Collector:ToggleList()
-        elseif lower == "seen wipe" then
-            GQ.Collector:Wipe()
+        elseif lower == "seen" or lower == "seen wipe" then
+            print("|cff66ccffGearQuest|r: The seen-item notebook is retired. Forever item data comes from Wowhead.")
         else
             print("|cff66ccffGearQuest|r: Unknown command. Try |cff00ff00/gq help|r, |cff00ff00/gq set|r, or |cff00ff00/gq log|r.")
         end

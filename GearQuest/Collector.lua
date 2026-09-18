@@ -3,7 +3,10 @@ local _, GQ = ...
 -- Local Forever item notebook. Records unique equippable items this client has
 -- actually seen (loot, bags, quest rewards, equipped, vendor, tooltip hover).
 -- Hover snapshots the live tooltip so vendor items you cannot buy still get saved.
--- Nothing is uploaded. Export: WTF\<account>\SavedVariables\GearQuestForever.lua → seenItems.
+-- Nothing is uploaded.
+-- Account copy: WTF\<account>\SavedVariables\GearQuestForever.lua → seenItems
+-- Character copy: WTF\<account>\<realm>\<char>\SavedVariables\GearQuestForever.lua
+-- Repo copy: scripts/backup-seen-notebook.ps1 (WoW cannot write outside WTF).
 
 GQ.Collector = GQ.Collector or {}
 
@@ -56,6 +59,124 @@ local function Store()
     return GearQuestForeverDB.seenItems
 end
 
+local function CharStore()
+    GearQuestForeverCharDB = GearQuestForeverCharDB or {}
+    GearQuestForeverCharDB.seenItems = GearQuestForeverCharDB.seenItems or {}
+    return GearQuestForeverCharDB.seenItems
+end
+
+local function IsNameKey(key)
+    return type(key) == "string" and key:sub(1, 2) == "n:"
+end
+
+local function CountIdRows(store)
+    local n, withStats = 0, 0
+    for key, row in pairs(store or {}) do
+        if type(row) == "table" and (row.id or IsNameKey(key)) then
+            n = n + 1
+            if row.hasStats then
+                withStats = withStats + 1
+            end
+        end
+    end
+    return n, withStats
+end
+
+-- SavedVariables are Lua. A raw newline, NUL, or '"' in a tooltip line can
+-- make the whole GearQuestForever.lua file fail to parse on the next login.
+local function SanitizeForSave(text)
+    if type(text) ~= "string" then
+        return text
+    end
+    if GQ.Data and GQ.Data.SanitizeText then
+        text = GQ.Data:SanitizeText(text) or text
+    end
+    text = text:gsub("%z", ""):gsub("[\r\n\t]", " "):gsub("%c", "")
+    text = text:gsub('"', "'")
+    if #text > 400 then
+        text = text:sub(1, 400)
+    end
+    return text
+end
+
+local function SanitizeLink(link)
+    if type(link) ~= "string" then
+        return link
+    end
+    return (link:gsub("%z", ""):gsub("[\r\n]", ""))
+end
+
+local function SanitizeLines(lines)
+    if type(lines) ~= "table" then
+        return lines
+    end
+    local out = {}
+    local n = math.min(#lines, 16)
+    for i = 1, n do
+        local line = SanitizeForSave(lines[i])
+        if line and line ~= "" then
+            out[#out + 1] = line
+        end
+    end
+    return out
+end
+
+local function CleanStats(stats)
+    if type(stats) ~= "table" then
+        return nil
+    end
+    local out = {}
+    local count = 0
+    for k, v in pairs(stats) do
+        if type(k) == "string" and type(v) == "number" and v == v and v ~= math.huge and v ~= -math.huge then
+            out[k] = v
+            count = count + 1
+        end
+    end
+    if count == 0 then
+        return nil
+    end
+    return out
+end
+
+local function MergeSeen(dst, src)
+    if type(src) ~= "table" or type(dst) ~= "table" then
+        return
+    end
+    for key, row in pairs(src) do
+        if type(row) == "table" then
+            local destKey = key
+            if row.id then
+                destKey = tostring(row.id)
+            end
+            local prev = dst[destKey]
+            if not prev then
+                dst[destKey] = row
+            elseif row.hasStats and not prev.hasStats then
+                dst[destKey] = row
+            elseif type(row.tooltip) == "table" and type(prev.tooltip) == "table" and #row.tooltip > #prev.tooltip then
+                dst[destKey] = row
+            end
+        end
+    end
+end
+
+local function RecoverAndMirror()
+    local account = Store()
+    local char = CharStore()
+    local accountN = CountIdRows(account)
+    local charN = CountIdRows(char)
+    if charN > accountN then
+        MergeSeen(account, char)
+    elseif accountN > charN then
+        MergeSeen(char, account)
+    else
+        MergeSeen(account, char)
+        MergeSeen(char, account)
+    end
+    GearQuestForeverCharDB.seenItems = account
+end
+
 local function After(delay, fn)
     if C_Timer and C_Timer.After then
         C_Timer.After(delay, fn)
@@ -73,10 +194,7 @@ local function After(delay, fn)
 end
 
 local function Sanitize(text)
-    if GQ.Data and GQ.Data.SanitizeText then
-        return GQ.Data:SanitizeText(text) or text
-    end
-    return text
+    return SanitizeForSave(text)
 end
 
 local function ParseItemId(link)
@@ -145,6 +263,17 @@ local function StripColors(text)
     return (text:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", ""))
 end
 
+local function FontStringText(fs)
+    if not fs or not fs.GetText then
+        return nil
+    end
+    local ok, text = pcall(fs.GetText, fs)
+    if not ok then
+        return nil
+    end
+    return GQ.PublicText(text)
+end
+
 local function ReadTooltipLines(tip)
     if not tip then
         return nil, false
@@ -157,9 +286,8 @@ local function ReadTooltipLines(tip)
     local hasStats = false
     local n = tip:NumLines() or 0
     for i = 1, n do
-        local fs = _G[name .. "TextLeft" .. i]
-        local text = fs and fs:GetText()
-        if text and text ~= "" then
+        local text = FontStringText(_G[name .. "TextLeft" .. i])
+        if text then
             text = Sanitize(text)
             lines[#lines + 1] = text
             if text:find("%+%d") or text:find("%d+%-%d+") or text:find("Armor") or text:find("Damage") then
@@ -303,7 +431,9 @@ function GQ.Collector:Record(itemId, link, source, snapshot)
 
     if not name then
         pending[itemId] = source
-        if type(GetItemInfo) == "function" then
+        if GQ.Equip and GQ.Equip.RequestItemInfo then
+            GQ.Equip:RequestItemInfo(itemId)
+        elseif type(GetItemInfo) == "function" then
             GetItemInfo(itemId)
         elseif C_Item and C_Item.GetItemInfo then
             C_Item.GetItemInfo(itemId)
@@ -375,12 +505,20 @@ function GQ.Collector:Record(itemId, link, source, snapshot)
     end
 
     if tooltipLines and (not row.tooltip or (hasStats and not row.hasStats) or #tooltipLines > #(row.tooltip or {})) then
-        row.tooltip = tooltipLines
+        row.tooltip = SanitizeLines(tooltipLines)
     end
     if apiStats then
-        row.stats = apiStats
+        row.stats = CleanStats(apiStats) or row.stats
     end
     row.hasStats = row.hasStats or hasStats or false
+
+    row.name = SanitizeForSave(name) or row.name
+    row.link = SanitizeLink(link) or row.link
+    row.zone = SanitizeForSave(row.zone)
+    row.subzone = SanitizeForSave(row.subzone)
+    row.npc = SanitizeForSave(row.npc)
+    row.itemType = SanitizeForSave(row.itemType)
+    row.itemSubType = SanitizeForSave(row.itemSubType)
 
     if name then
         store["n:" .. string.lower(name)] = nil
@@ -409,14 +547,14 @@ function GQ.Collector:RecordNameSnapshot(name, source, snapshot)
     local now = time()
     local key = "n:" .. lower
     local row = store[key] or {}
-    row.name = name
+    row.name = SanitizeForSave(name)
     row.equipLoc = equipLoc or row.equipLoc
     row.slot = EQUIP_TO_SLOT[row.equipLoc] or row.slot
-    row.tooltip = lines or row.tooltip
+    row.tooltip = SanitizeLines(lines) or row.tooltip
     row.hasStats = row.hasStats or hasStats or false
     row.lastSource = source or "recipe"
     row.lastSeen = now
-    row.zone = (GetRealZoneText and GetRealZoneText()) or row.zone
+    row.zone = SanitizeForSave((GetRealZoneText and GetRealZoneText()) or row.zone)
     row.playerLevel = UnitLevel("player")
     if not row.firstSeen then
         row.firstSeen = now
@@ -655,6 +793,11 @@ local function ExtractTooltipItem(tooltip, trainerIndex)
             if id then
                 return id, link
             end
+            -- Combat/imbue spells (Rockbiter, etc.) have secret FontString text.
+            -- Do not scrape those lines looking for gear.
+            if tonumber(spellId) then
+                return nil, nil
+            end
         end
     end
 
@@ -707,6 +850,9 @@ function GQ.Collector:RecordFromTooltip(tooltip, source, trainerIndex)
 
     source = source or HoverSource()
     local itemId, link, craftedName, parsedLines = ExtractTooltipItem(tooltip, trainerIndex)
+    if not itemId and not craftedName then
+        return false
+    end
     local lines, hasStats = ReadTooltipLines(tooltip)
     lines = lines or parsedLines
 
@@ -922,15 +1068,7 @@ function GQ.Collector:ScheduleBagScan()
 end
 
 function GQ.Collector:Count()
-    local store = Store()
-    local total, withStats = 0, 0
-    for _, row in pairs(store) do
-        total = total + 1
-        if row.hasStats then
-            withStats = withStats + 1
-        end
-    end
-    return total, withStats
+    return CountIdRows(Store())
 end
 
 function GQ.Collector:SortedRows()
@@ -1208,6 +1346,10 @@ function GQ.Collector:RefreshList()
                 if not self.itemLink and not self.itemId then
                     return
                 end
+                if GQ.Data and GQ.Data.ShowEntryItemTooltip then
+                    GQ.Data:ShowEntryItemTooltip(GameTooltip, self, { itemId = self.itemId }, "ANCHOR_RIGHT")
+                    return
+                end
                 GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
                 if self.itemLink then
                     GameTooltip:SetHyperlink(self.itemLink)
@@ -1217,6 +1359,9 @@ function GQ.Collector:RefreshList()
                 GameTooltip:Show()
             end)
             row:SetScript("OnLeave", function()
+                if GQ.Data and GQ.Data.ClearPendingItemTooltip then
+                    GQ.Data:ClearPendingItemTooltip(GameTooltip)
+                end
                 GameTooltip:Hide()
             end)
             row:SetScript("OnClick", function(self)
@@ -1292,12 +1437,14 @@ function GQ.Collector:PrintStatus()
         total,
         withStats
     ))
-    print("|cff66ccffGearQuest|r: Copy |cff00ff00WTF\\<account>\\SavedVariables\\GearQuestForever.lua|r after logout/reload to ingest.")
+    print("|cff66ccffGearQuest|r: Logout or /reload flushes WTF. Repo backup: |cff00ff00notebook/seenItems/|r.")
 end
 
 function GQ.Collector:Wipe()
     GearQuestForeverDB = GearQuestForeverDB or {}
     GearQuestForeverDB.seenItems = {}
+    GearQuestForeverCharDB = GearQuestForeverCharDB or {}
+    GearQuestForeverCharDB.seenItems = {}
     print("|cff66ccffGearQuest|r: Cleared local seen-item notebook.")
     if self.listFrame and self.listFrame:IsShown() then
         self:RefreshList()
@@ -1309,7 +1456,7 @@ function GQ.Collector:Init()
         return
     end
     self.initialized = true
-    Store()
+    RecoverAndMirror()
 
     local frame = CreateFrame("Frame")
     local events = {
@@ -1325,6 +1472,7 @@ function GQ.Collector:Init()
         "MERCHANT_SHOW",
         "TRAINER_SHOW",
         "TRADE_SKILL_SHOW",
+        "PLAYER_LOGOUT",
     }
     for i = 1, #events do
         GQ.RegisterEvent(frame, events[i])
@@ -1350,17 +1498,6 @@ function GQ.Collector:Init()
             local itemId = tonumber(arg1)
             if itemId and pending[itemId] then
                 GQ.Collector:Record(itemId, nil, pending[itemId])
-            elseif itemId then
-                local name = GetItemInfo(itemId)
-                if name then
-                    local named = Store()["n:" .. string.lower(name)]
-                    if named then
-                        GQ.Collector:Record(itemId, nil, named.lastSource or "recipe", {
-                            lines = named.tooltip,
-                            hasStats = named.hasStats,
-                        })
-                    end
-                end
             end
         elseif event == "QUEST_COMPLETE" or event == "QUEST_FINISHED" then
             GQ.Collector:ScanQuestRewards()
@@ -1375,6 +1512,8 @@ function GQ.Collector:Init()
             GQ.Collector:ScanTrainer()
         elseif event == "TRADE_SKILL_SHOW" then
             GQ.Collector:ScanTradeSkills()
+        elseif event == "PLAYER_LOGOUT" then
+            RecoverAndMirror()
         end
     end)
     self.frame = frame

@@ -106,6 +106,10 @@ local function CreateUpgradeIcon(parent, index)
     end)
 
     btn:SetScript("OnLeave", function()
+        local gq = _G.GearQuest
+        if gq and gq.Data and gq.Data.ClearPendingItemTooltip then
+            gq.Data:ClearPendingItemTooltip(GameTooltip)
+        end
         GameTooltip:Hide()
     end)
 
@@ -176,15 +180,42 @@ function GQ.Popup:EnsureItemInfoListener()
 
     local refreshFrame = CreateFrame("Frame")
     GQ.RegisterEvent(refreshFrame, "GET_ITEM_INFO_RECEIVED")
-    refreshFrame:SetScript("OnEvent", function()
+    refreshFrame:SetScript("OnEvent", function(_, _, itemId)
         local popup = _G.GearQuest and _G.GearQuest.Popup
         if not popup or not popup.container or not popup.container:IsShown() then
             return
         end
-        if popup.activeSlotName and popup.activeSlotButton then
-            popup:ShowForSlot(popup.activeSlotName, popup.activeSlotButton)
-        else
+
+        itemId = tonumber(itemId)
+        local relevant = false
+        if itemId and popup.currentUpgrades then
+            for i = 1, #popup.currentUpgrades do
+                local entry = popup.currentUpgrades[i]
+                if entry and entry.itemId == itemId then
+                    relevant = true
+                    break
+                end
+            end
+        end
+        if not relevant then
+            return
+        end
+
+        if popup._itemInfoRefreshScheduled then
+            return
+        end
+        popup._itemInfoRefreshScheduled = true
+        local function refresh()
+            popup._itemInfoRefreshScheduled = false
+            if not popup.container or not popup.container:IsShown() then
+                return
+            end
             popup:RefreshIcons()
+        end
+        if C_Timer and C_Timer.After then
+            C_Timer.After(0.2, refresh)
+        else
+            refresh()
         end
     end)
     self.itemInfoListener = refreshFrame
@@ -303,14 +334,21 @@ end
 
 function GQ.Popup:ApplyIconData(icon, entry)
     icon.entry = entry
-    local _, _, quality, _, _, _, _, _, _, texture = GetItemInfo(entry.itemId)
+
+    local texture = GQ.Equip and GQ.Equip.GetItemIconTexture and GQ.Equip:GetItemIconTexture(entry.itemId)
     if not texture then
-        GetItemInfo(entry.itemId)
+        texture = select(10, GetItemInfo(entry.itemId))
     end
 
     icon.icon:SetTexture(texture or "Interface\\Icons\\INV_Misc_QuestionMark")
 
-    local r, g, b = GetItemQualityColor(quality or 1)
+    local quality = GQ.Data and GQ.Data.GetItemQualityForDisplay and GQ.Data:GetItemQualityForDisplay(entry.itemId)
+    local r, g, b
+    if quality then
+        r, g, b = GetItemQualityColor(quality)
+    else
+        r, g, b = 1, 0.82, 0
+    end
     icon.icon:SetVertexColor(1, 1, 1)
     icon.border:SetVertexColor(r, g, b)
     self:UpdateObtainCheckmark(icon, entry)

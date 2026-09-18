@@ -1,0 +1,10 @@
+---
+description: Seen-item notebook is retired; Forever item data comes from Wowhead
+alwaysApply: true
+---
+
+# Seen-item notebook (retired)
+
+Do **not** run `scripts/backup-seen-notebook.ps1`. Do not mention 1:1 OK/GAP. Do not grow, shrink, or commit `notebook/seenItems/`.
+
+GearQuest Forever item facts come from Wowhead ingest (`pipeline/data/forever_wowhead/`), not from in-game collection.

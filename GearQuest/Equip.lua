@@ -53,18 +53,102 @@ function GQ.Equip:PlayerHasWeaponSkill(itemId)
     return self:PlayerHasSkill(skillName)
 end
 
-function GQ.Equip:PrimeItem(itemId)
-    if not itemId then
+function GQ.Equip:RequestItemInfo(itemId, force)
+    if not force or not itemId then
         return
     end
+
+    local numericId = tonumber(itemId)
+    if not numericId then
+        return
+    end
+
     if C_Item and C_Item.RequestLoadItemDataByID then
-        C_Item.RequestLoadItemDataByID(itemId)
+        C_Item.RequestLoadItemDataByID(numericId)
     end
     if type(GetItemInfo) == "function" then
-        GetItemInfo(itemId)
+        GetItemInfo(numericId)
     elseif C_Item and C_Item.GetItemInfo then
-        C_Item.GetItemInfo(itemId)
+        C_Item.GetItemInfo(numericId)
     end
+end
+
+function GQ.Equip:PrimeItem(itemId)
+    if self._suppressItemPrime then
+        return
+    end
+    self:RequestItemInfo(itemId)
+end
+
+function GQ.Equip:IsItemDataCached(itemId)
+    if not itemId then
+        return false
+    end
+
+    local numericId = tonumber(itemId)
+    if numericId and C_Item and C_Item.IsItemDataCachedByID then
+        return C_Item.IsItemDataCachedByID(numericId) == true
+    end
+
+    if not GetItemInfo then
+        return false
+    end
+
+    local name, _, quality = GetItemInfo(itemId)
+    -- Uncached Forever items often return a name with quality 0 (unidentified white).
+    return name ~= nil and name ~= "" and type(quality) == "number" and quality > 0
+end
+
+function GQ.Equip:GetKnownItemQuality(itemId)
+    if not itemId then
+        return nil
+    end
+
+    local numericId = tonumber(itemId)
+    if numericId and C_Item and C_Item.GetItemQualityByID then
+        local quality = C_Item.GetItemQualityByID(numericId)
+        if type(quality) == "number" and quality > 0 then
+            return quality
+        end
+    end
+
+    if GetItemInfo then
+        local name, _, quality = GetItemInfo(itemId)
+        if name and name ~= "" and type(quality) == "number" and quality > 0 then
+            return quality
+        end
+    end
+
+    return nil
+end
+
+function GQ.Equip:GetItemIconTexture(itemId)
+    if not itemId then
+        return nil
+    end
+
+    if C_Item and C_Item.GetItemIconByID then
+        local icon = C_Item.GetItemIconByID(itemId)
+        if icon then
+            return icon
+        end
+    end
+    if type(GetItemIcon) == "function" then
+        local icon = GetItemIcon(itemId)
+        if icon then
+            return icon
+        end
+    end
+    if type(GetItemInfoInstant) == "function" then
+        local icon = select(5, GetItemInfoInstant(itemId))
+        if icon then
+            return icon
+        end
+    end
+    if GetItemInfo then
+        return select(10, GetItemInfo(itemId))
+    end
+    return nil
 end
 
 function GQ.Equip:IsItemInfoLoaded(itemId)
@@ -72,8 +156,7 @@ function GQ.Equip:IsItemInfoLoaded(itemId)
         return false
     end
     self:PrimeItem(itemId)
-    local name = GetItemInfo(itemId)
-    return name ~= nil
+    return self:IsItemDataCached(itemId)
 end
 
 function GQ.Equip:GetItemBindType(itemId)
@@ -117,8 +200,28 @@ function GQ.Equip:GetRequiredLevel(itemId)
         return 9999
     end
     self:PrimeItem(itemId)
+    if not self:IsItemInfoLoaded(itemId) then
+        return nil
+    end
     local _, _, _, _, reqLevel = GetItemInfo(itemId)
     return reqLevel or 0
+end
+
+-- Uses GetEffectiveLevel, so a simulator level of 8 can show a Requires Level 8 item.
+-- Unknown (tooltip not cached yet) is allowed; query cache is invalidated when it loads.
+function GQ.Equip:MeetsRequiredLevel(itemId, playerLevel)
+    if not itemId then
+        return false
+    end
+    playerLevel = playerLevel or GQ:GetEffectiveLevel()
+    local reqLevel = self:GetRequiredLevel(itemId)
+    if reqLevel == nil then
+        if not self._suppressItemPrime and GQ.Data and GQ.Data.NotePendingRequiredLevel then
+            GQ.Data:NotePendingRequiredLevel(itemId)
+        end
+        return true
+    end
+    return reqLevel <= playerLevel
 end
 
 function GQ.Equip:GetEquipSlot(itemId)
@@ -228,8 +331,7 @@ function GQ.Equip:CanPlayerEquip(itemId, slotName)
         return true
     end
 
-    local playerLevel = GQ:GetEffectiveLevel()
-    if self:GetRequiredLevel(itemId) > playerLevel then
+    if not self:MeetsRequiredLevel(itemId) then
         return false
     end
 
@@ -256,6 +358,10 @@ function GQ.Equip:CanPlayerEquipNow(itemId)
     end
 
     self:PrimeItem(itemId)
+
+    if not self:MeetsRequiredLevel(itemId) then
+        return false
+    end
 
     if not self:PlayerHasWeaponSkill(itemId) then
         return false
@@ -287,9 +393,7 @@ function GQ.Equip:EntryMatchesItemRules(entry)
         return false
     end
 
-    local playerLevel = GQ:GetEffectiveLevel()
-
-    if self:GetRequiredLevel(entry.itemId) > playerLevel then
+    if not self:MeetsRequiredLevel(entry.itemId) then
         return false
     end
 

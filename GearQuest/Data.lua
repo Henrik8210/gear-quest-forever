@@ -5660,6 +5660,7 @@ function GQ.Data:BuildIndex()
     self.byId = {}
     self.byClass = {}
     self.byClassSlot = {}
+    self.byClassSlotSpec = {}
     for _, entry in ipairs(self.entries) do
         local slot = self:NormalizeSlotName(entry.slot)
         self.bySlot[slot] = self.bySlot[slot] or {}
@@ -5676,6 +5677,23 @@ function GQ.Data:BuildIndex()
                 self.byClassSlot[classFile] = self.byClassSlot[classFile] or {}
                 self.byClassSlot[classFile][slot] = self.byClassSlot[classFile][slot] or {}
                 table.insert(self.byClassSlot[classFile][slot], entry)
+
+                self.byClassSlotSpec[classFile] = self.byClassSlotSpec[classFile] or {}
+                self.byClassSlotSpec[classFile][slot] = self.byClassSlotSpec[classFile][slot] or { _any = {} }
+                local specMap = self.byClassSlotSpec[classFile][slot]
+                local placed = false
+                if entry.specs then
+                    for specName, enabled in pairs(entry.specs) do
+                        if enabled then
+                            specMap[specName] = specMap[specName] or {}
+                            table.insert(specMap[specName], entry)
+                            placed = true
+                        end
+                    end
+                end
+                if not placed then
+                    table.insert(specMap._any, entry)
+                end
             end
         end
     end
@@ -5685,6 +5703,34 @@ end
 function GQ.Data:GetClassSlotEntryList(slotName)
     slotName = self:NormalizeSlotName(slotName)
     local classFile = GQ:GetEffectiveClass()
+    local specMap = classFile
+        and self.byClassSlotSpec
+        and self.byClassSlotSpec[classFile]
+        and self.byClassSlotSpec[classFile][slotName]
+    if specMap then
+        local spec = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec()
+        local cacheKey = tostring(spec or "")
+        if specMap._lookup and specMap._lookupKey == cacheKey then
+            return specMap._lookup
+        end
+        local specList = spec and specMap[spec]
+        local anyList = specMap._any
+        local lookup
+        if specList and anyList and #anyList > 0 then
+            lookup = {}
+            for i = 1, #specList do
+                lookup[#lookup + 1] = specList[i]
+            end
+            for i = 1, #anyList do
+                lookup[#lookup + 1] = anyList[i]
+            end
+        else
+            lookup = specList or anyList or {}
+        end
+        specMap._lookup = lookup
+        specMap._lookupKey = cacheKey
+        return lookup
+    end
     if classFile and self.byClassSlot and self.byClassSlot[classFile] then
         return self.byClassSlot[classFile][slotName]
     end
@@ -5732,6 +5778,23 @@ function GQ.Data:GetItemFact(itemId)
     end
 
     return nil
+end
+
+function GQ.Data:RequestItemInfo(itemIdOrLink, force)
+    if not itemIdOrLink then
+        return
+    end
+
+    local itemId = tonumber(itemIdOrLink)
+    if not itemId and type(itemIdOrLink) == "string" then
+        itemId = self:ItemLinkToId(itemIdOrLink)
+    end
+    if GQ.Equip and GQ.Equip.RequestItemInfo and itemId then
+        GQ.Equip:RequestItemInfo(itemId, force)
+    end
+    if force and type(itemIdOrLink) == "string" and GetItemInfo then
+        GetItemInfo(itemIdOrLink)
+    end
 end
 
 function GQ.Data:GetItemDisplayName(itemId)
@@ -5808,22 +5871,33 @@ function GQ.Data:EntryDisplayNameReady(entry)
 end
 
 function GQ.Data:SanitizeText(text)
-    if text == nil or text == "" then
+    text = GQ.PublicText(text)
+    if not text then
         return text
     end
 
     text = tostring(text)
     -- WoW fonts lack these glyphs and draw them as empty boxes.
+    text = text:gsub("\239\191\189", "'") -- U+FFFD replacement char
     text = text:gsub("\226\128\148", "-") -- em dash
     text = text:gsub("\226\128\147", "-") -- en dash
     text = text:gsub("\226\128\146", "-") -- figure dash
     text = text:gsub("\194\183", ", ") -- middle dot
     text = text:gsub("\226\128\166", "...") -- ellipsis
-    text = text:gsub("\226\128\156", "\"")
-    text = text:gsub("\226\128\157", "\"")
-    text = text:gsub("\226\128\152", "'")
-    text = text:gsub("\226\128\153", "'")
+    text = text:gsub("\226\128\156", "'") -- left double quote
+    text = text:gsub("\226\128\157", "'") -- right double quote
+    text = text:gsub("\226\128\152", "'") -- left single quote
+    text = text:gsub("\226\128\153", "'") -- right single quote
     text = text:gsub("\194\160", " ")
+    text = text:gsub("\147", "'") -- cp1252 left double quote
+    text = text:gsub("\148", "'") -- cp1252 right double quote
+    text = text:gsub("\145", "'")
+    text = text:gsub("\146", "'")
+    text = text:gsub("\151", "-")
+    text = text:gsub("\150", "-")
+    -- FFFD/em-dash pairs became quote-space-quote after a bad decode.
+    text = text:gsub("' '", " - ")
+    text = text:gsub('" "', " - ")
     text = text:gsub(" +", " ")
     text = text:gsub(" ,", ",")
     return text
@@ -5969,7 +6043,8 @@ end
 
 -- Craft skill from item tooltip ("Leatherworking (260)"), not equip level req.
 local function StripTooltipText(text)
-    if not text or text == "" then
+    text = GQ.PublicText(text)
+    if not text then
         return ""
     end
     return text
@@ -6417,15 +6492,171 @@ function GQ.Data:AppendSuffixRangeLines(tooltip, entry)
     end
 end
 
-function GQ.Data:EnsureSuffixTooltipRefresh()
-    if self._suffixTooltipRefresh then
+function GQ.Data:GetItemQualityForDisplay(itemId)
+    if not itemId then
+        return nil
+    end
+    local fact = self:GetItemFact(itemId)
+    if fact and type(fact.quality) == "number" and fact.quality > 0 then
+        return fact.quality
+    end
+    local quality = GQ.Equip and GQ.Equip.GetKnownItemQuality and GQ.Equip:GetKnownItemQuality(itemId)
+    if type(quality) == "number" and quality > 0 then
+        return quality
+    end
+    return nil
+end
+
+function GQ.Data:ShowLoadingItemTooltip(tooltip, entry)
+    self:ShowFactFallbackTooltip(tooltip, entry)
+end
+
+function GQ.Data:ShowFactFallbackTooltip(tooltip, entry)
+    if not tooltip or not entry then
+        return
+    end
+
+    local displayName = self:GetEntryDisplayName(entry) or ("Item " .. tostring(entry.itemId))
+    local quality = self:GetItemQualityForDisplay(entry.itemId)
+    local r, g, b = 1, 0.82, 0
+    local c = ITEM_QUALITY_COLORS and quality and ITEM_QUALITY_COLORS[quality]
+    if c then
+        r, g, b = c.r, c.g, c.b
+    elseif quality then
+        r, g, b = GetItemQualityColor(quality)
+    end
+
+    tooltip:ClearLines()
+    tooltip:SetText(displayName, r, g, b)
+    if entry.slot then
+        tooltip:AddLine(entry.slot, 1, 1, 1)
+    end
+
+    local fact = self:GetItemFact(entry.itemId)
+    if fact and fact.kind then
+        tooltip:AddLine(fact.kind, 0.8, 0.8, 0.8)
+    end
+    local reqLevel = fact and fact.reqLevel
+    if reqLevel and reqLevel > 0 then
+        tooltip:AddLine("Requires Level " .. tostring(reqLevel), 1, 1, 1)
+    end
+    if fact and fact.stats then
+        for stat, value in pairs(fact.stats) do
+            if type(value) == "number" and value ~= 0 then
+                local label = tostring(stat)
+                tooltip:AddLine(string.format("+%s %s", tostring(value), label), 0, 1, 0)
+            end
+        end
+    end
+
+    local instructions = (fact and fact.instructions) or entry.instructions
+    if instructions and instructions ~= "" then
+        instructions = self:SanitizeText(instructions) or instructions
+        tooltip:AddLine(" ")
+        tooltip:AddLine(instructions, 0.8, 0.8, 0.8, true)
+    end
+    if entry.proc then
+        tooltip:AddLine(" ")
+        tooltip:AddLine(entry.proc, 1, 1, 1, true)
+    end
+    self:AppendSuffixRangeLines(tooltip, entry)
+end
+
+function GQ.Data:ItemInfoIsReady(itemIdOrLink)
+    if not itemIdOrLink or not GetItemInfo then
+        return false
+    end
+
+    local itemId = tonumber(itemIdOrLink)
+    if not itemId and type(itemIdOrLink) == "string" then
+        itemId = self:ItemLinkToId(itemIdOrLink)
+    end
+
+    local cached = itemId and GQ.Equip and GQ.Equip.IsItemDataCached and GQ.Equip:IsItemDataCached(itemId)
+    local name, _, quality = GetItemInfo(itemIdOrLink)
+    if (not name or name == "") and itemId then
+        name, _, quality = GetItemInfo(itemId)
+    end
+    if not name or name == "" then
+        return false
+    end
+    if cached then
+        return true
+    end
+    -- Stub GetItemInfo often returns quality 0 until the tooltip payload arrives.
+    return type(quality) == "number" and quality > 0
+end
+
+function GQ.Data:TooltipLooksRetrieving(tooltip)
+    if not tooltip then
+        return false
+    end
+
+    local retrieving = RETRIEVING_ITEM_INFO or "Retrieving item information"
+    local name = tooltip.GetName and tooltip:GetName()
+    local lineCount = (tooltip.NumLines and tooltip:NumLines()) or 0
+    for i = 1, math.min(lineCount, 5) do
+        local fs = name and _G[name .. "TextLeft" .. i]
+        local text = GQ.PublicText(fs and fs.GetText and fs:GetText())
+        if text and (text == retrieving or text:find("Retrieving", 1, true)) then
+            return true
+        end
+    end
+    return false
+end
+
+function GQ.Data:SetTooltipItem(tooltip, itemIdOrLink)
+    if not tooltip or not itemIdOrLink then
+        return false
+    end
+
+    local ok
+    if type(itemIdOrLink) == "number" then
+        if tooltip.SetItemByID then
+            ok = pcall(tooltip.SetItemByID, tooltip, itemIdOrLink)
+            if ok and not self:TooltipLooksRetrieving(tooltip) then
+                return true
+            end
+        end
+        ok = pcall(tooltip.SetHyperlink, tooltip, "item:" .. itemIdOrLink)
+        return ok == true
+    end
+
+    ok = pcall(tooltip.SetHyperlink, tooltip, itemIdOrLink)
+    return ok == true
+end
+
+function GQ.Data:RefreshPendingTooltip(tooltip, entry, forceFallback)
+    if not tooltip or not entry then
+        return
+    end
+    if tooltip.gqItemInfoRefreshing then
+        return
+    end
+
+    tooltip.gqItemInfoRefreshing = true
+    if forceFallback then
+        self:ShowFactFallbackTooltip(tooltip, entry)
+        self:ClearPendingItemTooltip(tooltip)
+    else
+        self:PopulateEntryItemTooltip(tooltip, entry)
+    end
+    if tooltip.Show then
+        tooltip:Show()
+    end
+    tooltip.gqItemInfoRefreshing = nil
+end
+
+function GQ.Data:EnsurePendingTooltipRefresh()
+    if self._pendingTooltipRefresh then
         return
     end
 
     local frame = CreateFrame("Frame")
     GQ.RegisterEvent(frame, "GET_ITEM_INFO_RECEIVED")
-    frame:SetScript("OnEvent", function()
-        local pending = self._pendingSuffixTooltips
+    frame:SetScript("OnEvent", function(_, _, itemId, success)
+        itemId = tonumber(itemId)
+        local pending = self._pendingItemTooltips
         if not pending then
             return
         end
@@ -6433,34 +6664,41 @@ function GQ.Data:EnsureSuffixTooltipRefresh()
         for tooltip, entry in pairs(pending) do
             if not tooltip or not tooltip.IsShown or not tooltip:IsShown() then
                 pending[tooltip] = nil
-            else
-                self:EnrichEntrySuffix(entry)
-                local link = self:MakeSuffixTargetLink(entry)
-                if link then
-                    if GetItemInfo then
-                        GetItemInfo(link)
-                    end
-                    tooltip:ClearLines()
-                    tooltip:SetHyperlink(link)
-                    pending[tooltip] = nil
-                end
+            elseif entry and itemId and entry.itemId == itemId then
+                local failed = success == false and entry and entry.itemId == itemId
+                self:RefreshPendingTooltip(tooltip, entry, failed)
             end
         end
     end)
-    self._suffixTooltipRefresh = frame
+    self._pendingTooltipRefresh = frame
 end
 
-function GQ.Data:TrackPendingSuffixTooltip(tooltip, entry)
+function GQ.Data:EnsurePendingTooltipPoll()
+end
+
+function GQ.Data:TrackPendingItemTooltip(tooltip, entry)
     if not tooltip or not entry then
         return
     end
 
-    self:EnsureSuffixTooltipRefresh()
-    self._pendingSuffixTooltips = self._pendingSuffixTooltips or {}
-    self._pendingSuffixTooltips[tooltip] = entry
+    self:EnsurePendingTooltipRefresh()
+    self._pendingItemTooltips = self._pendingItemTooltips or {}
+    self._pendingItemTooltips[tooltip] = entry
+    if entry.itemId then
+        self:RequestItemInfo(entry.itemId, true)
+        local link = self:ResolveSuffixItemLink(entry)
+        if link then
+            self:RequestItemInfo(link, true)
+        end
+    end
+end
 
-    if entry.itemId and GetItemInfo then
-        GetItemInfo(entry.itemId)
+function GQ.Data:ClearPendingItemTooltip(tooltip)
+    if self._pendingItemTooltips and tooltip then
+        self._pendingItemTooltips[tooltip] = nil
+    end
+    if self._pendingTooltipStartedAt and tooltip then
+        self._pendingTooltipStartedAt[tooltip] = nil
     end
 end
 
@@ -6475,11 +6713,14 @@ function GQ.Data:TryShowSuffixTargetTooltip(tooltip, entry)
         return false
     end
 
-    if GetItemInfo then
-        GetItemInfo(link)
+    self:RequestItemInfo(link)
+    if not self:ItemInfoIsReady(link) then
+        return false
     end
 
-    tooltip:SetHyperlink(link)
+    if not self:SetTooltipItem(tooltip, link) or self:TooltipLooksRetrieving(tooltip) then
+        return false
+    end
     return true
 end
 
@@ -6491,12 +6732,12 @@ function GQ.Data:CopyTooltipLinesFromScanner(tooltip, scanner, skipTitle)
         local left = _G[scannerName .. "TextLeft" .. i]
         local right = _G[scannerName .. "TextRight" .. i]
         if left then
-            local text = left:GetText()
-            if text and text ~= "" then
+            local text = GQ.PublicText(left:GetText())
+            if text then
                 local lr, lg, lb = left:GetTextColor()
                 if right then
-                    local rightText = right:GetText()
-                    if rightText and rightText ~= "" then
+                    local rightText = GQ.PublicText(right:GetText())
+                    if rightText then
                         local rr, rg, rb = right:GetTextColor()
                         tooltip:AddDoubleLine(text, rightText, lr, lg, lb, rr, rg, rb)
                     else
@@ -6565,25 +6806,46 @@ function GQ.Data:PopulateEntryItemTooltip(tooltip, entry)
         return false
     end
 
+    self:RequestItemInfo(entry.itemId, true)
+
     if entry.suffix and entry.suffix ~= "" then
         self:EnrichEntrySuffix(entry)
-        if self:MakeSuffixTargetLink(entry) then
-            self:TryShowSuffixTargetTooltip(tooltip, entry)
-            self:TrackPendingSuffixTooltip(tooltip, entry)
-            return true
+        local link = self:MakeSuffixTargetLink(entry)
+        if link then
+            self:RequestItemInfo(link, true)
+            if self:ItemInfoIsReady(link) and self:SetTooltipItem(tooltip, link)
+                and not self:TooltipLooksRetrieving(tooltip) then
+                self:ClearPendingItemTooltip(tooltip)
+                return true
+            end
         end
 
-        self:ShowSuffixFallbackTooltip(tooltip, entry)
-        self:TrackPendingSuffixTooltip(tooltip, entry)
+        if self:ItemInfoIsReady(entry.itemId) then
+            self:ShowSuffixFallbackTooltip(tooltip, entry)
+            if not self:TooltipLooksRetrieving(tooltip) then
+                self:ClearPendingItemTooltip(tooltip)
+                return true
+            end
+        end
+
+        self:ShowFactFallbackTooltip(tooltip, entry)
+        self:TrackPendingItemTooltip(tooltip, entry)
         return true
     end
 
-    tooltip:SetHyperlink("item:" .. entry.itemId)
-    if entry.proc then
-        tooltip:AddLine(" ")
-        tooltip:AddLine(entry.proc, 1, 1, 1, true)
+    if self:ItemInfoIsReady(entry.itemId) then
+        if self:SetTooltipItem(tooltip, entry.itemId) and not self:TooltipLooksRetrieving(tooltip) then
+            if entry.proc then
+                tooltip:AddLine(" ")
+                tooltip:AddLine(entry.proc, 1, 1, 1, true)
+            end
+            self:ClearPendingItemTooltip(tooltip)
+            return true
+        end
     end
 
+    self:ShowFactFallbackTooltip(tooltip, entry)
+    self:TrackPendingItemTooltip(tooltip, entry)
     return true
 end
 
@@ -6785,6 +7047,48 @@ function GQ.Data:InvalidateQueryCache()
     self._notableEntryCache = nil
 end
 
+function GQ.Data:ScheduleQueryRefresh()
+    self:InvalidateQueryCache()
+    if self._queryRefreshScheduled then
+        return
+    end
+    self._queryRefreshScheduled = true
+    local function fire()
+        self._queryRefreshScheduled = false
+        if GQ.RefreshUI then
+            GQ:RefreshUI()
+        end
+    end
+    if C_Timer and C_Timer.After then
+        C_Timer.After(0.25, fire)
+    else
+        fire()
+    end
+end
+
+-- Re-filter once GetItemInfo reports a real required level (unknown was allowed).
+function GQ.Data:NotePendingRequiredLevel(itemId)
+end
+
+function GQ.Data:EnsureRequiredLevelListener()
+    if self._requiredLevelListener then
+        return
+    end
+
+    local frame = CreateFrame("Frame")
+    GQ.RegisterEvent(frame, "GET_ITEM_INFO_RECEIVED")
+    frame:SetScript("OnEvent", function(_, _, itemId)
+        itemId = tonumber(itemId)
+        local pending = GQ.Data._pendingRequiredLevel
+        if not itemId or not pending or not pending[itemId] then
+            return
+        end
+        pending[itemId] = nil
+        GQ.Data:ScheduleQueryRefresh()
+    end)
+    self._requiredLevelListener = frame
+end
+
 function GQ.Data:InvalidateClassCache()
     self:InvalidateQueryCache()
     self.notableBySlot = nil
@@ -6853,6 +7157,7 @@ function GQ.Data:EntryMatchesPlayer(entry)
         return false
     end
 
+    -- Required level, class equip, and spec. Simulator uses GetEffectiveLevel.
     if not GQ.Equip:EntryMatchesItemRules(entry) then
         return false
     end
@@ -7327,7 +7632,7 @@ function GQ.Data:GetNotableForSlot(slotName)
     local results = {}
     for i = 1, #slotRows do
         local entry = self:BuildNotableEntry(slotRows[i], facts, classFile)
-        if entry and self:EntryMatchesPlayerBand(entry) then
+        if entry and self:ShouldShowEntry(entry) and self:EntryMatchesPlayer(entry) then
             table.insert(results, entry)
         end
     end
@@ -7382,6 +7687,7 @@ function GQ.Data:IsEntryNewForPlayer(entry)
     return (entry.minLevel or 1) == activeMinLevel
 end
 
+-- Active-band candidates the player can equip now (required level uses GetEffectiveLevel).
 function GQ.Data:GetCandidatesForSlot(slotName)
     slotName = self:NormalizeSlotName(slotName)
     self:EnsureQueryCache()
@@ -7393,14 +7699,23 @@ function GQ.Data:GetCandidatesForSlot(slotName)
 
     local results = {}
     local seen = {}
+    local equip = GQ.Equip
+    local prevSuppress = equip and equip._suppressItemPrime
+    if equip then
+        equip._suppressItemPrime = true
+    end
 
     for _, key in ipairs(self:GetCandidateSlotKeys(slotName)) do
         for _, entry in ipairs(self:GetClassSlotEntryList(key) or {}) do
-            if not seen[entry.id] and self:ShouldShowEntry(entry) and self:EntryMatchesPlayerBand(entry) then
+            if not seen[entry.id] and self:ShouldShowEntry(entry) and self:EntryMatchesPlayer(entry) then
                 seen[entry.id] = true
                 table.insert(results, entry)
             end
         end
+    end
+
+    if equip then
+        equip._suppressItemPrime = prevSuppress
     end
 
     local allMatching = results

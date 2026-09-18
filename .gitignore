@@ -30,6 +30,9 @@ _lore-v2-import/
 _route-import/
 _rootcause-import/
 _suffixids-import/
+notebook/seenItems/*.lua
+notebook/seenItems/snapshots/
+pipeline/data/forever_wowhead/
 pipeline/out/*
 !pipeline/out/.gitkeep
 __pycache__/

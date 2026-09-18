@@ -58,7 +58,8 @@ local LOWER_ARMOR_SCORE_PENALTY = 500
 -- Level 60 Wowhead guide rows (origin="guide") and hand-curated Data.lua rows
 -- (generated=false, curatedRank) keep their professional list order untouched.
 -- Weights come from GearQuest/_generated/*.weights.json (TBC stat priorities) via
--- StatWeights.generated.lua — spec-aware from level 10, levelling_1_9 below that.
+-- StatWeights.generated.lua — spec-aware at every level when the player has
+-- picked (or defaulted) a spec. levelling_1_9 is only the no-spec fallback.
 -- Weapons still rank on pipeline DPS, not these weights.
 -- https://www.wowhead.com/tbc/guide/classic-the-burning-crusade-stats-overview
 
@@ -103,12 +104,12 @@ local function GetStatWeightProfile(classFile, playerLevel, specId)
         return nil
     end
 
-    if playerLevel <= 9 and classWeights.levelling_1_9 then
-        return classWeights.levelling_1_9
-    end
-
     if specId and classWeights[specId] then
         return classWeights[specId]
+    end
+
+    if playerLevel <= 9 and classWeights.levelling_1_9 then
+        return classWeights.levelling_1_9
     end
 
     return classWeights.default
@@ -183,10 +184,10 @@ local function GetArmorClassMultiplier(itemId)
     end
 
     local specTable
-    if playerLevel <= 9 and classTable.levelling_1_9 then
-        specTable = classTable.levelling_1_9
-    elseif specId and classTable[specId] then
+    if specId and classTable[specId] then
         specTable = classTable[specId]
+    elseif playerLevel <= 9 and classTable.levelling_1_9 then
+        specTable = classTable.levelling_1_9
     else
         specTable = classTable.default
     end
@@ -433,7 +434,8 @@ local function ScoreNormalizedStats(statTable)
 end
 
 local function ParseTooltipStatLine(text, byName)
-    if not text or text == "" then
+    text = GQ.PublicText(text)
+    if not text then
         return
     end
 
@@ -524,6 +526,10 @@ function GQ.Compare:ScoreItemStats(entry)
 
     local statTable = CollectItemStats(itemLink, entry.itemId)
     local apiScore = next(statTable) and ScoreNormalizedStats(statTable) or 0
+    if apiScore > 0 then
+        return apiScore * GetArmorClassMultiplier(entry.itemId)
+    end
+
     local tooltipScore = ScoreItemStatsFromTooltip(entry.itemId, itemLink)
     local statScore = math.max(apiScore, tooltipScore)
 
@@ -539,31 +545,20 @@ function GQ.Compare:GetEntryPowerScore(entry)
         return 0
     end
 
-    local statScore = self:ScoreItemStats(entry)
-    local score = statScore
-
     if entry.suffix and entry.suffixRange and entry.suffixRange ~= "" then
         local maxSuffix = self:ScoreSuffixRangeMax(entry.suffixRange)
-        -- BiS display ranks by best possible roll; pipeline expected value is too low
-        -- for suffix picks and lets fixed-stat items with wasted stats (e.g. Str on hunters) win.
-        score = math.max(score, maxSuffix)
+        local score = maxSuffix
         if entry.pipelineScore then
             score = math.max(score, entry.pipelineScore)
         end
         return score
     end
 
-    -- Prefer runtime stat total when it clearly includes equip effects (hit/AP/etc.).
-    -- Base GetItemStats alone often misses green "Equip:" lines and would lose to pipeline.
-    if entry.pipelineScore and statScore > entry.pipelineScore then
-        return statScore
-    end
-
     if entry.pipelineScore then
-        score = math.max(score, entry.pipelineScore)
+        return entry.pipelineScore
     end
 
-    return score
+    return self:ScoreItemStats(entry)
 end
 
 function GQ.Compare:ScoreEntry(entry, equippedIlvl, slotName, maxPreferredIlvl)
@@ -640,10 +635,16 @@ function GQ.Compare:RankEntries(entries, slotName, maxResults)
     local classFile = GQ:GetEffectiveClass()
     local playerLevel = GQ:GetEffectiveLevel()
     local maxPreferredIlvl = 0
+    local equip = GQ.Equip
+    local prevSuppress = equip and equip._suppressItemPrime
+    if equip then
+        equip._suppressItemPrime = true
+    end
 
     if GQ.Equip and GQ.Equip.MeetsArmorPreference then
         for _, entry in ipairs(entries) do
-            if GQ.Equip:MeetsArmorPreference(entry.itemId, slotName, classFile, playerLevel) then
+            if (not GQ.Equip.MeetsRequiredLevel or GQ.Equip:MeetsRequiredLevel(entry.itemId, playerLevel))
+                and GQ.Equip:MeetsArmorPreference(entry.itemId, slotName, classFile, playerLevel) then
                 maxPreferredIlvl = math.max(maxPreferredIlvl, GetItemLevel(entry.itemId, entry))
             end
         end
@@ -652,9 +653,12 @@ function GQ.Compare:RankEntries(entries, slotName, maxResults)
     local scored = {}
 
     for _, entry in ipairs(entries) do
-        local sortScore = self:GetSortScore(entry, slotName, equippedIlvl, maxPreferredIlvl)
-        local _, itemIlvl = self:ScoreEntry(entry, equippedIlvl, slotName, maxPreferredIlvl)
-        table.insert(scored, { entry = entry, sortScore = sortScore, itemIlvl = itemIlvl })
+        if not GQ.Equip or not GQ.Equip.MeetsRequiredLevel
+            or GQ.Equip:MeetsRequiredLevel(entry.itemId, playerLevel) then
+            local sortScore = self:GetSortScore(entry, slotName, equippedIlvl, maxPreferredIlvl)
+            local _, itemIlvl = self:ScoreEntry(entry, equippedIlvl, slotName, maxPreferredIlvl)
+            table.insert(scored, { entry = entry, sortScore = sortScore, itemIlvl = itemIlvl })
+        end
     end
 
     table.sort(scored, function(a, b)
@@ -680,6 +684,10 @@ function GQ.Compare:RankEntries(entries, slotName, maxResults)
     local results = {}
     for i = 1, math.min(maxResults, #scored) do
         table.insert(results, scored[i].entry)
+    end
+
+    if equip then
+        equip._suppressItemPrime = prevSuppress
     end
 
     return results, equippedIlvl
