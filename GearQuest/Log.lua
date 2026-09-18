@@ -4133,6 +4133,16 @@ function GQ.Log:BuildDetailLines(entry)
             or entry.instructions,
     }
 
+    local audit = GQ.Data and GQ.Data.GetForeverAudit and GQ.Data:GetForeverAudit(entry.itemId)
+    if audit and audit.status == "missing" then
+        table.insert(lines, "\nNot found on Wowhead Forever - it may not exist in this game.")
+    elseif GQ.Data and GQ.Data.NeedsDatamineNotice and GQ.Data:NeedsDatamineNotice(entry) then
+        table.insert(lines, "\nHas not been datamined yet")
+    end
+    if audit and audit.tip and audit.tip ~= "" then
+        table.insert(lines, "\n" .. audit.tip)
+    end
+
     local suffixHint = GQ.Data:GetSuffixHint(entry)
     if suffixHint then
         table.insert(lines, "\nRandom enchant: " .. suffixHint)

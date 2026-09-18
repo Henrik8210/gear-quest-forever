@@ -105,10 +105,11 @@ REP_FACTION={
 # is claimed for a side only when its entire prefix-identified stock is that side and
 # there are at least three such items. 14 vendors qualify; none stock both sides.
 #
-# This is also what settled items with no faction-bearing name at all: Rune of Duty and
-# Rune of Perfection are BOTH Alliance (both sold by Illiyana), and Caretaker's Cape is
-# Alliance while Battle Healer's Cloak is Horde -- I had assumed those were faction
-# pairs and the data says they are not.
+# Caretaker's Cape is Alliance while Battle Healer's Cloak is Horde -- those are
+# faction pairs sold by Illiyana vs Kelm. Rune of Duty (21567/21568) and Rune of
+# Perfection (21565/21566) are the SAME item IDs on both sides; both quartermasters
+# sell them. sources.json must not pin npc to Illiyana or npc_ok gates Horde out of
+# the only trinkets available at 20-27.
 NPC_FACTION=json.load(open(G+"npc_faction.json"))
 def npc_ok(src, faction):
     side=NPC_FACTION.get(src.get("npc") or "")

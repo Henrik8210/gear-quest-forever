@@ -64,7 +64,7 @@ def main() -> int:
         f"apiVersion={chosen.get('apiVersion')}"
     )
 
-    changelog = "GearQuest Forever beta"
+    changelog = "GearQuest Forever"
     changelog_path = Path("CHANGELOG.md")
     if changelog_path.is_file():
         text = changelog_path.read_text(encoding="utf-8")
@@ -72,12 +72,16 @@ def main() -> int:
         changelog = ("## " + parts[1]).strip() if len(parts) > 1 else text[:4000]
 
     tag = os.environ.get("GITHUB_REF_NAME") or zip_path.stem
-    release_type = "beta" if ("beta" in tag.lower() or "alpha" in tag.lower()) else "release"
+    display = tag[1:] if tag.lower().startswith("v") else tag
+    release_type = (os.environ.get("CF_RELEASE_TYPE") or "beta").lower()
+    if release_type not in {"alpha", "beta", "release"}:
+        release_type = "beta"
+    print(f"CurseForge displayName={display} releaseType={release_type}")
     metadata = json.dumps(
         {
             "changelog": changelog,
             "changelogType": "markdown",
-            "displayName": tag,
+            "displayName": display,
             "gameVersions": [int(chosen["id"])],
             "releaseType": release_type,
         }

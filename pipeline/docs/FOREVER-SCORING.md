@@ -87,6 +87,35 @@ Python 3.12 is installed on the authoring PC. A one-off curated row in
 `GearQuest/Data.lua` is only for levels 1–9 Alliance bands (see
 `docs/DATA_RULES.md`).
 
+## Three picks per slot
+
+Generated lists should **aim for three items in every slot at every level**. A rank 2 or 3 that is a lower-`rlvl` leftover is still a hunt — show it. Empty bands (Horde enhancement Trinket 20–27 before the WSG rune fix) mean the pool was gated out, not that the player should see a blank slot.
+
+`score.py` already considers every eligible item with `rlvl` ≤ the character level. If a slot still has fewer than three picks, chase **source/faction/class gates** and **Wowhead coverage**, then re-score. Do not hand-edit generated Lua as the long-term fill.
+
+## Shared-ID Warsong Gulch runes
+
+`21565`/`21566` Rune of Perfection and `21567`/`21568` Rune of Duty are sold by **both** WSG quartermasters under the **same item IDs**. They are not Alliance-only.
+
+In `pipeline/data/sources.json` those four rows must have `npc: null` and `zone: null`. Instructions name both vendors (Illiyana at Silverwing Grove, Kelm at Mor'shan Base Camp). If `npc` is Illiyana, `npc_ok` + `npc_faction.json` drops every Horde pick and the first Horde trinket becomes Defiler's Talisman **21120** at 28.
+
+Forever nether tooltips have no class restriction — set `allowClass` to `-1`. (A leftover negative mask excluded shaman/druid from Duty.) Unique-Equipped: Rune of Battle (1): list both as alternatives.
+
+After changing those sources, re-score **all nine classes**, not only shaman.
+
+## Re-scrape Wowhead as Forever fills in
+
+The Forever catalog is not finished. Plan **many** scrape → ingest → re-score passes over the coming months:
+
+```powershell
+node scripts/scrape-forever-wowhead-items.mjs
+python pipeline/scripts/ingest_forever_wowhead.py
+```
+
+Then `score.py` / `reemit_all.py` and copy `pipeline/out/Data.*.generated.lua` into `GearQuest/_generated/`. Ingest does **not** overwrite existing classic ids in `items.json` / `sources.json` (so the WSG rune vendor fix survives a re-ingest). New Forever-only ids (≥ 200000) merge in as Wowhead grows.
+
+Hunt-id probe (`pipeline/scripts/probe_forever_hunt_tooltips.py`) labels 200 vs 404. Missing classic ids are pruned at runtime; existing items with no combat stats get the datamine notice.
+
 ## What is already wired
 
 - Paths are repo-relative (`gq_paths.py`). No `/home/claude/gq/`.

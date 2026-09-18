@@ -11,7 +11,9 @@ GearQuest Forever targets **WoW Forever 1–60** (Classic+). The fork inherited 
 
 **Done:** product split, `GQ.MAX_PLAYER_LEVEL`, phase **2** Classic suffix cache, phase **3** Classic `score.py` regen for all classes. **0** stale TBC +20/@7.9% fingerprint rows.
 
-**Not done:** Classic/Forever **StatWeights**; Alliance Forever deltas; classic ids that 404 on Wowhead Forever still need replacements as the community catalogs them. CurseForge project is **1698950**. Do **not** copy TBC CurseForge ID `1669225` or TBC `CF_API_KEY`.
+**Not done:** Classic/Forever **StatWeights**; Alliance Forever deltas; classic ids that 404 on Wowhead Forever still need replacements as the community catalogs them. Expect **many Wowhead scrape/ingest/re-score cycles** over the coming months — the catalog is incomplete, not a one-shot import. CurseForge project is **1698950**. Do **not** copy TBC CurseForge ID `1669225` or TBC `CF_API_KEY`.
+
+**Hunts:** target **three items per slot per level** (lower-req leftovers are valid rank 2/3). Empty slots are usually a gate bug (example: Horde WSG runes 21565–21568 pinned to Illiyana, so no trinket until 28).
 
 **Repo:** commit `scripts/`, `GearQuest/_generated/data/items_random.classic.json`, generated Lua patches, and docs together so another clone sees the same state — cache and generated files must stay in sync.
 

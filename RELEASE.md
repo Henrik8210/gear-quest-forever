@@ -19,10 +19,10 @@ Publishing uses **GitHub Actions**, not the CurseForge webhook. Keep any CurseFo
 
 Only when explicitly publishing:
 
-1. Bump `## Version:` in `GearQuest/GearQuestForever.toc` and `GearQuest/Core.lua` (`GQ.VERSION`).
-2. Add a `## vX.Y.Z` section to `CHANGELOG.md`.
+1. Bump `## Version:` in `GearQuest/GearQuestForever.toc` and `GearQuest/Core.lua` (`GQ.VERSION`) to **`X.Y.Z-forever-beta`** (e.g. `0.2.0-forever-beta`). Do not use `0.1.0-beta.7-forever`.
+2. Add a `## vX.Y.Z-forever-beta` section to `CHANGELOG.md`.
 3. Commit and push to `main`.
-4. Tag and push: `git tag vX.Y.Z` then `git push origin vX.Y.Z` (tag must match version with `v` prefix).
+4. Tag and push: `git tag vX.Y.Z-forever-beta` then `git push origin vX.Y.Z-forever-beta` (tag matches toc, with `v` prefix). CurseForge **Files** shows `X.Y.Z-forever-beta` (the `v` is stripped). Uploads stay on the **beta** channel until `CF_RELEASE_TYPE` is changed to `release`.
 5. Verify **GitHub Actions → Release** succeeds.
 6. Check CurseForge → **Files** — new file appears as Processing, then Approved.
 
@@ -33,13 +33,8 @@ Only when explicitly publishing:
 - Pushing to `main` alone is **not** a release.
 - **Never** copy `X-Curse-Project-ID` from the TBC GearQuest repo.
 
-## First upload
+## Next upload
 
-After `CF_API_KEY` is set and the **new** CurseForge project ID is in the toc. Tag must match `## Version:` with a `v` prefix (beta strings keep CurseForge on the beta channel):
+Version string is **`X.Y.Z-forever-beta`**. Do not use `0.1.0-beta.N-forever`.
 
-```powershell
-git tag v0.1.0-beta.6-forever
-git push origin v0.1.0-beta.6-forever
-```
-
-Then confirm the Release workflow and CurseForge Files tab.
+After `v0.2.0-forever-beta`, bump the patch (e.g. `0.2.1-forever-beta`) rather than deleting the tag.

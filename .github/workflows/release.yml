@@ -41,4 +41,5 @@ jobs:
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
           CF_PROJECT_ID: "1698950"
           CF_GAME_VERSION: "1.60.1"
+          CF_RELEASE_TYPE: "beta"
         run: python3 scripts/upload-curseforge-forever.py

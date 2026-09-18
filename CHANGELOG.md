@@ -2,6 +2,14 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
+## v0.2.0-forever-beta
+
+Nine-class re-score after Forever Wowhead hunt audit and the Horde trinket gap.
+
+- **Trinkets at 20:** Warsong Gulch Rune of Duty / Rune of Perfection (21565–21568) are the same item IDs for both factions. Sources no longer pin Illiyana only, so Horde enhancement (and every other Horde spec) gets a trinket hunt from 20 instead of waiting until Defiler's Talisman at 28.
+- **Three hunts per slot:** lists aim for three items at each level; a lower-required-level leftover is a valid rank 2/3. Empty slots are treated as data bugs.
+- **Wowhead Forever audit:** hunt ids probed against nether tooltips. Classic ids that 404 are dropped from hunts. Items that exist but have no combat stats, suffixes, or effects show “Has not been datamined yet” (source text is not a tooltip). Re-scrape as the Forever catalog grows.
+
 ## v0.1.0-beta.6-forever
 
 Forever beta client pass: profession-style window, per-spec early BiS, and Wowhead as the item-fact source.

@@ -5654,7 +5654,110 @@ function GQ.Data:GetCandidateSlotKeys(slotName)
     return { slotName }
 end
 
+function GQ.Data:GetForeverAudit(itemId)
+    if not itemId or not self.foreverAudit then
+        return nil
+    end
+    return self.foreverAudit[itemId]
+end
+
+function GQ.Data:GetForeverStatus(itemId)
+    local audit = self:GetForeverAudit(itemId)
+    return audit and audit.status or nil
+end
+
+function GQ.Data:IsForeverMissing(itemId)
+    return self:GetForeverStatus(itemId) == "missing"
+end
+
+function GQ.Data:TipHasCombatStats(tip)
+    if type(tip) ~= "string" or tip == "" then
+        return false
+    end
+    if tip:find("%+%d") then
+        return true
+    end
+    if tip:find("Armor", 1, true) or tip:find("Damage", 1, true) then
+        return true
+    end
+    if tip:find("Equip:", 1, true) or tip:find("Use:", 1, true) then
+        return true
+    end
+    if tip:find("Chance on hit", 1, true) then
+        return true
+    end
+    return false
+end
+
+function GQ.Data:HasCombatTooltipData(entry)
+    if not entry then
+        return false
+    end
+    if entry.suffixRange and entry.suffixRange ~= "" then
+        return true
+    end
+    if entry.proc and entry.proc ~= "" then
+        return true
+    end
+    local fact = self:GetItemFact(entry.itemId)
+    if fact and fact.proc and fact.proc ~= "" then
+        return true
+    end
+    if fact and fact.stats then
+        for _, value in pairs(fact.stats) do
+            if type(value) == "number" and value ~= 0 then
+                return true
+            end
+        end
+    end
+    local audit = self:GetForeverAudit(entry.itemId)
+    if audit and self:TipHasCombatStats(audit.tip) then
+        return true
+    end
+    return false
+end
+
+function GQ.Data:NeedsDatamineNotice(entry)
+    if not entry then
+        return false
+    end
+    if self:IsForeverMissing(entry.itemId) then
+        return false
+    end
+    if self:HasCombatTooltipData(entry) then
+        return false
+    end
+    -- A live client tooltip already has stats / suffixes / effects.
+    if entry.itemId and self.ItemInfoIsReady and self:ItemInfoIsReady(entry.itemId) then
+        return false
+    end
+    return true
+end
+
+function GQ.Data:AppendDatamineNotice(tooltip, entry)
+    if not tooltip or not self:NeedsDatamineNotice(entry) then
+        return
+    end
+    tooltip:AddLine("Has not been datamined yet", 1, 0.82, 0)
+end
+
+function GQ.Data:PruneMissingForever()
+    if not self.entries or not self.foreverAudit then
+        return
+    end
+
+    local kept = {}
+    for i = 1, #self.entries do
+        local entry = self.entries[i]
+        if not self:IsForeverMissing(entry and entry.itemId) then
+            kept[#kept + 1] = entry
+        end
+    end
+    self.entries = kept
+end
+
 function GQ.Data:BuildIndex()
+    self:PruneMissingForever()
     self.bySlot = {}
     self.byItemId = {}
     self.byId = {}
@@ -6500,6 +6603,10 @@ function GQ.Data:GetItemQualityForDisplay(itemId)
     if fact and type(fact.quality) == "number" and fact.quality > 0 then
         return fact.quality
     end
+    local audit = self:GetForeverAudit(itemId)
+    if audit and type(audit.quality) == "number" and audit.quality > 0 then
+        return audit.quality
+    end
     local quality = GQ.Equip and GQ.Equip.GetKnownItemQuality and GQ.Equip:GetKnownItemQuality(itemId)
     if type(quality) == "number" and quality > 0 then
         return quality
@@ -6533,6 +6640,10 @@ function GQ.Data:ShowFactFallbackTooltip(tooltip, entry)
     end
 
     local fact = self:GetItemFact(entry.itemId)
+    local audit = self:GetForeverAudit(entry.itemId)
+    if audit and audit.status == "missing" then
+        tooltip:AddLine("Not found on Wowhead Forever", 1, 0.2, 0.2)
+    end
     if fact and fact.kind then
         tooltip:AddLine(fact.kind, 0.8, 0.8, 0.8)
     end
@@ -6540,7 +6651,14 @@ function GQ.Data:ShowFactFallbackTooltip(tooltip, entry)
     if reqLevel and reqLevel > 0 then
         tooltip:AddLine("Requires Level " .. tostring(reqLevel), 1, 1, 1)
     end
-    if fact and fact.stats then
+    if audit and audit.tip and audit.tip ~= "" then
+        tooltip:AddLine(" ")
+        for line in string.gmatch(self:SanitizeText(audit.tip) .. "\n", "([^\n]*)\n") do
+            if line ~= "" then
+                tooltip:AddLine(line, 0.9, 0.9, 0.9, true)
+            end
+        end
+    elseif fact and fact.stats then
         for stat, value in pairs(fact.stats) do
             if type(value) == "number" and value ~= 0 then
                 local label = tostring(stat)
@@ -6560,6 +6678,7 @@ function GQ.Data:ShowFactFallbackTooltip(tooltip, entry)
         tooltip:AddLine(entry.proc, 1, 1, 1, true)
     end
     self:AppendSuffixRangeLines(tooltip, entry)
+    self:AppendDatamineNotice(tooltip, entry)
 end
 
 function GQ.Data:ItemInfoIsReady(itemIdOrLink)
@@ -6772,6 +6891,7 @@ function GQ.Data:ShowSuffixFallbackTooltip(tooltip, entry)
         tooltip:AddLine(" ")
         tooltip:AddLine("Target random enchant: " .. suffixHint, 0.7, 0.9, 1)
     end
+    self:AppendDatamineNotice(tooltip, entry)
 
     scanner:Hide()
 end

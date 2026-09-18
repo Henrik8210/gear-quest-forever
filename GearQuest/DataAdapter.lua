@@ -157,7 +157,7 @@ local function Expand(src, data, out)
         local r = rows[i]
         local itemId = r[1]
         local f = facts[itemId]
-        if f then
+        if f and not (data.IsForeverMissing and data:IsForeverMissing(itemId)) then
             local rank, spec, faction
             if src.hasSpec then
                 if type(r[5]) == "number" then

@@ -21,7 +21,7 @@ GearQuest uses **two different pipelines**. Do not apply one pipeline’s rules 
 node scripts/verify-generated-bis.mjs
 ```
 
-Expected total: **59,771** entries (**368 curated + 59,403 generated**) — always use the script, not a stale figure. All nine classes are Classic `score.py` regens with the Forever Wowhead pool (id ≥ 200000) merged in. Levels 1–9 are scored **per spec**. Weights are still TBC-derived. Horde Forever deltas in `Data.lua` use `foreverDelta = true` so they compete across generated per-level bands; Compare still shows the top 3.
+Expected total: **59,733** entries (**368 curated + 59,365 generated**) — always use the script, not a stale figure. All nine classes are Classic `score.py` regens with the Forever Wowhead pool (id ≥ 200000) merged in. Levels 1–9 are scored **per spec**. Weights are still TBC-derived. Horde Forever deltas in `Data.lua` use `foreverDelta = true` so they compete across generated per-level bands; Compare still shows the top 3.
 
 ### Ranking philosophy by source
 
@@ -34,11 +34,23 @@ At **runtime**, `Compare.lua` ranks most generated candidates by item level vs e
 
 **Faction gating (pipeline):** wrong-faction rows are stripped at emit time using vendor stock analysis (`npc_faction.json`), PvP prefix rules (`pvp_prefix_faction.json`), reputation exclusivity (mirror pairs + hand-verified names like Tranquillien), and quest/class locks on adjacent rows — **not** sub-zone lists alone (shared camps can host both factions’ vendors).
 
+**Shared-ID PvP (do not pin one quartermaster):** Warsong Gulch **Rune of Duty** (21567/21568) and **Rune of Perfection** (21565/21566) are the **same item IDs** for both factions. Alliance buys them from Illiyana Moonblaze (Silverwing Grove); Horde from Kelm Hargunth (Mor'shan Base Camp). `sources.json` must keep `npc`/`zone` unset and put both vendors in `instructions`. Pinning Illiyana made `npc_ok` treat them as Alliance-only and left **Horde with no trinket hunts from 20–27** (first pick was Defiler's Talisman at 28). Forever tooltips have no `Classes:` line — `allowClass` is `-1`. Both runes are Unique-Equipped: Rune of Battle (1), so they are alternatives, not a pair. Details: [`pipeline/docs/FOREVER-SCORING.md`](../pipeline/docs/FOREVER-SCORING.md).
+
 ---
 
 ## Goal
 
-Show the **top 3 upgrades per slot** for the player’s **class, faction, and spec** — nothing they cannot equip. **How** those three are chosen depends on the data source (see above): curated bands favour realistic, level-appropriate picks; generated 10–69 favours stat score regardless of obtainability (with pipeline faction/rep gates applied).
+Show **three hunts per slot** for the player’s **class, faction, spec, and level** — nothing they cannot equip. Empty slots are a data bug to chase, not an acceptable “nothing drops here” answer.
+
+**Always strive for 3 items per slot per level.** Rank 2 and 3 may be a lower required-level piece the player can still wear (a level-20 Warsong Gulch rune at 22, a quest green from last zone). That is okay. Do not leave a slot blank because the only remaining candidates are “old.” An empty Trinket at 22 usually means a faction/vendor/class gate stripped the pool, not that Classic has no trinkets.
+
+**How** the three are chosen depends on the source: curated bands favour realistic, level-appropriate picks; generated 10–60 favours stat score (with pipeline faction/rep/vendor gates). Compare still displays the top 3.
+
+### Forever catalog is incomplete — keep re-indexing
+
+Wowhead’s Forever item list and tooltips are still filling in. GearQuest will **scrape and ingest Wowhead many times over the coming months** (`scripts/scrape-forever-wowhead-items.mjs` → `pipeline/scripts/ingest_forever_wowhead.py` → re-score → copy `_generated/`). Each pass should add missing ids, retuned stats, and replacements for classic ids that 404 on `nether.wowhead.com/forever/tooltip/item/{id}`. Do not treat one ingest as finished product.
+
+Classic ids that 404 are pruned from hunts at load (`GQ.Data:PruneMissingForever`). Items that exist but have no combat stats, suffixes, or effect lines show **Has not been datamined yet** — hunt source text is not a tooltip.
 
 ## Curation workflow (primary)
 
