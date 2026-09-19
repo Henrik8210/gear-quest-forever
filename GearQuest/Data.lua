@@ -6582,17 +6582,52 @@ function GQ.Data:ResolveSuffixItemLink(entry)
     return self:MakeSuffixTargetLink(entry)
 end
 
+function GQ.Data:FormatSuffixRangeText(text)
+    text = self:NormalizeItemName(text)
+    if not text or text == "" then
+        return nil
+    end
+
+    -- Pipeline keys first (longest match), then leftover "sp".
+    text = text:gsub("spNature", "Nature Spell Power")
+    text = text:gsub("spFire", "Fire Spell Power")
+    text = text:gsub("spFrost", "Frost Spell Power")
+    text = text:gsub("spShadow", "Shadow Spell Power")
+    text = text:gsub("spArcane", "Arcane Spell Power")
+    text = text:gsub("spHoly", "Holy Spell Power")
+    text = text:gsub("(%d)%s+sp%f[%A]", "%1 Spell Power")
+    return text
+end
+
 function GQ.Data:AppendSuffixRangeLines(tooltip, entry)
     if not tooltip or not entry or not entry.suffixRange or entry.suffixRange == "" then
         return
     end
 
     for part in string.gmatch(entry.suffixRange, "[^,]+") do
-        local text = self:NormalizeItemName(part)
+        local text = self:FormatSuffixRangeText(part)
         if text and text ~= "" then
-            tooltip:AddLine(text, 1, 1, 1)
+            tooltip:AddLine(text, 0, 1, 0)
         end
     end
+end
+
+-- Forever often answers SetHyperlink(item:...:suffixId) with the BASE green
+-- (name + armor only). The hunt text already has the roll; the tooltip must too.
+function GQ.Data:TooltipShowsEntrySuffix(tooltip, entry)
+    if not tooltip or not entry or not entry.suffix or entry.suffix == "" then
+        return false
+    end
+
+    local name = tooltip.GetName and tooltip:GetName()
+    local fs = name and _G[name .. "TextLeft1"]
+    local title = GQ.PublicText(fs and fs.GetText and fs:GetText())
+    if not title or title == "" then
+        return false
+    end
+
+    local suffix = tostring(entry.suffix):gsub("^%s+", "")
+    return title:lower():find(suffix:lower(), 1, true) ~= nil
 end
 
 function GQ.Data:GetItemQualityForDisplay(itemId)
@@ -6840,7 +6875,7 @@ function GQ.Data:TryShowSuffixTargetTooltip(tooltip, entry)
     if not self:SetTooltipItem(tooltip, link) or self:TooltipLooksRetrieving(tooltip) then
         return false
     end
-    return true
+    return self:TooltipShowsEntrySuffix(tooltip, entry)
 end
 
 function GQ.Data:CopyTooltipLinesFromScanner(tooltip, scanner, skipTitle)
@@ -6933,19 +6968,20 @@ function GQ.Data:PopulateEntryItemTooltip(tooltip, entry)
         local link = self:MakeSuffixTargetLink(entry)
         if link then
             self:RequestItemInfo(link, true)
-            if self:ItemInfoIsReady(link) and self:SetTooltipItem(tooltip, link)
-                and not self:TooltipLooksRetrieving(tooltip) then
+            if self:SetTooltipItem(tooltip, link)
+                and not self:TooltipLooksRetrieving(tooltip)
+                and self:TooltipShowsEntrySuffix(tooltip, entry) then
                 self:ClearPendingItemTooltip(tooltip)
                 return true
             end
         end
 
+        -- Client rendered the unsuffixed base item (Forever) or the link is
+        -- still uncached. Paint the hunt name + suffix stats ourselves.
         if self:ItemInfoIsReady(entry.itemId) then
             self:ShowSuffixFallbackTooltip(tooltip, entry)
-            if not self:TooltipLooksRetrieving(tooltip) then
-                self:ClearPendingItemTooltip(tooltip)
-                return true
-            end
+            self:ClearPendingItemTooltip(tooltip)
+            return true
         end
 
         self:ShowFactFallbackTooltip(tooltip, entry)

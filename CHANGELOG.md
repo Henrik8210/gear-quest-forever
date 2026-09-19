@@ -2,6 +2,14 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
+## v0.2.4-beta
+
+Random-enchant greens show the suffix on the **item tooltip**, not only in the hunt text.
+
+- Forever often answers a suffixed `item:` link with the unsuffixed base green (Bandit Cloak, armor only). The log already had `of Nature's Wrath` / `+3-4 spNature`; the hover tooltip did not.
+- If the client tooltip title does not contain the suffix, GearQuest paints the hunt name and the roll stats for **every class, spec, and level**.
+- Shaman 10–60 re-score remains Wowhead Forever only (no TBC, 404s pruned).
+
 ## v0.2.3-beta
 
 Repo-only follow-up (logo, veldt diff script, local audit helpers). **In-game build matches v0.2.2-beta** — CurseForge file **`v0.2.3-beta`** for version alignment after the GitHub tooling commit.

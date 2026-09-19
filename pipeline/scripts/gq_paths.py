@@ -30,3 +30,11 @@ def forever_missing_ids():
             text = open(candidate, encoding="utf-8").read()
             return {int(m.group(1)) for m in re.finditer(r'\[(\d+)\]=\{status="missing"', text)}
     return set()
+
+def tbc_only_ids():
+    """Item ids that exist only in TBC/Outland. Never a Forever hunt target."""
+    import json
+    path = os.path.join(ADDON_GEN, "data", "tbc_only_item_ids.json")
+    if os.path.exists(path):
+        return set(json.load(open(path, encoding="utf-8")).get("ids") or [])
+    return set()

@@ -389,7 +389,7 @@ Do **not** mention Holy/Protection availability in the message — the picker al
 - [ ] Faction and spec filters are correct or omitted
 - [ ] If a spec is not yet selectable, `comingLater = true` is set in `Spec.lua` (not just missing data)
 - [ ] Instructions match the source type and zone
-- [ ] Random-enchant greens have `suffix` / `suffixChance` / `suffixRange` (and `suffixId` when Classic data has one) — otherwise the log shows the base name with no roll
+- [ ] Random-enchant greens have `suffix` / `suffixChance` / `suffixRange` (and `suffixId` when Classic data has one) — otherwise the log shows the base name with no roll. Forever item tooltips must still show that roll (`TooltipShowsEntrySuffix` / `ShowSuffixFallbackTooltip`) even when the client paints the unsuffixed base item.
 - [ ] `instructions` use ASCII hyphen/quotes only — WoW fonts draw em-dash/middle-dot as boxes or stray periods (`Data:SanitizeText` is the runtime backstop)
 - [ ] Test in-game at `/gq preview set class paladin level N` (or on a real character) and confirm top 3 look sane
 

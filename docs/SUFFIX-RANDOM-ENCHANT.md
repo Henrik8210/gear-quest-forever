@@ -93,9 +93,16 @@ For any row carrying a random enchant:
 ### Tooltips and async cache
 
 Suffixed links need a client round trip before stats appear. Keep
-`GET_ITEM_INFO_RECEIVED` retry (`TrackPendingSuffixTooltip`) for **all** suffixed rows,
+`GET_ITEM_INFO_RECEIVED` retry (`TrackPendingItemTooltip`) for **all** suffixed rows,
 not only the no-`suffixId` fallback — first hover can show base stats until the client
 caches the link.
+
+**Forever client:** `SetHyperlink("item:id:0:0:0:0:0:suffixId:0:0")` often paints the
+**unsuffixed** base green (name + armor, no roll). `GetItemInfo` still returns ready.
+After `SetTooltipItem`, `TooltipShowsEntrySuffix` checks that the tooltip title contains
+the suffix (`of Nature's Wrath`). If it does not, `ShowSuffixFallbackTooltip` replaces
+the tooltip: hunt display name + base lines + green `suffixRange` stats. This is the
+path for **every class / spec / level**, not shaman-only.
 
 Log list quality colors: prime `GetItemInfo` on list build and refresh on
 `GET_ITEM_INFO_RECEIVED` so uncached items do not render white (quality 1 default).
@@ -141,8 +148,9 @@ If notables still lack ids after import, the old generated files are still loade
 
 After `/reload` in-game:
 
-- Notable with `suffixId` → full client tooltip with suffix stats
-- Notable without `suffixId` (rare) → base item + `suffixRange` text lines
+- Client applied the suffix → native tooltip (name includes `of …`, stats from the roll)
+- Forever ignored the suffix link → fallback tooltip titled `Bandit Cloak of Nature's Wrath` with green `+3-4 Nature Spell Power` (from `suffixRange`)
+- Notable without `suffixId` (rare) → same fallback using `suffixRange`
 - Never computed stat values
 
 ---

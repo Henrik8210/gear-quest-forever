@@ -134,15 +134,22 @@ for sp,blob in gen.items():
         if b.get("hi", 60) <= 9: continue
         band_picks=unique_picks(b["picks"], 3)
         shown_names={p.get("name") for p in band_picks}
-        nbs=[nb for nb in (b.get("notableEffects") or []) if nb.get("name") not in shown_names]
+        cut=(band_picks[-1].get("score") or 0) if band_picks else 0
+        nbs=[nb for nb in (b.get("notableEffects") or [])
+             if nb.get("id") not in FOREVER_MISSING
+             and nb.get("name") not in shown_names
+             and (nb.get("score") is None or nb.get("score") < cut)]
         forever_nb=None
-        if band_picks:
-            cut=band_picks[-1].get("score") or 0
+        if band_picks and cut:
             shown_ids={p["id"] for p in band_picks}
             for p in b["picks"]:
+                if p["id"] in FOREVER_MISSING:
+                    continue
                 if p["id"] in shown_ids or p.get("name") in shown_names:
                     continue
-                if p["id"]>=200000 and cut and (p.get("score") or 0)>=cut*0.98:
+                sc=p.get("score") or 0
+                # Near-miss Forever item: notice-only, never equal/above BiS #3.
+                if p["id"]>=200000 and cut*0.98 <= sc < cut:
                     forever_nb=p
                     shown_names.add(p.get("name"))
                     break

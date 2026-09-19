@@ -17,8 +17,10 @@ import relic_score as RELIC
 # Strength weight keeps the physics ratio intact inside that spec's scale.
 DPS_PER_STR = 4.31
 
-from gq_paths import G, GUIDES_DIR, OUT, forever_missing_ids
+from gq_paths import G, GUIDES_DIR, OUT, forever_missing_ids, tbc_only_ids
 FOREVER_MISSING = forever_missing_ids()
+TBC_ONLY = tbc_only_ids()
+NO_GUIDES = os.environ.get("GQ_NO_GUIDES") == "1"
 
 # ilvl -> typical RequiredLevel, median over every item that states one.
 ILVL_FLOOR = json.load(open(G+"ilvl_floor.json"))
@@ -449,7 +451,7 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
     notable={}; full60={}
     armorClass=cfg.get("armorClass") or {}
     pool=[it for it in items.values() if slot_for(it,cls) and it['id'] not in EXCLUDED]
-    pool=[it for it in pool if it["id"] in CLASSIC_IDS]
+    pool=[it for it in pool if it["id"] in CLASSIC_IDS and it["id"] not in TBC_ONLY]
     per={}
     for faction in factions:
         for level in levels:
@@ -893,8 +895,10 @@ if __name__=="__main__":
                         out[_spec]["bands"][-1]["routeTwoHand"]=rt[1]
                         out[_spec]["bands"][-1]["routeOneHand"]=rt[2]
                 nbs=_notable.get((faction,hi,sl)) or []
-                shown={p["id"] for p in out[_spec]["bands"][-1]["picks"][:3]}
-                nbs=[r for r in nbs if r[1]["id"] not in shown]
+                bis=out[_spec]["bands"][-1]["picks"][:3]
+                shown={p["id"] for p in bis}
+                cut_score=bis[-1]["score"] if bis else 0
+                nbs=[r for r in nbs if r[1]["id"] not in shown and r[0] < cut_score]
                 if nbs:
                     out[_spec]["bands"][-1]["notableEffects"]=[{
                       "id":r[1]["id"],"name":r[1]["name"],"q":r[1]["quality"],
@@ -908,7 +912,7 @@ if __name__=="__main__":
             for faction,sl,lo,hi,key,rows in bands:
                 if early_band or spec=="levelling_1_9":
                     emit(faction,sl,lo,hi,rows); continue
-                if not (lo<=60<=hi):
+                if NO_GUIDES or not (lo<=60<=hi):
                     emit(faction,sl,lo,hi,rows); continue
                 r60=full60.get((faction,sl)) or per.get((faction,60,sl)) or rows
                 ov=guide_override(spec,sl,faction,r60,cls)
