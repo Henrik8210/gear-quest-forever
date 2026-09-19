@@ -251,17 +251,18 @@ end
 local TAB_GROUP_WIDTH = (88 * 2) + 4
 local DETAIL_TEXT_COLOR = { 0.13, 0.09, 0.04 }
 local LORE_TEXT_COLOR = { 0.20, 0.15, 0.10 }
-local DETAIL_TEXT_HEX = "21160a"
+-- QuestFont in this client has no usable space glyph, so parchment
+-- titles/bodies render as "LAMBENTSCALEPAULDRONS" / "Worlddrop".
 local QUEST_DETAIL_TITLE_FONTS = {
-    "QuestFont_Large", "QuestFont", "GameFontHighlight", "GameFontNormal",
+    "GameFontNormalLarge", "GameFontHighlightLarge", "GameFontNormal",
 }
 
 local QUEST_DETAIL_HEADER_FONTS = {
-    "QuestFont", "GameFontHighlight", "GameFontNormal",
+    "GameFontNormal", "GameFontHighlight",
 }
 
 local QUEST_DETAIL_BODY_FONTS = {
-    "QuestFont", "GameFontHighlight", "GameFontNormal",
+    "GameFontNormal", "GameFontHighlight",
 }
 
 local function GetHuntRecord(id)
@@ -584,13 +585,22 @@ local function CreateRewardItemButton(parent, name)
 end
 
 local function CreateFontStringWithFallback(parent, candidates)
+    local fs
     for _, font in ipairs(candidates) do
-        local ok, fs = pcall(parent.CreateFontString, parent, nil, "ARTWORK", font)
-        if ok and fs then
-            return fs
+        local ok, created = pcall(parent.CreateFontString, parent, nil, "ARTWORK", font)
+        if ok and created then
+            fs = created
+            break
         end
     end
-    return parent:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    fs = fs or parent:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    -- Keep the inherited size, but always use Friz so spaces actually draw.
+    local path, _, flags = GameFontNormal:GetFont()
+    if path and fs.GetFont and fs.SetFont then
+        local _, size = fs:GetFont()
+        fs:SetFont(path, size or 13, flags or "")
+    end
+    return fs
 end
 
 local PARCHMENT_TEXTURE = "Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Textures\\GQ-Parchment.png"
@@ -4207,9 +4217,6 @@ function GQ.Log:BuildDetailLines(entry)
     elseif GQ.Data and GQ.Data.NeedsDatamineNotice and GQ.Data:NeedsDatamineNotice(entry) then
         table.insert(lines, "\nHas not been datamined yet")
     end
-    if audit and audit.tip and audit.tip ~= "" then
-        table.insert(lines, "\n" .. audit.tip)
-    end
 
     local suffixHint = GQ.Data:GetSuffixHint(entry)
     if suffixHint then
@@ -4228,27 +4235,32 @@ function GQ.Log:BuildDetailLines(entry)
         table.insert(lines, "\nRanked from the Wowhead Classic BiS guide.")
     end
 
-    if entry.sourceType == "world_drop" then
-        local isBoE = GQ.Equip and GQ.Equip.IsBindOnEquip and GQ.Equip:IsBindOnEquip(entry.itemId)
-        if isBoE then
-            table.insert(lines, "\nAlso available on the Auction House (binds when equipped).")
+    local how = string.lower(lines[1] or "")
+
+    local function alreadySays(needle)
+        return needle and needle ~= "" and how:find(string.lower(needle), 1, true)
+    end
+
+    if entry.sourceType == "world_drop" or entry.sourceType == "profession" then
+        local mentionsAh = how:find("auction", 1, true)
+        if not mentionsAh then
+            local isBoE = GQ.Equip and GQ.Equip.IsBindOnEquip and GQ.Equip:IsBindOnEquip(entry.itemId)
+            if isBoE then
+                local ah = entry.sourceType == "profession"
+                    and "\nAlso available on the Auction House (crafted by others; binds when equipped)."
+                    or "\nAlso available on the Auction House (binds when equipped)."
+                table.insert(lines, ah)
+            end
         end
     end
 
-    if entry.sourceType == "profession" then
-        local isBoE = GQ.Equip and GQ.Equip.IsBindOnEquip and GQ.Equip:IsBindOnEquip(entry.itemId)
-        if isBoE then
-            table.insert(lines, "\nAlso available on the Auction House (crafted by others; binds when equipped).")
-        end
-    end
-
-    if entry.zone then
+    if entry.zone and not alreadySays(entry.zone) then
         table.insert(lines, "\nZone: " .. entry.zone)
     end
-    if entry.questName then
+    if entry.questName and not alreadySays(entry.questName) then
         table.insert(lines, "Quest: " .. entry.questName)
     end
-    if entry.npc then
+    if entry.npc and not alreadySays(entry.npc) then
         table.insert(lines, "NPC: " .. entry.npc)
     end
     table.insert(lines, "\nSource: " .. GQ:GetSourceLabel(entry.sourceType))
@@ -4298,7 +4310,11 @@ function GQ.Log:ApplyEntryDetail(entry)
     local itemName = GQ.Data:GetEntryDisplayName(entry) or ("Item " .. entry.itemId)
 
     self:SetDetailEmpty(false)
-    self.frame.detailTitle:SetText("|cff" .. DETAIL_TEXT_HEX .. itemName:upper() .. "|r")
+    local title = itemName:upper()
+    if GQ.Data and GQ.Data.SanitizeText then
+        title = GQ.Data:SanitizeText(title) or title
+    end
+    self.frame.detailTitle:SetText(title)
     self.frame.detailTitle:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
 
     local lore = entry.lore

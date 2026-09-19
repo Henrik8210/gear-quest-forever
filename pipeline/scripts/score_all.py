@@ -27,6 +27,7 @@ def score(cls, out_name):
     env["GQ_CLASS"] = cls
     env["GQ_OUT"] = out_name
     env["GQ_GUIDES"] = GUIDES[cls]
+    env["GQ_NO_GUIDES"] = "1"  # Forever: model at 60, no Classic/TBC guide pin
     print(f"== {cls} score ({GUIDES[cls]}) ==")
     subprocess.check_call([PY, str(ROOT / "score.py")], cwd=str(ROOT), env=env)
 

@@ -32,32 +32,34 @@ W      = json.load(open(G+"weights.json"))
 
 CLASS_BIT={"WARRIOR":1,"PALADIN":2,"HUNTER":4,"ROGUE":8,"PRIEST":16,"SHAMAN":64,
            "MAGE":128,"WARLOCK":256,"DRUID":1024}
+# BloodElf/Draenei bits stay so leftover TBC item masks still parse, but they are
+# not playable in Forever and are absent from CLASS_RACES and the faction masks.
+# Skyborne is on both factions; the bit is unused on Classic items (allowRace=-1
+# on Wowhead Forever ingest). Wrong bit only hides Skyborne-only masks, if any.
 RACE_BIT={"Human":1,"Orc":2,"Dwarf":4,"NightElf":8,"Undead":16,"Tauren":32,
-          "Gnome":64,"Troll":128,"BloodElf":512,"Draenei":1024}
-ALLIANCE=RACE_BIT["Human"]|RACE_BIT["Dwarf"]|RACE_BIT["NightElf"]|RACE_BIT["Gnome"]|RACE_BIT["Draenei"]
-HORDE   =RACE_BIT["Orc"]|RACE_BIT["Undead"]|RACE_BIT["Tauren"]|RACE_BIT["Troll"]|RACE_BIT["BloodElf"]
+          "Gnome":64,"Troll":128,"BloodElf":512,"Draenei":1024,"Skyborne":2048}
+ALLIANCE=RACE_BIT["Human"]|RACE_BIT["Dwarf"]|RACE_BIT["NightElf"]|RACE_BIT["Gnome"]|RACE_BIT["Skyborne"]
+HORDE   =RACE_BIT["Orc"]|RACE_BIT["Undead"]|RACE_BIT["Tauren"]|RACE_BIT["Troll"]|RACE_BIT["Skyborne"]
 FACTION_MASK={"Alliance":ALLIANCE,"Horde":HORDE}
 
-# A class is not playable by every race on its faction, and that matters a lot at
-# low level. A Horde paladin in TBC is a Blood Elf and nothing else, so Orc, Tauren,
-# Troll and Undead starting quests are as unreachable to it as Alliance ones. Using
-# the blanket faction mask put Durotar and Mulgore gear in a Blood Elf's list.
+# Forever character-create matrix (no Draenei, no Blood Elf). Skyborne shaman is
+# Horde-only; Skyborne mage is Alliance-only; Skyborne cannot be paladin/priest/warlock.
 R=RACE_BIT
 CLASS_RACES={
- "PALADIN":{"Alliance":R["Human"]|R["Dwarf"]|R["Draenei"], "Horde":R["BloodElf"]},
- "WARRIOR":{"Alliance":R["Human"]|R["Dwarf"]|R["NightElf"]|R["Gnome"]|R["Draenei"],
-            "Horde":R["Orc"]|R["Undead"]|R["Tauren"]|R["Troll"]},
- "HUNTER" :{"Alliance":R["Dwarf"]|R["NightElf"]|R["Draenei"],
-            "Horde":R["Orc"]|R["Tauren"]|R["Troll"]|R["BloodElf"]},
- "ROGUE"  :{"Alliance":R["Human"]|R["Dwarf"]|R["NightElf"]|R["Gnome"],
-            "Horde":R["Orc"]|R["Undead"]|R["Troll"]|R["BloodElf"]},
- "PRIEST" :{"Alliance":R["Human"]|R["Dwarf"]|R["NightElf"]|R["Draenei"],
-            "Horde":R["Undead"]|R["Troll"]|R["BloodElf"]},
- "SHAMAN" :{"Alliance":R["Draenei"], "Horde":R["Orc"]|R["Tauren"]|R["Troll"]},
- "MAGE"   :{"Alliance":R["Human"]|R["Gnome"]|R["Draenei"],
-            "Horde":R["Undead"]|R["Troll"]|R["BloodElf"]},
- "WARLOCK":{"Alliance":R["Human"]|R["Gnome"], "Horde":R["Orc"]|R["Undead"]|R["BloodElf"]},
- "DRUID"  :{"Alliance":R["NightElf"], "Horde":R["Tauren"]},
+ "PALADIN":{"Alliance":R["Human"]|R["Dwarf"], "Horde":R["Undead"]},
+ "WARRIOR":{"Alliance":R["Human"]|R["Dwarf"]|R["NightElf"]|R["Gnome"]|R["Skyborne"],
+            "Horde":R["Orc"]|R["Undead"]|R["Tauren"]|R["Troll"]|R["Skyborne"]},
+ "HUNTER" :{"Alliance":R["Human"]|R["Dwarf"]|R["NightElf"]|R["Skyborne"],
+            "Horde":R["Orc"]|R["Tauren"]|R["Troll"]|R["Skyborne"]},
+ "ROGUE"  :{"Alliance":R["Human"]|R["Dwarf"]|R["NightElf"]|R["Gnome"]|R["Skyborne"],
+            "Horde":R["Orc"]|R["Undead"]|R["Troll"]|R["Skyborne"]},
+ "PRIEST" :{"Alliance":R["Human"]|R["Dwarf"]|R["NightElf"]|R["Gnome"],
+            "Horde":R["Undead"]|R["Troll"]},
+ "SHAMAN" :{"Alliance":R["Dwarf"], "Horde":R["Orc"]|R["Tauren"]|R["Troll"]|R["Skyborne"]},
+ "MAGE"   :{"Alliance":R["Human"]|R["Gnome"]|R["Skyborne"],
+            "Horde":R["Undead"]|R["Troll"]|R["Orc"]},
+ "WARLOCK":{"Alliance":R["Human"]|R["Gnome"], "Horde":R["Orc"]|R["Undead"]|R["Troll"]},
+ "DRUID"  :{"Alliance":R["NightElf"]|R["Skyborne"], "Horde":R["Tauren"]|R["Skyborne"]},
 }
 
 # Faction-exclusive zones. The item and quest tables gate by race, but a vendor
@@ -67,20 +69,26 @@ CLASS_RACES={
 # reachable by both and stay absent.
 ALLIANCE_ZONES={"Northshire Valley","Elwynn Forest","Dun Morogh","Coldridge Valley","Kharanos",
  "Teldrassil","Shadowglen","Darnassus","Ironforge","Stormwind City","Loch Modan","Westfall",
- "Darkshore","Redridge Mountains","Duskwood","Azuremyst Isle","Bloodmyst Isle","The Exodar",
- "Ammen Vale","Dustwallow Marsh - Theramore",
- "Honor Hold","Telaar","Temple of Telhamat","Wildhammer Stronghold","Sylvanaar",
- "Toshley's Station","Allerian Stronghold","Nesingwary's Expedition","Feathermoon Stronghold",
+ "Darkshore","Redridge Mountains","Duskwood","Dustwallow Marsh - Theramore",
+ "Nesingwary's Expedition","Feathermoon Stronghold",
  "Nijel's Point","Refuge Pointe","Sentinel Hill","Lakeshire","Darkshire","Menethil Harbour",
  "Menethil Harbor","Southshore","Chillwind Camp","Booty Bay - Alliance","Astranaar",
  "Auberdine","Talrendis Point","Silverwind Refuge","Forest Song","Theramore Isle"}
 HORDE_ZONES={"Valley of Trials","Durotar","Razor Hill","Orgrimmar","Mulgore","Camp Narache",
  "Thunder Bluff","Deathknell","Tirisfal Glades","Brill","Undercity","Silverpine Forest",
- "Eversong Woods","Sunstrider Isle","Ghostlands","Silvermoon City","Sen'jin Village","The Barrens",
- "Tranquillien","Thrallmar","Garadar","Falcon Watch","Shadowmoon Village","Zabra'jin",
- "Thunderlord Stronghold","Mok'Nathal Village","Camp Mojache","Hammerfall","Kargath",
+ "Sen'jin Village","The Barrens",
+ "Camp Mojache","Hammerfall","Kargath",
  "Stonard","Grom'gol Base Camp","Brackenwall Village","Splintertree Post","Zoram'gar Outpost",
  "Valormok","Crossroads","Taurajo"}
+# TBC race hubs and Outland towns do not exist in Forever. Deny both factions so
+# leftover item zones cannot leak after those names left the faction lists.
+# Zephras Isle is the shared Skyborne start and stays unlisted (reachable by both).
+GONE_ZONES={"Azuremyst Isle","Bloodmyst Isle","The Exodar","Ammen Vale",
+ "Eversong Woods","Sunstrider Isle","Ghostlands","Silvermoon City","Tranquillien",
+ "Honor Hold","Telaar","Temple of Telhamat","Wildhammer Stronghold","Sylvanaar",
+ "Toshley's Station","Allerian Stronghold",
+ "Thrallmar","Garadar","Falcon Watch","Shadowmoon Village","Zabra'jin",
+ "Thunderlord Stronghold","Mok'Nathal Village"}
 # Faction-exclusive REPUTATIONS. A whole gate class that was missing: Batskin Belt
 # requires "Tranquillien - Honored", Tranquillien is the Horde hub in the Blood Elf
 # Ghostlands, and an Alliance paladin can never earn it -- but the item's allowRace is
@@ -127,6 +135,7 @@ def rep_ok(it, faction):
 
 def zone_ok(zone, faction):
     if not zone: return True
+    if zone in GONE_ZONES: return False
     if faction=="Horde"    and zone in ALLIANCE_ZONES: return False
     if faction=="Alliance" and zone in HORDE_ZONES:    return False
     return True
@@ -148,13 +157,10 @@ AC_SLOTS={"Head","Shoulder","Chest","Wrist","Hands","Waist","Legs","Feet"}
 # off-hand-only weapon (InventoryType 22) was a legal off-hand pick from its own
 # RequiredLevel -- Left-Handed Brass Knuckles, RequiredLevel 10, sat at rank 1 in a
 # level-10 warrior's off hand, ten levels before the character can equip it.
-# Level at which the class learns Dual Wield. None = never. A dict value is per-spec:
-# for a shaman it is not a class skill at all but an ENHANCEMENT TALENT, so an
-# elemental or restoration shaman can never hold a weapon in the off hand however
-# high its level. 30 is when 20 points of Enhancement -- the talent's depth -- is
-# reachable.
-DUAL_WIELD_LEVEL={"WARRIOR":20,"ROGUE":10,"HUNTER":20,
-                  "SHAMAN":{"enhancement":30}}
+# Dual Wield. None = never. Forever Enhancement has no dual-wield talent and can
+# equip 2H without one; shaman off-hand weapons are never legal. Hunter still
+# learns Dual Wield at 20 (class trainer).
+DUAL_WIELD_LEVEL={"WARRIOR":20,"ROGUE":10,"HUNTER":20}
 def dual_wield_level(cls, spec):
     v=DUAL_WIELD_LEVEL.get(cls)
     if isinstance(v,dict): return v.get(spec)
@@ -163,6 +169,31 @@ def dual_wield_level(cls, spec):
 ARMOR_SLOTS=["Head","Neck","Shoulder","Back","Chest","Wrist","Hands","Waist","Legs","Feet","Finger","Trinket"]
 RATING_KEYS={"hit","crit","haste","expertise","defense","dodge","parry","blockRating",
              "resilience","spellHit","spellCrit","spellHaste","hitRanged","critRanged"}
+SPELL_OFFENSE_KEYS=("sp","spSchool","spHoly","heal","sp_from_heal",
+                    "spShadow","spFire","spFrost","spNature","spArcane")
+PHYS_OFFENSE_KEYS=("str","agi","ap","rap","feralAp")
+TANK_SKILL_KEYS=("defense","dodge","parry","blockRating","blockValue")
+
+def spec_uses_spell_power(w):
+    return max((w.get(k, 0) or 0) for k in SPELL_OFFENSE_KEYS) >= 0.05
+
+def item_is_spell_gear(it):
+    """Caster gloves (SP/heal, no str/agi/ap) are not warrior-tank BiS."""
+    st = forever_stats(it.get("stats") or {})
+    spell = sum(st.get(k, 0) or 0 for k in SPELL_OFFENSE_KEYS)
+    phys = sum(st.get(k, 0) or 0 for k in PHYS_OFFENSE_KEYS)
+    return spell > 0 and phys <= 0
+
+def item_tank_skill_note(it):
+    st = it.get("stats") or {}
+    notes = []
+    for k, lab in (("defense", "Defense"), ("dodge", "Dodge"), ("parry", "Parry"),
+                   ("blockRating", "Block"), ("blockValue", "Block Value")):
+        v = st.get(k) or 0
+        if v:
+            n = int(v) if float(v) == int(v) else v
+            notes.append("+%s %s" % (n, lab))
+    return notes
 
 def slot_for(it, cls):
     s=it["slot"]
@@ -277,9 +308,10 @@ CONDITIONAL_SHARE = 1/3.0
 # conservative direction.
 RELIC_ABILITIES={
  "PALADIN":{
-   "holy":["Flash of Light","Holy Light","Cleanse","Blessing of Light","Holy Shock"],
-   "protection":["Holy Shield","Devotion Aura","block","Consecration","Judgement","Judgment"],
-   "retribution":["Seal","Judgement","Judgment","Crusader Strike","Exorcism","Holy Wrath",
+   "holy":["Flash of Light","Holy Light","Cleanse","Blessing of Light","Holy Shock","Holy Strike"],
+   "protection":["Holy Shield","Devotion Aura","block","Consecration","Judgement","Judgment",
+                 "Seal of Fury","Holy Strike"],
+   "retribution":["Seal","Judgement","Judgment","Holy Strike","Exorcism","Holy Wrath",
                   "Consecration"]},
  "DRUID":{
    "restoration":["Rejuvenation","Healing Touch","Lifebloom","Regrowth","Tree of Life"],
@@ -290,7 +322,7 @@ RELIC_ABILITIES={
    "restoration":["Lesser Healing Wave","Healing Wave","Chain Heal","Water Shield","Riptide"],
    "elemental":["Lightning Bolt","Chain Lightning","Earth Shock","Flame Shock","Frost Shock",
                 "Shock"],
-   "enhancement":["Stormstrike","Windfury","Shock"]},
+   "enhancement":["Stormstrike","Windfury","Shock","Lightning Bolt","Maelstrom"]},
 }
 def relic_ok(it, cls, spec):
     """True if this relic's effect names an ability the spec actually uses."""
@@ -307,8 +339,8 @@ def relic_ok(it, cls, spec):
 STAT_LABEL={"sta":"Stamina","int":"Intellect","str":"Strength","agi":"Agility",
  "spi":"Spirit","ap":"Attack Power","heal":"Healing","sp":"Spell Damage and Healing",
  "sp_from_heal":"Spell Damage","spSchool":"Spell Damage","spHoly":"Holy Damage",
- "crit":"Crit Rating","spellCrit":"Spell Crit Rating","hit":"Hit Rating","haste":"Haste",
- "defense":"Defense Rating","dodge":"Dodge Rating","blockRating":"Block Rating",
+ "crit":"Crit","spellCrit":"Crit","hit":"Hit","haste":"Haste",
+ "defense":"Defense","dodge":"Dodge","blockRating":"Block",
  "mp5":"Mana per 5","resArcane":"Arcane Resist","resNature":"Nature Resist",
  "resFire":"Fire Resist","resFrost":"Frost Resist","resShadow":"Shadow Resist"}
 def fmt_range(lo,hi):
@@ -324,6 +356,55 @@ def fmt_range(lo,hi):
 ROLL_POLICY="bestRoll"       # bestRoll | expectedValue | chanceFloor
 CHANCE_FLOOR=1.0             # used by chanceFloor policy (% for the whole suffix family)
 
+# Leveling is not raid min-max. Below 60:
+#   survivability -- sta / health / hp5 x3, armor x2
+#   endurance     -- int / spi / mp5 / mana x2 (keep casting; less than stam)
+# A +1 primary-stat stick with no stam/mana cannot beat a real leveling chest.
+# Level 60 keeps the raid-scale weights (guides may pin later).
+LEVELING_SURVIVE_UNTIL = 60
+LEVELING_STA_MULT = 3.0
+LEVELING_HEALTH_MULT = 3.0
+LEVELING_HP5_MULT = 3.0
+LEVELING_ARMOR_MULT = 2.0
+LEVELING_ENDURANCE_MULT = 2.0
+
+def weights_at_level(base_w, level):
+    if level >= LEVELING_SURVIVE_UNTIL:
+        return base_w
+    w = dict(base_w)
+    w["sta"] = w.get("sta", 0.0) * LEVELING_STA_MULT
+    w["health"] = w.get("health", 0.0) * LEVELING_HEALTH_MULT
+    w["hp5"] = w.get("hp5", 0.0) * LEVELING_HP5_MULT
+    w["armor"] = w.get("armor", 0.0) * LEVELING_ARMOR_MULT
+    w["int"] = w.get("int", 0.0) * LEVELING_ENDURANCE_MULT
+    w["spi"] = w.get("spi", 0.0) * LEVELING_ENDURANCE_MULT
+    w["mp5"] = w.get("mp5", 0.0) * LEVELING_ENDURANCE_MULT
+    w["mana"] = w.get("mana", 0.0) * LEVELING_ENDURANCE_MULT
+    return w
+
+# Forever combat: one Hit, one Crit, one Haste. TBC leftover keys on classic
+# item rows fold in. Expertise / armor pen / resilience do not exist.
+# Heal-only tooltips still grant SP at 1/3 (Blizzard rule); combined
+# "healing + damage" lines already carry sp_from_heal -- take the larger.
+UNIFIED_STAT={"spellHit":"hit","hitRanged":"hit",
+              "spellCrit":"crit","critRanged":"crit",
+              "spellHaste":"haste"}
+DEAD_STATS=("expertise","armorPen","resilience")
+
+def forever_stats(st):
+    out=dict(st or {})
+    for src,dst in UNIFIED_STAT.items():
+        if src in out:
+            out[dst]=out.get(dst,0)+out[src]
+            out[src]=0
+    for k in DEAD_STATS:
+        if k in out:
+            out[k]=0
+    heal=out.get("heal") or 0
+    if heal:
+        out["sp_from_heal"]=max(out.get("sp_from_heal") or 0, heal/3.0)
+    return out
+
 def best_variant(it, w, level, rscale):
     """-> (score, suffixName or None, chance or None, statsUsed)
 
@@ -333,10 +414,10 @@ def best_variant(it, w, level, rscale):
     wildly overvalued below 60. Keeping every weight level-invariant is both
     simpler and closer to the truth.
     """
-    base=it["stats"]
+    base=forever_stats(it["stats"])
     def sc(st):
         t=0.0
-        for k,v in st.items():
+        for k,v in forever_stats(st).items():
             wt=w.get(k,0.0)
             if not wt: continue
             t+= v*wt
@@ -349,46 +430,30 @@ def best_variant(it, w, level, rscale):
         for v in vs:
             merged=dict(base)
             for k,x in v["stats"].items(): merged[k]=merged.get(k,0)+x
+            merged=forever_stats(merged)
             ev+= (sc(merged)-bs)*v["chance"]/100.0; tot+=v["chance"]
         return ev, "<random roll>", round(tot,2), base, round(tot,2), ev, None, None
-    # RANK on the expected roll, DISPLAY the best one.
+    # RANK and DISPLAY the jackpot (top of the winning suffix range).
     #
-    # bestRoll alone made every random-enchantment item compete at its jackpot against
-    # fixed items competing at their actual stats. "Vice Grips of Strength" (+20 Str,
-    # a 7.9% roll) outranked Edgemaster's Handguards -- a guaranteed epic with 19 hit
-    # and 17 expertise -- on Hands for every level from 44 to 55. Henrik's rule is that
-    # ranking ignores *obtainability*, not that it assumes luck: the stat score of a
-    # random-enchant item is what you get on average, and the jackpot is the hunt
-    # target, which is what the suffix and chance columns are for.
-    #
-    # Chances sum to ~100% per item in the Wowhead scrape (median exactly 100), so the
-    # expectation is well defined. Where they fall short the missing mass is treated as
-    # the base item with no suffix, which is the conservative reading.
-    # Each suffix is itself a RANGE, not a number: Wowhead prints "of Healing" on
-    # Shimmering Sash as "+(11 - 13) Healing Spells and +(4 - 5) Damage Spells", one
-    # suffix spanning an item-level band. Henrik looted that exact item and it rolled
-    # 11. So the expected roll uses the MIDPOINT of the range and the hunt target uses
-    # the TOP -- previously both used the top, which assumed a best-case roll inside
-    # the suffix as well as across suffixes. 35% of the 17,789 variants have a real
-    # range, so this is not cosmetic.
-    best=None; ev=bs; tot=0.0
+    # A green "of Agility" that can roll +7 Agi (~9.5%) is BiS if that roll lands.
+    # Expected-value ranking hid it at ~2.68 while the hunt name still said of Agility
+    # -- the player never saw the real #1. Slim odds stay on the row as suffixChance;
+    # they do not bury the item. Each suffix is itself a RANGE: hunt target and rank
+    # both use the TOP of that range ("+6-7 Agility" -> +7).
+    best=None
     for v in vs:
         if ROLL_POLICY=="chanceFloor" and (v.get("chanceAny") or 0)<CHANCE_FLOOR: continue
         hi=v["stats"]; lo=v.get("statsMin") or hi
-        mid={k:(hi[k]+lo.get(k,hi[k]))/2.0 for k in hi}
-        mMid=dict(base); mHi=dict(base)
-        for k,x in mid.items(): mMid[k]=mMid.get(k,0)+x
+        mHi=dict(base)
         for k,x in hi.items():  mHi[k]=mHi.get(k,0)+x
-        ch=v.get("chance") or 0.0
-        ev += (sc(mMid)-bs)*ch/100.0; tot+=ch
+        mHi=forever_stats(mHi)
         s2=sc(mHi)
         if best is None or s2>best[0]: best=(s2,v["suffix"],v["chance"],mHi,v.get("chanceAny"),lo,hi,v.get("suffixId"))
-    if not best or ev<=bs: return bs, None, None, base, None, bs, None, None
-    # score = expected; suffix/chance/stats = the best roll, for the hunt;
-    # 6th = what the jackpot roll would score, used to surface the hunt target on the
-    # notable shelf when the average roll does not make the top 3;
-    # 7th = the printable range, so the addon shows "+11-13 Healing" not just "13".
-    return ev, best[1], best[2], best[3], best[4], best[0], fmt_range(best[5],best[6]), best[7]
+    if not best or best[0]<=bs: return bs, None, None, base, None, bs, None, None
+    # score = jackpot; suffix/chance/stats = that same roll; 6th = jackpot again
+    # (legacy notable-shelf slot; gain is now zero because rank == display);
+    # 7th = the printable range, so the addon shows "+6-7 Agility" not just "7".
+    return best[0], best[1], best[2], best[3], best[4], best[0], fmt_range(best[5],best[6]), best[7]
 
 # ---------------------------------------------------------------------------
 # Obtainability exclusions. Built by obtainability.py, which traces each item's
@@ -456,6 +521,7 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
     for faction in factions:
         for level in levels:
             rscale=70.0/max(1,level)
+            wl=weights_at_level(w, level)
             buckets=collections.defaultdict(list)
             for it in pool:
                 if not eligible(it,cls,spec_key and spec_key or "",level,faction,prof,wsubs): continue
@@ -495,7 +561,7 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     # left the list to caster held-in-off-hand junk (Buccaneer's Orb,
                     # Ritual Stein) scoring 1.4 against a shield's 20+.
                     if style=="onehand_dual" and level>=20 and it.get("kind")in("Shield","Buckler"): continue
-                s,suf,ch,st,chAny,sBest,srange,sid=best_variant(it,w,level,rscale)
+                s,suf,ch,st,chAny,sBest,srange,sid=best_variant(it,wl,level,rscale)
                 _roll_gain=sBest-s
                 # Armour-class preference. A multiplier, never a filter: Protection strongly
                 # favours plate, Retribution mildly, Holy is near-indifferent and will take
@@ -514,9 +580,9 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                 if sl in AC_SLOTS:
                     s *= armorClass.get(it.get("kind"), 1.0)
                 # Weapon damage is worth different amounts in different hands. For a
-                # hunter the RANGED weapon is the weapon -- Auto Shot and Steady Shot
-                # both scale off it -- while the melee weapon is a stat stick whose
-                # damage is never dealt. One dpsWeight for both would either price a
+                # hunter BM/MM the RANGED weapon is the weapon -- Auto Shot and Aimed
+                # Shot scale off it -- while the melee weapon is a stat stick.
+                # Survival swings: that spec sets a real melee dpsWeight. One dpsWeight for both would either price a
                 # bow like a sword or a sword like a bow. dpsWeightRanged defaults to
                 # dpsWeight, so classes that do not care are unaffected.
                 if it["cls"]==2:
@@ -574,7 +640,7 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     # full on weapons that are never swung.
                     onUseOnly = (sl in ("Ranged","MainHand","SecondaryHand")
                                  and not procDw)
-                    pp,_=PROCS.value(pr,it,spec_key,w,procDw,level,onUseOnly=onUseOnly)
+                    pp,_=PROCS.value(pr,it,spec_key,wl,procDw,level,onUseOnly=onUseOnly)
                     s+=pp
                 # RELICS: Totem, Idol, Libram. 108 of them in the dataset and only
                 # TWO carry a single stat -- their whole value is an effect line
@@ -591,7 +657,7 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                 # value -- and scores are only ever compared inside one slot.
                 if it["cls"]==4 and it["kind"] in ("Totem","Idol","Libram"):
                     if not relic_ok(it,cls,spec_key): continue
-                    rs = RELIC.score_relic(it, cls, spec_key, w)
+                    rs = RELIC.score_relic(it, cls, spec_key, wl)
                     if rs > 0:
                         s = rs
                     elif s <= 0:
@@ -643,34 +709,49 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                 # Wristguards of True Flight were all eligible and all invisible.
                 if level==60: full60[(faction,sl)]=list(rows)
                 rows=unique_name_rows(rows, 8)
+                # Physical specs: +SP/+heal pieces (Silvered Gauntlets) must not
+                # take a top-3 hunt. If they also have defense, they are the notable.
+                spell_gear = []
+                if not spec_uses_spell_power(wl):
+                    spell_gear = [r for r in rows if item_is_spell_gear(r[1])]
+                    rows = [r for r in rows if not item_is_spell_gear(r[1])]
                 top3={r[1]["id"] for r in rows[:3]}
                 top3_names={r[1]["name"] for r in rows[:3]}
-                nb=[r for r in rows if r[1].get("effectDriven")
-                    and r[1]["id"] not in top3 and r[1]["name"] not in top3_names
-                    and r[1]["quality"]>=3][:2]
-                # Random-enchantment hunt targets. Ranking moved to the EXPECTED roll,
-                # which is right for "what should I wear" and wrong for "what should I
-                # chase": War Torn Tunic "of Strength" is a 9.5% roll that beats
-                # everything at level 13 when it lands, and averaging dropped it out of
-                # the top 3 entirely. If the jackpot WOULD have made the top 3, the item
-                # belongs on the notable shelf with its suffix and chance.
+                nb=[]
+                for r in spell_gear:
+                    if r[1].get("quality", 0) >= 3 and item_tank_skill_note(r[1]):
+                        it2 = dict(r[1])
+                        it2["_notableOnly"] = True
+                        if not (it2.get("effects") or it2.get("procs")):
+                            it2["effects"] = ["Equip: %s." % ", ".join(item_tank_skill_note(it2))]
+                        nb = [(r[0], it2) + r[2:]]
+                        break
+                if not nb:
+                    nb=[r for r in rows if r[1].get("effectDriven")
+                        and r[1]["id"] not in top3 and r[1]["name"] not in top3_names
+                        and r[1]["quality"]>=3][:1]
+                # Random-enchantment items now rank on the jackpot, so a slim +7 Agi
+                # roll that is #1 in the slot appears as BiS #1 (suffixChance tells
+                # the player the odds). The notable shelf still catches a leftover
+                # jackpot that somehow missed the unique-name top 3.
                 cut = rows[2][0] if len(rows)>=3 else 0.0
                 shown={r[1]["id"] for r in rows[:3]} | {r[1]["id"] for r in nb}
                 shown_names=set(top3_names) | {r[1]["name"] for r in nb}
-                nb += [r for r in rows
-                       if r[2] and len(r)>6 and r[6]>cut and r[1]["id"] not in shown
-                       and r[1]["name"] not in shown_names][:1]
+                # One notable per slot. Jackpot items now rank in the top 3, so
+                # this shelf is only for a leftover proc or a near-miss Forever id.
+                if not nb:
+                    nb += [r for r in rows
+                           if r[2] and len(r)>6 and r[6]>cut and r[1]["id"] not in shown
+                           and r[1]["name"] not in shown_names][:1]
                 shown |= {r[1]["id"] for r in nb}
                 shown_names |= {r[1]["name"] for r in nb}
-                # Forever-only item that almost made the unique top 3 (A Bigger Shield
-                # vs Aegis of Stormwind is a 0.2-point miss). Surface it once as notable.
-                if cut and len(nb)<2:
+                if cut and not nb:
                     near=[r for r in rows
                           if r[1]["id"]>=200000 and r[1]["id"] not in shown
                           and r[1]["name"] not in shown_names
                           and r[1]["quality"]>=3 and r[0]>=cut*0.98][:1]
                     nb += near
-                notable[(faction,level,sl)]=nb
+                notable[(faction,level,sl)]=nb[:1]
                 per[(faction,level,sl)]=rows[:8]
     return per,cfg,notable,full60
 
@@ -898,7 +979,8 @@ if __name__=="__main__":
                 bis=out[_spec]["bands"][-1]["picks"][:3]
                 shown={p["id"] for p in bis}
                 cut_score=bis[-1]["score"] if bis else 0
-                nbs=[r for r in nbs if r[1]["id"] not in shown and r[0] < cut_score]
+                nbs=[r for r in nbs if r[1]["id"] not in shown
+                     and (r[0] < cut_score or r[1].get("_notableOnly"))]
                 if nbs:
                     out[_spec]["bands"][-1]["notableEffects"]=[{
                       "id":r[1]["id"],"name":r[1]["name"],"q":r[1]["quality"],

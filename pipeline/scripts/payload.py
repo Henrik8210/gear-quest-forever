@@ -231,8 +231,9 @@ GQ.Data = GQ.Data or {}
 --   spec     is always one of "retribution" / "protection" / "holy"
 --   faction  is "Alliance" or "Horde"
 --   optional: suffix, suffixChance, suffixRange  (random-enchantment items --
---             `score` is the EXPECTED roll, suffixChance the odds of any roll of that
---             suffix, and suffixRange the printable span, e.g.
+--             `score` is the JACKPOT roll (top of the suffix range). suffixChance
+--             is the odds of any roll of that suffix -- slim, but if it lands it
+--             is BiS. suffixRange is the printable span, e.g.
 --             "+11-13 Healing, +4-5 Spell Damage"), and suffixId -- the CLIENT id of
 --             the exact tier. MATCH ON suffixId, NEVER ON THE NAME: ItemRandomProperties
 --             has 2,012 rows sharing only 45 names, up to 85 tiers called the same

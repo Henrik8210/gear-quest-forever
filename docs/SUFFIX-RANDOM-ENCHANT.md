@@ -116,9 +116,11 @@ Log list quality colors: prime `GetItemInfo` on list build and refresh on
 | `suffix` | display name only (`"of Healing"`) — **not** an identifier |
 | `suffixId` | client tier id; positive = Property, negative = Suffix |
 | `suffixRange` | human-readable stat band for fallback tooltips and log hints |
-| `suffixChance` | drop probability from Wowhead enchant tables |
+| `suffixChance` | drop probability from Wowhead enchant tables. Shown so the player knows a jackpot BiS is slim (~9.5% for of Agility). Chance never hides the item from the top 3. |
 
 Emit all four on suffixed pick rows **and** notable rows.
+
+**Scoring:** `score.py` ranks the item on the jackpot (top of `suffixRange`), not the average of every suffix. A 9.5% +7 Agi roll that would be slot #1 is BiS #1. The chance column is information, not a rank penalty.
 
 ---
 

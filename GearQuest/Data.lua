@@ -6006,6 +6006,21 @@ function GQ.Data:SanitizeText(text)
     return text
 end
 
+-- Wowhead tips were stored with HTML stripped and no line breaks, so
+-- "Item Level 27Binds when equippedShoulderMail142" reads as one word.
+function GQ.Data:FormatAuditTip(tip)
+    tip = self:SanitizeText(tip)
+    if not tip or tip == "" then
+        return tip
+    end
+    tip = tip:gsub("(%d)(%u)", "%1 %2")
+    tip = tip:gsub("(%l)(%u)", "%1 %2")
+    tip = tip:gsub("(%l)(%d)", "%1 %2")
+    tip = tip:gsub("(%l)(%+)", "%1 %2")
+    tip = tip:gsub(" +", " ")
+    return tip
+end
+
 function GQ.Data:GetSuffixHint(entry)
     if not entry or not entry.suffix then
         return nil
@@ -6020,7 +6035,7 @@ function GQ.Data:GetSuffixHint(entry)
 
     local hint = table.concat(parts, ", ")
     if entry.suffixChance then
-        hint = hint .. " (~" .. tostring(entry.suffixChance) .. "% on drop)"
+        hint = hint .. " (slim ~" .. tostring(entry.suffixChance) .. "% roll -- BiS if you get it)"
     end
 
     return hint
@@ -6688,7 +6703,7 @@ function GQ.Data:ShowFactFallbackTooltip(tooltip, entry)
     end
     if audit and audit.tip and audit.tip ~= "" then
         tooltip:AddLine(" ")
-        for line in string.gmatch(self:SanitizeText(audit.tip) .. "\n", "([^\n]*)\n") do
+        for line in string.gmatch((self:FormatAuditTip(audit.tip) or "") .. "\n", "([^\n]*)\n") do
             if line ~= "" then
                 tooltip:AddLine(line, 0.9, 0.9, 0.9, true)
             end

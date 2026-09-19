@@ -2,6 +2,38 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
+## v0.2.5-beta
+
+Forever scoring model for every class, a Wowhead re-ingest, readable hunt text, and warrior-tank honesty.
+
+### Scoring (all nine classes, every spec, 1–60)
+
+Leveling hunts now follow a fixed order: **damage first**, then **survivability**, then **endurance**. The spec primary still leads (Agi, Str, spell power, tank threat). Below 60, stamina / health / hp5 count ×3 and armor ×2 so a naked +1 primary-stat stick cannot beat a real leveling chest (Brawler's / Trapper's vs Panther Armor at 22). Mana keep-up — intellect, spirit, mp5, mana — counts ×2, less than stam, so paladin seals, shaman shocks, hunter shots, and casters stay in the fight. Level 60 uses the raw raid-scale weights. Classic/TBC BiS guides do not pin Forever 60 (`GQ_NO_GUIDES=1`).
+
+**Random-enchant jackpot is BiS.** A green is ranked on the best suffix it can roll (top of the range), not the average of every suffix. If Superior Shoulders of Agility can roll +7 Agi and that would be #1, it is #1. The log still says the roll is slim (~9.5%). Chance never hides the hunt.
+
+**Three unique names + one notable** per slot. Notables are procs, leftover jackpots, or a tank-relevant extra — they are not rank 1–3.
+
+**Warrior Protection is a physical tank.** Spell power and healing no longer inflate prot-warrior ranks. **Silvered Gauntlets** (spell damage + healing, +3 Defense) is the Hands *notable* for the defense, not fake BiS. Paladin Protection still scores holy/spell threat.
+
+All nine classes were re-scored on this model (hunter and shaman first, then paladin, warrior, druid, rogue, priest, mage, warlock), then re-scored again after the 20 Sep ingest.
+
+### New and updated gear
+
+Wowhead Forever index compared to `items.json`: **24** missing ids ingested (one tooltip 404 — Wildstalker's Helm). After re-score, these mid-level rares made a top-3 or notable list:
+
+- **Silvered Gauntlets** (27) — paladin BiS; warrior-prot notable (+3 Defense)
+- **Cultist's Armguards** (29) — paladin, warrior, hunter, shaman, druid, rogue
+- **Dark Ritual Leggings** (29) — druid
+
+Ilvl-65 set pieces (Manaflare, Grimstitch, Wildstalker, Conviction, Spiritcaller) were scored and did not beat the existing level-60 lists.
+
+### Hunt parchment
+
+Quest descriptions no longer read `Worlddrop - dropsfrom364creaturetypes` / `ItemLevel27Bindswhenequipped`. Causes: `QuestFont` in this client has no usable space glyph (titles and body now use the readable UI font), and the mashed Wowhead audit tooltip is no longer pasted into the description. Instructions were cleaned: world drops say `World drop around level 23-28.` instead of creature-type counts; quest/vendor/drop copy no longer repeats the zone. Auction House is one BoE line. **Source** always prints.
+
+Random-enchant suffix stats still paint on the item tooltip when Forever returns the unsuffixed green.
+
 ## v0.2.4-beta
 
 Random-enchant greens show the suffix on the **item tooltip**, not only in the hunt text.

@@ -1,0 +1,36 @@
+---
+description: Forever BiS scoring — jackpot suffixes, survivability, endurance
+alwaysApply: true
+---
+
+# Forever scoring (every class)
+
+Item facts come from Wowhead Forever ingest. All nine classes are on this model. Re-score one class at a time after a rule change. Do not `reemit_all.py` from stale JSON.
+
+**Order:** damage (spec primary) first, then survivability (sta/armor below 60), then endurance (mana keep-up, less than stam). Level 60 is raw raid weights. Max 3 unique names + 1 notable per slot.
+
+## Random-enchant jackpot is BiS
+
+Rank a random-enchant green on the **best suffix it can roll** (top of that suffix’s range), not the expected value across every suffix.
+
+- Superior Shoulders of Agility at 22 is **+6–7 Agi** (~9.5%). If that roll would be #1 in the slot, it **must** appear as BiS #1.
+- `suffixChance` / the log hint tell the player the roll is slim. Chance never buries the hunt.
+- Implemented in `pipeline/scripts/score.py` `best_variant` (`ROLL_POLICY="bestRoll"` ranks on jackpot).
+
+## Leveling survivability (below 60)
+
+Leveling is not raid min-max. Stamina, health, and armor beat a naked +1 primary-stat upgrade.
+
+- Example: at 22, **Brawler’s / Trapper’s Leather Tunic** (8 Agi + stam / str / int) beat **Panther Armor** (9 Agi, no stam).
+- `score.py` `weights_at_level()` multiplies sta / health / hp5 ×3 and armor ×2 when `level < 60`.
+
+## Leveling endurance (below 60)
+
+Survivability also means having and keeping mana. Call this **endurance**. It is less important than stamina, but it matters for most classes (paladin seals/heals, shaman shocks, hunter shots, caster drinks).
+
+- `weights_at_level()` multiplies int / spirit / mp5 / mana ×2 when `level < 60` (stam is ×3).
+- Level 60 uses the raw raid-scale weights. Forever level-60 guides may pin later; until then `GQ_NO_GUIDES=1`.
+
+## Warrior tank is physical
+
+Warrior Protection does not score spell power or healing. A glove with +SP / +healing (Silvered Gauntlets) is not BiS even if the stam is fat. If it also has defense, it is the **notable** for that slot — not rank 1.

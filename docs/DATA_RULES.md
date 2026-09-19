@@ -2,7 +2,7 @@
 
 Rules for adding, importing, and maintaining gear quest entries in `GearQuest/Data.lua`. Follow these when curating data from Wowhead, in-game research, or leveling guides.
 
-**GearQuest Forever — target vs today:** Forever’s **target** is Classic 1–60 (+ Forever deltas). **Today**, all nine classes are Classic `score.py` regens (pool + suffixes + cap 60). Stat weights are still TBC-derived. See [FOREVER-DATA-MIGRATION.md](./FOREVER-DATA-MIGRATION.md).
+**GearQuest Forever — target vs today:** Forever’s **target** is Classic 1–60 (+ Forever deltas). **Today**, all nine classes are on the Forever scoring model (jackpot suffixes, leveling survivability + endurance, no TBC guide pin). See [FOREVER-SCORING.md](../pipeline/docs/FOREVER-SCORING.md).
 
 ## Data sources (read this first)
 
@@ -11,7 +11,7 @@ GearQuest uses **two different pipelines**. Do not apply one pipeline’s rules 
 | Source | Levels | Classes | How it gets in | Authoritative doc |
 |--------|--------|---------|----------------|-------------------|
 | **Curated** (`Data.lua`) | 1–9 Alliance bands, seasonal/event items, hand-picked Paladin quest chains | Early Alliance mail melee; not full-class 1–60 yet | Manual curation | This file (§ Curation workflow) |
-| **Generated** (`_generated/*.lua` → `DataAdapter.lua`) | **10–60 only** | **Nine classes** | Classic pool `score.py` regen (`pipeline/`); weights still TBC-derived | [`pipeline/docs/FOREVER-SCORING.md`](../pipeline/docs/FOREVER-SCORING.md), [`GearQuest/_generated/GEARQUEST-BIS-PIPELINE.md`](../GearQuest/_generated/GEARQUEST-BIS-PIPELINE.md) |
+| **Generated** (`_generated/*.lua` → `DataAdapter.lua`) | **1–9 generated** (except Alliance paladin/warrior curated) **and 10–60** | **Nine classes** | Forever `score.py` (`pipeline/`); damage then survivability then endurance | [`pipeline/docs/FOREVER-SCORING.md`](../pipeline/docs/FOREVER-SCORING.md) |
 
 **Forever max level is 60** (`GQ.MAX_PLAYER_LEVEL` in `Core.lua`). TBC **level 70** curated data was removed; do not re-import Phase 3 AtlasLoot into this repo. Generated bands are capped at **60**. Migration phases: [FOREVER-DATA-MIGRATION.md](./FOREVER-DATA-MIGRATION.md).
 
@@ -21,14 +21,14 @@ GearQuest uses **two different pipelines**. Do not apply one pipeline’s rules 
 node scripts/verify-generated-bis.mjs
 ```
 
-Expected total: **59,895** entries (**368 curated + 59,527 generated**) — always use the script, not a stale figure. All nine classes are Classic `score.py` regens with the Forever Wowhead pool (id ≥ 200000) merged in. Levels 1–9 are scored **per spec**. Weights are still TBC-derived. Horde Forever deltas in `Data.lua` use `foreverDelta = true` so they compete across generated per-level bands; Compare still shows the top 3.
+Always use `node scripts/verify-generated-bis.mjs` for the live entry count, not a stale figure. All nine classes are Forever `score.py` regens with the Wowhead Forever pool (id ≥ 200000) merged in. Levels 1–9 are scored **per spec** (Alliance paladin/warrior 1–9 stay curated). Horde Forever deltas in `Data.lua` use `foreverDelta = true` so they compete across generated per-level bands; Compare still shows the top 3.
 
 ### Ranking philosophy by source
 
 | Source | What “top 3” means |
 |--------|---------------------|
 | **Curated (early bands)** | Human judgment: realistic upgrades for that level band, correct armor tier, obtainability considered when hand-picking. |
-| **Generated (all classes 10–60)** | **Combat value** from per-spec weights (stats, weapon DPS, priced procs, relic effect lines) — obtainability is **not** gated beyond faction/rep/vendor locks in the pipeline. A level-60 chest can legitimately be a Naxxramas drop if stats win. **Notables** surface effect-driven items that missed the top 3 on stats alone; they are **not** BiS rank 1–3. |
+| **Generated (all classes 1–60)** | **Combat value** in this order: **damage** (spec primary) first, then **survivability** below 60 (sta / health / hp5 ×3, armor ×2), then **endurance** (int / spirit / mp5 / mana ×2, less than stam). Random-enchant greens rank on the **jackpot** (top of the suffix range) — a 9.5% +7 Agi roll that would be #1 must appear as BiS #1. Warrior Protection does not score spell power; defense on a caster piece is a notable, not rank 1. Max **3 unique names + 1 notable** per slot. Level 60 uses raw raid-scale weights (`GQ_NO_GUIDES=1`). |
 
 At **runtime**, `Compare.lua` ranks most generated candidates by item level vs equipped, armor-tier penalties, and small source bonuses — it does **not** re-run the full stat-weight model. Generated rows arrive with `curatedRank` from the pipeline; hand-curated rows keep author rank. **Exceptions:** (1) bands with `origin="guide"` (level-60 guide tiers) **must never be re-sorted by score**; (2) **Priest, Mage, and Warlock** always keep pipeline `curatedRank` (weapon pairing — staff vs 1H+off-hand). **`Compare.lua`’s ≥8 ilvl lower-tier armor rule applies to runtime re-ranking only**, not to how generated picks were chosen (those used armour multipliers in the pipeline).
 
@@ -53,6 +53,8 @@ Wowhead’s Forever item list and tooltips are still filling in. GearQuest will 
 After a Wowhead scrape, run `node scripts/diff-veldt-wowhead.mjs` as an extra check against [veldt1’s Forever Item Explorer](https://veldt1.github.io/wowf-items/) (beta client diff + computed stats). Wowhead stays authoritative for ingest; veldt only flags gaps (ids not on the Wowhead index, or empty Wowhead tooltips where veldt already has stat/effect text).
 
 **19 Sep 2026:** 3,245 → **3,586** Wowhead Forever items. Ingest added **316** new pool ids (25 list rows had no tooltip; 74 skipped). All nine classes × every spec were re-scored and emitted into `GearQuest/_generated/`. Classic rings **The 1 Ring (8350)** and **Woven Copper Ring (21931)** still 404 — Horde shaman Finger hunts start ~15, not at the level-9 Alliance paladin toast.
+
+**20 Sep 2026:** index still 3,586 rows; **24** missing ids ingested (Silvered Gauntlets, Cultist's Armguards, Dark Ritual Leggings, plus ilvl-65 sets that did not crack 60 BiS). Hunt instructions cleaned; parchment no longer dumps mashed tooltips or eats spaces. Warrior prot spell-power weight removed — Silvered Gauntlets is a Hands notable for +3 Defense.
 
 Classic ids that 404 are pruned from hunts at load (`GQ.Data:PruneMissingForever`, fed by `_generated/Data.ForeverAudit.generated.lua`). Items that exist but have no combat stats, suffixes, or effect lines show **Has not been datamined yet** — hunt source text is not a tooltip.
 

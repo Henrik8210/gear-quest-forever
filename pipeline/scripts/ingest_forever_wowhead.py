@@ -7,7 +7,8 @@ scripts/scrape-forever-wowhead-items.mjs and merges new ids into:
   pipeline/data/sources.json
   pipeline/data/classic_item_ids.json
 
-Does not overwrite existing ids. Re-score after this:
+New Forever-only ids are inserted. Existing Classic ids keep race/source
+gates but take Forever tooltip stats (re-itemization). Re-score after this:
 
   $env:GQ_CLASS="SHAMAN"; $env:GQ_GUIDES="guides_shaman.json"; $env:GQ_OUT="shaman.json"
   python pipeline/scripts/score.py
@@ -88,6 +89,8 @@ PATS = [
     (r"Your attacks ignore (\d+) of your opponent's armor", "armorPen"),
     (r"Increases your spell penetration by (\d+)", "spellPen"),
     (r"Restores (\d+) health per 5 sec", "hp5"),
+    (r"Increased Defense \+(\d+)", "defense"),
+    (r"Increases (?:your )?defense(?: skill)? by (\d+)", "defense"),
 ]
 PATS = [(re.compile(p), k) for p, k in PATS]
 rx_tag = re.compile(r"<[^>]+>")
@@ -333,10 +336,18 @@ def main():
         if SKIP_NAME.search(item["name"] or ""):
             skipped += 1
             continue
-        if iid >= 200000 or key not in items:
-            if key not in items:
-                added_items += 1
+        if key not in items:
             items[key] = item
+            added_items += 1
+        else:
+            # Classic id, Forever stats. Keep allowRace / allowClass / sources.
+            keep = items[key]
+            for fld in (
+                "stats", "dps", "speed", "dmgMin", "dmgMax", "delay",
+                "effects", "procs", "ilvl", "rlvl", "quality", "name",
+                "block", "effectDriven", "randomEnchant",
+            ):
+                keep[fld] = item[fld]
         if iid >= 200000 or key not in sources:
             if key not in sources:
                 added_sources += 1

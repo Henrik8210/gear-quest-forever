@@ -30,6 +30,8 @@ TAG = re.compile(r"<[^>]+>")
 def plain(text: str) -> str:
     if not text:
         return ""
+    text = re.sub(r"<br\s*/?>", "\n", text, flags=re.I)
+    text = re.sub(r"</(?:div|tr|p|li|h\d)>", "\n", text, flags=re.I)
     text = html.unescape(TAG.sub("", text))
     text = text.replace("\xa0", " ")
     text = re.sub(r"[ \t]+", " ", text)

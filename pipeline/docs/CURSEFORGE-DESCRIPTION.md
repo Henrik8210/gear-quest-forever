@@ -1,150 +1,98 @@
-# GearQuest — CurseForge listing copy (rev 2)
+# GearQuest Forever — CurseForge listing copy
 
-Everything below is ready to paste. CurseForge has three separate fields; they're split out here so you can drop each one straight in.
-
-Changes in rev 2, after Cursor's review: right-click is the correct paper-doll interaction, slot count corrected to 15, exact entry count replaced with "more than 68,000", toast wording tightened, weapon build labels added, level-70 spec footnote added.
+Paste into [GearQuest Forever](https://www.curseforge.com/wow/addons/gearquest-forever) (project **1698950**). This is **not** TBC Anniversary GearQuest.
 
 ---
 
-## 1. Project summary (short description field, ~250 char limit)
+## 1. Project summary (~250 characters)
 
-**Use this one.** Benefit-first, and it doesn't read like a data dump:
-
-> Best-in-slot gear for every class, spec and level 1–70. Right-click a slot, see the top three options with where to get them, pick one to hunt, and get a toast the moment it's yours.
-
-Keep this in your back pocket if you later want the scale up front instead:
-
-> More than 68,000 ranked gear options across all 9 classes, 28 specs and levels 1–70 — scored on your spec's actual stat priorities, not item level. Track a piece and GearQuest tells you when you get it.
+> Best-in-slot hunts for every class, spec, and level 1–60 on WoW Forever. Click a slot, see the top three upgrades and where they drop, track one, and get a toast when it's yours.
 
 ---
 
-## 2. Tagline / one-liner (for the header or Discord)
+## 2. Tagline
 
 > Know what to wear. Know where it drops. Know the moment it's yours.
 
 ---
 
-## 3. Full description (main body)
+## 3. Full description
 
-### GearQuest
+### GearQuest Forever
 
-**GearQuest answers one question, instantly, at any level: what is the best thing I could be wearing in this slot right now, and where do I get it?**
+**GearQuest Forever answers one question at every level from 1 to 60: what is the best thing I could be wearing in this slot right now, and where do I get it?**
 
-Open your character panel, right-click a slot, and GearQuest shows you the three best items for *your* class, *your* spec and *your* current level — with the stats, where each one comes from, and a one-click way to start hunting it. When you finally pick that item up, GearQuest marks it complete and congratulates you.
+This is the Forever / Classic+ addon (client 1.60). It is a separate project from GearQuest for TBC Anniversary. Open the log, pick a slot, and you get the three best hunts for *your* class, *your* spec, *your* faction, and *your* level — with a plain-language source and a one-click track. When the item lands in your bags, GearQuest marks the hunt complete and toasts you.
 
-No spreadsheets. No alt-tabbing to a website. No guessing whether that quest reward is actually better than the blue you've been wearing since Hillsbrad.
-
----
-
-### What makes it different
-
-**It's ranked by your spec, not by item level.**
-
-Every item in GearQuest is scored against a stat-weight profile built for one specific spec. A Fury warrior values hit and expertise very differently than an Arms warrior. A Balance druid wants Arcane and Nature spell damage — not Shadow damage, and not spirit. A Shadow priest doesn't care about the damage on a staff at all, because priests don't swing their staves. A Rogue wants stats on the ranged slot and nothing else; a Hunter wants the opposite. Every spec gets its own weighting, and it shows in the results.
-
-**It knows about weapon rules.**
-
-Whether a slot can even hold a weapon depends on your class and level. GearQuest knows when Dual Wield unlocks (and that Enhancement shamans get it from a talent), so a level 15 rogue sees off-hand items and a level 40 rogue sees one-handers. It knows the difference between a held-in-off-hand caster item and an actual off-hand weapon.
-
-And where the choice is genuinely open — two-hander versus main-hand plus off-hand — GearQuest picks a side and tells you which. The weapon slot headers are labelled with the setup the list is built around: **Staff build**, **Two-hand build**, **Dual-wield build** or **One-hand + off-hand**. No more wondering whether the staff or the mace-and-tome is the play.
-
-**Random enchantments are handled properly.**
-
-"Of the Owl", "of Nature's Wrath", "of Fiery Wrath" — GearQuest doesn't just point at the base item and shrug. It names the exact suffix you want, the tier, and the stat range it rolls, so you know which version of that world drop you're actually looking for on the auction house.
-
-**Levelling is a first-class citizen, not an afterthought.**
-
-Most BiS lists start at 60. GearQuest covers **every level from 1 to 70**, with cumulative candidate pools — a level 34 character sees everything still available to them, not just level-34 items. Fresh alt, twink, or the awkward 50s, it has an answer.
-
-**Faction-correct.**
-
-Alliance and Horde get their own lists. No teasing you with a quest reward you can never take.
+No spreadsheet. No alt-tab to a website that still thinks this is 2006 TBC.
 
 ---
 
-### Features
+### How we score (and why)
 
-- **Top-3 per slot**, across all 15 gear lists — head through feet, rings and trinkets, both weapon slots, and the ranged/relic slot (with the right name for your class: bow, wand, libram, totem, idol)
-- **All 9 classes and 28 specs** — including the odd ones out like Prot warrior, Holy paladin and Feral druid
-- **Every level, 1 to 70**
-- **Track a hunt** — pin one item as your goal and GearQuest keeps it in view
-- **Toast on obtain** — when you pick up something GearQuest is recommending, or the piece you're tracking, it completes it and celebrates
-- **The Log** — everything you've completed and everything you're still chasing, in one window. Left-click the minimap button to open it.
-- **Paper-doll integration** — right-click any equipment slot in the character panel you already have open
-- **Simulate panel** — right-click the minimap button to check what a different level, class or spec would want, for planning an alt or advising a guildmate
-- **Where to get it** — every item carries a plain-language source: which quest, which boss and instance, which vendor, which zone for world drops, and whether the auction house is an option
-- **Item lore and flavour** — over 3,600 items carry a line or two of story: what the quest was about, who the item is named after, or why the community remembers it. (Ask GearQuest about Edgemaster's Handguards.)
-- **Notable extras** — items that don't crack the top three but are worth knowing about get their own shelf
+Every hunt is scored with a per-spec Forever stat model. We do **not** rank by item level, and we do **not** average random-enchant greens into mush.
+
+The philosophy while you are leveling (1–59) is three layers, in this order:
+
+**1. Damage first.**
+The spec's real job still leads. A hunter hunts Agility. Arms hunts Strength. A mage hunts spell power. If the piece does not make you kill (or tank-threat) better, it is not BiS. Weapon rules stay here too: dual wield when it unlocks, shields for prot, totems/idols/librams in the relic slot, and procs that only count if you actually swing or shoot that slot.
+
+**2. Survivability second.**
+Leveling is not a raid parse. You pull extra mobs, you travel, you often have no healer. A naked +1 primary-stat upgrade that leaves you squishy loses to a piece with stamina, health, or armor. That is why at 22 **Brawler's / Trapper's Leather Tunic** (Agility *and* stam) beat **Panther Armor** (more Agility, no stam). Dying costs more time than a one-stat edge saves.
+
+**3. Endurance third.**
+Staying effective also means having and keeping mana. Intellect, spirit, and mana per 5 matter for paladin seals and heals, shaman shocks, hunter shots, and every caster's drink cycle. Endurance is real, but it is **less important than stamina**. A glass cannon that is OOM every two pulls is not a better hunt.
+
+At **level 60** those leveling boosts turn off. You get the raw raid-scale weights. Forever does not yet have pinned community 60 guides, so the model speaks at 60 too.
+
+**Random enchants: we rank the jackpot.**
+"Shoulders of Agility" can roll +6–7 Agi. If that +7 roll would be the best item in the slot, GearQuest lists it as BiS #1 and tells you the roll is slim (~9.5%). We do not hide a hunt because the suffix is rare. You came here to know what to look for on the auction house and on the corpse.
+
+**Three hunts, plus one notable.**
+Each slot shows up to three unique names. Beside them, one notable: a proc the math cannot fully price, or a tank-relevant extra (for example +3 Defense on a spell-power glove is a warrior-prot *notable*, not fake BiS). Warrior Protection does not score spell damage. Paladin Protection still does — holy threat is real.
+
+Item facts come from Wowhead Forever, not from a TBC dump. When the catalog grows, we scrape, ingest, and re-score.
 
 ---
 
-### How the data was built
+### What you get in game
 
-GearQuest's rankings are generated, then checked against the community's own conclusions.
-
-The base data comes from the game client's own item tables — every item, every stat, every random-suffix allocation — filtered to what actually exists in TBC. Items are scored with per-spec stat weights, including proc and on-use effects valued in context (a proc on a weapon you never swing is worth nothing, and GearQuest knows it). The result is more than 68,000 ranked entries.
-
-The generated lists were then compared, slot by slot, against the established level-60 best-in-slot guides for every spec:
-
-| Class | Agreement |
-|---|---|
-| Druid | 57 / 57 |
-| Warlock | 45 / 45 |
-| Hunter | 45 / 45 |
-| Shaman | 44 / 44 |
-| Warrior | 44 / 44 |
-| Priest | 43 / 43 |
-| Rogue | 43 / 43 |
-| Mage | 39 / 39 |
-| Paladin | 40 / 41 |
-
-Where a curated guide and the scorer disagree, the guide wins — hand-curated entries take priority in the display order, so you see the community's answer first and the raw score second. At level 70 the lists are curated from the current raid tiers, and a few specs with near-identical gear priorities share a pool.
-
-**A deliberate omission:** GearQuest does not show drop chances. Sourcing accurate drop rates for tens of thousands of items isn't feasible to do honestly, and a wrong number is worse than no number. You get *where*, not *how likely*.
+- **Top 3 per slot** for all nine classes and every spec, levels 1–60, Alliance and Horde
+- **Track a hunt** and **toast on obtain**
+- **The Log** — parchment detail with how to get the piece, zone, quest, NPC, and always a Source line
+- **Simulator** — browse another class, spec, faction, or level (right-click the minimap button)
+- **Paper-doll** — right-click a character-panel slot
+- **Suffix names on the tooltip** so Forever's unsuffixed green tooltip still shows *of Agility* and the roll
+- **Faction-correct lists** — no Stormwind quest on a Horde character
 
 ---
 
 ### Getting started
 
-1. Install and reload.
-2. **Right-click any equipment slot** in your character panel to see the top three for that slot.
-3. Pick the upgrade you want to chase.
-4. **Track it** if you want it pinned — then left-click the minimap button any time to open the Log and see everything you're chasing.
+1. Install **GearQuest Forever** (folder `GearQuestForever`) and `/reload`.
+2. Left-click the minimap button for the Log, or right-click a paper-doll slot.
+3. Pick a hunt. Track it if you want it pinned.
+4. Loot it — the toast means you're done.
 
-That's it. There's nothing to configure before it's useful.
+TBC Anniversary GearQuest can sit next to this one. They do not share saved variables or a CurseForge project.
 
 ---
 
 ### Compatibility
 
-- **World of Warcraft: The Burning Crusade — Anniversary Edition** (Interface 20505)
-- No dependencies, no external libraries required
-- Data is read-only — GearQuest never equips, sells, or moves anything
+- **World of Warcraft: Forever** (Interface 16001, max level 60)
+- No libraries, no bag automation — GearQuest never equips or moves items
 
 ---
 
-### Feedback and requests
+### Feedback
 
-Bug reports, mis-ranked items and "why is X above Y for my spec" questions are all welcome — the last one especially. If a stat weight is wrong for a spec you play seriously, that's the kind of report that improves the addon for everybody. Please include your class, spec, level and the slot in question.
-
----
-
-### On the roadmap
-
-- **Filter by how you get it** — hide raid drops, dungeon drops or long quest chains so the list only shows gear you can realistically obtain solo or in a five-man
-- Deeper level-70 raid progression tiers, and separate lists for the specs that currently share a pool
-- Additional lore coverage for named items
+Wrong rank, missing Forever item, or "why is X above Y" — please include class, spec, level, faction, and slot. Those reports are how the weights stay honest.
 
 ---
 
-## Notes for you (not part of the listing)
+## Notes for the author (not the listing)
 
-**Still to fix before the upload works:**
-
-1. **`.toc`** still has `X-Curse-Project-ID: <YOUR_PROJECT_ID>` — CurseForge won't link the package until that's the real numeric project ID. (Confirmed still a placeholder in both your Projects and Desktop copies.)
-2. **`Version: 0.1.0`** — worth bumping to `1.0.0` for the launch. Both copies still read 0.1.0.
-3. **`.pkgmeta`** ships `GearQuest/_generated/` including the pipeline docs and JSON weights/guides that players don't need. Ignoring it keeps the download lean.
-
-**On the entry count:** Cursor's verify says 68,520; my last measured build said 68,209. That's a real gap worth a glance — most likely a difference in what each side counts (notable-shelf rows, or the 1–9 band files) rather than missing data, but I haven't reconciled it. The copy says "more than 68,000", which is true either way, so it isn't blocking.
-
-**Verified against your repo for this revision:** right-click on the paper doll (`PaperDoll.lua:36`), minimap left = Log / right = simulate (`Minimap.lua:79-86`), 15 slot categories with Finger and Trinket merged (`Data.lua:21150-21176`), build labels `Staff build` / `Two-hand build` / `Dual-wield build` / `One-hand + off-hand` (`Data.lua:22795`), and the toast firing off tracked hunts plus current top upgrades (`Log.lua:1231-1259`).
+- CurseForge project **1698950**. Never use TBC `1669225`.
+- File names are `vX.Y.Z-beta` on the beta channel.
+- Keep this file in sync when scoring philosophy changes.

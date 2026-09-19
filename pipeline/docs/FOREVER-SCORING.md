@@ -3,6 +3,53 @@
 This folder is the **authoring asset**. Players never see it. CurseForge zips
 ignore `pipeline/` (`.pkgmeta`). The addon ships `GearQuest/_generated/*.lua`.
 
+## Philosophy: damage, then survive, then endure
+
+Leveling BiS is not a raid spreadsheet. The model answers “what should I hunt
+**now** so I kill faster, die less, and keep playing.” Weights apply in this
+order of importance. Do not invert them.
+
+1. **Damage first.** The spec primary still leads: Agility for a hunter,
+   Strength for arms, spell power for a mage. A hunt that does not make you
+   hit harder (or threaten harder, for a tank) is not BiS. Dual-wield rules,
+   weapon style, and “does this proc even fire in this slot” stay in the
+   damage layer.
+
+2. **Survivability second (below 60).** A naked +1 primary-stat upgrade that
+   leaves you squishy loses to a piece with stamina, health, hp5, or armor.
+   `weights_at_level()` multiplies sta / health / hp5 ×3 and armor ×2 when
+   `level < 60`. Example: at 22, **Brawler’s / Trapper’s Leather Tunic**
+   (8 Agi + stam / str / int) beat **Panther Armor** (9 Agi, no stam).
+   Leveling is travel, extra pulls, and no healer. Dying costs more time than
+   a one-stat edge saves.
+
+3. **Endurance third (below 60).** Staying effective also means having and
+   keeping mana. Int / spirit / mp5 / mana ×2 — real, but **less than stam**.
+   Paladin seals and heals, shaman shocks, hunter shots, and caster drinks
+   all run out. A glass cannon that is OOM every two pulls is not a better
+   hunt.
+
+Level **60** uses the raw raid-scale weights (`GQ_NO_GUIDES=1` until Forever
+guides exist). Do not apply the leveling multipliers at 60.
+
+**Jackpot greens are BiS, not an average.** Rank a random-enchant on the
+**best suffix it can roll** (top of that suffix’s range). Superior Shoulders
+of Agility at 22 is +6–7 Agi (~9.5%). If +7 would be #1, the item **is** #1.
+`suffixChance` tells the player the roll is slim; chance never buries the
+hunt. Implemented in `score.py` `best_variant` (`ROLL_POLICY="bestRoll"`).
+
+**Three + one.** Top 3 unique names per slot. One notable beside them: a
+proc the score cannot price, a leftover jackpot, or a tank-relevant extra
+(defense on a caster piece). Notables are not rank 1–3.
+
+**Warrior Protection is physical.** No spell power / healing weight. A glove
+with +SP and +healing (Silvered Gauntlets) is not tank BiS even if the stam
+is fat. If it also has +Defense, it is the Hands **notable**. Paladin
+Protection still scores holy/spell threat; Ret and Enhance stay hybrids.
+
+These rules apply to **every class**. Re-score **one class at a time** after
+a rule change. Do not `reemit_all.py` from stale JSON.
+
 ## When you find a new or retuned item in Forever beta
 
 Do not hand-edit generated Lua as the long-term fix. Put the item in the
@@ -133,6 +180,8 @@ Hunt-id probe (`pipeline/scripts/probe_forever_hunt_tooltips.py`) labels 200 vs 
 
 **19 Sep 2026 scrape:** 3,245 → **3,586** Forever items. Ingest **+316** pool ids. All nine classes × every spec re-scored and copied into `GearQuest/_generated/`.
 
+**20 Sep 2026 scrape:** index still **3,586** listview rows. `diff_forever_index.py` found **25** ids in the index that were missing from `items.json` (ingest **+24**; Wildstalker's Helm **280898** 404). Mid-level rares that made a list after re-score: **Silvered Gauntlets** (270025), **Cultist's Armguards** (270032), **Dark Ritual Leggings** (270031). Ilvl-65 set pieces (Manaflare, Grimstitch, Wildstalker, Conviction, Spiritcaller) were scored and did not beat existing 60 lists. `clean_source_instructions.py` rewrote world / quest / vendor / drop copy (no “364 creature types”, zone/NPC live in fields). Hunt parchment no longer dumps the mashed Forever audit tooltip; `QuestFont` was eating spaces — body/title use Friz (`GameFontNormal`). **Source** always prints.
+
 **Finger gap (Horde, levels 9–14):** curated level-9 rings are Alliance paladin/warrior only. Generated shaman Finger starts at 10 with **The 1 Ring (8350)**, which 404s on Forever and is pruned. **Woven Copper Ring (21931)** also 404s. Horde enhancement rings that exist are Bounty Hunter's Ring (5351, Barrens) and Ring of Scorn (3235, Silverpine) around 15. Do not toast “ring slot eligible” unless `SlotHasHunts("Finger")`.
 
 ## Relic effect scoring
@@ -170,19 +219,28 @@ Shaman **relic slot** is stored as pipeline slot **`Ranged`**; the log labels it
 - `check_era.py` asserts Classic Vice Grips, not TBC.
 - All nine classes have been re-scored into `GearQuest/_generated/`.
 
-## Stat weights (still TBC — retune on the Forever client)
+## Stat weights (Forever model)
 
-`data/weights.json` is the TBC Anniversary scale (expertise, armour pen, TBC
-paladin seals, Steady Shot in the hunter ranged weight). Rank order is a
-Classic-pool top 3 under those weights. Level 60 is mostly Classic guides, so
-this mainly affects **10–59**.
+`data/weights.json` is the Forever combat scale: no expertise / armour pen /
+resilience, unified Hit/Crit/Haste, hunter 1 Agi = 1 RAP, 14 AP = 1 DPS, no
+Steady Shot, shaman no dual wield. Level 60 is scored from the model
+(`GQ_NO_GUIDES=1`); Classic Wowhead BiS guides stay out until we write
+Forever ones.
 
-**On the Forever client:** inspect whether ratings exist and how seals/shots
-work, then edit `weights.json`, re-score affected classes, copy Lua, verify.
-Forever is Classic+ — do not paste vanilla 1.12 weights if the combat model
-moved.
+`check_roles.py` enforces the role split: casters carry no str/ap/rap;
+physical specs carry no sp/heal except Ret, Enhance, and Paladin Protection.
 
-**Optional before beta:** zero `expertise` / `armorPen`. Do not invent a full
-Forever scale until you have played.
+### Hunt instructions
 
-Full write-up: [../../docs/FOREVER-DATA-MIGRATION.md](../../docs/FOREVER-DATA-MIGRATION.md#stat-weights-tbc-model--forever-client).
+`sources.json` `instructions` are one short sentence. Zone, quest name, and
+NPC live in their own fields — the log prints them once. World drops:
+`World drop around level X-Y.` Quests: `Reward from the quest 'Name'.`
+Vendors/bosses: `Bought from X.` / `Drops from X.` Auction House is a
+separate BoE line, not repeated inside the sentence.
+
+Wowhead HTML tooltips must replace `<br>` / `</div>` with newlines before
+stripping tags (`probe_forever_hunt_tooltips.plain`). The log must not
+paste `foreverAudit.tip` into the parchment (that is how
+`ItemLevel27Bindswhenequipped` happened).
+
+Full write-up: [../../docs/FOREVER-DATA-MIGRATION.md](../../docs/FOREVER-DATA-MIGRATION.md).
