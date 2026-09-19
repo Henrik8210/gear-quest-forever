@@ -1,6 +1,7 @@
 """Score every eligible item per class/spec/level/slot, take top 3, collapse to bands."""
 import json, collections, re, sys, unicodedata, os
 import procs as PROCS
+import relic_score as RELIC
 
 # One point of weapon DPS versus one point of Strength, for a paladin:
 #   1 Strength = 2 attack power, which buys
@@ -16,7 +17,8 @@ import procs as PROCS
 # Strength weight keeps the physics ratio intact inside that spec's scale.
 DPS_PER_STR = 4.31
 
-from gq_paths import G, GUIDES_DIR, OUT
+from gq_paths import G, GUIDES_DIR, OUT, forever_missing_ids
+FOREVER_MISSING = forever_missing_ids()
 
 # ilvl -> typical RequiredLevel, median over every item that states one.
 ILVL_FLOOR = json.load(open(G+"ilvl_floor.json"))
@@ -227,6 +229,9 @@ def eligible(it, cls, spec, level, faction, prof, wsubs):
     src=srcs[str(it["id"])]
     if not src["obtainable"]: return False
     if it.get("temporary"): return False        # conjured / duration-limited, not gear
+    nm=(it.get("name") or "").lower()
+    if "test copy" in nm or "animation as" in nm:
+        return False
     if eff_req(it)>level: return False
     ac=it["allowClass"]
     if ac not in (-1,0) and not (ac & CLASS_BIT[cls]): return False
@@ -475,7 +480,11 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     # zero one-handers. Casters keep them -- a shaman holding an orb is
                     # real -- because they never make an off-hand attack anyway.
                     if it["inv"]==23 and canDW: continue
-                    if style=="twohand" and level>=20: continue
+                    # Two-hand specs still get a shield list: the log has an Off Hand
+                    # row, and a warrior/paladin can swap to a shield. Skipping the
+                    # whole slot left Arms/Ret empty from 20 up.
+                    if style=="twohand" and level>=20 and it.get("kind") not in ("Shield","Buckler"):
+                        continue
                     # Fury dual-wields: the off hand holds a second one-hander, not a
                     # shield. Without this the off-hand list fills with shields, which a
                     # Fury warrior would never equip.
@@ -580,7 +589,11 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                 # value -- and scores are only ever compared inside one slot.
                 if it["cls"]==4 and it["kind"] in ("Totem","Idol","Libram"):
                     if not relic_ok(it,cls,spec_key): continue
-                    if s<=0: s=it["ilvl"]*0.01
+                    rs = RELIC.score_relic(it, cls, spec_key, w)
+                    if rs > 0:
+                        s = rs
+                    elif s <= 0:
+                        s = it["ilvl"] * 0.01
                 if s>0: buckets[sl].append((s,it,suf,ch,st,chAny,s+_roll_gain,srange,sid))
 
                 # A one-hander (InventoryType 13) can be held in EITHER hand. slot_for
@@ -611,6 +624,8 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     if s2>0: buckets["SecondaryHand"].append((s2,it,suf,ch,st,chAny,s2+_roll_gain,srange,sid))
             for sl,rows in buckets.items():
                 rows.sort(key=lambda r:(-r[0], r[1]["id"]))
+                if sl == "Ranged":
+                    rows = promote_hunter_ranged_proc(rows, cls)
                 # Best item in this slot whose value is an effect the score cannot
                 # price, when it did not make the top 3 on stats alone. Thunderfury
                 # prints 5 Agility and 8 Stamina and scores 30.9 against a 118-point
@@ -625,9 +640,12 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                 # proc or a set bonus. Hand of Justice, Onyxia Tooth Pendant and
                 # Wristguards of True Flight were all eligible and all invisible.
                 if level==60: full60[(faction,sl)]=list(rows)
+                rows=unique_name_rows(rows, 8)
                 top3={r[1]["id"] for r in rows[:3]}
+                top3_names={r[1]["name"] for r in rows[:3]}
                 nb=[r for r in rows if r[1].get("effectDriven")
-                    and r[1]["id"] not in top3 and r[1]["quality"]>=3][:2]
+                    and r[1]["id"] not in top3 and r[1]["name"] not in top3_names
+                    and r[1]["quality"]>=3][:2]
                 # Random-enchantment hunt targets. Ranking moved to the EXPECTED roll,
                 # which is right for "what should I wear" and wrong for "what should I
                 # chase": War Torn Tunic "of Strength" is a 9.5% roll that beats
@@ -636,8 +654,20 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                 # belongs on the notable shelf with its suffix and chance.
                 cut = rows[2][0] if len(rows)>=3 else 0.0
                 shown={r[1]["id"] for r in rows[:3]} | {r[1]["id"] for r in nb}
+                shown_names=set(top3_names) | {r[1]["name"] for r in nb}
                 nb += [r for r in rows
-                       if r[2] and len(r)>6 and r[6]>cut and r[1]["id"] not in shown][:1]
+                       if r[2] and len(r)>6 and r[6]>cut and r[1]["id"] not in shown
+                       and r[1]["name"] not in shown_names][:1]
+                shown |= {r[1]["id"] for r in nb}
+                shown_names |= {r[1]["name"] for r in nb}
+                # Forever-only item that almost made the unique top 3 (A Bigger Shield
+                # vs Aegis of Stormwind is a 0.2-point miss). Surface it once as notable.
+                if cut and len(nb)<2:
+                    near=[r for r in rows
+                          if r[1]["id"]>=200000 and r[1]["id"] not in shown
+                          and r[1]["name"] not in shown_names
+                          and r[1]["quality"]>=3 and r[0]>=cut*0.98][:1]
+                    nb += near
                 notable[(faction,level,sl)]=nb
                 per[(faction,level,sl)]=rows[:8]
     return per,cfg,notable,full60
@@ -717,7 +747,64 @@ def guide_override(spec, sl, faction, rows, cls):
         other=other[1:]
     while len(picks)<3 and other:
         picks.append(other[0]); origin.append("model"); other=other[1:]
+    picks, origin = unique_name_pairs(picks, origin, 3)
+    while len(picks)<3 and other:
+        name=other[0][1]["name"]
+        if name not in {r[1]["name"] for r in picks}:
+            picks.append(other[0]); origin.append("model")
+        other=other[1:]
     return picks[:3], origin[:3]
+
+def promote_hunter_ranged_proc(rows, cls):
+    """Ranged proc weapons (Heartseeking Crossbow) often lose to high listed DPS on
+    Forever-indexed bows whose tooltips we trust less than a classic proc BiS. When
+    a proc-driven ranged weapon is still in the top 8 and within 15% of the leader,
+    promote it to rank 1 so it ships in picks, not as a notable."""
+    if cls != "HUNTER" or not rows or len(rows) < 4:
+        return rows
+    lead = rows[0][0]
+    if lead <= 0:
+        return rows
+    floor = lead * 0.85
+    for i, r in enumerate(rows):
+        if i < 3:
+            continue
+        it = r[1]
+        if not it.get("effectDriven") or not it.get("procs"):
+            continue
+        if r[0] < floor:
+            continue
+        return [r] + [x for j, x in enumerate(rows) if j != i]
+    return rows
+
+def unique_name_rows(rows, n=3):
+    """Keep the best-scoring id per display name so PvP rank twins do not eat the list."""
+    seen=set(); out=[]
+    for r in rows:
+        if r[1]["id"] in FOREVER_MISSING:
+            continue
+        name=r[1]["name"]
+        if name in seen:
+            continue
+        seen.add(name)
+        out.append(r)
+        if len(out)>=n:
+            break
+    return out
+
+def unique_name_pairs(picks, origins, n=3):
+    seen=set(); out_p=[]; out_o=[]
+    for r, o in zip(picks, origins):
+        if r[1]["id"] in FOREVER_MISSING:
+            continue
+        name=r[1]["name"]
+        if name in seen:
+            continue
+        seen.add(name)
+        out_p.append(r); out_o.append(o)
+        if len(out_p)>=n:
+            break
+    return out_p, out_o
 
 
 # Two-hander, or one-hander plus off-hand? For any spec that can legally do both, the

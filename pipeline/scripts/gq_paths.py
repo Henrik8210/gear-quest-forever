@@ -18,3 +18,15 @@ os.makedirs(OUT, exist_ok=True)
 def scored(name):
     """JSON written by score.py (pipeline/out/), not the input tables."""
     return os.path.join(OUT, name)
+
+def forever_missing_ids():
+    """Item ids Wowhead Forever 404'd. Those cannot be a hunt target."""
+    import re
+    path = os.path.join(ADDON_GEN, "Data.ForeverAudit.generated.lua")
+    alt = os.path.join(os.path.dirname(REPO), "GearQuest", "GearQuest", "_generated",
+                       "Data.ForeverAudit.generated.lua")
+    for candidate in (path, alt):
+        if os.path.exists(candidate):
+            text = open(candidate, encoding="utf-8").read()
+            return {int(m.group(1)) for m in re.finditer(r'\[(\d+)\]=\{status="missing"', text)}
+    return set()

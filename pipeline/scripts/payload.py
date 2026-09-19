@@ -1,6 +1,7 @@
 """Interned review payload + interned Data.lua (item facts stored once, not per band)."""
 import json, re, collections, unicodedata, os
-from gq_paths import G, OUT
+from gq_paths import G, OUT, forever_missing_ids
+FOREVER_MISSING = forever_missing_ids()
 CLS=os.environ.get("GQ_CLASS","PALADIN"); LC=CLS.lower()
 # The paladin file shipped before the facts table was renamed, and Henrik's merged
 # DataAdapter reads GQ.Data.itemFacts for it. Keep that name so a corrected paladin
@@ -82,31 +83,43 @@ def lua(v):
         s=s.replace(a,b)
     return '"'+s+'"'
 
-facts=[]
-allused=set()
-for sp,blob in gen.items():
-    for b in blob["bands"]:
-        for p in b["picks"][:3]: allused.add(p["id"])
-for iid in sorted(allused):
-    s=srcs[str(iid)]; it=items[str(iid)]
-    kv=[f'sourceType={lua(s["sourceType"])}',f'instructions={lua(s["instructions"])}']
-    for k,val in (("zone",s.get("zone")),("npc",s.get("npc")),
-                  ("questName",s.get("questName")),("profession",s.get("profession"))):
-        if val: kv.append(f'{k}={lua(val)}')
-    if s.get("seasonal"): kv.append("seasonal=true")
-    # A short piece of flavour shown under the item's name. Canonical in-game quest text
-    # for a quest reward, a note about the boss for a drop, hand-written for the
-    # legendaries -- see build_lore.py. Absent for anything with no real story, which is
-    # most world drops.
-    if LORE.get(str(iid)): kv.append(f'lore={lua(LORE[str(iid)])}')
-    pr=(it.get("procs") or [])
-    if pr: kv.append(f'proc={lua(pr[0][:180])}')
-    extra=[]
-    if it.get("quality") is not None: extra.append(f'quality={int(it["quality"])}')
-    if it.get("ilvl"): extra.append(f'ilvl={int(it["ilvl"])}')
-    if it.get("rlvl"): extra.append(f'reqLevel={int(it["rlvl"])}')
-    facts.append(f'    [{iid}]={{name={lua(it["name"])},{",".join(extra+kv)}}},')
+def unique_picks(picks, n=3):
+    seen=set(); out=[]
+    for p in picks:
+        if p.get("id") in FOREVER_MISSING:
+            continue
+        name=p.get("name")
+        lname=(name or "").lower()
+        if "test copy" in lname or "animation as" in lname:
+            continue
+        if name in seen:
+            continue
+        seen.add(name)
+        out.append(p)
+        if len(out)>=n:
+            break
+    return out
 
+def build_facts(used):
+    out=[]
+    for iid in sorted(used):
+        s=srcs[str(iid)]; it=items[str(iid)]
+        kv=[f'sourceType={lua(s["sourceType"])}',f'instructions={lua(s["instructions"])}']
+        for k,val in (("zone",s.get("zone")),("npc",s.get("npc")),
+                      ("questName",s.get("questName")),("profession",s.get("profession"))):
+            if val: kv.append(f'{k}={lua(val)}')
+        if s.get("seasonal"): kv.append("seasonal=true")
+        if LORE.get(str(iid)): kv.append(f'lore={lua(LORE[str(iid)])}')
+        pr=(it.get("procs") or [])
+        if pr: kv.append(f'proc={lua(pr[0][:180])}')
+        extra=[]
+        if it.get("quality") is not None: extra.append(f'quality={int(it["quality"])}')
+        if it.get("ilvl"): extra.append(f'ilvl={int(it["ilvl"])}')
+        if it.get("rlvl"): extra.append(f'reqLevel={int(it["rlvl"])}')
+        out.append(f'    [{iid}]={{name={lua(it["name"])},{",".join(extra+kv)}}},')
+    return out
+
+allused=set()
 rows=[]
 # Identity map over whatever specs this class actually has. It used to be a
 # hardcoded paladin dict, so for Warrior both "arms" and "fury" looked up as None
@@ -119,7 +132,27 @@ for sp,blob in gen.items():
         # This file is levels 10-60. Per-spec 1-9 ships in the Early/Horde 1-9 file.
         if sp=="levelling_1_9": continue
         if b.get("hi", 60) <= 9: continue
-        for rank,p in enumerate(b["picks"][:3],1):
+        band_picks=unique_picks(b["picks"], 3)
+        shown_names={p.get("name") for p in band_picks}
+        nbs=[nb for nb in (b.get("notableEffects") or []) if nb.get("name") not in shown_names]
+        forever_nb=None
+        if band_picks:
+            cut=band_picks[-1].get("score") or 0
+            shown_ids={p["id"] for p in band_picks}
+            for p in b["picks"]:
+                if p["id"] in shown_ids or p.get("name") in shown_names:
+                    continue
+                if p["id"]>=200000 and cut and (p.get("score") or 0)>=cut*0.98:
+                    forever_nb=p
+                    shown_names.add(p.get("name"))
+                    break
+        if forever_nb:
+            nbs=[forever_nb]+[nb for nb in nbs if nb.get("name")!=forever_nb.get("name")]
+        if nbs:
+            b["notableEffects"]=nbs[:2]
+        for p in band_picks:
+            allused.add(p["id"])
+        for rank,p in enumerate(band_picks,1):
             extra=""
             if p.get("suffix"):
                 extra=f',suffix={lua(p["suffix"])},suffixChance={p.get("chanceAny") or 0}'
@@ -152,6 +185,7 @@ for sp,blob in gen.items():
             notable.append('    {%d,%s,%d,%d,%s,%s%s},'%(
                 nb["id"], lua(b["slot"]), b["lo"], b["hi"], lua(SPEC.get(sp)), lua(b["faction"]), extra))
 
+facts=build_facts(allused)
 open(os.path.join(OUT,"Data.%s.generated.lua"%CLS.title()),"w").write(
 """local _, GQ = ...
 GQ.Data = GQ.Data or {}

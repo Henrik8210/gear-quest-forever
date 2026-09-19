@@ -9,7 +9,7 @@ end
 GQ = GQ or {}
 _G.GearQuest = GQ
 
-GQ.VERSION = "0.2.1-beta"
+GQ.VERSION = "0.2.2-beta"
 GQ.ADDON_NAME = ADDON_NAME
 -- WoW Forever: 1–60 Classic+ (no TBC level cap).
 GQ.MAX_PLAYER_LEVEL = 60
@@ -233,14 +233,21 @@ function GQ:RefreshUI(opts)
 
     local function runHeavy()
         local function afterIndicatorCache()
-            if self.Log and self.Log.frame and self.Log.frame:IsShown() then
+            if self.Log and self.Log.frame then
                 pcall(function()
-                    if self.Log.ScheduleListRefresh then
-                        self.Log:ScheduleListRefresh()
-                    else
-                        self.Log:Refresh()
+                    if self.Log.UpdateContextStatus then
+                        self.Log:UpdateContextStatus()
                     end
                 end)
+                if self.Log.frame:IsShown() then
+                    pcall(function()
+                        if self.Log.ScheduleListRefresh then
+                            self.Log:ScheduleListRefresh()
+                        else
+                            self.Log:Refresh()
+                        end
+                    end)
+                end
             end
 
             if self.Popup and self.Popup.container and self.Popup.container:IsShown() then

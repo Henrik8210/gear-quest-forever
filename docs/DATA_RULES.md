@@ -21,14 +21,14 @@ GearQuest uses **two different pipelines**. Do not apply one pipeline’s rules 
 node scripts/verify-generated-bis.mjs
 ```
 
-Expected total: **59,733** entries (**368 curated + 59,365 generated**) — always use the script, not a stale figure. All nine classes are Classic `score.py` regens with the Forever Wowhead pool (id ≥ 200000) merged in. Levels 1–9 are scored **per spec**. Weights are still TBC-derived. Horde Forever deltas in `Data.lua` use `foreverDelta = true` so they compete across generated per-level bands; Compare still shows the top 3.
+Expected total: **59,895** entries (**368 curated + 59,527 generated**) — always use the script, not a stale figure. All nine classes are Classic `score.py` regens with the Forever Wowhead pool (id ≥ 200000) merged in. Levels 1–9 are scored **per spec**. Weights are still TBC-derived. Horde Forever deltas in `Data.lua` use `foreverDelta = true` so they compete across generated per-level bands; Compare still shows the top 3.
 
 ### Ranking philosophy by source
 
 | Source | What “top 3” means |
 |--------|---------------------|
 | **Curated (early bands)** | Human judgment: realistic upgrades for that level band, correct armor tier, obtainability considered when hand-picking. |
-| **Generated (all classes 10–69)** | **Pure stat score** from per-spec weights — obtainability is **not** gated beyond faction/rep/vendor locks in the pipeline. A level-60 chest can legitimately be a Naxxramas drop if stats win. Procs and suffixes are priced where data exists. |
+| **Generated (all classes 10–60)** | **Combat value** from per-spec weights (stats, weapon DPS, priced procs, relic effect lines) — obtainability is **not** gated beyond faction/rep/vendor locks in the pipeline. A level-60 chest can legitimately be a Naxxramas drop if stats win. **Notables** surface effect-driven items that missed the top 3 on stats alone; they are **not** BiS rank 1–3. |
 
 At **runtime**, `Compare.lua` ranks most generated candidates by item level vs equipped, armor-tier penalties, and small source bonuses — it does **not** re-run the full stat-weight model. Generated rows arrive with `curatedRank` from the pipeline; hand-curated rows keep author rank. **Exceptions:** (1) bands with `origin="guide"` (level-60 guide tiers) **must never be re-sorted by score**; (2) **Priest, Mage, and Warlock** always keep pipeline `curatedRank` (weapon pairing — staff vs 1H+off-hand). **`Compare.lua`’s ≥8 ilvl lower-tier armor rule applies to runtime re-ranking only**, not to how generated picks were chosen (those used armour multipliers in the pipeline).
 
@@ -50,9 +50,17 @@ Show **three hunts per slot** for the player’s **class, faction, spec, and lev
 
 Wowhead’s Forever item list and tooltips are still filling in. GearQuest will **scrape and ingest Wowhead many times over the coming months** (`scripts/scrape-forever-wowhead-items.mjs` → `pipeline/scripts/ingest_forever_wowhead.py` → re-score → copy `_generated/`). Each pass should add missing ids, retuned stats, and replacements for classic ids that 404 on `nether.wowhead.com/forever/tooltip/item/{id}`. Do not treat one ingest as finished product.
 
-**18 Sep 2026:** 3,244 → 3,245 items. Only new gear: **Mirror of Rath'mael** (271213). Classic rings **The 1 Ring (8350)** and **Woven Copper Ring (21931)** still 404 — Horde shaman Finger hunts start ~15, not at the level-9 Alliance paladin toast.
+After a Wowhead scrape, run `node scripts/diff-veldt-wowhead.mjs` as an extra check against [veldt1’s Forever Item Explorer](https://veldt1.github.io/wowf-items/) (beta client diff + computed stats). Wowhead stays authoritative for ingest; veldt only flags gaps (ids not on the Wowhead index, or empty Wowhead tooltips where veldt already has stat/effect text).
 
-Classic ids that 404 are pruned from hunts at load (`GQ.Data:PruneMissingForever`). Items that exist but have no combat stats, suffixes, or effect lines show **Has not been datamined yet** — hunt source text is not a tooltip.
+**19 Sep 2026:** 3,245 → **3,586** Wowhead Forever items. Ingest added **316** new pool ids (25 list rows had no tooltip; 74 skipped). All nine classes × every spec were re-scored and emitted into `GearQuest/_generated/`. Classic rings **The 1 Ring (8350)** and **Woven Copper Ring (21931)** still 404 — Horde shaman Finger hunts start ~15, not at the level-9 Alliance paladin toast.
+
+Classic ids that 404 are pruned from hunts at load (`GQ.Data:PruneMissingForever`, fed by `_generated/Data.ForeverAudit.generated.lua`). Items that exist but have no combat stats, suffixes, or effect lines show **Has not been datamined yet** — hunt source text is not a tooltip.
+
+**Relics:** do not rank Totem/Idol/Libram by item level alone. Run `python pipeline/scripts/patch_relic_effects.py` after ingest so Equip lines land in `items.json`, then `relic_score.py` inside `score.py` prices casting mana reg, spell-line buffs, and small utility CD trims per spec.
+
+**Local WoW install:** after changing addon Lua or `_generated/`, always run `scripts/sync-addon.ps1` from repo root (see [README.md](../README.md)). Editing only the git tree does not update `Interface/AddOns/GearQuestForever`.
+
+**Log — simulation banner:** when preview/simulation is on, the log header shows level, spec, class, and faction; when off, it tells the player they are viewing their character and can use the spec picker.
 
 ## Curation workflow (primary)
 

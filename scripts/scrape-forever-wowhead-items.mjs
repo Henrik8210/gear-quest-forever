@@ -11,6 +11,7 @@
  *
  * Cache: pipeline/data/forever_wowhead/{index,tooltips}.json
  * Ingest with: python pipeline/scripts/ingest_forever_wowhead.py
+ * Extra reference (does not ingest): node scripts/diff-veldt-wowhead.mjs
  */
 import fs from "fs";
 import path from "path";

@@ -618,6 +618,10 @@ function GQ.Compare:GetSortScore(entry, slotName, equippedIlvl, maxPreferredIlvl
         return 1000000 - entry.curatedRank
     end
 
+    if entry.generated and entry.curatedRank and not entry.notable then
+        return 500000 - entry.curatedRank
+    end
+
     local itemIlvl = GetItemLevel(entry.itemId, entry)
     local score = self:GetEntryPowerScore(entry)
 
@@ -682,8 +686,21 @@ function GQ.Compare:RankEntries(entries, slotName, maxResults)
     end)
 
     local results = {}
-    for i = 1, math.min(maxResults, #scored) do
-        table.insert(results, scored[i].entry)
+    local seenName = {}
+    for i = 1, #scored do
+        if #results >= maxResults then
+            break
+        end
+        local entry = scored[i].entry
+        local name = GQ.Data and GQ.Data.GetItemDisplayName and GQ.Data:GetItemDisplayName(entry.itemId)
+        if name and name ~= "" and seenName[name] then
+            -- skip PvP rank twin
+        else
+            if name and name ~= "" then
+                seenName[name] = true
+            end
+            results[#results + 1] = entry
+        end
     end
 
     if equip then

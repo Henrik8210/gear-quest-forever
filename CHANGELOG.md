@@ -2,6 +2,17 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
+## v0.2.2-beta
+
+BiS quality pass, relic combat scoring, simulator UX, and local install workflow.
+
+- **BiS = combat value:** generated picks dedupe same-name variants (PvP rank twins), skip Forever-audit **404** ids at score time, and fill three **unique** names per slot where the pool allows. **Notables** are not rank 1–3; proc-driven hunter ranged weapons that lose to inflated Forever bow DPS can promote into the top 3 when still competitive.
+- **Relics (Totem / Idol / Libram):** effect text from Wowhead tooltips (`patch_relic_effects.py`) and **`relic_score.py`** — e.g. elemental **Polished Driftwood Icon** (casting mana reg) ranks above utility CD trims; ilvl-only ordering is fallback only.
+- **Log UI:** banner under the title — simulation mode shows level, spec, class, faction; live character mode explains spec picker. **Simulator** faction dropdown; list tabs re-attached to the hunt panel after the banner layout fix.
+- **Runtime:** `GetTopUpgradesForSlot` uses candidates only (not notables in the rank pool); Compare keeps pipeline `curatedRank`; Forever-missing items hidden when audit says 404.
+- **Authoring:** after any `GearQuest/` or `_generated/` change, run **`scripts/sync-addon.ps1`** (default `_classic_beta_` → `Interface/AddOns/GearQuestForever`). Re-score with `score_all.py` / `reemit_all.py` after pipeline edits.
+- CurseForge **Files** name is **`v0.2.2-beta`**.
+
 ## v0.2.1-beta
 
 Wowhead re-scrape, Horde ring toast fix, and CurseForge files named `vX.Y.Z-beta`.

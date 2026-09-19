@@ -411,7 +411,7 @@ end
 -- --- Simulate dialog (minimap right-click) ---
 
 local SIM_DIALOG_WIDTH = 280
-local SIM_DIALOG_HEIGHT = 226
+local SIM_DIALOG_HEIGHT = 268
 local METAL_EDGE = "Interface\\Tooltips\\UI-Tooltip-Border"
 
 local CLASS_ORDER = {
@@ -667,6 +667,32 @@ function GQ.Preview:EnsureDialog()
         GQ.Preview:HideDialog()
     end)
 
+    dialog.factionLabel = dialog:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    dialog.factionLabel:SetPoint("TOPLEFT", dialog.specDrop, "BOTTOMLEFT", 16, -36)
+    dialog.factionLabel:SetText("Faction")
+
+    dialog.factionDrop = CreateFrame("Frame", "GearQuestSimulateFactionDropDown", dialog, "UIDropDownMenuTemplate")
+    dialog.factionDrop:SetPoint("TOPLEFT", dialog.factionLabel, "BOTTOMLEFT", -16, -4)
+    UIDropDownMenu_SetWidth(dialog.factionDrop, 180)
+    dialog.selectedFaction = self:GetEffectiveFaction() or "Alliance"
+    UIDropDownMenu_Initialize(dialog.factionDrop, function(_, level)
+        if level ~= 1 then
+            return
+        end
+        for _, faction in ipairs({ "Alliance", "Horde" }) do
+            local info = UIDropDownMenu_CreateInfo()
+            info.text = faction
+            info.value = faction
+            info.func = function()
+                dialog.selectedFaction = faction
+                UIDropDownMenu_SetSelectedValue(dialog.factionDrop, faction)
+                UIDropDownMenu_SetText(dialog.factionDrop, faction)
+            end
+            info.checked = (dialog.selectedFaction == faction)
+            UIDropDownMenu_AddButton(info)
+        end
+    end)
+
     dialog.submit = CreateFrame("Button", nil, dialog, "UIPanelButtonTemplate")
     dialog.submit:SetSize(96, 22)
     dialog.submit:SetPoint("BOTTOMLEFT", dialog, "BOTTOMLEFT", 20, 18)
@@ -684,7 +710,7 @@ function GQ.Preview:EnsureDialog()
             return
         end
 
-        local ok, err = GQ.Preview:ApplySimulation(classFile, levelText, dialog.selectedSpec)
+        local ok, err = GQ.Preview:ApplySimulation(classFile, levelText, dialog.selectedSpec, dialog.selectedFaction)
         if ok then
             GQ.Preview:HideDialog()
         else
@@ -757,6 +783,12 @@ function GQ.Preview:RefreshDialogFields()
 
     self:RefreshDialogSpecDropdown()
     dialog.levelEdit:SetText(tostring(level))
+
+    dialog.selectedFaction = self:GetEffectiveFaction() or "Alliance"
+    if dialog.factionDrop then
+        UIDropDownMenu_SetSelectedValue(dialog.factionDrop, dialog.selectedFaction)
+        UIDropDownMenu_SetText(dialog.factionDrop, dialog.selectedFaction)
+    end
 end
 
 function GQ.Preview:HideDialog()

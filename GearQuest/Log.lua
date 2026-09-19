@@ -8,7 +8,9 @@ local ROW_HEIGHT = 16
 local TAB_HEIGHT = 24
 local TAB_BAR_PAD = 4
 local TAB_ROW_HEIGHT = TAB_HEIGHT + TAB_BAR_PAD
-local TAB_TOP_OFFSET = 56
+local CONTEXT_BAND_HEIGHT = 14
+local CONTEXT_BAND_TOP = -27
+local TAB_TOP_OFFSET = 56 + CONTEXT_BAND_HEIGHT
 local PORTRAIT_TEXTURE = "Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Art\\GearQuest-Portrait"
 local PORTRAIT_DISPLAY_SIZE = 61
 local PORTRAIT_OFFSET_X = -6
@@ -33,6 +35,7 @@ local FILTER_TAB_WIDTH = 84
 local PAGE_GROUP_WIDTH = PAGE_TAB_LOG_WIDTH + PAGE_TAB_SIM_WIDTH + 4
 local FILTER_TAB_OVERLAP = 3
 local FILTER_TAB_LEFT = 12
+-- Status band lives on the main frame above logPage; tabs still sit on the list edge.
 local LOG_SECTION_TOP = -(TAB_HEIGHT - FILTER_TAB_OVERLAP)
 local SIDE_TAB_HEIGHT = 53
 local SIDE_TAB_WIDTH = 53
@@ -2928,6 +2931,68 @@ function GQ.Log:UpdateSpecButton()
     self:RepositionSpecButton(self.frame)
 end
 
+function GQ.Log:UpdateContextStatus()
+    if not self.frame or not self.frame.contextStatus then
+        return
+    end
+
+    local text
+    if GQ.IsPreviewEnabled and GQ:IsPreviewEnabled() then
+        local level = GQ:GetEffectiveLevel() or UnitLevel("player") or 1
+        local spec = (GQ.Spec and GQ.Spec.GetSelectedSpecLabel and GQ.Spec:GetSelectedSpecLabel()) or "Specialization"
+        local classFile = GQ:GetEffectiveClass()
+        local className = classFile
+        if GQ.Preview and GQ.Preview.FormatClassName then
+            className = GQ.Preview:FormatClassName(classFile)
+        elseif classFile then
+            className = classFile:sub(1, 1) .. classFile:sub(2):lower()
+        end
+        local faction = (GQ.GetEffectiveFaction and GQ:GetEffectiveFaction())
+            or UnitFactionGroup("player")
+            or "Alliance"
+        text = string.format(
+            "Simulation mode: Level %d %s %s of the %s Faction.",
+            level,
+            spec,
+            className,
+            faction
+        )
+    else
+        text = "Viewing upgrades for your current Level, Class and Faction. Use the Spec Picker to change spec."
+    end
+
+    self.frame.contextStatus:SetText(text)
+end
+
+function GQ.Log:EnsureContextStatus(frame)
+    if not frame.contextStatusBar then
+        frame.contextStatusBar = CreateFrame("Frame", nil, frame)
+        frame.contextStatusBar:SetHeight(CONTEXT_BAND_HEIGHT)
+    end
+    frame.contextStatusBar:ClearAllPoints()
+    frame.contextStatusBar:SetPoint("TOPLEFT", frame, "TOPLEFT", 58, CONTEXT_BAND_TOP)
+    frame.contextStatusBar:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -36, CONTEXT_BAND_TOP)
+    frame.contextStatusBar:Show()
+
+    if not frame.contextStatus then
+        frame.contextStatus = CreateFontStringWithFallback(frame.contextStatusBar, {
+            "GameFontHighlight",
+            "QuestFont",
+            "GameFontNormal",
+        })
+        frame.contextStatus:SetJustifyH("CENTER")
+        frame.contextStatus:SetJustifyV("MIDDLE")
+        frame.contextStatus:SetTextColor(0.85, 0.80, 0.68)
+    end
+    frame.contextStatus:ClearAllPoints()
+    frame.contextStatus:SetPoint("LEFT", frame.contextStatusBar, "LEFT", 0, 0)
+    frame.contextStatus:SetPoint("RIGHT", frame.contextStatusBar, "RIGHT", 0, 0)
+    frame.contextStatus:SetPoint("TOP", frame.contextStatusBar, "TOP", 0, 0)
+    frame.contextStatus:SetPoint("BOTTOM", frame.contextStatusBar, "BOTTOM", 0, 0)
+    frame.contextStatus:Show()
+    self:UpdateContextStatus()
+end
+
 function GQ.Log:UpdateFooterButtons()
     if not self.frame then
         return
@@ -3130,6 +3195,8 @@ function GQ.Log:LayoutMainWindow(frame)
     pageBar:SetWidth(LEFT_COLUMN_WIDTH)
     pageBar:Show()
 
+    self:EnsureContextStatus(frame)
+
     self:LayoutSideTabs(frame)
     self:LayoutLogColumns(frame)
     self:RepositionSpecButton(frame)
@@ -3263,6 +3330,7 @@ function GQ.Log:ApplyPageTab()
 
     self:UpdatePageTabVisuals()
     self:UpdateFooterButtons()
+    self:UpdateContextStatus()
     if page == "log" then
         self:UpdateSpecButton()
     elseif self.frame.tabSpecControl then
@@ -4294,6 +4362,7 @@ function GQ.Log:Refresh()
 
     self:UpdateTabVisuals()
     self:UpdateFooterButtons()
+    self:UpdateContextStatus()
 
     if tab == "completed" then
         local anyCompleted = false

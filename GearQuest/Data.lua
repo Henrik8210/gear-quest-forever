@@ -8000,7 +8000,7 @@ function GQ.Data:GetTopUpgradesForSlot(slotName, maxResults)
         return cached
     end
 
-    local candidates = self:GetRankableEntriesForSlot(slotName)
+    local candidates = self:GetCandidatesForSlot(slotName)
     local ranked = GQ.Compare:RankEntries(candidates, slotName, maxResults)
     local results = {}
     for i = 1, #ranked do

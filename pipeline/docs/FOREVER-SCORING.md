@@ -73,10 +73,22 @@ pipeline inputs, re-score the class, then copy Lua back.
    python emit_early.py
    ```
 
-   Copy the emitted Lua into `GearQuest/_generated/`, then:
+   Copy the emitted Lua into `GearQuest/_generated/` (`python reemit_all.py` copies
+   `pipeline/out/` → `GearQuest/_generated/`), then sync the game folder:
 
    ```powershell
    node scripts/verify-generated-bis.mjs
+   .\scripts\sync-addon.ps1
+   ```
+
+   All nine classes at once:
+
+   ```powershell
+   cd pipeline/scripts
+   python score_all.py
+   python reemit_all.py
+   cd ../..
+   .\scripts\sync-addon.ps1
    ```
 
    After a Classic `score.py` regen, do **not** run `apply-classic-random-enchants.mjs`
@@ -110,15 +122,44 @@ The Forever catalog is not finished. Plan **many** scrape → ingest → re-scor
 ```powershell
 node scripts/scrape-forever-wowhead-items.mjs
 python pipeline/scripts/ingest_forever_wowhead.py
+node scripts/diff-veldt-wowhead.mjs
 ```
 
 Then `score.py` / `reemit_all.py` and copy `pipeline/out/Data.*.generated.lua` into `GearQuest/_generated/`. Ingest does **not** overwrite existing classic ids in `items.json` / `sources.json` (so the WSG rune vendor fix survives a re-ingest). New Forever-only ids (≥ 200000) merge in as Wowhead grows.
 
+`diff-veldt-wowhead.mjs` is **not** a second ingest. It diffs the Wowhead cache against [veldt1 wowf-items](https://veldt1.github.io/wowf-items/) (client `1.60.1` vs `1.15.9`) and writes `pipeline/data/forever_wowhead/veldt_wowhead_diff.json`. Use that to chase empty tooltips and missing Wowhead pages; do not copy veldt stats into `items.json`.
+
 Hunt-id probe (`pipeline/scripts/probe_forever_hunt_tooltips.py`) labels 200 vs 404. Missing classic ids are pruned at runtime; existing items with no combat stats get the datamine notice.
 
-**18 Sep 2026 scrape:** 3,244 → 3,245 Forever items. Only new id: **271213 Mirror of Rath'mael** (rare shield, ilvl 24, rlvl 19, +4 Str/+4 Sta/+3 Int). Wowhead has no drop source yet. Shield `block` is parsed from tooltips on ingest.
+**19 Sep 2026 scrape:** 3,245 → **3,586** Forever items. Ingest **+316** pool ids. All nine classes × every spec re-scored and copied into `GearQuest/_generated/`.
 
 **Finger gap (Horde, levels 9–14):** curated level-9 rings are Alliance paladin/warrior only. Generated shaman Finger starts at 10 with **The 1 Ring (8350)**, which 404s on Forever and is pruned. **Woven Copper Ring (21931)** also 404s. Horde enhancement rings that exist are Bounty Hunter's Ring (5351, Barrens) and Ring of Scorn (3235, Silverpine) around 15. Do not toast “ring slot eligible” unless `SlotHasHunts("Finger")`.
+
+## Relic effect scoring
+
+Totems/idols/librams often have **no flat stats** — only an Equip line. Without
+effect text, `score.py` fell back to `ilvl × 0.01`, which wrongly ranked e.g.
+**Totem of Ancestral Protection** above **Polished Driftwood Icon** for elemental.
+
+1. `python pipeline/scripts/patch_relic_effects.py` — copies Equip/Engrave lines
+   from `pipeline/data/forever_wowhead/tooltips.json` into `items.json` for
+   relics missing `effects`.
+2. `relic_score.py` — prices casting mana reg, “increases damage/healing of … by
+   up to N”, grounding-totem CD trims (low for elemental), and spec-specific
+   rune unlocks. Re-score shaman (or `score_all.py`) after changing weights or
+   patterns.
+
+Shaman **relic slot** is stored as pipeline slot **`Ranged`**; the log labels it
+**Totem** via `Data.lua`.
+
+## Pick quality checks
+
+- **Forever 404:** `gq_paths.forever_missing_ids()` reads
+  `Data.ForeverAudit.generated.lua`; `score.py` / `payload.py` skip those ids.
+- **Same display name, different id:** `unique_name_rows` / `unique_picks` keep one
+  id per name in the top 3 (PvP rank variants).
+- **Audits:** `node scripts/audit-generated-slots.mjs` (overlap bands, short slots,
+  duplicate names) and `node scripts/audit-unique-top3.mjs` after large regens.
 
 ## What is already wired
 

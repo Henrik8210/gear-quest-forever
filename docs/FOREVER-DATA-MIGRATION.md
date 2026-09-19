@@ -17,6 +17,10 @@ GearQuest Forever targets **WoW Forever 1–60** (Classic+). The fork inherited 
 
 **Repo:** commit `scripts/`, `GearQuest/_generated/data/items_random.classic.json`, generated Lua patches, and docs together so another clone sees the same state — cache and generated files must stay in sync.
 
+**Local playtest:** after `_generated/` or `GearQuest/*.lua` changes, run `scripts/sync-addon.ps1` so `_classic_beta_/Interface/AddOns/GearQuestForever` matches the repo (documented in README and DATA_RULES).
+
+**Relics (phase 4+):** ingest tooltips → `patch_relic_effects.py` → re-score; combat BiS for totems/idols/librams uses `relic_score.py`, not ilvl alone.
+
 Fork base: GearQuest **v0.1.1-beta.3-bcc**, not a greenfield Classic regen.
 
 | Phase | Scope | Status |
@@ -34,9 +38,12 @@ Forever-only loot stays out of generated lists until Wowhead has an item page. S
 ```powershell
 node scripts/scrape-forever-wowhead-items.mjs
 python pipeline/scripts/ingest_forever_wowhead.py
+node scripts/diff-veldt-wowhead.mjs
 ```
 
 That writes ids ≥ 200000 into `pipeline/data/{items,sources,classic_item_ids}.json`. The scrape cache itself (`pipeline/data/forever_wowhead/`) is gitignored. Re-score the class, then `python pipeline/scripts/reemit_all.py` (or `payload.py` + `emit_early.py` / `emit_horde19.py`) and copy Lua into `GearQuest/_generated/`.
+
+**Wowhead is still the ingest source.** [veldt1 Forever Item Explorer](https://veldt1.github.io/wowf-items/) is a second reference: a client-diff of beta `1.60.1` vs Classic `1.15.9` with stats computed from DBC (`StatPercentEditor × RandPropPoints`). `diff-veldt-wowhead.mjs` downloads that table and reports (1) Forever equipment veldt has that Wowhead has not indexed yet, and (2) Wowhead tooltips still missing combat stats where veldt already has numbers. Do **not** merge veldt rows into `items.json` from that report — use it to decide what to re-scrape or verify on Wowhead.
 
 The in-game **seen-item notebook is retired**. Do not run `scripts/backup-seen-notebook.ps1`. `GQ.Collector` is not started. `/gq seen` tells you Wowhead is the source. Horde `foreverDelta` rows already in `Data.lua` stay; new Forever items come from Wowhead as the catalog grows.
 

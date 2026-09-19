@@ -36,11 +36,13 @@ Current BiS data is Classic-pool generated 10–60 plus curated 1–9 Alliance b
 
 ## Local WoW install
 
-After editing addon files, sync to your game folder. The install folder is **`GearQuestForever`** (TBC Anniversary uses **`GearQuest`** — same repo name, different products).
+After **every** edit under `GearQuest/` (Lua, `_generated/`, art), sync to your game folder — the repo is not what WoW loads until you do. The install folder is **`GearQuestForever`** (TBC Anniversary uses **`GearQuest`** — same repo name, different products).
 
 ```powershell
 .\scripts\sync-addon.ps1
 ```
+
+The log shows a line under the **GearQuest** title: **simulation mode** (level, spec, class, faction) or **live character** + spec picker hint.
 
 No Forever client yet? You can still sync beside TBC GearQuest on Anniversary for rough UI testing (enable **Load out of date AddOns**):
 

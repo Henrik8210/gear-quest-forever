@@ -158,8 +158,8 @@ const SOURCES = [
   },
 ];
 
-const TARGET_TOTAL = 59733;
-const TARGET_GENERATED = 59365;
+const TARGET_TOTAL = 59895;
+const TARGET_GENERATED = 59527;
 const TARGET_CURATED = TARGET_TOTAL - TARGET_GENERATED;
 
 const dataLua = read("Data.lua");
