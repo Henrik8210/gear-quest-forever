@@ -37,4 +37,4 @@ Only when explicitly publishing:
 
 Version string is **`X.Y.Z-beta`**. CurseForge file name is **`vX.Y.Z-beta`**.
 
-After `v0.2.2-beta`, bump the patch (e.g. `0.2.3-beta`) rather than deleting the tag.
+After `v0.2.3-beta`, bump the patch (e.g. `0.2.4-beta`) rather than deleting the tag.

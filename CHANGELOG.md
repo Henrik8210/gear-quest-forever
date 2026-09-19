@@ -2,6 +2,10 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
+## v0.2.3-beta
+
+Repo-only follow-up (logo, veldt diff script, local audit helpers). **In-game build matches v0.2.2-beta** — CurseForge file **`v0.2.3-beta`** for version alignment after the GitHub tooling commit.
+
 ## v0.2.2-beta
 
 BiS quality pass, relic combat scoring, simulator UX, and local install workflow.
