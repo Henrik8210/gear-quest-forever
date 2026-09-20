@@ -68,11 +68,13 @@ local SOURCES = {
     hasSpec = true,
     specs = { elemental   = { elemental   = true },
               enhancement = { enhancement = true },
+              enhancement_tank = { enhancement_tank = true },
               restoration = { restoration = true } } },
   { class = "SHAMAN",  picks = "shamanEarly1to9",  facts = "shamanEarly1to9Facts",
     hasSpec = true,
     specs = { elemental   = { elemental   = true },
               enhancement = { enhancement = true },
+              enhancement_tank = { enhancement_tank = true },
               restoration = { restoration = true } } },
 
   { class = "ROGUE",   picks = "roguePicks",       facts = "rogueItemFacts",
@@ -226,7 +228,6 @@ function GQ.Data:LoadGenerated()
     for i = 1, #self.entries do
         self:EnrichEntrySuffix(self.entries[i])
         self:EnrichBossChestEntry(self.entries[i])
-        self:EnrichProfessionEntry(self.entries[i])
     end
     return n
 end

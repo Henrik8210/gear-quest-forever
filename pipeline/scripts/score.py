@@ -32,6 +32,95 @@ W      = json.load(open(G+"weights.json"))
 
 CLASS_BIT={"WARRIOR":1,"PALADIN":2,"HUNTER":4,"ROGUE":8,"PRIEST":16,"SHAMAN":64,
            "MAGE":128,"WARLOCK":256,"DRUID":1024}
+
+# Wowhead Forever "Classes: Priest" (and multi-class lists). Item allowClass is
+# often -1 on remakes, so the tooltip line is the lock.
+TIP_CLASS_LOCK = {}
+_TIPS_PATH = os.path.join(G, "forever_wowhead", "hunt_tooltips.json")
+if os.path.exists(_TIPS_PATH):
+    _tips = json.load(open(_TIPS_PATH, encoding="utf-8"))
+    for _id, _row in _tips.items():
+        tip = _row.get("tip") if isinstance(_row, dict) else _row
+        if not tip:
+            continue
+        idx = tip.find("Classes:")
+        if idx < 0:
+            continue
+        after = tip[idx + 8:].lstrip()
+        names = []
+        while after:
+            hit = None
+            for key in sorted(CLASS_BIT, key=len, reverse=True):
+                title = key[:1] + key[1:].lower()
+                if after.startswith(title) or after.upper().startswith(key):
+                    rest = after[len(title):]
+                    if rest == "" or rest[0] in ", " or rest[0].isupper():
+                        names.append(key)
+                        after = rest.lstrip(" ,")
+                        hit = True
+                        break
+            if not hit:
+                break
+        if names:
+            TIP_CLASS_LOCK[int(_id)] = set(names)
+
+# Class dungeon/raid/ZG/AQ sets whose Forever remakes omit "Classes:" on some
+# pieces (Deathmist Robe has no hunt tip; siblings say Classes: Warlock).
+_CLASS_SET_PREFIX = [
+    ("beaststalker", "HUNTER"), ("giantstalker", "HUNTER"), ("dragonstalker", "HUNTER"),
+    ("cryptstalker", "HUNTER"), ("predator", "HUNTER"), ("striker", "HUNTER"),
+    ("beastmaster", "HUNTER"),
+    ("deathmist", "WARLOCK"), ("dreadmist", "WARLOCK"), ("felheart", "WARLOCK"),
+    ("nemesis", "WARLOCK"), ("plagueheart", "WARLOCK"), ("demoniac", "WARLOCK"),
+    ("doomcaller", "WARLOCK"),
+    ("magister", "MAGE"), ("sorcerer", "MAGE"), ("arcanist", "MAGE"),
+    ("netherwind", "MAGE"), ("frostfire", "MAGE"), ("illusionist", "MAGE"),
+    ("enigma", "MAGE"),
+    ("devout", "PRIEST"), ("virtuous", "PRIEST"), ("prophecy", "PRIEST"),
+    ("transcendence", "PRIEST"), ("confessor", "PRIEST"),
+    ("shadowcraft", "ROGUE"), ("darkmantle", "ROGUE"), ("nightslayer", "ROGUE"),
+    ("bloodfang", "ROGUE"), ("bonescythe", "ROGUE"), ("madcap", "ROGUE"),
+    ("deathdealer", "ROGUE"),
+    ("wildheart", "DRUID"), ("feralheart", "DRUID"), ("cenarion", "DRUID"),
+    ("stormrage", "DRUID"), ("dreamwalker", "DRUID"), ("haruspex", "DRUID"),
+    ("genesis", "DRUID"),
+    ("lightforge", "PALADIN"), ("soulforge", "PALADIN"), ("lawbringer", "PALADIN"),
+    ("judgement", "PALADIN"), ("judgment", "PALADIN"), ("redemption", "PALADIN"),
+    ("freethinker", "PALADIN"), ("avenger", "PALADIN"),
+    ("earthfury", "SHAMAN"), ("earthshatter", "SHAMAN"), ("augur", "SHAMAN"),
+    ("stormcaller", "SHAMAN"),
+    ("dreadnaught", "WARRIOR"), ("vindicator", "WARRIOR"), ("conqueror", "WARRIOR"),
+]
+_CLASS_SET_PREFIX.sort(key=lambda kv: len(kv[0]), reverse=True)
+_CLASS_SET_SUFFIX = [
+    (" of the gathering storm", "SHAMAN"),
+    (" of the earthshatterer", "SHAMAN"),
+    (" of the five thunders", "SHAMAN"),
+    (" of the ten storms", "SHAMAN"),
+    (" of the unseen path", "HUNTER"),
+    (" of the oracle", "PRIEST"),
+    (" of elements", "SHAMAN"),
+    (" of heroism", "WARRIOR"),
+    (" of valor", "WARRIOR"),
+    (" of faith", "PRIEST"),
+    (" of might", "WARRIOR"),
+    (" of wrath", "WARRIOR"),
+]
+_CLASS_SET_SUFFIX.sort(key=lambda kv: len(kv[0]), reverse=True)
+
+def family_class_lock(name, ilvl=0):
+    """Classic set names stay class-locked even when Forever omits Classes:."""
+    if not name or (ilvl or 0) < 50:
+        return None
+    nm = name.lower()
+    for prefix, cls in _CLASS_SET_PREFIX:
+        if nm.startswith(prefix):
+            return {cls}
+    for suf, cls in _CLASS_SET_SUFFIX:
+        if nm.endswith(suf):
+            return {cls}
+    return None
+
 # BloodElf/Draenei bits stay so leftover TBC item masks still parse, but they are
 # not playable in Forever and are absent from CLASS_RACES and the faction masks.
 # Skyborne is on both factions; the bit is unused on Classic items (allowRace=-1
@@ -169,7 +258,7 @@ def dual_wield_level(cls, spec):
 ARMOR_SLOTS=["Head","Neck","Shoulder","Back","Chest","Wrist","Hands","Waist","Legs","Feet","Finger","Trinket"]
 RATING_KEYS={"hit","crit","haste","expertise","defense","dodge","parry","blockRating",
              "resilience","spellHit","spellCrit","spellHaste","hitRanged","critRanged"}
-SPELL_OFFENSE_KEYS=("sp","spSchool","spHoly","heal","sp_from_heal",
+SPELL_OFFENSE_KEYS=("sp","spSchool","spHoly","heal","sp_from_heal","damageDone",
                     "spShadow","spFire","spFrost","spNature","spArcane")
 PHYS_OFFENSE_KEYS=("str","agi","ap","rap","feralAp")
 TANK_SKILL_KEYS=("defense","dodge","parry","blockRating","blockValue")
@@ -180,8 +269,9 @@ def spec_uses_spell_power(w):
 def item_is_spell_gear(it):
     """Caster gloves (SP/heal, no str/agi/ap) are not warrior-tank BiS."""
     st = forever_stats(it.get("stats") or {})
-    spell = sum(st.get(k, 0) or 0 for k in SPELL_OFFENSE_KEYS)
-    phys = sum(st.get(k, 0) or 0 for k in PHYS_OFFENSE_KEYS)
+    spell = sum((st.get(k, 0) or 0) for k in SPELL_OFFENSE_KEYS)
+    spell += st.get("damageDone") or 0
+    phys = sum((st.get(k, 0) or 0) for k in PHYS_OFFENSE_KEYS)
     return spell > 0 and phys <= 0
 
 def item_tank_skill_note(it):
@@ -268,6 +358,17 @@ def eligible(it, cls, spec, level, faction, prof, wsubs):
     if eff_req(it)>level: return False
     ac=it["allowClass"]
     if ac not in (-1,0) and not (ac & CLASS_BIT[cls]): return False
+    # Forever remakes often have AllowableClass -1, but the tooltip says
+    # "Classes: Priest". Virtuous Robe must not score for mage/warlock.
+    locked=family_class_lock(it.get("name"), it.get("ilvl") or 0)
+    if not locked:
+        locked=TIP_CLASS_LOCK.get(it["id"])
+    if not locked:
+        locked=set()
+        for n in (it.get("tipClasses") or []):
+            if CLASS_BIT.get(str(n).upper()):
+                locked.add(str(n).upper())
+    if locked and cls not in locked: return False
     # Class lock carried by the quest that grants the item, not by the item itself.
     # Vanilla tier-3 pieces have AllowableClass 32767 ("anyone") but each is handed
     # over by a class-locked quest, so without this a paladin's list happily picked
@@ -322,7 +423,9 @@ RELIC_ABILITIES={
    "restoration":["Lesser Healing Wave","Healing Wave","Chain Heal","Water Shield","Riptide"],
    "elemental":["Lightning Bolt","Chain Lightning","Earth Shock","Flame Shock","Frost Shock",
                 "Shock"],
-   "enhancement":["Stormstrike","Windfury","Shock","Lightning Bolt","Maelstrom"]},
+   "enhancement":["Stormstrike","Windfury","Shock","Lightning Bolt","Maelstrom"],
+   "enhancement_tank":["Rockbiter","Stormstrike","Shock","Earth Shock","Flame Shock",
+                      "Frost Shock","Lightning Shield"]},
 }
 def relic_ok(it, cls, spec):
     """True if this relic's effect names an ability the spec actually uses."""
@@ -400,9 +503,17 @@ def forever_stats(st):
     for k in DEAD_STATS:
         if k in out:
             out[k]=0
-    heal=out.get("heal") or 0
-    if heal:
-        out["sp_from_heal"]=max(out.get("sp_from_heal") or 0, heal/3.0)
+    # Damage Done (rtg 42) is spell damage only. Fold into sp for scoring so
+    # casters value it like Spell Power. Healers still get `heal` separately.
+    dmg = out.get("damageDone") or 0
+    if dmg:
+        out["sp"] = (out.get("sp") or 0) + dmg
+    heal = out.get("heal") or 0
+    # Heal-only items grant 1/3 SP. Combined +Damage Done/+Healing Done already
+    # stored the damage half -- do not also convert heal/3 on top.
+    explicit_sp = out.get("sp") or 0
+    if heal and explicit_sp == 0:
+        out["sp_from_heal"] = max(out.get("sp_from_heal") or 0, heal / 3.0)
     return out
 
 def best_variant(it, w, level, rscale):

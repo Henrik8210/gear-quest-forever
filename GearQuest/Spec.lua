@@ -47,6 +47,7 @@ GQ.Spec.CLASS_SPECS = {
     SHAMAN = {
         { id = "elemental", label = "Elemental", icon = "Interface\\Icons\\Spell_Nature_Lightning", default = true },
         { id = "enhancement", label = "Enhancement", icon = "Interface\\Icons\\Spell_Nature_LightningShield" },
+        { id = "enhancement_tank", label = "Enhancement Tank", icon = "Interface\\Icons\\INV_Shield_06" },
         { id = "restoration", label = "Restoration", icon = "Interface\\Icons\\Spell_Nature_MagicImmunity" },
     },
     MAGE = {
@@ -102,6 +103,10 @@ local SPEC_ALIASES = {
     ele = "elemental",
     enhancement = "enhancement",
     enh = "enhancement",
+    enhancement_tank = "enhancement_tank",
+    enhancementtank = "enhancement_tank",
+    enhtank = "enhancement_tank",
+    enh_tank = "enhancement_tank",
     restoration = "restoration",
     resto = "restoration",
     rest = "restoration",

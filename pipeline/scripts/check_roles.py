@@ -2,7 +2,7 @@
 every role. Pure casters still carry no physical-damage stats (str/ap/rap/…);
 pure physical specs still carry no spell power / healing.
 
-Enhancement shaman, Ret, and Paladin Protection are hybrids on purpose.
+Enhancement shaman, Enhancement Tank, Ret, and Paladin Protection are hybrids on purpose.
 Warrior Protection is a physical tank -- no spell-power weight.
 """
 import json, sys
@@ -10,12 +10,13 @@ from gq_paths import G
 W=json.load(open(G+"weights.json"))
 # hit/crit/haste are shared Forever stats -- not role-locked.
 MELEE_OFFENSE=["ap","rap","feralAp","expertise","armorPen","wpnDmg","wpnSkill","str"]
-SPELL_OFFENSE=["sp","spSchool","spHoly","heal","sp_from_heal","spellPen",
+SPELL_OFFENSE=["sp","spSchool","spHoly","heal","sp_from_heal","damageDone","spellPen",
                "spShadow","spFire","spFrost","spNature","spArcane"]
 DEAD=["expertise","armorPen","resilience","wpnSkill","spellHit","spellCrit","spellHaste"]
 # Hybrids swing AND cast (or tank with holy/spell threat).
 HYBRID={("PALADIN","protection"),
-        ("PALADIN","retribution"),("SHAMAN","enhancement")}
+        ("PALADIN","retribution"),("SHAMAN","enhancement"),
+        ("SHAMAN","enhancement_tank")}
 CASTER_ANCHOR=0.5
 MELEE_ANCHOR=0.5
 

@@ -23,6 +23,7 @@ _CASTER_SPECS = {
 _GROUNDING_CD_SPECS = {
     ("SHAMAN", "restoration"): 0.35,
     ("SHAMAN", "enhancement"): 0.12,
+    ("SHAMAN", "enhancement_tank"): 0.22,
     ("SHAMAN", "elemental"): 0.04,
 }
 

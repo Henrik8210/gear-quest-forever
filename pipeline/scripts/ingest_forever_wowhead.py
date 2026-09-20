@@ -38,7 +38,7 @@ MOD = {
     31: "hit", 32: "crit", 33: "hitTaken", 34: "critTaken", 35: "resilience",
     36: "haste", 37: "expertise",
     # Forever nether tooltip rating ids.
-    38: "ap", 39: "rap", 41: "heal", 42: "sp", 43: "mp5", 44: "armorPen",
+    38: "ap", 39: "rap", 41: "heal", 42: "damageDone", 43: "mp5", 44: "armorPen",
     45: "sp", 46: "hp5", 47: "spellPen", 48: "blockValue", 50: "armor",
 }
 
@@ -166,14 +166,24 @@ def parse_tooltip(t):
         else:
             o["flags"].append("unscored:" + line[:70])
 
-    # Forever often prints "+N Spell Power" as a green stat, not Equip:.
+    # Forever green stats: Spell Power (both), Damage Done (spell dmg only),
+    # Healing Done (heal only). Rating comments are preferred; text is fallback.
     text = plain(t)
     for amt in re.findall(r"\+(\d+) Spell Power", text):
         if "sp" not in o["stats"]:
             add("sp", int(amt))
-    for amt in re.findall(r"\+(\d+) Healing", text):
+    for amt in re.findall(r"\+(\d+) Damage Done", text):
+        if "damageDone" not in o["stats"] and "sp" not in o["stats"]:
+            add("damageDone", int(amt))
+    for amt in re.findall(r"\+(\d+) Healing Done", text):
         if "heal" not in o["stats"]:
             add("heal", int(amt))
+    for amt in re.findall(r"\+(\d+) Healing(?! Done)", text):
+        if "heal" not in o["stats"]:
+            add("heal", int(amt))
+    for amt in re.findall(r"Restores \+(\d+) mana per 5", text, re.I):
+        if "mp5" not in o["stats"]:
+            add("mp5", int(amt))
 
     eff = []
     for m in re.finditer(r'<span class="q2">((?:Equip|Use|Chance on hit):.*?)</span>', t, re.S):
@@ -192,6 +202,28 @@ def parse_tooltip(t):
         o["temporary"] = True
     if "&lt;Random enchantment&gt;" in t or "Random enchantment" in text:
         o["randomEnchant"] = True
+    idx = text.find("Classes:")
+    if idx >= 0:
+        after = text[idx + 8:].lstrip()
+        class_names = (
+            "Warrior", "Paladin", "Hunter", "Rogue", "Priest",
+            "Shaman", "Mage", "Warlock", "Druid",
+        )
+        names = []
+        while after:
+            hit = None
+            for title in sorted(class_names, key=len, reverse=True):
+                if after.startswith(title):
+                    rest = after[len(title):]
+                    if rest == "" or rest[0] in ", " or rest[0].isupper():
+                        names.append(title)
+                        after = rest.lstrip(" ,")
+                        hit = True
+                        break
+            if not hit:
+                break
+        if names:
+            o["tipClasses"] = names
     if "Binds when picked up" in t:
         o["bind"] = "BoP"
     elif "Binds when equipped" in t:

@@ -47,13 +47,84 @@ with +SP and +healing (Silvered Gauntlets) is not tank BiS even if the stam
 is fat. If it also has +Defense, it is the Hands **notable**. Paladin
 Protection still scores holy/spell threat; Ret and Enhance stay hybrids.
 
+**Shaman Enhancement Tank is a hybrid**, like paladin Protection: 1h + shield,
+stamina / armor / defense first, then Rockbiter melee threat, then Earth Shock /
+Lightning Shield spell threat. Not dual-wield (Forever has no shaman DW).
+`enhancement_tank` in `weights.json`. No combat log sim — EP only; retune
+tankier vs threatier in the weights if play disagrees.
+
 These rules apply to **every class**. Re-score **one class at a time** after
-a rule change. Do not `reemit_all.py` from stale JSON.
+a rule change. Do not `reemit_all.py` from stale JSON. After a tip sync or
+rule change, run `python pipeline/scripts/rescore_hunter_shaman.py` (all nine
+despite the name; `GQ_NO_GUIDES=1`). Pass a class name to do one.
+
+**Class lock uses historical set names, then the tip.** Deathmist is warlock,
+Virtuous is priest, even when Forever omits `Classes:`. Names only gate class;
+stats always come from the Forever tip. `score.py` `family_class_lock` then
+`TIP_CLASS_LOCK`.
+
+## Item facts come from Wowhead Forever hunt tips
+
+Ingest **never overwrites** an id that already exists in `items.json`. Classic
+pieces that Forever remade (Serpent's Shoulders +9 Agi vs live +5, Marshal's
+Chain Legguards +34 Agi and no AP, Jouster's Crest 1051+50 armor) keep stale
+stats until you sync.
+
+Display already paints `foreverAudit.tip`. Scoring reads `items.json`. Those
+must match.
+
+```powershell
+python pipeline/scripts/inventory_hunt_ids.py
+python pipeline/scripts/probe_forever_hunt_tooltips.py
+python pipeline/scripts/sync_forever_item_stats.py --apply
+python pipeline/scripts/rescore_hunter_shaman.py
+python pipeline/scripts/emit_forever_audit.py
+.\scripts\sync-addon.ps1
+```
+
+`sync_forever_item_stats.py` dry-run first. `--apply` only when the parse of
+known items is sane (Imperial Plate Helm **18/17** Str/Sta, not 38 from the
+set bonus; Lionheart **+20 Hit**; Jouster's Crest **1101** armor).
+
+### Tip parser pitfalls (nether text is mashed)
+
+Wowhead Forever tips often have no spaces (`1051 Armor17 Block+9 Stamina+50 Bonus ArmorDurability`).
+
+| Trap | Wrong | Right |
+|------|--------|--------|
+| Set listing / `(N) Set:` bonuses | Imperial Plate Helm 18+20 Str = 38 | `body_only()` cuts at the set header |
+| `Restores +4 mana per 5` | miss mp5 | `Restores \+?N mana per 5` |
+| `+N Bonus Armor` | 185 Feralheart, or **50** on a 1051 shield | base armor + bonus (185+140=325, 1051+50=1101) |
+| `(\d+) Armor\b` | skips `1051 Armor17` (`1` is `\w`, no boundary) | no `\b`; do not take the Bonus Armor digit as base |
+| `+20 Hit+28 Crit`, `+9 Defense+60`, `+6 DodgeClasses` | rating dropped | lookahead `+` / `Durability` / `Classes` |
+| `re.I` + `(?![a-z])` | `HitDurability` fails (`D` matches `[a-z]`) | do not use case-insensitive letter lookahead |
+| Listview armor vs tooltip | PvP 168 vs 128 | trust the hunt tip + bonus armor |
+| `+N Damage Done` | ignored | store `damageDone`; `forever_stats()` folds it into SP |
+
+Index listview rows are not item facts. Veldt is not item facts. Client
+tooltip is the fallback only when Forever has **no** tip.
+
+## Hunt tooltip (addon)
+
+Players should see the Wowhead Forever tip, not the client's stale Equip
+paragraph.
+
+- **Quality** comes from Forever first (`GetItemQualityForDisplay`). Reinforced
+  Woolen Shoulders is **green**, even if `items.json` still says quality 1.
+- **Layout:** slot on the left, armor type on the right (`Shoulder | Leather`).
+  Same for `Damage | Speed`.
+- **Sets:** blank line before the set header, indented piece names, blank
+  before Sell Price. Forever stats stay; client set-bonus overlay only when
+  the bonuses are usable (`GetClientSetBlock` / `ApplyClientSetBlock`).
+- **No Forever tip** → `ShowClientItemTooltip` (`SetItemByID`).
+- Green `+N Spell Power` / Damage Done / Healing Done, not the old Equip
+  “increases damage and healing by up to N” sentence.
 
 ## When you find a new or retuned item in Forever beta
 
-Do not hand-edit generated Lua as the long-term fix. Put the item in the
-pipeline inputs, re-score the class, then copy Lua back.
+Do not hand-edit generated Lua as the long-term fix. Do not hand-edit
+`items.json` stats when a Forever hunt tip exists — sync from the tip, then
+re-score the class, then copy Lua back.
 
 1. **Item facts** — add or edit `pipeline/data/items.json` keyed by item id
    (string). Copy a nearby item of the same slot and fill:
@@ -128,15 +199,15 @@ pipeline inputs, re-score the class, then copy Lua back.
    .\scripts\sync-addon.ps1
    ```
 
-   All nine classes at once:
+   All nine classes at once (Forever model, `GQ_NO_GUIDES=1`):
 
    ```powershell
-   cd pipeline/scripts
-   python score_all.py
-   python reemit_all.py
-   cd ../..
+   python pipeline/scripts/rescore_hunter_shaman.py
    .\scripts\sync-addon.ps1
    ```
+
+   One class: `python pipeline/scripts/rescore_hunter_shaman.py SHAMAN`.
+   Do not `reemit_all.py` from stale `pipeline/out/*.json` after a tip sync.
 
    After a Classic `score.py` regen, do **not** run `apply-classic-random-enchants.mjs`
    (that tool patches TBC-scored Lua). Suffixes already come from Classic
@@ -180,7 +251,9 @@ Hunt-id probe (`pipeline/scripts/probe_forever_hunt_tooltips.py`) labels 200 vs 
 
 **19 Sep 2026 scrape:** 3,245 → **3,586** Forever items. Ingest **+316** pool ids. All nine classes × every spec re-scored and copied into `GearQuest/_generated/`.
 
-**20 Sep 2026 scrape:** index still **3,586** listview rows. `diff_forever_index.py` found **25** ids in the index that were missing from `items.json` (ingest **+24**; Wildstalker's Helm **280898** 404). Mid-level rares that made a list after re-score: **Silvered Gauntlets** (270025), **Cultist's Armguards** (270032), **Dark Ritual Leggings** (270031). Ilvl-65 set pieces (Manaflare, Grimstitch, Wildstalker, Conviction, Spiritcaller) were scored and did not beat existing 60 lists. `clean_source_instructions.py` rewrote world / quest / vendor / drop copy (no “364 creature types”, zone/NPC live in fields). Hunt parchment no longer dumps the mashed Forever audit tooltip; `QuestFont` was eating spaces — body/title use Friz (`GameFontNormal`). **Source** always prints.
+**20 Sep 2026 scrape (morning):** index still **3,586** listview rows. `diff_forever_index.py` found **25** ids in the index that were missing from `items.json` (ingest **+24**; Wildstalker's Helm **280898** 404). Mid-level rares that made a list after re-score: **Silvered Gauntlets** (270025), **Cultist's Armguards** (270032), **Dark Ritual Leggings** (270031). Ilvl-65 set pieces (Manaflare, Grimstitch, Wildstalker, Conviction, Spiritcaller) were scored and did not beat existing 60 lists. `clean_source_instructions.py` rewrote world / quest / vendor / drop copy (no “364 creature types”, zone/NPC live in fields). Hunt parchment no longer dumps the mashed Forever audit tooltip; `QuestFont` was eating spaces — body/title use Friz (`GameFontNormal`). **Source** always prints.
+
+**20 Sep 2026 scrape (evening) + tip sync:** index **3,621** listview rows, **0** new Forever remakes vs the morning catalog. Scoring `items.json` was still Classic/TBC on ~640 hunt pieces. After parser fixes, `sync_forever_item_stats.py --apply` brought those in line (0 dry-run mismatches). Hunt list **3,876** unique ids: **3,858** Forever tips, **18** Classic 404s still on lists (Ten Storms shoulders, Drillborer Disk, Amberseal Keeper, Eskhandar's Left Claw, Will of Arlokk, Staff of the Ruins, The 1 Ring / Woven Copper Ring, and a few unnamed early whites). Historical audit cache still has ~1,500 old 404 rows; current hunt count is the one that matters. Enhancement Tank scored 1–60 with the other shaman specs.
 
 **Finger gap (Horde, levels 9–14):** curated level-9 rings are Alliance paladin/warrior only. Generated shaman Finger starts at 10 with **The 1 Ring (8350)**, which 404s on Forever and is pruned. **Woven Copper Ring (21931)** also 404s. Horde enhancement rings that exist are Bounty Hunter's Ring (5351, Barrens) and Ring of Scorn (3235, Silverpine) around 15. Do not toast “ring slot eligible” unless `SlotHasHunts("Finger")`.
 
@@ -228,7 +301,8 @@ Steady Shot, shaman no dual wield. Level 60 is scored from the model
 Forever ones.
 
 `check_roles.py` enforces the role split: casters carry no str/ap/rap;
-physical specs carry no sp/heal except Ret, Enhance, and Paladin Protection.
+physical specs carry no sp/heal except Ret, Enhance, Enhancement Tank, and
+Paladin Protection. Warrior Protection is physical (no SP/heal).
 
 ### Hunt instructions
 

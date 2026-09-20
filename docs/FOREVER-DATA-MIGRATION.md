@@ -7,7 +7,7 @@ GearQuest Forever targets **WoW Forever 1–60** (Classic+). The fork inherited 
 | Question | Answer |
 |----------|--------|
 | **Is the fork set up correctly?** | **Yes** — separate toc/package/SavedVariables, max level 60, L70 curated removed, migration phases documented. |
-| **Is all BiS data Classic-correct?** | **Mostly** — all nine classes were re-scored on the Classic item pool (cap 60, Classic suffixes). Stat **weights** are still the TBC model. Horde Forever deltas are in `Data.lua`; Alliance Forever items are still outstanding. |
+| **Is all BiS data Classic-correct?** | **Mostly** — all nine classes are on the Forever combat scale (jackpot suffixes, leveling survivability + endurance, `GQ_NO_GUIDES=1`). Item facts come from Wowhead Forever hunt tips (`sync_forever_item_stats.py`). Classic ids that 404 still need replacements. |
 
 **Done:** product split, `GQ.MAX_PLAYER_LEVEL`, phase **2** Classic suffix cache, phase **3** Classic `score.py` regen for all classes. **0** stale TBC +20/@7.9% fingerprint rows.
 
@@ -194,7 +194,9 @@ Keep the pipeline **out of the CurseForge addon zip** (`.pkgmeta` already ignore
 
 ## Stat weights (TBC model → Forever client)
 
-`pipeline/data/weights.json` is still the **TBC Anniversary** scale. Phase 3 re-scored the **item pool** (Classic IDs, Classic suffixes, cap 60) but did not retune what a point of each stat is worth. Level **60** rows mostly come from Wowhead Classic guides, so bad weights hurt **10–59** the most.
+**Update (v0.2.5–0.2.6):** `weights.json` is the Forever combat scale (no expertise / armor pen, unified Hit/Crit/Haste, leveling survivability + endurance, Enhancement Tank). Do not treat the TBC leftover notes below as current. Live authoring: [FOREVER-SCORING.md](../pipeline/docs/FOREVER-SCORING.md).
+
+`pipeline/data/weights.json` was the **TBC Anniversary** scale through phase 3. The paragraphs below are historical: Phase 3 re-scored the **item pool** (Classic IDs, Classic suffixes, cap 60) but did not retune what a point of each stat is worth. Level **60** rows mostly come from Wowhead Classic guides, so bad weights hurt **10–59** the most.
 
 What is TBC-specific today (not just “a bit off”):
 

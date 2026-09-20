@@ -39,6 +39,8 @@ local HORDE = { Horde = true }
 local SHAMAN_CLASS = { SHAMAN = true }
 local SPEC_ELEMENTAL = { elemental = true }
 local SPEC_ENHANCEMENT = { enhancement = true }
+local SPEC_ENHANCEMENT_TANK = { enhancement_tank = true }
+local SPEC_ENHANCEMENT_ALL = { enhancement = true, enhancement_tank = true }
 local SPEC_RESTORATION = { restoration = true }
 local MAGE_CLASS = { MAGE = true }
 local SPEC_MAGE_ALL = { frost = true, fire = true, arcane = true }
@@ -4425,7 +4427,7 @@ GQ.Data.entries = {
         minLevel = 10,
         maxLevel = 14,
         classes = SHAMAN_CLASS,
-        specs = SPEC_ENHANCEMENT,
+        specs = SPEC_ENHANCEMENT_ALL,
         factions = HORDE,
         curatedRank = 1,
         foreverDelta = true,
@@ -6008,6 +6010,38 @@ end
 
 -- Wowhead tips were stored with HTML stripped and no line breaks, so
 -- "Item Level 27Binds when equippedShoulderMail142" reads as one word.
+local FOREVER_TIP_BREAKS = {
+    "Item Level ",
+    "Binds when ",
+    "Unique%-Equipped",
+    "Unique",
+    "Requires Level ",
+    "Requires ",
+    "Classes:",
+    "Sell Price",
+    "Durability",
+    "Dropped by:",
+    "Drop Chance:",
+    "Restores ",
+    "Equip:",
+    "Use:",
+    "Chance on hit:",
+}
+
+-- Only the generic personal convert Wowhead already replaced with +Spell Power.
+-- Do not strip party auras, Flash of Light, or set bonuses.
+local STALE_EQUIP = {
+    "^Equip: Increases damage and healing done by magical spells and effects by up to %d+",
+    "^Equip: Increases healing done by spells and effects by up to %d+",
+    "^Equip: Increases damage done by magical spells and effects by up to %d+",
+}
+
+local GREEN_STAT = {
+    "Spell Power", "Damage Done", "Healing Done", "Ranged Attack Power",
+    "Attack Power", "Critical Strike", "Expertise", "Hit", "Haste",
+    "Defense", "Dodge", "Parry", "Resistance",
+}
+
 function GQ.Data:FormatAuditTip(tip)
     tip = self:SanitizeText(tip)
     if not tip or tip == "" then
@@ -6017,8 +6051,663 @@ function GQ.Data:FormatAuditTip(tip)
     tip = tip:gsub("(%l)(%u)", "%1 %2")
     tip = tip:gsub("(%l)(%d)", "%1 %2")
     tip = tip:gsub("(%l)(%+)", "%1 %2")
+    tip = tip:gsub("%)(%u)", ")\n%1")
+    tip = tip:gsub("%.%(", ".\n(")
+    tip = tip:gsub("%.(%u)", ".\n%1")
+    tip = tip:gsub("(Binds when equipped)", "%1\n")
+    tip = tip:gsub("(Binds when picked up)", "%1\n")
+    tip = tip:gsub("(Unique)(%s)", "%1\n")
+    tip = tip:gsub(" (%d+) Armor", "\n%1 Armor")
+    tip = tip:gsub("(%a)(%d+) Armor", "%1\n%2 Armor")
+    tip = tip:gsub("(%d+) Block", "\n%1 Block")
+    tip = tip:gsub("(%(%d+%) Set :)", "\n%1")
+    tip = tip:gsub("(Requires Level %d+)%s+", "%1\n")
+    for _, head in ipairs(FOREVER_TIP_BREAKS) do
+        tip = tip:gsub("(" .. head .. ")", "\n%1")
+    end
+    tip = tip:gsub("%+(%d+)%s+", "\n+%1 ")
     tip = tip:gsub(" +", " ")
-    return tip
+    tip = tip:gsub("\n+", "\n")
+    return tip:match("^%s*(.-)%s*$")
+end
+
+local GOLD_COIN = "|TInterface\\MoneyFrame\\UI-GoldIcon:12:12:2:0|t"
+local SILVER_COIN = "|TInterface\\MoneyFrame\\UI-SilverIcon:12:12:2:0|t"
+local COPPER_COIN = "|TInterface\\MoneyFrame\\UI-CopperIcon:12:12:2:0|t"
+
+function GQ.Data:FormatSellPriceLine(line)
+    local rest = line and line:match("^Sell Price:%s*(.*)$")
+    if not rest or rest == "" then
+        return line
+    end
+    local nums = {}
+    for n in rest:gmatch("%d+") do
+        nums[#nums + 1] = tonumber(n)
+    end
+    if #nums == 0 then
+        return line
+    end
+    local gold, silver, copper = 0, 0, 0
+    if #nums == 1 then
+        copper = nums[1]
+    elseif #nums == 2 then
+        silver, copper = nums[1], nums[2]
+    else
+        gold, silver, copper = nums[1], nums[2], nums[3]
+    end
+    local amount = gold * 10000 + silver * 100 + copper
+    local coin
+    if GetCoinTextureString then
+        coin = GetCoinTextureString(amount)
+    elseif C_CurrencyInfo and C_CurrencyInfo.GetCoinTextureString then
+        coin = C_CurrencyInfo.GetCoinTextureString(amount)
+    end
+    if coin and coin ~= "" then
+        return "Sell Price: " .. coin
+    end
+    local parts = {}
+    if gold > 0 then
+        parts[#parts + 1] = gold .. GOLD_COIN
+    end
+    if silver > 0 or gold > 0 then
+        parts[#parts + 1] = silver .. SILVER_COIN
+    end
+    parts[#parts + 1] = copper .. COPPER_COIN
+    return "Sell Price: " .. table.concat(parts, " ")
+end
+
+local function lua_escape(s)
+    return (s:gsub("(%W)", "%%%1"))
+end
+
+-- Infer the shared piece prefix from the mashed list ("Savage Gladiator Helm
+-- Savage Gladiator Chain..."), not from the set title. "The Gladiator (0/6)"
+-- is the Wowhead set name; splitting on "Gladiator" alone cuts every piece.
+function GQ.Data:InferSetPiecePrefix(blob, total)
+    if not blob or blob == "" then
+        return nil
+    end
+    total = tonumber(total)
+    local words = {}
+    for w in blob:gmatch("%S+") do
+        words[#words + 1] = w
+    end
+    local best, bestLen = nil, 0
+    for len = math.min(4, #words), 1, -1 do
+        local prefix = table.concat(words, " ", 1, len)
+        local count = 0
+        local pos = 1
+        while true do
+            local a, b = blob:find(prefix, pos, true)
+            if not a then
+                break
+            end
+            count = count + 1
+            pos = b + 1
+        end
+        if count >= 2 and len > bestLen then
+            best = prefix
+            bestLen = len
+            if total and count == total then
+                return prefix
+            end
+        end
+    end
+    return best
+end
+
+-- Wowhead stores set blocks as "Cryptstalker Armor (0/9)Cryptstalker BootsCryptstalker Girdle...".
+-- After camel-case spacing that is one long line; split it like the client tooltip.
+function GQ.Data:SplitSetPieceNames(header, blob, total)
+    local family = self:InferSetPiecePrefix(blob, total)
+    if not family or family == "" then
+        return blob
+    end
+    local out = blob
+    out = out:gsub("of the " .. family, "of the\0" .. family)
+    out = out:gsub(" (" .. lua_escape(family) .. ")", "\n" .. family)
+    out = out:gsub("of the\0", "of the ")
+    out = out:gsub(" (Ring of )", "\nRing of ")
+    out = out:gsub(" (Cloak of )", "\nCloak of ")
+    out = out:gsub(" (Band of )", "\nBand of ")
+    out = out:gsub(" (Pendant of )", "\nPendant of ")
+    out = out:gsub(" (Medallion of )", "\nMedallion of ")
+    return out
+end
+
+function GQ.Data:ExpandForeverSetLines(lines)
+    local out = {}
+    local i = 1
+    while i <= #lines do
+        local line = lines[i]
+        local req, rest = line:match("^(Requires Level %d+)%s+(.+)$")
+        if req and rest then
+            out[#out + 1] = req
+            line = rest
+        end
+        local classesLine, afterClasses = line:match("^(Classes: [%a, ]+)%s+(.+)$")
+        if classesLine and afterClasses and afterClasses:find("%(%d+/%d+%)") then
+            classesLine = classesLine:gsub("%s+$", "")
+            -- Keep only real class names; "Classes: Priest Vestments..." is mashed.
+            local kept = {}
+            for word in classesLine:gmatch("%u%l+") do
+                if word == "Warrior" or word == "Paladin" or word == "Hunter"
+                    or word == "Rogue" or word == "Priest" or word == "Shaman"
+                    or word == "Mage" or word == "Warlock" or word == "Druid" then
+                    kept[#kept + 1] = word
+                end
+            end
+            if #kept > 0 then
+                out[#out + 1] = "Classes: " .. table.concat(kept, ", ")
+                line = afterClasses:match("^%s*(.-)%s*$") or afterClasses
+            end
+        end
+        local name, worn, total, trail = line:match("^(.-)%s*%((%d+)/(%d+)%)%s*(.*)$")
+        if name and total then
+            out[#out + 1] = name .. " (" .. worn .. "/" .. total .. ")"
+            local blob = trail
+            if (not blob or blob == "") and lines[i + 1]
+                and not lines[i + 1]:find("^%(%d+%) Set")
+                and not lines[i + 1]:find("^Sell Price")
+                and not lines[i + 1]:find("^Equip:") then
+                blob = lines[i + 1]
+                i = i + 1
+            end
+            if blob and blob ~= "" then
+                local pieces = self:SplitSetPieceNames(name .. " (" .. worn .. "/" .. total .. ")", blob, total)
+                for piece in string.gmatch(pieces .. "\n", "([^\n]*)\n") do
+                    piece = piece:match("^%s*(.-)%s*$") or ""
+                    if piece ~= "" then
+                        out[#out + 1] = self:ResolveSetPieceLine(piece)
+                    end
+                end
+            end
+            i = i + 1
+        else
+            if line ~= "" then
+                out[#out + 1] = line
+            end
+            i = i + 1
+        end
+    end
+    return out
+end
+
+function GQ.Data:ForeverLineIsName(line, ...)
+    if not line or line == "" then
+        return false
+    end
+    local folded = line:lower()
+    for i = 1, select("#", ...) do
+        local name = select(i, ...)
+        if type(name) == "string" and name ~= "" and folded == name:lower() then
+            return true
+        end
+    end
+    return false
+end
+
+function GQ.Data:ForeverTooltipLines(tip)
+    local text = self:FormatAuditTip(tip)
+    if not text then
+        return {}
+    end
+    local lines = {}
+    for line in string.gmatch(text .. "\n", "([^\n]*)\n") do
+        line = line:match("^%s*(.-)%s*$") or ""
+        if line ~= "" then
+            local stale = false
+            for _, rx in ipairs(STALE_EQUIP) do
+                if line:find(rx) then
+                    stale = true
+                    break
+                end
+            end
+            if not stale then
+                if line:find("^Sell Price") then
+                    line = self:FormatSellPriceLine(line)
+                end
+                lines[#lines + 1] = line
+            end
+        end
+    end
+    local merged = {}
+    local i = 1
+    while i <= #lines do
+        local line = lines[i]
+        local nxt = lines[i + 1]
+        if line == "Restores" and nxt and nxt:find("^%+%d+ mana") then
+            merged[#merged + 1] = "Restores " .. nxt
+            i = i + 2
+        else
+            merged[#merged + 1] = line
+            i = i + 1
+        end
+    end
+    return self:SplitForeverLayoutLines(self:ExpandForeverSetLines(merged))
+end
+
+function GQ.Data:ForeverLineColor(line)
+    if line:find("^Equip:") or line:find("^Use:") or line:find("^Chance on hit")
+        or line:find("^Restores") or line:find("mana per 5", 1, true) then
+        return 0, 1, 0
+    end
+    if line:find("^%+") then
+        for _, label in ipairs(GREEN_STAT) do
+            if line:find(label, 1, true) then
+                return 0, 1, 0
+            end
+        end
+        return 1, 1, 1
+    end
+    if line:find("^%(%d+%) Set") then
+        return 0.5, 0.5, 0.5
+    end
+    if line:find("%(%d+/%d+%)$") then
+        return 1, 0.82, 0.1
+    end
+    if line:find("^Item Level") then
+        return 1, 0.82, 0.1
+    end
+    if line:find("^Sell Price") then
+        return 1, 1, 1
+    end
+    if line:find("^Dropped by") or line:find("^Drop Chance") then
+        return 0.62, 0.62, 0.62
+    end
+    return 1, 1, 1
+end
+
+function GQ.Data:IsSetHeaderLine(line)
+    return type(line) == "string" and line:find("%(%d+/%d+%)%s*$")
+end
+
+-- Client tooltips put slot on the left and armor/weapon type on the right.
+-- Wowhead Forever mashes them ("ShoulderLeather" -> "Shoulder Leather").
+local EQUIP_SLOT_PAT = "Held In Off%-hand|Held In Off%-Hand|One%-Hand|Two%-Hand|Main Hand|Off Hand|Shoulder|Finger|Trinket|Chest|Wrist|Hands|Waist|Legs|Feet|Head|Neck|Back|Ranged|Thrown|Relic"
+local EQUIP_TYPE_PAT = "Fist Weapon|Fishing Pole|Leather|Cloth|Mail|Plate|Shield|Sword|Dagger|Staff|Polearm|Mace|Axe|Crossbow|Wand|Bow|Gun|Thrown|Libram|Totem|Idol|Miscellaneous"
+
+function GQ.Data:SplitForeverLayoutLines(lines)
+    local out = {}
+    local i = 1
+    local combo = "^(" .. EQUIP_SLOT_PAT .. ")%s+(" .. EQUIP_TYPE_PAT .. ")$"
+    local slotOnly = "^(" .. EQUIP_SLOT_PAT .. ")$"
+    local typeOnly = "^(" .. EQUIP_TYPE_PAT .. ")$"
+    while i <= #lines do
+        local line = lines[i]
+        local nxt = lines[i + 1]
+        if type(line) ~= "string" then
+            out[#out + 1] = line
+            i = i + 1
+        else
+            local left, right = line:match(combo)
+            if left and right then
+                out[#out + 1] = { left = left, right = right }
+                i = i + 1
+            elseif line:match(slotOnly) and type(nxt) == "string" and nxt:match(typeOnly) then
+                out[#out + 1] = { left = line, right = nxt }
+                i = i + 2
+            else
+                local dmg, spd = line:match("^(%d+ %- %d+ Damage)%s+(Speed [%d%.]+)$")
+                if dmg and spd then
+                    out[#out + 1] = { left = dmg, right = spd }
+                    i = i + 1
+                elseif line:match("^%d+ %- %d+ Damage$") and type(nxt) == "string" and nxt:match("^Speed ") then
+                    out[#out + 1] = { left = line, right = nxt }
+                    i = i + 2
+                else
+                    out[#out + 1] = line
+                    i = i + 1
+                end
+            end
+        end
+    end
+    return out
+end
+
+function GQ.Data:AddForeverTooltipLines(tooltip, lines, displayName, auditName)
+    local setPhase
+    local worn = 0
+    local lastBlank = false
+
+    local function addBlank()
+        if lastBlank then
+            return
+        end
+        tooltip:AddLine(" ")
+        lastBlank = true
+    end
+
+    for _, line in ipairs(lines) do
+        if type(line) == "table" then
+            tooltip:AddDoubleLine(line.left or "", line.right or "", 1, 1, 1, 1, 1, 1)
+            lastBlank = false
+        else
+            local isHeader = self:IsSetHeaderLine(line)
+            local isBonus = line:find("^%(%d+%) Set")
+            local isTail = line:find("^Sell Price") or line:find("^Dropped")
+            if isHeader then
+                addBlank()
+                setPhase = "pieces"
+                worn = tonumber(line:match("%((%d+)/%d+%)%s*$")) or 0
+            elseif isBonus then
+                setPhase = "bonus"
+            elseif isTail then
+                if setPhase == "bonus" or setPhase == "pieces" then
+                    addBlank()
+                end
+                setPhase = nil
+            end
+
+            -- Skip a leftover title line. Never drop the hovered piece from the set list.
+            if setPhase == "pieces" or not self:ForeverLineIsName(line, displayName, auditName) then
+                local text = line
+                if setPhase == "pieces" and not isHeader and not text:find("^%s") then
+                    text = "  " .. text
+                end
+                local lr, lg, lb
+                if isHeader then
+                    lr, lg, lb = 1, 0.82, 0.1
+                elseif isBonus then
+                    local need = tonumber(line:match("^%((%d+)%) Set"))
+                    if need and worn >= need then
+                        lr, lg, lb = 0, 1, 0
+                    else
+                        lr, lg, lb = 0.5, 0.5, 0.5
+                    end
+                elseif setPhase == "pieces" then
+                    lr, lg, lb = 0.5, 0.5, 0.5
+                else
+                    lr, lg, lb = self:ForeverLineColor(line)
+                end
+
+                local wrap = isBonus or (not isHeader and setPhase ~= "pieces" and not isTail)
+                tooltip:AddLine(text, lr, lg, lb, wrap)
+                lastBlank = false
+            end
+        end
+    end
+end
+
+function GQ.Data:ResolveSetPieceLine(line)
+    local id = line and line:match("^Item #(%d+)$")
+    if not id then
+        return line
+    end
+    id = tonumber(id)
+    local audit = self:GetForeverAudit(id)
+    if audit and audit.name and audit.name ~= "" then
+        return audit.name
+    end
+    local name = GetItemInfo(id)
+    if name and name ~= "" then
+        return name
+    end
+    self:RequestItemInfo(id, true)
+    return line
+end
+
+function GQ.Data:ReadScannerLeftLines(scanner)
+    local name = scanner and scanner.GetName and scanner:GetName()
+    local out = {}
+    local n = (scanner and scanner.NumLines and scanner:NumLines()) or 0
+    for i = 1, n do
+        local fs = name and _G[name .. "TextLeft" .. i]
+        local text = GQ.PublicText(fs and fs.GetText and fs:GetText())
+        if text then
+            text = text:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", ""):gsub("^%s+", ""):gsub("%s+$", "")
+        end
+        if text and text ~= "" then
+            out[#out + 1] = text
+        end
+    end
+    return out
+end
+
+function GQ.Data:ParseSetBlockFromLines(lines)
+    local start
+    for i = 1, #lines do
+        if lines[i]:find("%(%d+/%d+%)$") then
+            start = i
+            break
+        end
+    end
+    if not start then
+        return nil
+    end
+    local block = { header = lines[start], pieces = {}, bonuses = {} }
+    for i = start + 1, #lines do
+        local line = lines[i]
+        if line:find("^Requires Level") or line:find("^Sell Price") or line:find("^Dropped")
+            or line:find("^You haven") or line:find("^Press F")
+            or line:find("^Item Level") or line:find("^Binds when") or line:find("^Durability") then
+            break
+        end
+        if line:find("^Classes:") or line:find("^Item #") or self:IsSetHeaderLine(line) then
+            -- Classes can sit above or below the bonuses; Item # / extra headers are not pieces.
+        elseif line:find("^%(%d+%) Set") then
+            block.bonuses[#block.bonuses + 1] = line
+        else
+            block.pieces[#block.pieces + 1] = line
+        end
+    end
+    return block
+end
+
+function GQ.Data:ClientSetBlockIsUsable(block)
+    if not block or not block.bonuses or #block.bonuses == 0 then
+        return false
+    end
+    if block.header then
+        local total = tonumber(block.header:match("%(%d+/(%d+)%)"))
+        if total == 0 then
+            return false
+        end
+    end
+    local filled = 0
+    for i = 1, #block.bonuses do
+        local rest = block.bonuses[i]:match("^%(%d+%) Set%s*:?%s*(.*)$")
+        if rest and rest:match("%S") then
+            filled = filled + 1
+        end
+    end
+    return filled > 0
+end
+
+function GQ.Data:ScannerSetLooksComplete(lines)
+    for i = 1, #lines do
+        if lines[i]:find("^Sell Price") or lines[i]:find("^Classes:") or lines[i]:find("^Press F") then
+            return true
+        end
+    end
+    return false
+end
+
+function GQ.Data:InvalidateClientSetBlock(itemId)
+    if itemId and self._clientSetBlock then
+        self._clientSetBlock[itemId] = nil
+    end
+end
+
+-- Use the live client set block only when it actually has (2)/(4)/… bonuses.
+-- Empty client bonuses (Savage Gladiator) stay on the Wowhead Forever piece list.
+function GQ.Data:GetClientSetBlock(itemId)
+    if not itemId then
+        return nil, false
+    end
+    self._clientSetBlock = self._clientSetBlock or {}
+    local cached = self._clientSetBlock[itemId]
+    if cached ~= nil then
+        if cached == false then
+            return nil, false
+        end
+        return cached, false
+    end
+
+    self:RequestItemInfo(itemId, true)
+    local scanner = self:GetTooltipScanner()
+    scanner:SetOwner(UIParent, "ANCHOR_NONE")
+    scanner:ClearLines()
+    if not self:SetTooltipItem(scanner, itemId) or self:TooltipLooksRetrieving(scanner) then
+        scanner:Hide()
+        return nil, true
+    end
+    local lines = self:ReadScannerLeftLines(scanner)
+    scanner:Hide()
+    local block = self:ParseSetBlockFromLines(lines)
+    if not block then
+        if self:ScannerSetLooksComplete(lines) then
+            self._clientSetBlock[itemId] = false
+            return nil, false
+        end
+        return nil, true
+    end
+    if #block.bonuses > 0 and self:ClientSetBlockIsUsable(block) then
+        self._clientSetBlock[itemId] = block
+        return block, false
+    end
+    if self:ScannerSetLooksComplete(lines) then
+        self._clientSetBlock[itemId] = false
+        return nil, false
+    end
+    return nil, true
+end
+
+function GQ.Data:ReplaceSetBlock(lines, block)
+    if not block or not block.header then
+        return lines
+    end
+    local body, classes, requires, sell = {}, {}, {}, {}
+    local dropping = false
+    for i = 1, #lines do
+        local line = lines[i]
+        if type(line) == "table" then
+            if not dropping then
+                body[#body + 1] = line
+            end
+        else
+        if self:IsSetHeaderLine(line) or line:find("^Item #") or line:find("^%(%d+%) Set") then
+            dropping = true
+        elseif dropping then
+            if line:find("^Sell Price") or line:find("^Dropped") or line:find("^Requires Level")
+                or line:find("^Classes:") or line:find("^Equip:") or line:find("^Use:")
+                or line:find("^Item Level") or line:find("^Binds") or line:find("^Durability") then
+                dropping = false
+            end
+        end
+        if dropping then
+            -- Wowhead set leftovers
+        elseif line:find("^Sell Price") or line:find("^Dropped") then
+            sell[#sell + 1] = line
+        elseif line:find("^Requires Level") then
+            requires[#requires + 1] = line
+        elseif line:find("^Classes:") then
+            classes[#classes + 1] = line
+        else
+            body[#body + 1] = line
+        end
+        end
+    end
+
+    local out = {}
+    for i = 1, #body do
+        out[#out + 1] = body[i]
+    end
+    for i = 1, #classes do
+        out[#out + 1] = classes[i]
+    end
+    for i = 1, #requires do
+        out[#out + 1] = requires[i]
+    end
+    out[#out + 1] = block.header
+    for p = 1, #block.pieces do
+        out[#out + 1] = block.pieces[p]
+    end
+    for b = 1, #block.bonuses do
+        out[#out + 1] = block.bonuses[b]
+    end
+    for i = 1, #sell do
+        out[#out + 1] = sell[i]
+    end
+    return out
+end
+
+function GQ.Data:LinesHaveSetHeader(lines)
+    for i = 1, #lines do
+        if self:IsSetHeaderLine(lines[i]) then
+            return true
+        end
+    end
+    return false
+end
+
+function GQ.Data:ApplyClientSetBlock(lines, block)
+    if not block or not block.bonuses or #block.bonuses == 0 then
+        return lines
+    end
+    local pieces = {}
+    for i = 1, #(block.pieces or {}) do
+        local piece = block.pieces[i]
+        if piece and piece ~= "" and not piece:find("^Item #") and not self:IsSetHeaderLine(piece) then
+            pieces[#pieces + 1] = piece
+        end
+    end
+    return self:ReplaceSetBlock(lines, {
+        header = block.header,
+        pieces = pieces,
+        bonuses = block.bonuses,
+    })
+end
+
+-- Paint the Wowhead Forever tooltip. The client still shows Classic Equip:
+-- "Increases damage and healing done by up to N" for items that Wowhead
+-- already prints as +N Spell Power / Damage Done / Healing Done.
+function GQ.Data:ShowForeverItemTooltip(tooltip, entry)
+    if not tooltip or not entry then
+        return false
+    end
+    local audit = self:GetForeverAudit(entry.itemId)
+    if not audit or not audit.tip or audit.tip == "" then
+        return false
+    end
+
+    local displayName = self:GetEntryDisplayName(entry) or audit.name or ("Item " .. tostring(entry.itemId))
+    local quality = self:GetItemQualityForDisplay(entry.itemId)
+    local r, g, b = 1, 0.82, 0
+    local c = ITEM_QUALITY_COLORS and quality and ITEM_QUALITY_COLORS[quality]
+    if c then
+        r, g, b = c.r, c.g, c.b
+    elseif quality then
+        r, g, b = GetItemQualityColor(quality)
+    end
+
+    tooltip:ClearLines()
+    tooltip:SetText(displayName, r, g, b)
+
+    if audit.status == "missing" then
+        tooltip:AddLine("Not found on Wowhead Forever", 1, 0.2, 0.2)
+    end
+
+    local lines = self:ForeverTooltipLines(audit.tip)
+    local clientSet, setPending = self:GetClientSetBlock(entry.itemId)
+    if clientSet and clientSet.bonuses and #clientSet.bonuses > 0 then
+        lines = self:ApplyClientSetBlock(lines, clientSet)
+    end
+    self._pendingClientSet = setPending and self:LinesHaveSetHeader(lines)
+    self:AddForeverTooltipLines(tooltip, lines, displayName, audit.name)
+
+    if entry.proc then
+        tooltip:AddLine(" ")
+        tooltip:AddLine(entry.proc, 1, 1, 1, true)
+    end
+    self:AppendSuffixRangeLines(tooltip, entry)
+    local suffixHint = self:GetSuffixHint(entry)
+    if suffixHint then
+        tooltip:AddLine(" ")
+        tooltip:AddLine("Target random enchant: " .. suffixHint, 0.7, 0.9, 1)
+    end
+    self:AppendDatamineNotice(tooltip, entry)
+    return true
 end
 
 function GQ.Data:GetSuffixHint(entry)
@@ -6149,7 +6838,123 @@ function GQ.Data:ShouldShowEntry(entry)
         return false
     end
 
+    if not self:EntryMatchesPlayerClass(entry) then
+        return false
+    end
+
     return true
+end
+
+GQ.Data.TIP_CLASS_NAMES = {
+    Warrior = "WARRIOR", Paladin = "PALADIN", Hunter = "HUNTER",
+    Rogue = "ROGUE", Priest = "PRIEST", Shaman = "SHAMAN",
+    Mage = "MAGE", Warlock = "WARLOCK", Druid = "DRUID",
+}
+
+-- Longest first. Forever remakes often omit Classes: on a piece (Deathmist Robe).
+GQ.Data.CLASS_SET_PREFIX = {
+    {"beaststalker", "HUNTER"}, {"giantstalker", "HUNTER"}, {"dragonstalker", "HUNTER"},
+    {"cryptstalker", "HUNTER"}, {"beastmaster", "HUNTER"},
+    {"predator", "HUNTER"}, {"striker", "HUNTER"},
+    {"deathmist", "WARLOCK"}, {"dreadmist", "WARLOCK"}, {"plagueheart", "WARLOCK"},
+    {"felheart", "WARLOCK"}, {"demoniac", "WARLOCK"}, {"doomcaller", "WARLOCK"},
+    {"nemesis", "WARLOCK"},
+    {"netherwind", "MAGE"}, {"frostfire", "MAGE"}, {"illusionist", "MAGE"},
+    {"sorcerer", "MAGE"}, {"arcanist", "MAGE"}, {"magister", "MAGE"}, {"enigma", "MAGE"},
+    {"transcendence", "PRIEST"}, {"confessor", "PRIEST"}, {"prophecy", "PRIEST"},
+    {"virtuous", "PRIEST"}, {"devout", "PRIEST"},
+    {"nightslayer", "ROGUE"}, {"shadowcraft", "ROGUE"}, {"darkmantle", "ROGUE"},
+    {"bonescythe", "ROGUE"}, {"deathdealer", "ROGUE"}, {"bloodfang", "ROGUE"},
+    {"madcap", "ROGUE"},
+    {"feralheart", "DRUID"}, {"dreamwalker", "DRUID"}, {"wildheart", "DRUID"},
+    {"cenarion", "DRUID"}, {"stormrage", "DRUID"}, {"haruspex", "DRUID"},
+    {"genesis", "DRUID"},
+    {"lawbringer", "PALADIN"}, {"lightforge", "PALADIN"}, {"soulforge", "PALADIN"},
+    {"freethinker", "PALADIN"}, {"redemption", "PALADIN"}, {"judgement", "PALADIN"},
+    {"judgment", "PALADIN"}, {"avenger", "PALADIN"},
+    {"earthshatter", "SHAMAN"}, {"stormcaller", "SHAMAN"}, {"earthfury", "SHAMAN"},
+    {"augur", "SHAMAN"},
+    {"dreadnaught", "WARRIOR"}, {"vindicator", "WARRIOR"}, {"conqueror", "WARRIOR"},
+}
+
+GQ.Data.CLASS_SET_SUFFIX = {
+    {" of the gathering storm", "SHAMAN"},
+    {" of the earthshatterer", "SHAMAN"},
+    {" of the five thunders", "SHAMAN"},
+    {" of the ten storms", "SHAMAN"},
+    {" of the unseen path", "HUNTER"},
+    {" of the oracle", "PRIEST"},
+    {" of elements", "SHAMAN"},
+    {" of heroism", "WARRIOR"},
+    {" of valor", "WARRIOR"},
+    {" of faith", "PRIEST"},
+    {" of might", "WARRIOR"},
+    {" of wrath", "WARRIOR"},
+}
+
+function GQ.Data:SetFamilyClass(name)
+    if not name or name == "" then
+        return nil
+    end
+    local lower = name:lower()
+    for i = 1, #self.CLASS_SET_PREFIX do
+        local row = self.CLASS_SET_PREFIX[i]
+        if lower:sub(1, #row[1]) == row[1] then
+            return row[2]
+        end
+    end
+    for i = 1, #self.CLASS_SET_SUFFIX do
+        local row = self.CLASS_SET_SUFFIX[i]
+        if lower:sub(-#row[1]) == row[1] then
+            return row[2]
+        end
+    end
+    return nil
+end
+
+function GQ.Data:TipRequiredClasses(tip)
+    if not tip or tip == "" then
+        return nil
+    end
+    local pos = tip:find("Classes:", 1, true)
+    if not pos then
+        return nil
+    end
+    local after = tip:sub(pos + 8)
+    local found = {}
+    for word in after:gmatch("(%u%l+)") do
+        local token = self.TIP_CLASS_NAMES[word]
+        if not token then
+            break
+        end
+        found[#found + 1] = token
+    end
+    if #found == 0 then
+        return nil
+    end
+    return found
+end
+
+function GQ.Data:EntryMatchesPlayerClass(entry)
+    if not entry or not entry.itemId then
+        return true
+    end
+    local classFile = GQ:GetEffectiveClass()
+    if not classFile then
+        return true
+    end
+    local audit = self:GetForeverAudit(entry.itemId)
+    local family = self:SetFamilyClass((audit and audit.name) or entry.name)
+    local required = family and { family } or self:TipRequiredClasses(audit and audit.tip)
+    if not required then
+        return true
+    end
+    for i = 1, #required do
+        if required[i] == classFile then
+            return true
+        end
+    end
+    return false
 end
 
 function GQ.Data:GetTooltipScanner()
@@ -6235,6 +7040,27 @@ function GQ.Data:CacheTradeSkillRecipes()
     end
 end
 
+function GQ.Data:CraftSkillFromText(text, profession)
+    if not text or text == "" then
+        return nil
+    end
+    if profession then
+        local skill = tonumber(text:match(profession .. "%s*%((%d+)%)"))
+        if skill and skill > 0 then
+            return skill
+        end
+        skill = tonumber(text:match("requires skill (%d+)"))
+        if skill and skill > 0 and text:find(profession, 1, true) then
+            return skill
+        end
+    end
+    local skill = tonumber(text:match("requires skill (%d+)"))
+    if skill and skill > 0 then
+        return skill
+    end
+    return nil
+end
+
 function GQ.Data:LookupProfessionCraftSkill(itemId, profession)
     if not itemId then
         return nil
@@ -6246,70 +7072,25 @@ function GQ.Data:LookupProfessionCraftSkill(itemId, profession)
 
     self._craftSkillCache = self._craftSkillCache or {}
     local cached = self._craftSkillCache[itemId]
+    if cached == false then
+        return nil
+    end
     if cached and cached > 0 then
         return cached
     end
 
-    if GQ.Equip and GQ.Equip.PrimeItem then
-        GQ.Equip:PrimeItem(itemId)
-    else
-        GetItemInfo(itemId)
-    end
-
-    local itemLink = select(2, GetItemInfo(itemId))
-    if not itemLink then
-        return nil
-    end
-
-    local scanner = self:GetTooltipScanner()
-    scanner:SetOwner(UIParent, "ANCHOR_NONE")
-    scanner:ClearLines()
-    scanner:SetHyperlink(itemLink)
-    if scanner.Show then
-        scanner:Show()
-    end
-
-    local craftSkill
-    local scannerName = scanner:GetName()
-    for i = 1, scanner:NumLines() do
-        for _, suffix in ipairs({ "TextLeft", "TextRight" }) do
-            local line = _G[scannerName .. suffix .. i]
-            local text = StripTooltipText(line and line:GetText())
-            if text ~= "" then
-                if profession and text:find(profession, 1, true) then
-                    local skill = tonumber(text:match("%((%d+)%)"))
-                    if skill and skill > 0 then
-                        craftSkill = skill
-                        break
-                    end
-                end
-
-                local profName, skillText = text:match("([%a%s]+) %((%d+)%)")
-                local skill = skillText and tonumber(skillText)
-                if skill and skill > 0 then
-                    if not profession or not profName
-                        or profName:find(profession, 1, true)
-                        or profession:find(StripTooltipText(profName), 1, true) then
-                        craftSkill = skill
-                        break
-                    end
-                end
-            end
-        end
-        if craftSkill then
-            break
-        end
-    end
-
-    if scanner.Hide then
-        scanner:Hide()
-    end
-
+    local audit = self:GetForeverAudit(itemId)
+    local craftSkill = self:CraftSkillFromText(audit and audit.tip, profession)
     if craftSkill and craftSkill > 0 then
         self._craftSkillCache[itemId] = craftSkill
+        return craftSkill
     end
 
-    return craftSkill
+    -- Item tooltips do not include recipe skill. Do not SetHyperlink-scan here:
+    -- LoadGenerated used to do that for every profession row and hit
+    -- "script ran too long".
+    self._craftSkillCache[itemId] = false
+    return nil
 end
 
 function GQ.Data:GetProfessionInstructions(entry)
@@ -6649,17 +7430,19 @@ function GQ.Data:GetItemQualityForDisplay(itemId)
     if not itemId then
         return nil
     end
-    local fact = self:GetItemFact(itemId)
-    if fact and type(fact.quality) == "number" and fact.quality > 0 then
-        return fact.quality
-    end
+    -- Forever quality wins (Reinforced Woolen Shoulders is green on Wowhead,
+    -- but stale items.json still says common/white).
     local audit = self:GetForeverAudit(itemId)
-    if audit and type(audit.quality) == "number" and audit.quality > 0 then
+    if audit and type(audit.quality) == "number" then
         return audit.quality
     end
     local quality = GQ.Equip and GQ.Equip.GetKnownItemQuality and GQ.Equip:GetKnownItemQuality(itemId)
-    if type(quality) == "number" and quality > 0 then
+    if type(quality) == "number" then
         return quality
+    end
+    local fact = self:GetItemFact(itemId)
+    if fact and type(fact.quality) == "number" then
+        return fact.quality
     end
     return nil
 end
@@ -6685,43 +7468,43 @@ function GQ.Data:ShowFactFallbackTooltip(tooltip, entry)
 
     tooltip:ClearLines()
     tooltip:SetText(displayName, r, g, b)
-    if entry.slot then
-        tooltip:AddLine(entry.slot, 1, 1, 1)
-    end
 
     local fact = self:GetItemFact(entry.itemId)
     local audit = self:GetForeverAudit(entry.itemId)
     if audit and audit.status == "missing" then
         tooltip:AddLine("Not found on Wowhead Forever", 1, 0.2, 0.2)
     end
-    if fact and fact.kind then
-        tooltip:AddLine(fact.kind, 0.8, 0.8, 0.8)
-    end
-    local reqLevel = fact and fact.reqLevel
-    if reqLevel and reqLevel > 0 then
-        tooltip:AddLine("Requires Level " .. tostring(reqLevel), 1, 1, 1)
-    end
     if audit and audit.tip and audit.tip ~= "" then
-        tooltip:AddLine(" ")
-        for line in string.gmatch((self:FormatAuditTip(audit.tip) or "") .. "\n", "([^\n]*)\n") do
-            if line ~= "" then
-                tooltip:AddLine(line, 0.9, 0.9, 0.9, true)
+        local lines = self:ForeverTooltipLines(audit.tip)
+        local clientSet = self:GetClientSetBlock(entry.itemId)
+        if clientSet and clientSet.bonuses and #clientSet.bonuses > 0 then
+            lines = self:ApplyClientSetBlock(lines, clientSet)
+        end
+        self:AddForeverTooltipLines(tooltip, lines, displayName, audit.name)
+    else
+        if entry.slot then
+            tooltip:AddLine(entry.slot, 1, 1, 1)
+        end
+        if fact and fact.kind then
+            tooltip:AddLine(fact.kind, 0.8, 0.8, 0.8)
+        end
+        local reqLevel = fact and fact.reqLevel
+        if reqLevel and reqLevel > 0 then
+            tooltip:AddLine("Requires Level " .. tostring(reqLevel), 1, 1, 1)
+        end
+        if fact and fact.stats then
+            for stat, value in pairs(fact.stats) do
+                if type(value) == "number" and value ~= 0 then
+                    tooltip:AddLine(string.format("+%s %s", tostring(value), tostring(stat)), 0, 1, 0)
+                end
             end
         end
-    elseif fact and fact.stats then
-        for stat, value in pairs(fact.stats) do
-            if type(value) == "number" and value ~= 0 then
-                local label = tostring(stat)
-                tooltip:AddLine(string.format("+%s %s", tostring(value), label), 0, 1, 0)
-            end
+        local instructions = (fact and fact.instructions) or entry.instructions
+        if instructions and instructions ~= "" then
+            instructions = self:SanitizeText(instructions) or instructions
+            tooltip:AddLine(" ")
+            tooltip:AddLine(instructions, 0.8, 0.8, 0.8, true)
         end
-    end
-
-    local instructions = (fact and fact.instructions) or entry.instructions
-    if instructions and instructions ~= "" then
-        instructions = self:SanitizeText(instructions) or instructions
-        tooltip:AddLine(" ")
-        tooltip:AddLine(instructions, 0.8, 0.8, 0.8, true)
     end
     if entry.proc then
         tooltip:AddLine(" ")
@@ -6834,6 +7617,7 @@ function GQ.Data:EnsurePendingTooltipRefresh()
             if not tooltip or not tooltip.IsShown or not tooltip:IsShown() then
                 pending[tooltip] = nil
             elseif entry and itemId and entry.itemId == itemId then
+                self:InvalidateClientSetBlock(itemId)
                 local failed = success == false and entry and entry.itemId == itemId
                 self:RefreshPendingTooltip(tooltip, entry, failed)
             end
@@ -6971,48 +7755,38 @@ function GQ.Data:GetEntryItemHyperlink(entry)
     return "item:" .. entry.itemId
 end
 
+function GQ.Data:ShowClientItemTooltip(tooltip, entry)
+    if not tooltip or not entry or not entry.itemId then
+        return false
+    end
+    if entry.suffix and entry.suffix ~= "" then
+        return self:TryShowSuffixTargetTooltip(tooltip, entry)
+    end
+    if not self:SetTooltipItem(tooltip, entry.itemId) or self:TooltipLooksRetrieving(tooltip) then
+        return false
+    end
+    return true
+end
+
 function GQ.Data:PopulateEntryItemTooltip(tooltip, entry)
     if not tooltip or not entry or not entry.itemId then
         return false
     end
 
-    self:RequestItemInfo(entry.itemId, true)
-
-    if entry.suffix and entry.suffix ~= "" then
-        self:EnrichEntrySuffix(entry)
-        local link = self:MakeSuffixTargetLink(entry)
-        if link then
-            self:RequestItemInfo(link, true)
-            if self:SetTooltipItem(tooltip, link)
-                and not self:TooltipLooksRetrieving(tooltip)
-                and self:TooltipShowsEntrySuffix(tooltip, entry) then
-                self:ClearPendingItemTooltip(tooltip)
-                return true
-            end
-        end
-
-        -- Client rendered the unsuffixed base item (Forever) or the link is
-        -- still uncached. Paint the hunt name + suffix stats ourselves.
-        if self:ItemInfoIsReady(entry.itemId) then
-            self:ShowSuffixFallbackTooltip(tooltip, entry)
+    -- Forever tip wins for stats. Names only decide class. No Forever tip
+    -- means the live client tooltip, not reconstructed pipeline facts.
+    if self:ShowForeverItemTooltip(tooltip, entry) then
+        if self._pendingClientSet then
+            self:TrackPendingItemTooltip(tooltip, entry)
+        else
             self:ClearPendingItemTooltip(tooltip)
-            return true
         end
-
-        self:ShowFactFallbackTooltip(tooltip, entry)
-        self:TrackPendingItemTooltip(tooltip, entry)
         return true
     end
 
-    if self:ItemInfoIsReady(entry.itemId) then
-        if self:SetTooltipItem(tooltip, entry.itemId) and not self:TooltipLooksRetrieving(tooltip) then
-            if entry.proc then
-                tooltip:AddLine(" ")
-                tooltip:AddLine(entry.proc, 1, 1, 1, true)
-            end
-            self:ClearPendingItemTooltip(tooltip)
-            return true
-        end
+    if self:ShowClientItemTooltip(tooltip, entry) then
+        self:ClearPendingItemTooltip(tooltip)
+        return true
     end
 
     self:ShowFactFallbackTooltip(tooltip, entry)
@@ -7573,6 +8347,7 @@ local NOTABLE_SPECS = {
     SHAMAN = {
         elemental   = { elemental   = true },
         enhancement = { enhancement = true },
+        enhancement_tank = { enhancement_tank = true },
         restoration = { restoration = true },
     },
     ROGUE = {
@@ -8081,6 +8856,9 @@ function GQ.Data:GetWeaponRouteLabel(route)
     local spec = GQ:GetEffectiveSpec()
     local dualWieldTerms = classFile == "HUNTER"
         or (classFile == "SHAMAN" and spec == "enhancement")
+    if classFile == "SHAMAN" and spec == "enhancement_tank" then
+        return "One-hand + shield"
+    end
     if route == "twohand" then
         return dualWieldTerms and "Two-hand build" or "Staff build"
     end

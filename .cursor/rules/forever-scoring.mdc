@@ -34,3 +34,7 @@ Survivability also means having and keeping mana. Call this **endurance**. It is
 ## Warrior tank is physical
 
 Warrior Protection does not score spell power or healing. A glove with +SP / +healing (Silvered Gauntlets) is not BiS even if the stam is fat. If it also has defense, it is the **notable** for that slot — not rank 1.
+
+## Shaman Enhancement Tank is a hybrid
+
+Like paladin Protection: 1h + shield, stamina/armor/defense first, then Rockbiter melee threat, then Earth Shock / Lightning Shield spell threat. Not dual-wield (Forever has no shaman DW). `enhancement_tank` in `weights.json`.

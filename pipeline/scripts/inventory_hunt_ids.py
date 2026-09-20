@@ -24,9 +24,9 @@ def main():
     facts = {}
     picks = []  # dicts
     for path in sorted(GEN.glob("Data.*.generated.lua")):
-        if "StatWeights" in path.name or "CraftSkills" in path.name:
+        if any(x in path.name for x in ("StatWeights", "CraftSkills", "ForeverAudit")):
             continue
-        text = path.read_text(encoding="utf-8")
+        text = path.read_text(encoding="utf-8", errors="replace")
         cls = class_from_filename(path.name)
         for m in FACT_RE.finditer(text):
             iid = int(m.group(1))

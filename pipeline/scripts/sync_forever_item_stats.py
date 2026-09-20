@@ -25,18 +25,19 @@ PLUS = [
     (r"\+(\d+)\s+Critical Strike", "crit"),
     (r"\+(\d+)\s+Spell Power", "sp"),
     (r"\+(\d+)\s+Healing Done", "heal"),
-    (r"\+(\d+)\s+Damage Done", "sp_from_heal"),
+    (r"\+(\d+)\s+Damage Done", "damageDone"),
     (r"\+(\d+)\s+Healing(?! Done)", "heal"),
     (r"\+(\d+)\s+Strength", "str"),
     (r"\+(\d+)\s+Agility", "agi"),
     (r"\+(\d+)\s+Stamina", "sta"),
     (r"\+(\d+)\s+Intellect", "int"),
     (r"\+(\d+)\s+Spirit", "spi"),
-    (r"\+(\d+)\s+Hit\b", "hit"),
-    (r"\+(\d+)\s+Haste\b", "haste"),
-    (r"\+(\d+)\s+Defense\b", "defense"),
-    (r"\+(\d+)\s+Dodge\b", "dodge"),
-    (r"\+(\d+)\s+Parry\b", "parry"),
+    # Mashed nether text: +20 Hit+28 Crit, +15 HitDurability, +6 DodgeClasses.
+    (r"\+(\d+)\s+Hit(?=\+|Durability|Classes|\s|$)", "hit"),
+    (r"\+(\d+)\s+Haste(?=\+|Durability|Classes|\s|$)", "haste"),
+    (r"\+(\d+)\s+Defense(?=\+|Durability|Classes|\s|$)", "defense"),
+    (r"\+(\d+)\s+Dodge(?=\+|Durability|Classes|\s|$)", "dodge"),
+    (r"\+(\d+)\s+Parry(?=\+|Durability|Classes|\s|$)", "parry"),
 ]
 PLUS = [(re.compile(p, re.I), k) for p, k in PLUS]
 
@@ -45,29 +46,46 @@ EQUIP = [
     (re.compile(r"Increases damage and healing done by magical spells and effects by up to (\d+)", re.I), "sp"),
     (re.compile(r"Increases (?:your )?(?:melee and ranged )?attack power by (\d+)(?! when)", re.I), "ap"),
     (re.compile(r"Increases ranged attack power by (\d+)", re.I), "rap"),
-    (re.compile(r"Restores (\d+) mana per 5", re.I), "mp5"),
-    (re.compile(r"Restores (\d+) health per 5", re.I), "hp5"),
+    (re.compile(r"Restores \+?(\d+) mana per 5", re.I), "mp5"),
+    (re.compile(r"Restores \+?(\d+) health per 5", re.I), "hp5"),
     (re.compile(r"Increases attack power by (\d+) in Cat, Bear", re.I), "feralAp"),
 ]
-ARMOR = re.compile(r"(?<![.\d])(\d+)\s*Armor\b")
-BLOCK = re.compile(r"(?<![.\d])(\d+)\s*Block\b")
+# Mashed "1051 Armor17 Block" / "9 BlockRestores" — no \b (digit and letter are \w).
+ARMOR = re.compile(r"(?<![.\d])(\d+)\s*Armor")
+BLOCK = re.compile(r"(?<![.\d])(\d+)\s*Block")
 DPS = re.compile(r"\(([\d.]+)\s+damage per second\)", re.I)
 SPEED = re.compile(r"Speed\s+([\d.]+)")
 DMG = re.compile(r"(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)\s+Damage")
 
 SCORE = (
     "str", "agi", "sta", "int", "spi", "ap", "rap", "sp", "heal", "sp_from_heal",
-    "hit", "crit", "haste", "mp5", "hp5", "feralAp", "defense", "dodge", "parry",
-    "blockValue", "armor",
+    "damageDone", "hit", "crit", "haste", "mp5", "hp5", "feralAp", "defense",
+    "dodge", "parry", "blockValue", "armor",
+)
+BONUS_ARMOR = re.compile(r"\+(\d+)\s+Bonus Armor", re.I)
+SET_CUT = re.compile(
+    r"(?:Classes:\s*[A-Za-z, ]+)?[A-Z][A-Za-z' :-]{1,50}\(\d+/\d+\)"
 )
 DEAD = ("expertise", "armorPen", "resilience", "spellHit", "spellCrit", "spellHaste",
         "hitRanged", "critRanged")
+
+
+def body_only(tip: str) -> str:
+    """Drop the set listing and (N) Set bonuses so those stats are not on the piece."""
+    m = SET_CUT.search(tip)
+    if m:
+        return tip[: m.start()]
+    m = re.search(r"\(\d+\) Set\s*:", tip)
+    if m:
+        return tip[: m.start()]
+    return tip
 
 
 def parse_tip(tip: str) -> dict:
     st = {}
     if not tip:
         return st
+    tip = body_only(tip)
 
     def add(k, v):
         if v:
@@ -86,6 +104,9 @@ def parse_tip(tip: str) -> dict:
         else:
             add(key, int(m.group(1)))
     m = ARMOR.search(tip)
+    if m:
+        add("armor", int(m.group(1)))
+    m = BONUS_ARMOR.search(tip)
     if m:
         add("armor", int(m.group(1)))
     m = BLOCK.search(tip)

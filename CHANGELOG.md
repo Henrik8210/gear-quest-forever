@@ -2,6 +2,31 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
+## v0.2.6-beta
+
+Hunt tooltips match Wowhead Forever, scoring stats synced from those tips, and shaman **Enhancement Tank**.
+
+### Hunt tooltips
+
+- Title quality comes from Forever first (Reinforced Woolen Shoulders is green, not white).
+- Slot stays left, armor type right (`Shoulder | Leather`). Same for `Damage | Speed`.
+- Set items: blank before the set header, indented pieces, blank before Sell Price. Forever stats stay.
+- No Forever tip → the live client tooltip.
+- Green `+N Spell Power` / Damage Done / Healing Done, not the client's stale Equip paragraph.
+- Historical dungeon/raid set names still lock class when Forever omits `Classes:` (Deathmist = warlock, Virtuous = priest). Stats stay Forever.
+
+### Scoring
+
+- **Enhancement Tank** (1h + shield): stamina / armor / defense first, then Rockbiter melee threat, then shock / Lightning Shield spell threat. Not dual-wield.
+- `items.json` overwritten from hunt tips so remakes rank on Forever numbers (Marshal's Chain Legguards, Jouster's Crest armor, Lionheart hit, mashed `+20 Hit+28` / `1051 Armor17` / set-bonus stats no longer leak onto the piece).
+- All nine classes re-scored 1–60 (`GQ_NO_GUIDES=1`).
+
+### Catalog
+
+Wowhead Forever index **3,621** (0 new remakes vs the morning scrape). Hunt list **3,876** ids: **3,858** tips, **18** Classic 404s still on lists.
+
+Authoring notes: [pipeline/docs/FOREVER-SCORING.md](pipeline/docs/FOREVER-SCORING.md).
+
 ## v0.2.5-beta
 
 Forever scoring model for every class, a Wowhead re-ingest, readable hunt text, and warrior-tank honesty.
