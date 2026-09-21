@@ -163,7 +163,7 @@ GQ.Data.warlockEarly1to9Facts = {
     [283471]={name="Fellicent's Bindings",quality=2,ilvl=14,reqLevel=9,sourceType="world_drop",instructions="Drops from Fellicent's Shade.",npc="Fellicent's Shade"},
     [284287]={name="Felweaver's Staff",quality=2,ilvl=13,reqLevel=8,sourceType="world_drop",instructions="Drops from Felweaver Scornn.",npc="Felweaver Scornn"},
     [284323]={name="Geolord's Mitts",quality=2,ilvl=11,reqLevel=6,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
-    [285238]={name="Chipped Spellstaff",quality=2,ilvl=8,reqLevel=3,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
+    [285238]={name="Chipped Spellstaff",quality=2,ilvl=8,reqLevel=3,sourceType="world_drop",instructions="Drops from Slydris.",npc="Slydris"},
     [285253]={name="Skyseer's Gloves",quality=2,ilvl=11,reqLevel=6,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
     [285264]={name="Skyseer's Slippers",quality=2,ilvl=10,reqLevel=5,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
 }

@@ -401,65 +401,10 @@ function GQ.Indicator:ResolveTrainerServiceItemId(index)
 end
 
 function GQ.Indicator:ResolveTrainerServiceLink(index)
-    if not index or index <= 0 then
-        return nil
-    end
-
-    if IsTradeskillTrainer and IsTradeskillTrainer() and GameTooltip and GameTooltip.SetTrainerService then
-        local link = ResolveLinkFromTooltip(function()
-            GameTooltip:SetTrainerService(index)
-        end)
-        if link then
-            return link
-        end
-    end
-
-    local serviceName = GetTrainerServiceName(index)
-    local matchedId = self:MatchTrainerServiceName(serviceName)
-    if matchedId then
-        return "item:" .. matchedId
-    end
-
-    if GetTrainerServiceItemLink then
-        local link = GetTrainerServiceItemLink(index)
-        if link then
-            return link
-        end
-    end
-
-    if GameTooltip and GameTooltip.SetTrainerService then
-        local link = ResolveLinkFromTooltip(function()
-            GameTooltip:SetTrainerService(index)
-        end)
-        if link then
-            return link
-        end
-    end
-
     return nil
 end
 
 function GQ.Indicator:UpdateTrainerDetailIcon()
-    local detailIcon = _G.ClassTrainerSkillIcon
-    if not detailIcon or (detailIcon.IsShown and not detailIcon:IsShown()) then
-        detailIcon = self:FindTrainerDetailIconHost()
-    end
-    if not detailIcon then
-        return
-    end
-
-    local index = GetSelectedTrainerServiceIndex()
-    if not index or index <= 0 or IsTrainerServiceHeader(index) then
-        self:HideButton(detailIcon)
-        return
-    end
-
-    local link = self:ResolveTrainerServiceLink(index)
-    if link then
-        self:UpdateButton(detailIcon, link)
-    else
-        self:HideButton(detailIcon)
-    end
 end
 
 function GQ.Indicator:FindTrainerDetailIconHost()
@@ -594,80 +539,12 @@ function GQ.Indicator:HideProfessionListRows(getButton, count)
 end
 
 function GQ.Indicator:UpdateClassTrainerFrame()
-    if not ClassTrainerFrame or not ClassTrainerFrame:IsShown() then
-        return
-    end
-
-    if not GetNumTrainerServices or not GetTrainerServiceInfo then
-        return
-    end
-
-    local displayed = CLASS_TRAINER_SKILLS_DISPLAYED or 11
-    self:HideProfessionListRows(function(i)
-        return _G["ClassTrainerSkill" .. i]
-    end, displayed)
-
-    if ClassTrainerFrame.ScrollBox and ClassTrainerFrame.ScrollBox.ForEachFrame then
-        ClassTrainerFrame.ScrollBox:ForEachFrame(function(button)
-            GQ.Indicator:HideButton(button)
-        end)
-    end
-
-    if ClassTrainerFrame.skillStepButton then
-        self:HideButton(ClassTrainerFrame.skillStepButton)
-    end
-
-    self:UpdateTrainerDetailIcon()
 end
 
 function GQ.Indicator:ScheduleTrainerRefresh()
-    if not C_Timer or not C_Timer.After then
-        self:UpdateClassTrainerFrame()
-        return
-    end
-
-    local delays = { 0, 0.05, 0.15, 0.35, 0.6, 1.0 }
-    for _, delay in ipairs(delays) do
-        C_Timer.After(delay, function()
-            if not GQ.Indicator or not ClassTrainerFrame or not ClassTrainerFrame:IsShown() then
-                return
-            end
-            if delay >= 0.35 then
-                GQ.Indicator:RebuildCache()
-            end
-            GQ.Indicator:UpdateClassTrainerFrame()
-        end)
-    end
 end
 
 function GQ.Indicator:StartTrainerDetailWatcher()
-    self:StopTrainerDetailWatcher()
-
-    local frame = CreateFrame("Frame")
-    local elapsed = 0
-    local ticks = 0
-    frame:SetScript("OnUpdate", function(_, dt)
-        if not ClassTrainerFrame or not ClassTrainerFrame:IsShown() then
-            frame:SetScript("OnUpdate", nil)
-            GQ.Indicator.trainerDetailWatcher = nil
-            return
-        end
-
-        elapsed = elapsed + dt
-        if elapsed < 0.2 then
-            return
-        end
-        elapsed = 0
-        ticks = ticks + 1
-
-        GQ.Indicator:UpdateTrainerDetailIcon()
-
-        if ticks >= 15 then
-            frame:SetScript("OnUpdate", nil)
-            GQ.Indicator.trainerDetailWatcher = nil
-        end
-    end)
-    self.trainerDetailWatcher = frame
 end
 
 function GQ.Indicator:StopTrainerDetailWatcher()
@@ -678,53 +555,12 @@ function GQ.Indicator:StopTrainerDetailWatcher()
 end
 
 function GQ.Indicator:EnsureTrainerListButtonHooks()
-    local displayed = CLASS_TRAINER_SKILLS_DISPLAYED or 11
-    for i = 1, displayed do
-        local button = _G["ClassTrainerSkill" .. i]
-        if button and not button.gqTrainerListHooked then
-            button.gqTrainerListHooked = true
-            button:HookScript("OnClick", function()
-                GQ.Indicator:ScheduleTrainerRefresh()
-            end)
-        end
-    end
 end
 
 function GQ.Indicator:EnsureTrainerFrameHooks()
-    if not ClassTrainerFrame or ClassTrainerFrame.gqTrainerFrameHooked then
-        return
-    end
-
-    ClassTrainerFrame.gqTrainerFrameHooked = true
-
-    ClassTrainerFrame:HookScript("OnShow", function()
-        GQ.Indicator:EnsureTrainerHooks()
-        GQ.Indicator:EnsureTrainerListButtonHooks()
-        GQ.Indicator:ScheduleTrainerRefresh()
-        GQ.Indicator:StartTrainerDetailWatcher()
-    end)
-
-    ClassTrainerFrame:HookScript("OnHide", function()
-        GQ.Indicator:StopTrainerDetailWatcher()
-    end)
-
-    if ClassTrainerFrame:IsShown() then
-        self:EnsureTrainerHooks()
-        self:EnsureTrainerListButtonHooks()
-        self:ScheduleTrainerRefresh()
-        self:StartTrainerDetailWatcher()
-    end
 end
 
 function GQ.Indicator:OnTrainerOpen()
-    self:EnsureTrainerHooks()
-    self:EnsureTrainerFrameHooks()
-    self:EnsureTrainerListButtonHooks()
-    self:RebuildCache()
-    self:PrimeDataItemInfo()
-    self:PrimeUpgradeItemInfo()
-    self:ScheduleTrainerRefresh()
-    self:StartTrainerDetailWatcher()
 end
 
 function GQ.Indicator:GetIconAnchor(button)
@@ -1009,11 +845,7 @@ function GQ.Indicator:ScheduleRebuildCache()
         self._rebuildDebounce = false
         if self.RebuildCacheAsync then
             self:RebuildCacheAsync(function()
-                if ClassTrainerFrame and ClassTrainerFrame:IsShown() then
-                    self:ScheduleTrainerRefresh()
-                else
-                    self:RefreshAll()
-                end
+                self:RefreshAll()
             end)
         else
             self:RebuildCache()
@@ -1450,49 +1282,9 @@ function GQ.Indicator:RefreshAll()
     self:UpdateTradeSkillFrame()
     self:UpdateCraftFrame()
     self:UpdateMerchantFrame()
-    self:UpdateClassTrainerFrame()
 end
 
 function GQ.Indicator:EnsureTrainerHooks()
-    if self.trainerHooksReady then
-        return
-    end
-
-    if type(ClassTrainerFrame_Update) ~= "function" then
-        return
-    end
-
-    self.trainerHooksReady = true
-
-    self:HookFunction("ClassTrainerFrame_Update", function()
-        GQ.Indicator:UpdateClassTrainerFrame()
-    end)
-
-    self:HookFunction("ClassTrainer_SetSelection", function()
-        GQ.Indicator:ScheduleTrainerRefresh()
-    end)
-
-    self:HookFunction("ClassTrainer_ShowSkillDetails", function()
-        GQ.Indicator:ScheduleTrainerRefresh()
-    end)
-
-    self:HookFunction("BuyTrainerService", function()
-        GQ.Indicator:ScheduleTrainerRefresh()
-    end)
-
-    self:HookFunction("ClassTrainerFrame_OnShow", function()
-        GQ.Indicator:OnTrainerOpen()
-    end)
-
-    self:HookFunction("ClassTrainerFrame_Show", function()
-        GQ.Indicator:OnTrainerOpen()
-    end)
-
-    self:HookFunction("ClassTrainerSkillButton_OnClick", function()
-        GQ.Indicator:ScheduleTrainerRefresh()
-    end)
-
-    self:UpdateClassTrainerFrame()
 end
 
 function GQ.Indicator:EnsureMerchantHooks()
@@ -1568,7 +1360,6 @@ function GQ.Indicator:Init()
     end)
 
     self:EnsureMerchantHooks()
-    self:EnsureTrainerHooks()
 
     local eventFrame = CreateFrame("Frame")
     local events = {
@@ -1585,9 +1376,6 @@ function GQ.Indicator:Init()
         "TRADE_SKILL_DETAILS_UPDATE",
         "CRAFT_SHOW",
         "CRAFT_UPDATE",
-        "TRAINER_SHOW",
-        "TRAINER_UPDATE",
-        "TRAINER_DESCRIPTION_UPDATE",
         "GET_ITEM_INFO_RECEIVED",
         "PLAYER_ENTERING_WORLD",
     }
@@ -1595,20 +1383,13 @@ function GQ.Indicator:Init()
         GQ.RegisterEvent(eventFrame, events[i])
     end
     eventFrame:SetScript("OnEvent", function(_, event, arg1, arg2)
-        if event == "ADDON_LOADED" and (arg1 == "Blizzard_TrainerUI" or arg1 == "Blizzard_TradeSkillUI") then
-            GQ.Indicator:EnsureTrainerHooks()
-            GQ.Indicator:EnsureTrainerFrameHooks()
-            if ClassTrainerFrame and ClassTrainerFrame:IsShown() then
-                GQ.Indicator:OnTrainerOpen()
-            end
-            if arg1 == "Blizzard_TradeSkillUI" then
-                GQ.Indicator:HookFunction("TradeSkillFrame_Update", function()
-                    GQ.Indicator:UpdateTradeSkillFrame()
-                end)
-                GQ.Indicator:HookFunction("TradeSkillFrame_SetSelection", function()
-                    GQ.Indicator:ScheduleProfessionRefresh()
-                end)
-            end
+        if event == "ADDON_LOADED" and arg1 == "Blizzard_TradeSkillUI" then
+            GQ.Indicator:HookFunction("TradeSkillFrame_Update", function()
+                GQ.Indicator:UpdateTradeSkillFrame()
+            end)
+            GQ.Indicator:HookFunction("TradeSkillFrame_SetSelection", function()
+                GQ.Indicator:ScheduleProfessionRefresh()
+            end)
             return
         end
 
@@ -1643,11 +1424,6 @@ function GQ.Indicator:Init()
                     GQ.Indicator.itemNameCache[itemId] = name
                 end
             end
-            return
-        end
-
-        if event == "TRAINER_SHOW" or event == "TRAINER_UPDATE" or event == "TRAINER_DESCRIPTION_UPDATE" then
-            GQ.Indicator:OnTrainerOpen()
             return
         end
 

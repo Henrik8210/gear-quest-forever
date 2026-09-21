@@ -9,7 +9,7 @@ end
 GQ = GQ or {}
 _G.GearQuest = GQ
 
-GQ.VERSION = "0.2.6-beta"
+GQ.VERSION = "0.2.7-beta"
 GQ.ADDON_NAME = ADDON_NAME
 -- WoW Forever: 1–60 Classic+ (no TBC level cap).
 GQ.MAX_PLAYER_LEVEL = 60

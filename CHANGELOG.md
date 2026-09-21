@@ -2,6 +2,16 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
+## v0.2.7-beta
+
+Profession trainers no longer freeze the client. Wowhead catalog +4 held offhands (none made BiS).
+
+- Removed in-game item collection (`Collector.lua`). GearQuest does not scan trainers, vendors, bags, or tooltips for new item IDs.
+- Class-trainer hooks are off: no `TRAINER_UPDATE` cache rebuild, no `SetTrainerService` scrape. Talking to a profession trainer is safe. BiS arrows still work on loot, vendors, quests, and your own trade-skill window.
+- Wowhead Forever **3,625** items. Four new offhands (Gnawed Bone, Apothecary's Concoction, Kobold Firestarter, Bael'dun Tankard) were ingested and scored for caster/healer classes; they did not take a top-3 slot.
+
+Authoring notes: [pipeline/docs/FOREVER-SCORING.md](pipeline/docs/FOREVER-SCORING.md).
+
 ## v0.2.6-beta
 
 Hunt tooltips match Wowhead Forever, scoring stats synced from those tips, and shaman **Enhancement Tank**.

@@ -56,7 +56,7 @@ After a Wowhead scrape, run `node scripts/diff-veldt-wowhead.mjs` as an extra ch
 
 **20 Sep 2026 (morning):** index still 3,586 rows; **24** missing ids ingested (Silvered Gauntlets, Cultist's Armguards, Dark Ritual Leggings, plus ilvl-65 sets that did not crack 60 BiS). Hunt instructions cleaned; parchment no longer dumps mashed tooltips or eats spaces. Warrior prot spell-power weight removed — Silvered Gauntlets is a Hands notable for +3 Defense.
 
-**20 Sep 2026 (evening):** index **3,621**, 0 new remakes. Synced ~640 stale `items.json` rows from hunt tips (parser must cut set bonuses and survive mashed `Armor17` / `Hit+28` / `DodgeClasses`). Hunt **3,876** ids, **3,858** tips, **18** Classic 404s. Enhancement Tank added. Hunt item tooltips: Forever quality, slot \| type, set spacing; no tip → client. Details: [`FOREVER-SCORING.md`](../pipeline/docs/FOREVER-SCORING.md).
+**21 Sep 2026:** index **3,625** (+4 held-in-off-hand greens). Re-scored mage/priest/warlock/druid/shaman/paladin; none made top 3. **Do not scan profession trainers in-game** — Collector is deleted; trainer hooks froze the client (`Script exceeded its execution time limit`). Details: [`FOREVER-SCORING.md`](../pipeline/docs/FOREVER-SCORING.md).
 
 Classic ids that 404 are pruned from hunts at load (`GQ.Data:PruneMissingForever`, fed by `_generated/Data.ForeverAudit.generated.lua`). Items that exist but have no combat stats, suffixes, or effect lines show **Has not been datamined yet** — hunt source text is not a tooltip.
 
@@ -569,7 +569,7 @@ GearQuest shows a **green ↑** on item icons when that item is one of your curr
 | **Need/Greed roll frames** | Group loot rolls on BiS upgrades |
 | **Quest log reward choices** | Quest rewards that match a top-3 hunt |
 | **Vendor window** | Items the merchant sells that are BiS upgrades |
-| **Trainer window** | **Detail inset icon only** — large icon at bottom when a recipe is selected (e.g. Copper Chain Pants at Smith Argus) |
+| **Trainer window** | **Removed (v0.2.7).** Scanning trainer recipes on `TRAINER_UPDATE` froze the client. Do not re-hook class trainers. |
 | **Trade Skill window** | **Detail inset icon only** — large icon at bottom when a recipe is selected (e.g. Rough Copper Vest in Blacksmithing) |
 | **Craft window** | Detail icon when the recipe produces an equippable BiS item (First Aid, etc.) |
 
@@ -577,14 +577,7 @@ GearQuest shows a **green ↑** on item icons when that item is one of your curr
 
 #### Trainer window (Class Trainer / profession trainers)
 
-| Topic | Detail |
-|-------|--------|
-| **Detail icon frame** | `ClassTrainerSkillIcon` (classic / TBC Anniversary layout). Do not rely on `TradeSkillDetailIcon` naming — that frame is tradeskill-only. |
-| **Load order** | `Blizzard_TrainerUI` is **LoadOnDemand**. Hooks on `ClassTrainerFrame_Update`, `ClassTrainer_SetSelection`, etc. are registered in `EnsureTrainerHooks()` when the trainer opens (`TRAINER_SHOW`, `ADDON_LOADED`) — not at addon load, or they never attach after `/reload`. |
-| **Open vs click** | After `/reload`, opening Smith Argus runs Blizzard’s initial `ClassTrainer_SetSelection` **before** GearQuest hooks exist. The arrow only appeared after clicking a list row until we added `OnTrainerOpen()`: frame `OnShow` hooks, list-button `OnClick` hooks, staggered `C_Timer.After` refreshes (0–1 s), and a short detail-icon watcher (~3 s) that polls `ClassTrainerSkillIcon`. |
-| **Link before learning profession** | `GetTrainerServiceItemLink(index)` is often **nil** until the player learns the profession or the client caches the item. Fallback order: tooltip `GameTooltip:SetTrainerService(index)` + `Show()` → match `GetTrainerServiceName(index)` to upgrade `itemId` → `GetTrainerServiceItemLink`. |
-| **Name matching** | Service name from the list (e.g. `"Copper Chain Pants"`) is matched to top-3 upgrade items. Use `Data:GetItemDisplayName(itemId)` which falls back to `PROFESSION_ITEM_NAMES` in `Data.lua` when `GetItemInfo` is not cached yet. |
-| **Classic API quirk** | `GetTrainerServiceInfo(index)` returns `(name, subText, serviceType, isExpanded)` — read **service type from the 3rd return**, not the 2nd (2nd is sub-text, not `"available"` / `"header"`). |
+**Removed in v0.2.7.** Do not register `TRAINER_SHOW` / `TRAINER_UPDATE`, hook `ClassTrainerFrame_*`, or call `GameTooltip:SetTrainerService`. That scrape exceeded the Lua time cap and froze the client. New items come from Wowhead ingest only. Green arrows still apply on the player's **Trade Skill** window.
 
 #### Trade Skill window (your profession UI)
 
