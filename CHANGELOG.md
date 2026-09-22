@@ -2,6 +2,22 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
+## v0.2.9-beta
+
+Crafted BiS from the supply camps now says who sells the recipe, for both factions.
+
+- **Horde:** Durotar Supply and Logistics, northwest of the Crossroads in The Barrens.
+- **Alliance:** Azeroth Commerce Authority, Three Corners in Redridge Mountains.
+- Leatherworking: Pawani (Horde), Daniel Stitchsong (Alliance).
+- Blacksmithing: Gor'mak (Horde), Stondry Darkhammer (Alliance).
+- Tailoring: Jim'bek (Horde), Mivin Shadowweave (Alliance).
+- Enchanting: Beneris (Horde), Alynsia (Alliance).
+- Engineering: Fizzlefuse (Horde), Fritz Fizzle (Alliance).
+
+The description is on every piece of those sets, including when the item and the pattern use different words (Stormrider's Leather Armor and Tunic, Gilded Slippers and Sandals). Trainer crafts such as linen and mithril stay on the short "Crafted with …" line.
+
+Authoring notes: [pipeline/docs/FOREVER-SCORING.md](pipeline/docs/FOREVER-SCORING.md).
+
 ## v0.2.8-beta
 
 Mage **Battle Mage** specs, and imbued weapons say how to make them.

@@ -151,6 +151,27 @@ tooltip: Death Prophet Spine (274158), Corsepickers (282012), Slimy Sword
 **Login chat** is the two welcome lines only. Ring and specialization notices
 print when the character crosses that level, then never again on `/reload`.
 
+### Merchant's Favor camps
+
+A lot of the crafted BiS (Brawler's leather, Trapper's leather, Veteran's silvered
+mail, Shining / Flame cloth, the enchanting staves and off-hands, the engineering
+goggles and belts) is bought as a recipe for Merchant's Favor, then crafted.
+
+| | Horde | Alliance |
+|---|---|---|
+| Camp | Durotar Supply and Logistics, northwest of the Crossroads in The Barrens | Azeroth Commerce Authority, Three Corners in Redridge Mountains |
+| Leatherworking | Pawani | Daniel Stitchsong |
+| Blacksmithing | Gor'mak | Stondry Darkhammer |
+| Tailoring | Jim'bek | Mivin Shadowweave |
+| Enchanting | Beneris | Alynsia |
+| Engineering | Fizzlefuse | Fritz Fizzle |
+
+Alchemy (Horde: Apothecary Durelle, Alliance: Nina Surefire) and cooking
+(Horde: Aza'bek, Alliance: Kalsey Sanden) stand in the same camps. They do not
+make worn gear, so those recipes are not hunt text.
+
+The hunt line is `Crafted with <profession>. You can buy the recipe from <Horde vendor> at <Horde camp>, or from <Alliance vendor> at <Alliance camp>.` The pattern and the crafted piece often use different slot words (Stormrider's Leather Armor and Tunic; Gilded Sandals and Gilded Slippers; Waistcord and Cord). Every piece of those named sets gets the camp sentence (`pipeline/scripts/commerce_camps.py`). Trainer recipes (linen, mageweave, mithril, scorpid, and the rest) stay on the short profession line.
+
 Index listview rows are not item facts. Veldt is not item facts. A client
 tooltip overrides a Forever tip only when it is pinned above. Otherwise the
 client tooltip is the fallback when Forever has **no** tip.

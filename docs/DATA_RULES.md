@@ -125,6 +125,8 @@ You do not need all five in every slot, but do not stop after vendors alone if a
 
 For **profession** entries, also set optional `profession = "Blacksmithing"` (or Tailoring, Leatherworking, …) and mention the trainer, recipe, and where to craft in `instructions`. The hunt completes only when the player **crafts** the output item (`itemId`), not when they learn the recipe alone.
 
+Forever camp crafts (Brawler's and Stormrider's leather, including Armor as well as Tunic, Veteran's mail, Shining cloth, and the other sets sold for Merchant's Favor) name both vendors in `instructions`: Horde buys from the profession vendor at the Durotar Supply and Logistics camp northwest of the Crossroads in The Barrens; Alliance buys from the matching vendor at the Azeroth Commerce Authority camp at Three Corners in Redridge Mountains. The list of sold outputs and the sentence live in `pipeline/scripts/commerce_camps.py`. Classic trainer recipes stay on the short "Crafted with …" line. A known craft skill is inserted into the first sentence and does not drop the vendor sentence.
+
 **Profession learnable upgrades — green arrows (automatic):** Any entry with `sourceType = "profession"` whose output is a **top-3 upgrade** for the player’s class/level automatically gets the green ↑ in **both** places below. No extra flags or per-entry UI config — only correct `itemId`, ranking, and (for new recipes) a row in `PROFESSION_ITEM_NAMES` if name lookup is needed before `GetItemInfo` caches.
 
 | Where | When |

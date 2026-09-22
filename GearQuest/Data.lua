@@ -7237,7 +7237,13 @@ function GQ.Data:GetProfessionInstructions(entry)
     local craftSkill = self:LookupProfessionCraftSkill(entry.itemId, entry.profession)
     if craftSkill and craftSkill > 0 then
         local profession = entry.profession or "Profession"
-        return string.format("Crafted with %s (requires skill %d).", profession, craftSkill)
+        local head = string.format("Crafted with %s (requires skill %d).", profession, craftSkill)
+        -- Keep the camp vendor sentence that follows "Crafted with …."
+        local rest = instructions:match("^Crafted with [^.]*%.(.*)$")
+        if rest and rest:find("%S") then
+            return head .. rest
+        end
+        return head
     end
 
     return instructions

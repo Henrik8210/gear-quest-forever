@@ -24,6 +24,7 @@ import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from commerce_camps import camp_instructions
 from gq_paths import G, DATA
 
 def _client_pins():
@@ -251,7 +252,7 @@ def source_from_row(row, parsed, name):
         npc = None
     if source_type == "profession":
         skill = profession or "a profession"
-        instructions = f"Crafted with {skill}."
+        instructions = camp_instructions(name, profession) or f"Crafted with {skill}."
     elif source_type == "vendor" and npc:
         instructions = f"Bought from {npc}."
     elif source_type == "quest_reward":
