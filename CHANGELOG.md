@@ -2,6 +2,19 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
+## v0.2.8-beta
+
+Mage **Battle Mage** specs, and imbued weapons say how to make them.
+
+- **Battle Mage (Frost)** is the new hunt. Fire and Arcane battle mage are in the spec menu too. Damage is that school's spell power, with a small weapon-swing weight. Stamina stays only a step above a normal mage.
+- **Coldflame Saber** is the mage main hand from level 21. Stats are the Forever client tooltip (+7 Intellect, +32 spell power and healing, 98 Fire on melee against Frozen targets), not Wowhead's higher white damage.
+- Imbue tooltip: the sword's own stats stay the normal colors. Only the imbue effect is grey. Instead of a second Equip line: **Use: Combine the Blade of Silverlaine and Imbue Blade.**
+- The saber is mage-only, so it leaves rogue, warrior, and paladin lists. Blade of Silverlaine keeps the client +28 spell power.
+- Login and `/reload` print only the welcome lines. Ring and specialization notices show once, when you actually cross that level.
+- New leather feet: Shapeshifting Sentinel's Strides (level 24).
+
+Authoring notes: [pipeline/docs/FOREVER-SCORING.md](pipeline/docs/FOREVER-SCORING.md).
+
 ## v0.2.7-beta
 
 Profession trainers no longer freeze the client. Wowhead catalog +4 held offhands (none made BiS).

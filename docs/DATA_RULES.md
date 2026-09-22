@@ -493,7 +493,7 @@ This keeps low-level logs focused and avoids empty categories. When a slot **fir
 | Mechanism | Where | What it does |
 |-----------|--------|----------------|
 | **Slot unlock level** | `GQ.Data.SLOT_UNLOCK_LEVEL` in `Data.lua` | Slot category omitted from log/popup/indicators until `GetEffectiveLevel()` ≥ unlock level. |
-| **Level-up milestone** | `GQ:CheckLevelMilestones` in `Core.lua` | One-time chat print when the player **crosses** the level where new slot content applies. Fires on real level-up, `/gq level N`, and login if not yet notified. |
+| **Level-up milestone** | `GQ:CheckLevelMilestones` in `Core.lua` | One-time chat print when the player **crosses** the level where new slot content applies. Fires on a real level-up and `/gq level N`. Login and `/reload` do not print it; they only mark milestones this character has already passed. |
 
 #### Message wording (principle)
 

@@ -9,7 +9,7 @@ end
 GQ = GQ or {}
 _G.GearQuest = GQ
 
-GQ.VERSION = "0.2.7-beta"
+GQ.VERSION = "0.2.8-beta"
 GQ.ADDON_NAME = ADDON_NAME
 -- WoW Forever: 1–60 Classic+ (no TBC level cap).
 GQ.MAX_PLAYER_LEVEL = 60
@@ -181,8 +181,11 @@ function GQ:PLAYER_LOGIN()
     local previewNote = self.Preview:IsEnabled() and (" (" .. self:GetPreviewLabel() .. ")") or ""
     print("|cff66ccffGearQuest|r v" .. self.VERSION .. " By Weber8210 loaded" .. previewNote .. ". Right-click a gear slot on your character panel, or |cff00ff00/gq|r.")
     print("|cff66ccffGearQuest|r: Click the minimap icon to open GearQuest.")
+    -- Login and /reload only print the welcome lines above. Milestone chat
+    -- belongs to a real level-up, and a character already past that level
+    -- is marked seen so a later check cannot repeat it.
     run("milestones", function()
-        self:CheckLevelMilestones(nil, self:GetEffectiveLevel())
+        self:RememberMilestonesAlreadyPassed(self:GetEffectiveLevel())
     end)
     if self.Log and self.Log.ScheduleAutoCompletionCheck then
         run("auto-complete", function()
@@ -302,48 +305,92 @@ function GQ:RefreshUI(opts)
     end
 end
 
-function GQ:NotifyMilestoneOnce(key, message)
+function GQ:MilestoneTables()
+    GearQuestForeverCharDB = GearQuestForeverCharDB or {}
+    GearQuestForeverCharDB.milestones = GearQuestForeverCharDB.milestones or {}
     GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
     GearQuestForeverDB.settings.milestones = GearQuestForeverDB.settings.milestones or {}
-    local milestones = GearQuestForeverDB.settings.milestones
+    return GearQuestForeverCharDB.milestones, GearQuestForeverDB.settings.milestones
+end
 
-    -- Legacy key from first ring-slot message.
-    if key == "ringSlot1" and milestones.ringSlots then
-        milestones.ringSlot1 = true
+function GQ:MilestoneSeen(key)
+    local char, account = self:MilestoneTables()
+    if key == "ringSlot1" and (char.ringSlots or account.ringSlots) then
+        char.ringSlot1 = true
+        account.ringSlot1 = true
     end
+    return char[key] or account[key]
+end
 
-    if milestones[key] then
+function GQ:MarkMilestone(key)
+    local char, account = self:MilestoneTables()
+    char[key] = true
+    account[key] = true
+end
+
+function GQ:NotifyMilestoneOnce(key, message)
+    if self:MilestoneSeen(key) then
+        self:MarkMilestone(key)
         return
     end
 
-    milestones[key] = true
+    self:MarkMilestone(key)
     print(message)
+end
+
+-- A character who logs in already past a milestone has had their chance.
+-- Record it without printing. Welcome chat is the only login message.
+function GQ:RememberMilestonesAlreadyPassed(level)
+    level = tonumber(level)
+    if not level then
+        return
+    end
+
+    if level >= 10 then
+        self:MarkMilestone("specSwitch")
+    end
+
+    local fingerUnlock = 9
+    if GQ.Data and GQ.Data.GetSlotUnlockLevel then
+        fingerUnlock = GQ.Data:GetSlotUnlockLevel("Finger") or fingerUnlock
+    end
+    if level >= fingerUnlock then
+        self:MarkMilestone("ringSlot1")
+    end
+
+    local ringSlot2Level = GQ.Data and GQ.Data.RING_SLOT_2_MILESTONE_LEVEL
+    if ringSlot2Level and level >= ringSlot2Level then
+        self:MarkMilestone("ringSlot2")
+    end
 end
 
 function GQ:CheckLevelMilestones(previousLevel, newLevel)
     -- Slot unlock messages — see docs/DATA_RULES.md § Slot unlock & level-up messages.
-    if not newLevel then
+    -- Only when the player crosses the level. Login must not call this.
+    if not newLevel or not previousLevel or newLevel <= previousLevel then
         return
     end
-
-    previousLevel = previousLevel or 0
 
     -- Finger milestones follow this character's hunts, not the Alliance paladin
     -- level-9 band. Horde shaman has no Finger rows until later; do not toast an empty slot.
     local fingerHunts = GQ.Data and GQ.Data.GetTopUpgradesForSlot and GQ.Data:GetTopUpgradesForSlot("Finger", 3)
     local fingerCount = fingerHunts and #fingerHunts or 0
-    if fingerCount > 0 then
+    local fingerUnlock = 9
+    if GQ.Data and GQ.Data.GetSlotUnlockLevel then
+        fingerUnlock = GQ.Data:GetSlotUnlockLevel("Finger") or fingerUnlock
+    end
+    if fingerCount > 0 and previousLevel < fingerUnlock and newLevel >= fingerUnlock then
         self:NotifyMilestoneOnce(
             "ringSlot1",
             "|cff66ccffGearQuest|r: You've reached level " .. newLevel .. " — one of your ring slots is now eligible for an upgrade! Open |cff00ff00/gq log|r to browse finger upgrades."
         )
-        local ringSlot2Level = GQ.Data.RING_SLOT_2_MILESTONE_LEVEL
-        if fingerCount >= 2 and ringSlot2Level and newLevel >= ringSlot2Level then
-            self:NotifyMilestoneOnce(
-                "ringSlot2",
-                "|cff66ccffGearQuest|r: You've reached level " .. newLevel .. " — your other ring slot is now eligible for an upgrade! Open |cff00ff00/gq log|r to browse finger upgrades."
-            )
-        end
+    end
+    local ringSlot2Level = GQ.Data and GQ.Data.RING_SLOT_2_MILESTONE_LEVEL
+    if fingerCount >= 2 and ringSlot2Level and previousLevel < ringSlot2Level and newLevel >= ringSlot2Level then
+        self:NotifyMilestoneOnce(
+            "ringSlot2",
+            "|cff66ccffGearQuest|r: You've reached level " .. newLevel .. " — your other ring slot is now eligible for an upgrade! Open |cff00ff00/gq log|r to browse finger upgrades."
+        )
     end
 
     -- Level 10: talent specs — log button and /gq spec filter gear lists.

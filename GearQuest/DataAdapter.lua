@@ -114,12 +114,18 @@ local SOURCES = {
     hasSpec = true,
     specs = { frost  = { frost  = true },
               fire   = { fire   = true },
-              arcane = { arcane = true } } },
+              arcane = { arcane = true },
+              battlemage_frost  = { battlemage_frost  = true },
+              battlemage_fire   = { battlemage_fire   = true },
+              battlemage_arcane = { battlemage_arcane = true } } },
   { class = "MAGE",    picks = "mageEarly1to9",    facts = "mageEarly1to9Facts",
     hasSpec = true,
     specs = { frost  = { frost  = true },
               fire   = { fire   = true },
-              arcane = { arcane = true } } },
+              arcane = { arcane = true },
+              battlemage_frost  = { battlemage_frost  = true },
+              battlemage_fire   = { battlemage_fire   = true },
+              battlemage_arcane = { battlemage_arcane = true } } },
 }
 
 local CLASSTBL = {}

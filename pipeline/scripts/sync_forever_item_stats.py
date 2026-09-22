@@ -135,9 +135,16 @@ def main():
     items = json.loads(ITEMS.read_text(encoding="utf-8"))
     rand = json.loads(RAND.read_text(encoding="utf-8"))
 
+    pins = set()
+    pin_path = Path(DATA) / "client_item_overrides.json"
+    if pin_path.exists():
+        pins = set(json.loads(pin_path.read_text(encoding="utf-8")))
+
     diffs = []
     patched = 0
     for key, row in tips.items():
+        if str(key) in pins:
+            continue
         if not isinstance(row, dict) or row.get("status") != "ok":
             continue
         iid = int(key)

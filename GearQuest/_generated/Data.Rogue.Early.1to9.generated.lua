@@ -171,7 +171,7 @@ GQ.Data.rogueEarly1to9Facts = {
     [284320]={name="Flayed Scorpid Bands",quality=2,ilvl=13,reqLevel=8,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
     [285236]={name="Worn Ranger's Dagger",quality=2,ilvl=8,reqLevel=3,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
     [285239]={name="Explorer's Shortsword",quality=2,ilvl=8,reqLevel=3,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
-    [285254]={name="Scout Ranger's Gloves",quality=2,ilvl=11,reqLevel=6,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
+    [285254]={name="Scout Ranger's Gloves",quality=2,ilvl=11,reqLevel=6,sourceType="world_drop",instructions="Drops from Galemender Delanea.",npc="Galemender Delanea"},
     [285268]={name="Scout Ranger's Boots",quality=2,ilvl=10,reqLevel=5,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
     [285273]={name="Scout Ranger's Belt",quality=2,ilvl=10,reqLevel=5,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
 }

@@ -1,0 +1,42 @@
+{
+  "273637": {
+    "source": "Forever client tooltip, confirmed 2026-09-22. Wowhead nether tip overstates white damage and omits spell power.",
+    "rlvl": 21,
+    "dps": 10.9,
+    "speed": 2.3,
+    "dmgMin": 17.0,
+    "dmgMax": 33.0,
+    "stats": {
+      "resist": 6,
+      "sp": 28,
+      "heal": 28
+    },
+    "tipClasses": [],
+    "procs": [],
+    "effects": [],
+    "tip": "Item Level 26\nBinds when picked up\nMain Hand Sword\n17 - 33 Damage Speed 2.30\n(10.9 damage per second)\n+6 Shadow Resistance\n+28 Spell Power\n+28 Healing Done\nRequires Level 21\nSell Price: 37 72"
+  },
+  "276631": {
+    "source": "Forever client tooltip, confirmed 2026-09-22. Wowhead nether tip overstates white damage, drops +32 spell power, and the stored rlvl was 24. Client requires level 21. Classes: Mage.",
+    "rlvl": 21,
+    "dps": 12.2,
+    "speed": 2.0,
+    "dmgMin": 17.0,
+    "dmgMax": 32.0,
+    "stats": {
+      "int": 7,
+      "sp": 32,
+      "heal": 32
+    },
+    "tipClasses": ["Mage"],
+    "procs": [
+      "Equip: Melee attacks deal 98 Fire additional damage against Frozen targets."
+    ],
+    "effects": [
+      "Equip: Melee attacks deal 98 Fire additional damage against Frozen targets."
+    ],
+    "imbueScroll": "Imbue Blade",
+    "imbueBase": "Blade of Silverlaine",
+    "tip": "Item Level 29\nBinds when picked up\nMain Hand Sword\n17 - 32 Damage Speed 2.00\n(12.2 damage per second)\n+7 Intellect\n+32 Spell Power\n+32 Healing Done\nClasses: Mage\nRequires Level 21\nEquip: Melee attacks deal 98 Fire additional damage against Frozen targets.\nSell Price: 47 16"
+  }
+}

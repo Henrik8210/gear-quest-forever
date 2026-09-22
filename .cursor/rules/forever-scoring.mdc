@@ -38,3 +38,7 @@ Warrior Protection does not score spell power or healing. A glove with +SP / +he
 ## Shaman Enhancement Tank is a hybrid
 
 Like paladin Protection: 1h + shield, stamina/armor/defense first, then Rockbiter melee threat, then Earth Shock / Lightning Shield spell threat. Not dual-wield (Forever has no shaman DW). `enhancement_tank` in `weights.json`.
+
+## Mage Battle Mage
+
+Caster who swings. Specs: `battlemage_frost` (the hunt), `battlemage_fire`, `battlemage_arcane`. Spell power of that school first. Stamina base 0.15 (slightly above frost 0.1). Weapon `dpsWeight` 0.35. Coldflame Saber and Blade of Silverlaine stats are the Forever **client** tooltip, pinned in `client_item_overrides.json`. Do not sync the Wowhead nether tip back over them. The saber’s 98 Fire vs Frozen is every swing during a freeze (`FROZEN_MELEE_UPTIME` 25% frost, 15% fire/arcane). On an imbued weapon, printed stats stay the normal colors and only the imbue effect is grey. Do not repeat that effect. Add `Use: Combine the <base weapon> and <scroll>.` (`CLIENT_IMBUE` in `Data.lua`).

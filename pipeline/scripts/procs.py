@@ -33,6 +33,16 @@ import re, json
 
 # ---- scenario constants -----------------------------------------------------
 PPM_DEFAULT      = 2.0    # weapon procs with no stated chance
+# Coldflame Saber: every melee hit deals fire while the target is Frozen.
+# Not a chance-on-hit. Uptime is the share of swings that land during a freeze
+# (Frost Nova window), not a permanent aura. Frost battle mage keeps the freeze
+# up more often; fire and arcane still talent into it so the sword works.
+# Other specs do not swing into Frozen, so they score the line at 0.
+FROZEN_MELEE_UPTIME = {
+    "battlemage_frost": 0.25,
+    "battlemage_fire": 0.15,
+    "battlemage_arcane": 0.15,
+}
 FIGHT_SECONDS    = 45.0   # one levelling engagement; sets on-use cooldown value
 SWING_1H         = 2.6
 SWING_2H         = 3.4
@@ -80,6 +90,16 @@ def classify(text):
     # rank 1 in a Horde warrior's off hand for every level from 1 to 19, and the
     # same for the paladin list that already shipped.
     if re.match(r"use:\s*use\b", low): return []
+
+    # Every swing while Frozen, not a proc chance. Must win before the
+    # generic "deal N damage" parser, which would price it at PPM_DEFAULT.
+    m=re.search(
+        r"melee attacks deal "+NUM+r"(?:\s+\w+)?\s+additional damage against frozen",
+        low,
+    )
+    if m:
+        out.append(("frozen_melee",{"amt":n(m.group(1))}))
+        return out
 
     on_use = low.startswith("use:")
     cd=None
@@ -188,7 +208,19 @@ def value(procs, item, spec, weights, dpsWeight, level, onUseOnly=False):
         dmg_pts_this_line=[0.0]
         for kind,p in classify(line):
             if onUseOnly and not p.get("onUse"): continue
-            if kind=="dmg" or kind=="dot":
+            if kind=="frozen_melee":
+                up = FROZEN_MELEE_UPTIME.get(spec, 0.0)
+                if up <= 0 or not dpsWeight:
+                    why.append(f"frozen melee {p['amt']:.0f} -> 0")
+                    continue
+                rate = swings_min * up
+                pts, dps = dmg_points(p["amt"], rate)
+                total += pts
+                why.append(
+                    f"frozen melee {p['amt']:.0f} @ {up*100:.0f}% of swings "
+                    f"({rate:.1f}/min) = {dps:.1f} dps -> {pts:.1f}"
+                )
+            elif kind=="dmg" or kind=="dot":
                 # An on-use nuke fires once per cooldown, not PPM_DEFAULT times a
                 # minute. Electromagnetic Gigaflux Reactivator does 152-172 Nature
                 # damage on a 30-MINUTE cooldown; charging it at 2 procs/min priced

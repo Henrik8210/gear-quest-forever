@@ -194,7 +194,7 @@ GQ.Data.warriorHorde1to9Facts = {
     [284322]={name="Invading Marine's Shield",quality=2,ilvl=11,reqLevel=6,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
     [284361]={name="Venture Company Legguards",quality=2,ilvl=13,reqLevel=8,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
     [285236]={name="Worn Ranger's Dagger",quality=2,ilvl=8,reqLevel=3,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
-    [285238]={name="Chipped Spellstaff",quality=2,ilvl=8,reqLevel=3,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
+    [285238]={name="Chipped Spellstaff",quality=2,ilvl=8,reqLevel=3,sourceType="world_drop",instructions="Drops from Slydris.",npc="Slydris"},
     [285239]={name="Explorer's Shortsword",quality=2,ilvl=8,reqLevel=3,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
     [285255]={name="Thendal Watcher's Gloves",quality=2,ilvl=11,reqLevel=6,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
     [285269]={name="Thendal Watcher's Boots",quality=2,ilvl=10,reqLevel=5,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},

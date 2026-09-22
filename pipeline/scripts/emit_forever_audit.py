@@ -10,6 +10,8 @@ ROOT = Path(__file__).resolve().parents[2]
 CACHE = ROOT / "pipeline" / "data" / "forever_wowhead"
 HUNT = json.loads((CACHE / "hunt_ids.json").read_text(encoding="utf-8"))
 TIPS = json.loads((CACHE / "hunt_tooltips.json").read_text(encoding="utf-8"))
+_PINS = ROOT / "pipeline" / "data" / "client_item_overrides.json"
+PINS = json.loads(_PINS.read_text(encoding="utf-8")) if _PINS.exists() else {}
 ADDON = ROOT / "GearQuest" / "_generated" / "Data.ForeverAudit.generated.lua"
 SUMMARY = CACHE / "forever_audit.summary.json"
 
@@ -51,7 +53,12 @@ def main():
         status = row.get("status") or "unknown"
         status_by_id[iid] = status
         name = row.get("name") or names.get(sid) or names.get(str(iid))
-        tip = strip_leading_name(name or "", row.get("tip") or "")
+        pin = PINS.get(sid) or PINS.get(str(iid)) or {}
+        if pin.get("tip"):
+            # Client tooltip wins for these ids. The cached nether tip does not.
+            tip = pin["tip"]
+        else:
+            tip = strip_leading_name(name or "", row.get("tip") or "")
         parts = [f'status="{status}"']
         if name:
             parts.append(f"name={lua_str(name)}")

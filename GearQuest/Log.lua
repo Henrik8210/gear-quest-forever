@@ -464,6 +464,9 @@ local function ShowItemTooltipForRow(row)
     end
 
     GameTooltip:Show()
+    if row.entry.itemId and GQ.Data.ApplyImbueTooltipLines then
+        GQ.Data:ApplyImbueTooltipLines(GameTooltip, row.entry.itemId)
+    end
 end
 
 local function HideItemTooltip()

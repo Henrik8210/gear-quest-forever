@@ -26,6 +26,13 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from gq_paths import G, DATA
 
+def _client_pins():
+    path = os.path.join(G, "client_item_overrides.json")
+    if not os.path.exists(path):
+        return set()
+    return set(json.load(open(path, encoding="utf-8")))
+
+
 INDEX = os.path.join(DATA, "forever_wowhead", "index.json")
 TIPS = os.path.join(DATA, "forever_wowhead", "tooltips.json")
 ILVL_FLOOR = json.load(open(os.path.join(DATA, "ilvl_floor.json"), encoding="utf-8"))
@@ -371,6 +378,9 @@ def main():
         if key not in items:
             items[key] = item
             added_items += 1
+        elif key in _client_pins():
+            # Client-confirmed facts. The nether tip is not Forever-client compatible.
+            pass
         else:
             # Classic id, Forever stats. Keep allowRace / allowClass / sources.
             keep = items[key]

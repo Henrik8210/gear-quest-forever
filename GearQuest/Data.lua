@@ -6659,6 +6659,137 @@ function GQ.Data:ApplyClientSetBlock(lines, block)
     })
 end
 
+-- Imbued result items. Printed stats stay the normal colors. Only the effect
+-- the scroll adds is grey. Do not repeat that effect from entry.proc.
+-- In its place: "Use: Combine the <base weapon> and <scroll>."
+-- Add a row here and imbueBase / imbueScroll on the client override when
+-- another weapon is made the same way.
+local CLIENT_IMBUE = {
+    [276631] = {
+        scroll = "Imbue Blade",
+        base = "Blade of Silverlaine",
+        effect = {
+            "Melee attacks deal",
+            "against Frozen",
+        },
+    },
+}
+
+function GQ.Data:HideImbueScrollTooltip()
+    if self._imbueTip then
+        self._imbueTip:Hide()
+    end
+end
+
+function GQ.Data:ShowImbueScrollTooltip(owner, info)
+    if not owner or not info or not info.scroll then
+        return
+    end
+    if not self._imbueTip then
+        self._imbueTip = CreateFrame("GameTooltip", "GearQuestImbueTooltip", UIParent, "GameTooltipTemplate")
+    end
+    local tip = self._imbueTip
+    tip:SetOwner(owner, "ANCHOR_NONE")
+    tip:ClearAllPoints()
+    tip:SetPoint("LEFT", owner, "RIGHT", 8, 0)
+    tip:SetText(info.scroll, 0.75, 0.75, 0.75)
+    tip:Show()
+end
+
+function GQ.Data:ImbueInfo(itemId)
+    return CLIENT_IMBUE[itemId]
+end
+
+function GQ.Data:ImbueCombineLine(info)
+    if not info or not info.base or info.base == "" or not info.scroll or info.scroll == "" then
+        return nil
+    end
+    return "Use: Combine the " .. info.base .. " and " .. info.scroll .. "."
+end
+
+function GQ.Data:LineIsImbued(text, info)
+    if not text or not info or not info.effect then
+        return false
+    end
+    for i = 1, #info.effect do
+        if text:find(info.effect[i], 1, true) then
+            return true
+        end
+    end
+    return false
+end
+
+function GQ.Data:AppendImbueOrProc(tooltip, entry)
+    if not tooltip or not entry then
+        return
+    end
+    local info = self:ImbueInfo(entry.itemId)
+    if info then
+        local line = self:ImbueCombineLine(info)
+        if line then
+            tooltip:AddLine(" ")
+            tooltip:AddLine(line, 0, 1, 0, true)
+        end
+        return
+    end
+    if entry.proc and entry.proc ~= "" then
+        tooltip:AddLine(" ")
+        tooltip:AddLine(entry.proc, 1, 1, 1, true)
+    end
+end
+
+function GQ.Data:ApplyImbueTooltipLines(tooltip, itemId)
+    self:HideImbueScrollTooltip()
+    local pool = tooltip and tooltip.gqImbueButtons
+    if pool then
+        for i = 1, #pool do
+            pool[i]:Hide()
+        end
+    end
+    local info = CLIENT_IMBUE[itemId]
+    if not info or not tooltip or not tooltip.NumLines or not tooltip.GetName then
+        return
+    end
+    local name = tooltip:GetName()
+    if not name then
+        return
+    end
+    if not self._imbueHooked and GameTooltip and GameTooltip.HookScript then
+        GameTooltip:HookScript("OnHide", function()
+            GQ.Data:HideImbueScrollTooltip()
+        end)
+        self._imbueHooked = true
+    end
+    pool = tooltip.gqImbueButtons or {}
+    tooltip.gqImbueButtons = pool
+    local used = 0
+    local n = tooltip:NumLines() or 0
+    for i = 1, n do
+        local fs = _G[name .. "TextLeft" .. i]
+        local text = fs and fs.GetText and fs:GetText()
+        if text and self:LineIsImbued(text, info) then
+            fs:SetTextColor(0.55, 0.55, 0.55)
+            used = used + 1
+            local btn = pool[used]
+            if not btn then
+                btn = CreateFrame("Button", nil, tooltip)
+                btn:SetScript("OnEnter", function(self)
+                    GQ.Data:ShowImbueScrollTooltip(self, self.gqImbue)
+                end)
+                btn:SetScript("OnLeave", function()
+                    GQ.Data:HideImbueScrollTooltip()
+                end)
+                pool[used] = btn
+            end
+            btn.gqImbue = info
+            btn:ClearAllPoints()
+            btn:SetAllPoints(fs)
+            btn:SetFrameLevel((tooltip:GetFrameLevel() or 0) + 20)
+            btn:Show()
+        end
+    end
+end
+
 -- Paint the Wowhead Forever tooltip. The client still shows Classic Equip:
 -- "Increases damage and healing done by up to N" for items that Wowhead
 -- already prints as +N Spell Power / Damage Done / Healing Done.
@@ -6696,10 +6827,7 @@ function GQ.Data:ShowForeverItemTooltip(tooltip, entry)
     self._pendingClientSet = setPending and self:LinesHaveSetHeader(lines)
     self:AddForeverTooltipLines(tooltip, lines, displayName, audit.name)
 
-    if entry.proc then
-        tooltip:AddLine(" ")
-        tooltip:AddLine(entry.proc, 1, 1, 1, true)
-    end
+    self:AppendImbueOrProc(tooltip, entry)
     self:AppendSuffixRangeLines(tooltip, entry)
     local suffixHint = self:GetSuffixHint(entry)
     if suffixHint then
@@ -6707,6 +6835,7 @@ function GQ.Data:ShowForeverItemTooltip(tooltip, entry)
         tooltip:AddLine("Target random enchant: " .. suffixHint, 0.7, 0.9, 1)
     end
     self:AppendDatamineNotice(tooltip, entry)
+    self:ApplyImbueTooltipLines(tooltip, entry.itemId)
     return true
 end
 
@@ -7506,10 +7635,7 @@ function GQ.Data:ShowFactFallbackTooltip(tooltip, entry)
             tooltip:AddLine(instructions, 0.8, 0.8, 0.8, true)
         end
     end
-    if entry.proc then
-        tooltip:AddLine(" ")
-        tooltip:AddLine(entry.proc, 1, 1, 1, true)
-    end
+    self:AppendImbueOrProc(tooltip, entry)
     self:AppendSuffixRangeLines(tooltip, entry)
     self:AppendDatamineNotice(tooltip, entry)
 end
@@ -7596,6 +7722,9 @@ function GQ.Data:RefreshPendingTooltip(tooltip, entry, forceFallback)
     if tooltip.Show then
         tooltip:Show()
     end
+    if entry.itemId then
+        self:ApplyImbueTooltipLines(tooltip, entry.itemId)
+    end
     tooltip.gqItemInfoRefreshing = nil
 end
 
@@ -7647,6 +7776,7 @@ function GQ.Data:TrackPendingItemTooltip(tooltip, entry)
 end
 
 function GQ.Data:ClearPendingItemTooltip(tooltip)
+    self:HideImbueScrollTooltip()
     if self._pendingItemTooltips and tooltip then
         self._pendingItemTooltips[tooltip] = nil
     end
@@ -7802,6 +7932,7 @@ function GQ.Data:ShowEntryItemTooltip(tooltip, owner, entry, anchor, ...)
     tooltip:SetOwner(owner, anchor or "ANCHOR_RIGHT", ...)
     self:PopulateEntryItemTooltip(tooltip, entry)
     tooltip:Show()
+    self:ApplyImbueTooltipLines(tooltip, entry.itemId)
 end
 
 function GQ.Data:CacheContainerItemLinks()

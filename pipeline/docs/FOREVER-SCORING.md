@@ -53,6 +53,34 @@ Lightning Shield spell threat. Not dual-wield (Forever has no shaman DW).
 `enhancement_tank` in `weights.json`. No combat log sim — EP only; retune
 tankier vs threatier in the weights if play disagrees.
 
+**Mage Battle Mage is a caster who swings.** Three specs, same pillars as every
+other class: damage, then survivability, then endurance. Stamina is only a
+step above frost (`0.15` vs `0.1`) because the build is usually behind a tank.
+`battlemage_frost` is the one scored as the hunt; fire and arcane are the same
+skeleton with that school in front.
+
+- Damage is frost / fire / arcane spell power, plus a small weapon DPS weight
+  (`0.35`, so a swing is real and still loses to spell power).
+- **Coldflame Saber** (276631) is mage-only. Client tooltip, not the Wowhead
+  nether tip: 17–32 damage, 12.2 DPS, +7 Intellect, +32 spell power and
+  healing, 98 Fire on melee against Frozen targets, requires level 21.
+  Pinned in `client_item_overrides.json`. Wowhead’s higher white damage and
+  missing spell power must not be synced back.
+- The 98 Fire line is every swing while Frozen, priced at 25% of swings for
+  frost battle mage and 15% for fire and arcane (`FROZEN_MELEE_UPTIME`).
+  Retune if a melee hit breaks the freeze.
+- **Blade of Silverlaine** (273637) is the sword Imbue Blade consumes. Client:
+  17–33 damage, 10.9 DPS, +6 Shadow Resistance, +28 spell power and healing.
+  It is not mage-locked.
+- The log shows the imbued saber. Intellect, spell power, and healing stay
+  the normal colors. Only the effect the scroll adds is grey (98 Fire vs
+  Frozen). Do not print that effect a second time. Under it:
+  `Use: Combine the Blade of Silverlaine and Imbue Blade.`
+  Same shape for any later imbue: `Use: Combine the <base weapon> and <scroll>.`
+  Register the pair in `CLIENT_IMBUE` (`GearQuest/Data.lua`) and as
+  `imbueBase` / `imbueScroll` on the client override. Hovering the grey
+  effect still names the scroll.
+
 These rules apply to **every class**. Re-score **one class at a time** after
 a rule change. Do not `reemit_all.py` from stale JSON. After a tip sync or
 rule change, run `python pipeline/scripts/rescore_hunter_shaman.py` (all nine
@@ -86,6 +114,47 @@ python pipeline/scripts/emit_forever_audit.py
 known items is sane (Imperial Plate Helm **18/17** Str/Sta, not 38 from the
 set bonus; Lionheart **+20 Hit**; Jouster's Crest **1101** armor).
 
+### Client tooltip wins when Wowhead disagrees
+
+A nether tip is not automatically the Forever client. Do not `--apply` a bulk
+tip refresh over an id the client has already contradicted.
+
+Pinned in `pipeline/data/client_item_overrides.json`. `sync_forever_item_stats.py`
+and `ingest_forever_wowhead.py` skip these ids. `emit_forever_audit.py` paints
+the client tip.
+
+| Item | Wowhead nether | Forever client (22 Sep 2026) |
+|------|----------------|------------------------------|
+| Coldflame Saber (276631) | 25–48 damage, 18.25 DPS, +7 Int, no spell power, rlvl stored as 24 | 17–32 damage, 12.2 DPS, +7 Int, +32 spell power and healing, 98 Fire vs Frozen, requires 21, Classes: Mage |
+| Blade of Silverlaine (273637) | 26–50 damage, 16.52 DPS, +6 Shadow Resistance, no spell power | 17–33 damage, 10.9 DPS, +6 Shadow Resistance, +28 spell power and healing, requires 21 |
+
+Coldflame is mage-only. After the client stats, it is the mage main hand from
+21 until the level-60 raid staves, and it leaves rogue, warrior, and paladin
+lists. Silverlaine is not mage-locked; +28 spell power puts it on paladin Holy
+and warlock main hands at 21.
+
+**Imbue tooltip.** Printed stats stay the normal colors. Only the effect the
+scroll adds is grey. Do not repeat that Equip line from `entry.proc`. Under it:
+
+`Use: Combine the <base weapon> and <scroll>.`
+
+Coldflame: `Use: Combine the Blade of Silverlaine and Imbue Blade.` Register
+the next pair in `CLIENT_IMBUE` (`GearQuest/Data.lua`) and as `imbueBase` /
+`imbueScroll` on the override. Hovering the grey effect still names the scroll.
+
+**22 Sep index: 3,634.** One new piece ingested: Shapeshifting Sentinel's
+Strides (284403), leather feet, level 24, 70 armor, +8 Agility, +16 Attack
+Power. Rank 1 feet at 24 for hunter, rogue, feral, and enhancement. Still no
+tooltip: Death Prophet Spine (274158), Corsepickers (282012), Slimy Sword
+(284702).
+
+**Login chat** is the two welcome lines only. Ring and specialization notices
+print when the character crosses that level, then never again on `/reload`.
+
+Index listview rows are not item facts. Veldt is not item facts. A client
+tooltip overrides a Forever tip only when it is pinned above. Otherwise the
+client tooltip is the fallback when Forever has **no** tip.
+
 ### Tip parser pitfalls (nether text is mashed)
 
 Wowhead Forever tips often have no spaces (`1051 Armor17 Block+9 Stamina+50 Bonus ArmorDurability`).
@@ -101,8 +170,7 @@ Wowhead Forever tips often have no spaces (`1051 Armor17 Block+9 Stamina+50 Bonu
 | Listview armor vs tooltip | PvP 168 vs 128 | trust the hunt tip + bonus armor |
 | `+N Damage Done` | ignored | store `damageDone`; `forever_stats()` folds it into SP |
 
-Index listview rows are not item facts. Veldt is not item facts. Client
-tooltip is the fallback only when Forever has **no** tip.
+Index listview rows are not item facts. Veldt is not item facts. Unless an id is pinned above, the client tooltip is the fallback only when Forever has **no** tip.
 
 ## Hunt tooltip (addon)
 
