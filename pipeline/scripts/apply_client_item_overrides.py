@@ -53,17 +53,23 @@ def apply_pins(items: dict) -> list[str]:
         if not it:
             print("pin missing from items.json", key)
             continue
-        it["rlvl"] = pin["rlvl"]
-        it["dps"] = pin["dps"]
-        it["speed"] = pin["speed"]
-        it["delay"] = int(round(pin["speed"] * 1000))
-        it["dmgMin"] = pin["dmgMin"]
-        it["dmgMax"] = pin["dmgMax"]
-        it["stats"] = dict(pin.get("stats") or {})
-        it["tipClasses"] = list(pin.get("tipClasses") or [])
-        it["procs"] = list(pin.get("procs") or [])
-        it["effects"] = list(pin.get("effects") or [])
-        it["effectDriven"] = False
+        if "rlvl" in pin:
+            it["rlvl"] = pin["rlvl"]
+        if "dps" in pin:
+            it["dps"] = pin["dps"]
+            it["speed"] = pin["speed"]
+            it["delay"] = int(round(pin["speed"] * 1000))
+            it["dmgMin"] = pin["dmgMin"]
+            it["dmgMax"] = pin["dmgMax"]
+        if "stats" in pin:
+            it["stats"] = dict(pin.get("stats") or {})
+        if "tipClasses" in pin:
+            it["tipClasses"] = list(pin.get("tipClasses") or [])
+        if "procs" in pin:
+            it["procs"] = list(pin.get("procs") or [])
+        if "effects" in pin:
+            it["effects"] = list(pin.get("effects") or [])
+            it["effectDriven"] = False
         changed.append(f"{key} {it.get('name')}")
     return changed
 

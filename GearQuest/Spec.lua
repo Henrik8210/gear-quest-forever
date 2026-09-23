@@ -141,25 +141,24 @@ local SPEC_ALIASES = {
     tank = "protection",
 }
 
-local function BuildSpecToTab(classFile)
-    local byTab = SPEC_BY_TAB[classFile]
-    if not byTab then
+local function NormalizeClassFile(classFile)
+    if type(classFile) ~= "string" or classFile == "" then
         return nil
     end
-    local map = {}
-    for tab, specId in ipairs(byTab) do
-        map[specId] = tab
-    end
-    return map
+    return classFile:upper()
 end
 
 function GQ.Spec:GetOptions(classFile)
+    classFile = NormalizeClassFile(classFile)
+    if not classFile then
+        return nil
+    end
     return self.CLASS_SPECS[classFile]
 end
 
 function GQ.Spec:HasSpecs(classFile)
-    classFile = classFile or GQ:GetEffectiveClass()
-    return self.CLASS_SPECS[classFile] ~= nil
+    classFile = NormalizeClassFile(classFile or GQ:GetEffectiveClass())
+    return classFile ~= nil and self.CLASS_SPECS[classFile] ~= nil
 end
 
 function GQ.Spec:IsActive()
@@ -182,7 +181,7 @@ function GQ.Spec:GetDefaultSpec(classFile)
 end
 
 function GQ.Spec:GetSpecOption(specId, classFile)
-    classFile = classFile or GQ:GetEffectiveClass()
+    classFile = NormalizeClassFile(classFile or GQ:GetEffectiveClass())
     for _, opt in ipairs(self:GetOptions(classFile) or {}) do
         if opt.id == specId then
             return opt
@@ -221,43 +220,85 @@ function GQ.Spec:GetSpecIcon(specId, classFile)
     return "Interface\\Icons\\INV_Misc_QuestionMark"
 end
 
-function GQ.Spec:GetDisplaySpec(classFile)
-    classFile = classFile or GQ:GetEffectiveClass()
-    if not self:HasSpecs(classFile) then
+local function NormalizeSavedSpecId(specId, classFile)
+    if type(specId) ~= "string" or specId == "" then
         return nil
     end
+    specId = GQ.Spec:ResolveSpecInput(specId, classFile) or specId
+    if GQ.Spec:IsSpecSelectable(specId, classFile) then
+        return specId
+    end
+    return nil
+end
 
-    local saved = self:GetSavedSpec(classFile)
-    if saved and self:IsSpecSelectable(saved, classFile) then
-        return saved
+local function EnsurePreviewSpecStore()
+    if GQ.EnsureSavedVariableDefaults then
+        GQ:EnsureSavedVariableDefaults(true)
+    end
+    if type(GearQuestForeverDB) ~= "table" then
+        return nil
+    end
+    GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+    GearQuestForeverDB.settings.preview = GearQuestForeverDB.settings.preview or {}
+    GearQuestForeverDB.settings.preview.specByClass = GearQuestForeverDB.settings.preview.specByClass or {}
+    return GearQuestForeverDB.settings.preview.specByClass
+end
+
+local function GetSimulatedSpec(classFile)
+    if not (GQ.IsPreviewEnabled and GQ:IsPreviewEnabled()) then
+        return nil
+    end
+    local store = EnsurePreviewSpecStore()
+    if not store then
+        return nil
+    end
+    local specId = store[classFile]
+    if type(specId) ~= "string" or specId == "" then
+        return nil
+    end
+    specId = GQ.Spec:ResolveSpecInput(specId, classFile) or specId
+    if GQ.Spec:IsSpecSelectable(specId, classFile) then
+        return specId
+    end
+    return nil
+end
+
+function GQ.Spec:GetDisplaySpec(classFile)
+    classFile = NormalizeClassFile(classFile or GQ:GetEffectiveClass())
+    if not classFile or not self:HasSpecs(classFile) then
+        local _, playerClass = UnitClass("player")
+        classFile = NormalizeClassFile(playerClass)
+        if not classFile or not self:HasSpecs(classFile) then
+            return nil
+        end
     end
 
-    if not (GQ.IsPreviewEnabled and GQ:IsPreviewEnabled()) then
-        local fromTalents = self:DetectSpecFromTalents(classFile)
-        if fromTalents and self:IsSpecSelectable(fromTalents, classFile) then
-            return fromTalents
+    local previewMode = GQ.IsPreviewEnabled and GQ:IsPreviewEnabled()
+    if previewMode then
+        local saved = GetSimulatedSpec(classFile)
+        if saved then
+            return saved
         end
+        return self:GetDefaultSpec(classFile)
+    end
+
+    -- Log picker override for this session only (/reload returns to talent tree).
+    local session = self._sessionOverrideByClass and self._sessionOverrideByClass[classFile]
+    session = NormalizeSavedSpecId(session, classFile)
+    if session then
+        return session
+    end
+
+    local fromTalents = self:DetectSpecFromTalents(classFile)
+    if fromTalents and self:IsSpecSelectable(fromTalents, classFile) then
+        return fromTalents
     end
 
     return self:GetDefaultSpec(classFile)
 end
 
-local function GetSpecStore(previewMode)
-    if previewMode then
-        GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
-        GearQuestForeverDB.settings.preview = GearQuestForeverDB.settings.preview or {}
-        GearQuestForeverDB.settings.preview.specByClass = GearQuestForeverDB.settings.preview.specByClass or {}
-        return GearQuestForeverDB.settings.preview.specByClass
-    end
-    GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
-    GearQuestForeverDB.settings.specByClass = GearQuestForeverDB.settings.specByClass or {}
-    return GearQuestForeverDB.settings.specByClass
-end
-
 function GQ.Spec:GetSavedSpec(classFile)
-    classFile = classFile or GQ:GetEffectiveClass()
-    local previewMode = GQ.IsPreviewEnabled and GQ:IsPreviewEnabled()
-    return GetSpecStore(previewMode)[classFile]
+    return GetSimulatedSpec(classFile)
 end
 
 function GQ.Spec:ResolveSpecInput(specId, classFile)
@@ -288,7 +329,10 @@ function GQ.Spec:ResolveSpecInput(specId, classFile)
 end
 
 function GQ.Spec:SetSelectedSpec(specId, classFile)
-    classFile = classFile or GQ:GetEffectiveClass()
+    classFile = NormalizeClassFile(classFile or GQ:GetEffectiveClass())
+    if not classFile then
+        return false, "Could not determine your class."
+    end
     local options = self:GetOptions(classFile)
     if not options then
         return false, "This class has no specialization options in GearQuest yet."
@@ -317,8 +361,15 @@ function GQ.Spec:SetSelectedSpec(specId, classFile)
         return false, matched.label .. " is coming later."
     end
 
-    local previewMode = GQ.IsPreviewEnabled and GQ:IsPreviewEnabled()
-    GetSpecStore(previewMode)[classFile] = matched.id
+    if GQ.IsPreviewEnabled and GQ:IsPreviewEnabled() then
+        local store = EnsurePreviewSpecStore()
+        if store then
+            store[classFile] = matched.id
+        end
+    else
+        self._sessionOverrideByClass = self._sessionOverrideByClass or {}
+        self._sessionOverrideByClass[classFile] = matched.id
+    end
 
     if GQ.Data and GQ.Data.InvalidateSpecCache then
         GQ.Data:InvalidateSpecCache()
@@ -331,27 +382,91 @@ function GQ.Spec:SetSelectedSpec(specId, classFile)
     return true
 end
 
-local function GetTalentTabPoints(tab)
-    if not GetTalentTabInfo then
-        return 0
+local function SumRanksInTalentTab(tab)
+    if not GetNumTalents or not GetTalentInfo then
+        return nil
     end
-
-    local _, _, third, _, fifth = GetTalentTabInfo(tab)
-    -- TBC Anniversary / modern Classic: id, name, description, icon, pointsSpent, ...
-    -- Legacy Classic: name, icon, pointsSpent, fileName
-    return tonumber(fifth) or tonumber(third) or 0
-end
-
-function GQ.Spec:DetectSpecFromTalents(classFile)
-    local byTab = SPEC_BY_TAB[classFile]
-    if not byTab or not GetTalentTabInfo then
+    local talentGroup = (GetActiveTalentGroup and GetActiveTalentGroup()) or 1
+    local count = GetNumTalents(tab, talentGroup) or GetNumTalents(tab)
+    if not count or count <= 0 then
         return nil
     end
 
+    local total = 0
+    for index = 1, count do
+        local ok, a, b, c, d, e, f, g, h = pcall(GetTalentInfo, tab, index, talentGroup)
+        if not ok then
+            ok, a, b, c, d, e, f, g, h = pcall(GetTalentInfo, tab, index)
+        end
+        if ok then
+            local rank = tonumber(e) or tonumber(d) or tonumber(c) or tonumber(a)
+            if rank and rank >= 0 and rank <= 10 then
+                total = total + rank
+            end
+        end
+    end
+    if total > 0 then
+        return total
+    end
+    return nil
+end
+
+local function GetTalentTabPoints(tab)
+    if GetTalentTabInfo then
+        local talentGroup = (GetActiveTalentGroup and GetActiveTalentGroup()) or nil
+        local ok, a, b, c, d, e, f, g, h = pcall(GetTalentTabInfo, tab, talentGroup)
+        if not ok then
+            ok, a, b, c, d, e, f, g, h = pcall(GetTalentTabInfo, tab)
+        end
+        if ok then
+            local candidates = { c, e, f, d, g, b, h, a }
+            for i = 1, #candidates do
+                local pts = tonumber(candidates[i])
+                if pts and pts >= 1 and pts <= 51 then
+                    return pts
+                end
+            end
+        end
+    end
+
+    local summed = SumRanksInTalentTab(tab)
+    if summed then
+        return summed
+    end
+
+    return 0
+end
+
+function GQ.Spec:DetectSpecFromTalents(classFile)
+    classFile = NormalizeClassFile(classFile)
+    local byTab = SPEC_BY_TAB[classFile]
+    if not byTab then
+        return nil
+    end
+
+    if GetPrimaryTalentTree then
+        local group = (GetActiveTalentGroup and GetActiveTalentGroup()) or nil
+        local primary = group and GetPrimaryTalentTree(group) or GetPrimaryTalentTree()
+        primary = tonumber(primary)
+        if primary then
+            if byTab[primary] then
+                return byTab[primary]
+            end
+            if byTab[primary + 1] then
+                return byTab[primary + 1]
+            end
+        end
+    end
+
+    local tabCount = #byTab
+    if GetNumTalentTabs then
+        tabCount = math.max(tabCount, GetNumTalentTabs() or 0)
+    end
+
     local bestTab, bestPoints = nil, 0
-    for tab = 1, #byTab do
+    for tab = 1, tabCount do
         local points = GetTalentTabPoints(tab)
-        if points > bestPoints then
+        if points > bestPoints and byTab[tab] then
             bestPoints = points
             bestTab = tab
         end
@@ -364,37 +479,83 @@ function GQ.Spec:DetectSpecFromTalents(classFile)
     return nil
 end
 
-function GQ.Spec:GetEffectiveSpec()
-    local classFile = GQ:GetEffectiveClass()
-    if not self:HasSpecs(classFile) then
-        return nil
+function GQ.Spec:EnsureTalentRefresh()
+    if self._talentFrame then
+        return
     end
-
-    -- Spec is selectable in the log before talents (level 10). Ranking must
-    -- follow that pick so enhancement does not share a hybrid 1–9 list with resto.
-    local spec
-
-    local saved = self:GetSavedSpec(classFile)
-    if saved and self:IsSpecSelectable(saved, classFile) then
-        spec = saved
-    end
-
-    if not spec and not GQ:IsPreviewEnabled() then
-        local fromTalents = self:DetectSpecFromTalents(classFile)
-        if fromTalents and self:IsSpecSelectable(fromTalents, classFile) then
-            spec = fromTalents
+    local frame = CreateFrame("Frame")
+    local function onTalentChange()
+        if GQ.Spec then
+            GQ.Spec._sessionOverrideByClass = nil
+        end
+        if GQ.Data and GQ.Data.InvalidateSpecCache then
+            GQ.Data:InvalidateSpecCache()
+        end
+        if GQ.Log and GQ.Log.UpdateSpecButton then
+            GQ.Log:UpdateSpecButton()
+        end
+        if GQ.RefreshUI then
+            GQ:RefreshUI({ reason = "spec" })
         end
     end
+    GQ.RegisterEvent(frame, "PLAYER_TALENT_UPDATE")
+    GQ.RegisterEvent(frame, "CHARACTER_POINTS_CHANGED")
+    frame:SetScript("OnEvent", onTalentChange)
+    self._talentFrame = frame
+end
 
-    if not spec then
-        spec = self:GetDefaultSpec(classFile)
+function GQ.Spec:OnPlayerLogin()
+    self._sessionOverrideByClass = nil
+    self:EnsureTalentRefresh()
+    local function refreshSpecUi()
+        if GQ.Log and GQ.Log.UpdateSpecButton then
+            GQ.Log:UpdateSpecButton()
+        end
     end
+    if C_Timer and C_Timer.After then
+        C_Timer.After(0, refreshSpecUi)
+        C_Timer.After(1, refreshSpecUi)
+    else
+        refreshSpecUi()
+    end
+end
 
-    return spec
+function GQ.Spec:GetEffectiveSpec()
+    return self:GetDisplaySpec()
 end
 
 function GQ.Spec:GetSelectedSpecLabel()
-    local classFile = GQ:GetEffectiveClass()
+    local classFile = NormalizeClassFile(GQ:GetEffectiveClass())
     local specId = self:GetDisplaySpec(classFile) or self:GetEffectiveSpec()
     return self:GetSpecLabel(specId, classFile) or "Specialization"
+end
+
+function GQ.Spec:PrintSpecDebug()
+    local classFile = NormalizeClassFile(GQ:GetEffectiveClass())
+    if not classFile then
+        print("|cff66ccffGearQuest|r: Could not read your class.")
+        return
+    end
+
+    local display = self:GetDisplaySpec(classFile)
+    local talents = self:DetectSpecFromTalents(classFile)
+    local default = self:GetDefaultSpec(classFile)
+    local previewOn = GQ.IsPreviewEnabled and GQ:IsPreviewEnabled()
+    local session = self._sessionOverrideByClass and self._sessionOverrideByClass[classFile]
+
+    print("|cff66ccffGearQuest|r spec debug (" .. classFile .. "):")
+    print("  simulation: " .. (previewOn and "on" or "off"))
+    print("  sim spec: " .. tostring(GetSimulatedSpec(classFile)))
+    print("  session picker: " .. tostring(session))
+    print("  talent-tree guess: " .. tostring(talents))
+    print("  using for hunts: " .. tostring(display))
+    if session then
+        print("  source: log picker (this session only)")
+    elseif display == talents and talents then
+        print("  source: talent tree (most points)")
+    elseif previewOn and GetSimulatedSpec(classFile) then
+        print("  source: simulation picker")
+    else
+        print("  class default (fallback): " .. tostring(default))
+    end
 end

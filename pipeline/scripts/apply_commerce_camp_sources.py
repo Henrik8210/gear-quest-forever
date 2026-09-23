@@ -82,8 +82,11 @@ def main():
             continue
         name = (items.get(iid) or {}).get("name") or ""
         text = camp_instructions(name, src.get("profession"))
+        current = src.get("instructions") or ""
         if text:
             updates[iid] = text
+        elif "buy the recipe from" in current and src.get("profession"):
+            updates[iid] = f"Crafted with {src['profession']}."
     print(f"camp recipes to describe: {len(updates)}")
     raw = open(SOURCES, encoding="utf-8", newline="").read()
     raw, n_src = patch_sources(raw, updates)

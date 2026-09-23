@@ -104,6 +104,18 @@ OUTPUTS = {
     ],
 }
 
+# Crafts that share a set prefix but are not sold as camp patterns.
+# Pawani's Trapper legs pattern is "Trapper's Leather Legguards", not Pants.
+# Armor / Helm / Pants on these six sets have no Pattern: item.
+NOT_CAMP_RECIPES = {
+    "brawler's leather armor", "brawler's leather helm", "brawler's leather pants",
+    "defender's leather armor", "defender's leather helm", "defender's leather pants",
+    "totemic leather armor", "totemic leather helm", "totemic leather pants",
+    "trapper's leather armor", "trapper's leather helm", "trapper's leather pants",
+    "stormrider's leather armor", "stormrider's leather helm", "stormrider's leather pants",
+    "wisdom's leather armor", "wisdom's leather helm", "wisdom's leather pants",
+}
+
 # Whole sets. The pattern name and the item name do not always match.
 SET_PREFIX = {
     "Leatherworking": (
@@ -143,6 +155,8 @@ def camp_profession(item_name):
     if not item_name:
         return None
     low = item_name.lower()
+    if low in NOT_CAMP_RECIPES:
+        return None
     for exact_l, prof in _EXACT:
         for opt in _options(exact_l):
             if low == opt or low.endswith(" " + opt):

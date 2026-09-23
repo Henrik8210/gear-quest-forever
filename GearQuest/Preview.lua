@@ -53,6 +53,12 @@ local function NormalizeFaction(input)
 end
 
 function GQ.Preview:MigrateSettings()
+    if GQ.BindSavedVariableGlobals then
+        GQ:BindSavedVariableGlobals()
+    end
+    if type(GearQuestForeverDB) ~= "table" then
+        return
+    end
     GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
     local settings = GearQuestForeverDB.settings
 
@@ -66,7 +72,14 @@ function GQ.Preview:MigrateSettings()
 end
 
 function GQ.Preview:GetSettings()
+    if GQ.BindSavedVariableGlobals then
+        GQ:BindSavedVariableGlobals()
+    end
+    if GQ.EnsureSavedVariableDefaults then
+        GQ:EnsureSavedVariableDefaults(true)
+    end
     self:MigrateSettings()
+    GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
     GearQuestForeverDB.settings.preview = GearQuestForeverDB.settings.preview or {}
 
     local preview = GearQuestForeverDB.settings.preview
@@ -391,6 +404,10 @@ function GQ.Preview:HandleCommand(msg)
     end
 
     if key == "spec" or key == "specialization" or key == "talent" then
+        if (value == "status" or value == "debug") and GQ.Spec and GQ.Spec.PrintSpecDebug then
+            GQ.Spec:PrintSpecDebug()
+            return
+        end
         if GQ.Spec and GQ.Spec.SetSelectedSpec then
             local ok, err = GQ.Spec:SetSelectedSpec(value)
             if ok then

@@ -9,7 +9,7 @@ end
 GQ = GQ or {}
 _G.GearQuest = GQ
 
-GQ.VERSION = "0.2.9-beta"
+GQ.VERSION = "0.2.10-beta"
 GQ.ADDON_NAME = ADDON_NAME
 -- WoW Forever: 1–60 Classic+ (no TBC level cap).
 GQ.MAX_PLAYER_LEVEL = 60
@@ -103,16 +103,58 @@ function GQ:ClampPlayerLevel(level)
     return level
 end
 
-GearQuestForeverDB = GearQuestForeverDB or {
-    hunts = {},
-    obtained = {},
-    obtainedItems = {},
-    crafted = {},
-    dismissedCompleted = {},
-    settings = {},
-}
+-- Forever can inject SavedVariables into _G while addon code holds a separate
+-- empty table if we assign defaults too early. Always read/write _G explicitly.
+function GQ:BindSavedVariableGlobals()
+    -- Never fabricate empty SavedVariables tables here — that runs before the
+    -- client merges WTF data and can shadow saved hunt/obtained keys on reload.
+    if type(_G.GearQuestForeverDB) == "table" then
+        GearQuestForeverDB = _G.GearQuestForeverDB
+    elseif type(GearQuestForeverDB) == "table" then
+        _G.GearQuestForeverDB = GearQuestForeverDB
+    end
+    if type(_G.GearQuestForeverCharDB) == "table" then
+        GearQuestForeverCharDB = _G.GearQuestForeverCharDB
+    elseif type(GearQuestForeverCharDB) == "table" then
+        _G.GearQuestForeverCharDB = GearQuestForeverCharDB
+    end
+end
 
-GearQuestForeverCharDB = GearQuestForeverCharDB or {}
+-- forceCreate: never pass true before SavedVariables have had a chance to load.
+function GQ:EnsureSavedVariableDefaults(forceCreate)
+    self:BindSavedVariableGlobals()
+    if type(GearQuestForeverDB) ~= "table" then
+        if not forceCreate then
+            return false
+        end
+        _G.GearQuestForeverDB = {}
+        GearQuestForeverDB = _G.GearQuestForeverDB
+    end
+    if type(GearQuestForeverCharDB) ~= "table" then
+        if forceCreate then
+            _G.GearQuestForeverCharDB = {}
+            GearQuestForeverCharDB = _G.GearQuestForeverCharDB
+        end
+    end
+    GearQuestForeverDB.hunts = GearQuestForeverDB.hunts or {}
+    GearQuestForeverDB.obtained = GearQuestForeverDB.obtained or {}
+    GearQuestForeverDB.obtainedItems = GearQuestForeverDB.obtainedItems or {}
+    GearQuestForeverDB.crafted = GearQuestForeverDB.crafted or {}
+    GearQuestForeverDB.dismissedCompleted = GearQuestForeverDB.dismissedCompleted or {}
+    return true
+end
+
+local svBindFrame = CreateFrame("Frame")
+svBindFrame:RegisterEvent("ADDON_LOADED")
+pcall(function()
+    svBindFrame:RegisterEvent("VARIABLES_LOADED")
+end)
+svBindFrame:SetScript("OnEvent", function(_, event, addonName)
+    if event == "ADDON_LOADED" and addonName ~= GQ.ADDON_NAME then
+        return
+    end
+    GQ:BindSavedVariableGlobals()
+end)
 
 local SOURCE_LABELS = {
     world_drop = "World drop",
@@ -155,22 +197,33 @@ function GQ:PLAYER_LOGIN()
     end
 
     run("startup", function()
-        GearQuestForeverDB.hunts = GearQuestForeverDB.hunts or {}
-        GearQuestForeverDB.obtained = GearQuestForeverDB.obtained or {}
-        GearQuestForeverDB.obtainedItems = GearQuestForeverDB.obtainedItems or {}
-        GearQuestForeverDB.crafted = GearQuestForeverDB.crafted or {}
-        GearQuestForeverDB.dismissedCompleted = GearQuestForeverDB.dismissedCompleted or {}
-        GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+        self:BindSavedVariableGlobals()
+        self:EnsureSavedVariableDefaults(true)
         GearQuestForeverDB.suffixLinks = nil
         GearQuestForeverDB.suffixLinksVersion = nil
         self.Preview:MigrateSettings()
         self.Preview:OnPlayerLogin()
+        if self.Spec and self.Spec.OnPlayerLogin then
+            self.Spec:OnPlayerLogin()
+        end
         self.Data:BuildIndex()
         self.Data:CacheContainerItemLinks()
     end)
 
     run("Indicator", function() self.Indicator:Init() end)
     run("Log", function() self.Log:Init() end)
+    run("spec-ui", function()
+        if self.Log and self.Log.UpdateSpecButton then
+            self.Log:UpdateSpecButton()
+        end
+        if C_Timer and C_Timer.After and self.Log and self.Log.UpdateSpecButton then
+            C_Timer.After(0.5, function()
+                if GQ.Log and GQ.Log.UpdateSpecButton then
+                    GQ.Log:UpdateSpecButton()
+                end
+            end)
+        end
+    end)
     run("Toast", function() self.Toast:Init() end)
     run("Tracker", function() self.Tracker:Init() end)
     run("Popup", function() self.Popup:Init() end)
@@ -306,7 +359,7 @@ function GQ:RefreshUI(opts)
 end
 
 function GQ:MilestoneTables()
-    GearQuestForeverCharDB = GearQuestForeverCharDB or {}
+    self:BindSavedVariableGlobals()
     GearQuestForeverCharDB.milestones = GearQuestForeverCharDB.milestones or {}
     GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
     GearQuestForeverDB.settings.milestones = GearQuestForeverDB.settings.milestones or {}

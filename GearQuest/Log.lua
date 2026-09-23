@@ -219,11 +219,19 @@ local SPEC_PICKER_PAD = 4
 local SPEC_ICON_SIZE = 18
 local SPEC_ARROW_SIZE = 27
 local SPEC_CONTROL_GAP = 2
-local SPEC_CONTROL_WIDTH = SPEC_ICON_SIZE + SPEC_CONTROL_GAP + SPEC_ARROW_SIZE
+local SPEC_LABEL_WIDTH = 88
+local SPEC_CONTROL_WIDTH = SPEC_LABEL_WIDTH + SPEC_CONTROL_GAP + SPEC_ICON_SIZE + SPEC_CONTROL_GAP + SPEC_ARROW_SIZE
 local SPEC_CONTROL_HEIGHT = math.max(SPEC_ICON_SIZE, SPEC_ARROW_SIZE)
 local SPEC_ROW_GAP = 2
 local LOG_FRAME_STRATA = "DIALOG"
 local LOG_FRAME_LEVEL = 100
+
+local function SafeRegisterForClicks(frame, ...)
+    if not frame or type(frame.RegisterForClicks) ~= "function" then
+        return
+    end
+    pcall(frame.RegisterForClicks, frame, ...)
+end
 
 local function ApplyLogWindowLayer(frame)
     if not frame then
@@ -1790,6 +1798,27 @@ function GQ.Log:GetActiveSlotListEntries(slotName)
     return results
 end
 
+function GQ.Log:DisplayEntryForObtainedItem(itemId, slotName)
+    if not itemId or not GQ.Data or not GQ.Data.GetEntriesByItemId then
+        return nil
+    end
+
+    local matches = {}
+    for _, entry in ipairs(GQ.Data:GetEntriesByItemId(itemId)) do
+        if entry and GQ.Data:EntryMatchesSlot(entry, slotName)
+            and self:EntryMatchesTrackedHunt(entry)
+            and not IsDismissedCompleted(entry.id) then
+            matches[#matches + 1] = entry
+        end
+    end
+    if #matches == 0 then
+        return nil
+    end
+
+    local band = GQ.Data.FilterToActiveBand and GQ.Data:FilterToActiveBand(matches) or matches
+    return band[1] or matches[1]
+end
+
 function GQ.Log:GetCompletedSlotListEntries(slotName)
     local results = {}
     local seen = {}
@@ -1823,6 +1852,29 @@ function GQ.Log:GetCompletedSlotListEntries(slotName)
         end
     end
 
+    -- Item ids survive even when the per-hunt rows were cleared.
+    local seenItem = {}
+    for _, row in ipairs(results) do
+        local itemId = row.entry and row.entry.itemId
+        if itemId then
+            seenItem[tostring(itemId)] = true
+        end
+    end
+    GearQuestForeverDB.obtainedItems = GearQuestForeverDB.obtainedItems or {}
+    GearQuestForeverDB.dismissedItems = GearQuestForeverDB.dismissedItems or {}
+    for itemKey, obtainedAt in pairs(GearQuestForeverDB.obtainedItems) do
+        if not seenItem[itemKey] and not GearQuestForeverDB.dismissedItems[itemKey] then
+            local entry = self:DisplayEntryForObtainedItem(tonumber(itemKey), slotName)
+            if entry then
+                seenItem[itemKey] = true
+                table.insert(results, {
+                    entry = entry,
+                    completedAt = obtainedAt or 0,
+                })
+            end
+        end
+    end
+
     -- Best BiS first; acquisition time breaks ties between equal power.
     local equippedIlvl = GQ.Compare:GetEquippedItemLevel(slotName)
     table.sort(results, function(a, b)
@@ -1838,8 +1890,15 @@ function GQ.Log:GetCompletedSlotListEntries(slotName)
     end)
 
     local entries = {}
+    local seenKey = {}
     for _, row in ipairs(results) do
-        table.insert(entries, row.entry)
+        local itemKey = GQ.Data:EntryListKey(row.entry)
+        if not itemKey or not seenKey[itemKey] then
+            if itemKey then
+                seenKey[itemKey] = true
+            end
+            table.insert(entries, row.entry)
+        end
     end
 
     return entries
@@ -1977,7 +2036,14 @@ function GQ.Log:RememberObtainedEntry(entry, now)
 
     GearQuestForeverDB.obtained[entry.id] = GearQuestForeverDB.obtained[entry.id] or now
     if entry.itemId then
-        GearQuestForeverDB.obtainedItems[tostring(entry.itemId)] = GearQuestForeverDB.obtainedItems[tostring(entry.itemId)] or now
+        local itemKey = tostring(entry.itemId)
+        GearQuestForeverDB.obtainedItems[itemKey] = GearQuestForeverDB.obtainedItems[itemKey] or now
+        GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+        local backup = GearQuestForeverDB.settings.completedItemBackup or {}
+        if not backup[itemKey] or backup[itemKey] < (GearQuestForeverDB.obtainedItems[itemKey] or now) then
+            backup[itemKey] = GearQuestForeverDB.obtainedItems[itemKey]
+        end
+        GearQuestForeverDB.settings.completedItemBackup = backup
     end
 
     local record = GetHuntRecord(entry.id) or {}
@@ -2111,7 +2177,33 @@ function GQ.Log:UntrackHunt(id)
 
     if self:IsEntryObtained(id) and onCompletedTab then
         GearQuestForeverDB.dismissedCompleted = GearQuestForeverDB.dismissedCompleted or {}
-        GearQuestForeverDB.dismissedCompleted[id] = true
+        local entry = GQ.Data:GetEntryById(id)
+        local itemKey = entry and GQ.Data:EntryListKey(entry)
+        local dismissedSibling = false
+        if itemKey and entry.itemId and GQ.Data.GetEntriesByItemId then
+            for _, sibling in ipairs(GQ.Data:GetEntriesByItemId(entry.itemId)) do
+                if sibling and sibling.id and GQ.Data:EntryListKey(sibling) == itemKey then
+                    GearQuestForeverDB.dismissedCompleted[sibling.id] = true
+                    dismissedSibling = true
+                end
+            end
+        end
+        if not dismissedSibling then
+            GearQuestForeverDB.dismissedCompleted[id] = true
+        end
+        local entry = GQ.Data:GetEntryById(id)
+        if entry and entry.itemId then
+            local itemKey = tostring(entry.itemId)
+            GearQuestForeverDB.dismissedItems = GearQuestForeverDB.dismissedItems or {}
+            GearQuestForeverDB.dismissedItems[itemKey] = true
+            if GearQuestForeverDB.obtainedItems then
+                GearQuestForeverDB.obtainedItems[itemKey] = nil
+            end
+            GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+            if GearQuestForeverDB.settings.completedItemBackup then
+                GearQuestForeverDB.settings.completedItemBackup[itemKey] = nil
+            end
+        end
     end
 
     GearQuestForeverDB.hunts[id] = nil
@@ -2138,6 +2230,10 @@ function GQ.Log:WipeCharacterData()
     GearQuestForeverDB.obtainedItems = {}
     GearQuestForeverDB.crafted = {}
     GearQuestForeverDB.dismissedCompleted = {}
+    GearQuestForeverDB.dismissedItems = {}
+    GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+    GearQuestForeverDB.settings.completedItemBackup = {}
+    GearQuestForeverDB.settings.completedWipeAt = time()
     self.ownedAtLogin = {}
 
     self.selectedHuntId = nil
@@ -2554,6 +2650,11 @@ function GQ.Log:HideSpecPicker()
     if self._specPickerCatcher then
         self._specPickerCatcher:Hide()
     end
+    -- Legacy catcher was parented to UIParent and could block the whole UI if left shown.
+    local orphan = _G.GearQuestSpecPickerCatcher
+    if orphan and orphan ~= self._specPickerCatcher and orphan:IsShown() then
+        orphan:Hide()
+    end
 end
 
 function GQ.Log:EnsureSpecPicker(frame)
@@ -2577,6 +2678,16 @@ function GQ.Log:EnsureSpecPicker(frame)
     ApplySpecPickerChrome(picker)
     picker.rows = {}
 
+    if not picker.gqHideHooked then
+        picker.gqHideHooked = true
+        picker:HookScript("OnHide", function()
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if log and log._specPickerCatcher then
+                log._specPickerCatcher:Hide()
+            end
+        end)
+    end
+
     frame.specPicker = picker
     return picker
 end
@@ -2588,8 +2699,9 @@ function GQ.Log:RefreshSpecPickerRows()
     end
 
     local picker = frame.specPicker
-    local options = GQ.Spec:GetOptions(GQ:GetEffectiveClass()) or {}
-    local current = GQ.Spec:GetEffectiveSpec()
+    local classFile = GQ:GetEffectiveClass()
+    local options = GQ.Spec:GetOptions(classFile) or {}
+    local current = GQ.Spec:GetDisplaySpec(classFile)
     local rowCount = #options
 
     for i, row in ipairs(picker.rows) do
@@ -2601,6 +2713,7 @@ function GQ.Log:RefreshSpecPickerRows()
         if not row then
             row = CreateFrame("Button", nil, picker)
             row:SetSize(SPEC_PICKER_WIDTH - (SPEC_PICKER_PAD * 2), SPEC_PICKER_ROW_HEIGHT)
+            SafeRegisterForClicks(row, "LeftButtonUp", "RightButtonUp")
             row.icon = row:CreateTexture(nil, "ARTWORK")
             row.icon:SetSize(16, 16)
             row.icon:SetPoint("LEFT", row, "LEFT", 2, 0)
@@ -2628,36 +2741,40 @@ function GQ.Log:RefreshSpecPickerRows()
         row:SetPoint("TOPLEFT", picker, "TOPLEFT", SPEC_PICKER_PAD, -(SPEC_PICKER_PAD + ((i - 1) * SPEC_PICKER_ROW_HEIGHT)))
         row:Show()
 
-        local selectable = GQ.Spec:IsSpecSelectable(opt.id)
-        row.icon:SetTexture(GQ.Spec:GetSpecIcon(opt.id, GQ:GetEffectiveClass()))
+        local specId = opt.id
+        local specLabel = opt.label
+        row.specId = specId
+        local selectable = GQ.Spec:IsSpecSelectable(specId, classFile)
+        row.icon:SetTexture(GQ.Spec:GetSpecIcon(specId, classFile))
         if selectable then
             row.icon:SetVertexColor(1, 1, 1)
         else
             row.icon:SetVertexColor(0.45, 0.45, 0.45)
         end
 
-        local selected = (current == opt.id)
+        local selected = (current == specId)
         if not selectable then
             row:Disable()
-            row.label:SetText("|cff888888" .. opt.label .. " (coming later)|r")
+            row.label:SetText("|cff888888" .. specLabel .. " (coming later)|r")
             row:SetScript("OnClick", nil)
         else
             row:Enable()
             if selected then
-                row.label:SetText("|cffFFD200> |r" .. opt.label)
+                row.label:SetText("|cffFFD200> |r" .. specLabel)
             else
-                row.label:SetText(opt.label)
+                row.label:SetText(specLabel)
             end
 
-            row:SetScript("OnClick", function()
-                local ok, err = GQ.Spec:SetSelectedSpec(opt.id)
+            row:SetScript("OnClick", function(self)
+                local picked = self.specId
+                local ok, err = GQ.Spec:SetSelectedSpec(picked, classFile)
                 if not ok then
                     print("|cff66ccffGearQuest|r: " .. (err or "Could not change specialization."))
                     return
                 end
                 print(string.format(
                     "|cff66ccffGearQuest|r: Now viewing |cff00ff00%s|r upgrades.",
-                    opt.label
+                    GQ.Spec:GetSpecLabel(picked, classFile) or specLabel
                 ))
                 GQ.Log:HideSpecPicker()
                 GQ.Log:UpdateSpecButton()
@@ -2685,22 +2802,28 @@ function GQ.Log:ToggleSpecPicker(anchorBtn)
     self:RefreshSpecPickerRows()
     picker:ClearAllPoints()
     picker:SetPoint("TOPRIGHT", anchorBtn, "BOTTOMRIGHT", 0, -2)
-    picker:SetFrameLevel((anchorBtn:GetFrameLevel() or 1) + 10)
+    local anchorLevel = anchorBtn:GetFrameLevel() or 1
+    local logLevel = (frame.GetFrameLevel and frame:GetFrameLevel()) or LOG_FRAME_LEVEL
+    local pickerLevel = math.max(anchorLevel, logLevel) + 30
+    picker:SetFrameLevel(pickerLevel)
     picker:Show()
 
     if not self._specPickerCatcher then
-        local catcher = CreateFrame("Frame", "GearQuestSpecPickerCatcher", UIParent)
+        local catcher = CreateFrame("Frame", "GearQuestSpecPickerCatcher", frame)
         catcher:SetFrameStrata("FULLSCREEN_DIALOG")
-        catcher:SetAllPoints(UIParent)
+        catcher:SetAllPoints(frame)
         catcher:EnableMouse(true)
         catcher:Hide()
         catcher:SetScript("OnMouseDown", function()
             GQ.Log:HideSpecPicker()
         end)
         self._specPickerCatcher = catcher
+    elseif self._specPickerCatcher:GetParent() ~= frame then
+        self._specPickerCatcher:SetParent(frame)
+        self._specPickerCatcher:SetAllPoints(frame)
     end
 
-    self._specPickerCatcher:SetFrameLevel(picker:GetFrameLevel() - 1)
+    self._specPickerCatcher:SetFrameLevel(pickerLevel - 5)
     self._specPickerCatcher:Show()
 end
 
@@ -2711,6 +2834,7 @@ function GQ.Log:WireSpecArrow(arrowFrame)
 
     arrowFrame.gqArrowWired = true
     arrowFrame:EnableMouse(true)
+    SafeRegisterForClicks(arrowFrame, "LeftButtonUp")
 
     arrowFrame:SetScript("OnEnter", function(self)
         if self.gqHighlight then
@@ -2803,6 +2927,13 @@ function GQ.Log:EnsureSpecControl(frame)
     if frame.tabSpecControl then
         frame.tabSpecControl:SetSize(SPEC_CONTROL_WIDTH, SPEC_CONTROL_HEIGHT)
         self:EnsureSpecArrow(frame)
+        if frame.tabSpecIcon and not frame.tabSpecIcon.label then
+            frame.tabSpecIcon.label = frame.tabSpecControl:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+            frame.tabSpecIcon.label:SetPoint("LEFT", frame.tabSpecControl, "LEFT", 0, 0)
+            frame.tabSpecIcon.label:SetPoint("RIGHT", frame.tabSpecIcon, "LEFT", -SPEC_CONTROL_GAP, 0)
+            frame.tabSpecIcon.label:SetJustifyH("RIGHT")
+            frame.tabSpecIcon.label:SetTextColor(1, 0.82, 0)
+        end
         return frame.tabSpecControl
     end
 
@@ -2818,8 +2949,15 @@ function GQ.Log:EnsureSpecControl(frame)
 
     local iconFrame = CreateFrame("Frame", nil, control)
     iconFrame:SetSize(SPEC_ICON_SIZE, SPEC_ICON_SIZE)
-    iconFrame:SetPoint("LEFT", control, "LEFT", 0, 0)
+    iconFrame:SetPoint("LEFT", control, "LEFT", SPEC_LABEL_WIDTH + SPEC_CONTROL_GAP, 0)
     iconFrame:EnableMouse(true)
+    SafeRegisterForClicks(iconFrame, "LeftButtonUp")
+
+    iconFrame.label = control:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    iconFrame.label:SetPoint("LEFT", control, "LEFT", 0, 0)
+    iconFrame.label:SetPoint("RIGHT", iconFrame, "LEFT", -SPEC_CONTROL_GAP, 0)
+    iconFrame.label:SetJustifyH("RIGHT")
+    iconFrame.label:SetTextColor(1, 0.82, 0)
 
     iconFrame.border = iconFrame:CreateTexture(nil, "OVERLAY")
     iconFrame.border:SetAllPoints()
@@ -2934,9 +3072,13 @@ function GQ.Log:UpdateSpecButton()
 
     if GQ.Spec and GQ.Spec.HasSpecs and GQ.Spec:HasSpecs() then
         control:Show()
-        local specId = GQ.Spec.GetDisplaySpec and GQ.Spec:GetDisplaySpec() or GQ.Spec:GetEffectiveSpec()
+        local classFile = GQ:GetEffectiveClass()
+        local specId = GQ.Spec:GetDisplaySpec(classFile)
         if self.frame.tabSpecIcon and self.frame.tabSpecIcon.icon then
-            self.frame.tabSpecIcon.icon:SetTexture(GQ.Spec:GetSpecIcon(specId, GQ:GetEffectiveClass()))
+            self.frame.tabSpecIcon.icon:SetTexture(GQ.Spec:GetSpecIcon(specId, classFile))
+        end
+        if self.frame.tabSpecIcon and self.frame.tabSpecIcon.label then
+            self.frame.tabSpecIcon.label:SetText(GQ.Spec:GetSpecLabel(specId, classFile) or "")
         end
     else
         control:Hide()
@@ -2971,7 +3113,8 @@ function GQ.Log:UpdateContextStatus()
             faction
         )
     else
-        text = "Viewing upgrades for your current Level, Class and Faction. Use the Spec Picker to change spec."
+        local spec = (GQ.Spec and GQ.Spec.GetSelectedSpecLabel and GQ.Spec:GetSelectedSpecLabel()) or "your spec"
+        text = "Viewing upgrades for your current level, class and faction — " .. spec .. "."
     end
 
     self.frame.contextStatus:SetText(text)
@@ -3554,7 +3697,7 @@ function GQ.Log:EnsureSimulatorPage(frame)
                 return
             end
             log.simSpec = self.specId
-            if GQ.Preview and GQ.Preview.IsEnabled and GQ.Preview:IsEnabled() and GQ.Spec and self.specId then
+            if GQ.Spec and self.specId then
                 GQ.Spec:SetSelectedSpec(self.specId, log.simClass)
             end
             log:RefreshSimulator()
@@ -3658,7 +3801,7 @@ function GQ.Log:SelectSimulatorClass(classFile)
             end
         end
         if not stillValid then
-            self.simSpec = GQ.Spec:GetDefaultSpec(classFile)
+            self.simSpec = GQ.Spec:GetSavedSpec(classFile) or GQ.Spec:GetDefaultSpec(classFile)
         end
     end
     self:RefreshSimulator()
@@ -3719,7 +3862,17 @@ function GQ.Log:RefreshSimulator()
         end
     end
     if not specValid then
-        self.simSpec = specOptions[1] and specOptions[1].id or nil
+        local saved = GQ.Spec and GQ.Spec:GetSavedSpec(self.simClass)
+        local savedOk = false
+        if saved then
+            for _, opt in ipairs(specOptions) do
+                if opt.id == saved then
+                    savedOk = true
+                    break
+                end
+            end
+        end
+        self.simSpec = savedOk and saved or (specOptions[1] and specOptions[1].id or nil)
     end
 
     if self.frame.simSpecHeader then
@@ -3859,11 +4012,91 @@ function GQ.Log:BindExistingFrame(frame)
     self:EnsureTrackerEvents()
 end
 
+function GQ.Log:SyncCompletedItemBackup()
+    GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+    GearQuestForeverDB.obtainedItems = GearQuestForeverDB.obtainedItems or {}
+    local settings = GearQuestForeverDB.settings
+    local backup = settings.completedItemBackup or {}
+    local wipedAt = settings.completedWipeAt or 0
+
+    for itemId, when in pairs(backup) do
+        if (when or 0) > wipedAt and not GearQuestForeverDB.obtainedItems[itemId]
+            and not (GearQuestForeverDB.dismissedItems and GearQuestForeverDB.dismissedItems[itemId]) then
+            GearQuestForeverDB.obtainedItems[itemId] = when
+        end
+    end
+
+    for itemId, when in pairs(GearQuestForeverDB.obtainedItems) do
+        if (when or 0) > wipedAt then
+            local prev = backup[itemId]
+            if not prev or prev < when then
+                backup[itemId] = when
+            end
+        end
+    end
+
+    settings.completedItemBackup = backup
+end
+
+function GQ.Log:RestoreLostCompletedProgress()
+    -- This character's completed hunts were cleared while settings were kept.
+    -- Put the two pieces back once. Other characters are left alone.
+    local guid = UnitGUID and UnitGUID("player")
+    if guid ~= "Player-4613-00530DE6" then
+        local saved = GearQuestForeverDB.settings and GearQuestForeverDB.settings.preview
+        guid = saved and saved.loginCharacterKey
+    end
+    if guid ~= "Player-4613-00530DE6" then
+        return
+    end
+
+    GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+    if GearQuestForeverDB.settings.restoredLostCompleted then
+        return
+    end
+    GearQuestForeverDB.settings.restoredLostCompleted = true
+
+    GearQuestForeverDB.obtainedItems = GearQuestForeverDB.obtainedItems or {}
+    GearQuestForeverDB.crafted = GearQuestForeverDB.crafted or {}
+    local lost = {
+        ["252495"] = 1790113531,
+        ["263412"] = 1790106509,
+    }
+    for itemId, when in pairs(lost) do
+        if not GearQuestForeverDB.obtainedItems[itemId] then
+            GearQuestForeverDB.obtainedItems[itemId] = when
+        end
+    end
+
+    local crafted = {
+        [2287] = 1790107045, [5030] = 1790106679, [2319] = 1790113806,
+        [253710] = 1790108331, [11227] = 1790109830, [2934] = 1790106984,
+        [1499] = 1790107078, [1503] = 1790109472, [858] = 1790106679,
+        [276070] = 1790107809, [2313] = 1790114014, [2455] = 1790109493,
+        [2589] = 1790106679, [5115] = 1790110140, [2881] = 1790106809,
+        [17056] = 1790109771, [5574] = 1790109472, [5023] = 1790106914,
+        [248706] = 1790109494, [5025] = 1790109422, [2592] = 1790110202,
+        [3301] = 1790109988, [4239] = 1790112772, [252495] = 1790113512,
+        [4233] = 1790114076, [3299] = 1790106809, [4246] = 1790112894,
+        [2778] = 1790106774, [2318] = 1790106814, [14119] = 1790110285,
+        [5065] = 1790110140, [1502] = 1790107045, [248687] = 1790107738,
+    }
+    for itemId, when in pairs(crafted) do
+        if not GearQuestForeverDB.crafted[itemId] then
+            GearQuestForeverDB.crafted[itemId] = when
+        end
+    end
+end
+
 function GQ.Log:MigrateObtainedRecords()
     GearQuestForeverDB.obtained = GearQuestForeverDB.obtained or {}
     GearQuestForeverDB.obtainedItems = GearQuestForeverDB.obtainedItems or {}
     GearQuestForeverDB.crafted = GearQuestForeverDB.crafted or {}
     GearQuestForeverDB.dismissedCompleted = GearQuestForeverDB.dismissedCompleted or {}
+    GearQuestForeverDB.dismissedItems = GearQuestForeverDB.dismissedItems or {}
+
+    self:RestoreLostCompletedProgress()
+    self:SyncCompletedItemBackup()
 
     for id, record in pairs(GearQuestForeverDB.hunts or {}) do
         if NormalizeHuntStatus(record.status) == "completed" and not GearQuestForeverDB.obtained[id] then
@@ -4371,6 +4604,8 @@ function GQ.Log:SelectHunt(id, scrollToSelection, entryOverride)
 end
 
 function GQ.Log:Refresh()
+    self:HideSpecPicker()
+
     local classFile = GQ:GetEffectiveClass()
     local slots = GQ.Data:GetSlotsForClass(classFile)
     local layoutRows = {}

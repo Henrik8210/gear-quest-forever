@@ -162,7 +162,9 @@ for sp,blob in gen.items():
         for rank,p in enumerate(band_picks,1):
             extra=""
             if p.get("suffix"):
-                extra=f',suffix={lua(p["suffix"])},suffixChance={p.get("chanceAny") or 0}'
+                extra=f',suffix={lua(p["suffix"])}'
+                if p.get("chanceAny"):
+                    extra+=f',suffixChance={p.get("chanceAny")}'
                 if p.get("suffixId"):
                     extra+=f',suffixId={p["suffixId"]}'
                 if p.get("suffixRange"):
@@ -186,7 +188,9 @@ for sp,blob in gen.items():
             allused.add(nb["id"])
             extra=""
             if nb.get("suffix"):
-                extra=',suffix=%s,suffixChance=%s'%(lua(nb["suffix"]), nb.get("chanceAny") or 0)
+                extra=',suffix=%s'%lua(nb["suffix"])
+                if nb.get("chanceAny"):
+                    extra+=',suffixChance=%s'%nb.get("chanceAny")
                 if nb.get("suffixId"):    extra+=',suffixId=%d'%nb["suffixId"]
                 if nb.get("suffixRange"): extra+=',suffixRange=%s'%lua(nb["suffixRange"])
             notable.append('    {%d,%s,%d,%d,%s,%s%s},'%(

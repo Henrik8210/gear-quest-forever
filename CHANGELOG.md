@@ -2,6 +2,16 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
+## v0.2.10-beta
+
+Specialization follows your talent tree after `/reload`; log spec picker is session-only. Wowhead PvP stat refresh and six new Forever items.
+
+- **Spec:** No saved spec across `/reload`. Order is log picker (this session) → talent tab with the most points → class default. Simulation mode still saves its spec in preview settings. Removed `SpecPersist.lua` and extra SavedVariables.
+- **Log spec menu:** Click-outside dismiss works on Forever (no `OnClick` on plain frames). Picker overlay stays on the log window so it does not block the action bar.
+- **Wowhead Forever (23 Sep):** index **3,637** items. **Six** new pool pieces (Skullduggery Belt, Death Prophet Spine, Corsepickers, Braided Seer Stones, Dragonmaw Battle Shroud, Slimy Sword). **397** cached tooltips re-fetched where PvP / rank-set armor drifted on Wowhead. All nine classes re-scored. **Death Prophet Spine** appears for Enhancement shaman at 26. Client-pinned items (Coldflame Saber, Blade of Silverlaine, etc.) unchanged.
+
+Authoring notes: [pipeline/docs/FOREVER-SCORING.md](pipeline/docs/FOREVER-SCORING.md).
+
 ## v0.2.9-beta
 
 Crafted BiS from the supply camps now says who sells the recipe, for both factions.
