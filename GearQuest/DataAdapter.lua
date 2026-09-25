@@ -210,6 +210,8 @@ local function Expand(src, data, out)
                 origin       = r.origin,
                 proc         = f.proc,
                 generated    = true,
+                reserve      = r.reserve,
+                healOnly     = r.healOnly,
             }
             if pipelineScore and GQ.Data.RegisterPipelineScore then
                 GQ.Data:RegisterPipelineScore(itemId, r[2], r[3], faction, spec, pipelineScore)

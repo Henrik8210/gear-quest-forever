@@ -38,6 +38,14 @@ of Agility at 22 is +6–7 Agi (~9.5%). If +7 would be #1, the item **is** #1.
 `suffixChance` tells the player the roll is slim; chance never buries the
 hunt. Implemented in `score.py` `best_variant` (`ROLL_POLICY="bestRoll"`).
 
+**Healing Done is a healer stat.** Holy paladin, Restoration druid, Restoration
+shaman, and Holy or Discipline priest score it. Every other spec, including
+Elemental, Balance, and Shadow, scores **+Damage Done** as spell power (one
+point equals one point of generic spell power) and ignores Healing Done.
+School-only damage stays on that school’s weight (Elemental nature is 0.8,
+because frost and fire still exist in the kit). Do not add Damage Done and
+Healing Done together, and do not count Damage Done twice.
+
 **Three + one.** Top 3 unique names per slot. One notable beside them: a
 proc the score cannot price, a leftover jackpot, or a tank-relevant extra
 (defense on a caster piece). Notables are not rank 1–3.

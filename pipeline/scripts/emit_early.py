@@ -36,7 +36,15 @@ for sp, blob in gen.items():
         if b.get("faction") not in FACTIONS:
             continue
         bands.append((sp, b))
-        for rank,p in enumerate(b["picks"][:3],1):
+        shipped=[]
+        seen=set()
+        for p in b["picks"]:
+            if p["id"] in seen or p.get("name") in seen:
+                continue
+            seen.add(p["id"]); seen.add(p.get("name"))
+            shipped.append(p)
+        primary=set(id(p) for p in [p for p in shipped if not p.get("alt")][:3])
+        for rank,p in enumerate(shipped,1):
             used.add(p["id"])
             extra=""
             if p.get("suffix"):
@@ -45,6 +53,10 @@ for sp, blob in gen.items():
                 if p.get("suffixRange"): extra+=f',suffixRange={lua(p["suffixRange"])}'
             if b.get("route"):
                 extra+=f',route={lua(b["route"])}'
+            if id(p) not in primary:
+                extra+=",reserve=true"
+            if p.get("healOnly"):
+                extra+=",healOnly=true"
             rows.append('    {%d,%s,%d,%d,%d,%s,%s,%s%s},'%(
                 p["id"], lua(b["slot"]), b["lo"], b["hi"], rank,
                 lua(sp), lua(b["faction"]), p["score"], extra))
@@ -52,7 +64,10 @@ assert bands and all(b["hi"]<=9 for _, b in bands), "band range guard"
 facts=[]
 for iid in sorted(used):
     s=srcs[str(iid)]; it=items[str(iid)]
-    kv=[f'sourceType={lua(s["sourceType"])}',f'instructions={lua(s["instructions"])}']
+    st = s["sourceType"]
+    if st == "quest_reward" and s.get("seasonal"):
+        st = "seasonal_quest"
+    kv=[f'sourceType={lua(st)}',f'instructions={lua(s["instructions"])}']
     for k,val in (("zone",s.get("zone")),("npc",s.get("npc")),
                   ("questName",s.get("questName")),("profession",s.get("profession"))):
         if val: kv.append(f'{k}={lua(val)}')

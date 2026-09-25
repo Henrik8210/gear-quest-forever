@@ -274,6 +274,29 @@ def item_is_spell_gear(it):
     phys = sum((st.get(k, 0) or 0) for k in PHYS_OFFENSE_KEYS)
     return spell > 0 and phys <= 0
 
+def item_is_heal_only(it):
+    """Healing with no spell damage. A DPS caster should not hunt these."""
+    st = it.get("stats") or {}
+    if (st.get("heal") or 0) <= 0:
+        return False
+    for k in ("sp", "damageDone", "spFire", "spFrost", "spNature", "spArcane", "spShadow", "spHoly"):
+        if st.get(k):
+            return False
+    return True
+
+HEALER_SPECS = {
+    ("PALADIN", "holy"),
+    ("DRUID", "restoration"),
+    ("SHAMAN", "restoration"),
+    ("PRIEST", "holy"),
+    ("PRIEST", "discipline"),
+}
+
+def spec_wants_heal(cls, spec_key):
+    # Healing Done is a healer stat. Damage specs, including Balance and Shadow,
+    # score Damage Done (folded into spell power) and do not treat +healing as power.
+    return (cls, spec_key) in HEALER_SPECS
+
 def item_tank_skill_note(it):
     st = it.get("stats") or {}
     notes = []
@@ -508,9 +531,11 @@ def forever_stats(st):
     dmg = out.get("damageDone") or 0
     if dmg:
         out["sp"] = (out.get("sp") or 0) + dmg
+        # sc() runs forever_stats again. Leaving damageDone in place counted it twice.
+        out["damageDone"] = 0
     heal = out.get("heal") or 0
-    # Heal-only items grant 1/3 SP. Combined +Damage Done/+Healing Done already
-    # stored the damage half -- do not also convert heal/3 on top.
+    # Heal-only items grant 1/3 SP. A piece that already has Damage Done does not
+    # also convert its Healing Done; that number is for healers.
     explicit_sp = out.get("sp") or 0
     if heal and explicit_sp == 0:
         out["sp_from_heal"] = max(out.get("sp_from_heal") or 0, heal / 3.0)
@@ -624,7 +649,7 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
     dpsWRanged=cfg.get("dpsWeightRanged", 0.0)
     mhKinds=set(cfg["mainHandKinds"]) if cfg.get("mainHandKinds") else None
     prof=ARMOR_PROF[cls]; wsubs=set(W[cls]["_weaponSubclasses"])
-    notable={}; full60={}
+    notable={}; full60={}; source_alts={}
     armorClass=cfg.get("armorClass") or {}
     pool=[it for it in items.values() if slot_for(it,cls) and it['id'] not in EXCLUDED]
     pool=[it for it in pool if it["id"] in CLASSIC_IDS and it["id"] not in TBC_ONLY]
@@ -633,6 +658,11 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
         for level in levels:
             rscale=70.0/max(1,level)
             wl=weights_at_level(w, level)
+            if not spec_wants_heal(cls, spec_key):
+                # Healing Done is a healer stat. Damage specs score Damage Done
+                # (folded into spell power) and do not treat +healing as spell power.
+                wl["heal"] = 0.0
+                wl["sp_from_heal"] = 0.0
             buckets=collections.defaultdict(list)
             for it in pool:
                 if not eligible(it,cls,spec_key and spec_key or "",level,faction,prof,wsubs): continue
@@ -819,6 +849,7 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                 # proc or a set bonus. Hand of Justice, Onyxia Tooth Pendant and
                 # Wristguards of True Flight were all eligible and all invisible.
                 if level==60: full60[(faction,sl)]=list(rows)
+                ranked_all=rows
                 rows=unique_name_rows(rows, 8)
                 # Physical specs: +SP/+heal pieces (Silvered Gauntlets) must not
                 # take a top-3 hunt. If they also have defense, they are the notable.
@@ -864,7 +895,31 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     nb += near
                 notable[(faction,level,sl)]=nb[:1]
                 per[(faction,level,sl)]=rows[:8]
-    return per,cfg,notable,full60
+                # Alternates for the source filter. The shipped top 3 (and the
+                # rest of this 8) stay exactly as ranked above. These are only
+                # the next items of each source, so a filtered list can still
+                # fill three hunts without changing the unfiltered order.
+                held_ids={r[1]["id"] for r in rows[:8]}
+                held_names={r[1]["name"] for r in rows[:8]}
+                held_names |= {r[1]["name"] for r in nb}
+                skip_spell=not spec_uses_spell_power(wl)
+                counts={}; extra=[]
+                for r in ranked_all:
+                    it=r[1]
+                    if it["id"] in FOREVER_MISSING or it["id"] in held_ids or it["name"] in held_names:
+                        continue
+                    if skip_spell and item_is_spell_gear(it):
+                        continue
+                    if not spec_wants_heal(cls, spec_key) and item_is_heal_only(it):
+                        continue
+                    src=(srcs.get(str(it["id"])) or {}).get("sourceType") or "unknown"
+                    if counts.get(src,0)>=3:
+                        continue
+                    counts[src]=counts.get(src,0)+1
+                    held_ids.add(it["id"]); held_names.add(it["name"])
+                    extra.append(r)
+                source_alts[(faction,level,sl)]=extra
+    return per,cfg,notable,full60,source_alts
 
 # ---------------------------------------------------------------------------
 # Level-60 override.
@@ -1063,13 +1118,25 @@ if __name__=="__main__":
         level_ranges = [range(1,10)] if spec=="levelling_1_9" else [range(1,10), range(10,61)]
         out[spec]=None
         for lv in level_ranges:
-            per,cfg,notable,full60=run(cls,spec,lv)
+            per,cfg,notable,full60,source_alts=run(cls,spec,lv)
             if out[spec] is None:
                 out[spec]={"label":cfg["label"],"bands":[]}
             slots=sorted({k[2] for k in per})
             bands=collapse(per,("Alliance","Horde"),slots,lv)
             early_band = max(lv)==9
-            def emit(faction,sl,lo,hi,rows,origins=None, _spec=spec, _notable=notable):
+            def emit(faction,sl,lo,hi,rows,origins=None, _spec=spec, _notable=notable, _alts=source_alts):
+                # Append source alternates after the existing picks. Ranks 1-3
+                # stay the rows this band already chose.
+                base_count=len(rows)
+                have={r[1]["id"] for r in rows}
+                have_names={r[1]["name"] for r in rows}
+                merged=list(rows)
+                for r in (_alts.get((faction,hi,sl)) or []):
+                    if r[1]["id"] in have or r[1]["name"] in have_names:
+                        continue
+                    have.add(r[1]["id"]); have_names.add(r[1]["name"])
+                    merged.append(r)
+                rows=merged
                 out[_spec]["bands"].append({"faction":faction,"slot":sl,"lo":lo,"hi":hi,
                   "picks":[{"id":r[1]["id"],"name":r[1]["name"],"q":r[1]["quality"],
                             "ilvl":r[1]["ilvl"],"rlvl":r[1]["rlvl"],"req":eff_req(r[1]),"bind":r[1].get("bonding"),"kind":r[1]["kind"],
@@ -1079,6 +1146,11 @@ if __name__=="__main__":
                             "stats":r[4],"src":srcs[str(r[1]["id"])],"seasonal":srcs[str(r[1]["id"])].get("seasonal",False),
                             "effects":r[1].get("effects") or [],
                             "reqSkills":r[1].get("reqSkills") or [],"reqRep":r[1].get("reqRep") or []} for r in rows]})
+                for p in out[_spec]["bands"][-1]["picks"]:
+                    if not spec_wants_heal(cls, _spec) and item_is_heal_only({"stats": p.get("stats") or {}}):
+                        p["healOnly"] = True
+                for p in out[_spec]["bands"][-1]["picks"][base_count:]:
+                    p["alt"]=True
                 if origins: out[_spec]["bands"][-1]["origins"]=origins
                 if sl in ("MainHand","SecondaryHand") and cfg["weaponStyle"] in AMBIGUOUS_STYLES:
                     rt=route_for(per,faction,hi)

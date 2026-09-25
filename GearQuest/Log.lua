@@ -257,30 +257,85 @@ local function BringLogWindowToFront(frame)
     end
 end
 local TAB_GROUP_WIDTH = (88 * 2) + 4
-local DETAIL_TEXT_COLOR = { 0.13, 0.09, 0.04 }
-local LORE_TEXT_COLOR = { 0.20, 0.15, 0.10 }
--- QuestFont in this client has no usable space glyph, so parchment
--- titles/bodies render as "LAMBENTSCALEPAULDRONS" / "Worlddrop".
+local DETAIL_TEXT_COLOR = { 0, 0, 0 }
+local LORE_TEXT_COLOR = { 0, 0, 0 }
+-- Same faces as the quest log: QuestTitleFont for the title and
+-- DESCRIPTION/REWARD headers, QuestFont for the paragraph.
 local QUEST_DETAIL_TITLE_FONTS = {
-    "GameFontNormalLarge", "GameFontHighlightLarge", "GameFontNormal",
+    "QuestTitleFont", "QuestFont_Super_Huge", "QuestFont_Huge", "QuestFont_Large",
 }
 
 local QUEST_DETAIL_HEADER_FONTS = {
-    "GameFontNormal", "GameFontHighlight",
+    "QuestTitleFont", "QuestFont_Large", "QuestFont",
 }
 
 local QUEST_DETAIL_BODY_FONTS = {
-    "GameFontNormal", "GameFontHighlight",
+    "QuestFont", "QuestFontNormalSmall", "QuestFont_Large",
 }
 
+local function CopyProgressMap(src)
+    local out = {}
+    if type(src) ~= "table" then
+        return out
+    end
+    for k, v in pairs(src) do
+        if type(v) == "table" then
+            local row = {}
+            for rk, rv in pairs(v) do
+                row[rk] = rv
+            end
+            out[k] = row
+        else
+            out[k] = v
+        end
+    end
+    return out
+end
+
+local function EnsureProgressTables(db)
+    db.hunts = db.hunts or {}
+    db.obtained = db.obtained or {}
+    db.obtainedItems = db.obtainedItems or {}
+    db.crafted = db.crafted or {}
+    return db
+end
+
+local function CharProgress()
+    if type(GearQuestForeverCharDB) ~= "table" then
+        GearQuestForeverCharDB = {}
+        _G.GearQuestForeverCharDB = GearQuestForeverCharDB
+    end
+    local guid = UnitGUID and UnitGUID("player")
+    if GearQuestForeverCharDB.progressReady then
+        return EnsureProgressTables(GearQuestForeverCharDB)
+    end
+    if not guid then
+        return EnsureProgressTables(GearQuestForeverCharDB)
+    end
+    GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+    if not GearQuestForeverDB.settings.completedClaimedBy then
+        GearQuestForeverCharDB.hunts = CopyProgressMap(GearQuestForeverDB.hunts)
+        GearQuestForeverCharDB.obtained = CopyProgressMap(GearQuestForeverDB.obtained)
+        GearQuestForeverCharDB.obtainedItems = CopyProgressMap(GearQuestForeverDB.obtainedItems)
+        GearQuestForeverCharDB.crafted = CopyProgressMap(GearQuestForeverDB.crafted)
+        GearQuestForeverDB.settings.completedClaimedBy = guid
+    end
+    GearQuestForeverCharDB.progressReady = true
+    return EnsureProgressTables(GearQuestForeverCharDB)
+end
+
+function GQ.Log:CharProgress()
+    return CharProgress()
+end
+
 local function GetHuntRecord(id)
-    GearQuestForeverDB.hunts = GearQuestForeverDB.hunts or {}
-    return GearQuestForeverDB.hunts[id]
+    local db = CharProgress()
+    return db.hunts[id]
 end
 
 local function GetObtainedTimestamp(id)
-    GearQuestForeverDB.obtained = GearQuestForeverDB.obtained or {}
-    return GearQuestForeverDB.obtained[id]
+    local db = CharProgress()
+    return db.obtained[id]
 end
 
 local function IsDismissedCompleted(id)
@@ -289,14 +344,14 @@ local function IsDismissedCompleted(id)
 end
 
 local function EnsureHuntRecord(id)
-    GearQuestForeverDB.hunts = GearQuestForeverDB.hunts or {}
-    if not GearQuestForeverDB.hunts[id] then
-        GearQuestForeverDB.hunts[id] = {
+    local db = CharProgress()
+    if not db.hunts[id] then
+        db.hunts[id] = {
             status = "tracked",
             trackedAt = time(),
         }
     end
-    return GearQuestForeverDB.hunts[id]
+    return db.hunts[id]
 end
 
 local function NormalizeHuntStatus(status)
@@ -385,8 +440,8 @@ local function PlayerOwnsItem(itemId)
 end
 
 local function GetCraftedTimestamp(itemId)
-    GearQuestForeverDB.crafted = GearQuestForeverDB.crafted or {}
-    return GearQuestForeverDB.crafted[itemId]
+    local db = CharProgress()
+    return db.crafted[itemId] or db.crafted[tostring(itemId)]
 end
 
 local function ExtractItemIdFromChatMessage(msg)
@@ -596,22 +651,13 @@ local function CreateRewardItemButton(parent, name)
 end
 
 local function CreateFontStringWithFallback(parent, candidates)
-    local fs
     for _, font in ipairs(candidates) do
         local ok, created = pcall(parent.CreateFontString, parent, nil, "ARTWORK", font)
         if ok and created then
-            fs = created
-            break
+            return created
         end
     end
-    fs = fs or parent:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    -- Keep the inherited size, but always use Friz so spaces actually draw.
-    local path, _, flags = GameFontNormal:GetFont()
-    if path and fs.GetFont and fs.SetFont then
-        local _, size = fs:GetFont()
-        fs:SetFont(path, size or 13, flags or "")
-    end
-    return fs
+    return parent:CreateFontString(nil, "ARTWORK", "GameFontNormal")
 end
 
 local PARCHMENT_TEXTURE = "Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Textures\\GQ-Parchment.png"
@@ -1744,6 +1790,109 @@ function GQ.Log:ToggleSlotCollapsed(slotName)
     self:Refresh()
 end
 
+local SOURCE_FILTERS = {
+    { id = "world_drop", label = "World drop" },
+    { id = "boss_drop", label = "Boss drop" },
+    { id = "raid_trash", label = "Raid trash" },
+    { id = "quest_reward", label = "Quest reward" },
+    { id = "seasonal_quest", label = "Seasonal quest" },
+    { id = "vendor", label = "Vendor" },
+    { id = "profession", label = "Profession" },
+    { id = "object_drop", label = "Container" },
+    { id = "special", label = "Special" },
+}
+
+function GQ.Log:GetHiddenSources()
+    GearQuestForeverDB.ui = GearQuestForeverDB.ui or {}
+    GearQuestForeverDB.ui.hiddenSources = GearQuestForeverDB.ui.hiddenSources or {}
+    return GearQuestForeverDB.ui.hiddenSources
+end
+
+function GQ.Log:SourceFilterActive()
+    local hidden = self:GetHiddenSources()
+    for _, opt in ipairs(SOURCE_FILTERS) do
+        if hidden[opt.id] then
+            return true
+        end
+    end
+    return false
+end
+
+function GQ.Log:EntrySourceAllowed(entry)
+    if not self:SourceFilterActive() then
+        return true
+    end
+    local hidden = self:GetHiddenSources()
+    local allHidden = true
+    for _, opt in ipairs(SOURCE_FILTERS) do
+        if not hidden[opt.id] then
+            allHidden = false
+            break
+        end
+    end
+    if allHidden then
+        return false
+    end
+    local src = (entry and entry.sourceType) or "unknown"
+    return not hidden[src]
+end
+
+function GQ.Log:GetFilteredTopForSlot(slotName)
+    -- A filter can use an earlier level band, so a slot still shows the best
+    -- allowed piece the character can equip when this level's band has none.
+    local pool = {}
+    local seen = {}
+    local playerLevel = GQ:GetEffectiveLevel()
+    local equip = GQ.Equip
+
+    for _, key in ipairs(GQ.Data:GetCandidateSlotKeys(slotName)) do
+        for _, entry in ipairs(GQ.Data:GetClassSlotEntryList(key) or {}) do
+            if entry and entry.id and not seen[entry.id]
+                and GQ.Data:ShouldShowEntry(entry)
+                and self:EntrySourceAllowed(entry)
+                and not entry.healOnly
+                and playerLevel >= (entry.minLevel or 1)
+                and (not equip or not equip.EntryMatchesSpec or equip:EntryMatchesSpec(entry))
+                and (not equip or not equip.MeetsRequiredLevel or equip:MeetsRequiredLevel(entry.itemId, playerLevel))
+            then
+                seen[entry.id] = true
+                pool[#pool + 1] = entry
+            end
+        end
+    end
+
+    table.sort(pool, function(a, b)
+        local levelA = a.minLevel or 0
+        local levelB = b.minLevel or 0
+        if levelA ~= levelB then
+            return levelA > levelB
+        end
+        local scoreA = a.pipelineScore or 0
+        local scoreB = b.pipelineScore or 0
+        if scoreA ~= scoreB then
+            return scoreA > scoreB
+        end
+        return (a.curatedRank or 99) < (b.curatedRank or 99)
+    end)
+
+    local results = {}
+    local seenName = {}
+    for i = 1, #pool do
+        if #results >= 3 then
+            break
+        end
+        local entry = pool[i]
+        local name = GQ.Data.GetItemDisplayName and GQ.Data:GetItemDisplayName(entry.itemId)
+        if not (name and name ~= "" and seenName[name]) then
+            if name and name ~= "" then
+                seenName[name] = true
+            end
+            results[#results + 1] = entry
+        end
+    end
+    return results
+end
+
 function GQ.Log:GetActiveSlotListEntries(slotName)
     local results = {}
     local seenId = {}
@@ -1751,8 +1900,11 @@ function GQ.Log:GetActiveSlotListEntries(slotName)
     local notableCount = 0
     local MAX_NOTABLES_PER_SLOT = 1
 
-    local function addEntry(entry, allowNotable)
-        if not entry or not entry.id or seenId[entry.id] or self:IsEntryObtained(entry.id) then
+    local function addEntry(entry, allowNotable, keepObtained)
+        if not entry or not entry.id or seenId[entry.id] then
+            return false
+        end
+        if not keepObtained and self:IsEntryObtained(entry.id) then
             return false
         end
 
@@ -1776,6 +1928,13 @@ function GQ.Log:GetActiveSlotListEntries(slotName)
         return true
     end
 
+    if self:SourceFilterActive() then
+        for _, entry in ipairs(self:GetFilteredTopForSlot(slotName)) do
+            addEntry(entry, false, true)
+        end
+        return results
+    end
+
     for _, entry in ipairs(GQ.Data:GetTopUpgradesForSlot(slotName)) do
         addEntry(entry, false)
     end
@@ -1784,7 +1943,7 @@ function GQ.Log:GetActiveSlotListEntries(slotName)
         addEntry(entry, true)
     end
 
-    for id, record in pairs(GearQuestForeverDB.hunts or {}) do
+    for id, record in pairs(CharProgress().hunts) do
         if not seenId[id] and NormalizeHuntStatus(record.status) == "tracked" and not self:IsEntryObtained(id) then
             local entry = GQ.Data:GetEntryById(id)
             if entry and GQ.Data:EntryMatchesSlot(entry, slotName)
@@ -1823,8 +1982,8 @@ function GQ.Log:GetCompletedSlotListEntries(slotName)
     local results = {}
     local seen = {}
 
-    GearQuestForeverDB.obtained = GearQuestForeverDB.obtained or {}
-    for id, obtainedAt in pairs(GearQuestForeverDB.obtained) do
+    local progress = CharProgress()
+    for id, obtainedAt in pairs(progress.obtained) do
         if not IsDismissedCompleted(id) then
             local entry = GQ.Data:GetEntryById(id)
             if entry and GQ.Data:EntryMatchesSlot(entry, slotName)
@@ -1838,7 +1997,7 @@ function GQ.Log:GetCompletedSlotListEntries(slotName)
         end
     end
 
-    for id, record in pairs(GearQuestForeverDB.hunts or {}) do
+    for id, record in pairs(progress.hunts) do
         if not seen[id] and not IsDismissedCompleted(id) and NormalizeHuntStatus(record.status) == "completed" then
             local entry = GQ.Data:GetEntryById(id)
             if entry and GQ.Data:EntryMatchesSlot(entry, slotName)
@@ -1860,9 +2019,8 @@ function GQ.Log:GetCompletedSlotListEntries(slotName)
             seenItem[tostring(itemId)] = true
         end
     end
-    GearQuestForeverDB.obtainedItems = GearQuestForeverDB.obtainedItems or {}
     GearQuestForeverDB.dismissedItems = GearQuestForeverDB.dismissedItems or {}
-    for itemKey, obtainedAt in pairs(GearQuestForeverDB.obtainedItems) do
+    for itemKey, obtainedAt in pairs(progress.obtainedItems) do
         if not seenItem[itemKey] and not GearQuestForeverDB.dismissedItems[itemKey] then
             local entry = self:DisplayEntryForObtainedItem(tonumber(itemKey), slotName)
             if entry then
@@ -1937,12 +2095,12 @@ function GQ.Log:RecordCraftedItem(itemId)
         return false
     end
 
-    GearQuestForeverDB.crafted = GearQuestForeverDB.crafted or {}
-    if GearQuestForeverDB.crafted[itemId] then
+    local crafted = CharProgress().crafted
+    if crafted[itemId] or crafted[tostring(itemId)] then
         return false
     end
 
-    GearQuestForeverDB.crafted[itemId] = time()
+    crafted[itemId] = time()
     return true
 end
 
@@ -1961,9 +2119,8 @@ function GQ.Log:HasObtainedItemId(itemId)
     if not itemId then
         return false
     end
-    GearQuestForeverDB.obtainedItems = GearQuestForeverDB.obtainedItems or {}
-    return GearQuestForeverDB.obtainedItems[itemId]
-        or GearQuestForeverDB.obtainedItems[tostring(itemId)]
+    local items = CharProgress().obtainedItems
+    return items[itemId] or items[tostring(itemId)]
 end
 
 function GQ.Log:IsEntryObtained(id)
@@ -2030,18 +2187,16 @@ function GQ.Log:RememberObtainedEntry(entry, now)
     end
 
     now = now or time()
-    GearQuestForeverDB.obtained = GearQuestForeverDB.obtained or {}
-    GearQuestForeverDB.obtainedItems = GearQuestForeverDB.obtainedItems or {}
-    GearQuestForeverDB.hunts = GearQuestForeverDB.hunts or {}
+    local progress = CharProgress()
 
-    GearQuestForeverDB.obtained[entry.id] = GearQuestForeverDB.obtained[entry.id] or now
+    progress.obtained[entry.id] = progress.obtained[entry.id] or now
     if entry.itemId then
         local itemKey = tostring(entry.itemId)
-        GearQuestForeverDB.obtainedItems[itemKey] = GearQuestForeverDB.obtainedItems[itemKey] or now
+        progress.obtainedItems[itemKey] = progress.obtainedItems[itemKey] or now
         GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
         local backup = GearQuestForeverDB.settings.completedItemBackup or {}
-        if not backup[itemKey] or backup[itemKey] < (GearQuestForeverDB.obtainedItems[itemKey] or now) then
-            backup[itemKey] = GearQuestForeverDB.obtainedItems[itemKey]
+        if not backup[itemKey] or backup[itemKey] < (progress.obtainedItems[itemKey] or now) then
+            backup[itemKey] = progress.obtainedItems[itemKey]
         end
         GearQuestForeverDB.settings.completedItemBackup = backup
     end
@@ -2050,7 +2205,7 @@ function GQ.Log:RememberObtainedEntry(entry, now)
     record.status = "completed"
     record.completedAt = record.completedAt or now
     record.obtained = true
-    GearQuestForeverDB.hunts[entry.id] = record
+    progress.hunts[entry.id] = record
 end
 
 function GQ.Log:MarkEntryObtained(entry, options)
@@ -2097,8 +2252,7 @@ function GQ.Log:CompleteHunt(id)
         if record then
             record.status = "completed"
             record.completedAt = time()
-            GearQuestForeverDB.obtained = GearQuestForeverDB.obtained or {}
-            GearQuestForeverDB.obtained[id] = record.completedAt
+            CharProgress().obtained[id] = record.completedAt
         end
     end
 
@@ -2196,9 +2350,7 @@ function GQ.Log:UntrackHunt(id)
             local itemKey = tostring(entry.itemId)
             GearQuestForeverDB.dismissedItems = GearQuestForeverDB.dismissedItems or {}
             GearQuestForeverDB.dismissedItems[itemKey] = true
-            if GearQuestForeverDB.obtainedItems then
-                GearQuestForeverDB.obtainedItems[itemKey] = nil
-            end
+            CharProgress().obtainedItems[itemKey] = nil
             GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
             if GearQuestForeverDB.settings.completedItemBackup then
                 GearQuestForeverDB.settings.completedItemBackup[itemKey] = nil
@@ -2206,7 +2358,7 @@ function GQ.Log:UntrackHunt(id)
         end
     end
 
-    GearQuestForeverDB.hunts[id] = nil
+    CharProgress().hunts[id] = nil
 
     if self.selectedHuntId == id and (willDisappear or onCompletedTab) then
         self.selectedHuntId = nil
@@ -2225,10 +2377,15 @@ function GQ.Log:AbandonHunt(id)
 end
 
 function GQ.Log:WipeCharacterData()
-    GearQuestForeverDB.hunts = {}
-    GearQuestForeverDB.obtained = {}
-    GearQuestForeverDB.obtainedItems = {}
-    GearQuestForeverDB.crafted = {}
+    local progress = CharProgress()
+    progress.hunts = {}
+    progress.obtained = {}
+    progress.obtainedItems = {}
+    progress.crafted = {}
+    GearQuestForeverCharDB.hunts = progress.hunts
+    GearQuestForeverCharDB.obtained = progress.obtained
+    GearQuestForeverCharDB.obtainedItems = progress.obtainedItems
+    GearQuestForeverCharDB.crafted = progress.crafted
     GearQuestForeverDB.dismissedCompleted = {}
     GearQuestForeverDB.dismissedItems = {}
     GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
@@ -2267,7 +2424,7 @@ function GQ.Log:CollectAutoCompletionCandidates()
         end
     end
 
-    for id, record in pairs(GearQuestForeverDB.hunts or {}) do
+    for id, record in pairs(CharProgress().hunts) do
         if NormalizeHuntStatus(record.status) == "tracked" then
             add(GQ.Data:GetEntryById(id))
         end
@@ -3026,6 +3183,22 @@ function GQ.Log:RepositionSpecButton(frame)
     if control.SetFrameLevel then
         control:SetFrameLevel(logPage:GetFrameLevel() + 8)
     end
+
+    if frame.sourceFilterBtn then
+        local listEdge = frame.listInset or logPage
+        if frame.sourceFilterBtn:GetParent() ~= logPage then
+            frame.sourceFilterBtn:SetParent(logPage)
+        end
+        frame.sourceFilterBtn:ClearAllPoints()
+        -- Same row as the spec picker, flush with the gear list's right edge.
+        local rowCenter = 4 + (SPEC_CONTROL_HEIGHT / 2)
+        if frame.listInset then
+            frame.sourceFilterBtn:SetPoint("RIGHT", frame.listInset, "TOPRIGHT", -2, rowCenter)
+        else
+            frame.sourceFilterBtn:SetPoint("TOPRIGHT", logPage, "TOPLEFT", LEFT_COLUMN_WIDTH - 2, 0)
+        end
+        frame.sourceFilterBtn:SetFrameLevel((listEdge:GetFrameLevel() or 1) + 12)
+    end
 end
 
 function GQ.Log:UpdateTabVisuals()
@@ -3539,9 +3712,138 @@ function GQ.Log:EnsureTabBar(frame)
         StyleGoldTab(frame.tabCompleted, self:GetListTab() == "completed")
     end
 
+    self:EnsureSourceFilter(frame)
     self:EnsureSimulatorPage(frame)
     self:LayoutMainWindow(frame)
     self:UpdateTabVisuals()
+end
+
+function GQ.Log:UpdateSourceFilterButton()
+    local btn = self.frame and self.frame.sourceFilterBtn
+    if not btn then
+        return
+    end
+    if self:SourceFilterActive() then
+        btn:SetText("Filter*")
+    else
+        btn:SetText("Filter")
+    end
+end
+
+function GQ.Log:EnsureSourceFilter(frame)
+    local pageBar = frame.pageBar or frame.tabBar and frame.tabBar:GetParent()
+    if not pageBar then
+        return
+    end
+
+    if not frame.sourceFilterBtn then
+        local btn = CreateFrame("Button", "GearQuestSourceFilterButton", frame.logPage or pageBar, "UIPanelButtonTemplate")
+        btn:SetSize(72, 22)
+        btn:SetText("Filter")
+        btn:SetScript("OnClick", function()
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if log then
+                log:ToggleSourceFilterMenu()
+            end
+        end)
+        frame.sourceFilterBtn = btn
+    else
+        self:RepositionSpecButton(frame)
+    end
+
+    if frame.sourceFilterMenu then
+        self:UpdateSourceFilterButton()
+        return
+    end
+
+    local menu = CreateFrame("Frame", "GearQuestSourceFilterMenu", frame, "BackdropTemplate")
+    menu:SetFrameStrata("TOOLTIP")
+    menu:SetFrameLevel(50)
+    menu:EnableMouse(true)
+    menu:EnableMouseWheel(true)
+    menu:SetSize(168, 12 + (#SOURCE_FILTERS * 20))
+    menu:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8X8",
+        edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+        tile = true, tileSize = 16, edgeSize = 16,
+        insets = { left = 4, right = 4, top = 4, bottom = 4 },
+    })
+    if menu.SetBackdropColor then
+        menu:SetBackdropColor(0.07, 0.06, 0.05, 1)
+    end
+    if menu.SetBackdropBorderColor then
+        menu:SetBackdropBorderColor(0.78, 0.72, 0.58, 1)
+    end
+    menu:SetPoint("TOPRIGHT", frame.sourceFilterBtn, "BOTTOMRIGHT", 0, -2)
+    menu:Hide()
+    menu:SetScript("OnEnter", HideItemTooltip)
+    menu:SetScript("OnShow", function(self)
+        HideItemTooltip()
+        self:SetFrameStrata("TOOLTIP")
+        self:SetFrameLevel(50)
+    end)
+    frame.sourceFilterMenu = menu
+
+    local previous
+    for _, opt in ipairs(SOURCE_FILTERS) do
+        local check = CreateFrame("CheckButton", nil, menu, "UICheckButtonTemplate")
+        check:SetSize(22, 22)
+        if previous then
+            check:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, 2)
+        else
+            check:SetPoint("TOPLEFT", menu, "TOPLEFT", 8, -6)
+        end
+        check.sourceId = opt.id
+        local label = check:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        label:SetPoint("LEFT", check, "RIGHT", 2, 0)
+        label:SetText(opt.label)
+        check:SetHitRectInsets(0, -((label:GetStringWidth() or 90) + 8), -2, -2)
+        check:SetScript("OnEnter", HideItemTooltip)
+        check:SetScript("OnClick", function(self)
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if not log then
+                return
+            end
+            local hidden = log:GetHiddenSources()
+            if self:GetChecked() then
+                hidden[self.sourceId] = nil
+            else
+                hidden[self.sourceId] = true
+            end
+            log:UpdateSourceFilterButton()
+            log:Refresh()
+            if GQ.Indicator and GQ.Indicator.ScheduleRebuildCache then
+                GQ.Indicator:ScheduleRebuildCache()
+            end
+        end)
+        previous = check
+    end
+
+    menu.sync = function()
+        local hidden = GQ.Log:GetHiddenSources()
+        local kids = { menu:GetChildren() }
+        for _, childBtn in ipairs(kids) do
+            if childBtn.sourceId then
+                childBtn:SetChecked(not hidden[childBtn.sourceId])
+            end
+        end
+    end
+    self:UpdateSourceFilterButton()
+end
+
+function GQ.Log:ToggleSourceFilterMenu()
+    local menu = self.frame and self.frame.sourceFilterMenu
+    if not menu then
+        return
+    end
+    if menu:IsShown() then
+        menu:Hide()
+        return
+    end
+    if menu.sync then
+        menu.sync()
+    end
+    menu:Show()
 end
 
 function GQ.Log:EnsureSimulatorPage(frame)
@@ -3635,7 +3937,7 @@ function GQ.Log:EnsureSimulatorPage(frame)
     body:SetJustifyH("LEFT")
     body:SetWordWrap(true)
     body:SetText("Pick a class on the left, then set faction, specialization, and level. Simulate to browse that character's upgrades in the log.")
-    body:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    body:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
     frame.simBody = body
 
     local factionHeader = CreateFontStringWithFallback(simDetail, QUEST_DETAIL_HEADER_FONTS)
@@ -3741,7 +4043,7 @@ function GQ.Log:EnsureSimulatorPage(frame)
     status:SetPoint("RIGHT", simDetail, "RIGHT", -16, 0)
     status:SetJustifyH("LEFT")
     status:SetWordWrap(true)
-    status:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    status:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
     frame.simStatus = status
 
     local simulateBtn = CreateFrame("Button", "GearQuestSimApplyButton", simDetail, "UIPanelButtonTemplate")
@@ -4236,7 +4538,7 @@ function GQ.Log:Init()
     frame.detailBody:SetPoint("RIGHT", frame.detailChild, "RIGHT", -8, 0)
     frame.detailBody:SetJustifyH("LEFT")
     frame.detailBody:SetWordWrap(true)
-    frame.detailBody:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    frame.detailBody:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
     frame.detailBody:Hide()
 
     self:EnsureDetailLore(frame)
@@ -4245,7 +4547,7 @@ function GQ.Log:Init()
     frame.detailEmpty = CreateFontStringWithFallback(frame.detailChild, QUEST_DETAIL_BODY_FONTS)
     frame.detailEmpty:SetPoint("TOPLEFT", frame.detailChild, "TOPLEFT", 8, -8)
     frame.detailEmpty:SetText("Select an upgrade to see how to get it.")
-    frame.detailEmpty:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    frame.detailEmpty:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
     frame.detailEmpty:Show()
 
     frame.trackBtn = CreateFrame("Button", "GearQuestLogTrackButton", frame, "UIPanelButtonTemplate")
@@ -4502,10 +4804,29 @@ function GQ.Log:BuildDetailLines(entry)
     table.insert(lines, "\nSource: " .. GQ:GetSourceLabel(entry.sourceType))
 
     local record = GetHuntRecord(entry.id)
-    if record and NormalizeHuntStatus(record.status) == "completed" then
-        local completedText = FormatCompletedDate(record.completedAt)
+    local completed = record and NormalizeHuntStatus(record.status) == "completed"
+    if not completed and entry.itemId and GQ.Log and GQ.Log.HasObtainedItemId then
+        completed = GQ.Log:HasObtainedItemId(entry.itemId) and true or false
+    end
+    if not completed then
+        completed = GetObtainedTimestamp(entry.id) and true or false
+    end
+    if completed then
+        local when = record and record.completedAt
+        if type(when) ~= "number" or when <= 0 then
+            when = GetObtainedTimestamp(entry.id)
+        end
+        if (type(when) ~= "number" or when <= 0) and entry.itemId and GQ.Log and GQ.Log.HasObtainedItemId then
+            when = GQ.Log:HasObtainedItemId(entry.itemId)
+        end
+        if (type(when) ~= "number" or when <= 0) and entry.itemId then
+            when = GetCraftedTimestamp(entry.itemId)
+        end
+        local completedText = type(when) == "number" and when > 0 and FormatCompletedDate(when)
         if completedText then
             table.insert(lines, "\nCompleted: " .. completedText)
+        else
+            table.insert(lines, "\nCompleted")
         end
     end
 

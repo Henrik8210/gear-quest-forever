@@ -398,7 +398,12 @@ function GQ.Popup:ShowForSlot(slotName, slotButton)
 
     slotName = GQ.Data:NormalizeSlotName(slotName)
     local slotLabel = GQ.Data:SlotLabel(slotName)
-    local upgrades = GQ.Data:GetTopUpgradesForSlot(slotName, MAX_OPTIONS)
+    local upgrades
+    if GQ.Log and GQ.Log.SourceFilterActive and GQ.Log:SourceFilterActive() then
+        upgrades = GQ.Log:GetFilteredTopForSlot(slotName)
+    else
+        upgrades = GQ.Data:GetTopUpgradesForSlot(slotName, MAX_OPTIONS)
+    end
 
     if #upgrades == 0 then
         self:Hide()

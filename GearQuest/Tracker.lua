@@ -167,7 +167,8 @@ end
 function GQ.Tracker:GetTrackedEntries()
     local results = {}
 
-    for id, record in pairs(GearQuestForeverDB.hunts or {}) do
+    local progress = GQ.Log and GQ.Log.CharProgress and GQ.Log:CharProgress() or GearQuestForeverDB
+    for id, record in pairs(progress.hunts or {}) do
         if NormalizeHuntStatus(record.status) == "tracked" then
             local entry = GQ.Data:GetEntryById(id)
             if entry

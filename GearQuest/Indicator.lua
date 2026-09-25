@@ -888,7 +888,12 @@ function GQ.Indicator:RebuildCacheForSlot(slotName)
     self.itemNameCache = self.itemNameCache or {}
 
     local maxUpgrades = GQ.Data.GetMaxUpgradesForSlot and GQ.Data:GetMaxUpgradesForSlot(slotName) or 3
-    local upgrades = GQ.Data:GetTopUpgradesForSlot(slotName, maxUpgrades)
+    local upgrades
+    if GQ.Log and GQ.Log.SourceFilterActive and GQ.Log:SourceFilterActive() and GQ.Log.GetFilteredTopForSlot then
+        upgrades = GQ.Log:GetFilteredTopForSlot(slotName)
+    else
+        upgrades = GQ.Data:GetTopUpgradesForSlot(slotName, maxUpgrades)
+    end
     for _, entry in ipairs(upgrades) do
         if entry.itemId and not (GQ.Log and GQ.Log.IsItemIdObtained and GQ.Log:IsItemIdObtained(entry.itemId)) then
             self.upgradeItems[entry.itemId] = true
@@ -1046,6 +1051,76 @@ function GQ.Indicator:GetQuestLogRewardButtons()
     end
 
     return results
+end
+
+function GQ.Indicator:CollectQuestOfferButtons()
+    local results = {}
+    local seen = {}
+    local function add(btn)
+        if btn and not seen[btn] then
+            seen[btn] = true
+            table.insert(results, btn)
+        end
+    end
+
+    local rewards = _G.QuestInfoRewardsFrame
+        or (QuestInfoFrame and (QuestInfoFrame.rewardsFrame or QuestInfoFrame.RewardsFrame))
+    if rewards then
+        if rewards.RewardButtons then
+            for _, btn in ipairs(rewards.RewardButtons) do
+                add(btn)
+            end
+        end
+        for i = 1, 12 do
+            add(rewards["Item" .. i] or rewards["QuestInfoItem" .. i])
+        end
+    end
+
+    for i = 1, 10 do
+        add(_G["QuestInfoItem" .. i])
+        add(_G["QuestRewardItem" .. i])
+        add(_G["QuestProgressItem" .. i])
+    end
+
+    if #results == 0 and QuestFrame then
+        self:CollectItemButtons(QuestFrame, results, 0, seen)
+    end
+    return results
+end
+
+function GQ.Indicator:UpdateQuestOfferRewards()
+    if not QuestFrame or not QuestFrame:IsShown() then
+        return
+    end
+    if not GetQuestItemLink then
+        return
+    end
+
+    local buttons = self:CollectQuestOfferButtons()
+    local buttonIndex = 1
+
+    local function ApplyLinks(itemType, countFn)
+        local count = countFn and countFn() or 0
+        for i = 1, count do
+            local link = GetQuestItemLink(itemType, i)
+            local button = buttons[buttonIndex]
+            if button and link then
+                self:UpdateButton(button, link)
+                buttonIndex = buttonIndex + 1
+            elseif link then
+                buttonIndex = buttonIndex + 1
+            end
+        end
+    end
+
+    ApplyLinks("choice", GetNumQuestChoices)
+    ApplyLinks("reward", GetNumQuestRewards)
+
+    for i = buttonIndex, #buttons do
+        if buttons[i] then
+            self:HideButton(buttons[i])
+        end
+    end
 end
 
 function GQ.Indicator:UpdateQuestLogRewards()
@@ -1279,6 +1354,7 @@ function GQ.Indicator:RefreshAll()
     self:UpdateLootFrame()
     self:UpdateGroupLootFrames()
     self:UpdateQuestLogRewards()
+    self:UpdateQuestOfferRewards()
     self:UpdateTradeSkillFrame()
     self:UpdateCraftFrame()
     self:UpdateMerchantFrame()
@@ -1339,6 +1415,18 @@ function GQ.Indicator:Init()
         self:UpdateQuestLogRewards()
     end)
 
+    self:HookFunction("QuestInfo_ShowRewards", function()
+        self:UpdateQuestOfferRewards()
+    end)
+
+    self:HookFunction("QuestFrameItems_Update", function()
+        self:UpdateQuestOfferRewards()
+    end)
+
+    self:HookFunction("QuestFrame_UpdatePortrait", function()
+        self:UpdateQuestOfferRewards()
+    end)
+
     self:HookFunction("TradeSkillFrame_Update", function()
         self:UpdateTradeSkillFrame()
     end)
@@ -1378,6 +1466,10 @@ function GQ.Indicator:Init()
         "CRAFT_UPDATE",
         "GET_ITEM_INFO_RECEIVED",
         "PLAYER_ENTERING_WORLD",
+        "QUEST_DETAIL",
+        "QUEST_PROGRESS",
+        "QUEST_COMPLETE",
+        "QUEST_FINISHED",
     }
     for i = 1, #events do
         GQ.RegisterEvent(eventFrame, events[i])
@@ -1428,6 +1520,16 @@ function GQ.Indicator:Init()
         end
 
         GQ.Indicator:RefreshAll()
+
+        if event == "QUEST_DETAIL" or event == "QUEST_PROGRESS" or event == "QUEST_COMPLETE" then
+            if C_Timer and C_Timer.After then
+                C_Timer.After(0, function()
+                    if GQ.Indicator then
+                        GQ.Indicator:UpdateQuestOfferRewards()
+                    end
+                end)
+            end
+        end
 
         if (event == "MERCHANT_SHOW" or event == "MERCHANT_UPDATE") and C_Timer and C_Timer.After then
             C_Timer.After(0, function()

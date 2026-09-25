@@ -8963,7 +8963,12 @@ function GQ.Data:GetTopUpgradesForSlot(slotName, maxResults)
         return cached
     end
 
-    local candidates = self:GetCandidatesForSlot(slotName)
+    local candidates = {}
+    for _, entry in ipairs(self:GetCandidatesForSlot(slotName)) do
+        if not entry.reserve then
+            candidates[#candidates + 1] = entry
+        end
+    end
     local ranked = GQ.Compare:RankEntries(candidates, slotName, maxResults)
     local results = {}
     for i = 1, #ranked do

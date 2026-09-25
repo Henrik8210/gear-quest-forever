@@ -2,6 +2,37 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
+## v0.2.11-beta
+
+Source filter on the hunt list, and the source on each piece is the one you can actually use. Damage specs stop chasing Healing Done.
+
+### Filter
+
+- **Filter** sits above the slot list. Uncheck a source to hide it. The button reads **Filter\*** while anything is hidden.
+- World drop, Boss drop, Raid trash, Quest reward, Seasonal quest, Vendor, Profession, Container, Special.
+- The list, the character-panel arrow, and the quest-reward arrow all follow the same filter. Unfiltered, the top 3 stay the full BiS list.
+- A filtered slot still fills with the best allowed piece you can equip, including from an earlier level band when this level has none.
+
+### Sources match the filter
+
+- Quest rewards no longer say "Bought from" the quest title. They are Quest reward, with who starts the quest, where, and the objective.
+- Vendor gear no longer says "Drops from" the seller. Brother Zendraas sells the Al'aketh sets. Rune Broker, the PvP quartermasters, and the other vendor-only NPCs are Vendor.
+- Horde Rune Broker (Orgrimmar, Thunder Bluff, Undercity, and the starting zones) sells shaman icons and the shared druid idols. Alliance Rune Broker (Stormwind, Ironforge, Darnassus, and the starting zones) sells paladin librams and those same idols.
+
+### Scoring
+
+- **Healing Done** counts for healers: Holy paladin, Restoration druid and shaman, Holy and Discipline priest.
+- Damage specs, including Elemental, Balance, Shadow, and mages, score **+Damage Done** as spell power. One point of Damage Done equals one point of spell power. Healing Done on that piece adds nothing.
+- Nature-only spell damage is a step below generic spell power for Elemental (frost and fire still exist in the kit).
+- Wowhead Forever index **3,676** items. New pieces that took a top slot include Wyrmak's Cuirass, Bristlebark Bow, Snarlsnout Shooter, Wisesight Wand, Ghostfang's Steps, Igleggings, and Ukta's Conduit.
+
+### Completed
+
+- The Completed tab is this character only. The first character to log in after this update keeps the completions you already had. Other characters start empty.
+- Obtained and crafted pieces still show a Completed date when the hunt row itself had none.
+
+Authoring notes: [pipeline/docs/FOREVER-SCORING.md](pipeline/docs/FOREVER-SCORING.md).
+
 ## v0.2.10-beta
 
 Specialization follows your talent tree after `/reload`; log spec picker is session-only. Wowhead PvP stat refresh and six new Forever items.

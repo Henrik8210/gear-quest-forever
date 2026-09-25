@@ -155,6 +155,18 @@ def parse_tooltip(t):
     for m in re.finditer(r'<span class="q2">Equip:(.*?)</span>', t, re.S):
         raw = m.group(1)
         if "<!--rtg" in raw:
+            # Forever tags "damage and healing ... by up to N" as rtg41, which
+            # MOD maps to healing-only. That sentence is spell power.
+            if "damage and healing" in plain(raw) and "<!--rtg41-->" in raw:
+                mm = re.search(r"<!--rtg41-->(\d+)", raw)
+                if mm:
+                    amt = int(mm.group(1))
+                    heal = o["stats"].get("heal", 0) - amt
+                    if heal > 0:
+                        o["stats"]["heal"] = heal
+                    else:
+                        o["stats"].pop("heal", None)
+                    add("sp", amt)
             continue
         line = plain(raw).strip()
         for rx, key in PATS:
@@ -242,8 +254,120 @@ def parse_tooltip(t):
     return o
 
 
+# Rune Brokers sell these relics. Wowhead also lists a creature drop first.
+# Horde npc 233428, Alliance npc 233335. They do not stock the same relics.
+HORDE_BROKER = (
+    "Bought from Rune Broker in Orgrimmar, Thunder Bluff, Undercity, "
+    "Durotar, Mulgore, and Tirisfal Glades."
+)
+ALLIANCE_BROKER = (
+    "Bought from Rune Broker in Stormwind, Ironforge, Darnassus, "
+    "Elwynn Forest, Dun Morogh, and Teldrassil."
+)
+BOTH_BROKERS = (
+    "Bought from Rune Broker in Stormwind, Ironforge, Darnassus, Elwynn Forest, "
+    "Dun Morogh, and Teldrassil, and in Orgrimmar, Thunder Bluff, Undercity, "
+    "Durotar, Mulgore, and Tirisfal Glades."
+)
+RUNE_BROKER_HORDE = {
+    206381,  # Dyadic Icon
+    206382,  # Tempest Icon
+    206386,  # Galvanic Icon
+    206387,  # Kajaric Icon
+    206388,  # Sulfurous Icon
+    225838,  # Voltaic Icon
+}
+RUNE_BROKER_ALLIANCE = {
+    205420,  # Libram of Judgement
+    208849,  # Libram of Blessings
+    208851,  # Libram of Justice
+    211472,  # Libram of Banishment
+}
+RUNE_BROKER_BOTH = {
+    206954,  # Idol of Ursine Rage
+    208414,  # Lunar Idol
+    208689,  # Ferocious Idol
+    210534,  # Idol of the Wild
+    220915,  # Idol of the Raging Shambler
+    227444,  # Idol of the Huntress
+}
+RUNE_BROKER_RELICS = RUNE_BROKER_HORDE | RUNE_BROKER_ALLIANCE | RUNE_BROKER_BOTH
+
+
+def _rune_broker_source(parsed, row):
+    iid = row.get("id")
+    if iid in RUNE_BROKER_ALLIANCE:
+        instructions = ALLIANCE_BROKER
+    elif iid in RUNE_BROKER_BOTH:
+        instructions = BOTH_BROKERS
+    else:
+        instructions = HORDE_BROKER
+    return {
+        "sourceType": "vendor",
+        "instructions": instructions,
+        "zone": None,
+        "npc": "Rune Broker",
+        "questName": None,
+        "profession": None,
+        "dropChance": None,
+        "alts": [],
+        "gateLevel": parsed.get("rlvl") or row.get("rlvl") or 0,
+        "questClasses": 0,
+        "questRaces": 0,
+        "seasonal": False,
+        "obtainable": True,
+        "excludedBecause": None,
+    }
+
+
 def source_from_row(row, parsed, name):
-    more = (row.get("sourcemore") or [None])[0] or {}
+    more_list = [e for e in (row.get("sourcemore") or []) if e]
+    broker = next((e for e in more_list if e.get("n") == "Rune Broker"), None)
+    relic = row.get("slot") == "Relic" or row.get("slotId") == 28
+    if row.get("id") in RUNE_BROKER_RELICS or (relic and broker):
+        return _rune_broker_source(parsed, row)
+    more = more_list[0] if more_list else {}
+    kinds = set(row.get("source") or [])
+    # Forever listview source 4 is a quest. sourcemore.t is no longer that enum
+    # (quests come through as t=5, which used to mean vendor).
+    if 4 in kinds and 5 not in kinds:
+        qn = more.get("n")
+        return {
+            "sourceType": "quest_reward",
+            "instructions": f"Reward from the quest “{qn}”." if qn else "Quest reward.",
+            "zone": None,
+            "npc": None,
+            "questName": qn,
+            "profession": None,
+            "dropChance": None,
+            "alts": [],
+            "gateLevel": parsed.get("rlvl") or row.get("rlvl") or 0,
+            "questClasses": 0,
+            "questRaces": 0,
+            "seasonal": False,
+            "obtainable": True,
+            "excludedBecause": None,
+        }
+    # source 5 is a vendor. sourcemore.t=1 is the creature NPC, not a drop.
+    # A vendor-only row must not be labeled "Drops from".
+    if 5 in kinds and 2 not in kinds:
+        npc = more.get("n")
+        return {
+            "sourceType": "vendor",
+            "instructions": f"Bought from {npc}." if npc else "Bought from a vendor.",
+            "zone": None,
+            "npc": npc,
+            "questName": None,
+            "profession": None,
+            "dropChance": None,
+            "alts": [],
+            "gateLevel": parsed.get("rlvl") or row.get("rlvl") or 0,
+            "questClasses": 0,
+            "questRaces": 0,
+            "seasonal": False,
+            "obtainable": True,
+            "excludedBecause": None,
+        }
     t = more.get("t")
     source_type = SRC_T.get(t, "world_drop")
     profession = SKILL.get(more.get("s")) if source_type == "profession" else None
