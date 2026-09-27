@@ -2,6 +2,31 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
+## v0.2.16-beta
+
+The log header shows the Forever version, a source filter no longer lists gear you already have on both tabs, and a wipe plus a level jump puts the pieces you are wearing back on Completed.
+
+### Window title
+
+The gold band at the top of the GearQuest window now reads **GearQuest Forever** and the addon version, for example **GearQuest Forever v0.2.16-beta**. That text follows the addon version on every release.
+
+### Source filter and gear you already have
+
+Unchecking a source (for example **World drop** only) used to put an item you already own back on **Active** while it was still on **Completed**. **Snake Eye Kaleidoscope** (Lady Anacondra, Wailing Caverns, from level 17) did this on a level 20 Beast Mastery hunter: with every source checked it stayed on **Completed** only; with World drop unchecked it showed on **Active** and **Completed**.
+
+- An item on **Completed** for that slot stays off **Active**, whatever sources you leave checked.
+- The same rule applies with every source selected.
+- Other owned hunts in that situation, such as **Brawler's Leather Hood**, **Gloves of the Fang**, and **Belt of the Fang**, follow the same rule.
+- Toggling sources should feel smoother. The list refreshes once after you click, instead of rebuilding the whole hunt pool on every checkbox.
+
+### Wipe data, then simulate a higher level
+
+`/gq wipe data` clears saved hunt progress so you can test obtain again. Your bags and what you are wearing do not change.
+
+After a wipe at a low sim level (for example **10**) and then **Simulate** at a higher level (for example **20**), pieces you already own that were hunts in the bands you skipped are marked **Completed** again. That includes earlier-band picks, not only the two newest top pieces at the new level.
+
+On that level 20 Beast Mastery hunter, **Completed** should include owned hunts such as **Brawler's Leather Hood**, **Snake Eye Kaleidoscope**, **Gloves of the Fang**, and **Belt of the Fang**, as well as whatever you obtain in the current band (for example **Fine Leather Tunic** or **Bounty Hunter's Ring**). They belong on **Completed** only, including when World drop is unchecked.
+
 ## v0.2.15-beta
 
 Profession windows stay responsive, the log respects gear you already have, and Horde hunts no longer point at Alliance-only sources.

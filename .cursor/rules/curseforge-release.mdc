@@ -26,7 +26,7 @@ Never create or push a CurseForge release tag unless the user **explicitly** req
 
 ## When the user asks for CurseForge
 
-1. Bump `GearQuest/GearQuestForever.toc` `## Version:` and `GearQuest/Core.lua` `GQ.VERSION` to `X.Y.Z-beta` (e.g. `0.2.1-beta`). File name on CurseForge is **`vX.Y.Z-beta`**.
+1. Bump `GearQuest/GearQuestForever.toc` `## Version:` and `GearQuest/Core.lua` `GQ.VERSION` to `X.Y.Z-beta` (e.g. `0.2.1-beta`). File name on CurseForge is **`vX.Y.Z-beta`**. The log header must read **`GearQuest Forever v`** + that same version (`GearQuestWindowTitle` in `GearQuest/Log.lua` uses `GQ.VERSION`). Do not hardcode a separate header version; every release bump of `GQ.VERSION` updates the band.
 2. Add `## vX.Y.Z-beta` to `CHANGELOG.md`. CurseForge shows that whole section (until the next `## ` heading). Write it for players, in the detail of `v0.2.12-beta`: a short lead, then a subsection per change. Each subsection says what the player sees, which classes, specs, and levels, and the concrete windows or behavior. Name the sets, the pieces, and the levels. A one-line summary is not the changelog. Cover every player-visible change in that push.
 3. Confirm `## X-Curse-Project-ID:` is the **Forever** project, not TBC GearQuest (`1669225`).
 4. Commit and push to `main`.

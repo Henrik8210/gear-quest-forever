@@ -1585,6 +1585,14 @@ local function SetFrameTitle(frame, text)
     end
 end
 
+local function GearQuestWindowTitle()
+    local version = (GQ and GQ.VERSION) or ""
+    if version == "" then
+        return "GearQuest Forever"
+    end
+    return "GearQuest Forever v" .. version
+end
+
 local function GetPortraitTexture(frame)
     if not frame then
         return nil
@@ -1919,9 +1927,162 @@ function GQ.Log:EntrySourceAllowed(entry)
     return not hidden[src]
 end
 
+function GQ.Log:InvalidateActiveListCaches()
+    self._activeListCachesReady = false
+    self._activeListCacheContext = nil
+    self._completedBySlot = nil
+    self._completedItemKeysBySlot = nil
+    self._obtainedItemIdSet = nil
+    self._ownedItemIdSet = nil
+    self:InvalidateSourceFilterCache()
+end
+
+function GQ.Log:GetActiveListCacheContextKey()
+    local spec = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec() or ""
+    return table.concat({
+        tostring(GQ:GetEffectiveClass()),
+        tostring(GQ:GetEffectiveLevel()),
+        tostring(spec),
+        tostring(GQ:GetEffectiveFaction()),
+    }, "|")
+end
+
+function GQ.Log:ForEachOwnedItemId(callback)
+    if not callback then
+        return
+    end
+    pcall(function()
+        for invSlot = 1, 19 do
+            callback(ItemLinkToId(GetInventoryItemLink("player", invSlot)))
+        end
+        local numBags = NUM_BAG_SLOTS or 4
+        for bag = 0, numBags do
+            local numSlots = GetBagSlotCount(bag)
+            for slot = 1, numSlots do
+                callback(ItemLinkToId(GetBagItemLink(bag, slot)))
+            end
+        end
+    end)
+end
+
+function GQ.Log:InvalidateSourceFilterCache()
+    self._filteredTopBySlot = nil
+end
+
+function GQ.Log:EnsureActiveListCaches()
+    local ctx = self:GetActiveListCacheContextKey()
+    if self._activeListCachesReady and self._activeListCacheContext == ctx then
+        return
+    end
+    self._activeListCacheContext = ctx
+    self._completedBySlot = nil
+
+    self:CollectCompletedBySlot()
+
+    local keysBySlot = {}
+    for slotName, entries in pairs(self._completedBySlot or {}) do
+        local keys = {}
+        for i = 1, #entries do
+            local key = GQ.Data:EntryListKey(entries[i])
+            if key then
+                keys[key] = true
+            end
+        end
+        keysBySlot[slotName] = keys
+    end
+    self._completedItemKeysBySlot = keysBySlot
+
+    local obtained = {}
+    local function markItemId(itemId)
+        if itemId then
+            obtained[tostring(itemId)] = true
+        end
+    end
+
+    local progress = CharProgress()
+    for itemKey in pairs(progress.obtainedItems or {}) do
+        markItemId(tonumber(itemKey) or itemKey)
+    end
+    if GearQuestForeverDB and GearQuestForeverDB.obtainedItems then
+        for itemKey in pairs(GearQuestForeverDB.obtainedItems) do
+            local itemId = tonumber(itemKey) or itemKey
+            if self:AccountObtainedItemCounts(itemId) then
+                markItemId(itemId)
+            end
+        end
+    end
+    for id in pairs(progress.obtained or {}) do
+        local entry = GQ.Data:GetEntryById(id)
+        if entry then
+            markItemId(entry.itemId)
+        end
+    end
+    for id, record in pairs(progress.hunts or {}) do
+        if NormalizeHuntStatus(record.status) == "completed" then
+            local entry = GQ.Data:GetEntryById(id)
+            if entry then
+                markItemId(entry.itemId)
+            end
+        end
+    end
+    local owned = {}
+    local function markOwned(itemId)
+        if not itemId then
+            return
+        end
+        local key = tostring(itemId)
+        owned[key] = true
+        obtained[key] = true
+    end
+
+    pcall(function()
+        for invSlot = 1, 19 do
+            markOwned(ItemLinkToId(GetInventoryItemLink("player", invSlot)))
+        end
+        local numBags = NUM_BAG_SLOTS or 4
+        for bag = 0, numBags do
+            local numSlots = GetBagSlotCount(bag)
+            for slot = 1, numSlots do
+                markOwned(ItemLinkToId(GetBagItemLink(bag, slot)))
+            end
+        end
+    end)
+    self._obtainedItemIdSet = obtained
+    self._ownedItemIdSet = owned
+
+    self._activeListCachesReady = true
+end
+
+function GQ.Log:EntryHiddenFromActiveFast(entry, slotName)
+    if not entry then
+        return true
+    end
+    self:EnsureActiveListCaches()
+
+    slotName = GQ.Data:NormalizeSlotName(slotName or entry.slot)
+    local itemKey = GQ.Data:EntryListKey(entry)
+    local completedKeys = self._completedItemKeysBySlot and self._completedItemKeysBySlot[slotName]
+    if itemKey and completedKeys and completedKeys[itemKey] then
+        return true
+    end
+    if entry.itemId and self._obtainedItemIdSet and self._obtainedItemIdSet[tostring(entry.itemId)] then
+        return true
+    end
+    return false
+end
+
 function GQ.Log:GetFilteredTopForSlot(slotName)
     -- A filter can use an earlier level band, so a slot still shows the best
     -- allowed piece the character can equip when this level's band has none.
+    slotName = GQ.Data:NormalizeSlotName(slotName)
+    self:EnsureActiveListCaches()
+
+    self._filteredTopBySlot = self._filteredTopBySlot or {}
+    local cached = self._filteredTopBySlot[slotName]
+    if cached then
+        return cached
+    end
+
     local pool = {}
     local seen = {}
     local playerLevel = GQ:GetEffectiveLevel()
@@ -1930,11 +2091,12 @@ function GQ.Log:GetFilteredTopForSlot(slotName)
     for _, key in ipairs(GQ.Data:GetCandidateSlotKeys(slotName)) do
         for _, entry in ipairs(GQ.Data:GetClassSlotEntryList(key) or {}) do
             if entry and entry.id and not seen[entry.id]
-                and GQ.Data:ShouldShowEntry(entry)
-                and GQ.Data:EntryMatchesPlayer(entry)
-                and self:EntrySourceAllowed(entry)
                 and not entry.healOnly
                 and playerLevel >= (entry.minLevel or 1)
+                and self:EntrySourceAllowed(entry)
+                and not self:EntryHiddenFromActiveFast(entry, slotName)
+                and GQ.Data:ShouldShowEntry(entry)
+                and GQ.Data:EntryMatchesPlayer(entry)
                 and (not equip or not equip.EntryMatchesSpec or equip:EntryMatchesSpec(entry))
                 and (not equip or not equip.MeetsRequiredLevel or equip:MeetsRequiredLevel(entry.itemId, playerLevel))
             then
@@ -1973,7 +2135,39 @@ function GQ.Log:GetFilteredTopForSlot(slotName)
             results[#results + 1] = entry
         end
     end
+    self._filteredTopBySlot[slotName] = results
     return results
+end
+
+function GQ.Log:GetCompletedItemKeysForSlot(slotName)
+    self:EnsureActiveListCaches()
+    slotName = GQ.Data:NormalizeSlotName(slotName)
+    return (self._completedItemKeysBySlot and self._completedItemKeysBySlot[slotName]) or {}
+end
+
+function GQ.Log:ShouldHideFromActiveList(entry, slotName, completedItemKeys)
+    if self:EntryHiddenFromActiveFast(entry, slotName) then
+        return true
+    end
+
+    if not completedItemKeys and slotName then
+        completedItemKeys = self:GetCompletedItemKeysForSlot(slotName)
+    end
+
+    local itemKey = GQ.Data:EntryListKey(entry)
+    if itemKey and completedItemKeys and completedItemKeys[itemKey] then
+        return true
+    end
+
+    if entry.itemId and self._ownedItemIdSet and self._ownedItemIdSet[tostring(entry.itemId)] then
+        return true
+    end
+
+    if self:IsEntryObtained(entry.id) or PlayerHasObtainedEntryItem(entry) then
+        return true
+    end
+
+    return false
 end
 
 function GQ.Log:GetActiveSlotListEntries(slotName)
@@ -1982,12 +2176,13 @@ function GQ.Log:GetActiveSlotListEntries(slotName)
     local seenItem = {}
     local notableCount = 0
     local MAX_NOTABLES_PER_SLOT = 1
+    local completedItemKeys = self:GetCompletedItemKeysForSlot(slotName)
 
     local function addEntry(entry, allowNotable, keepObtained)
         if not entry or not entry.id or seenId[entry.id] then
             return false
         end
-        if not keepObtained and (self:IsEntryObtained(entry.id) or PlayerHasObtainedEntryItem(entry)) then
+        if not keepObtained and self:ShouldHideFromActiveList(entry, slotName, completedItemKeys) then
             return false
         end
 
@@ -2012,9 +2207,39 @@ function GQ.Log:GetActiveSlotListEntries(slotName)
     end
 
     if self:SourceFilterActive() then
-        for _, entry in ipairs(self:GetFilteredTopForSlot(slotName)) do
-            addEntry(entry, false, true)
+        for _, entry in ipairs(GQ.Data:GetTopUpgradesForSlot(slotName)) do
+            if self:EntrySourceAllowed(entry) then
+                addEntry(entry, false)
+            end
         end
+
+        if #results < 3 then
+            for _, entry in ipairs(self:GetFilteredTopForSlot(slotName)) do
+                addEntry(entry, false)
+                if #results >= 3 then
+                    break
+                end
+            end
+        end
+
+        for _, entry in ipairs(GQ.Data:GetNotableForSlot(slotName)) do
+            if self:EntrySourceAllowed(entry) then
+                addEntry(entry, true)
+            end
+        end
+
+        for id, record in pairs(CharProgress().hunts) do
+            if not seenId[id] and NormalizeHuntStatus(record.status) == "tracked" and not self:IsEntryObtained(id) then
+                local entry = GQ.Data:GetEntryById(id)
+                if entry and GQ.Data:EntryMatchesSlot(entry, slotName)
+                    and GQ.Data:EntryMatchesPlayer(entry)
+                    and self:EntryMatchesTrackedHunt(entry)
+                    and self:EntrySourceAllowed(entry) then
+                    addEntry(entry, entry.notable == true)
+                end
+            end
+        end
+
         return results
     end
 
@@ -2069,11 +2294,18 @@ function GQ.Log:CollectCompletedBySlot()
     local rowsBySlot = {}
     local seenId = {}
 
-    local function consider(entry, completedAt)
+    local function consider(entry, completedAt, trustProgress)
         if not entry or not entry.id or seenId[entry.id] or IsDismissedCompleted(entry.id) then
             return
         end
-        if not GQ.Data or not self:EntryMatchesTrackedHunt(entry) then
+        if not GQ.Data then
+            return
+        end
+        if trustProgress then
+            if not GQ.Data:EntryMatchesPlayerClass(entry) or not GQ.Data:EntryMatchesPlayerFaction(entry) then
+                return
+            end
+        elseif not self:EntryMatchesTrackedHunt(entry) then
             return
         end
         local slotName = GQ.Data:NormalizeSlotName(entry.slot)
@@ -2115,12 +2347,12 @@ function GQ.Log:CollectCompletedBySlot()
     end
 
     for id, obtainedAt in pairs(progress.obtained or {}) do
-        consider(GQ.Data:GetEntryById(id), obtainedAt)
+        consider(GQ.Data:GetEntryById(id), obtainedAt, true)
     end
 
     for id, record in pairs(progress.hunts or {}) do
         if NormalizeHuntStatus(record.status) == "completed" then
-            consider(GQ.Data:GetEntryById(id), record.completedAt or record.trackedAt or 0)
+            consider(GQ.Data:GetEntryById(id), record.completedAt or record.trackedAt or 0, true)
         end
     end
 
@@ -2140,7 +2372,7 @@ function GQ.Log:CollectCompletedBySlot()
             local entry = self:DisplayEntryForObtainedItem(tonumber(itemKey))
             if entry then
                 seenItem[itemKey] = true
-                consider(entry, obtainedAt)
+                consider(entry, obtainedAt, true)
             end
         end
     end
@@ -2238,12 +2470,30 @@ function GQ.Log:HandleCraftChatMessage(msg)
     end
 end
 
+function GQ.Log:AccountObtainedItemCounts(itemId)
+    if not itemId or not GearQuestForeverDB or type(GearQuestForeverDB.obtainedItems) ~= "table" then
+        return false
+    end
+    local map = GearQuestForeverDB.obtainedItems
+    local numId = tonumber(itemId)
+    local when = map[itemId] or map[tostring(itemId)] or (numId and map[numId])
+    if not when then
+        return false
+    end
+    local wipedAt = GearQuestForeverDB.settings and GearQuestForeverDB.settings.completedWipeAt or 0
+    return (when or 0) > wipedAt
+end
+
 function GQ.Log:HasObtainedItemId(itemId)
     if not itemId then
         return false
     end
     local items = CharProgress().obtainedItems
-    return items[itemId] or items[tostring(itemId)]
+    local numId = tonumber(itemId)
+    if items[itemId] or items[tostring(itemId)] or (numId and items[numId]) then
+        return true
+    end
+    return self:AccountObtainedItemCounts(itemId)
 end
 
 function GQ.Log:IsEntryObtained(id)
@@ -2258,7 +2508,7 @@ function GQ.Log:IsEntryObtained(id)
         return true
     end
     local entry = GQ.Data and GQ.Data.GetEntryById and GQ.Data:GetEntryById(id)
-    if entry and self:HasObtainedItemId(entry.itemId) then
+    if entry and entry.itemId and self:IsItemIdObtained(entry.itemId) then
         return true
     end
     return false
@@ -2272,13 +2522,42 @@ function GQ.Log:IsItemIdObtained(itemId)
         return true
     end
 
-    for _, entry in ipairs(GQ.Data:GetEntriesByItemId(itemId)) do
-        if GQ.Data:EntryMatchesPlayer(entry) and GetObtainedTimestamp(entry.id) then
+    local needle = tostring(itemId)
+    local progress = CharProgress()
+
+    local function entryItemMatches(entry)
+        return entry and entry.itemId and tostring(entry.itemId) == needle
+    end
+
+    for id, _ in pairs(progress.obtained or {}) do
+        if entryItemMatches(GQ.Data:GetEntryById(id)) then
             return true
         end
-        local record = GetHuntRecord(entry.id)
-        if GQ.Data:EntryMatchesPlayer(entry) and record and NormalizeHuntStatus(record.status) == "completed" then
+    end
+
+    for id, record in pairs(progress.hunts or {}) do
+        if NormalizeHuntStatus(record.status) == "completed"
+            and entryItemMatches(GQ.Data:GetEntryById(id)) then
             return true
+        end
+    end
+
+    -- Same item can appear under several generated hunt ids (level band, filter pool).
+    local numId = tonumber(itemId)
+    local lists = { GQ.Data:GetEntriesByItemId(itemId) }
+    if numId and numId ~= itemId then
+        lists[#lists + 1] = GQ.Data:GetEntriesByItemId(numId)
+    end
+
+    for li = 1, #lists do
+        for _, entry in ipairs(lists[li]) do
+            if GetObtainedTimestamp(entry.id) then
+                return true
+            end
+            local record = GetHuntRecord(entry.id)
+            if record and NormalizeHuntStatus(record.status) == "completed" then
+                return true
+            end
         end
     end
 
@@ -2301,6 +2580,35 @@ function GQ.Log:AnnounceObtained(entry)
     end
 end
 
+function GQ.Log:EntryMatchesActiveHuntLists(entry)
+    if not entry or not entry.slot then
+        return false
+    end
+    local slotName = GQ.Data:NormalizeSlotName(entry.slot)
+    local itemKey = GQ.Data:EntryListKey(entry)
+    local function listHasMatch(list)
+        for _, row in ipairs(list or {}) do
+            if row.id == entry.id then
+                return true
+            end
+            if itemKey and GQ.Data:EntryListKey(row) == itemKey then
+                return true
+            end
+        end
+        return false
+    end
+    if listHasMatch(GQ.Data:GetTopUpgradesForSlot(slotName)) then
+        return true
+    end
+    if listHasMatch(GQ.Data:GetNotableForSlot(slotName)) then
+        return true
+    end
+    if listHasMatch(GQ.Data:GetCandidatesForSlot(slotName)) then
+        return true
+    end
+    return false
+end
+
 function GQ.Log:ShouldAutoCompleteOnObtain(entry)
     if not entry or self:IsEntryObtained(entry.id) or self:HasObtainedItemId(entry.itemId) then
         return false
@@ -2310,14 +2618,22 @@ function GQ.Log:ShouldAutoCompleteOnObtain(entry)
         return true
     end
 
-    local slotName = GQ.Data:NormalizeSlotName(entry.slot)
-    for _, upgrade in ipairs(GQ.Data:GetTopUpgradesForSlot(slotName)) do
-        if upgrade.id == entry.id then
-            return true
-        end
+    if not self:EntryMatchesTrackedHunt(entry) or not GQ.Data:ShouldShowEntry(entry) then
+        return false
     end
 
-    return false
+    -- A sim jump (10 → 20) skips the bands where this piece was the hunt.
+    -- Owning it after that level is still a completed hunt.
+    local playerLevel = GQ:GetEffectiveLevel()
+    if playerLevel >= (entry.minLevel or 1) and PlayerHasObtainedEntryItem(entry) then
+        return true
+    end
+
+    if not GQ.Data:EntryMatchesPlayer(entry) then
+        return false
+    end
+
+    return self:EntryMatchesActiveHuntLists(entry)
 end
 
 function GQ.Log:RememberObtainedEntry(entry, now)
@@ -2328,7 +2644,7 @@ function GQ.Log:RememberObtainedEntry(entry, now)
     now = now or time()
     local progress = CharProgress()
 
-    self._completedBySlot = nil
+    self:InvalidateActiveListCaches()
     progress.obtained[entry.id] = progress.obtained[entry.id] or now
     if entry.itemId then
         local itemKey = tostring(entry.itemId)
@@ -2516,7 +2832,9 @@ function GQ.Log:WipeCharacterData()
     GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
     GearQuestForeverDB.settings.completedItemBackup = {}
     GearQuestForeverDB.settings.completedWipeAt = time()
+    GearQuestForeverDB.obtainedItems = {}
     self.ownedAtLogin = {}
+    self:InvalidateActiveListCaches()
 
     self.selectedHuntId = nil
     self.selectedEntry = nil
@@ -2562,6 +2880,36 @@ function GQ.Log:CollectAutoCompletionCandidates()
             for _, entry in ipairs(GQ.Data:GetTopUpgradesForSlot(slotName)) do
                 add(entry)
             end
+            for _, entry in ipairs(GQ.Data:GetNotableForSlot(slotName) or {}) do
+                add(entry)
+            end
+        end
+    end
+
+    local owned = {}
+    self:ForEachOwnedItemId(function(itemId)
+        if itemId then
+            owned[tostring(itemId)] = true
+        end
+    end)
+
+    local playerLevel = GQ:GetEffectiveLevel()
+    if classFile and GQ.Data.GetSlotsForClass and GQ.Data.GetCandidateSlotKeys then
+        local seenOwned = {}
+        for _, slotName in ipairs(GQ.Data:GetSlotsForClass(classFile)) do
+            for _, key in ipairs(GQ.Data:GetCandidateSlotKeys(slotName)) do
+                for _, entry in ipairs(GQ.Data:GetClassSlotEntryList(key) or {}) do
+                    local itemKey = entry and entry.itemId and tostring(entry.itemId)
+                    if itemKey and owned[itemKey] and not seenOwned[itemKey]
+                        and playerLevel >= (entry.minLevel or 1)
+                        and not entry.healOnly
+                        and GQ.Data:ShouldShowEntry(entry)
+                        and self:EntryMatchesTrackedHunt(entry) then
+                        seenOwned[itemKey] = true
+                        add(entry)
+                    end
+                end
+            end
         end
     end
 
@@ -2574,7 +2922,6 @@ function GQ.Log:CheckAutoCompletion()
     local ok, err = pcall(function()
         for _, entry in ipairs(self:CollectAutoCompletionCandidates()) do
             if entry
-                and GQ.Data:EntryMatchesPlayer(entry)
                 and self:ShouldAutoCompleteOnObtain(entry)
                 and PlayerHasObtainedEntryItem(entry)
             then
@@ -2591,6 +2938,7 @@ function GQ.Log:CheckAutoCompletion()
     end
 
     if changed then
+        self:InvalidateActiveListCaches()
         if self.frame and self.frame:IsShown() then
             self:Refresh()
         end
@@ -4033,7 +4381,8 @@ function GQ.Log:EnsureSourceFilter(frame)
                 hidden[self.sourceId] = true
             end
             log:UpdateSourceFilterButton()
-            log:Refresh()
+            log:InvalidateSourceFilterCache()
+            log:ScheduleListRefresh()
             if GQ.Indicator and GQ.Indicator.ScheduleRebuildCache then
                 GQ.Indicator:ScheduleRebuildCache()
             end
@@ -4849,7 +5198,7 @@ function GQ.Log:Init()
     frame:Hide()
     tinsert(UISpecialFrames, frame:GetName())
 
-    SetFrameTitle(frame, "GearQuest")
+    SetFrameTitle(frame, GearQuestWindowTitle())
     ApplyModernChrome(frame)
     self.frame = frame
     self:EnsureLogPages(frame)
@@ -5311,7 +5660,7 @@ end
 
 function GQ.Log:Refresh()
     self:HideSpecPicker()
-    self._completedBySlot = nil
+    self:EnsureActiveListCaches()
 
     local classFile = GQ:GetEffectiveClass()
     local slots = GQ.Data:GetSlotsForClass(classFile)

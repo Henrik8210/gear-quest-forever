@@ -8219,6 +8219,9 @@ function GQ.Data:InvalidateQueryCache()
     self._queryCache = nil
     self._activeBandCache = nil
     self._notableEntryCache = nil
+    if GQ.Log and GQ.Log.InvalidateSourceFilterCache then
+        GQ.Log:InvalidateSourceFilterCache()
+    end
 end
 
 function GQ.Data:ScheduleQueryRefresh()

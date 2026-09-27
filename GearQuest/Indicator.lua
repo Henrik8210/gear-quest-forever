@@ -889,7 +889,9 @@ function GQ.Indicator:RebuildCacheForSlot(slotName)
         upgrades = GQ.Data:GetTopUpgradesForSlot(slotName, maxUpgrades)
     end
     for _, entry in ipairs(upgrades) do
-        if entry.itemId and not (GQ.Log and GQ.Log.IsItemIdObtained and GQ.Log:IsItemIdObtained(entry.itemId)) then
+        local hide = GQ.Log and GQ.Log.ShouldHideFromActiveList
+            and GQ.Log:ShouldHideFromActiveList(entry, slotName)
+        if entry.itemId and not hide then
             self.upgradeItems[entry.itemId] = true
             local itemName = (GQ.Data.GetItemDisplayName and GQ.Data:GetItemDisplayName(entry.itemId))
                 or GetItemInfo(entry.itemId)

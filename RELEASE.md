@@ -19,7 +19,7 @@ Publishing uses **GitHub Actions**, not the CurseForge webhook. Keep any CurseFo
 
 Only when explicitly publishing:
 
-1. Bump `## Version:` in `GearQuest/GearQuestForever.toc` and `GearQuest/Core.lua` (`GQ.VERSION`) to **`X.Y.Z-beta`** (e.g. `0.2.1-beta`).
+1. Bump `## Version:` in `GearQuest/GearQuestForever.toc` and `GearQuest/Core.lua` (`GQ.VERSION`) to **`X.Y.Z-beta`** (e.g. `0.2.1-beta`). The log window header is **`GearQuest Forever v`** plus `GQ.VERSION` (`GearQuest/Log.lua`, `GearQuestWindowTitle`). It must stay that string — do not hardcode a different version in the header. Bumping `GQ.VERSION` is what updates the band on every release.
 2. Add a `## vX.Y.Z-beta` section to `CHANGELOG.md`. That whole section is the CurseForge changelog (until the next `## ` heading). Write it for players: a short lead, then a subsection per change, with the classes, specs, levels, and what they will see. A one-line summary is not enough.
 3. Commit and push to `main`.
 4. Tag and push: `git tag vX.Y.Z-beta` then `git push origin vX.Y.Z-beta`. CurseForge **Files** shows **`vX.Y.Z-beta`** (keep the `v`). Uploads stay on the **beta** channel until `CF_RELEASE_TYPE` is changed to `release`.

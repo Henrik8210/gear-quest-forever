@@ -119,6 +119,9 @@ function GQ.Preview:SetClass(classFile)
     if GQ.Data and GQ.Data.InvalidateClassCache then
         GQ.Data:InvalidateClassCache()
     end
+    if GQ.Log and GQ.Log.InvalidateActiveListCaches then
+        GQ.Log:InvalidateActiveListCaches()
+    end
     return true
 end
 
@@ -134,6 +137,9 @@ function GQ.Preview:SetLevel(level)
     self:SetEnabled(true)
     if GQ.Data and GQ.Data.InvalidatePlayerBandCache then
         GQ.Data:InvalidatePlayerBandCache()
+    end
+    if GQ.Log and GQ.Log.InvalidateActiveListCaches then
+        GQ.Log:InvalidateActiveListCaches()
     end
     if GQ.CheckLevelMilestones then
         GQ:CheckLevelMilestones(previousLevel, level)
@@ -155,6 +161,9 @@ function GQ.Preview:SetFaction(faction)
     self:SetEnabled(true)
     if GQ.Data and GQ.Data.InvalidatePlayerBandCache then
         GQ.Data:InvalidatePlayerBandCache()
+    end
+    if GQ.Log and GQ.Log.InvalidateActiveListCaches then
+        GQ.Log:InvalidateActiveListCaches()
     end
     return true
 end
