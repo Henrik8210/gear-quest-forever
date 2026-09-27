@@ -6949,6 +6949,37 @@ function GQ.Data:IsDruidMeleeHasteForCaster(entry)
     return entry.specs.balance or entry.specs.restoration
 end
 
+-- Rune Broker relics are sold by different NPCs per faction (ingest_forever_wowhead.py).
+-- Generated itemFacts are keyed by itemId only, so Alliance broker copy must not
+-- gate Horde lists at display time until the next re-score removes bad rows.
+GQ.Data.RUNE_BROKER_ALLIANCE = {
+    [205420] = true, [208849] = true, [208851] = true, [211472] = true,
+}
+GQ.Data.RUNE_BROKER_HORDE = {
+    [206381] = true, [206382] = true, [206386] = true, [206387] = true,
+    [206388] = true, [225838] = true,
+}
+GQ.Data.RUNE_BROKER_INSTRUCTIONS = {
+    Alliance = "Bought from Rune Broker in Stormwind, Ironforge, Darnassus, Elwynn Forest, Dun Morogh, and Teldrassil.",
+    Horde = "Bought from Rune Broker in Orgrimmar, Thunder Bluff, Undercity, Durotar, Mulgore, and Tirisfal Glades.",
+    Both = "Bought from Rune Broker in Stormwind, Ironforge, Darnassus, Elwynn Forest, Dun Morogh, and Teldrassil, "
+        .. "and in Orgrimmar, Thunder Bluff, Undercity, Durotar, Mulgore, and Tirisfal Glades.",
+}
+
+-- Quest hubs that are genuinely one-faction (mirrors pipeline ALLIANCE_ZONES / HORDE_ZONES).
+GQ.Data.FACTION_ZONE_DENY = {
+    Alliance = {
+        ["Valley of Trials"] = true, ["Durotar"] = true, ["Razor Hill"] = true, ["Orgrimmar"] = true,
+        ["Mulgore"] = true, ["Camp Narache"] = true, ["Thunder Bluff"] = true, ["Deathknell"] = true,
+        ["Tirisfal Glades"] = true, ["Brill"] = true, ["Undercity"] = true,
+    },
+    Horde = {
+        ["Northshire Valley"] = true, ["Elwynn Forest"] = true, ["Dun Morogh"] = true,
+        ["Coldridge Valley"] = true, ["Kharanos"] = true, ["Teldrassil"] = true, ["Shadowglen"] = true,
+        ["Darnassus"] = true, ["Ironforge"] = true, ["Stormwind City"] = true,
+    },
+}
+
 -- On-use AOE / novelty trinkets that are not real stat upgrades for leveling BiS.
 GQ.Data.EXCLUDED_ITEMS = {
     [13515] = true, -- Ramstein's Lightning Bolts
@@ -6959,6 +6990,53 @@ function GQ.Data:IsExcludedItem(entry)
         return false
     end
     return self.EXCLUDED_ITEMS[entry.itemId] == true
+end
+
+function GQ.Data:EntryMatchesPlayerFaction(entry)
+    if not entry then
+        return false
+    end
+
+    local faction = GQ:GetEffectiveFaction()
+    if entry.factions and not entry.factions[faction] then
+        return false
+    end
+
+    local itemId = entry.itemId
+    if faction == "Horde" and itemId and self.RUNE_BROKER_ALLIANCE[itemId] then
+        return false
+    end
+    if faction == "Alliance" and itemId and self.RUNE_BROKER_HORDE[itemId] then
+        return false
+    end
+
+    local zone = entry.zone
+    if zone and self.FACTION_ZONE_DENY[faction] and self.FACTION_ZONE_DENY[faction][zone] then
+        return false
+    end
+
+    return true
+end
+
+function GQ.Data:GetEntryInstructions(entry)
+    if not entry then
+        return nil
+    end
+
+    local text = entry.instructions
+    local itemId = entry.itemId
+    if itemId and (self.RUNE_BROKER_ALLIANCE[itemId] or self.RUNE_BROKER_HORDE[itemId]) then
+        local faction = GQ:GetEffectiveFaction()
+        if self.RUNE_BROKER_ALLIANCE[itemId] and self.RUNE_BROKER_HORDE[itemId] then
+            text = self.RUNE_BROKER_INSTRUCTIONS.Both
+        elseif faction == "Horde" and self.RUNE_BROKER_HORDE[itemId] then
+            text = self.RUNE_BROKER_INSTRUCTIONS.Horde
+        else
+            text = self.RUNE_BROKER_INSTRUCTIONS.Alliance
+        end
+    end
+
+    return text
 end
 
 function GQ.Data:ShouldShowEntry(entry)
@@ -6975,6 +7053,10 @@ function GQ.Data:ShouldShowEntry(entry)
     end
 
     if not self:EntryMatchesPlayerClass(entry) then
+        return false
+    end
+
+    if not self:EntryMatchesPlayerFaction(entry) then
         return false
     end
 
@@ -7641,7 +7723,7 @@ function GQ.Data:ShowFactFallbackTooltip(tooltip, entry)
                 end
             end
         end
-        local instructions = (fact and fact.instructions) or entry.instructions
+        local instructions = self:GetEntryInstructions(entry) or (fact and fact.instructions)
         if instructions and instructions ~= "" then
             instructions = self:SanitizeText(instructions) or instructions
             tooltip:AddLine(" ")
@@ -8424,7 +8506,8 @@ function GQ.Data:BackfillCandidates(allEntries, filtered, minCount)
 
     local extras = {}
     for _, entry in ipairs(allEntries or {}) do
-        if not seen[entry.id] and not entry.notable and self:ShouldShowEntry(entry) then
+        if not seen[entry.id] and not entry.notable and self:ShouldShowEntry(entry)
+            and self:EntryMatchesPlayer(entry) then
             local key = self:EntryListKey(entry)
             if key and not seenItem[key] and activeMinLevel
                 and self:EntryInActiveBand(entry, activeMinLevel, activeMaxLevel) then

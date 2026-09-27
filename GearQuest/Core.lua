@@ -9,7 +9,7 @@ end
 GQ = GQ or {}
 _G.GearQuest = GQ
 
-GQ.VERSION = "0.2.14-beta"
+GQ.VERSION = "0.2.15-beta"
 GQ.ADDON_NAME = ADDON_NAME
 -- WoW Forever: 1–60 Classic+ (no TBC level cap).
 GQ.MAX_PLAYER_LEVEL = 60
@@ -468,7 +468,13 @@ function GQ:PLAYER_LEVEL_UP(_, newLevel)
     if newLevel and not self:IsPreviewEnabled() then
         self._playerLevelOverride = newLevel
     end
+    if self.Data and self.Data.InvalidateQueryCache then
+        self.Data:InvalidateQueryCache()
+    end
     self:CheckLevelMilestones(previousLevel, newLevel)
+    if self.Log and self.Log.CheckAutoCompletion then
+        self.Log:CheckAutoCompletion()
+    end
     self:RefreshUI()
 end
 

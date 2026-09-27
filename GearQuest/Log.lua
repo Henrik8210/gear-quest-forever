@@ -1931,6 +1931,7 @@ function GQ.Log:GetFilteredTopForSlot(slotName)
         for _, entry in ipairs(GQ.Data:GetClassSlotEntryList(key) or {}) do
             if entry and entry.id and not seen[entry.id]
                 and GQ.Data:ShouldShowEntry(entry)
+                and GQ.Data:EntryMatchesPlayer(entry)
                 and self:EntrySourceAllowed(entry)
                 and not entry.healOnly
                 and playerLevel >= (entry.minLevel or 1)
@@ -1986,7 +1987,7 @@ function GQ.Log:GetActiveSlotListEntries(slotName)
         if not entry or not entry.id or seenId[entry.id] then
             return false
         end
-        if not keepObtained and self:IsEntryObtained(entry.id) then
+        if not keepObtained and (self:IsEntryObtained(entry.id) or PlayerHasObtainedEntryItem(entry)) then
             return false
         end
 
@@ -4585,7 +4586,7 @@ function GQ.Log:RefreshSimulator()
     end
 
     local viewing = string.format(
-        "Simulate a level %s %s %s%s, then open the log to hunt their upgrades.",
+        "Simulate a level %s %s %s%s, then click Simulate to apply and open the log.",
         tostring(level),
         self.simFaction or "Alliance",
         className,
@@ -5129,6 +5130,7 @@ function GQ.Log:BuildDetailLines(entry)
 
     local lines = {
         (GQ.Data and GQ.Data.GetProfessionInstructions and GQ.Data:GetProfessionInstructions(entry))
+            or (GQ.Data and GQ.Data.GetEntryInstructions and GQ.Data:GetEntryInstructions(entry))
             or entry.instructions,
     }
 

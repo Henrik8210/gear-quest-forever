@@ -510,20 +510,7 @@ end
 
 function GQ.Indicator:UpdateTradeSkillDetailIcon()
     local detailIcon = self:FindTradeSkillDetailIconHost()
-    if not detailIcon then
-        return
-    end
-
-    local index = self:GetTradeSkillSelectionIndex()
-    if not index or index <= 0 or IsTradeSkillHeader(index) then
-        self:HideButton(detailIcon)
-        return
-    end
-
-    local link = self:ResolveTradeSkillOutputLink(index)
-    if link then
-        self:UpdateButton(detailIcon, link)
-    else
+    if detailIcon then
         self:HideButton(detailIcon)
     end
 end
@@ -813,6 +800,13 @@ end
 
 function GQ.Indicator:UpdateButton(button, link)
     if not button then
+        return
+    end
+
+    -- No upgrade arrows on profession windows (craft / trade skill): avoids
+    -- link resolution and full cache rebuilds while browsing recipes.
+    if IsProfessionListRow(button) or IsTradeSkillDetailIconHost(button) or IsCraftDetailIconHost(button) then
+        self:HideButton(button)
         return
     end
 
@@ -1218,10 +1212,6 @@ function GQ.Indicator:UpdateTradeSkillFrame()
     end
 
     self:UpdateTradeSkillDetailIcon()
-
-    if GQ.Data and GQ.Data.CacheTradeSkillRecipes then
-        GQ.Data:CacheTradeSkillRecipes()
-    end
 end
 
 function GQ.Indicator:IsMerchantBuybackTab()
@@ -1318,36 +1308,14 @@ function GQ.Indicator:UpdateCraftFrame()
     end, displayed)
 
     local detailIcon = _G.CraftIcon or (CraftFrame and CraftFrame.DetailIcon)
-    if detailIcon and GetCraftSelectionIndex then
-        local index = GetCraftSelectionIndex()
-        if index and index > 0 then
-            self:UpdateButton(detailIcon, self:ResolveCraftOutputLink(index))
-        else
-            self:HideButton(detailIcon)
-        end
+    if detailIcon then
+        self:HideButton(detailIcon)
     end
 end
 
 function GQ.Indicator:ScheduleProfessionRefresh()
-    if not C_Timer or not C_Timer.After then
-        self:UpdateTradeSkillFrame()
-        self:UpdateCraftFrame()
-        return
-    end
-
-    C_Timer.After(0, function()
-        if GQ.Indicator then
-            GQ.Indicator:UpdateTradeSkillFrame()
-            GQ.Indicator:UpdateCraftFrame()
-        end
-    end)
-
-    C_Timer.After(0.15, function()
-        if GQ.Indicator then
-            GQ.Indicator:UpdateTradeSkillFrame()
-            GQ.Indicator:UpdateCraftFrame()
-        end
-    end)
+    self:UpdateTradeSkillFrame()
+    self:UpdateCraftFrame()
 end
 
 function GQ.Indicator:RefreshAll()
@@ -1439,10 +1407,6 @@ function GQ.Indicator:Init()
         self:ScheduleProfessionRefresh()
     end)
 
-    self:HookFunction("TradeSkillFrame_Update", function()
-        self:UpdateTradeSkillFrame()
-    end)
-
     self:HookFunction("CraftFrame_SetSelection", function()
         self:ScheduleProfessionRefresh()
     end)
@@ -1506,7 +1470,6 @@ function GQ.Indicator:Init()
                     GQ.Tracker:ClampRowMouse()
                 end
             end
-            GQ.Indicator:RebuildCache()
             GQ.Indicator:ScheduleProfessionRefresh()
             return
         end

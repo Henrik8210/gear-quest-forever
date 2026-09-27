@@ -2,6 +2,47 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
+## v0.2.15-beta
+
+Profession windows stay responsive, the log respects gear you already have, and Horde hunts no longer point at Alliance-only sources.
+
+### Profession book and crafting (load fix)
+
+Opening a profession, switching tabs (e.g. Blacksmithing → Mining), or clicking **Create** used to hitch badly because GearQuest rescanned **every slot’s** BiS cache and walked **every recipe** in the open trade skill window on each update.
+
+- Green **upgrade arrows are removed only on the profession / trade skill UI** (recipe list and the detail icon). Loot, vendors, quest rewards, and dungeon drops still show arrows when a piece is a tracked upgrade.
+- GearQuest no longer runs a full **`RebuildCache()`** when `TRADE_SKILL_SHOW`, `TRADE_SKILL_UPDATE`, `TRADE_SKILL_LIST_UPDATE`, `TRADE_SKILL_DATA_SOURCE_CHANGED`, or craft events fire.
+- GearQuest no longer rescans all recipes on every trade skill frame update.
+
+You should be able to browse recipes and craft without the client freezing or stuttering on each tab change. BiS tracking everywhere else is unchanged.
+
+### Gear you already have (Active vs Completed)
+
+If a hunt is still one of your top upgrades for your **current** class, spec, level, and faction, but you **already carry or wear** that item, it no longer clutters the **Active** hunt list.
+
+- When you **level up for real**, enter a new level band in **preview/simulator** (after you click **Simulate**), log in, loot, or craft the piece, GearQuest runs **auto-complete** and moves it to **Completed** (no second toast if you had it before login).
+- **`/gq wipe data`** clears saved hunt progress only. Your bags and equipment stay the same, so auto-complete can still fill **Completed** once the right level band is active.
+
+If **Active** looks empty for a slot but you are wearing the BiS, check **Completed** first.
+
+### Simulator and preview level
+
+On the **Simulator** tab, changing the level number only updates the text until you click **Simulate** (or press Enter in the level box). That applies level, class, spec, and faction to the log. Preview level changes now run the same obtain check as a real level-up, so jumping from 10 → 20 after a wipe can mark pieces you already wear as completed.
+
+### Horde paladin and other faction fixes
+
+Horde players should no longer see hunts that only make sense on the Alliance side:
+
+- **Alliance Rune Broker librams** (e.g. Libram of Blessings, Libram of Justice) no longer appear on Horde lists. Horde broker relics no longer appear on Alliance lists. Instructions for broker relics follow your faction when shown.
+- Quest and vendor rows tied to **one-faction hubs** (e.g. **Stormwind City** on Horde) are filtered out at display time.
+- Source filters and backfill use the same player/faction rules as the main list.
+
+A full **re-score and re-emit** for every class will tighten generated rows further; this release fixes what you see in-game immediately.
+
+### Snake Eye Kaleidoscope (reminder)
+
+The neck from **Lady Anacondra** in **Wailing Caverns** (requires level **17**) is on generated lists for all classes while it remains in the **top three** neck picks for your level band. It is not listed below 17. If you already wear it, it moves off **Active** and should appear under **Completed** after auto-complete.
+
 ## v0.2.14-beta
 
 Settings, set pieces, and the hunts that come with collecting a set.

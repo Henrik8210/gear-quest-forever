@@ -496,6 +496,13 @@ Hunt-id probe (`pipeline/scripts/probe_forever_hunt_tooltips.py`) labels 200 vs 
 
 **Finger gap (Horde, levels 9–14):** curated level-9 rings are Alliance paladin/warrior only. Generated shaman Finger starts at 10 with **The 1 Ring (8350)**, which 404s on Forever and is pruned. **Woven Copper Ring (21931)** also 404s. Horde enhancement rings that exist are Bounty Hunter's Ring (5351, Barrens) and Ring of Scorn (3235, Silverpine) around 15. Do not toast “ring slot eligible” unless `SlotHasHunts("Finger")`.
 
+**28 Sep 2026 (v0.2.15-beta).**
+
+- **Profession book performance.** Do not paint green BiS arrows on the trade skill or craft windows (recipe list or detail icon). Switching profession tabs or crafting used to call `RebuildCache()` on every `TRADE_SKILL_*` event and scan every recipe via `CacheTradeSkillRecipes()` — full-slot rescans on each tab change. Arrows stay on loot, vendors, quests, and loot rolls. `Indicator.lua` only hides profession overlays now; no cache rebuild on profession events.
+- **Owned gear and the log.** If you already have a top upgrade in bags or equipped, it is hidden on the **Active** list (less clutter). Auto-complete still records it on **Completed** when you enter that level band or on login scan. Real **`PLAYER_LEVEL_UP`** invalidates bands and runs `CheckAutoCompletion`. Preview / simulator level changes do the same via `Preview:SetLevel` (they do not fire `PLAYER_LEVEL_UP`). Simulator: typing a level only updates the hint until you click **Simulate** (or Enter in the level box); that applies preview and refreshes hunts.
+- **Snake Eye Kaleidoscope (273088).** In generated data for all classes/specs from character level 17 while it stays in the top three neck picks for that band; it is not shown below 17. If you are already wearing it, Active hides it; Completed should list it after auto-complete. Re-score is not required for the item itself; `items.json` kind is `Misc`.
+- **Horde faction leaks (runtime).** Generated `itemFacts` are keyed by item id only, so Alliance Rune Broker libram copy could appear on Horde rows until the next re-emit. `Data.lua` `EntryMatchesPlayerFaction` hides Alliance-only broker relic ids on Horde (and the mirror on Alliance), denies one-faction **zones** on entries (e.g. Stormwind City on Horde), and tightens backfill / source-filter pools with `EntryMatchesPlayer`. `score.py` `RUNE_BROKER_ALLIANCE` / `RUNE_BROKER_HORDE` gates the next paladin (etc.) re-score so bad rows leave `_generated/`.
+
 ## Relic effect scoring
 
 Totems/idols/librams often have **no flat stats** — only an Equip line. Without

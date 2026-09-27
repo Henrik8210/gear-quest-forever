@@ -138,6 +138,11 @@ function GQ.Preview:SetLevel(level)
     if GQ.CheckLevelMilestones then
         GQ:CheckLevelMilestones(previousLevel, level)
     end
+    -- Preview jumps (simulator, /gq level) do not fire PLAYER_LEVEL_UP; still
+    -- need obtain checks when a new level band unlocks hunts you already have.
+    if self:IsEnabled() and GQ.Log and GQ.Log.ScheduleAutoCompletionCheck then
+        GQ.Log:ScheduleAutoCompletionCheck()
+    end
     return true
 end
 

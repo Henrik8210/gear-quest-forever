@@ -371,6 +371,10 @@ def pvp_side(name):
         if name.startswith(p): return PVP_PREFIX[p]
     return None
 
+# Rune Broker stock is split by faction (see ingest_forever_wowhead.py).
+RUNE_BROKER_ALLIANCE = {205420, 208849, 208851, 211472}
+RUNE_BROKER_HORDE = {206381, 206382, 206386, 206387, 206388, 225838}
+
 def eligible(it, cls, spec, level, faction, prof, wsubs):
     src=srcs[str(it["id"])]
     if not src["obtainable"]: return False
@@ -404,6 +408,9 @@ def eligible(it, cls, spec, level, faction, prof, wsubs):
     qr=src.get("questRaces") or 0
     if qr and not (qr & mask): return False          # captured all along, never used
     if not zone_ok(src.get("zone"), faction): return False
+    iid = it["id"]
+    if iid in RUNE_BROKER_ALLIANCE and faction != "Alliance": return False
+    if iid in RUNE_BROKER_HORDE and faction != "Horde": return False
     side=pvp_side(it["name"])
     if side and side!=faction: return False
     if not rep_ok(it, faction): return False
