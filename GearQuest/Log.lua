@@ -47,7 +47,8 @@ local SIDE_TAB_TOP = -(TAB_TOP_OFFSET - LOG_SECTION_TOP)
 local TAB_BORDER_EDGE = 12
 local FILTER_BORDER_EDGE = 8
 local LOG_TAB_ICON = "Interface\\GossipFrame\\AvailableQuestIcon"
-local SIM_TAB_ICON = "Interface\\Icons\\Trade_Engineering"
+local SIM_TAB_ICON = "Interface\\Icons\\INV_Misc_QuestionMark"
+local SETTINGS_TAB_ICON = "Interface\\Icons\\Trade_Engineering"
 local SECTION_DIVIDER_HEIGHT = 3
 local METAL_EDGE = "Interface\\Tooltips\\UI-Tooltip-Border"
 local GOLD = { 0.90, 0.75, 0.28 }
@@ -172,6 +173,10 @@ local function BuildListItemTags(entry, status, includeNewLabel, slotName)
 
     if entry and entry.origin == "guide" then
         tags = tags .. " |cff88ccff(Guide)|r"
+    end
+
+    if entry and entry.setPiece then
+        tags = tags .. " |cff88ccff(Set piece)|r"
     end
 
     if entry and GQ.Data:ShouldDisplayAsNotable(entry, slotName or (entry and entry.slot)) then
@@ -1794,6 +1799,8 @@ function GQ.Log:SetPageTab(tab)
     self:ApplyPageTab()
     if self:GetPageTab() == "simulator" then
         self:RefreshSimulator()
+    elseif self:GetPageTab() == "settings" then
+        self:RefreshSettings()
     else
         self:Refresh()
     end
@@ -3387,7 +3394,9 @@ function GQ.Log:UpdateContextStatus()
     end
 
     local text
-    if GQ.IsPreviewEnabled and GQ:IsPreviewEnabled() then
+    if self:GetPageTab() == "settings" then
+        text = "Settings"
+    elseif GQ.IsPreviewEnabled and GQ:IsPreviewEnabled() then
         local level = GQ:GetEffectiveLevel() or UnitLevel("player") or 1
         local spec = (GQ.Spec and GQ.Spec.GetSelectedSpecLabel and GQ.Spec:GetSelectedSpecLabel()) or "Specialization"
         local classFile = GQ:GetEffectiveClass()
@@ -3413,6 +3422,28 @@ function GQ.Log:UpdateContextStatus()
     end
 
     self.frame.contextStatus:SetText(text)
+    self:LayoutContextHeading()
+end
+
+function GQ.Log:LayoutContextHeading()
+    local frame = self.frame
+    local fs = frame and frame.contextStatus
+    if not fs then
+        return
+    end
+    fs:ClearAllPoints()
+    fs:SetJustifyH("CENTER")
+    fs:SetJustifyV("MIDDLE")
+    if self:GetPageTab() == "settings" then
+        local mid = (CONTEXT_BAND_TOP - TAB_TOP_OFFSET) / 2
+        fs:SetPoint("CENTER", frame, "TOP", 0, mid)
+    else
+        local bar = frame.contextStatusBar
+        fs:SetPoint("LEFT", bar, "LEFT", 0, 0)
+        fs:SetPoint("RIGHT", bar, "RIGHT", 0, 0)
+        fs:SetPoint("TOP", bar, "TOP", 0, 0)
+        fs:SetPoint("BOTTOM", bar, "BOTTOM", 0, 0)
+    end
 end
 
 function GQ.Log:EnsureContextStatus(frame)
@@ -3462,6 +3493,20 @@ function GQ.Log:UpdateFooterButtons()
         return
     end
 
+    if self.frame.exitBtn then
+        self.frame.exitBtn:Hide()
+    end
+
+    if self:GetPageTab() == "settings" then
+        if self.frame.trackBtn then
+            self.frame.trackBtn:Hide()
+        end
+        if self.frame.untrackBtn then
+            self.frame.untrackBtn:Hide()
+        end
+        return
+    end
+
     local tab = self:GetListTab()
     local selectedId = self.selectedHuntId
     local status = selectedId and GetHuntStatus(selectedId) or nil
@@ -3500,10 +3545,18 @@ function GQ.Log:EnsurePageBar(frame)
     return frame.pageBar
 end
 
+local function SideTabStride()
+    return SIDE_TAB_HEIGHT + SIDE_TAB_GAP
+end
+
+local function SideTabRailHeight()
+    return (SIDE_TAB_HEIGHT * 3) + (SIDE_TAB_GAP * 2)
+end
+
 function GQ.Log:EnsureSideTabs(frame)
     if not frame.sideTabRail then
         frame.sideTabRail = CreateFrame("Frame", nil, frame)
-        frame.sideTabRail:SetSize(SIDE_TAB_WIDTH, (SIDE_TAB_HEIGHT * 2) + SIDE_TAB_GAP)
+        frame.sideTabRail:SetSize(SIDE_TAB_WIDTH, SideTabRailHeight())
     end
     local rail = frame.sideTabRail
 
@@ -3553,6 +3606,29 @@ function GQ.Log:EnsureSideTabs(frame)
         end
     end
 
+    if not frame.tabSettings then
+        frame.tabSettings = CreateHandleTab(rail, "GearQuestPageTabSettings", "Settings", SETTINGS_TAB_ICON)
+        frame.tabSettings:SetScript("OnClick", function()
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if log then
+                log:SetPageTab("settings")
+            end
+        end)
+    else
+        frame.tabSettings:SetParent(rail)
+        frame.tabSettings.gqLabel = frame.tabSettings.gqLabel or "Settings"
+        frame.tabSettings.gqIconPath = SETTINGS_TAB_ICON
+        frame.tabSettings:SetSize(SIDE_TAB_WIDTH, SIDE_TAB_HEIGHT)
+        if not frame.tabSettings:GetScript("OnClick") then
+            frame.tabSettings:SetScript("OnClick", function()
+                local log = _G.GearQuest and _G.GearQuest.Log
+                if log then
+                    log:SetPageTab("settings")
+                end
+            end)
+        end
+    end
+
     return rail
 end
 
@@ -3576,7 +3652,7 @@ function GQ.Log:LayoutSideTabs(frame)
     rail:SetFrameLevel(railLevel)
     rail:ClearAllPoints()
     rail:SetPoint("TOPLEFT", frame, "TOPRIGHT", -SIDE_TAB_OVERLAP, SIDE_TAB_TOP)
-    rail:SetSize(SIDE_TAB_WIDTH, (SIDE_TAB_HEIGHT * 2) + SIDE_TAB_GAP)
+    rail:SetSize(SIDE_TAB_WIDTH, SideTabRailHeight())
     if frame:IsShown() then
         rail:Show()
     else
@@ -3597,17 +3673,21 @@ function GQ.Log:LayoutSideTabs(frame)
     end
 
     local page = self:GetPageTab()
-    local logSelected = page == "log"
     frame.tabLog:ClearAllPoints()
     frame.tabLog:SetPoint("TOPLEFT", rail, "TOPLEFT", 0, 0)
     frame.tabSimulator:ClearAllPoints()
-    frame.tabSimulator:SetPoint("TOPLEFT", rail, "TOPLEFT", 0, -(SIDE_TAB_HEIGHT + SIDE_TAB_GAP))
+    frame.tabSimulator:SetPoint("TOPLEFT", rail, "TOPLEFT", 0, -SideTabStride())
+    frame.tabSettings:ClearAllPoints()
+    frame.tabSettings:SetPoint("TOPLEFT", rail, "TOPLEFT", 0, -(SideTabStride() * 2))
     frame.tabLog:Show()
     frame.tabSimulator:Show()
-    frame.tabLog:SetFrameLevel(logSelected and frontLevel or backLevel)
-    frame.tabSimulator:SetFrameLevel(logSelected and backLevel or frontLevel)
-    StyleHandleTab(frame.tabLog, logSelected)
-    StyleHandleTab(frame.tabSimulator, not logSelected)
+    frame.tabSettings:Show()
+    frame.tabLog:SetFrameLevel(page == "log" and frontLevel or backLevel)
+    frame.tabSimulator:SetFrameLevel(page == "simulator" and frontLevel or backLevel)
+    frame.tabSettings:SetFrameLevel(page == "settings" and frontLevel or backLevel)
+    StyleHandleTab(frame.tabLog, page == "log")
+    StyleHandleTab(frame.tabSimulator, page == "simulator")
+    StyleHandleTab(frame.tabSettings, page == "settings")
 end
 
 function GQ.Log:EnsureLogPages(frame)
@@ -3616,6 +3696,9 @@ function GQ.Log:EnsureLogPages(frame)
     end
     if not frame.simPage then
         frame.simPage = CreateFrame("Frame", nil, frame)
+    end
+    if not frame.settingsPage then
+        frame.settingsPage = CreateFrame("Frame", nil, frame)
     end
     return frame.logPage, frame.simPage
 end
@@ -3637,6 +3720,13 @@ function GQ.Log:LayoutMainWindow(frame)
     simPage:SetPoint("TOPLEFT", logPage, "TOPLEFT", 0, 0)
     simPage:SetPoint("BOTTOMRIGHT", logPage, "BOTTOMRIGHT", 0, 0)
 
+    local settingsPage = frame.settingsPage
+    if settingsPage then
+        settingsPage:ClearAllPoints()
+        settingsPage:SetPoint("TOPLEFT", logPage, "TOPLEFT", 0, 0)
+        settingsPage:SetPoint("BOTTOMRIGHT", logPage, "BOTTOMRIGHT", 0, 0)
+    end
+
     if pageBar:GetParent() ~= logPage then
         pageBar:SetParent(logPage)
     end
@@ -3652,6 +3742,7 @@ function GQ.Log:LayoutMainWindow(frame)
     self:LayoutLogColumns(frame)
     self:RepositionSpecButton(frame)
     self:LayoutSimulatorPage(frame)
+    self:LayoutSettingsPage(frame)
     self:LayoutFooterButtons(frame)
     self:ApplyPageTab()
 end
@@ -3778,6 +3869,13 @@ function GQ.Log:ApplyPageTab()
             self.frame.simPage:Hide()
         end
     end
+    if self.frame.settingsPage then
+        if page == "settings" then
+            self.frame.settingsPage:Show()
+        else
+            self.frame.settingsPage:Hide()
+        end
+    end
 
     self:UpdatePageTabVisuals()
     self:UpdateFooterButtons()
@@ -3836,6 +3934,7 @@ function GQ.Log:EnsureTabBar(frame)
 
     self:EnsureSourceFilter(frame)
     self:EnsureSimulatorPage(frame)
+    self:EnsureSettingsPage(frame)
     self:LayoutMainWindow(frame)
     self:UpdateTabVisuals()
 end
@@ -4211,6 +4310,160 @@ function GQ.Log:LayoutSimulatorPage(frame)
     frame.simDetail:SetPoint("TOPLEFT", frame.simPage, "TOPLEFT", LEFT_COLUMN_WIDTH + COLUMN_GAP, LOG_SECTION_TOP)
     frame.simDetail:SetPoint("BOTTOMRIGHT", frame.simPage, "BOTTOMRIGHT", 0, FOOTER_OFFSET)
     ApplyMetalEdge(frame.simDetail, 16)
+end
+
+local function CreateSettingsCheck(parent, label)
+    local ok, btn = pcall(CreateFrame, "CheckButton", "GearQuestHideMinimapCheck", parent, "UICheckButtonTemplate")
+    if not ok or not btn then
+        btn = CreateFrame("CheckButton", nil, parent)
+        btn:SetSize(24, 24)
+        btn:SetNormalTexture("Interface\\Buttons\\UI-CheckBox-Up")
+        btn:SetPushedTexture("Interface\\Buttons\\UI-CheckBox-Down")
+        btn:SetHighlightTexture("Interface\\Buttons\\UI-CheckBox-Highlight")
+        btn:SetCheckedTexture("Interface\\Buttons\\UI-CheckBox-Check")
+    end
+    btn:SetSize(24, 24)
+    local text = btn.Text
+    if not text and btn.GetName and btn:GetName() then
+        text = _G[btn:GetName() .. "Text"]
+    end
+    if not text then
+        text = btn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        text:SetPoint("LEFT", btn, "RIGHT", 2, 0)
+    end
+    text:SetText(label)
+    text:SetTextColor(0, 0, 0)
+    btn.text = text
+    return btn
+end
+
+function GQ.Log:EnsureSettingsPage(frame)
+    self:EnsureLogPages(frame)
+    local page = frame.settingsPage
+    if page.settingsReady then
+        return page
+    end
+    page.settingsReady = true
+
+    local list = CreateFrame("Frame", nil, page)
+    ApplyBlackBackground(list)
+    ApplyMetalEdge(list, 16)
+    frame.settingsList = list
+
+    local general = CreateFrame("Button", "GearQuestSettingsGeneral", list)
+    general:SetHeight(22)
+    general:SetPoint("TOPLEFT", list, "TOPLEFT", 6, -8)
+    general:SetPoint("TOPRIGHT", list, "TOPRIGHT", -8, -8)
+    general.highlight = general:CreateTexture(nil, "BACKGROUND")
+    general.highlight:SetAllPoints()
+    general.highlight:SetColorTexture(0.28, 0.22, 0.08, 0.85)
+    general.highlight:Show()
+    general.text = general:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    general.text:SetPoint("LEFT", general, "LEFT", 8, 0)
+    general.text:SetJustifyH("LEFT")
+    general.text:SetText("General")
+    general.text:SetTextColor(GOLD[1], GOLD[2], GOLD[3])
+    frame.settingsGeneralBtn = general
+
+    local detail = CreateFrame("Frame", nil, page)
+    EnableClipping(detail)
+    ApplyParchmentBackground(detail)
+    ApplyMetalEdge(detail, 16)
+    frame.settingsDetail = detail
+
+    local SETTINGS_NOTE_FONTS = {
+        "QuestFontNormalSmall",
+        "SystemFont_Small",
+        "SystemFont_Shadow_Small",
+        "QuestFont",
+    }
+
+    local label = CreateFontStringWithFallback(detail, QUEST_DETAIL_TITLE_FONTS)
+    label:SetJustifyH("LEFT")
+    label:SetText("Hide minimap icon")
+    label:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    frame.settingsMinimapLabel = label
+
+    local labelHit = CreateFrame("Button", nil, detail)
+    labelHit:SetPoint("TOPLEFT", detail, "TOPLEFT", 48, -18)
+    labelHit:SetSize(math.max(label:GetStringWidth() or 0, 1) + 4, math.max(label:GetStringHeight() or 0, 18))
+    label:SetParent(labelHit)
+    label:ClearAllPoints()
+    label:SetPoint("LEFT", labelHit, "LEFT", 0, 0)
+    frame.settingsMinimapLabelHit = labelHit
+
+    local function ApplyMinimapCheck(checked)
+        if GQ.Minimap and GQ.Minimap.SetHidden then
+            GQ.Minimap:SetHidden(checked)
+        end
+    end
+
+    local check = CreateSettingsCheck(detail, "")
+    check:SetPoint("RIGHT", labelHit, "LEFT", -6, 0)
+    if check.text then
+        check.text:SetText("")
+        check.text:Hide()
+    end
+    check:SetScript("OnClick", function(self)
+        ApplyMinimapCheck(self:GetChecked())
+    end)
+    labelHit:SetScript("OnClick", function()
+        local checked = not check:GetChecked()
+        check:SetChecked(checked)
+        ApplyMinimapCheck(checked)
+    end)
+    frame.settingsMinimapCheck = check
+
+    local hint = CreateFontStringWithFallback(detail, SETTINGS_NOTE_FONTS)
+    hint:SetPoint("TOPLEFT", labelHit, "BOTTOMLEFT", 0, -4)
+    hint:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
+    hint:SetJustifyH("LEFT")
+    hint:SetWordWrap(true)
+    hint:SetText("You can still open GearQuest with /gq while the icon is hidden.")
+    hint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
+    frame.settingsHint = hint
+
+    return page
+end
+
+function GQ.Log:LayoutSettingsPage(frame)
+    if not frame.settingsPage or not frame.settingsList or not frame.settingsDetail then
+        return
+    end
+
+    frame.settingsList:ClearAllPoints()
+    frame.settingsList:SetPoint("TOPLEFT", frame.settingsPage, "TOPLEFT", 0, LOG_SECTION_TOP)
+    frame.settingsList:SetPoint("BOTTOMLEFT", frame.settingsPage, "BOTTOMLEFT", 0, FOOTER_OFFSET)
+    frame.settingsList:SetWidth(LEFT_COLUMN_WIDTH)
+    ApplyBlackBackground(frame.settingsList)
+    ApplyMetalEdge(frame.settingsList, 16)
+
+    frame.settingsDetail:ClearAllPoints()
+    frame.settingsDetail:SetPoint("TOPLEFT", frame.settingsPage, "TOPLEFT", LEFT_COLUMN_WIDTH + COLUMN_GAP, LOG_SECTION_TOP)
+    frame.settingsDetail:SetPoint("BOTTOMRIGHT", frame.settingsPage, "BOTTOMRIGHT", 0, FOOTER_OFFSET)
+    ApplyMetalEdge(frame.settingsDetail, 16)
+end
+
+function GQ.Log:RefreshSettings()
+    local frame = self.frame
+    local check = frame and frame.settingsMinimapCheck
+    if not check then
+        return
+    end
+    local hidden = GQ.Minimap and GQ.Minimap.IsHidden and GQ.Minimap:IsHidden()
+    check:SetChecked(hidden and true or false)
+    local label = frame.settingsMinimapLabel
+    local hit = frame.settingsMinimapLabelHit
+    if label and hit and label.GetStringWidth then
+        local width = label:GetStringWidth()
+        local height = label.GetStringHeight and label:GetStringHeight()
+        if width and width > 1 then
+            hit:SetWidth(width + 4)
+        end
+        if height and height > 1 then
+            hit:SetHeight(height)
+        end
+    end
 end
 
 function GQ.Log:SelectSimulatorClass(classFile)
@@ -4613,7 +4866,9 @@ function GQ.Log:Init()
     frame.scrollChild:SetWidth(LEFT_COLUMN_WIDTH - (PANEL_INSET * 2) - SCROLLBAR_INSET)
     frame.scrollChild:SetHeight(1)
     frame.scroll:SetScrollChild(frame.scrollChild)
-    EnableClipping(frame.scroll)
+    -- Do not clip this frame. The scrollbar is a child drawn just outside
+    -- the scroll rect, and SetClipsChildren hides it. The scroll child is
+    -- already clipped by the ScrollFrame.
     frame.scrollChild:EnableMouse(false)
 
     frame.listGutter = CreateFrame("Frame", nil, frame)
@@ -4633,7 +4888,6 @@ function GQ.Log:Init()
     frame.detailChild = CreateFrame("Frame", "GearQuestLogDetailScrollChild", frame.detailScroll)
     frame.detailChild:SetWidth(RIGHT_COLUMN_WIDTH - (PANEL_INSET * 2) - SCROLLBAR_INSET - 8)
     frame.detailScroll:SetScrollChild(frame.detailChild)
-    EnableClipping(frame.detailScroll)
     frame.detailChild:EnableMouse(false)
 
     frame.detailGutter = CreateFrame("Frame", nil, frame)

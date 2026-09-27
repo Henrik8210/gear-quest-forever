@@ -93,6 +93,36 @@ local function WireMinimapButton(button)
     end)
 end
 
+function GQ.Minimap:IsHidden()
+    return type(GearQuestForeverDB) == "table"
+        and type(GearQuestForeverDB.settings) == "table"
+        and GearQuestForeverDB.settings.hideMinimapIcon
+        and true
+        or false
+end
+
+function GQ.Minimap:ApplyVisibility()
+    local button = self.button
+    if not button then
+        return
+    end
+    if self:IsHidden() then
+        button:Hide()
+        if GameTooltip and GameTooltip.GetOwner and GameTooltip:GetOwner() == button then
+            GameTooltip:Hide()
+        end
+    else
+        button:Show()
+        UpdatePosition(button)
+    end
+end
+
+function GQ.Minimap:SetHidden(hidden)
+    GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+    GearQuestForeverDB.settings.hideMinimapIcon = hidden and true or false
+    self:ApplyVisibility()
+end
+
 function GQ.Minimap:Init()
     if self.initialized then
         return
@@ -104,6 +134,7 @@ function GQ.Minimap:Init()
         if self.button then
             WireMinimapButton(self.button)
             UpdatePosition(self.button)
+            self:ApplyVisibility()
         end
         return
     end
@@ -144,8 +175,8 @@ function GQ.Minimap:Init()
     end)
 
     UpdatePosition(button)
-    button:Show()
     self.button = button
+    self:ApplyVisibility()
 
     if Minimap.HookScript then
         pcall(function()

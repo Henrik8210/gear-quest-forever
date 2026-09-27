@@ -37178,7 +37178,7 @@
   },
   "6473": {
     "sourceType": "boss_drop",
-    "instructions": "Drops from Lord Pythas.",
+    "instructions": "Drops from Lord Pythas. Part of Embrace of the Viper (Wailing Caverns). At 4 pieces, falling to 25% health restores 100 health and mana over 5 sec, once every 5 min. At 5 pieces, melee attacks can inflict Dream Venom and stun for 1 sec. A druid in the full set turns into a serpent: the color follows your race, and Prowl or Stealth slithers.",
     "zone": "Wailing Caverns",
     "npc": "Lord Pythas",
     "questName": null,
@@ -62051,7 +62051,7 @@
   },
   "10410": {
     "sourceType": "boss_drop",
-    "instructions": "Drops from Lord Cobrahn.",
+    "instructions": "Drops from Lord Cobrahn. Part of Embrace of the Viper (Wailing Caverns). At 4 pieces, falling to 25% health restores 100 health and mana over 5 sec, once every 5 min. At 5 pieces, melee attacks can inflict Dream Venom and stun for 1 sec. A druid in the full set turns into a serpent: the color follows your race, and Prowl or Stealth slithers.",
     "zone": "Wailing Caverns",
     "npc": "Lord Cobrahn",
     "questName": null,
@@ -62067,7 +62067,7 @@
   },
   "10411": {
     "sourceType": "boss_drop",
-    "instructions": "Drops from Lord Serpentis.",
+    "instructions": "Drops from Lord Serpentis. Part of Embrace of the Viper (Wailing Caverns). At 4 pieces, falling to 25% health restores 100 health and mana over 5 sec, once every 5 min. At 5 pieces, melee attacks can inflict Dream Venom and stun for 1 sec. A druid in the full set turns into a serpent: the color follows your race, and Prowl or Stealth slithers.",
     "zone": "Wailing Caverns",
     "npc": "Lord Serpentis",
     "questName": null,
@@ -62083,7 +62083,7 @@
   },
   "10412": {
     "sourceType": "boss_drop",
-    "instructions": "Drops from Lady Anacondra.",
+    "instructions": "Drops from Lady Anacondra. Part of Embrace of the Viper (Wailing Caverns). At 4 pieces, falling to 25% health restores 100 health and mana over 5 sec, once every 5 min. At 5 pieces, melee attacks can inflict Dream Venom and stun for 1 sec. A druid in the full set turns into a serpent: the color follows your race, and Prowl or Stealth slithers.",
     "zone": "Wailing Caverns",
     "npc": "Lady Anacondra",
     "questName": null,
@@ -62099,7 +62099,7 @@
   },
   "10413": {
     "sourceType": "boss_drop",
-    "instructions": "Drops from Druid of the Fang.",
+    "instructions": "Drops from Druid of the Fang. Part of Embrace of the Viper (Wailing Caverns). At 4 pieces, falling to 25% health restores 100 health and mana over 5 sec, once every 5 min. At 5 pieces, melee attacks can inflict Dream Venom and stun for 1 sec. A druid in the full set turns into a serpent: the color follows your race, and Prowl or Stealth slithers.",
     "zone": "Wailing Caverns",
     "npc": "Druid of the Fang",
     "questName": null,

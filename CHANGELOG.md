@@ -2,6 +2,58 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
+## v0.2.14-beta
+
+Settings, set pieces, and the hunts that come with collecting a set.
+
+### Settings
+
+A Settings handle sits with the log and the simulator. The cog opens Settings. The simulator handle is the red question mark.
+
+- Hide the minimap icon. The choice stays after you reload.
+- Click the setting name, not only the box, to turn it on or off.
+
+### Set pieces
+
+A hunt that belongs to a gear set is marked **(Set piece)**, the same way a proc is marked (Notable). Open the piece and the description names the bonuses and the levels where that spec actually wants them. Some pieces are a hunt on their own. Others become a hunt once the set is together.
+
+### Embrace of the Viper
+
+Wailing Caverns leather, for hunters, rogues, enhancement shaman, and feral druids.
+
+- Beast Mastery and Marksmanship: all five together from 18 to 21. From 22 the chest drops off and the other four stay a little longer.
+- Survival: all five through 23.
+- Combat, Assassination, and Subtlety: all five from 18 through 23.
+- Enhancement: all five from 18 through 28. At 29 the chest drops off.
+- Feral: all five from 18 through 23. All five pieces turn you into a serpent. The color follows your race, and Prowl or Stealth slithers.
+
+The gloves are a hunt from 14 on their own, and the legs from 17. The chest and the belt become a hunt with the set. Four pieces are the heal and mana. All five are Dream Venom.
+
+### Defias Leather
+
+Deadmines, for rogues. The full set looks flashy. The bonuses do not make every piece a hunt.
+
+- Legs at 14 and 15
+- Boots at 15 and 16
+
+After that the Fang pieces take those slots. The chest, gloves, and belt stay behind stronger leather.
+
+### Chain of the Scarlet Crusade
+
+Scarlet Monastery mail.
+
+- Retribution: belt from 32 to 36, chest from 34 to 39, legs at 39. The gauntlets are in the top 3 at 33 and 34.
+- Arms and Fury: belt from 32 to 39, chest from 34 to 39, legs at 39. The gauntlets are in the top 3 around 33 to 34.
+- Protection, paladin and warrior: boots from 30 to 36, bracers from 31 to 35, chest from 34 to 39.
+
+### Set tooltips
+
+A set piece tooltip now matches Wowhead. The set name and how many pieces you have, each piece on its own line, then one line per bonus. The required level stays above the set.
+
+### Scrollbars
+
+The scrollbars on the hunt list and the parchment are visible again.
+
 ## v0.2.13-beta
 
 Hotfix: an upgrade toasts once.

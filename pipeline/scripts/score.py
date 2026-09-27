@@ -638,6 +638,129 @@ def slug(s):
     s=unicodedata.normalize("NFKD",s).encode("ascii","ignore").decode()
     return re.sub(r"_+","_",re.sub(r"[^a-z0-9]+","_",s.lower())).strip("_")
 
+# Embrace of the Viper (Forever set 162). Five leather pieces, all from
+# Wailing Caverns. Each piece is scored on its own stats first. The 2/3/4/5
+# bonuses are not on any one piece, so a chest with no agility never reaches
+# the top 3 alone, and the player never sees the set that makes those pieces
+# worth wearing.
+#
+# After the slot lists exist, compare two packages in the same point currency:
+#   the five pieces + the set bonuses
+#   the best item already chosen for each of those slots
+# If the set wins, every piece in that package becomes the hunt for its slot.
+# A 4-piece package (the low-health save, no stun) can win when the fifth
+# piece is not worth it. Specs that do not melee for a living are not on this
+# list: the 5-piece is a melee stun.
+EMBRACE_PIECES = {
+    6473: "Chest",   # Armor of the Fang, Lord Pythas, req 18
+    10410: "Legs",    # Leggings of the Fang, Lord Cobrahn, req 17
+    10413: "Hands",   # Gloves of the Fang, Druid of the Fang, req 14
+    10412: "Waist",   # Belt of the Fang, Lady Anacondra, req 16
+    10411: "Feet",    # Footpads of the Fang, Lord Serpentis, req 17
+}
+EMBRACE_SPECS = {
+    "HUNTER": {"beast_mastery", "marksmanship", "survival"},
+    "ROGUE": {"combat", "assassination", "subtlety"},
+    "SHAMAN": {"enhancement"},
+    "DRUID": {"feral"},
+}
+# The pieces are item level 19-23. Dream Venom does not scale with the
+# wearer, so the stun is priced at this level even when the character is higher.
+EMBRACE_ITEM_LEVEL = 22
+# Cat form melees and the weapon dpsWeight is 0 (the weapon is a stat stick).
+# Classic cat: 1 agility = 1 attack power, 1 attack power = 1/14 white dps,
+# so 1 white dps = 14 agility. Hunters with no melee dpsWeight still swing
+# sometimes; that is a smaller share, priced off their agility the same way
+# weapon dps is priced off strength at the top of this file.
+
+def embrace_bonus(wl, _level, dps_w, spec_key, pieces):
+    """Points for wearing `pieces` of Embrace of the Viper. Same currency as stats."""
+    pts = 0.0
+    if pieces >= 2:
+        pts += 10.0 * wl.get("int", 0.0)
+    if pieces >= 3:
+        pts += 10.0 * wl.get("ap", 0.0)
+    if pieces >= 4:
+        # 100 health is 10 stamina, paid when you are about to die.
+        # The 5-minute lockout is why this is not a permanent aura on top.
+        pts += (100.0 / PROCS.HP_PER_STA) * wl.get("sta", 0.0)
+        mana_w = wl.get("mana", 0.0)
+        if mana_w:
+            pts += 100.0 * mana_w
+        elif wl.get("int", 0.0):
+            # Classic: 1 intellect = 15 mana. Enhancement weights intellect
+            # and leaves raw mana at 0; the 100 mana is still their stat.
+            pts += (100.0 / 15.0) * wl.get("int", 0.0)
+    if pieces >= 5:
+        dw = dps_w or 0.0
+        if dw <= 0 and spec_key == "feral":
+            dw = 14.0
+        elif dw <= 0 and spec_key in ("beast_mastery", "marksmanship"):
+            dw = DPS_PER_STR * wl.get("agi", 0.0)
+        if dw > 0:
+            # Trash stuns. procs.py prices raid stuns at 0 because bosses are
+            # immune; this set is gone before a raid. One second of white
+            # melee per proc, at the default proc rate. Priced at the set's
+            # item level so a level-18 stun does not grow into a level-40 one.
+            white = EMBRACE_ITEM_LEVEL * 1.05
+            pts += white * (PROCS.PPM_DEFAULT * 1.0 / 60.0) * dw
+    return pts
+
+def _embrace_cost(per, faction, level, chosen):
+    """How many points you give up by wearing `chosen` instead of the best other item."""
+    cost = 0.0
+    for sl, row in chosen.items():
+        best_other = 0.0
+        for r in (per.get((faction, level, sl)) or []):
+            if r[1]["id"] == row[1]["id"]:
+                continue
+            best_other = r[0]
+            break
+        cost += max(0.0, best_other - row[0])
+    return cost
+
+def apply_embrace_package(per, faction, level, cls, spec_key, wl, dps_w, found):
+    """If the set outscores the mixed best, hunt those pieces."""
+    if spec_key not in EMBRACE_SPECS.get(cls, ()):
+        return
+    if len(found) < 4:
+        return
+    options = []
+    if len(found) == 5:
+        options.append(dict(found))
+    # Every 4-piece subset. The piece you skip is the one the set does not need.
+    if len(found) >= 4:
+        slots = list(found)
+        for drop in slots:
+            if len(found) == 4 and drop:
+                options.append(dict(found))
+                break
+            sub = {sl: row for sl, row in found.items() if sl != drop}
+            if len(sub) == 4:
+                options.append(sub)
+    best = None
+    best_margin = None
+    for chosen in options:
+        n = len(chosen)
+        bonus = embrace_bonus(wl, level, dps_w, spec_key, n)
+        margin = bonus - _embrace_cost(per, faction, level, chosen)
+        # Prefer the full set when it wins. Otherwise the best 4-piece.
+        if margin < 0:
+            continue
+        if best is None or n > len(best) or (n == len(best) and margin > best_margin):
+            best = chosen
+            best_margin = margin
+    if not best:
+        return
+    bonus = embrace_bonus(wl, level, dps_w, spec_key, len(best))
+    share = bonus / float(len(best))
+    for sl, row in best.items():
+        key = (faction, level, sl)
+        cur = [r for r in (per.get(key) or []) if r[1]["id"] != row[1]["id"]]
+        promoted = (row[0] + share,) + row[1:]
+        cur.insert(0, promoted)
+        per[key] = cur[:8]
+
 def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
     cfg=W[cls][spec_key]
     w=dict(cfg["weights"]); style=cfg["weaponStyle"]; dpsW=cfg.get("dpsWeight",0.0)
@@ -664,6 +787,7 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                 wl["heal"] = 0.0
                 wl["sp_from_heal"] = 0.0
             buckets=collections.defaultdict(list)
+            embrace_found={}
             for it in pool:
                 if not eligible(it,cls,spec_key and spec_key or "",level,faction,prof,wsubs): continue
                 sl=slot_for(it,cls)
@@ -803,7 +927,11 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                         s = rs
                     elif s <= 0:
                         s = it["ilvl"] * 0.01
-                if s>0: buckets[sl].append((s,it,suf,ch,st,chAny,s+_roll_gain,srange,sid))
+                if s>0:
+                    row=(s,it,suf,ch,st,chAny,s+_roll_gain,srange,sid)
+                    buckets[sl].append(row)
+                    if it["id"] in EMBRACE_PIECES:
+                        embrace_found[sl]=row
 
                 # A one-hander (InventoryType 13) can be held in EITHER hand. slot_for
                 # returns one slot per item, so every inv-13 weapon was MainHand-only
@@ -919,6 +1047,7 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     held_ids.add(it["id"]); held_names.add(it["name"])
                     extra.append(r)
                 source_alts[(faction,level,sl)]=extra
+            apply_embrace_package(per, faction, level, cls, spec_key, wl, dpsW, embrace_found)
     return per,cfg,notable,full60,source_alts
 
 # ---------------------------------------------------------------------------

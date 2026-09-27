@@ -6022,6 +6022,7 @@ local FOREVER_TIP_BREAKS = {
     "Durability",
     "Dropped by:",
     "Drop Chance:",
+    "Durability",
     "Restores ",
     "Equip:",
     "Use:",
@@ -6060,12 +6061,18 @@ function GQ.Data:FormatAuditTip(tip)
     tip = tip:gsub(" (%d+) Armor", "\n%1 Armor")
     tip = tip:gsub("(%a)(%d+) Armor", "%1\n%2 Armor")
     tip = tip:gsub("(%d+) Block", "\n%1 Block")
-    tip = tip:gsub("(%(%d+%) Set :)", "\n%1")
+    -- Wowhead prints one line per bonus: "(2) Set : +10 Intellect."
+    -- "Set:" and "Set :" both occur. Keep the +N on that line; the stat
+    -- splitter below is for "+6 Strength+4 Stamina", not for set bonuses.
+    tip = tip:gsub("(%(%d+%)%s*Set%s*:)", "\n%1")
     tip = tip:gsub("(Requires Level %d+)%s+", "%1\n")
     for _, head in ipairs(FOREVER_TIP_BREAKS) do
         tip = tip:gsub("(" .. head .. ")", "\n%1")
     end
+    tip = tip:gsub("(%(%d+%)%s*Set%s*:%s*)%+(%d+)", "%1\1%2")
     tip = tip:gsub("%+(%d+)%s+", "\n+%1 ")
+    tip = tip:gsub("(%(%d+%)%s*Set%s*:%s*)\1(%d+)", "%1+%2")
+    tip = tip:gsub("(%(%d+%)%s*Set%s*:)%s*\n%s*(%+%d+)", "%1 %2")
     tip = tip:gsub(" +", " ")
     tip = tip:gsub("\n+", "\n")
     return tip:match("^%s*(.-)%s*$")
@@ -8553,6 +8560,7 @@ function GQ.Data:BuildNotableEntry(row, facts, classFile)
         factions = faction and FACTION[faction] or nil,
         sourceType = f.sourceType,
         instructions = f.instructions,
+        setPiece = f.setPiece,
         zone = f.zone,
         npc = f.npc,
         questName = f.questName,

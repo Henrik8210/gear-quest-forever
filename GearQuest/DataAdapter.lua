@@ -197,6 +197,7 @@ local function Expand(src, data, out)
                 factions     = faction and FACTION[faction] or nil,
                 sourceType   = f.sourceType,
                 instructions = f.instructions,
+                setPiece     = f.setPiece,
                 lore         = f.lore,
                 zone         = f.zone,
                 npc          = f.npc,

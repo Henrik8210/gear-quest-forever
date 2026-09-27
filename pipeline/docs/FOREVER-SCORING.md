@@ -38,6 +38,91 @@ of Agility at 22 is +6–7 Agi (~9.5%). If +7 would be #1, the item **is** #1.
 `suffixChance` tells the player the roll is slim; chance never buries the
 hunt. Implemented in `score.py` `best_variant` (`ROLL_POLICY="bestRoll"`).
 
+## Embrace of the Viper (set 162)
+
+Forever reworked this Wailing Caverns leather set. The pieces were already
+in `items.json` on Classic stats, and the tooltip scrape had 404'd them, so
+`forever_missing_ids()` hid every hunt. Stats are the Forever tooltip
+(27 Sep 2026): chest is +6 Strength, +4 Stamina, +7 Spirit, not the old
++8/+8.
+
+A piece is still scored alone. After the slot lists exist,
+`apply_embrace_package` compares two packages in the same point currency:
+the set, and the best item already chosen for each of those slots. If the
+set wins, those pieces become the hunt. Bonuses, same weights as printed
+stats:
+
+- 2 pieces: +10 Intellect
+- 3 pieces: +10 Attack Power
+- 4 pieces: 100 health (10 stamina) and 100 mana, once per 5 min at 25% health
+- 5 pieces: Dream Venom, a 1-second melee stun. Raid stuns stay worth 0 in
+  `procs.py` (bosses are immune). This stun is priced as one second of white
+  melee at item level 22, because the proc does not grow with the wearer.
+
+DPS specs only: hunter (all three), rogue (all three), enhancement, feral.
+Bear, Balance, Restoration, Elemental, and Enhancement Tank are not on it.
+
+Verified windows, both factions (27 Sep 2026):
+
+- Beast Mastery and Marksmanship: all five together from 18 to 21. From 22
+  the chest falls off and the other four stay through about 24.
+- Survival: all five through 23. At 24 the legs are what remain.
+- Combat, Assassination, Subtlety: all five from 18 through 23.
+- Enhancement: all five from 18 through 28. At 29 the chest falls off and
+  the other four remain. The 2-piece intellect is why it lasts.
+- Feral: all five from 18 through 23.
+
+The chest and the belt become BiS with the set. Gloves (from 14) and legs
+(from 17) are already hunts on their own stats. Dream Venom is priced at
+item level 22, not the wearer’s level, or Enhancement keeps the chest too
+long. Feral has no weapon `dpsWeight`; the stun uses 14 (cat: 1 AP = 1/14
+white dps).
+
+The list tags these rows `(Set piece)`, the same way a proc row is tagged
+`(Notable)`. The drop text names the bonuses and the level window for that
+class. A druid in all five pieces turns into a serpent (race colors it;
+Prowl and Stealth slither). That is flavor on the description, not a stat.
+
+Do not promote a set until the Forever bonus text is known and this package
+comparison wins. A single piece is still scored on its own stats. The
+package only inserts pieces at rank 1 when the bonuses pay for the slots
+you give up. Do not copy a set-bonus line (`+15 Attack Power against
+Humanoids`) onto the item’s own stats. `wpnSkill` is 0 on every spec, so
+`+1 Daggers` does not move a rank.
+
+**Defias Leather (161),** Deadmines. Forever stats, not the Classic row:
+chest is item level 22, requires 17, 89 armor, +4 Strength, +3 Agility,
++10 Stamina. Bonuses: +5 arcane resist, +15 attack power vs humanoids, a
+5% behind-only bleed, +1 daggers. Those bonuses do not carry the weak
+slots. For Combat, Assassination, and Subtlety, both factions: legs are a
+hunt at 14–15, boots at 15–16, then the Fang pieces take those slots.
+Chest, gloves, and belt stay off the top 3 even with all five.
+
+**Chain of the Scarlet Crusade (163),** Scarlet Monastery mail. Bonuses:
++10 shadow resist, +30 attack power vs undead, Enraging Light (20 Holy on
+melee, 60 vs undead), +1% hit at 5, and a 480 absorb at 20% health on a
+4 minute cooldown at 6. Do not price that absorb as 48 permanent stamina.
+Pieces that rank do it on their own stats:
+
+- Retribution: belt 32–36, chest 34–39, legs at 39. Gauntlets are in the
+  top 3 at 33–34.
+- Arms and Fury: belt 32–39, chest 34–39, legs at 39. Gauntlets are in the
+  top 3 around 33–34.
+- Protection, paladin and warrior: boots 30–36, bracers 31–35, chest 34–39.
+
+The list tags Defias and Scarlet rows `(Set piece)` on the classes above.
+
+Smaller sets left on their own stats until the same check: Stormshroud
+(rogue energy, about 50), Black Dragon Mail (1% hit at 2 pieces, 2% melee
+crit at 3, about 53), Ironfeather (2 pieces, +20 spell power, about 49),
+Green Dragon Mail (mana regen, about 47), Imperial Plate (defense, hit,
+strength, about 47). Level-60 dungeon sets stay unscored for bonuses.
+
+Set tooltips follow the Wowhead block: the set name and `(0/N)`, one line
+per piece, then one line per bonus such as `(2) Set : +10 Intellect.`
+The `+N` stays on that bonus line.
+
+
 **Healing Done is a healer stat.** Holy paladin, Restoration druid, Restoration
 shaman, and Holy or Discipline priest score it. Every other spec, including
 Elemental, Balance, and Shadow, scores **+Damage Done** as spell power (one
@@ -210,12 +295,30 @@ paragraph.
   Woolen Shoulders is **green**, even if `items.json` still says quality 1.
 - **Layout:** slot on the left, armor type on the right (`Shoulder | Leather`).
   Same for `Damage | Speed`.
-- **Sets:** blank line before the set header, indented piece names, blank
-  before Sell Price. Forever stats stay; client set-bonus overlay only when
-  the bonuses are usable (`GetClientSetBlock` / `ApplyClientSetBlock`).
-- **No Forever tip** → `ShowClientItemTooltip` (`SetItemByID`).
+- **Sets:** Wowhead order. Stats, durability, required level, then the set
+  name with `(0/N)`, one line per piece, then one line per bonus:
+  `(2) Set : +10 Intellect.` Do not tear `+N` onto the next line. The old
+  hand-written Viper tip (`Embrace of the Viper(2) Set:` above the level
+  requirement) was that bug. `FormatAuditTip` keeps the bonus on the set
+  line. A stored tip with real newlines from the nether HTML is the source.
+  Client set-bonus overlay only when the bonuses are usable
+  (`GetClientSetBlock` / `ApplyClientSetBlock`).
+- **No Forever tip** goes to `ShowClientItemTooltip` (`SetItemByID`).
 - Green `+N Spell Power` / Damage Done / Healing Done, not the old Equip
-  “increases damage and healing by up to N” sentence.
+  sentence that says increases damage and healing by up to N.
+
+## Log window
+
+- **Settings** is the third side handle (cog, `Interface\Icons\Trade_Engineering`).
+  Simulator stays the red question mark. The page heading is centered. The
+  setting name is the large text; the note under it is smaller and not bold.
+  Clicking the label toggles the checkbox. Hide minimap is
+  `GearQuestForeverDB.settings.hideMinimapIcon`.
+- **Scrollbars** on the hunt list and the parchment sit just outside the
+  scroll frame, as children of it. `SetClipsChildren` on that frame hides
+  them. Do not clip `GearQuestLogListScrollFrame` or
+  `GearQuestLogDetailScrollFrame`. The ScrollFrame already clips its scroll
+  child. The bar still hides when the content fits.
 
 **Do not scan the live client for new items.** `Collector.lua` is gone. Do not
 hook `TRAINER_SHOW` / `TRAINER_UPDATE`, call `SetTrainerService`, rebuild the
