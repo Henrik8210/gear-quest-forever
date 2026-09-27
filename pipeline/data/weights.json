@@ -10,7 +10,7 @@
   "hunterNote": "1 Str = 1 melee AP, 0 RAP. 1 Agi = 0 melee AP, 1 RAP. 14 AP = 1 DPS. No Steady Shot: BM/MM dpsWeightRanged is 14 Agi (1 bow DPS = 14 RAP = 14 Agi), melee dpsWeight 0 from 10. Survival is melee: dpsWeight 10, dpsWeightRanged 6, Strength 0.50. Marksmanship Int 0.40 assumes Careful Aim. Lone Wolf vs pet is one weight row (pet/BM default).",
   "druidNote": "Druids are the first class where weapon DAMAGE is worth zero. In Cat and Bear form the weapon's dps is not used at all; attack power in form comes from the feralAp stat ('+N attack power in Cat, Bear, Dire Bear and Moonkin forms only', 72 items) which is weighted identically to plain ap because in form it IS plain ap. Balance and Restoration never swing either. dpsWeight is 0.0 for all four specs; only levelling_1_9 keeps a real one, because Bear form is not learned until 10. Leather and cloth only -- no mail, plate or shields -- and Staff/Mace/Dagger/Fist/Polearm only: no swords, no axes, no ranged weapon. The Ranged slot holds an Idol.",
   "roleNote": "Forever unifies hit, crit and haste across melee, ranged and spells. Those three are legal on every spec. expertise/armorPen/resilience/wpnSkill are dead. Pure casters still have no str/ap/rap; pure physical specs still have no sp/heal except Ret, Enhance, and Paladin Protection. Warrior Protection is a physical tank -- spell damage does not rank BiS (defense on a caster piece is a notable). check_roles.py enforces this.",
-  "shamanNote": "Forever Enhancement cannot dual wield and can equip 2H without a talent. Mental Dexterity (100% Int->AP) and Mental Quickness (30% Int->SP) plus Maelstrom bolts make Int and spell power real. Elemental/Restoration never hold an off-hand weapon. Axe/Mace/Staff/Dagger/Fist only. Ranged slot is a Totem.",
+  "shamanNote": "Forever Enhancement cannot dual wield and can equip 2H without a talent. Mental Dexterity is 1 AP per intellect. Enhancement int is 0.6 raw so levels 1-59 (int x2) score it at 1.2, just above agility 1.0. Level 60 keeps the raw 0.6. Mental Quickness (30% Int->SP) and Maelstrom keep a smaller spell-power weight. Elemental/Restoration never hold an off-hand weapon. Axe/Mace/Staff/Dagger/Fist only. Ranged slot is a Totem. Enhancement Tank is a separate row and stays stamina-first.",
   "rogueNote": "Rogue is the hunter mirrored: dpsWeightRanged 0.0 because a rogue never fires the bow -- it is a stat stick -- while melee dpsWeight is 15.0 (1 Agi = 1 AP = 1/14 white dps plus crit ~= 0.095; 1 weapon dps = 1.0 x ~1.5 for Sinister Strike, Backstab and Eviscerate riding on weapon damage). Rogues get 1 AP per Strength, not 2. hit 1.90-2.00 is the highest physical hit weight in the project: the dual-wield miss penalty punishes being under the cap harder than for anyone else. ASSASSINATION and SUBTLETY are dagger-locked in the main hand via mainHandKinds -- Backstab, Ambush and Mutilate do not fire with a sword -- COMBAT takes either. Leather and cloth only; no shields; no two-handers.",
   "foreverNote": "Weapon skill still exists on the Skills tab but item/racial skill sticks are gone or tiny -- wpnSkill weight is 0. Character sheet has no Hit or Expertise row; Hit on items still scores. Haste is a real % (about 1% baseline on melee sheets)."
  },
@@ -1094,7 +1094,7 @@
     "spellHit": 0.0,
     "spellHaste": 0.0,
     "spellPen": 0.0,
-    "int": 0.5,
+    "int": 0.6,
     "spi": 0.0,
     "mana": 0.0,
     "mp5": 0.05,

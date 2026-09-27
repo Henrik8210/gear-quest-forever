@@ -3603,6 +3603,10 @@ function GQ.Log:EnsureSpecControl(frame)
     iconFrame.icon:SetPoint("BOTTOMRIGHT", iconFrame, "BOTTOMRIGHT", -1, 1)
 
     iconFrame:SetScript("OnEnter", function(self)
+        if GQ.Compare and GQ.Compare.ShowScoringWeightTooltip then
+            GQ.Compare:ShowScoringWeightTooltip(self)
+            return
+        end
         if not GQ.Spec then
             return
         end
@@ -3612,6 +3616,25 @@ function GQ.Log:EnsureSpecControl(frame)
     end)
     iconFrame:SetScript("OnLeave", function()
         GameTooltip:Hide()
+    end)
+
+    local nameHit = CreateFrame("Button", nil, control)
+    nameHit:SetPoint("LEFT", control, "LEFT", 0, 0)
+    nameHit:SetPoint("RIGHT", iconFrame, "LEFT", -SPEC_CONTROL_GAP, 0)
+    nameHit:SetHeight(SPEC_CONTROL_HEIGHT)
+    nameHit:SetScript("OnEnter", function(self)
+        if GQ.Compare and GQ.Compare.ShowScoringWeightTooltip then
+            GQ.Compare:ShowScoringWeightTooltip(self)
+        end
+    end)
+    nameHit:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+    nameHit:SetScript("OnClick", function()
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if log then
+            log:ToggleSpecPicker(iconFrame)
+        end
     end)
     iconFrame:SetScript("OnMouseDown", function(self, button)
         if button == "LeftButton" then

@@ -2,6 +2,39 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
+## v0.2.17-beta
+
+The spec icon explains how GearQuest ranks that spec, Enhancement shaman hunts value intellect while leveling, and Horde Retribution gets Wolfsbane at level 20.
+
+The window title reads **GearQuest Forever v0.2.17-beta**.
+
+### How a spec is scored
+
+Hover the specialization name or the spec icon in the log. A tooltip lists the weights GearQuest uses for the spec you are viewing, including a simulated spec.
+
+- **1.00** is one point of that spec's main stat. Higher numbers matter more. Stats at 0 are hidden.
+- From level **1 through 59**, the numbers already include the leveling bonuses. Stamina, health, and health per 5 count ×3. Armor counts ×2. Intellect, spirit, mana, and mana per 5 count ×2.
+- At level **60** the tooltip shows the raw weights, with no leveling bonus.
+- Weapon damage is listed on its own when that spec swings or shoots. A Beast Mastery hunter shows ranged weapon damage. An Enhancement shaman shows melee weapon damage.
+- Switch spec and the tooltip follows. Elemental and Enhancement are not the same list.
+
+### Enhancement shaman
+
+**Mental Dexterity** turns intellect into attack power, one point of attack power per point of intellect. The Enhancement lists were still treating intellect as half of agility.
+
+- Below level 60, Enhancement now scores intellect at **1.2**, just above agility at **1.0**. Hover Enhancement and the tooltip shows Intellect **1.2**.
+- At level 60 the same talent is a smaller share of the hunt: intellect stays **0.6**, and agility stays **1.0**.
+- Enhancement hunts from 1 to 59 were re-scored, so intellect pieces rank higher than they did before. Spell power is unchanged (Mental Quickness and Maelstrom).
+- **Enhancement Tank** is unchanged. Stamina is still that spec's first stat.
+
+### Wolfsbane for Horde Retribution
+
+**Wolfsbane** (a two-hand sword) is the Horde paladin reward from the quest chain that starts with **Diplomatic Incident**. Danitha Morr at Bandarion Keep in Tirisfal Glades offers it from level 18, and the sword can be earned by level **20**. It is 69–105 damage, speed 3.40, **25.59** damage per second, +9 stamina, +10 intellect, and a chance on hit to deal Holystorm damage (more against wolves and worgen).
+
+- Horde **Retribution** main hand, rank **1**, from level **20 through 26**.
+- It replaces **Hammerbone** (the reward from **Leaders of the Fang** in Thunder Bluff), which was rank 1 at level 20 and is now rank 2 there.
+- Horde paladins only. Alliance paladins do not see it. Other classes do not see it. Horde warriors who previously had it on a weapon list no longer do.
+
 ## v0.2.16-beta
 
 The log header shows the Forever version, a source filter no longer lists gear you already have on both tabs, and a wipe plus a level jump puts the pieces you are wearing back on Completed.

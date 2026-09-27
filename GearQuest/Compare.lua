@@ -709,3 +709,91 @@ function GQ.Compare:RankEntries(entries, slotName, maxResults)
 
     return results, equippedIlvl
 end
+
+local function FormatScoringWeight(value)
+    local text = string.format("%.2f", value)
+    text = text:gsub("0+$", ""):gsub("%.$", "")
+    return text
+end
+
+function GQ.Compare:GetEffectiveScoringRows(classFile, specId, playerLevel)
+    local classTable = GQ.ScoringWeights and GQ.ScoringWeights[classFile]
+    local specRow = classTable and specId and classTable[specId]
+    if not specRow or not specRow.weights then
+        return nil
+    end
+
+    playerLevel = playerLevel or 1
+    local leveling = GQ.ScoringLeveling
+    local useLeveling = leveling and playerLevel < (leveling.untilLevel or 60)
+    local rows = {}
+
+    for key, raw in pairs(specRow.weights) do
+        local mult = 1
+        if useLeveling and leveling[key] then
+            mult = leveling[key]
+        end
+        local value = raw * mult
+        if value > 0 then
+            local label = (GQ.ScoringWeightLabels and GQ.ScoringWeightLabels[key]) or key
+            rows[#rows + 1] = { label = label, value = value }
+        end
+    end
+
+    if (specRow.dpsWeight or 0) > 0 then
+        rows[#rows + 1] = { label = "Melee weapon damage", value = specRow.dpsWeight }
+    end
+    if (specRow.dpsWeightRanged or 0) > 0 then
+        rows[#rows + 1] = { label = "Ranged weapon damage", value = specRow.dpsWeightRanged }
+    end
+
+    table.sort(rows, function(a, b)
+        if a.value ~= b.value then
+            return a.value > b.value
+        end
+        return a.label < b.label
+    end)
+
+    return rows, specRow.label, useLeveling
+end
+
+function GQ.Compare:ShowScoringWeightTooltip(owner)
+    if not owner or not GameTooltip then
+        return
+    end
+
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    local specId = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec()
+    local playerLevel = GQ.GetEffectiveLevel and GQ:GetEffectiveLevel() or 1
+    local rows, specLabel, useLeveling = self:GetEffectiveScoringRows(classFile, specId, playerLevel)
+
+    GameTooltip:SetOwner(owner, "ANCHOR_RIGHT")
+    local title = specLabel
+    if GQ.Spec and GQ.Spec.GetSelectedSpecLabel then
+        title = GQ.Spec:GetSelectedSpecLabel() or title
+    end
+    GameTooltip:SetText(title or "Specialization", 1, 0.82, 0)
+
+    if not rows then
+        GameTooltip:AddLine("Click to change specialization.", 1, 1, 1, true)
+        GameTooltip:Show()
+        return
+    end
+
+    GameTooltip:AddLine("How GearQuest ranks gear for this spec.", 1, 1, 1, true)
+    if useLeveling then
+        GameTooltip:AddLine(
+            "Levels 1–59. Stamina, health, and health per 5 count ×3. Armor counts ×2. Intellect, spirit, mana, and mana per 5 count ×2. The numbers below already include that.",
+            0.75, 0.75, 0.75, true
+        )
+    else
+        GameTooltip:AddLine("Level 60 uses these weights with no leveling bonus.", 0.75, 0.75, 0.75, true)
+    end
+    GameTooltip:AddLine("1.00 is one point of this spec's main stat.", 0.75, 0.75, 0.75, true)
+    GameTooltip:AddLine(" ")
+
+    for i = 1, #rows do
+        GameTooltip:AddDoubleLine(rows[i].label, FormatScoringWeight(rows[i].value), 1, 1, 1, 1, 0.82, 0)
+    end
+    GameTooltip:Show()
+end

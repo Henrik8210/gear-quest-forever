@@ -1,5 +1,7 @@
 # Scoring Forever / Classic items
 
+Player-edited stat weights (not built): [CURSOR-NOTE-PLAYER-WEIGHTS.md](CURSOR-NOTE-PLAYER-WEIGHTS.md).
+
 This folder is the **authoring asset**. Players never see it. CurseForge zips
 ignore `pipeline/` (`.pkgmeta`). The addon ships `GearQuest/_generated/*.lua`.
 
@@ -31,6 +33,15 @@ order of importance. Do not invert them.
 
 Level **60** uses the raw raid-scale weights (`GQ_NO_GUIDES=1` until Forever
 guides exist). Do not apply the leveling multipliers at 60.
+
+The same multipliers live in the addon as `GQ.ScoringLeveling` in
+`GearQuest/_generated/ScoringWeights.generated.lua` (from
+`pipeline/data/weights.json` via `scripts/generate-stat-weights-lua.mjs`).
+Hovering the spec name or icon in the log shows the **effective** weights
+for the current level: below 60 the tooltip already includes ×3 / ×2.
+If you change `LEVELING_*` in `score.py`, change `GQ.ScoringLeveling` to
+match and regenerate that file. `GQ.StatWeights` is still the Compare.lua
+reorder table; the tooltip does not read it.
 
 **Jackpot greens are BiS, not an average.** Rank a random-enchant on the
 **best suffix it can roll** (top of that suffix’s range). Superior Shoulders
@@ -139,6 +150,10 @@ proc the score cannot price, a leftover jackpot, or a tank-relevant extra
 with +SP and +healing (Silvered Gauntlets) is not tank BiS even if the stam
 is fat. If it also has +Defense, it is the Hands **notable**. Paladin
 Protection still scores holy/spell threat; Ret and Enhance stay hybrids.
+
+**Wolfsbane (267369)** is the Horde paladin two-hander from the Diplomatic Incident chain (Danitha Morr, Bandarion Keep, Tirisfal). The quest can be finished at level 20. Wowhead has no Requires Level; the stored level 26 was inferred from item level 31. `client_item_overrides.json` pins required level 20 and Classes: Paladin, so Alliance and other classes do not get it. 25.59 weapon damage is why it is rank 1 for Horde Retribution at 20.
+
+**Enhancement intellect is 0.6 raw.** Mental Dexterity grants 1 attack power per intellect, and the scorer does not convert intellect into attack power on its own. Below 60 the endurance rule doubles intellect, so the lists use **1.2**, just above agility at 1.0. Level 60 keeps 0.6. Spell power stays 0.35 for Mental Quickness and Maelstrom. Enhancement Tank is unchanged and still stamina-first.
 
 **Shaman Enhancement Tank is a hybrid**, like paladin Protection: 1h + shield,
 stamina / armor / defense first, then Rockbiter melee threat, then Earth Shock /
@@ -509,6 +524,12 @@ Hunt-id probe (`pipeline/scripts/probe_forever_hunt_tooltips.py`) labels 200 vs 
 - **Source filter must not duplicate Completed onto Active.** The same item can exist under several generated hunt ids (level band vs the wide filter pool). `IsItemIdObtained` is true if any hunt id for that item is in `obtained` or a completed hunt, or `obtainedItems`. `ShouldHideFromActiveList` also hides an item whose list key is already on **Completed** for that slot. With a filter on, Active starts from the normal top upgrades / notables / tracked hunts (source-gated), then backfills from `GetFilteredTopForSlot` only while the slot has fewer than 3 rows. Example: level 20 Beast Mastery, World drop unchecked, **Snake Eye Kaleidoscope** stays on Completed only.
 - **Filter toggles stay cheap.** Do not bag-scan or walk every sibling hunt id per row in the wide pool. `EnsureActiveListCaches` builds completed keys, obtained item ids, and a bag/equip id set once per class/level/spec/faction. `GetFilteredTopForSlot` uses `EntryHiddenFromActiveFast` and caches per slot until `InvalidateSourceFilterCache`. Checkbox clicks call `ScheduleListRefresh` (debounced), not a synchronous `Refresh` plus a full indicator rebuild in the same frame. `InvalidateQueryCache` also drops the filtered-top cache.
 - **`/gq wipe data` then sim up.** Wipe clears character progress, `GearQuestForeverDB.obtainedItems`, and `completedItemBackup`, and sets `completedWipeAt`. Account `obtainedItems` with a timestamp at or before that wipe must not count (`AccountObtainedItemCounts`). Otherwise auto-complete skips pieces the player still wears, and Completed stays empty for them. A jump from 10 to 20 does not pass through earlier bands, so `CheckAutoCompletion` must mark owned hunt rows with `minLevel <=` effective level (class/spec/faction via `EntryMatchesTrackedHunt`), not only `EntryMatchesPlayer` / current top 3. Do not require `EntryMatchesPlayer` in the auto-complete loop or earlier-band pieces never record. Preview class, level, and faction changes call `InvalidateActiveListCaches`.
+
+**28 Sep 2026 (v0.2.17-beta).**
+
+- **Spec weight tooltip.** Hover the spec name or icon. `GQ.Compare:ShowScoringWeightTooltip` reads `GQ.ScoringWeights` (pipeline `weights.json`) and applies `GQ.ScoringLeveling` when level &lt; 60. Do not show `GQ.StatWeights` (Compare.lua reorder table). Weapon `dpsWeight` / `dpsWeightRanged` are extra rows. Regenerate with `node scripts/generate-stat-weights-lua.mjs` after a weight edit. `sources.json` must stay ASCII JSON (`ensure_ascii=True`); `score.py` opens it with the Windows default encoding and rejects raw UTF-8.
+- **Enhancement intellect.** `weights.json` Enhancement `int` is **0.6**. `weights_at_level` doubles intellect below 60, so those bands score it at **1.2**, above agility **1.0**. Level 60 stays 0.6. The scorer does not turn intellect into attack power; Mental Dexterity lives only in this weight. Enhancement Tank `int` stays 0.4. Shaman was re-scored and `Data.Shaman.generated.lua` plus the early 1–9 file were copied. Do not `reemit_all.py` for this.
+- **Wolfsbane (267369).** Horde Retribution main hand rank 1 from level **20 through 26** (score 124 vs Hammerbone 103 at 20). Pin in `client_item_overrides.json`: `rlvl` 20, `tipClasses` Paladin, Holystorm proc text. Source is Diplomatic Incident, Danitha Morr, Bandarion Keep, Tirisfal Glades (`sources.json` `gateLevel` 20). Tirisfal is a Horde zone, so Alliance never sees it. Warrior was re-scored after the class lock so Arms/Fury/Protection no longer list it. Paladin files: `Data.Paladin.generated.lua` and `Data.Paladin.Horde.1to9.generated.lua`.
 
 ## Relic effect scoring
 

@@ -44,5 +44,16 @@
   "252500": {"source": "Forever client, 2026-09-23. Camp leather pants require level 25. Wowhead nether tip says 20.", "rlvl": 25},
   "252501": {"source": "Forever client, 2026-09-23. Camp leather pants require level 25. Wowhead nether tip says 20.", "rlvl": 25},
   "252502": {"source": "Forever client, 2026-09-23. Camp leather pants require level 25. Wowhead nether tip says 20.", "rlvl": 25},
-  "252503": {"source": "Forever client, 2026-09-23. Camp leather pants require level 25. Wowhead nether tip says 20.", "rlvl": 25}
+  "252503": {"source": "Forever client, 2026-09-23. Camp leather pants require level 25. Wowhead nether tip says 20.", "rlvl": 25},
+  "267369": {
+    "source": "Forever, 28 Sep 2026. Wolfsbane is the Horde paladin reward from the Diplomatic Incident chain (Danitha Morr, Bandarion Keep, Tirisfal). The quest is available at 18 and can be completed at 20. Wowhead stores no Requires Level and the pipeline had inferred 26 from item level 31. Tooltip: Classes: Paladin. Two-hand sword, 25.59 dps, +9 stamina, +10 intellect.",
+    "rlvl": 20,
+    "tipClasses": ["Paladin"],
+    "procs": [
+      "Chance on hit: Sear the target with a vortex of blazing wind, dealing 39 to 59 Holystorm damage. Deals 3 times as much damage to Wolves and Worgen."
+    ],
+    "effects": [
+      "Chance on hit: Sear the target with a vortex of blazing wind, dealing 39 to 59 Holystorm damage. Deals 3 times as much damage to Wolves and Worgen."
+    ]
+  }
 }
