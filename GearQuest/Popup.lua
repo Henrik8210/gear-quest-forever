@@ -143,14 +143,41 @@ function GQ.Popup:WireIconScripts()
     end
 end
 
+function GQ.Popup:HookCharacterFrameHide()
+    if not CharacterFrame or not CharacterFrame.HookScript or CharacterFrame.GearQuestOnHideHooked then
+        return
+    end
+    CharacterFrame.GearQuestOnHideHooked = true
+    CharacterFrame:HookScript("OnHide", function()
+        local popup = _G.GearQuest and _G.GearQuest.Popup
+        if popup then
+            popup:Hide()
+        end
+    end)
+end
+
 function GQ.Popup:EnsureDismissLayer()
+    self:HookCharacterFrameHide()
+    local parent = CharacterFrame
+    if not parent then
+        return
+    end
+    if self.dismissLayer and self.dismissLayer:GetParent() ~= parent then
+        self.dismissLayer:Hide()
+        self.dismissLayer:SetParent(parent)
+        self.dismissLayer:ClearAllPoints()
+        self.dismissLayer:SetAllPoints(parent)
+    end
     if self.dismissLayer then
         return
     end
 
-    local parent = CharacterFrame or UIParent
     local layer = CreateFrame("Button", "GearQuestPopupDismiss", parent)
-    layer:SetFrameStrata("HIGH")
+    -- Match the character sheet. HIGH + UIParent used to sit over the
+    -- profession book and swallow every click while the sheet was closed.
+    if parent.GetFrameStrata and layer.SetFrameStrata then
+        layer:SetFrameStrata(parent:GetFrameStrata())
+    end
     layer:SetAllPoints(parent)
     layer:EnableMouse(true)
     layer:RegisterForClicks("LeftButtonUp", "RightButtonUp")
@@ -165,11 +192,29 @@ function GQ.Popup:EnsureDismissLayer()
 end
 
 function GQ.Popup:ShowDismissLayer()
+    if not CharacterFrame or not CharacterFrame:IsShown() then
+        if self.dismissLayer then
+            self.dismissLayer:Hide()
+        end
+        return
+    end
     self:EnsureDismissLayer()
     if not self.dismissLayer or not self.container then
         return
     end
-    self.dismissLayer:SetFrameLevel(self.container:GetFrameLevel() - 1)
+    -- Stay under the equipment slots. A catcher above them swallows the first
+    -- click, so a worn item cannot be dragged until something else is clicked.
+    local parent = self.dismissLayer:GetParent()
+    local base = (parent and parent.GetFrameLevel and parent:GetFrameLevel()) or 1
+    self.dismissLayer:SetFrameLevel(base)
+    if GQ.Data and GQ.Data.PAPER_DOLL_SLOTS then
+        for _, slotName in ipairs(GQ.Data.PAPER_DOLL_SLOTS) do
+            local button = _G["Character" .. slotName .. "Slot"]
+            if button and button.SetFrameLevel and (button:GetFrameLevel() or 0) <= base then
+                button:SetFrameLevel(base + 5)
+            end
+        end
+    end
     self.dismissLayer:Show()
 end
 
@@ -281,17 +326,8 @@ function GQ.Popup:Init()
     self.activeSlotButton = nil
     self.pendingItemIds = {}
 
-    if CharacterFrame and CharacterFrame.HookScript and not CharacterFrame.GearQuestOnHideHooked then
-        CharacterFrame.GearQuestOnHideHooked = true
-        CharacterFrame:HookScript("OnHide", function()
-            local popup = _G.GearQuest and _G.GearQuest.Popup
-            if popup then
-                popup:Hide()
-            end
-        end)
-    end
-
     self:WireIconScripts()
+    self:HookCharacterFrameHide()
     self:EnsureDismissLayer()
 end
 

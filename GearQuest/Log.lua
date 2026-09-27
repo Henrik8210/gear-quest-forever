@@ -448,6 +448,11 @@ local function ExtractItemIdFromChatMessage(msg)
     if not msg then
         return nil
     end
+    -- Forever marks some loot/craft lines as secret. Reading them from addon
+    -- code errors instead of returning the text.
+    if issecretvalue and issecretvalue(msg) then
+        return nil
+    end
 
     -- Only the local player's craft/loot lines — never party loot chat with item links.
     if msg:find("You create", 1, true) then
@@ -496,10 +501,72 @@ local function PlayerHasObtainedEntryItem(entry)
     end
 
     if entry.sourceType == "profession" then
-        return PlayerHasProducedProfessionItem(entry)
+        if PlayerHasProducedProfessionItem(entry) then
+            return true
+        end
+        return GQ.Data:PlayerOwnsEntryItem(entry)
     end
 
     return GQ.Data:PlayerOwnsEntryItem(entry)
+end
+
+local function HideEquippedCompare()
+    for i = 1, 2 do
+        local tip = _G["ShoppingTooltip" .. i]
+        if tip then
+            tip:Hide()
+        end
+    end
+end
+
+local function ShowEquippedCompare(entry)
+    HideEquippedCompare()
+    if not entry or not entry.slot or not GQ.Data or not GQ.Data.GetInventorySlots then
+        return
+    end
+    if not GetInventoryItemLink then
+        return
+    end
+
+    local tips = {}
+    for _, invSlot in ipairs(GQ.Data:GetInventorySlots(entry.slot)) do
+        if #tips >= 2 then
+            break
+        end
+        if GetInventoryItemLink("player", invSlot) then
+            local tip = _G["ShoppingTooltip" .. (#tips + 1)]
+            if tip and tip.SetInventoryItem then
+                tip:SetOwner(GameTooltip, "ANCHOR_NONE")
+                tip:SetInventoryItem("player", invSlot)
+                tip:AddLine("Currently equipped", 1, 0.82, 0)
+                tip:Show()
+                tips[#tips + 1] = tip
+            end
+        end
+    end
+
+    if #tips == 0 then
+        return
+    end
+
+    local totalWidth = 0
+    for i = 1, #tips do
+        totalWidth = totalWidth + (tips[i]:GetWidth() or 0)
+    end
+    local tooltipRight = GameTooltip:GetRight() or 0
+    local screenRight = (UIParent and UIParent:GetRight()) or tooltipRight
+    local placeRight = (tooltipRight + totalWidth) <= (screenRight - 8)
+    local point, relative, x = "TOPLEFT", "TOPRIGHT", 0
+    if not placeRight then
+        point, relative, x = "TOPRIGHT", "TOPLEFT", 0
+    end
+
+    local anchor = GameTooltip
+    for i = 1, #tips do
+        tips[i]:ClearAllPoints()
+        tips[i]:SetPoint(point, anchor, relative, x, 0)
+        anchor = tips[i]
+    end
 end
 
 local function ShowItemTooltipForRow(row)
@@ -530,9 +597,11 @@ local function ShowItemTooltipForRow(row)
     if row.entry.itemId and GQ.Data.ApplyImbueTooltipLines then
         GQ.Data:ApplyImbueTooltipLines(GameTooltip, row.entry.itemId)
     end
+    ShowEquippedCompare(row.entry)
 end
 
 local function HideItemTooltip()
+    HideEquippedCompare()
     if GQ.Data and GQ.Data.ClearPendingItemTooltip then
         GQ.Data:ClearPendingItemTooltip(GameTooltip)
     end
@@ -634,6 +703,7 @@ local function CreateRewardItemButton(parent, name)
             GameTooltip:SetHyperlink("item:" .. self.itemId)
             GameTooltip:Show()
         end
+        ShowEquippedCompare(entry)
     end)
 
     button:SetScript("OnLeave", function()
@@ -1321,6 +1391,11 @@ local function ScrollFrameOnMouseWheel(scroll, delta)
         scroll:SetVerticalScroll(dest)
     end
 
+    local log = _G.GearQuest and _G.GearQuest.Log
+    if log and log.frame and scroll == log.frame.scroll and log.ClampListRowMouse then
+        log:ClampListRowMouse()
+    end
+
     local scrollName = scroll.GetName and scroll:GetName()
     local bar = scroll.ScrollBar or (scrollName and _G[scrollName .. "ScrollBar"])
     if bar and bar.SetValue then
@@ -1964,7 +2039,7 @@ function GQ.Log:DisplayEntryForObtainedItem(itemId, slotName)
 
     local matches = {}
     for _, entry in ipairs(GQ.Data:GetEntriesByItemId(itemId)) do
-        if entry and GQ.Data:EntryMatchesSlot(entry, slotName)
+        if entry and (not slotName or GQ.Data:EntryMatchesSlot(entry, slotName))
             and self:EntryMatchesTrackedHunt(entry)
             and not IsDismissedCompleted(entry.id) then
             matches[#matches + 1] = entry
@@ -1978,88 +2053,128 @@ function GQ.Log:DisplayEntryForObtainedItem(itemId, slotName)
     return band[1] or matches[1]
 end
 
-function GQ.Log:GetCompletedSlotListEntries(slotName)
-    local results = {}
-    local seen = {}
+function GQ.Log:CollectCompletedBySlot()
+    if self._completedBySlot then
+        return self._completedBySlot
+    end
+
+    local rowsBySlot = {}
+    local seenId = {}
+
+    local function consider(entry, completedAt)
+        if not entry or not entry.id or seenId[entry.id] or IsDismissedCompleted(entry.id) then
+            return
+        end
+        if not GQ.Data or not self:EntryMatchesTrackedHunt(entry) then
+            return
+        end
+        local slotName = GQ.Data:NormalizeSlotName(entry.slot)
+        if not slotName then
+            return
+        end
+        seenId[entry.id] = true
+        local bucket = rowsBySlot[slotName]
+        if not bucket then
+            bucket = {}
+            rowsBySlot[slotName] = bucket
+        end
+        bucket[#bucket + 1] = {
+            entry = entry,
+            completedAt = completedAt or 0,
+        }
+    end
 
     local progress = CharProgress()
-    for id, obtainedAt in pairs(progress.obtained) do
-        if not IsDismissedCompleted(id) then
-            local entry = GQ.Data:GetEntryById(id)
-            if entry and GQ.Data:EntryMatchesSlot(entry, slotName)
-                and self:EntryMatchesTrackedHunt(entry) then
-                seen[id] = true
-                table.insert(results, {
-                    entry = entry,
-                    completedAt = obtainedAt or 0,
-                })
+    if not self._prunedStaleObtained then
+        self._prunedStaleObtained = true
+        local dropObtained, dropHunts = {}, {}
+        for id in pairs(progress.obtained or {}) do
+            if not GQ.Data:GetEntryById(id) then
+                dropObtained[#dropObtained + 1] = id
             end
+        end
+        for id, record in pairs(progress.hunts or {}) do
+            if NormalizeHuntStatus(record.status) == "completed" and not GQ.Data:GetEntryById(id) then
+                dropHunts[#dropHunts + 1] = id
+            end
+        end
+        for i = 1, #dropObtained do
+            progress.obtained[dropObtained[i]] = nil
+        end
+        for i = 1, #dropHunts do
+            progress.hunts[dropHunts[i]] = nil
         end
     end
 
-    for id, record in pairs(progress.hunts) do
-        if not seen[id] and not IsDismissedCompleted(id) and NormalizeHuntStatus(record.status) == "completed" then
-            local entry = GQ.Data:GetEntryById(id)
-            if entry and GQ.Data:EntryMatchesSlot(entry, slotName)
-                and self:EntryMatchesTrackedHunt(entry) then
-                seen[id] = true
-                table.insert(results, {
-                    entry = entry,
-                    completedAt = record.completedAt or record.trackedAt or 0,
-                })
-            end
+    for id, obtainedAt in pairs(progress.obtained or {}) do
+        consider(GQ.Data:GetEntryById(id), obtainedAt)
+    end
+
+    for id, record in pairs(progress.hunts or {}) do
+        if NormalizeHuntStatus(record.status) == "completed" then
+            consider(GQ.Data:GetEntryById(id), record.completedAt or record.trackedAt or 0)
         end
     end
 
     -- Item ids survive even when the per-hunt rows were cleared.
     local seenItem = {}
-    for _, row in ipairs(results) do
-        local itemId = row.entry and row.entry.itemId
-        if itemId then
-            seenItem[tostring(itemId)] = true
+    for _, bucket in pairs(rowsBySlot) do
+        for i = 1, #bucket do
+            local itemId = bucket[i].entry and bucket[i].entry.itemId
+            if itemId then
+                seenItem[tostring(itemId)] = true
+            end
         end
     end
     GearQuestForeverDB.dismissedItems = GearQuestForeverDB.dismissedItems or {}
-    for itemKey, obtainedAt in pairs(progress.obtainedItems) do
+    for itemKey, obtainedAt in pairs(progress.obtainedItems or {}) do
         if not seenItem[itemKey] and not GearQuestForeverDB.dismissedItems[itemKey] then
-            local entry = self:DisplayEntryForObtainedItem(tonumber(itemKey), slotName)
+            local entry = self:DisplayEntryForObtainedItem(tonumber(itemKey))
             if entry then
                 seenItem[itemKey] = true
-                table.insert(results, {
-                    entry = entry,
-                    completedAt = obtainedAt or 0,
-                })
+                consider(entry, obtainedAt)
             end
         end
     end
 
-    -- Best BiS first; acquisition time breaks ties between equal power.
-    local equippedIlvl = GQ.Compare:GetEquippedItemLevel(slotName)
-    table.sort(results, function(a, b)
-        local scoreA = GQ.Compare:GetSortScore(a.entry, slotName, equippedIlvl, 0)
-        local scoreB = GQ.Compare:GetSortScore(b.entry, slotName, equippedIlvl, 0)
-        if scoreA ~= scoreB then
-            return scoreA > scoreB
-        end
-        if a.completedAt ~= b.completedAt then
-            return a.completedAt > b.completedAt
-        end
-        return a.entry.id < b.entry.id
-    end)
-
-    local entries = {}
-    local seenKey = {}
-    for _, row in ipairs(results) do
-        local itemKey = GQ.Data:EntryListKey(row.entry)
-        if not itemKey or not seenKey[itemKey] then
-            if itemKey then
-                seenKey[itemKey] = true
+    local bySlot = {}
+    for slotName, results in pairs(rowsBySlot) do
+        local equippedIlvl = GQ.Compare:GetEquippedItemLevel(slotName)
+        table.sort(results, function(a, b)
+            local scoreA = GQ.Compare:GetSortScore(a.entry, slotName, equippedIlvl, 0)
+            local scoreB = GQ.Compare:GetSortScore(b.entry, slotName, equippedIlvl, 0)
+            if scoreA ~= scoreB then
+                return scoreA > scoreB
             end
-            table.insert(entries, row.entry)
+            if a.completedAt ~= b.completedAt then
+                return a.completedAt > b.completedAt
+            end
+            return a.entry.id < b.entry.id
+        end)
+
+        local entries = {}
+        local seenKey = {}
+        for i = 1, #results do
+            local entry = results[i].entry
+            local itemKey = GQ.Data:EntryListKey(entry)
+            if not itemKey or not seenKey[itemKey] then
+                if itemKey then
+                    seenKey[itemKey] = true
+                end
+                entries[#entries + 1] = entry
+            end
         end
+        bySlot[slotName] = entries
     end
 
-    return entries
+    self._completedBySlot = bySlot
+    return bySlot
+end
+
+function GQ.Log:GetCompletedSlotListEntries(slotName)
+    local bySlot = self:CollectCompletedBySlot()
+    slotName = GQ.Data:NormalizeSlotName(slotName)
+    return bySlot[slotName] or {}
 end
 
 -- Backwards-compatible alias
@@ -2162,6 +2277,66 @@ function GQ.Log:IsItemIdObtained(itemId)
     return false
 end
 
+function GQ.Log:FindCurrentUpgradeEntry(itemId)
+    if not itemId or not GQ.Data or not GQ.Data.GetSlotsForClass then
+        return nil
+    end
+    local classFile = GQ:GetEffectiveClass()
+    if not classFile then
+        return nil
+    end
+    for _, slotName in ipairs(GQ.Data:GetSlotsForClass(classFile)) do
+        for _, entry in ipairs(GQ.Data:GetTopUpgradesForSlot(slotName)) do
+            if entry.itemId == itemId and GQ.Data:EntryMatchesPlayer(entry) then
+                return entry
+            end
+        end
+    end
+    return nil
+end
+
+function GQ.Log:AnnounceObtained(entry)
+    if not entry or not self.obtainToastsEnabled then
+        return
+    end
+    if GQ.Toast then
+        GQ.Toast:ShowForEntry(entry)
+    end
+    local itemName = (GQ.Data and GQ.Data.GetEntryDisplayName and GQ.Data:GetEntryDisplayName(entry))
+        or ("Item " .. tostring(entry.itemId))
+    if entry.sourceType == "profession" then
+        print("|cff66ccffGearQuest|r: Completed — " .. itemName .. " crafted.")
+    else
+        print("|cff66ccffGearQuest|r: Completed — " .. itemName .. " obtained.")
+    end
+end
+
+function GQ.Log:ToastReequippedUpgrades()
+    local equipped = {}
+    pcall(function()
+        for invSlot = 1, 19 do
+            local id = ItemLinkToId(GetInventoryItemLink("player", invSlot))
+            if id then
+                equipped[id] = true
+            end
+        end
+    end)
+    local previous = self.equippedSnapshot
+    self.equippedSnapshot = equipped
+    if not previous or not self.obtainToastsEnabled then
+        return
+    end
+    for itemId in pairs(equipped) do
+        if not previous[itemId]
+            and (self:HasObtainedItemId(itemId) or (self.ownedAtLogin and self.ownedAtLogin[itemId])) then
+            local entry = self:FindCurrentUpgradeEntry(itemId)
+            if entry then
+                self:AnnounceObtained(entry)
+            end
+        end
+    end
+end
+
 function GQ.Log:ShouldAutoCompleteOnObtain(entry)
     if not entry or self:IsEntryObtained(entry.id) or self:HasObtainedItemId(entry.itemId) then
         return false
@@ -2189,6 +2364,7 @@ function GQ.Log:RememberObtainedEntry(entry, now)
     now = now or time()
     local progress = CharProgress()
 
+    self._completedBySlot = nil
     progress.obtained[entry.id] = progress.obtained[entry.id] or now
     if entry.itemId then
         local itemKey = tostring(entry.itemId)
@@ -2218,26 +2394,9 @@ function GQ.Log:MarkEntryObtained(entry, options)
         or (entry.itemId and self.ownedAtLogin and self.ownedAtLogin[entry.itemId])
     self:RememberObtainedEntry(entry, now)
 
-    if entry.itemId and GQ.Data and GQ.Data.GetEntriesByItemId then
-        for _, sibling in ipairs(GQ.Data:GetEntriesByItemId(entry.itemId)) do
-            if sibling and sibling.id then
-                self:RememberObtainedEntry(sibling, now)
-            end
-        end
-    end
-
     local announce = not options or (options.showToast ~= false and options.announce ~= false)
-    if announce and not alreadyHadItem and self.obtainToastsEnabled then
-        if GQ.Toast then
-            GQ.Toast:ShowForEntry(entry)
-        end
-        local itemName = (GQ.Data and GQ.Data.GetEntryDisplayName and GQ.Data:GetEntryDisplayName(entry))
-            or ("Item " .. tostring(entry.itemId))
-        if entry.sourceType == "profession" then
-            print("|cff66ccffGearQuest|r: Completed — " .. itemName .. " crafted.")
-        else
-            print("|cff66ccffGearQuest|r: Completed — " .. itemName .. " obtained.")
-        end
+    if announce and not alreadyHadItem then
+        self:AnnounceObtained(entry)
     end
 
     return true
@@ -2392,6 +2551,7 @@ function GQ.Log:WipeCharacterData()
     GearQuestForeverDB.settings.completedItemBackup = {}
     GearQuestForeverDB.settings.completedWipeAt = time()
     self.ownedAtLogin = {}
+    self.equippedSnapshot = nil
 
     self.selectedHuntId = nil
     self.selectedEntry = nil
@@ -2409,6 +2569,7 @@ function GQ.Log:WipeCharacterData()
     if GQ.RefreshUI then
         GQ:RefreshUI()
     end
+    self:ScheduleAutoCompletionCheck()
 end
 
 function GQ.Log:CollectAutoCompletionCandidates()
@@ -2525,8 +2686,14 @@ function GQ.Log:UnionOwnedAtLogin()
 end
 
 function GQ.Log:BeginLoginObtainScan()
+    -- Later zone loads must not turn toasts off. The first scan is the only
+    -- window where bags are recorded as already owned.
+    if self.obtainToastsEnabled then
+        return
+    end
     self.obtainToastsEnabled = false
     self:UnionOwnedAtLogin()
+    self:ToastReequippedUpgrades()
     self:ScheduleAutoCompletionCheck()
 
     if self.loginObtainScanTimer then
@@ -2786,6 +2953,7 @@ function GQ.Log:EnsureTrackerEvents()
             end
         end
 
+        log:ToastReequippedUpgrades()
         log:ScheduleAutoCompletionCheck()
     end)
     self.trackerFrame = tracker
@@ -2967,7 +3135,6 @@ function GQ.Log:ToggleSpecPicker(anchorBtn)
 
     if not self._specPickerCatcher then
         local catcher = CreateFrame("Frame", "GearQuestSpecPickerCatcher", frame)
-        catcher:SetFrameStrata("FULLSCREEN_DIALOG")
         catcher:SetAllPoints(frame)
         catcher:EnableMouse(true)
         catcher:Hide()
@@ -4465,6 +4632,9 @@ function GQ.Log:Init()
     frame:SetScript("OnShow", function(self)
         BringLogWindowToFront(self)
     end)
+    frame:HookScript("OnMouseDown", function(self)
+        BringLogWindowToFront(self)
+    end)
     WireLogWindowMouseWheel(frame)
     ApplyLogWindowLayer(frame)
     frame:Hide()
@@ -4488,6 +4658,8 @@ function GQ.Log:Init()
     frame.scrollChild:SetWidth(LEFT_COLUMN_WIDTH - (PANEL_INSET * 2) - SCROLLBAR_INSET)
     frame.scrollChild:SetHeight(1)
     frame.scroll:SetScrollChild(frame.scrollChild)
+    EnableClipping(frame.scroll)
+    frame.scrollChild:EnableMouse(false)
 
     frame.listGutter = CreateFrame("Frame", nil, frame)
     frame.listGutter:Hide()
@@ -4506,6 +4678,8 @@ function GQ.Log:Init()
     frame.detailChild = CreateFrame("Frame", "GearQuestLogDetailScrollChild", frame.detailScroll)
     frame.detailChild:SetWidth(RIGHT_COLUMN_WIDTH - (PANEL_INSET * 2) - SCROLLBAR_INSET - 8)
     frame.detailScroll:SetScrollChild(frame.detailChild)
+    EnableClipping(frame.detailScroll)
+    frame.detailChild:EnableMouse(false)
 
     frame.detailGutter = CreateFrame("Frame", nil, frame)
     frame.detailGutter:Hide()
@@ -4926,6 +5100,7 @@ end
 
 function GQ.Log:Refresh()
     self:HideSpecPicker()
+    self._completedBySlot = nil
 
     local classFile = GQ:GetEffectiveClass()
     local slots = GQ.Data:GetSlotsForClass(classFile)
@@ -5014,6 +5189,14 @@ function GQ.Log:Refresh()
     self:UpdateDetailScrollHeight()
     LayoutDetailScroll(self.frame)
     self:ApplyPageTab()
+    self:ClampListRowMouse()
+    if C_Timer and C_Timer.After then
+        C_Timer.After(0, function()
+            if GQ.Log and GQ.Log.ClampListRowMouse then
+                GQ.Log:ClampListRowMouse()
+            end
+        end)
+    end
 
     if self.scrollListToSelected and selectedLayoutIndex then
         local layoutIndex = selectedLayoutIndex
@@ -5049,6 +5232,55 @@ function GQ.Log:Refresh()
             self:ClearDetail()
         end
     end
+end
+
+function GQ.Log:ClampListRowMouse()
+    local scroll = self.frame and self.frame.scroll
+    if not scroll or not self.listRows then
+        return
+    end
+    local scrollTop = scroll:GetTop()
+    local scrollBottom = scroll:GetBottom()
+    if not scrollTop or not scrollBottom then
+        return
+    end
+    for _, row in ipairs(self.listRows) do
+        if row:IsShown() and row.EnableMouse then
+            local rowTop = row:GetTop()
+            local rowBottom = row:GetBottom()
+            local overlaps = rowTop and rowBottom and rowBottom < scrollTop and rowTop > scrollBottom
+            row:EnableMouse(overlaps and true or false)
+            if overlaps and row.SetHitRectInsets then
+                row:SetHitRectInsets(0, 0, math.max(0, rowTop - scrollTop), math.max(0, scrollBottom - rowBottom))
+            end
+        end
+    end
+end
+
+-- The log sits on DIALOG, above the profession book. List rows also stick out
+-- of the scroll and keep taking clicks. Drop both while that book is open.
+function GQ.Log:ReleaseMouseForGameUI()
+    if self._specPickerCatcher then
+        self._specPickerCatcher:Hide()
+    end
+    local orphan = _G.GearQuestSpecPickerCatcher
+    if orphan and orphan.IsShown and orphan:IsShown() then
+        orphan:Hide()
+    end
+    local frame = self.frame
+    if frame and frame:IsShown() then
+        if frame.SetFrameStrata then
+            frame:SetFrameStrata("MEDIUM")
+        end
+        if frame.SetFrameLevel then
+            frame:SetFrameLevel(1)
+        end
+        local rail = frame.sideTabRail
+        if rail and rail.SetFrameStrata then
+            rail:SetFrameStrata("MEDIUM")
+        end
+    end
+    self:ClampListRowMouse()
 end
 
 function GQ.Log:Show()

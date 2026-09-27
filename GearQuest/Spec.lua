@@ -263,6 +263,27 @@ local function GetSimulatedSpec(classFile)
     return nil
 end
 
+local function EnsureCharSpecStore()
+    if type(GearQuestForeverCharDB) ~= "table" then
+        GearQuestForeverCharDB = {}
+        _G.GearQuestForeverCharDB = GearQuestForeverCharDB
+    end
+    GearQuestForeverCharDB.specPick = GearQuestForeverCharDB.specPick or {}
+    return GearQuestForeverCharDB.specPick
+end
+
+local function GetSavedSpecPick(classFile)
+    if type(GearQuestForeverCharDB) ~= "table" or type(GearQuestForeverCharDB.specPick) ~= "table" then
+        return nil
+    end
+    return NormalizeSavedSpecId(GearQuestForeverCharDB.specPick[classFile], classFile)
+end
+
+local function StoreSpecPick(classFile, specId)
+    local store = EnsureCharSpecStore()
+    store[classFile] = specId
+end
+
 function GQ.Spec:GetDisplaySpec(classFile)
     classFile = NormalizeClassFile(classFile or GQ:GetEffectiveClass())
     if not classFile or not self:HasSpecs(classFile) then
@@ -282,11 +303,10 @@ function GQ.Spec:GetDisplaySpec(classFile)
         return self:GetDefaultSpec(classFile)
     end
 
-    -- Log picker override for this session only (/reload returns to talent tree).
-    local session = self._sessionOverrideByClass and self._sessionOverrideByClass[classFile]
-    session = NormalizeSavedSpecId(session, classFile)
-    if session then
-        return session
+    -- Manual pick sticks across login until they choose a different spec.
+    local picked = GetSavedSpecPick(classFile)
+    if picked then
+        return picked
     end
 
     local fromTalents = self:DetectSpecFromTalents(classFile)
@@ -367,8 +387,7 @@ function GQ.Spec:SetSelectedSpec(specId, classFile)
             store[classFile] = matched.id
         end
     else
-        self._sessionOverrideByClass = self._sessionOverrideByClass or {}
-        self._sessionOverrideByClass[classFile] = matched.id
+        StoreSpecPick(classFile, matched.id)
     end
 
     if GQ.Data and GQ.Data.InvalidateSpecCache then
@@ -485,9 +504,6 @@ function GQ.Spec:EnsureTalentRefresh()
     end
     local frame = CreateFrame("Frame")
     local function onTalentChange()
-        if GQ.Spec then
-            GQ.Spec._sessionOverrideByClass = nil
-        end
         if GQ.Data and GQ.Data.InvalidateSpecCache then
             GQ.Data:InvalidateSpecCache()
         end
@@ -505,7 +521,6 @@ function GQ.Spec:EnsureTalentRefresh()
 end
 
 function GQ.Spec:OnPlayerLogin()
-    self._sessionOverrideByClass = nil
     self:EnsureTalentRefresh()
     local function refreshSpecUi()
         if GQ.Log and GQ.Log.UpdateSpecButton then
@@ -541,16 +556,16 @@ function GQ.Spec:PrintSpecDebug()
     local talents = self:DetectSpecFromTalents(classFile)
     local default = self:GetDefaultSpec(classFile)
     local previewOn = GQ.IsPreviewEnabled and GQ:IsPreviewEnabled()
-    local session = self._sessionOverrideByClass and self._sessionOverrideByClass[classFile]
+    local picked = GetSavedSpecPick(classFile)
 
     print("|cff66ccffGearQuest|r spec debug (" .. classFile .. "):")
     print("  simulation: " .. (previewOn and "on" or "off"))
     print("  sim spec: " .. tostring(GetSimulatedSpec(classFile)))
-    print("  session picker: " .. tostring(session))
+    print("  saved picker: " .. tostring(picked))
     print("  talent-tree guess: " .. tostring(talents))
     print("  using for hunts: " .. tostring(display))
-    if session then
-        print("  source: log picker (this session only)")
+    if picked and display == picked then
+        print("  source: saved spec picker")
     elseif display == talents and talents then
         print("  source: talent tree (most points)")
     elseif previewOn and GetSimulatedSpec(classFile) then

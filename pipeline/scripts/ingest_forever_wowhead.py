@@ -60,6 +60,10 @@ INV = {
 ARMOR_SUB = {
     0: "Misc", 1: "Cloth", 2: "Leather", 3: "Mail", 4: "Plate", 5: "Buckler",
     6: "Shield", 7: "Libram", 8: "Idol", 9: "Totem", 10: "Sigil",
+    # Wowhead Forever uses negative subclasses for slots that are not armor:
+    # neck -3, finger -2, trinket -4, cloak -6, held -5. Those are Misc, same
+    # as classic necks and rings. Left as "?" they never become eligible.
+    -2: "Misc", -3: "Misc", -4: "Misc", -5: "Misc", -6: "Misc",
 }
 WEAP_SUB = {
     0: "Axe1H", 1: "Axe2H", 2: "Bow", 3: "Gun", 4: "Mace1H", 5: "Mace2H",
@@ -404,6 +408,53 @@ def source_from_row(row, parsed, name):
     }
 
 
+def apply_pinned_boss_sources(sources):
+    """Dungeon bosses the Wowhead listview still leaves unsourced.
+
+    The loot tables name the boss. A later ingest must not put these back to
+    "Source not listed yet."
+    """
+    path = os.path.join(G, "forever_boss_sources.json")
+    if not os.path.exists(path):
+        return 0
+    pins = json.load(open(path, encoding="utf-8"))
+    n = 0
+    for row in pins:
+        key = str(row["id"])
+        src = sources.get(key)
+        if not src:
+            continue
+        npc = row["npc"]
+        src["sourceType"] = "boss_drop"
+        src["npc"] = npc
+        src["zone"] = row["zone"]
+        src["instructions"] = f"Drops from {npc}."
+        src["obtainable"] = True
+        src["excludedBecause"] = None
+        n += 1
+    return n
+
+
+def apply_pinned_faction_zones(sources):
+    """Forever quests whose turn-in city is one faction.
+
+    The listview leaves zone empty, so a Stormwind turn-in was scoring for
+    Horde. A later ingest must not clear these.
+    """
+    path = os.path.join(G, "forever_faction_zones.json")
+    if not os.path.exists(path):
+        return 0
+    pins = json.load(open(path, encoding="utf-8"))
+    n = 0
+    for row in pins:
+        src = sources.get(str(row["id"]))
+        if not src or not row.get("zone"):
+            continue
+        src["zone"] = row["zone"]
+        n += 1
+    return n
+
+
 def build_item(row, tip):
     html_tip = (tip or {}).get("tooltip") or ""
     parsed = parse_tooltip(html_tip) if html_tip else {"stats": {}, "flags": []}
@@ -535,6 +586,8 @@ def main():
             continue
         cleaned.append(iid)
     pool = cleaned
+    apply_pinned_boss_sources(sources)
+    apply_pinned_faction_zones(sources)
     json.dump(items, open(G + "items.json", "w", encoding="utf-8"), separators=(",", ":"))
     json.dump(sources, open(G + "sources.json", "w", encoding="utf-8"), indent=2)
     json.dump(pool, open(G + "classic_item_ids.json", "w", encoding="utf-8"))

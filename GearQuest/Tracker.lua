@@ -370,7 +370,14 @@ function GQ.Tracker:EnsureTrackerHoverWiring()
     self.trackerHoverWired = true
     WireTrackerHoverRegion(self.frame)
     WireTrackerHoverRegion(self.scroll)
-    WireTrackerHoverRegion(self.contentInner)
+    -- The list body is taller than the visible tracker. Leaving it mouse-enabled
+    -- lets those rows sit on top of the bags and eat the first left-drag.
+    if self.contentInner then
+        self.contentInner:EnableMouse(false)
+    end
+    if self.scroll and self.scroll.SetClipsChildren then
+        self.scroll:SetClipsChildren(true)
+    end
     WireTrackerHoverRegion(self.collapseBtn)
     WireTrackerHoverRegion(self.dragHandle)
     WireTrackerHoverRegion(self.resizeHandle)
@@ -794,6 +801,31 @@ function GQ.Tracker:ShowScrollBarTemporary()
     self:ScheduleScrollBarHide()
 end
 
+function GQ.Tracker:ClampRowMouse()
+    local scroll = self.scroll
+    if not scroll or not self.entryRows then
+        return
+    end
+    local scrollTop = scroll:GetTop()
+    local scrollBottom = scroll:GetBottom()
+    if not scrollTop or not scrollBottom then
+        return
+    end
+    for _, row in ipairs(self.entryRows) do
+        if row:IsShown() and row.EnableMouse then
+            local rowTop = row:GetTop()
+            local rowBottom = row:GetBottom()
+            local overlaps = rowTop and rowBottom and rowBottom < scrollTop and rowTop > scrollBottom
+            row:EnableMouse(overlaps and true or false)
+            if overlaps and row.SetHitRectInsets then
+                local topInset = math.max(0, rowTop - scrollTop)
+                local bottomInset = math.max(0, scrollBottom - rowBottom)
+                row:SetHitRectInsets(0, 0, topInset, bottomInset)
+            end
+        end
+    end
+end
+
 function GQ.Tracker:SetScrollOffset(offset)
     if not self.scroll then
         return
@@ -803,6 +835,7 @@ function GQ.Tracker:SetScrollOffset(offset)
     offset = math.max(0, math.min(maxScroll, offset or 0))
     self.scroll:SetVerticalScroll(offset)
     self:UpdateScrollBar()
+    self:ClampRowMouse()
 end
 
 function GQ.Tracker:ScrollBy(delta)
@@ -1102,6 +1135,7 @@ function GQ.Tracker:Refresh(widthOverride, heightOverride)
     if maxScroll <= 0 then
         self:HideScrollBar()
     end
+    self:ClampRowMouse()
 
     if self.sizing then
         local frameWidth, frameHeight = self.frame:GetSize()
@@ -1112,6 +1146,14 @@ function GQ.Tracker:Refresh(widthOverride, heightOverride)
     end
 
     self.frame:Show()
+    self:ClampRowMouse()
+    if C_Timer and C_Timer.After then
+        C_Timer.After(0, function()
+            if GQ.Tracker and GQ.Tracker.ClampRowMouse then
+                GQ.Tracker:ClampRowMouse()
+            end
+        end)
+    end
 end
 
 function GQ.Tracker:Init()

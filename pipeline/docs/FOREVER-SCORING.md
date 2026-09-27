@@ -362,7 +362,30 @@ Hunt-id probe (`pipeline/scripts/probe_forever_hunt_tooltips.py`) labels 200 vs 
 
 **21 Sep 2026 scrape:** index **3,625** (+4 vs 20 Sep evening). New held-in-off-hand greens: Gnawed Bone (282654), Apothecary's Concoction (284668), Kobold Firestarter (285192), Bael'dun Tankard (286541). Mage / priest / warlock / druid / shaman / paladin re-scored; none beat existing offhand top 3 (mage 22 is already ~6.4 EP). Hunter / rogue / warrior skipped — held offhands are gated once they can dual wield. Live client: Collector removed; class-trainer hooks disabled after a freeze on `TRAINER_UPDATE`.
 
-**23 Sep 2026 scrape:** index **3,637** (same count as 22 Sep; six ids rotated into the list). Ingest **+6** pool ids after fetching missing tooltips. **397** nether tooltips re-fetched where the listview armor/DPS no longer matched `items.json` (mostly PvP / rank-set pieces). Re-ingest merged stats; `client_item_overrides.json` pins untouched. All nine classes × every spec re-scored. New pick on lists: **Death Prophet Spine** (274158) Enhancement shaman MainHand @ 26. Other new ids (274042 belt, 282012 hands, 282019 neck, 282658 back, 284702 sword) scored but did not take top-3 yet. Addon: spec choice is session-only in the log; after `/reload`, hunts follow the talent tree (most points) unless simulation preview is on.
+**23 Sep 2026 scrape:** index **3,637** (same count as 22 Sep; six ids rotated into the list). Ingest **+6** pool ids after fetching missing tooltips. **397** nether tooltips re-fetched where the listview armor/DPS no longer matched `items.json` (mostly PvP / rank-set pieces). Re-ingest merged stats; `client_item_overrides.json` pins untouched. All nine classes × every spec re-scored. New pick on lists: **Death Prophet Spine** (274158) Enhancement shaman MainHand @ 26. Other new ids (274042 belt, 282012 hands, 282019 neck, 282658 back, 284702 sword) scored but did not take top-3 yet.
+
+**27 Sep 2026.** Spec picker is no longer session-only. A manual pick is stored on `GearQuestForeverCharDB.specPick` and survives `/reload`. Talent tree (most points) is used only when this character has not picked a spec. Simulation preview still has its own spec.
+
+**Jewelry and held items with kind `?` do not score.** Wowhead Forever subclasses: neck `-3`, finger `-2`, trinket `-4`, cloak `-6`, held `-5`. `ARMOR_SUB` maps those to `Misc` for **new** rows. Ingest does **not** overwrite `kind` on an id already in `items.json` (`kind` is not in the update field list). Do not mass-edit the leftover `?` rows. Hand-patched only:
+
+- **Snake Eye Kaleidoscope** (273088) neck, `kind` Misc, +1 str/agi/sta/int/spi and `resist` 5. Boss pin: Lady Anacondra, Wailing Caverns. On neck lists from req 17 (level 20 Enhancement Tank Horde: rank 2 behind Scout's Medallion).
+- **Heart of Alterac** (283254) held, `kind` Misc. Limited top-3 only (Guardian around 34–39, Destruction and Arcane Battle Mage at 34). Source still unknown. Do not invent a drop.
+
+**Boss pins** live in `pipeline/data/forever_boss_sources.json`. `apply_pinned_boss_sources` runs after `source_from_row`, which would otherwise clear zone and instructions on every id ≥ 200000. A later ingest must keep that call. Ruins of Lordaeron: Witherfang, The Baron, Viktor the Vile, The Abandoned, Bjork, Rath'Mael. Hall of Thanes: Faldrim Anvilmar, Magmatus, Plunder, Durgen Dirgehammer. Kaleidoscope is on the same pin list. Wowhead renamed **Rotmender's Leggings** (271207) and **Rotmender's Treads** (271214).
+
+**Faction zone pins** live in `pipeline/data/forever_faction_zones.json`. `apply_pinned_faction_zones` sets `zone` only. `zone_ok` is what gates the faction; quest text that names Stormwind does nothing if zone is null. Stormwind City and Teldrassil are Alliance. Thunder Bluff is Horde. Wailing Caverns is both.
+
+- 279868 Duty Bound Leggings, 279869 Remembrance Armor → Stormwind City (Bloodied Insignia, General Marcus Jonathan). Horde must not see them.
+- 281250 Forest Oracle's Cloak → Teldrassil. Still `kind` `?`, so it does not score until that is patched on purpose.
+- 270008 Heat Resistant Mitts, 270009 Safety Boots → Thunder Bluff (Serpentbloom, Apothecary Zamah). Alliance must not see them. Instructions may still mention Wailing Caverns; the displayed zone is what gates.
+
+**Clicks.** Do not parent a fullscreen mouse catcher to `UIParent`. `GearQuestPopupDismiss` exists only under `CharacterFrame`, and hides when that frame hides. Log list and detail scrolls use `SetClipsChildren`. Scroll children are not mouse-enabled. Tracker and log rows outside the visible scroll have mouse off and a shrunk hit rect. Opening the profession book (`TRADE_SKILL_SHOW` / `CRAFT_SHOW`) drops the log from DIALOG to MEDIUM so the book receives clicks. Clicking the log calls `BringLogWindowToFront` and puts it back on DIALOG.
+
+**Chat.** Some `CHAT_MSG_LOOT` / skill lines are secret strings during a boss pull. `ExtractItemIdFromChatMessage` returns before `:find` when `issecretvalue(msg)`.
+
+**Completed tab.** Once `byId` exists, `GetEntryById` must not walk `self.entries` (~467k). A miss is a stale saved id. `CollectCompletedBySlot` walks obtained hunts once. `MarkEntryObtained` does not record every sibling band from `GetEntriesByItemId`.
+
+**Worn gear beside the hunt tooltip.** After the hunt tooltip, `ShowEquippedCompare` fills `ShoppingTooltip1` / `2` from `GetInventorySlots`. Finger 11+12, Trinket 13+14, other slots one. Gold line `Currently equipped`. Empty slot shows nothing.
 
 **Finger gap (Horde, levels 9–14):** curated level-9 rings are Alliance paladin/warrior only. Generated shaman Finger starts at 10 with **The 1 Ring (8350)**, which 404s on Forever and is pruned. **Woven Copper Ring (21931)** also 404s. Horde enhancement rings that exist are Bounty Hunter's Ring (5351, Barrens) and Ring of Scorn (3235, Silverpine) around 15. Do not toast “ring slot eligible” unless `SlotHasHunts("Finger")`.
 

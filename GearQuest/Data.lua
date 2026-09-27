@@ -8103,8 +8103,11 @@ function GQ.Data:GetEntryById(id)
     if not id then
         return nil
     end
-    if self.byId and self.byId[id] then
-        return self.byId[id]
+    -- byId is built once login finishes. A miss is a stale saved hunt id.
+    -- Walking self.entries here scans every generated row (about 467k) and
+    -- the Completed tab does that once per slot, which trips "script ran too long".
+    if self.byId then
+        return self.byId[id] or self:GetNotableEntryById(id)
     end
     for _, entry in ipairs(self.entries or {}) do
         if entry.id == id then

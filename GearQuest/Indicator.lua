@@ -1495,6 +1495,17 @@ function GQ.Indicator:Init()
             or event == "TRADE_SKILL_DETAILS_UPDATE"
             or event == "CRAFT_SHOW" or event == "CRAFT_UPDATE"
         then
+            if event == "TRADE_SKILL_SHOW" or event == "CRAFT_SHOW" then
+                if GQ.Log and GQ.Log.ReleaseMouseForGameUI then
+                    GQ.Log:ReleaseMouseForGameUI()
+                end
+                if GQ.Popup and GQ.Popup.dismissLayer and (not CharacterFrame or not CharacterFrame:IsShown()) then
+                    GQ.Popup.dismissLayer:Hide()
+                end
+                if GQ.Tracker and GQ.Tracker.ClampRowMouse then
+                    GQ.Tracker:ClampRowMouse()
+                end
+            end
             GQ.Indicator:RebuildCache()
             GQ.Indicator:ScheduleProfessionRefresh()
             return

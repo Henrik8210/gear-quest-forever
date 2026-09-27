@@ -2,6 +2,67 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
+## v0.2.12-beta
+
+Your worn gear shows up beside a hunt, dungeon drops name the boss, and clicks on bags and the profession book work again.
+
+### Worn gear next to a hunt
+
+Hover a piece in the log. Your currently equipped gear for that slot appears beside the hunt tooltip, the same way the game compares loot. Rings and trinkets show both filled slots. An empty slot shows nothing.
+
+### Clicks
+
+- Taking an item out of your bags is a normal left-click drag again.
+- The profession book takes clicks again: recipes, search, filter, Track Recipe, and Create.
+- Opening First Aid (or any profession) no longer leaves the log sitting on top of it. Click the log when you want that window in front.
+
+### Completed tab
+
+Opening Completed could freeze the game for a long moment and then error. It opens normally now.
+
+### Boss pulls
+
+Engaging a boss could throw a Lua error from a loot or skill line in chat. Those lines are skipped, and the error is gone. A crafted Best-in-Slot piece still counts when it is in your bags or on your character.
+
+### Spec choice stays on this character
+
+A spec you pick in the log stays after `/reload` and after you log out. It stays until you pick a different one. If you have never picked a spec, hunts still follow the talent tree with the most points. Simulation mode still uses the spec you set there.
+
+### Faction quests
+
+- **Alliance only:** Duty Bound Leggings and Remembrance Armor, from Bloodied Insignia (General Marcus Jonathan in Stormwind). Horde characters no longer see them.
+- **Horde only:** Heat Resistant Mitts and Safety Boots, from Serpentbloom (Apothecary Zamah in Thunder Bluff). Alliance characters no longer see them.
+
+### Snake Eye Kaleidoscope
+
+The neck from Lady Anacondra in Wailing Caverns is on the lists. It requires level 17. It is a hunt while it is still one of the best necks for your spec, then it drops off as better necks show up.
+
+### Dungeon bosses
+
+These pieces used to say the source was not listed. The hunt now names the boss.
+
+**Ruins of Lordaeron**
+
+- **Witherfang:** Atrophic Girdle, Witherbite Bracers, Segmented Spider Leg
+- **The Baron:** Meathook Slicer, Abomination Bones, Leftover Abomination Skin
+- **Viktor the Vile:** Vileblood Scimitar, Bloodied Chestwraps, Vilewalkers
+- **The Abandoned:** Scepter of the Abandoned, Grip of Fear, Rotmender's Leggings
+- **Bjork:** Corpse Chopper, Bonerust Leggings, Tuskwrap Belt
+- **Rath'Mael:** Mirror of Rath'mael, Coldspire Staff, Rotmender's Treads
+
+**Hall of Thanes**
+
+- **Faldrim Anvilmar:** Spiritwraith Drape, Ephemeral Choker, Aetherwisp Bracers
+- **Magmatus:** Kindlegem Girdle, Flamefist Grips, Fang of Magmatus
+- **Plunder:** Golemheart Stave, Golemguard Chest, Treads of the Protector Golem
+- **Durgen Dirgehammer:** Durgen's Crescent Axe, Direhammer Leggings, Robes of the Disgraced Thane
+
+Rotmender's Leggings and Rotmender's Treads use those names now.
+
+### Heart of Alterac
+
+A held off-hand that requires level 34. It can show up for Guardian druid, Destruction warlock, and Arcane Battle Mage. Where it drops is still unknown, so that hunt still says the source is not listed.
+
 ## v0.2.11-beta
 
 Source filter on the hunt list, and the source on each piece is the one you can actually use. Damage specs stop chasing Healing Done.
