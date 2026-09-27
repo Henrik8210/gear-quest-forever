@@ -2277,24 +2277,6 @@ function GQ.Log:IsItemIdObtained(itemId)
     return false
 end
 
-function GQ.Log:FindCurrentUpgradeEntry(itemId)
-    if not itemId or not GQ.Data or not GQ.Data.GetSlotsForClass then
-        return nil
-    end
-    local classFile = GQ:GetEffectiveClass()
-    if not classFile then
-        return nil
-    end
-    for _, slotName in ipairs(GQ.Data:GetSlotsForClass(classFile)) do
-        for _, entry in ipairs(GQ.Data:GetTopUpgradesForSlot(slotName)) do
-            if entry.itemId == itemId and GQ.Data:EntryMatchesPlayer(entry) then
-                return entry
-            end
-        end
-    end
-    return nil
-end
-
 function GQ.Log:AnnounceObtained(entry)
     if not entry or not self.obtainToastsEnabled then
         return
@@ -2308,32 +2290,6 @@ function GQ.Log:AnnounceObtained(entry)
         print("|cff66ccffGearQuest|r: Completed — " .. itemName .. " crafted.")
     else
         print("|cff66ccffGearQuest|r: Completed — " .. itemName .. " obtained.")
-    end
-end
-
-function GQ.Log:ToastReequippedUpgrades()
-    local equipped = {}
-    pcall(function()
-        for invSlot = 1, 19 do
-            local id = ItemLinkToId(GetInventoryItemLink("player", invSlot))
-            if id then
-                equipped[id] = true
-            end
-        end
-    end)
-    local previous = self.equippedSnapshot
-    self.equippedSnapshot = equipped
-    if not previous or not self.obtainToastsEnabled then
-        return
-    end
-    for itemId in pairs(equipped) do
-        if not previous[itemId]
-            and (self:HasObtainedItemId(itemId) or (self.ownedAtLogin and self.ownedAtLogin[itemId])) then
-            local entry = self:FindCurrentUpgradeEntry(itemId)
-            if entry then
-                self:AnnounceObtained(entry)
-            end
-        end
     end
 end
 
@@ -2394,6 +2350,8 @@ function GQ.Log:MarkEntryObtained(entry, options)
         or (entry.itemId and self.ownedAtLogin and self.ownedAtLogin[entry.itemId])
     self:RememberObtainedEntry(entry, now)
 
+    -- Once per item, the first time it is in bags or on the character.
+    -- Taking it off and putting it back on must not toast again.
     local announce = not options or (options.showToast ~= false and options.announce ~= false)
     if announce and not alreadyHadItem then
         self:AnnounceObtained(entry)
@@ -2551,7 +2509,6 @@ function GQ.Log:WipeCharacterData()
     GearQuestForeverDB.settings.completedItemBackup = {}
     GearQuestForeverDB.settings.completedWipeAt = time()
     self.ownedAtLogin = {}
-    self.equippedSnapshot = nil
 
     self.selectedHuntId = nil
     self.selectedEntry = nil
@@ -2693,7 +2650,6 @@ function GQ.Log:BeginLoginObtainScan()
     end
     self.obtainToastsEnabled = false
     self:UnionOwnedAtLogin()
-    self:ToastReequippedUpgrades()
     self:ScheduleAutoCompletionCheck()
 
     if self.loginObtainScanTimer then
@@ -2953,7 +2909,6 @@ function GQ.Log:EnsureTrackerEvents()
             end
         end
 
-        log:ToastReequippedUpgrades()
         log:ScheduleAutoCompletionCheck()
     end)
     self.trackerFrame = tracker

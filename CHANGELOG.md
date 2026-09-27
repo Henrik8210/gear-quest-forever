@@ -2,6 +2,12 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
+## v0.2.13-beta
+
+Hotfix: an upgrade toasts once.
+
+The "BiS upgrade obtained" notice shows the first time that item lands in your bags or on your character. Taking it off and equipping it again does not toast again.
+
 ## v0.2.12-beta
 
 Your worn gear shows up beside a hunt, dungeon drops name the boss, and clicks on bags and the profession book work again.
