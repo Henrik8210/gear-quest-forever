@@ -107,6 +107,17 @@ end
 
 function GQ.Preview:SetEnabled(enabled)
     self:GetSettings().enabled = enabled
+    if not enabled and GQ.Data and GQ.Data.ReleaseIdleHuntClasses then
+        if GQ.Data:ReleaseIdleHuntClasses() and GQ.Data.BuildIndex then
+            GQ.Data:BuildIndex()
+            if GQ.Data.InvalidateClassCache then
+                GQ.Data:InvalidateClassCache()
+            end
+            if GQ.Log and GQ.Log.InvalidateActiveListCaches then
+                GQ.Log:InvalidateActiveListCaches()
+            end
+        end
+    end
 end
 
 function GQ.Preview:SetClass(classFile)
@@ -114,8 +125,19 @@ function GQ.Preview:SetClass(classFile)
     if not normalized then
         return false, "Unknown class. Use: warrior, paladin, hunter, rogue, priest, shaman, mage, warlock, druid."
     end
+    local wasExpanded = GQ.Data and GQ.Data.IsClassExpanded and GQ.Data:IsClassExpanded(normalized)
     self:GetSettings().class = normalized
     self:SetEnabled(true)
+    if GQ.Data and GQ.Data.EnsureClassLoaded then
+        local loaded = GQ.Data:EnsureClassLoaded(normalized)
+        local removed = GQ.Data.ReleaseIdleHuntClasses and GQ.Data:ReleaseIdleHuntClasses()
+        if loaded and ((not wasExpanded) or removed) and GQ.Data.BuildIndex then
+            GQ.Data:BuildIndex()
+            if collectgarbage then
+                collectgarbage("collect")
+            end
+        end
+    end
     if GQ.Data and GQ.Data.InvalidateClassCache then
         GQ.Data:InvalidateClassCache()
     end
@@ -147,7 +169,9 @@ function GQ.Preview:SetLevel(level)
     -- Preview jumps (simulator, /gq level) do not fire PLAYER_LEVEL_UP; still
     -- need obtain checks when a new level band unlocks hunts you already have.
     if self:IsEnabled() and GQ.Log and GQ.Log.ScheduleAutoCompletionCheck then
-        GQ.Log:ScheduleAutoCompletionCheck()
+        -- A sim jump can skip bands. Record gear already owned in those bands
+        -- with no toast. Live loot does not use this path.
+        GQ.Log:ScheduleAutoCompletionCheck(true)
     end
     return true
 end

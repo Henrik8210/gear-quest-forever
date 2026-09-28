@@ -1,4 +1,7 @@
-local _, GQ = ...
+local GQ = _G.GearQuest
+if not GQ then
+    error("GearQuest Forever class data loaded without the main addon")
+end
 GQ.Data = GQ.Data or {}
 
 -- GENERATED -- Warrior, HORDE only, levels 1-9. Nothing else is in this file:
@@ -526,6 +529,7 @@ GQ.Data.warriorHorde1to9Facts = {
     [277988]={name="Hoof-Holstered Blade",quality=2,ilvl=11,reqLevel=6,sourceType="quest_reward",instructions="Reward from the quest 'Stalk With The Earthmother'. Starts with Boarton Shadetotem in Thunder Bluff. Objective: Buy or catch a Raw Brilliant Smallfish, then use the Knife Set to fillet it in front of Boarton Shadetotem in Thunder Bluff.",zone="Thunder Bluff",questName="Stalk With The Earthmother"},
     [278002]={name="Valley Cosh",quality=2,ilvl=11,reqLevel=6,sourceType="quest_reward",instructions="Reward from the quest 'Stalk With The Earthmother'. Starts with Boarton Shadetotem in Thunder Bluff. Objective: Buy or catch a Raw Brilliant Smallfish, then use the Knife Set to fillet it in front of Boarton Shadetotem in Thunder Bluff.",zone="Thunder Bluff",questName="Stalk With The Earthmother"},
     [280304]={name="Invisible Dagger",quality=4,ilvl=1,reqLevel=1,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
+    [281266]={name="Furred Belt",quality=1,ilvl=8,reqLevel=4,sourceType="quest_reward",instructions="Reward from the quest 'Chakuyak'. Starts with Yaw Sharpmane in Mulgore. Objective: Defeat Chakuyak and bring back her pelt.",zone="Mulgore",questName="Chakuyak"},
     [281267]={name="Raptorscale Pants",quality=2,ilvl=8,reqLevel=5,sourceType="quest_reward",instructions="Reward from the quest 'Bloodtalon Matriarch'. Starts with Xar'Ti in Durotar. Objective: Bring Eggs of the Bloodtalon Matriarch to Xar'Ti in Sen'jin Village.",zone="Durotar",questName="Bloodtalon Matriarch"},
     [281271]={name="Puk's Friendship Bracelet",quality=2,ilvl=10,reqLevel=5,sourceType="quest_reward",instructions="Reward from the quest 'Rocks to Rests'. Starts with Thra in Orgrimmar. Objective: Return 8 Smooth Boulders to Thra behind Grommash Hold.",zone="Orgrimmar",questName="Rocks to Rests"},
     [281272]={name="Brog's Friendship Bracelet",quality=2,ilvl=10,reqLevel=5,sourceType="quest_reward",instructions="Reward from the quest 'Rocks to Rests'. Starts with Thra in Orgrimmar. Objective: Return 8 Smooth Boulders to Thra behind Grommash Hold.",zone="Orgrimmar",questName="Rocks to Rests"},
@@ -1599,8 +1603,8 @@ GQ.Data.warriorHorde1to9 = {
     {4666,"Waist",4,4,12,"arms","Horde",0.78,reserve=true},
     {281706,"Waist",4,4,13,"arms","Horde",0.76,reserve=true},
     {5936,"Waist",4,4,14,"arms","Horde",0.72,reserve=true},
-    {1835,"Waist",4,4,15,"arms","Horde",0.55,reserve=true},
-    {4954,"Waist",4,4,16,"arms","Horde",0.55,reserve=true},
+    {281266,"Waist",4,4,15,"arms","Horde",0.72,reserve=true},
+    {1835,"Waist",4,4,16,"arms","Horde",0.55,reserve=true},
     {277077,"Waist",4,4,17,"arms","Horde",0.22,reserve=true},
     {7026,"Waist",4,4,18,"arms","Horde",0.2,reserve=true},
     {277059,"Waist",5,5,1,"arms","Horde",2.79},
@@ -2742,8 +2746,8 @@ GQ.Data.warriorHorde1to9 = {
     {4666,"Waist",4,4,12,"fury","Horde",0.78,reserve=true},
     {281706,"Waist",4,4,13,"fury","Horde",0.76,reserve=true},
     {5936,"Waist",4,4,14,"fury","Horde",0.72,reserve=true},
-    {1835,"Waist",4,4,15,"fury","Horde",0.55,reserve=true},
-    {4954,"Waist",4,4,16,"fury","Horde",0.55,reserve=true},
+    {281266,"Waist",4,4,15,"fury","Horde",0.72,reserve=true},
+    {1835,"Waist",4,4,16,"fury","Horde",0.55,reserve=true},
     {277077,"Waist",4,4,17,"fury","Horde",0.22,reserve=true},
     {7026,"Waist",4,4,18,"fury","Horde",0.2,reserve=true},
     {277059,"Waist",5,5,1,"fury","Horde",2.79},
@@ -3837,9 +3841,9 @@ GQ.Data.warriorHorde1to9 = {
     {277071,"Waist",4,4,12,"protection","Horde",1.22,reserve=true},
     {4666,"Waist",4,4,13,"protection","Horde",1.13,reserve=true},
     {5936,"Waist",4,4,14,"protection","Horde",1.05,reserve=true},
-    {1835,"Waist",4,4,15,"protection","Horde",0.8,reserve=true},
-    {4954,"Waist",4,4,16,"protection","Horde",0.8,reserve=true},
-    {257263,"Waist",4,4,17,"protection","Horde",0.8,reserve=true},
+    {281266,"Waist",4,4,15,"protection","Horde",1.05,reserve=true},
+    {1835,"Waist",4,4,16,"protection","Horde",0.8,reserve=true},
+    {4954,"Waist",4,4,17,"protection","Horde",0.8,reserve=true},
     {7026,"Waist",4,4,18,"protection","Horde",0.19,reserve=true},
     {276995,"Waist",5,5,1,"protection","Horde",5.68},
     {277019,"Waist",5,5,2,"protection","Horde",5.68},

@@ -30,9 +30,10 @@ jobs:
             --exclude '_generated/*.json' \
             --exclude '_generated/*.md' \
             GearQuest/ .release/GearQuestForever/
+          python3 scripts/stage-class-addons.py --dest .release --main .release/GearQuestForever
           (
             cd .release
-            zip -X -r "GearQuestForever-${GITHUB_REF_NAME}.zip" GearQuestForever
+            zip -X -r "GearQuestForever-${GITHUB_REF_NAME}.zip" GearQuestForever GearQuestForever_*
           )
           unzip -l ".release/GearQuestForever-${GITHUB_REF_NAME}.zip" | head -n 20
 

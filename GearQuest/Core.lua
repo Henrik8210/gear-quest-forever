@@ -9,7 +9,7 @@ end
 GQ = GQ or {}
 _G.GearQuest = GQ
 
-GQ.VERSION = "0.2.17-beta"
+GQ.VERSION = "0.2.18-beta"
 GQ.ADDON_NAME = ADDON_NAME
 -- WoW Forever: 1–60 Classic+ (no TBC level cap).
 GQ.MAX_PLAYER_LEVEL = 60
@@ -207,6 +207,9 @@ function GQ:PLAYER_LOGIN()
         self.Preview:OnPlayerLogin()
         if self.Spec and self.Spec.OnPlayerLogin then
             self.Spec:OnPlayerLogin()
+        end
+        if self.Data.EnsureActiveHuntClasses then
+            self.Data:EnsureActiveHuntClasses()
         end
         self.Data:BuildIndex()
         self.Data:CacheContainerItemLinks()

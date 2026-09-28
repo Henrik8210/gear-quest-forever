@@ -69,5 +69,12 @@ if (-not (Test-Path (Join-Path $source "GearQuestForever.toc"))) {
 New-Item -ItemType Directory -Force -Path $target | Out-Null
 Copy-Item -Path (Join-Path $source "*") -Destination $target -Recurse -Force
 
+$addonsRoot = Join-Path $clientFolder "Interface\AddOns"
+python (Join-Path $PSScriptRoot "stage-class-addons.py") --dest $addonsRoot --main $target
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "stage-class-addons.py failed"
+}
+
 Write-Host "Synced GearQuest Forever -> $target"
+Write-Host "Class hunt data is a separate addon per class (loaded when you play or simulate that class)."
 Write-Host "In-game addon list: GearQuest Forever (folder $addonName). TBC GearQuest is a separate addon if installed."

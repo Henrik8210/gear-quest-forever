@@ -5885,6 +5885,20 @@ function GQ.Data:GetItemFact(itemId)
     return nil
 end
 
+function GQ.Data:NoteClientItemMissing(itemId)
+    itemId = tonumber(itemId)
+    if not itemId then
+        return
+    end
+    self._clientMissing = self._clientMissing or {}
+    self._clientMissing[itemId] = true
+end
+
+function GQ.Data:IsClientItemMissing(itemId)
+    itemId = tonumber(itemId)
+    return itemId and self._clientMissing and self._clientMissing[itemId] == true
+end
+
 function GQ.Data:RequestItemInfo(itemIdOrLink, force)
     if not itemIdOrLink then
         return
@@ -7809,7 +7823,9 @@ function GQ.Data:RefreshPendingTooltip(tooltip, entry, forceFallback)
 
     tooltip.gqItemInfoRefreshing = true
     if forceFallback then
-        self:ShowFactFallbackTooltip(tooltip, entry)
+        if not self:ShowForeverItemTooltip(tooltip, entry) then
+            self:ShowFactFallbackTooltip(tooltip, entry)
+        end
         self:ClearPendingItemTooltip(tooltip)
     else
         self:PopulateEntryItemTooltip(tooltip, entry)
@@ -7993,29 +8009,93 @@ function GQ.Data:ShowClientItemTooltip(tooltip, entry)
     return true
 end
 
+function GQ.Data:EntryUsesRebuiltTooltip(entry)
+    if not entry then
+        return false
+    end
+    -- Random-suffix greens keep the rebuilt jackpot tooltip. A green world
+    -- drop is that hunt even when this row has not stored a suffix yet.
+    if entry.suffix and entry.suffix ~= "" then
+        return true
+    end
+    if entry.sourceType ~= "world_drop" then
+        return false
+    end
+    local quality = self:GetItemQualityForDisplay(entry.itemId)
+    return quality == 2
+end
+
+function GQ.Data:AppendImbueCombineLine(tooltip, entry)
+    if not tooltip or not entry then
+        return
+    end
+    local info = self:ImbueInfo(entry.itemId)
+    if not info then
+        return
+    end
+    local line = self:ImbueCombineLine(info)
+    if not line then
+        return
+    end
+    tooltip:AddLine(" ")
+    tooltip:AddLine(line, 0, 1, 0, true)
+end
+
+function GQ.Data:ShowClientWaitTooltip(tooltip, entry, missing)
+    local displayName = self:GetEntryDisplayName(entry) or ("Item " .. tostring(entry.itemId))
+    local quality = self:GetItemQualityForDisplay(entry.itemId)
+    local r, g, b = 1, 0.82, 0
+    local c = ITEM_QUALITY_COLORS and quality and ITEM_QUALITY_COLORS[quality]
+    if c then
+        r, g, b = c.r, c.g, c.b
+    elseif quality then
+        r, g, b = GetItemQualityColor(quality)
+    end
+    tooltip:ClearLines()
+    tooltip:SetText(displayName, r, g, b)
+    if missing then
+        tooltip:AddLine("Not found in the client", 1, 0.2, 0.2)
+    else
+        tooltip:AddLine(RETRIEVING_ITEM_INFO or "Retrieving item information", 1, 1, 1)
+    end
+end
+
 function GQ.Data:PopulateEntryItemTooltip(tooltip, entry)
     if not tooltip or not entry or not entry.itemId then
         return false
     end
 
-    -- Forever tip wins for stats. Names only decide class. No Forever tip
-    -- means the live client tooltip, not reconstructed pipeline facts.
-    if self:ShowForeverItemTooltip(tooltip, entry) then
-        if self._pendingClientSet then
-            self:TrackPendingItemTooltip(tooltip, entry)
-        else
-            self:ClearPendingItemTooltip(tooltip)
+    -- Green world drops keep the rebuilt jackpot tooltip. Every other item
+    -- uses the Wowhead tip. A missing client item must not replace that hover.
+    if self:EntryUsesRebuiltTooltip(entry) then
+        if self:ShowForeverItemTooltip(tooltip, entry) then
+            if self._pendingClientSet then
+                self:TrackPendingItemTooltip(tooltip, entry)
+            else
+                self:ClearPendingItemTooltip(tooltip)
+            end
+            return true
         end
+
+        if self:ShowClientItemTooltip(tooltip, entry) then
+            self:ClearPendingItemTooltip(tooltip)
+            return true
+        end
+
+        self:ShowFactFallbackTooltip(tooltip, entry)
+        self:TrackPendingItemTooltip(tooltip, entry)
         return true
     end
 
-    if self:ShowClientItemTooltip(tooltip, entry) then
+    -- Quest, dungeon, and set pieces use the Wowhead tip. The client item
+    -- is often missing until that level, and that must not replace the tip.
+    if self:ShowForeverItemTooltip(tooltip, entry) then
         self:ClearPendingItemTooltip(tooltip)
         return true
     end
 
     self:ShowFactFallbackTooltip(tooltip, entry)
-    self:TrackPendingItemTooltip(tooltip, entry)
+    self:ClearPendingItemTooltip(tooltip)
     return true
 end
 

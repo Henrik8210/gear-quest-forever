@@ -1,4 +1,7 @@
-local _, GQ = ...
+local GQ = _G.GearQuest
+if not GQ then
+    error("GearQuest Forever class data loaded without the main addon")
+end
 GQ.Data = GQ.Data or {}
 
 -- GENERATED -- Paladin, HORDE only, levels 1-9. Nothing else is in this file:
@@ -550,6 +553,7 @@ GQ.Data.paladinHorde1to9Facts = {
     [277107]={name="Zephrali Bludgeon",quality=1,ilvl=14,reqLevel=9,sourceType="vendor",instructions="Bought from Falfaan Halfwind.",npc="Falfaan Halfwind"},
     [277672]={name="Rough Copper Chain Boots",quality=2,ilvl=10,reqLevel=5,sourceType="profession",instructions="Crafted with Blacksmithing.",profession="Blacksmithing"},
     [278002]={name="Valley Cosh",quality=2,ilvl=11,reqLevel=6,sourceType="quest_reward",instructions="Reward from the quest 'Stalk With The Earthmother'. Starts with Boarton Shadetotem in Thunder Bluff. Objective: Buy or catch a Raw Brilliant Smallfish, then use the Knife Set to fillet it in front of Boarton Shadetotem in Thunder Bluff.",zone="Thunder Bluff",questName="Stalk With The Earthmother"},
+    [281266]={name="Furred Belt",quality=1,ilvl=8,reqLevel=4,sourceType="quest_reward",instructions="Reward from the quest 'Chakuyak'. Starts with Yaw Sharpmane in Mulgore. Objective: Defeat Chakuyak and bring back her pelt.",zone="Mulgore",questName="Chakuyak"},
     [281267]={name="Raptorscale Pants",quality=2,ilvl=8,reqLevel=5,sourceType="quest_reward",instructions="Reward from the quest 'Bloodtalon Matriarch'. Starts with Xar'Ti in Durotar. Objective: Bring Eggs of the Bloodtalon Matriarch to Xar'Ti in Sen'jin Village.",zone="Durotar",questName="Bloodtalon Matriarch"},
     [281269]={name="Mogra's Friendship Bracelet",quality=2,ilvl=10,reqLevel=5,sourceType="quest_reward",instructions="Reward from the quest 'Rocks to Rests'. Starts with Thra in Orgrimmar. Objective: Return 8 Smooth Boulders to Thra behind Grommash Hold.",zone="Orgrimmar",questName="Rocks to Rests"},
     [281270]={name="Thra's Friendship Bracelet",quality=2,ilvl=10,reqLevel=5,sourceType="quest_reward",instructions="Reward from the quest 'Rocks to Rests'. Starts with Thra in Orgrimmar. Objective: Return 8 Smooth Boulders to Thra behind Grommash Hold.",zone="Orgrimmar",questName="Rocks to Rests"},
@@ -2682,9 +2686,9 @@ GQ.Data.paladinHorde1to9 = {
     {277065,"Waist",4,4,12,"protection","Horde",1.12,reserve=true},
     {4666,"Waist",4,4,13,"protection","Horde",0.94,reserve=true},
     {5936,"Waist",4,4,14,"protection","Horde",0.88,reserve=true},
-    {1835,"Waist",4,4,15,"protection","Horde",0.67,reserve=true},
-    {4954,"Waist",4,4,16,"protection","Horde",0.67,reserve=true},
-    {257263,"Waist",4,4,17,"protection","Horde",0.67,reserve=true},
+    {281266,"Waist",4,4,15,"protection","Horde",0.88,reserve=true},
+    {1835,"Waist",4,4,16,"protection","Horde",0.67,reserve=true},
+    {4954,"Waist",4,4,17,"protection","Horde",0.67,reserve=true},
     {7026,"Waist",4,4,18,"protection","Horde",0.16,reserve=true},
     {276995,"Waist",5,5,1,"protection","Horde",5.01},
     {277019,"Waist",5,5,2,"protection","Horde",5.01},

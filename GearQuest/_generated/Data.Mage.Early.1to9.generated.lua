@@ -1,4 +1,7 @@
-local _, GQ = ...
+local GQ = _G.GearQuest
+if not GQ then
+    error("GearQuest Forever class data loaded without the main addon")
+end
 GQ.Data = GQ.Data or {}
 
 -- GENERATED -- Mage, ALLIANCE, HORDE, levels 1-9. Nothing else is in this file:

@@ -82,7 +82,10 @@ for iid in sorted(used):
 
 TAG = FACTIONS[0] if len(FACTIONS)==1 else "Early"
 out=os.path.join(OUT,"Data.%s.%s.1to9.generated.lua"%(CLS.title(),TAG))
-open(out,"w").write("""local _, GQ = ...
+open(out,"w").write("""local GQ = _G.GearQuest
+if not GQ then
+    error("GearQuest Forever class data loaded without the main addon")
+end
 GQ.Data = GQ.Data or {}
 
 -- GENERATED -- """+CLS.title()+""", """+(", ".join(FACTIONS).upper())+""", levels 1-9. Nothing else is in this file:

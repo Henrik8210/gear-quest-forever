@@ -128,6 +128,56 @@ local SOURCES = {
               battlemage_arcane = { battlemage_arcane = true } } },
 }
 
+-- Hunt rows live in a load-on-demand addon per class so a shaman does not
+-- parse warrior, mage, and the rest at login. The first time you simulate
+-- another class, that addon loads and its rows are expanded once.
+local CLASS_ADDONS = {
+    PALADIN = "GearQuestForever_PALADIN",
+    WARRIOR = "GearQuestForever_WARRIOR",
+    HUNTER  = "GearQuestForever_HUNTER",
+    DRUID   = "GearQuestForever_DRUID",
+    SHAMAN  = "GearQuestForever_SHAMAN",
+    ROGUE   = "GearQuestForever_ROGUE",
+    PRIEST  = "GearQuestForever_PRIEST",
+    WARLOCK = "GearQuestForever_WARLOCK",
+    MAGE    = "GearQuestForever_MAGE",
+}
+
+local NOTABLE_TABLE = {
+    PALADIN = "paladinNotable",
+    WARRIOR = "warriorNotable",
+    HUNTER  = "hunterNotable",
+    DRUID   = "druidNotable",
+    SHAMAN  = "shamanNotable",
+    ROGUE   = "rogueNotable",
+    PRIEST  = "priestNotable",
+    WARLOCK = "warlockNotable",
+    MAGE    = "mageNotable",
+}
+
+local function AddonIsLoaded(name)
+    if C_AddOns and C_AddOns.IsAddOnLoaded then
+        return C_AddOns.IsAddOnLoaded(name)
+    end
+    if IsAddOnLoaded then
+        return IsAddOnLoaded(name)
+    end
+    return false
+end
+
+local function LoadClassAddon(name)
+    if AddonIsLoaded(name) then
+        return true
+    end
+    if C_AddOns and C_AddOns.LoadAddOn then
+        return C_AddOns.LoadAddOn(name)
+    end
+    if LoadAddOn then
+        return LoadAddOn(name)
+    end
+    return false, "LoadAddOn missing"
+end
+
 local CLASSTBL = {}
 
 local function ExtractPipelineScore(r, src)
@@ -223,32 +273,161 @@ local function Expand(src, data, out)
     return added
 end
 
-function GQ.Data:LoadGenerated()
-    if self._generatedLoaded then return 0 end
-    self._generatedLoaded = true
-    self.entries = self.entries or {}
-    self._pipelineScoreLookup = {}
-    local n = 0
-    for i = 1, #SOURCES do
-        n = n + Expand(SOURCES[i], self, self.entries)
+function GQ.Data:IsClassLoaded(classFile)
+    classFile = classFile and string.upper(classFile)
+    return self._loadedClasses and self._loadedClasses[classFile] == true
+end
+
+function GQ.Data:IsClassExpanded(classFile)
+    classFile = classFile and string.upper(classFile)
+    return self._expandedClasses and self._expandedClasses[classFile] == true
+end
+
+function GQ.Data:EnsureClassLoaded(classFile)
+    if not classFile then
+        return false
     end
-    self._generatedCount = n
-    self:BuildSuffixLookup()
-    for i = 1, #self.entries do
+    classFile = string.upper(classFile)
+    self._loadedClasses = self._loadedClasses or {}
+    self._expandedClasses = self._expandedClasses or {}
+    if self._expandedClasses[classFile] then
+        return true
+    end
+
+    local addon = CLASS_ADDONS[classFile]
+    if not addon then
+        return false
+    end
+    if not AddonIsLoaded(addon) then
+        local ok, reason = LoadClassAddon(addon)
+        if not ok then
+            self._classLoadFailed = self._classLoadFailed or {}
+            if not self._classLoadFailed[classFile] then
+                self._classLoadFailed[classFile] = true
+                local label = classFile:sub(1, 1) .. classFile:sub(2):lower()
+                print("|cffff0000GearQuest|r: could not load " .. label .. " hunt data (" .. tostring(reason) .. "). Enable |cff00ff00GearQuest Forever: " .. label .. "|r in the addon list, then /reload.")
+            end
+            return false
+        end
+    end
+
+    self.entries = self.entries or {}
+    local start = #self.entries
+    local n = 0
+    local found = false
+    for i = 1, #SOURCES do
+        local src = SOURCES[i]
+        if src.class == classFile then
+            if self[src.picks] and self[src.facts] then
+                found = true
+            end
+            n = n + Expand(src, self, self.entries)
+        end
+    end
+    if not found then
+        self._classLoadFailed = self._classLoadFailed or {}
+        if not self._classLoadFailed[classFile] then
+            self._classLoadFailed[classFile] = true
+            print("|cffff0000GearQuest|r: " .. classFile .. " hunt data loaded with no picks.")
+        end
+        return false
+    end
+
+    self:BuildSuffixLookup(classFile)
+    for i = start + 1, #self.entries do
         self:EnrichEntrySuffix(self.entries[i])
         self:EnrichBossChestEntry(self.entries[i])
     end
-    return n
+    -- Pick arrays stay. WoW will not run this class file again, and leaving
+    -- the class drops only the expanded rows.
+    self._loadedClasses[classFile] = true
+    self._expandedClasses[classFile] = true
+    self._generatedCount = (self._generatedCount or 0) + n
+    return true
 end
 
-function GQ.Data:BuildSuffixLookup()
-    if self._suffixLookup then
+function GQ.Data:ReleaseExpandedClass(classFile)
+    classFile = classFile and string.upper(classFile)
+    if not classFile or not self._expandedClasses or not self._expandedClasses[classFile] then
+        return false
+    end
+    local kept = {}
+    local entries = self.entries or {}
+    for i = 1, #entries do
+        local entry = entries[i]
+        if not (entry.generated and entry.classes and entry.classes[classFile]) then
+            kept[#kept + 1] = entry
+        end
+    end
+    self.entries = kept
+    self._expandedClasses[classFile] = nil
+    return true
+end
+
+function GQ.Data:ReleaseIdleHuntClasses()
+    -- Your class stays. The class on screen stays. An earlier sim class drops
+    -- its expanded rows. Its addon stays loaded until /reload.
+    local playerClass
+    if UnitClass then
+        local _
+        _, playerClass = UnitClass("player")
+    end
+    playerClass = playerClass and string.upper(playerClass)
+    local current = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    current = current and string.upper(current)
+
+    local removed = false
+    if self._expandedClasses then
+        for classFile in pairs(self._expandedClasses) do
+            if classFile ~= playerClass and classFile ~= current then
+                if self:ReleaseExpandedClass(classFile) then
+                    removed = true
+                end
+            end
+        end
+    end
+    if removed and collectgarbage then
+        collectgarbage("collect")
+    end
+    return removed
+end
+
+function GQ.Data:EnsureActiveHuntClasses()
+    local playerClass
+    if UnitClass then
+        local _
+        _, playerClass = UnitClass("player")
+    end
+    if playerClass then
+        self:EnsureClassLoaded(playerClass)
+    end
+    if GQ.Preview and GQ.Preview.IsEnabled and GQ.Preview:IsEnabled() then
+        local sim = GQ.Preview:GetEffectiveClass()
+        if sim and sim ~= playerClass then
+            self:EnsureClassLoaded(sim)
+        end
+    end
+    self:ReleaseIdleHuntClasses()
+    if collectgarbage then
+        collectgarbage("collect")
+    end
+end
+
+function GQ.Data:LoadGenerated()
+    self:EnsureActiveHuntClasses()
+    return self._generatedCount or 0
+end
+
+function GQ.Data:BuildSuffixLookup(classFile)
+    if self._suffixLookup and not classFile then
         return
     end
 
     -- Per item+suffix+level only. Never cross-item: "of the Tiger" on item A
     -- is id 690 while item B at the same level may be id 753.
-    self._suffixLookup = { byItemLevel = {}, byItemSuffix = {}, byItemLevelRange = {}, byItemSuffixRange = {} }
+    if not self._suffixLookup then
+        self._suffixLookup = { byItemLevel = {}, byItemSuffix = {}, byItemLevelRange = {}, byItemSuffixRange = {} }
+    end
 
     local function ingest(itemId, suffix, minLevel, suffixId, suffixRange)
         if not suffix or suffix == "" or not suffixId or suffixId == 0 then
@@ -301,29 +480,38 @@ function GQ.Data:BuildSuffixLookup()
     end
 
     for i = 1, #SOURCES do
-        local rows = self[SOURCES[i].picks]
-        if rows then
-            for j = 1, #rows do
-                ingestRow(rows[j])
+        local src = SOURCES[i]
+        if not classFile or src.class == classFile then
+            local rows = self[src.picks]
+            if rows then
+                for j = 1, #rows do
+                    ingestRow(rows[j])
+                end
             end
         end
     end
 
     for _, entry in ipairs(self.entries or {}) do
-        ingest(entry.itemId, entry.suffix, entry.minLevel, entry.suffixId, entry.suffixRange)
-        ingestRange(entry.itemId, entry.suffix, entry.minLevel, entry.suffixRange)
+        if not classFile or (entry.classes and entry.classes[classFile]) then
+            ingest(entry.itemId, entry.suffix, entry.minLevel, entry.suffixId, entry.suffixRange)
+            ingestRange(entry.itemId, entry.suffix, entry.minLevel, entry.suffixRange)
+        end
     end
 
-    local notableTables = {
-        "paladinNotable", "warriorNotable", "hunterNotable",
-        "druidNotable", "shamanNotable", "rogueNotable", "priestNotable",
-        "warlockNotable", "mageNotable",
-    }
-    for t = 1, #notableTables do
-        local rows = self[notableTables[t]]
+    if classFile then
+        local rows = self[NOTABLE_TABLE[classFile]]
         if rows then
             for i = 1, #rows do
                 ingestRow(rows[i])
+            end
+        end
+    else
+        for _, tableName in pairs(NOTABLE_TABLE) do
+            local rows = self[tableName]
+            if rows then
+                for i = 1, #rows do
+                    ingestRow(rows[i])
+                end
             end
         end
     end
@@ -431,5 +619,3 @@ function GQ.Data:EnrichEntrySuffix(entry)
 
     return entry
 end
-
-GQ.Data:LoadGenerated()

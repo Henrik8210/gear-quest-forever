@@ -2580,15 +2580,21 @@ function GQ.Log:AnnounceObtained(entry)
     end
 end
 
-function GQ.Log:EntryMatchesActiveHuntLists(entry)
-    if not entry or not entry.slot then
+function GQ.Log:EntryOnCurrentGearQuestList(entry)
+    -- The log's current list: top upgrades and the notable for this level.
+    -- Not the whole candidate pool, and not an earlier band (a level 9 cloak
+    -- is not a level 20 hunt).
+    if not entry or not entry.slot or not GQ.Data then
         return false
     end
     local slotName = GQ.Data:NormalizeSlotName(entry.slot)
-    local itemKey = GQ.Data:EntryListKey(entry)
+    local itemKey = GQ.Data.EntryListKey and GQ.Data:EntryListKey(entry)
     local function listHasMatch(list)
         for _, row in ipairs(list or {}) do
             if row.id == entry.id then
+                return true
+            end
+            if entry.itemId and row.itemId == entry.itemId then
                 return true
             end
             if itemKey and GQ.Data:EntryListKey(row) == itemKey then
@@ -2603,37 +2609,34 @@ function GQ.Log:EntryMatchesActiveHuntLists(entry)
     if listHasMatch(GQ.Data:GetNotableForSlot(slotName)) then
         return true
     end
-    if listHasMatch(GQ.Data:GetCandidatesForSlot(slotName)) then
-        return true
-    end
     return false
 end
 
-function GQ.Log:ShouldAutoCompleteOnObtain(entry)
+function GQ.Log:ShouldAutoCompleteOnObtain(entry, includeReached)
     if not entry or self:IsEntryObtained(entry.id) or self:HasObtainedItemId(entry.itemId) then
         return false
-    end
-
-    if GetHuntStatus(entry.id) == "tracked" then
-        return true
     end
 
     if not self:EntryMatchesTrackedHunt(entry) or not GQ.Data:ShouldShowEntry(entry) then
         return false
     end
 
-    -- A sim jump (10 → 20) skips the bands where this piece was the hunt.
-    -- Owning it after that level is still a completed hunt.
-    local playerLevel = GQ:GetEffectiveLevel()
-    if playerLevel >= (entry.minLevel or 1) and PlayerHasObtainedEntryItem(entry) then
+    local onList = self:EntryOnCurrentGearQuestList(entry)
+    if not onList and GetHuntStatus(entry.id) == "tracked" and GQ.Data:EntryMatchesPlayer(entry) then
+        onList = true
+    end
+    if onList then
         return true
     end
 
-    if not GQ.Data:EntryMatchesPlayer(entry) then
+    -- Simulator jumps and /gq wipe data only. A live loot of an older piece
+    -- (Calico Cloak at level 20) is not a current hunt and must not complete.
+    if not includeReached then
         return false
     end
 
-    return self:EntryMatchesActiveHuntLists(entry)
+    local playerLevel = GQ:GetEffectiveLevel()
+    return playerLevel >= (entry.minLevel or 1)
 end
 
 function GQ.Log:RememberObtainedEntry(entry, now)
@@ -2852,7 +2855,7 @@ function GQ.Log:WipeCharacterData()
     if GQ.RefreshUI then
         GQ:RefreshUI()
     end
-    self:ScheduleAutoCompletionCheck()
+    self:ScheduleAutoCompletionCheck(true)
 end
 
 function GQ.Log:CollectAutoCompletionCandidates()
@@ -2870,7 +2873,10 @@ function GQ.Log:CollectAutoCompletionCandidates()
 
     for id, record in pairs(CharProgress().hunts) do
         if NormalizeHuntStatus(record.status) == "tracked" then
-            add(GQ.Data:GetEntryById(id))
+            local entry = GQ.Data:GetEntryById(id)
+            if entry and GQ.Data:EntryMatchesPlayer(entry) then
+                add(entry)
+            end
         end
     end
 
@@ -2886,46 +2892,78 @@ function GQ.Log:CollectAutoCompletionCandidates()
         end
     end
 
-    local owned = {}
-    self:ForEachOwnedItemId(function(itemId)
-        if itemId then
-            owned[tostring(itemId)] = true
-        end
-    end)
-
-    local playerLevel = GQ:GetEffectiveLevel()
-    if classFile and GQ.Data.GetSlotsForClass and GQ.Data.GetCandidateSlotKeys then
-        local seenOwned = {}
-        for _, slotName in ipairs(GQ.Data:GetSlotsForClass(classFile)) do
-            for _, key in ipairs(GQ.Data:GetCandidateSlotKeys(slotName)) do
-                for _, entry in ipairs(GQ.Data:GetClassSlotEntryList(key) or {}) do
-                    local itemKey = entry and entry.itemId and tostring(entry.itemId)
-                    if itemKey and owned[itemKey] and not seenOwned[itemKey]
-                        and playerLevel >= (entry.minLevel or 1)
-                        and not entry.healOnly
-                        and GQ.Data:ShouldShowEntry(entry)
-                        and self:EntryMatchesTrackedHunt(entry) then
-                        seenOwned[itemKey] = true
-                        add(entry)
-                    end
-                end
-            end
-        end
-    end
-
     return candidates
 end
 
-function GQ.Log:CheckAutoCompletion()
+function GQ.Log:CollectReachedOwnedHunts()
+    -- Items already in bags after a sim jump or wipe. One row per item id.
+    -- Never call this from a loot or bag event: walking the class catalog
+    -- there trips "script ran too long" in a dungeon.
+    local candidates = {}
+    local seenItem = {}
+    local playerLevel = GQ:GetEffectiveLevel()
+    self:ForEachOwnedItemId(function(itemId)
+        if not itemId or seenItem[itemId] or self:HasObtainedItemId(itemId) then
+            return
+        end
+        seenItem[itemId] = true
+        local entries = GQ.Data.GetEntriesByItemId and GQ.Data:GetEntriesByItemId(itemId) or {}
+        for i = 1, #entries do
+            local entry = entries[i]
+            if entry and entry.id
+                and not entry.healOnly
+                and playerLevel >= (entry.minLevel or 1)
+                and GQ.Data:ShouldShowEntry(entry)
+                and self:EntryMatchesTrackedHunt(entry) then
+                candidates[#candidates + 1] = entry
+                break
+            end
+        end
+    end)
+    return candidates
+end
+
+function GQ.Log:CheckAutoCompletion(includeReached)
     local changed = false
 
     local ok, err = pcall(function()
-        for _, entry in ipairs(self:CollectAutoCompletionCandidates()) do
-            if entry
-                and self:ShouldAutoCompleteOnObtain(entry)
-                and PlayerHasObtainedEntryItem(entry)
-            then
-                if self:MarkEntryObtained(entry) then
+        local owned = {}
+        self:ForEachOwnedItemId(function(itemId)
+            if itemId then
+                owned[itemId] = true
+            end
+        end)
+
+        local function owns(entry)
+            if not entry or not entry.itemId then
+                return false
+            end
+            if entry.sourceType == "profession" and GetCraftedTimestamp(entry.itemId) then
+                return true
+            end
+            return owned[entry.itemId] == true
+        end
+
+        local seen = {}
+        local list = self:CollectAutoCompletionCandidates()
+        if includeReached then
+            local extra = self:CollectReachedOwnedHunts()
+            for i = 1, #extra do
+                list[#list + 1] = extra[i]
+            end
+        end
+
+        for _, entry in ipairs(list) do
+            if entry and entry.id and not seen[entry.id] and owns(entry)
+                and self:ShouldAutoCompleteOnObtain(entry, includeReached) then
+                seen[entry.id] = true
+                local onList = self:EntryOnCurrentGearQuestList(entry)
+                    or (GetHuntStatus(entry.id) == "tracked" and GQ.Data:EntryMatchesPlayer(entry))
+                local options = nil
+                if not onList then
+                    options = { showToast = false, announce = false }
+                end
+                if self:MarkEntryObtained(entry, options) then
                     changed = true
                 end
             end
@@ -3028,19 +3066,26 @@ function GQ.Log:BeginLoginObtainScan()
     end
 end
 
-function GQ.Log:ScheduleAutoCompletionCheck()
+function GQ.Log:ScheduleAutoCompletionCheck(includeReached)
+    if includeReached then
+        self.completionIncludeReached = true
+    end
     if self.completionPending then
         return
     end
     self.completionPending = true
     if C_Timer and C_Timer.After then
         C_Timer.After(0.25, function()
+            local reached = GQ.Log.completionIncludeReached
             GQ.Log.completionPending = false
-            GQ.Log:CheckAutoCompletion()
+            GQ.Log.completionIncludeReached = nil
+            GQ.Log:CheckAutoCompletion(reached)
         end)
     else
+        local reached = self.completionIncludeReached
         self.completionPending = false
-        self:CheckAutoCompletion()
+        self.completionIncludeReached = nil
+        self:CheckAutoCompletion(reached)
     end
 end
 
@@ -5513,6 +5558,11 @@ function GQ.Log:BuildDetailLines(entry)
         table.insert(lines, "\nHas not been datamined yet")
     end
 
+    if entry.itemId and GQ.Data and GQ.Data.IsClientItemMissing and GQ.Data:IsClientItemMissing(entry.itemId)
+        and not (GQ.Data.EntryUsesRebuiltTooltip and GQ.Data:EntryUsesRebuiltTooltip(entry)) then
+        table.insert(lines, "\nNot found in the client yet.")
+    end
+
     local suffixHint = GQ.Data:GetSuffixHint(entry)
     if suffixHint then
         table.insert(lines, "\nRandom enchant: " .. suffixHint)
@@ -5597,18 +5647,24 @@ function GQ.Log:EnsureItemInfoListener()
 
     local frame = CreateFrame("Frame")
     GQ.RegisterEvent(frame, "GET_ITEM_INFO_RECEIVED")
-    frame:SetScript("OnEvent", function(_, _, itemId)
+    frame:SetScript("OnEvent", function(_, _, itemId, success)
         local log = _G.GearQuest and _G.GearQuest.Log
         if not log or not log.frame or not log.frame:IsShown() then
             return
         end
 
         itemId = tonumber(itemId)
+        if success == false and itemId and GQ.Data and GQ.Data.NoteClientItemMissing then
+            GQ.Data:NoteClientItemMissing(itemId)
+        end
         local entry = log.selectedEntry or GQ.Data:GetEntryById(log.selectedHuntId)
         if not entry or not itemId or entry.itemId ~= itemId then
             return
         end
 
+        if success == false then
+            log:ApplyEntryDetail(entry)
+        end
         log:UpdateDetailReward(entry)
     end)
     self.itemInfoListener = frame
@@ -5624,6 +5680,11 @@ function GQ.Log:ApplyEntryDetail(entry)
     local itemName = GQ.Data:GetEntryDisplayName(entry) or ("Item " .. entry.itemId)
 
     self:SetDetailEmpty(false)
+    if entry.itemId and GQ.Data and GQ.Data.RequestItemInfo and GQ.Data.IsClientItemMissing
+        and not GQ.Data:IsClientItemMissing(entry.itemId)
+        and GQ.Data.ItemInfoIsReady and not GQ.Data:ItemInfoIsReady(entry.itemId) then
+        GQ.Data:RequestItemInfo(entry.itemId, true)
+    end
     local title = itemName:upper()
     if GQ.Data and GQ.Data.SanitizeText then
         title = GQ.Data:SanitizeText(title) or title

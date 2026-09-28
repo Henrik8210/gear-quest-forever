@@ -76,7 +76,10 @@ for iid in sorted(used):
     facts.append(f'    [{iid}]={{name={lua(it["name"])},{",".join(extra+kv)}}},')
 
 out=os.path.join(OUT,"Data.%s.Horde.1to9.generated.lua"%CLS.title())
-open(out,"w").write("""local _, GQ = ...
+open(out,"w").write("""local GQ = _G.GearQuest
+if not GQ then
+    error("GearQuest Forever class data loaded without the main addon")
+end
 GQ.Data = GQ.Data or {}
 
 -- GENERATED -- """+CLS.title()+""", HORDE only, levels 1-9. Nothing else is in this file:
