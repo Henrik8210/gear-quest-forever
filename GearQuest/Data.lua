@@ -5916,22 +5916,51 @@ function GQ.Data:RequestItemInfo(itemIdOrLink, force)
     end
 end
 
+function GQ.Data:IsPlaceholderItemName(name, itemId)
+    if type(name) ~= "string" then
+        return true
+    end
+    name = name:match("^%s*(.-)%s*$") or ""
+    if name == "" then
+        return true
+    end
+    -- Forever's client answers GetItemInfo with "Item 23173" until the
+    -- real name is in its cache. That is not a name.
+    if name:find("^Item #?%d+$") then
+        return true
+    end
+    if itemId and name == tostring(itemId) then
+        return true
+    end
+    return false
+end
+
 function GQ.Data:GetItemDisplayName(itemId)
     if not itemId then
         return nil
     end
 
-    local name = GetItemInfo(itemId)
-    if name then
-        return name
+    local clientName = GetItemInfo and GetItemInfo(itemId)
+    if clientName and not self:IsPlaceholderItemName(clientName, itemId) then
+        return clientName
     end
 
     local fact = self:GetItemFact(itemId)
-    if fact and fact.name then
+    if fact and fact.name and not self:IsPlaceholderItemName(fact.name, itemId) then
         return fact.name
     end
 
-    return PROFESSION_ITEM_NAMES[itemId]
+    local audit = self:GetForeverAudit(itemId)
+    if audit and audit.name and not self:IsPlaceholderItemName(audit.name, itemId) then
+        return audit.name
+    end
+
+    local prof = PROFESSION_ITEM_NAMES[itemId]
+    if prof and not self:IsPlaceholderItemName(prof, itemId) then
+        return prof
+    end
+
+    return nil
 end
 
 function GQ.Data:GetEntryDisplayName(entry)
@@ -6041,14 +6070,6 @@ local FOREVER_TIP_BREAKS = {
     "Equip:",
     "Use:",
     "Chance on hit:",
-}
-
--- Only the generic personal convert Wowhead already replaced with +Spell Power.
--- Do not strip party auras, Flash of Light, or set bonuses.
-local STALE_EQUIP = {
-    "^Equip: Increases damage and healing done by magical spells and effects by up to %d+",
-    "^Equip: Increases healing done by spells and effects by up to %d+",
-    "^Equip: Increases damage done by magical spells and effects by up to %d+",
 }
 
 local GREEN_STAT = {
@@ -6277,19 +6298,10 @@ function GQ.Data:ForeverTooltipLines(tip)
     for line in string.gmatch(text .. "\n", "([^\n]*)\n") do
         line = line:match("^%s*(.-)%s*$") or ""
         if line ~= "" then
-            local stale = false
-            for _, rx in ipairs(STALE_EQUIP) do
-                if line:find(rx) then
-                    stale = true
-                    break
-                end
+            if line:find("^Sell Price") then
+                line = self:FormatSellPriceLine(line)
             end
-            if not stale then
-                if line:find("^Sell Price") then
-                    line = self:FormatSellPriceLine(line)
-                end
-                lines[#lines + 1] = line
-            end
+            lines[#lines + 1] = line
         end
     end
     local merged = {}
@@ -6456,12 +6468,8 @@ function GQ.Data:ResolveSetPieceLine(line)
         return line
     end
     id = tonumber(id)
-    local audit = self:GetForeverAudit(id)
-    if audit and audit.name and audit.name ~= "" then
-        return audit.name
-    end
-    local name = GetItemInfo(id)
-    if name and name ~= "" then
+    local name = self:GetItemDisplayName(id)
+    if name then
         return name
     end
     self:RequestItemInfo(id, true)
@@ -8199,13 +8207,17 @@ function GQ.Data:ItemNameFromLink(link)
 
     local itemId = self:ItemLinkToId(link)
     if itemId then
-        local name = GetItemInfo(itemId)
+        local name = self:GetItemDisplayName(itemId)
         if name then
             return name
         end
     end
 
-    return link:match("%[(.-)%]")
+    local bracket = link:match("%[(.-)%]")
+    if bracket and not self:IsPlaceholderItemName(bracket, itemId) then
+        return bracket
+    end
+    return nil
 end
 
 function GQ.Data:PlayerOwnsEntryItem(entry)
@@ -9166,22 +9178,80 @@ function GQ.Data:GetWeaponRouteForBand()
     return nil
 end
 
-function GQ.Data:GetWeaponRouteLabel(route)
-    route = route or self:GetWeaponRouteForBand()
-    if not route then
-        return nil
-    end
+local SHIELD_SPECS = {
+    PALADIN = { protection = true, holy = true },
+    WARRIOR = { protection = true },
+    SHAMAN = { elemental = true, restoration = true, enhancement_tank = true },
+}
+
+local DUAL_WIELD_SPECS = {
+    ROGUE = { combat = true, assassination = true, subtlety = true },
+    WARRIOR = { fury = true },
+}
+
+local TWO_HAND_SPECS = {
+    PALADIN = { retribution = true },
+    WARRIOR = { arms = true },
+}
+
+-- The main-hand and off-hand lists stay separate. The main-hand header names
+-- the choice. The off-hand header stays "Off Hand", and its rank 1 is the
+-- piece that pairs with the one-hand (main-hand rank 2 when a staff is rank 1).
+function GQ.Data:WeaponHeaderSuffix(slotName)
     local classFile = GQ:GetEffectiveClass()
     local spec = GQ:GetEffectiveSpec()
-    local dualWieldTerms = classFile == "HUNTER"
-        or (classFile == "SHAMAN" and spec == "enhancement")
-    if classFile == "SHAMAN" and spec == "enhancement_tank" then
-        return "One-hand + shield"
+    if slotName == "Ranged" and classFile == "HUNTER" then
+        return "Bow"
     end
-    if route == "twohand" then
-        return dualWieldTerms and "Two-hand build" or "Staff build"
+    local shield = SHIELD_SPECS[classFile]
+    if shield and shield[spec] then
+        if slotName == "SecondaryHand" then
+            return "Shield"
+        end
+        return nil
     end
-    return dualWieldTerms and "Dual-wield build" or "One-hand + off-hand"
+    local dual = DUAL_WIELD_SPECS[classFile]
+    if dual and dual[spec] then
+        if slotName == "MainHand" then
+            return "Dual wield"
+        end
+        return nil
+    end
+    local twoHand = TWO_HAND_SPECS[classFile]
+    if twoHand and twoHand[spec] then
+        if slotName == "MainHand" then
+            return "Two-hand"
+        end
+        return nil
+    end
+    if classFile == "HUNTER" then
+        if slotName == "MainHand" then
+            return "Two-hand or dual wield"
+        end
+        return nil
+    end
+    if classFile == "SHAMAN" and spec == "enhancement" then
+        if slotName == "MainHand" then
+            return "Two-hand or main hand"
+        end
+        return nil
+    end
+    if classFile == "MAGE" or classFile == "PRIEST" or classFile == "WARLOCK" then
+        if slotName == "MainHand" then
+            return "Staff or main hand"
+        end
+        return nil
+    end
+    if classFile == "DRUID" then
+        if slotName == "MainHand" then
+            return "Two-hand or main hand"
+        end
+        return nil
+    end
+    if slotName == "MainHand" and self:GetWeaponRouteForBand() then
+        return "Two-hand or main hand"
+    end
+    return nil
 end
 
 function GQ.Data:EntryOffWeaponRoute(entry, slotName)
@@ -9201,11 +9271,12 @@ end
 function GQ.Data:SlotHeaderLabel(slotName)
     slotName = self:NormalizeSlotName(slotName)
     local label = self:SlotLabel(slotName)
-    if slotName == "MainHand" or slotName == "SecondaryHand" then
-        local routeLabel = self:GetWeaponRouteLabel()
-        if routeLabel then
-            return label .. " — " .. routeLabel
+    local routeLabel = self:WeaponHeaderSuffix(slotName)
+    if routeLabel then
+        if slotName == "Ranged" then
+            return routeLabel
         end
+        return label .. " — " .. routeLabel
     end
     return label
 end

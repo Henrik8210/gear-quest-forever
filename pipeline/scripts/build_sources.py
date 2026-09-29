@@ -148,9 +148,9 @@ for tbl,mapper in (("npc_vendor",lambda e:[e]),("npc_vendor_template",lambda e:v
                     vend[r["i"]].append((cid,r["xc"]))
 
 misc=collections.defaultdict(list)
-MISC=[("fishing_loot_template","fishing","Fished up"),
+MISC=[("fishing_loot_template","profession","Fished up"),
       ("pickpocketing_loot_template","pickpocket","Pickpocketed from a humanoid"),
-      ("skinning_loot_template","skinning","Skinned from a beast"),
+      ("skinning_loot_template","profession","Skinned from a beast"),
       ("item_loot_template","container","Found inside another item"),
       ("mail_loot_template","mail","Delivered by in-game mail")]
 for tbl,kind,txt in MISC:

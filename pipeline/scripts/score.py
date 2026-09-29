@@ -992,6 +992,8 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                 if not spec_uses_spell_power(wl):
                     spell_gear = [r for r in rows if item_is_spell_gear(r[1])]
                     rows = [r for r in rows if not item_is_spell_gear(r[1])]
+                if sl == "MainHand" and style == "twohand_or_onehand":
+                    rows = pair_weapon_styles(rows)
                 top3={r[1]["id"] for r in rows[:3]}
                 top3_names={r[1]["name"] for r in rows[:3]}
                 nb=[]
@@ -1161,6 +1163,32 @@ def promote_hunter_ranged_proc(rows, cls):
             continue
         return [r] + [x for j, x in enumerate(rows) if j != i]
     return rows
+
+TWO_HAND_KINDS = {"Staff", "Polearm", "Mace2H", "Sword2H", "Axe2H", "FishingPole"}
+
+def pair_weapon_styles(rows):
+    """Rank 1 stays the best weapon. Rank 2 is the best of the other hand style.
+
+    A staff at rank 1 used to be followed by two more staves, so the one-hand
+    that the off-hand rank 1 pairs with never appeared in the top 3.
+    """
+    if len(rows) < 2:
+        return rows
+
+    def is_two(r):
+        it = r[1]
+        return it.get("inv") == 17 or it.get("slot") == "TwoHand" or it.get("kind") in TWO_HAND_KINDS
+
+    two = next((r for r in rows if is_two(r)), None)
+    one = next((r for r in rows if not is_two(r)), None)
+    if not two or not one:
+        return rows
+    best = rows[0]
+    other = one if is_two(best) else two
+    if other[1]["id"] == best[1]["id"]:
+        return rows
+    rest = [r for r in rows if r[1]["id"] not in (best[1]["id"], other[1]["id"])]
+    return [best, other] + rest
 
 def unique_name_rows(rows, n=3):
     """Keep the best-scoring id per display name so PvP rank twins do not eat the list."""

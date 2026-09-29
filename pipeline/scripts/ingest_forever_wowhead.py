@@ -87,7 +87,9 @@ SRC_T = {
 }
 
 PATS = [
-    (r"Increases damage and healing done by magical spells and effects by up to (\d+)", "sp"),
+    # Both halves. Healers score the healing; damage casters score the damage.
+    # Do not collapse this sentence into spell power alone.
+    (r"Increases damage and healing done by magical spells and effects by up to (\d+)", "both"),
     (r"Increases healing done by up to (\d+) and damage done by up to (\d+) for all magical spells", "heal_sp"),
     (r"Increases attack power by (\d+) in Cat, Bear, Dire Bear, and Moonkin forms only", "feralAp"),
     (r"Increases melee and ranged attack power by (\d+)", "ap"),
@@ -159,18 +161,15 @@ def parse_tooltip(t):
     for m in re.finditer(r'<span class="q2">Equip:(.*?)</span>', t, re.S):
         raw = m.group(1)
         if "<!--rtg" in raw:
-            # Forever tags "damage and healing ... by up to N" as rtg41, which
-            # MOD maps to healing-only. That sentence is spell power.
-            if "damage and healing" in plain(raw) and "<!--rtg41-->" in raw:
+            # rtg41 already counted the number as healing. The sentence is
+            # healing and spell damage. A split line (rtg41 and rtg42) already
+            # has both. A party aura is not personal spell power.
+            text = plain(raw)
+            if ("damage and healing" in text and "party" not in text
+                    and "<!--rtg41-->" in raw and "<!--rtg42-->" not in raw):
                 mm = re.search(r"<!--rtg41-->(\d+)", raw)
                 if mm:
-                    amt = int(mm.group(1))
-                    heal = o["stats"].get("heal", 0) - amt
-                    if heal > 0:
-                        o["stats"]["heal"] = heal
-                    else:
-                        o["stats"].pop("heal", None)
-                    add("sp", amt)
+                    add("damageDone", int(mm.group(1)))
             continue
         line = plain(raw).strip()
         for rx, key in PATS:
@@ -180,6 +179,9 @@ def parse_tooltip(t):
             if key == "heal_sp":
                 add("heal", int(mm.group(1)))
                 add("sp_from_heal", int(mm.group(2)))
+            elif key == "both":
+                add("heal", int(mm.group(1)))
+                add("damageDone", int(mm.group(1)))
             elif key == "spSchoolNamed":
                 school, amt = mm.group(1), int(mm.group(2))
                 add("spSchool", amt)
@@ -509,11 +511,19 @@ def build_item(row, tip):
         "effectDriven": parsed.get("_effectDriven", False),
         "tipClasses": parsed.get("tipClasses") or [],
     }
-    # Wowhead Forever still stubs many required levels as 0/1. Use the measured
-    # Classic ilvl->rlvl floor so an ilvl-48 axe cannot rank at character level 1.
+    # A stated Requires Level is the equip level. Item level is not a
+    # requirement. The floor is only for a missing line (0 or the Wowhead
+    # stub of 1), so an unstated ilvl-48 axe cannot rank at level 1.
+    stated = int(parsed.get("rlvl") or 0)
     floor = int(ILVL_FLOOR.get(str(item["ilvl"]), 0) or 0)
-    if item["id"] >= 200000 and item["rlvl"] < floor:
+    if stated > 1:
+        item["rlvl"] = stated
+    elif item["id"] >= 200000 and item["rlvl"] < floor:
         item["rlvl"] = floor
+    # Grave Shroud has no Requires Level. The quests require 16, which is
+    # earlier than the item-level floor of 18.
+    if item["id"] == 279865:
+        item["rlvl"] = 16
     parsed["rlvl"] = item["rlvl"]
     return item, parsed
 

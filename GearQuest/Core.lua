@@ -9,7 +9,7 @@ end
 GQ = GQ or {}
 _G.GearQuest = GQ
 
-GQ.VERSION = "0.2.18-beta"
+GQ.VERSION = "0.2.19-beta"
 GQ.ADDON_NAME = ADDON_NAME
 -- WoW Forever: 1–60 Classic+ (no TBC level cap).
 GQ.MAX_PLAYER_LEVEL = 60
@@ -180,11 +180,27 @@ local SOURCE_COLORS = {
     auction_house = "|cffffa500",
 }
 
+local SOURCE_ALIAS = {
+    -- Fishing and skinning are professions. The filter checkbox is Profession.
+    fishing = "profession",
+    skinning = "profession",
+    -- Looted from a container. The checkbox id is object_drop.
+    container = "object_drop",
+    mail = "special",
+    pickpocket = "special",
+}
+
+function GQ:NormalizeSourceType(sourceType)
+    return SOURCE_ALIAS[sourceType] or sourceType
+end
+
 function GQ:GetSourceLabel(sourceType)
+    sourceType = self:NormalizeSourceType(sourceType)
     return SOURCE_LABELS[sourceType] or sourceType
 end
 
 function GQ:GetSourceTag(sourceType)
+    sourceType = self:NormalizeSourceType(sourceType)
     local color = SOURCE_COLORS[sourceType] or "|cffcccccc"
     return color .. (SOURCE_LABELS[sourceType] or sourceType) .. "|r"
 end

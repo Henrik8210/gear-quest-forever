@@ -324,8 +324,12 @@ paragraph.
   Client set-bonus overlay only when the bonuses are usable
   (`GetClientSetBlock` / `ApplyClientSetBlock`).
 - **No Forever tip** goes to `ShowClientItemTooltip` (`SetItemByID`).
-- Green `+N Spell Power` / Damage Done / Healing Done, not the old Equip
-  sentence that says increases damage and healing by up to N.
+- Keep the Equip sentence `Increases damage and healing done by magical
+  spells and effects by up to N`. That sentence **is** the spell power on a
+  weapon. Do not strip it (`STALE_EQUIP` is gone). A green `+N Spell Power`
+  line is generic spell power only. A party line (`of all party members`)
+  is not personal spell power. Set bonuses start with `(N) Set`, not
+  `Equip:`, and stay on the set block.
 
 ## Log window
 
@@ -541,6 +545,145 @@ Hunt-id probe (`pipeline/scripts/probe_forever_hunt_tooltips.py`) labels 200 vs 
 **28 Sep 2026 index: 3,693** (26 Sep was 3,678). Fifteen new listview ids. Ingest added the seven that had a nether tooltip: Needletooth's Needletooth (282703), Bloodstained Pants (282713), Denmother's Hide (283253), Arcane Charged Robes (284697), Still Water Band (284699), Wyvern Heart Band (285190), Winds of Tanaris (286556). Eight still 404 and are not in the pool: Wail of Death (281600), Fishscale Hauberk (281891), Unmovable Sabatons (284154), Eternally Frozen Band (284253), Budding Leaf Belt (284382), Faerie Dragon's Skin (284383), Ursol'lok's Paws (284573), Snapped Branch Wand (284574). All nine classes were re-scored. **Wyvern Heart Band** is rank 1 finger from 29 through 37 for Arms, Fury, Retribution, Combat, Subtlety, Survival, and Feral, and through 47 for Assassination. The other six did not take a top-3 slot.
 
 A full ingest rewrites sources.json for every id >= 200000. That cleared 162 zones, including Wolfsbane (Tirisfal / Diplomatic Incident became Old Fire-Eye) and dropped Kaleidoscope's hand-patched resist 5. After ingest, restore every source key that already existed and only add new ids. Keep Kaleidoscope resist 5. Client pins stay skipped. Do not rescore from the wiped sources.
+
+**29 Sep 2026 (v0.2.19-beta). Score from the refreshed Wowhead Forever tooltip.**
+
+`pipeline/scripts/refresh_forever_tips.py` re-fetched nether tips for the
+Forever index (except the nine client pins) and for classic ids the audit
+had marked missing. `emit_forever_audit.py` ran **before** the re-score, so
+recovered ids leave `FOREVER_MISSING`. Then `rescore_hunter_shaman.py` with
+`GQ_NO_GUIDES=1` for all nine classes. Do not `reemit_all.py` from stale
+JSON. Do not run a full ingest to refresh tips: a full ingest replaces
+existing `sources.json` rows for id ≥ 200000. Restore existing source keys
+and only append new ids. Re-apply boss pins and faction zone pins.
+Wolfsbane's Tirisfal zone is hand-maintained. Kaleidoscope (273088) resist
+5 must survive a refresh (`refresh_forever_tips.py` keeps resist when the
+new parse has none). Client pins (Coldflame, Silverlaine, Wolfsbane rlvl 20)
+must not be overwritten by the nether tip.
+
+**Spell line → stats.** The equal sentence `Increases damage and healing
+done by magical spells and effects by up to N` stores **both** `heal=N` and
+`damageDone=N`. Do not collapse it to `sp` only. `forever_stats` folds
+`damageDone` into `sp` and zeros `damageDone`, so it is not counted twice.
+Holy weights: heal 1.0, sp 0.3, `sp_from_heal` 0.3. Mage heal weight is 0
+and sp is 1.0, so a mage gets the damage half only. The unequal sentence
+`Increases healing done by up to X and damage done by up to Y` is
+`heal=X`, `damageDone=Y` (Staff of Westfall: heal 48, damage done 16, from
+`rtg41=48` and `rtg42=16`). Nether HTML tags the equal sentence as
+`<!--rtg41-->` only. Keep the heal and **add** `damageDone` for that amount.
+Skip that special case when `rtg42` is also present, or when the line says
+`party`. A green `+N Spell Power` line stays `sp` only. Do not remap every
+Spell Power piece into heal.
+
+Checked after the refresh:
+
+| Item | Stored stats | Level |
+|---|---|---|
+| Staff of Westfall (2042) | int 5, spi 6, heal 48, damageDone 16, 15.17 dps | 14, quest The Defias Brotherhood |
+| Golemheart Stave (270228) | sta 3, int 6, spi 5, heal 18, damageDone 18, 11.88 dps | 13, Plunder, Hall of Thanes |
+| Fang of Magmatus (271095) | int 4, heal 18, damageDone 18, 7.94 dps | 13, Magmatus, Hall of Thanes |
+| Royal Dagger (281297) | int 4, heal 18, damageDone 18, 8.53 dps | 20, Alliance, A Friend of the Family |
+| Grave Shroud (279865) | 20 armor, str 3, agi 2, sta 5, kind Misc | 16, both faction quests |
+
+Fang is **not** Holy rank 1. Horde Holy 13–17: Crescent Staff (6505, Leaders
+of the Fang, requires 10) is rank 1, Trogg Scepter (272996) is rank 2, Staff
+of Orgrimmar (15444) is rank 3. Fang is rank 8 there. Alliance Holy at 13:
+Trogg Scepter, Golemheart, Fang. From 14, Staff of Westfall is rank 1.
+Frost mage 13–18: Golemheart rank 1, Fang rank 2. Do not pin Fang over
+Golemheart.
+
+**Required level is the tooltip, never item level.** `build_item`: if the
+tip states `Requires Level` greater than 1, that number is `rlvl`. The
+`ILVL_FLOOR` (ilvl 18 → 13, ilvl 23 → 18, ilvl 24 → 19) applies only when
+the stated level is 0 or Wowhead's stub of 1. `eff_req` then uses `rlvl`
+when it is &gt; 0. Fang's tip is `<!--rlvl-->13`. It was never gated at
+item level 18. It ranked low because spell power was stored as 0.
+
+**Quest pickup level when the tip has no Requires Level.** If the tooltip
+has no `Requires Level` / `<!--rlvl-->` and the Wowhead source includes 4
+(quest) or `sourcemore` `t==5`, the item `rlvl` and the source `gateLevel`
+are the lowest quest pickup level. The item XML
+`https://www.wowhead.com/forever/item=ID&xml` first `<json>` CDATA
+`reqlevel` matches the quest page `Requires level N`. `jsonEquip` reqlevel
+is often the stub 1. Ignore it. Quest HTML `Requires level N` is the pickup
+level. The scaling `minLevel` is the reward-scale level. Do not use it.
+`sourcemore.ti` is the quest id. Multiple quests: take the minimum.
+`apply_quest_req_levels.py` writes through a `.json.tmp` then `Path.replace`
+(`items.json` `write_text` raises `OSError` 22). Cache is
+`pipeline/data/forever_wowhead/quest_req_cache.json`. 686 quest levels were
+applied, including Kris of Orgrimmar (15443) and Staff of Orgrimmar (15444)
+at 9 (Hidden Enemies, 5730). Staff of Westfall stays 14. Grave Shroud stays
+16. Fang stays 13. Wowhead returned HTTP 403 after ~914 lookups. Resume
+with `--apply-only` for successes already in the cache, and retry only rows
+whose error starts with `HTTP Error 403`. Do not refetch the good rows. Do
+not apply `reqlevel` from a drop (Staff of Nobles 3902 is source `[2]`,
+reqlevel 15, and is not a quest). Drops, vendors, and crafts are not
+rewritten. Items that still have no Requires Level keep the old gate
+(source `gateLevel` or `ILVL_FLOOR`).
+
+**Blank item kind.** Subclass −2 ring, −3 neck, −4 trinket, −5 held, −6
+cloak must be `kind` `Misc` (`ARMOR_SUB`). `kind` `?` makes `eligible()`
+reject the piece. A full ingest does not copy `kind` onto existing items.
+`refresh_forever_tips.py` sets `kind` `?` to `Misc` for those subclasses.
+Weapon subclass `?` (test spears and the like) stays. Grave Shroud was
+`kind` `?` and `rlvl` 18 from the ilvl floor. It is now Misc, rlvl 16,
+`gateLevel` 16, zone null, instructions naming Alliance **Abominable
+Creatures** (95250) and Horde **Unending Torment** (97290). Horde and
+Alliance Bear back: rank 1 at 16 (score ~21.15). Levels 19–22 Horde Bear:
+rank 3 behind Sporid Cape (6629, 22.0) and Sentry Cloak (2059, 21.4).
+
+**Weapon headers are display-only** (`Data.lua` `WeaponHeaderSuffix`). The
+lists stay per slot. `pair_weapon_styles` in `score.py` runs when the slot
+is MainHand and the style is `twohand_or_onehand`. Rank 1 stays the best
+weapon. Rank 2 is the best weapon of the **other** hand style, so a staff
+at rank 1 is followed by the one-hand that Off Hand rank 1 pairs with.
+Rank 3+ keeps score order, so a second staff can sit at rank 3 with a
+higher score than rank 2. That is intentional. Off hand stays score-sorted.
+`EntryOffWeaponRoute` is unused. Do not grey the off hand.
+
+| Who | Main Hand header | Off Hand header |
+|---|---|---|
+| Mage, priest, warlock | Staff or main hand | Off Hand |
+| Druid, Enhancement, paladin/warrior levelling when a route exists | Two-hand or main hand | Off Hand |
+| Hunter | Two-hand or dual wield | Off Hand. Ranged label is **Bow** |
+| Rogue (combat, assassination, subtlety), Warrior Fury | Dual wield | Off Hand |
+| Paladin Retribution, Warrior Arms | Two-hand | Off Hand |
+| Paladin Protection and Holy, Warrior Protection, Shaman Elemental, Restoration, Enhancement Tank | Main Hand | Shield |
+
+Forever Enhancement has no dual wield. Do not label it Dual-wield.
+Rogues cannot wear two-hand. Hunters: the bow is its own slot.
+
+**Source filter.** `EntrySourceAllowed` used to return `not hidden[src]`.
+A source type with no checkbox is never in `hidden`, so it showed on every
+filtered list. The 1 Ring (8350), Steelscale Crushfish (6360), and Broken
+Wine Bottle (6651) are `sourceType` `fishing` ("Fished up.") and leaked
+onto a Boss drop only list. `GQ:NormalizeSourceType` maps `fishing` and
+`skinning` to `profession`, `container` to `object_drop` (the Container
+checkbox), and `mail` and `pickpocket` to `special`. While a filter is
+active, a type that is still not a checkbox id is hidden. `unknown` stays
+on the unfiltered list. `GetSourceLabel` prints Profession, not the raw
+string `fishing`. `build_sources.py` stores new fishing and skinning rows
+as `profession`. Instructions stay "Fished up." Do not add a Fishing
+checkbox.
+
+**Placeholder client names.** `GetItemInfo` returns `Item 23173` when the
+Forever client has the id and not the name. `GetItemDisplayName` treats
+`Item 23173`, `Item #23173`, and a bare id as missing, then uses the fact
+name, then the audit name, then `PROFESSION_ITEM_NAMES`. 23173 is
+Abomination Skin Leggings. 6750 is Snake Hoop. Every listed hunt already
+has a real name in `items.json`. Do not display `Item` plus the id when
+either of those names exists. `Indicator` must not cache the stub.
+
+Set packages were not retuned by the tooltip refresh. Embrace of the
+Viper, Defias Leather, and Chain of the Scarlet Crusade stay. Wolfsbane
+stays Horde Retribution main hand rank 1 from 20 through 26. Snake Eye
+Kaleidoscope keeps resist 5.
+
+Eight Forever index items still have no tooltip and are not ingested:
+281600 Wail of Death, 281891 Fishscale Hauberk, 284154 Unmovable Sabatons,
+284253 Eternally Frozen Band, 284382 Budding Leaf Belt, 284383 Faerie
+Dragon's Skin, 284573 Ursol'lok's Paws, 284574 Snapped Branch Wand. Do not
+invent stats.
 
 ## Relic effect scoring
 

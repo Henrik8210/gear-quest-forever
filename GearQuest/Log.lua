@@ -476,7 +476,8 @@ local function ExtractItemIdFromChatMessage(msg)
 
         for _, entry in ipairs(GQ.Data.entries) do
             if entry.sourceType == "profession" and entry.itemId then
-                local name = GetItemInfo(entry.itemId)
+                local name = (GQ.Data.GetItemDisplayName and GQ.Data:GetItemDisplayName(entry.itemId))
+                    or GetItemInfo(entry.itemId)
                 if name == itemName then
                     return entry.itemId
                 end
@@ -1923,7 +1924,19 @@ function GQ.Log:EntrySourceAllowed(entry)
     if allHidden then
         return false
     end
-    local src = (entry and entry.sourceType) or "unknown"
+    local src = GQ:NormalizeSourceType((entry and entry.sourceType) or "unknown")
+    local known = false
+    for _, opt in ipairs(SOURCE_FILTERS) do
+        if opt.id == src then
+            known = true
+            break
+        end
+    end
+    -- A source with no checkbox was treated as allowed, so fishing showed on a
+    -- Boss drop list. Unlisted sources stay off a filtered list.
+    if not known then
+        return false
+    end
     return not hidden[src]
 end
 
@@ -3168,7 +3181,7 @@ function GQ.Log:UpdateDetailReward(entryOrItemId)
     icon.entry = entry
 
     local itemName = (entry and GQ.Data:GetEntryDisplayName(entry))
-        or GetItemInfo(itemId)
+        or (GQ.Data and GQ.Data.GetItemDisplayName and GQ.Data:GetItemDisplayName(itemId))
         or ("Item " .. itemId)
     TruncateFontStringToWidth(icon.name, itemName, REWARD_NAME_MAX_WIDTH)
     icon:SetWidth(REWARD_ICON_SIZE + REWARD_NAME_MIN_WIDTH)

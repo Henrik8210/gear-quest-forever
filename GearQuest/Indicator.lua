@@ -319,14 +319,9 @@ function GQ.Indicator:PrimeDataItemInfo()
     end
 
     for itemId in pairs(self.upgradeItems) do
-        local name = GetItemInfo(itemId)
+        local name = GQ.Data and GQ.Data.GetItemDisplayName and GQ.Data:GetItemDisplayName(itemId)
         if name then
             self.itemNameCache[itemId] = name
-        elseif GQ.Data and GQ.Data.GetItemDisplayName then
-            name = GQ.Data:GetItemDisplayName(itemId)
-            if name then
-                self.itemNameCache[itemId] = name
-            end
         end
     end
 end
@@ -376,9 +371,8 @@ function GQ.Indicator:MatchTrainerServiceName(serviceName)
     if self.upgradeItems then
         for itemId in pairs(self.upgradeItems) do
             local name = (GQ.Data and GQ.Data.GetItemDisplayName and GQ.Data:GetItemDisplayName(itemId))
-                or GetItemInfo(itemId)
                 or self.itemNameCache[itemId]
-            if name then
+            if name and not (GQ.Data and GQ.Data.IsPlaceholderItemName and GQ.Data:IsPlaceholderItemName(name, itemId)) then
                 self.itemNameCache[itemId] = name
                 local lowerName = name:lower()
                 for _, key in ipairs(keys) do
@@ -894,8 +888,10 @@ function GQ.Indicator:RebuildCacheForSlot(slotName)
         if entry.itemId and not hide then
             self.upgradeItems[entry.itemId] = true
             local itemName = (GQ.Data.GetItemDisplayName and GQ.Data:GetItemDisplayName(entry.itemId))
-                or GetItemInfo(entry.itemId)
                 or self.itemNameCache[entry.itemId]
+            if itemName and GQ.Data.IsPlaceholderItemName and GQ.Data:IsPlaceholderItemName(itemName, entry.itemId) then
+                itemName = nil
+            end
             if itemName then
                 self.itemNameCache[entry.itemId] = itemName
                 self.upgradeItemNames[itemName:lower()] = entry.itemId
@@ -1487,7 +1483,7 @@ function GQ.Indicator:Init()
             local itemId = arg1
             if itemId then
                 GQ.Indicator.itemNameCache = GQ.Indicator.itemNameCache or {}
-                local name = GetItemInfo(itemId)
+                local name = GQ.Data and GQ.Data.GetItemDisplayName and GQ.Data:GetItemDisplayName(itemId)
                 if name then
                     GQ.Indicator.itemNameCache[itemId] = name
                 end

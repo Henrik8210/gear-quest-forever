@@ -39,6 +39,16 @@ Warrior Protection does not score spell power or healing. A glove with +SP / +he
 
 Like paladin Protection: 1h + shield, stamina/armor/defense first, then Rockbiter melee threat, then Earth Shock / Lightning Shield spell threat. Not dual-wield (Forever has no shaman DW). `enhancement_tank` in `weights.json`.
 
+## Refreshed Forever tooltips (score from these)
+
+Stats come from the refreshed Wowhead Forever tooltip (`refresh_forever_tips.py`), then a re-score. Do not full-ingest to refresh tips (that replaces `sources.json` for id ≥ 200000). Client pins stay: Coldflame, Silverlaine, Wolfsbane required level 20. Kaleidoscope resist 5 stays. Emit the audit **before** rescoring so recovered ids leave `FOREVER_MISSING`.
+
+- The Equip line `Increases damage and healing done by magical spells and effects by up to N` is stored as **both** heal=N and damageDone=N. Do not strip it. Do not collapse it to spell power only. `forever_stats` folds damageDone into spell power so it is not counted twice. Holy uses the heal half. Mages (heal weight 0) use the damage half. An unequal "healing up to X and damage up to Y" stays heal=X, damageDone=Y (Staff of Westfall: 48 and 16). Skip party lines. A green `+N Spell Power` line is spell power only.
+- **Required level is the tooltip `Requires Level`, never item level.** The item-level floor applies only when the tip states 0 or Wowhead's stub of 1. Fang of Magmatus is 13. A quest reward with **no** Requires Level uses the lowest quest pickup level (`Requires level N` on the quest; item XML `<json>` reqlevel, not `jsonEquip`, not the scaling minLevel). Drops and vendors are not rewritten. Fang is not pinned over Golemheart.
+- Cloaks, rings, necks, trinkets, and held items with `kind` `?` are `Misc`. `kind` `?` is not equippable.
+- Weapon headers are labels only. If a staff is rank 1, main-hand rank 2 is the one-hand that off-hand rank 1 pairs with. A second staff may sit at rank 3 with a higher score than rank 2.
+- Fishing and skinning are Profession. Container loot uses the Container filter. An active filter hides source types that have no checkbox. `GetItemInfo` names of the form `Item 23173` are not names; use the stored fact or audit name.
+
 ## Mage Battle Mage
 
 Caster who swings. Specs: `battlemage_frost` (the hunt), `battlemage_fire`, `battlemage_arcane`. Spell power of that school first. Stamina base 0.15 (slightly above frost 0.1). Weapon `dpsWeight` 0.35. Coldflame Saber and Blade of Silverlaine stats are the Forever **client** tooltip, pinned in `client_item_overrides.json`. Do not sync the Wowhead nether tip back over them. The saber’s 98 Fire vs Frozen is every swing during a freeze (`FROZEN_MELEE_UPTIME` 25% frost, 15% fire/arcane). On an imbued weapon, printed stats stay the normal colors and only the imbue effect is grey. Do not repeat that effect. Add `Use: Combine the <base weapon> and <scroll>.` (`CLIENT_IMBUE` in `Data.lua`).
