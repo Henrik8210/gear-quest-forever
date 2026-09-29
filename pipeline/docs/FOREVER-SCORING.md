@@ -593,33 +593,38 @@ Frost mage 13–18: Golemheart rank 1, Fang rank 2. Do not pin Fang over
 Golemheart.
 
 **Required level is the tooltip, never item level.** `build_item`: if the
-tip states `Requires Level` greater than 1, that number is `rlvl`. The
-`ILVL_FLOOR` (ilvl 18 → 13, ilvl 23 → 18, ilvl 24 → 19) applies only when
-the stated level is 0 or Wowhead's stub of 1. `eff_req` then uses `rlvl`
-when it is &gt; 0. Fang's tip is `<!--rlvl-->13`. It was never gated at
-item level 18. It ranked low because spell power was stored as 0.
+tip states `Requires Level` greater than 1, that number is `rlvl`. A stated
+level is never replaced. Fang's tip is `<!--rlvl-->13`. It was never gated
+at item level 18. It ranked low because spell power was stored as 0.
 
-**Quest pickup level when the tip has no Requires Level.** If the tooltip
-has no `Requires Level` / `<!--rlvl-->` and the Wowhead source includes 4
-(quest) or `sourcemore` `t==5`, the item `rlvl` and the source `gateLevel`
-are the lowest quest pickup level. The item XML
-`https://www.wowhead.com/forever/item=ID&xml` first `<json>` CDATA
-`reqlevel` matches the quest page `Requires level N`. `jsonEquip` reqlevel
-is often the stub 1. Ignore it. Quest HTML `Requires level N` is the pickup
-level. The scaling `minLevel` is the reward-scale level. Do not use it.
-`sourcemore.ti` is the quest id. Multiple quests: take the minimum.
+**No required level means look the item up.** Every time an item has no
+`Requires Level` (nothing on the tip, or Wowhead's stub of 1), assume it is
+a quest reward, or some other source that has a level gate, and look it up
+on Wowhead Forever. Do not leave it on the item-level floor (`ILVL_FLOOR`:
+ilvl 18 → 13, ilvl 23 → 18, ilvl 24 → 19). That floor is only a stand-in
+until the lookup has been done. Find the quest attached to the item. The
+**minimum** level required to pick up that quest becomes the item's `rlvl`
+and the source `gateLevel`. Several quests: take the lowest. `eff_req` then
+uses `rlvl` when it is &gt; 0.
+
+The item XML `https://www.wowhead.com/forever/item=ID&xml` first `<json>`
+CDATA `reqlevel` matches the quest page `Requires level N`. `jsonEquip`
+reqlevel is often the stub 1. Ignore it. Quest HTML `Requires level N` is
+the pickup level. The scaling `minLevel` is the reward-scale level. Do not
+use it. `sourcemore.ti` is the quest id (`t==5`, or source list contains 4).
+If the page has no quest, use the real gate for whatever the source actually
+is. Do not treat a drop's page level as a quest pickup. Staff of Nobles
+(3902) is a drop (source `[2]`, reqlevel 15), not a quest.
+
 `apply_quest_req_levels.py` writes through a `.json.tmp` then `Path.replace`
 (`items.json` `write_text` raises `OSError` 22). Cache is
 `pipeline/data/forever_wowhead/quest_req_cache.json`. 686 quest levels were
 applied, including Kris of Orgrimmar (15443) and Staff of Orgrimmar (15444)
 at 9 (Hidden Enemies, 5730). Staff of Westfall stays 14. Grave Shroud stays
-16. Fang stays 13. Wowhead returned HTTP 403 after ~914 lookups. Resume
-with `--apply-only` for successes already in the cache, and retry only rows
-whose error starts with `HTTP Error 403`. Do not refetch the good rows. Do
-not apply `reqlevel` from a drop (Staff of Nobles 3902 is source `[2]`,
-reqlevel 15, and is not a quest). Drops, vendors, and crafts are not
-rewritten. Items that still have no Requires Level keep the old gate
-(source `gateLevel` or `ILVL_FLOOR`).
+16. Fang stays 13. Wowhead returned HTTP 403 after ~914 lookups. The items
+still sitting on no required level still need this lookup. Resume with
+`--apply-only` for successes already in the cache, and retry only rows whose
+error starts with `HTTP Error 403`. Do not refetch the good rows.
 
 **Blank item kind.** Subclass −2 ring, −3 neck, −4 trinket, −5 held, −6
 cloak must be `kind` `Misc` (`ARMOR_SUB`). `kind` `?` makes `eligible()`
