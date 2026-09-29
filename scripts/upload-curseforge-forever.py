@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -68,8 +69,11 @@ def main() -> int:
     changelog_path = Path("CHANGELOG.md")
     if changelog_path.is_file():
         text = changelog_path.read_text(encoding="utf-8")
-        parts = text.split("## ", 2)
-        changelog = ("## " + parts[1]).strip() if len(parts) > 1 else text[:4000]
+        # From the version heading through the end of the file, including every
+        # older version. A line that starts with "### " must not end the
+        # changelog: "### Title" contains the characters "## ".
+        match = re.search(r"(?m)^## .+$", text)
+        changelog = text[match.start():].strip() if match else text.strip()
 
     tag = os.environ.get("GITHUB_REF_NAME") or zip_path.stem
     if tag.lower().startswith("gearquestforever-"):

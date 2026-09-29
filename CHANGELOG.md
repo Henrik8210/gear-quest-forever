@@ -35,7 +35,7 @@ Hovering a weapon that increases spell damage and healing used to drop that Equi
 
 A hunt uses the **Requires Level** printed on the tooltip. Item level does not push the piece to a later band when the tooltip already states a level.
 
-If the tooltip has no required level and the item is a quest reward, the lowest level that can pick up that quest is the required level. Drops, vendor goods, and crafted pieces are not moved this way.
+If the tooltip has no required level, that piece is treated as a quest reward, or as some other source that has a level gate, and the quest is looked up. The lowest level that can pick up that quest becomes the required level. Several quests use the lowest one. A required level already printed on the tooltip is never replaced.
 
 - **Staff of Westfall** is 14, from The Defias Brotherhood.
 - **Grave Shroud** is 16.
@@ -95,539 +95,100 @@ Re-scoring used the refreshed tooltips. It did not drop the set bonuses or the p
 
 ### v0.2.18-beta
 
-GearQuest uses far less memory, item hovers come from Wowhead instead of an empty "not in the client" box, and a new ring is a hunt from level 29.
-
-The window title reads **GearQuest Forever v0.2.18-beta**.
-
-### Memory
-
-Opening the game used to load every class's hunt list at once. GearQuest Forever was about **1.3 GB** in the addon memory window.
-
-- Only the class you are playing loads its hunts. A shaman does not load the mage, warrior, or paladin lists at login.
-- Simulate another class and that class loads once. The list on screen is that class. Your own class stays loaded, so leaving the simulator puts your hunts back.
-- Simulate a different class after that and the previous simulated class drops its hunt rows. The old class can remain as a small line in the memory list until you `/reload`, because the game cannot unload an addon. The heavy hunt list is gone.
-- In the addon list, leave **GearQuest Forever** enabled, and leave **GearQuest Forever: Shaman** (and the other class addons) enabled. They load when you play or simulate that class. Turning one off leaves that class's list empty.
-
-### Item hovers
-
-Hovering a hunt the Forever client has not cached yet used to show only the item name and **Not found in the client**. Scarlet Gauntlets and Duracin Bracers did this on a level 33 Retribution paladin. The same empty hover could appear on any quest reward, dungeon drop, crafted piece, or set piece.
-
-- Those hovers now use the Wowhead Forever tooltip: name, stats, requirements, and set bonuses.
-- If the client still does not have that item, the hunt description says **Not found in the client yet.** The hover stays the Wowhead tip.
-- Green world drops are unchanged. **Jazeraint Cloak of the Bear**, **Renegade Chestguard of the Bear**, **Steadfast Bracelets of the Bear**, and **Knight's Gauntlets of the Bear** still show the best suffix roll for your spec, in green, with the slim-chance line.
-
-### Toasts only for the gear on your list
-
-A level 20 Enhancement shaman who looted **Calico Cloak** (a level 9 back) used to get a completion toast even though that cloak was not on the current list.
-
-- A toast fires only when the piece is a top upgrade, the notable, or a hunt you are tracking, for your current level.
-- Looting in a dungeon no longer walks the whole catalog. That walk was the **script ran too long** error during group loot.
-
-### New gear from the 28 September Wowhead index
-
-The Forever item list grew from **3,678** to **3,693**. Seven pieces had tooltips and were scored for every class and spec.
-
-**Wyvern Heart Band** is a blue finger that requires level 29. It is +5 Agility, +5 Stamina, and +15 Attack Power. It is rank **1** in the finger slot from level **29 through 37** for:
-
-- Warrior Arms and Fury, both factions
-- Paladin Retribution, both factions
-- Rogue Combat and Subtlety, both factions
-- Hunter Survival, both factions
-- Druid Feral, both factions
-
-Assassination keeps it as rank 1 through level **47**, both factions.
-
-These were scored and did not take a top-3 slot: **Needletooth's Needletooth** (dagger, requires 32), **Bloodstained Pants** (leather legs, requires 31), **Denmother's Hide** (back, requires 32), **Arcane Charged Robes** (cloth chest, requires 29), **Still Water Band** (finger, requires 24), and **Winds of Tanaris** (trinket, requires 48).
-
-Eight more names are on Wowhead without a tooltip yet, so they are not hunts: **Wail of Death**, **Fishscale Hauberk**, **Unmovable Sabatons**, **Eternally Frozen Band**, **Budding Leaf Belt**, **Faerie Dragon's Skin**, **Ursol'lok's Paws**, and **Snapped Branch Wand**.
-
-### Sets and pinned hunts stay
-
-Re-scoring did not drop the set bonuses or the pieces we already treat as the hunt.
-
-- **Embrace of the Viper** (Wailing Caverns) is still the hunt for hunter, rogue, Enhancement shaman, and Feral druid in the same level windows as before. Enhancement Tank is not on that set.
-- **Chain of the Scarlet Crusade** (Scarlet Monastery) still ranks on each piece's own stats. Scarlet Gauntlets stay a Retribution hands pick around level 33. Scarlet Boots stay Protection rank 1 around level 30 to 36, for both paladin and warrior.
-- **Wolfsbane** is still Horde Retribution only. Main hand, rank 1, from level 20 through 26. Alliance paladins do not see it.
+GearQuest loads one class at a time, so it uses far less memory. Hovers that used to say **Not found in the client** now show the Wowhead Forever tooltip. A toast only fires for a top upgrade, the notable, or a hunt you are tracking at your current level. **Wyvern Heart Band** is finger rank 1 from level 29 through 37 for Arms, Fury, Retribution, Combat, Subtlety, Survival, and Feral, and through 47 for Assassination.
 
 ### v0.2.17-beta
 
-The spec icon explains how GearQuest ranks that spec, Enhancement shaman hunts value intellect while leveling, and Horde Retribution gets Wolfsbane at level 20.
-
-The window title reads **GearQuest Forever v0.2.17-beta**.
-
-### How a spec is scored
-
-Hover the specialization name or the spec icon in the log. A tooltip lists the weights GearQuest uses for the spec you are viewing, including a simulated spec.
-
-- **1.00** is one point of that spec's main stat. Higher numbers matter more. Stats at 0 are hidden.
-- From level **1 through 59**, the numbers already include the leveling bonuses. Stamina, health, and health per 5 count ×3. Armor counts ×2. Intellect, spirit, mana, and mana per 5 count ×2.
-- At level **60** the tooltip shows the raw weights, with no leveling bonus.
-- Weapon damage is listed on its own when that spec swings or shoots. A Beast Mastery hunter shows ranged weapon damage. An Enhancement shaman shows melee weapon damage.
-- Switch spec and the tooltip follows. Elemental and Enhancement are not the same list.
-
-### Enhancement shaman
-
-**Mental Dexterity** turns intellect into attack power, one point of attack power per point of intellect. The Enhancement lists were still treating intellect as half of agility.
-
-- Below level 60, Enhancement now scores intellect at **1.2**, just above agility at **1.0**. Hover Enhancement and the tooltip shows Intellect **1.2**.
-- At level 60 the same talent is a smaller share of the hunt: intellect stays **0.6**, and agility stays **1.0**.
-- Enhancement hunts from 1 to 59 were re-scored, so intellect pieces rank higher than they did before. Spell power is unchanged (Mental Quickness and Maelstrom).
-- **Enhancement Tank** is unchanged. Stamina is still that spec's first stat.
-
-### Wolfsbane for Horde Retribution
-
-**Wolfsbane** (a two-hand sword) is the Horde paladin reward from the quest chain that starts with **Diplomatic Incident**. Danitha Morr at Bandarion Keep in Tirisfal Glades offers it from level 18, and the sword can be earned by level **20**. It is 69–105 damage, speed 3.40, **25.59** damage per second, +9 stamina, +10 intellect, and a chance on hit to deal Holystorm damage (more against wolves and worgen).
-
-- Horde **Retribution** main hand, rank **1**, from level **20 through 26**.
-- It replaces **Hammerbone** (the reward from **Leaders of the Fang** in Thunder Bluff), which was rank 1 at level 20 and is now rank 2 there.
-- Horde paladins only. Alliance paladins do not see it. Other classes do not see it. Horde warriors who previously had it on a weapon list no longer do.
+Hover the spec name or icon to see how that spec is scored. Below 60, Enhancement shaman intellect counts at **1.2**. **Wolfsbane** is Horde Retribution main hand rank 1 from level 20 through 26.
 
 ### v0.2.16-beta
 
-The log header shows the Forever version, a source filter no longer lists gear you already have on both tabs, and a wipe plus a level jump puts the pieces you are wearing back on Completed.
-
-### Window title
-
-The gold band at the top of the GearQuest window now reads **GearQuest Forever** and the addon version, for example **GearQuest Forever v0.2.16-beta**. That text follows the addon version on every release.
-
-### Source filter and gear you already have
-
-Unchecking a source (for example **World drop** only) used to put an item you already own back on **Active** while it was still on **Completed**. **Snake Eye Kaleidoscope** (Lady Anacondra, Wailing Caverns, from level 17) did this on a level 20 Beast Mastery hunter: with every source checked it stayed on **Completed** only; with World drop unchecked it showed on **Active** and **Completed**.
-
-- An item on **Completed** for that slot stays off **Active**, whatever sources you leave checked.
-- The same rule applies with every source selected.
-- Other owned hunts in that situation, such as **Brawler's Leather Hood**, **Gloves of the Fang**, and **Belt of the Fang**, follow the same rule.
-- Toggling sources should feel smoother. The list refreshes once after you click, instead of rebuilding the whole hunt pool on every checkbox.
-
-### Wipe data, then simulate a higher level
-
-`/gq wipe data` clears saved hunt progress so you can test obtain again. Your bags and what you are wearing do not change.
-
-After a wipe at a low sim level (for example **10**) and then **Simulate** at a higher level (for example **20**), pieces you already own that were hunts in the bands you skipped are marked **Completed** again. That includes earlier-band picks, not only the two newest top pieces at the new level.
-
-On that level 20 Beast Mastery hunter, **Completed** should include owned hunts such as **Brawler's Leather Hood**, **Snake Eye Kaleidoscope**, **Gloves of the Fang**, and **Belt of the Fang**, as well as whatever you obtain in the current band (for example **Fine Leather Tunic** or **Bounty Hunter's Ring**). They belong on **Completed** only, including when World drop is unchecked.
+The window title reads **GearQuest Forever** plus the version. Gear you already have stays on **Completed** when a source filter is on. After `/gq wipe data`, jumping the simulator to a higher level marks the pieces you are wearing as completed again.
 
 ### v0.2.15-beta
 
-Profession windows stay responsive, the log respects gear you already have, and Horde hunts no longer point at Alliance-only sources.
-
-### Profession book and crafting (load fix)
-
-Opening a profession, switching tabs (e.g. Blacksmithing → Mining), or clicking **Create** used to hitch badly because GearQuest rescanned **every slot’s** BiS cache and walked **every recipe** in the open trade skill window on each update.
-
-- Green **upgrade arrows are removed only on the profession / trade skill UI** (recipe list and the detail icon). Loot, vendors, quest rewards, and dungeon drops still show arrows when a piece is a tracked upgrade.
-- GearQuest no longer runs a full **`RebuildCache()`** when `TRADE_SKILL_SHOW`, `TRADE_SKILL_UPDATE`, `TRADE_SKILL_LIST_UPDATE`, `TRADE_SKILL_DATA_SOURCE_CHANGED`, or craft events fire.
-- GearQuest no longer rescans all recipes on every trade skill frame update.
-
-You should be able to browse recipes and craft without the client freezing or stuttering on each tab change. BiS tracking everywhere else is unchanged.
-
-### Gear you already have (Active vs Completed)
-
-If a hunt is still one of your top upgrades for your **current** class, spec, level, and faction, but you **already carry or wear** that item, it no longer clutters the **Active** hunt list.
-
-- When you **level up for real**, enter a new level band in **preview/simulator** (after you click **Simulate**), log in, loot, or craft the piece, GearQuest runs **auto-complete** and moves it to **Completed** (no second toast if you had it before login).
-- **`/gq wipe data`** clears saved hunt progress only. Your bags and equipment stay the same, so auto-complete can still fill **Completed** once the right level band is active.
-
-If **Active** looks empty for a slot but you are wearing the BiS, check **Completed** first.
-
-### Simulator and preview level
-
-On the **Simulator** tab, changing the level number only updates the text until you click **Simulate** (or press Enter in the level box). That applies level, class, spec, and faction to the log. Preview level changes now run the same obtain check as a real level-up, so jumping from 10 → 20 after a wipe can mark pieces you already wear as completed.
-
-### Horde paladin and other faction fixes
-
-Horde players should no longer see hunts that only make sense on the Alliance side:
-
-- **Alliance Rune Broker librams** (e.g. Libram of Blessings, Libram of Justice) no longer appear on Horde lists. Horde broker relics no longer appear on Alliance lists. Instructions for broker relics follow your faction when shown.
-- Quest and vendor rows tied to **one-faction hubs** (e.g. **Stormwind City** on Horde) are filtered out at display time.
-- Source filters and backfill use the same player/faction rules as the main list.
-
-A full **re-score and re-emit** for every class will tighten generated rows further; this release fixes what you see in-game immediately.
-
-### Snake Eye Kaleidoscope (reminder)
-
-The neck from **Lady Anacondra** in **Wailing Caverns** (requires level **17**) is on generated lists for all classes while it remains in the **top three** neck picks for your level band. It is not listed below 17. If you already wear it, it moves off **Active** and should appear under **Completed** after auto-complete.
+Profession windows stay responsive. A piece you already carry or wear leaves **Active** and sits on **Completed**. Horde lists no longer show Alliance-only librams or Stormwind quests. **Snake Eye Kaleidoscope** is a neck hunt from level 17 while it stays in the top three.
 
 ### v0.2.14-beta
 
-Settings, set pieces, and the hunts that come with collecting a set.
-
-### Settings
-
-A Settings handle sits with the log and the simulator. The cog opens Settings. The simulator handle is the red question mark.
-
-- Hide the minimap icon. The choice stays after you reload.
-- Click the setting name, not only the box, to turn it on or off.
-
-### Set pieces
-
-A hunt that belongs to a gear set is marked **(Set piece)**, the same way a proc is marked (Notable). Open the piece and the description names the bonuses and the levels where that spec actually wants them. Some pieces are a hunt on their own. Others become a hunt once the set is together.
-
-### Embrace of the Viper
-
-Wailing Caverns leather, for hunters, rogues, enhancement shaman, and feral druids.
-
-- Beast Mastery and Marksmanship: all five together from 18 to 21. From 22 the chest drops off and the other four stay a little longer.
-- Survival: all five through 23.
-- Combat, Assassination, and Subtlety: all five from 18 through 23.
-- Enhancement: all five from 18 through 28. At 29 the chest drops off.
-- Feral: all five from 18 through 23. All five pieces turn you into a serpent. The color follows your race, and Prowl or Stealth slithers.
-
-The gloves are a hunt from 14 on their own, and the legs from 17. The chest and the belt become a hunt with the set. Four pieces are the heal and mana. All five are Dream Venom.
-
-### Defias Leather
-
-Deadmines, for rogues. The full set looks flashy. The bonuses do not make every piece a hunt.
-
-- Legs at 14 and 15
-- Boots at 15 and 16
-
-After that the Fang pieces take those slots. The chest, gloves, and belt stay behind stronger leather.
-
-### Chain of the Scarlet Crusade
-
-Scarlet Monastery mail.
-
-- Retribution: belt from 32 to 36, chest from 34 to 39, legs at 39. The gauntlets are in the top 3 at 33 and 34.
-- Arms and Fury: belt from 32 to 39, chest from 34 to 39, legs at 39. The gauntlets are in the top 3 around 33 to 34.
-- Protection, paladin and warrior: boots from 30 to 36, bracers from 31 to 35, chest from 34 to 39.
-
-### Set tooltips
-
-A set piece tooltip now matches Wowhead. The set name and how many pieces you have, each piece on its own line, then one line per bonus. The required level stays above the set.
-
-### Scrollbars
-
-The scrollbars on the hunt list and the parchment are visible again.
+Settings can hide the minimap icon. Set pieces are marked **(Set piece)**. **Embrace of the Viper** is the Wailing Caverns hunt for hunter, rogue, Enhancement, and Feral in the high teens and twenties. **Defias Leather** is legs at 14–15 and boots at 15–16 for rogues. **Chain of the Scarlet Crusade** ranks on its own stats for Retribution, Arms, Fury, and Protection around the low 30s.
 
 ### v0.2.13-beta
 
-Hotfix: an upgrade toasts once.
-
-The "BiS upgrade obtained" notice shows the first time that item lands in your bags or on your character. Taking it off and equipping it again does not toast again.
+An upgrade toasts once, the first time it lands in your bags or on your character.
 
 ### v0.2.12-beta
 
-Your worn gear shows up beside a hunt, dungeon drops name the boss, and clicks on bags and the profession book work again.
-
-### Worn gear next to a hunt
-
-Hover a piece in the log. Your currently equipped gear for that slot appears beside the hunt tooltip, the same way the game compares loot. Rings and trinkets show both filled slots. An empty slot shows nothing.
-
-### Clicks
-
-- Taking an item out of your bags is a normal left-click drag again.
-- The profession book takes clicks again: recipes, search, filter, Track Recipe, and Create.
-- Opening First Aid (or any profession) no longer leaves the log sitting on top of it. Click the log when you want that window in front.
-
-### Completed tab
-
-Opening Completed could freeze the game for a long moment and then error. It opens normally now.
-
-### Boss pulls
-
-Engaging a boss could throw a Lua error from a loot or skill line in chat. Those lines are skipped, and the error is gone. A crafted Best-in-Slot piece still counts when it is in your bags or on your character.
-
-### Spec choice stays on this character
-
-A spec you pick in the log stays after `/reload` and after you log out. It stays until you pick a different one. If you have never picked a spec, hunts still follow the talent tree with the most points. Simulation mode still uses the spec you set there.
-
-### Faction quests
-
-- **Alliance only:** Duty Bound Leggings and Remembrance Armor, from Bloodied Insignia (General Marcus Jonathan in Stormwind). Horde characters no longer see them.
-- **Horde only:** Heat Resistant Mitts and Safety Boots, from Serpentbloom (Apothecary Zamah in Thunder Bluff). Alliance characters no longer see them.
-
-### Snake Eye Kaleidoscope
-
-The neck from Lady Anacondra in Wailing Caverns is on the lists. It requires level 17. It is a hunt while it is still one of the best necks for your spec, then it drops off as better necks show up.
-
-### Dungeon bosses
-
-These pieces used to say the source was not listed. The hunt now names the boss.
-
-**Ruins of Lordaeron**
-
-- **Witherfang:** Atrophic Girdle, Witherbite Bracers, Segmented Spider Leg
-- **The Baron:** Meathook Slicer, Abomination Bones, Leftover Abomination Skin
-- **Viktor the Vile:** Vileblood Scimitar, Bloodied Chestwraps, Vilewalkers
-- **The Abandoned:** Scepter of the Abandoned, Grip of Fear, Rotmender's Leggings
-- **Bjork:** Corpse Chopper, Bonerust Leggings, Tuskwrap Belt
-- **Rath'Mael:** Mirror of Rath'mael, Coldspire Staff, Rotmender's Treads
-
-**Hall of Thanes**
-
-- **Faldrim Anvilmar:** Spiritwraith Drape, Ephemeral Choker, Aetherwisp Bracers
-- **Magmatus:** Kindlegem Girdle, Flamefist Grips, Fang of Magmatus
-- **Plunder:** Golemheart Stave, Golemguard Chest, Treads of the Protector Golem
-- **Durgen Dirgehammer:** Durgen's Crescent Axe, Direhammer Leggings, Robes of the Disgraced Thane
-
-Rotmender's Leggings and Rotmender's Treads use those names now.
-
-### Heart of Alterac
-
-A held off-hand that requires level 34. It can show up for Guardian druid, Destruction warlock, and Arcane Battle Mage. Where it drops is still unknown, so that hunt still says the source is not listed.
+Worn gear shows beside a hunt tooltip. Bag clicks and the profession book work again. Completed opens without freezing. Dungeon hunts name the boss, including Witherfang, The Baron, Magmatus, and Plunder. A spec you pick stays on this character. Duty Bound Leggings and Remembrance Armor are Alliance only. Heat Resistant Mitts and Safety Boots are Horde only.
 
 ### v0.2.11-beta
 
-Source filter on the hunt list, and the source on each piece is the one you can actually use. Damage specs stop chasing Healing Done.
-
-### Filter
-
-- **Filter** sits above the slot list. Uncheck a source to hide it. The button reads **Filter\*** while anything is hidden.
-- World drop, Boss drop, Raid trash, Quest reward, Seasonal quest, Vendor, Profession, Container, Special.
-- The list, the character-panel arrow, and the quest-reward arrow all follow the same filter. Unfiltered, the top 3 stay the full BiS list.
-- A filtered slot still fills with the best allowed piece you can equip, including from an earlier level band when this level has none.
-
-### Sources match the filter
-
-- Quest rewards no longer say "Bought from" the quest title. They are Quest reward, with who starts the quest, where, and the objective.
-- Vendor gear no longer says "Drops from" the seller. Brother Zendraas sells the Al'aketh sets. Rune Broker, the PvP quartermasters, and the other vendor-only NPCs are Vendor.
-- Horde Rune Broker (Orgrimmar, Thunder Bluff, Undercity, and the starting zones) sells shaman icons and the shared druid idols. Alliance Rune Broker (Stormwind, Ironforge, Darnassus, and the starting zones) sells paladin librams and those same idols.
-
-### Scoring
-
-- **Healing Done** counts for healers: Holy paladin, Restoration druid and shaman, Holy and Discipline priest.
-- Damage specs, including Elemental, Balance, Shadow, and mages, score **+Damage Done** as spell power. One point of Damage Done equals one point of spell power. Healing Done on that piece adds nothing.
-- Nature-only spell damage is a step below generic spell power for Elemental (frost and fire still exist in the kit).
-- Wowhead Forever index **3,676** items. New pieces that took a top slot include Wyrmak's Cuirass, Bristlebark Bow, Snarlsnout Shooter, Wisesight Wand, Ghostfang's Steps, Igleggings, and Ukta's Conduit.
-
-### Completed
-
-- The Completed tab is this character only. The first character to log in after this update keeps the completions you already had. Other characters start empty.
-- Obtained and crafted pieces still show a Completed date when the hunt row itself had none.
-
-Authoring notes: [pipeline/docs/FOREVER-SCORING.md](pipeline/docs/FOREVER-SCORING.md).
+The source filter hides World drop, Boss drop, Raid trash, Quest reward, Seasonal quest, Vendor, Profession, Container, and Special. Quest rewards and vendor gear use the source you can actually use. **Healing Done** counts for healers. Damage specs score **+Damage Done** as spell power. Completed is per character.
 
 ### v0.2.10-beta
 
-Specialization follows your talent tree after `/reload`; log spec picker is session-only. Wowhead PvP stat refresh and six new Forever items.
-
-- **Spec:** No saved spec across `/reload`. Order is log picker (this session) → talent tab with the most points → class default. Simulation mode still saves its spec in preview settings. Removed `SpecPersist.lua` and extra SavedVariables.
-- **Log spec menu:** Click-outside dismiss works on Forever (no `OnClick` on plain frames). Picker overlay stays on the log window so it does not block the action bar.
-- **Wowhead Forever (23 Sep):** index **3,637** items. **Six** new pool pieces (Skullduggery Belt, Death Prophet Spine, Corsepickers, Braided Seer Stones, Dragonmaw Battle Shroud, Slimy Sword). **397** cached tooltips re-fetched where PvP / rank-set armor drifted on Wowhead. All nine classes re-scored. **Death Prophet Spine** appears for Enhancement shaman at 26. Client-pinned items (Coldflame Saber, Blade of Silverlaine, etc.) unchanged.
-
-Authoring notes: [pipeline/docs/FOREVER-SCORING.md](pipeline/docs/FOREVER-SCORING.md).
+Your talent tree picks the spec again after `/reload`. The log spec menu is for this session. Wowhead PvP stats were refreshed, and **Death Prophet Spine** is an Enhancement shaman hunt at 26.
 
 ### v0.2.9-beta
 
-Crafted BiS from the supply camps now says who sells the recipe, for both factions.
-
-- **Horde:** Durotar Supply and Logistics, northwest of the Crossroads in The Barrens.
-- **Alliance:** Azeroth Commerce Authority, Three Corners in Redridge Mountains.
-- Leatherworking: Pawani (Horde), Daniel Stitchsong (Alliance).
-- Blacksmithing: Gor'mak (Horde), Stondry Darkhammer (Alliance).
-- Tailoring: Jim'bek (Horde), Mivin Shadowweave (Alliance).
-- Enchanting: Beneris (Horde), Alynsia (Alliance).
-- Engineering: Fizzlefuse (Horde), Fritz Fizzle (Alliance).
-
-The description is on every piece of those sets, including when the item and the pattern use different words (Stormrider's Leather Armor and Tunic, Gilded Slippers and Sandals). Trainer crafts such as linen and mithril stay on the short "Crafted with …" line.
-
-Authoring notes: [pipeline/docs/FOREVER-SCORING.md](pipeline/docs/FOREVER-SCORING.md).
+Crafted hunts name who sells the recipe. Horde buys from Durotar Supply and Logistics in The Barrens. Alliance buys from Azeroth Commerce Authority in Redridge Mountains.
 
 ### v0.2.8-beta
 
-Mage **Battle Mage** specs, and imbued weapons say how to make them.
-
-- **Battle Mage (Frost)** is the new hunt. Fire and Arcane battle mage are in the spec menu too. Damage is that school's spell power, with a small weapon-swing weight. Stamina stays only a step above a normal mage.
-- **Coldflame Saber** is the mage main hand from level 21. Stats are the Forever client tooltip (+7 Intellect, +32 spell power and healing, 98 Fire on melee against Frozen targets), not Wowhead's higher white damage.
-- Imbue tooltip: the sword's own stats stay the normal colors. Only the imbue effect is grey. Instead of a second Equip line: **Use: Combine the Blade of Silverlaine and Imbue Blade.**
-- The saber is mage-only, so it leaves rogue, warrior, and paladin lists. Blade of Silverlaine keeps the client +28 spell power.
-- Login and `/reload` print only the welcome lines. Ring and specialization notices show once, when you actually cross that level.
-- New leather feet: Shapeshifting Sentinel's Strides (level 24).
-
-Authoring notes: [pipeline/docs/FOREVER-SCORING.md](pipeline/docs/FOREVER-SCORING.md).
+Mage **Battle Mage** is in the spec menu. **Coldflame Saber** is the mage main hand from level 21, using the Forever client tooltip. The imbue line reads **Use: Combine the Blade of Silverlaine and Imbue Blade.**
 
 ### v0.2.7-beta
 
-Profession trainers no longer freeze the client. Wowhead catalog +4 held offhands (none made BiS).
-
-- Removed in-game item collection (`Collector.lua`). GearQuest does not scan trainers, vendors, bags, or tooltips for new item IDs.
-- Class-trainer hooks are off: no `TRAINER_UPDATE` cache rebuild, no `SetTrainerService` scrape. Talking to a profession trainer is safe. BiS arrows still work on loot, vendors, quests, and your own trade-skill window.
-- Wowhead Forever **3,625** items. Four new offhands (Gnawed Bone, Apothecary's Concoction, Kobold Firestarter, Bael'dun Tankard) were ingested and scored for caster/healer classes; they did not take a top-3 slot.
-
-Authoring notes: [pipeline/docs/FOREVER-SCORING.md](pipeline/docs/FOREVER-SCORING.md).
+Talking to a profession trainer no longer freezes the client. GearQuest does not scan trainers for new items.
 
 ### v0.2.6-beta
 
-Hunt tooltips match Wowhead Forever, scoring stats synced from those tips, and shaman **Enhancement Tank**.
-
-### Hunt tooltips
-
-- Title quality comes from Forever first (Reinforced Woolen Shoulders is green, not white).
-- Slot stays left, armor type right (`Shoulder | Leather`). Same for `Damage | Speed`.
-- Set items: blank before the set header, indented pieces, blank before Sell Price. Forever stats stay.
-- No Forever tip → the live client tooltip.
-- Green `+N Spell Power` / Damage Done / Healing Done, not the client's stale Equip paragraph.
-- Historical dungeon/raid set names still lock class when Forever omits `Classes:` (Deathmist = warlock, Virtuous = priest). Stats stay Forever.
-
-### Scoring
-
-- **Enhancement Tank** (1h + shield): stamina / armor / defense first, then Rockbiter melee threat, then shock / Lightning Shield spell threat. Not dual-wield.
-- `items.json` overwritten from hunt tips so remakes rank on Forever numbers (Marshal's Chain Legguards, Jouster's Crest armor, Lionheart hit, mashed `+20 Hit+28` / `1051 Armor17` / set-bonus stats no longer leak onto the piece).
-- All nine classes re-scored 1–60 (`GQ_NO_GUIDES=1`).
-
-### Catalog
-
-Wowhead Forever index **3,621** (0 new remakes vs the morning scrape). Hunt list **3,876** ids: **3,858** tips, **18** Classic 404s still on lists.
-
-Authoring notes: [pipeline/docs/FOREVER-SCORING.md](pipeline/docs/FOREVER-SCORING.md).
+Hunt tooltips follow Wowhead Forever, including set layout and quality color. **Enhancement Tank** is a one-hand and shield hunt: stamina and armor first, then threat.
 
 ### v0.2.5-beta
 
-Forever scoring model for every class, a Wowhead re-ingest, readable hunt text, and warrior-tank honesty.
-
-### Scoring (all nine classes, every spec, 1–60)
-
-Leveling hunts now follow a fixed order: **damage first**, then **survivability**, then **endurance**. The spec primary still leads (Agi, Str, spell power, tank threat). Below 60, stamina / health / hp5 count ×3 and armor ×2 so a naked +1 primary-stat stick cannot beat a real leveling chest (Brawler's / Trapper's vs Panther Armor at 22). Mana keep-up — intellect, spirit, mp5, mana — counts ×2, less than stam, so paladin seals, shaman shocks, hunter shots, and casters stay in the fight. Level 60 uses the raw raid-scale weights. Classic/TBC BiS guides do not pin Forever 60 (`GQ_NO_GUIDES=1`).
-
-**Random-enchant jackpot is BiS.** A green is ranked on the best suffix it can roll (top of the range), not the average of every suffix. If Superior Shoulders of Agility can roll +7 Agi and that would be #1, it is #1. The log still says the roll is slim (~9.5%). Chance never hides the hunt.
-
-**Three unique names + one notable** per slot. Notables are procs, leftover jackpots, or a tank-relevant extra — they are not rank 1–3.
-
-**Warrior Protection is a physical tank.** Spell power and healing no longer inflate prot-warrior ranks. **Silvered Gauntlets** (spell damage + healing, +3 Defense) is the Hands *notable* for the defense, not fake BiS. Paladin Protection still scores holy/spell threat.
-
-All nine classes were re-scored on this model (hunter and shaman first, then paladin, warrior, druid, rogue, priest, mage, warlock), then re-scored again after the 20 Sep ingest.
-
-### New and updated gear
-
-Wowhead Forever index compared to `items.json`: **24** missing ids ingested (one tooltip 404 — Wildstalker's Helm). After re-score, these mid-level rares made a top-3 or notable list:
-
-- **Silvered Gauntlets** (27) — paladin BiS; warrior-prot notable (+3 Defense)
-- **Cultist's Armguards** (29) — paladin, warrior, hunter, shaman, druid, rogue
-- **Dark Ritual Leggings** (29) — druid
-
-Ilvl-65 set pieces (Manaflare, Grimstitch, Wildstalker, Conviction, Spiritcaller) were scored and did not beat the existing level-60 lists.
-
-### Hunt parchment
-
-Quest descriptions no longer read `Worlddrop - dropsfrom364creaturetypes` / `ItemLevel27Bindswhenequipped`. Causes: `QuestFont` in this client has no usable space glyph (titles and body now use the readable UI font), and the mashed Wowhead audit tooltip is no longer pasted into the description. Instructions were cleaned: world drops say `World drop around level 23-28.` instead of creature-type counts; quest/vendor/drop copy no longer repeats the zone. Auction House is one BoE line. **Source** always prints.
-
-Random-enchant suffix stats still paint on the item tooltip when Forever returns the unsuffixed green.
+Leveling hunts rank damage first, then stamina and armor, then mana. A random-enchant green is ranked on its best suffix, not the average roll. Warrior Protection does not score spell power. **Silvered Gauntlets** are the Protection hands notable.
 
 ### v0.2.4-beta
 
-Random-enchant greens show the suffix on the **item tooltip**, not only in the hunt text.
-
-- Forever often answers a suffixed `item:` link with the unsuffixed base green (Bandit Cloak, armor only). The log already had `of Nature's Wrath` / `+3-4 spNature`; the hover tooltip did not.
-- If the client tooltip title does not contain the suffix, GearQuest paints the hunt name and the roll stats for **every class, spec, and level**.
-- Shaman 10–60 re-score remains Wowhead Forever only (no TBC, 404s pruned).
+Random-enchant greens show the suffix on the item tooltip, not only in the hunt text.
 
 ### v0.2.3-beta
 
-Repo-only follow-up (logo, veldt diff script, local audit helpers). **In-game build matches v0.2.2-beta** — CurseForge file **`v0.2.3-beta`** for version alignment after the GitHub tooling commit.
+Repo-only follow-up. The in-game build matches v0.2.2-beta.
 
 ### v0.2.2-beta
 
-BiS quality pass, relic combat scoring, simulator UX, and local install workflow.
-
-- **BiS = combat value:** generated picks dedupe same-name variants (PvP rank twins), skip Forever-audit **404** ids at score time, and fill three **unique** names per slot where the pool allows. **Notables** are not rank 1–3; proc-driven hunter ranged weapons that lose to inflated Forever bow DPS can promote into the top 3 when still competitive.
-- **Relics (Totem / Idol / Libram):** effect text from Wowhead tooltips (`patch_relic_effects.py`) and **`relic_score.py`** — e.g. elemental **Polished Driftwood Icon** (casting mana reg) ranks above utility CD trims; ilvl-only ordering is fallback only.
-- **Log UI:** banner under the title — simulation mode shows level, spec, class, faction; live character mode explains spec picker. **Simulator** faction dropdown; list tabs re-attached to the hunt panel after the banner layout fix.
-- **Runtime:** `GetTopUpgradesForSlot` uses candidates only (not notables in the rank pool); Compare keeps pipeline `curatedRank`; Forever-missing items hidden when audit says 404.
-- **Authoring:** after any `GearQuest/` or `_generated/` change, run **`scripts/sync-addon.ps1`** (default `_classic_beta_` → `Interface/AddOns/GearQuestForever`). Re-score with `score_all.py` / `reemit_all.py` after pipeline edits.
-- CurseForge **Files** name is **`v0.2.2-beta`**.
+Lists aim for three different names per slot. Totem, idol, and libram hunts score the effect on the tooltip. The simulator has a faction dropdown.
 
 ### v0.2.1-beta
 
-Wowhead re-scrape, Horde ring toast fix, and CurseForge files named `vX.Y.Z-beta`.
-
-- **Wowhead (18 Sep 2026):** catalog 3,244 → 3,245. Only new item: **Mirror of Rath'mael** (271213), a level-19 rare shield. Paladin / warrior / shaman re-scored.
-- **Finger at 9:** the “ring slot eligible” toast was Alliance paladin/warrior data. Horde shaman has no Finger hunts at 9 (The 1 Ring 8350 and Woven Copper Ring 21931 404 on Forever; Barrens/Silverpine rings land ~15). Toast and log now require hunts for this character.
-- CurseForge **Files** name is **`v0.2.1-beta`**.
+**Mirror of Rath'mael** was the new Wowhead piece. The “ring slot eligible” toast no longer fires for Horde characters who have no ring hunts at level 9.
 
 ### v0.2.0-forever-beta
 
-Nine-class re-score after Forever Wowhead hunt audit and the Horde trinket gap.
-
-- **Trinkets at 20:** Warsong Gulch Rune of Duty / Rune of Perfection (21565–21568) are the same item IDs for both factions. Sources no longer pin Illiyana only, so Horde enhancement (and every other Horde spec) gets a trinket hunt from 20 instead of waiting until Defiler's Talisman at 28.
-- **Three hunts per slot:** lists aim for three items at each level; a lower-required-level leftover is a valid rank 2/3. Empty slots are treated as data bugs.
-- **Wowhead Forever audit:** hunt ids probed against nether tooltips. Classic ids that 404 are dropped from hunts. Items that exist but have no combat stats, suffixes, or effects show “Has not been datamined yet” (source text is not a tooltip). Re-scrape as the Forever catalog grows.
+Warsong Gulch rune trinkets are hunts for both factions from level 20. Classic items Wowhead Forever does not have are dropped from the lists.
 
 ### v0.1.0-beta.6-forever
 
-Forever beta client pass: profession-style window, per-spec early BiS, and Wowhead as the item-fact source.
-
-### Window and portrait
-
-- GearQuest log uses `PortraitFrameTemplate` (profession-style metal chrome and circular portrait well).
-- Portrait sits in the socket (61px, offset -6 / 7). `SetTexCoord` is skipped while the CircleMask is attached.
-
-### Hunts and item info (no more login freeze)
-
-- Do not bulk-request item data for every list row. `RequestLoadItemDataByID` runs only on hover.
-- Hunt names and colors come from pipeline facts (`quality`, `ilvl`, `reqLevel`) plus `ITEM_QUALITY_COLORS`, not from unidentified client stubs (quality 0 / gold “Retrieving item information”).
-- Hover falls back to the fact tooltip when the client has no item payload. Classic ids that 404 on Wowhead Forever (e.g. Bands of Serra'kis, 6902) still show that way until the community catalogs a replacement.
-
-### Descriptions
-
-- Curly quotes, em dashes, and replacement characters are folded to ASCII so WoW fonts no longer draw empty `[]` boxes (`quest 'The Den'` instead of `[]The Den[]`).
-
-### Early BiS
-
-- Generated 1–9 is scored **per spec** (enhancement vs resto, arms vs fury, …) instead of one hybrid `levelling_1_9` list.
-
-### Data source
-
-- Forever item facts come from Wowhead `/forever/items` (ids ≥ 200000) via `scripts/scrape-forever-wowhead-items.mjs` and `pipeline/scripts/ingest_forever_wowhead.py`.
-- The in-game seen-item notebook is retired: Collector is not started, `/gq seen` prints that Wowhead is the source, and `sync-addon.ps1` no longer backs up `notebook/seenItems/`.
-- New or retuned Forever items will land as Wowhead’s catalog grows; lists can still include classic ids that this client cannot identify.
+The log uses the profession-style window. Hunt names come from stored facts, so login no longer requests every item. Early hunts are scored per spec.
 
 ### v0.1.0-beta.5-forever
 
-- Same Horde Forever deltas and item notebook as beta.4 (that tag did not reach CurseForge).
-- Fix CurseForge upload metadata so changelog punctuation cannot break the multipart field.
+Same Horde notes as beta.4. The CurseForge upload no longer breaks on changelog punctuation.
 
 ### v0.1.0-beta.4-forever
 
-- Horde **phase-4 Forever deltas** for all nine classes in `Data.lua` (`foreverDelta`). Zephras Isle quest whites and Shen'dar crafts (sashes, copper boots, mageweave slippers, shaman totem, druid idol) compete across generated per-level bands; Compare still shows the top 3.
-- Local item notebook (`GQ.Collector` / `/gq seen`) records unique equippable items this client has seen so Forever IDs can be ingested without inventing rows.
-- `scripts/sync-addon.ps1` prefers `_classic_beta_` (Forever) and can still target `_anniversary_` for side-by-side UI tests.
+Horde phase-4 quest and crafted pieces compete on the generated lists.
 
 ### v0.1.0-beta.3-forever
 
-- Target CurseForge **WoW Forever 1.60.1** (`## Interface: 16001`).
-- Zip `GearQuest/` as `GearQuestForever` and upload to the Forever game version directly (BigWigs packager still treats 1.x as Classic Era).
+CurseForge target is WoW Forever 1.60.1.
 
 ### v0.1.0-beta.2-forever
 
-- Target CurseForge **WoW Forever 1.60.1** (`## Interface: 16001`).
-- First successful packaging pass: zip as `GearQuestForever` (the previous `move-folders` step emptied the archive).
+First zip that actually contained the addon.
 
 ### v0.1.0-beta.1-forever
 
-First CurseForge beta. Project **1698950** (`X-Curse-Project-ID`). Not TBC GearQuest (`1669225`).
-
-- Two-column GearQuest log: hunt list on the left, parchment description on the right. **GearQuest Log** and **Simulator** are handle tabs on the right of the frame.
-- **Active** / **Completed** sit on the quest-list border. Spec picker sits above the parchment (far right). The Simulator tab has its own spec; while simulation is on it overrides the log spec until Reset (`/gq set me`).
-- Click the minimap button to open GearQuest (any click). Right-click a character-panel slot for upgrades.
-- Simulator and `/gq level` cap at **60**. Art paths use the `GearQuestForever` folder name.
-- Random-enchant greens in curated Alliance paladin/warrior 1–9 now carry Classic suffix rolls (e.g. Infantry Tunic / Spiked Club of Strength). Suffix hints use commas, not middle dots. Player-facing text strips em-dashes and other glyphs WoW fonts cannot draw.
-
-- New repo and CurseForge packaging for WoW Forever (beta 17 Sep 2026).
-- In-game title **GearQuest Forever**; slash commands stay `/gq` and `/gearquest`.
-- `## Interface: 11507` is a placeholder until the beta client reports `lastAddonVersion`.
-- Sync script targets a Forever client folder (`_forever_` and similar), not `_anniversary_`.
-- No TBC CurseForge project ID or GitHub secrets were copied.
-
-### Install name (distinct from TBC GearQuest)
-
-- Game / CurseForge folder **`GearQuestForever`** (`GearQuestForever.toc`); saved variables **`GearQuestForeverDB`** so it can sit beside TBC **`GearQuest`** on the same client.
-
-### Data (Forever migration phase 3 — complete)
-
-- Filtered generated picks to a Classic-era pool, then re-scored **all nine classes** in-repo via `pipeline/scripts/score.py` (Classic item pool, Classic suffixes, cap 60).
-- Paladin/Warrior Alliance 1–9 stays curated; Horde 1–9 and every other class’s Early 1–9 are generated.
-- **57,202** generated rows (was 67,033 TBC; 56,576 after the filter slice). Stat weights are still TBC-derived — retune on the Forever client ([docs/FOREVER-DATA-MIGRATION.md](docs/FOREVER-DATA-MIGRATION.md#stat-weights-tbc-model--forever-client)).
-
-### Data (Forever migration phase 2 — complete)
-
-- Classic Wowhead random-enchant scrape/apply pipeline (`classic-suffix-sync.mjs --retry-403 --phase2-gate`).
-- Cache: `items_random.classic.json` — **610** scrapeable suffix items with Classic tables; **162** TBC-era IDs marked `noClassicPage` (Classic Wowhead 404).
-- Scraper preserves existing enchant rows; records 404 as non-scrapeable; `--phase2-gate` enforces ≥80% scrapeable coverage.
-- Generated picks/notables patched for Classic suffix metadata where tables exist (e.g. **9640** +17 @ 9%); **0** stale TBC +20/@7.9% rows.
-
-### Data (Forever migration phase 1)
-
-- Cap addon scope at **level 60** (`GQ.MAX_PLAYER_LEVEL`); preview/simulate clamped accordingly.
-- Removed ~1,200 TBC Phase 3 **level 70** curated entries from `Data.lua`.
-- Migration plan: [docs/FOREVER-DATA-MIGRATION.md](docs/FOREVER-DATA-MIGRATION.md).
+First CurseForge beta, project **1698950**. Two-column log, Active and Completed, simulator capped at 60. The folder name is **GearQuestForever**, separate from TBC GearQuest. Lists are Classic-era, level 60, not TBC level 70.
