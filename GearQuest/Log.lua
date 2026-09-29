@@ -737,6 +737,14 @@ local function CreateFontStringWithFallback(parent, candidates)
 end
 
 local PARCHMENT_TEXTURE = "Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Textures\\GQ-Parchment.png"
+local SHAMAN_LOG_SCENE = "Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Art\\GQ-LogScene-Shaman.png"
+local SHAMAN_LOG_VIGNETTE = "Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Art\\GQ-LogScene-Vignette.png"
+local SHAMAN_LIST_SHADE = "Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Art\\GQ-ListShade.png"
+local SHAMAN_PARCHMENT_ALPHA = 0.72
+
+local function LogSceneArt(file)
+    return "Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Art\\" .. file
+end
 
 local function ApplyParchmentBackground(parent)
     if parent.parchmentApplied then
@@ -747,6 +755,7 @@ local function ApplyParchmentBackground(parent)
     local parchment = parent:CreateTexture(nil, "BACKGROUND", nil, 0)
     parchment:SetTexture(PARCHMENT_TEXTURE)
     parchment:SetAllPoints()
+    parent.gqParchment = parchment
     -- Stretch once so clean top/left and worn bottom/right stay anchored to the panel.
 end
 
@@ -923,6 +932,30 @@ local function GetFrameTitle(frame)
     return name and _G[name .. "TitleText"] or nil
 end
 
+local function EnsurePortraitBorderMetal(frame)
+    if not frame then
+        return
+    end
+
+    local ns = frame.NineSlice
+    if ns then
+        ns:Show()
+        if ns.SetFrameLevel then
+            -- Above the portrait face so the TopLeftCorner ring matches the window edge.
+            ns:SetFrameLevel((frame:GetFrameLevel() or 1) + 3)
+        end
+        local corner = ns.TopLeftCorner
+        if corner then
+            corner:Show()
+            corner:SetAlpha(1)
+        end
+    end
+
+    if frame.gqPortraitBorderRing then
+        frame.gqPortraitBorderRing:Hide()
+    end
+end
+
 local function GetFrameCloseButton(frame)
     if frame.CloseButton then
         return frame.CloseButton
@@ -967,6 +1000,8 @@ local function ApplyOuterWindowBorder(frame)
         frame.gqOuterBorder:SetFrameLevel((frame:GetFrameLevel() or 1) + 2)
         ApplyMetalEdge(frame.gqOuterBorder, 16)
     end
+
+    EnsurePortraitBorderMetal(frame)
 
     if frame.OverlayElements and frame.OverlayElements.Show then
         frame.OverlayElements:Show()
@@ -1727,7 +1762,8 @@ local function PlacePortraitOnFrame(region, frame)
     region:SetSize(PORTRAIT_DISPLAY_SIZE, PORTRAIT_DISPLAY_SIZE)
     region:SetPoint("TOPLEFT", frame, "TOPLEFT", PORTRAIT_OFFSET_X, PORTRAIT_OFFSET_Y)
     if region.SetFrameLevel and frame.GetFrameLevel then
-        region:SetFrameLevel(frame:GetFrameLevel() + 8)
+        -- Under PortraitFrame NineSlice (+3) so the same metal ring shows around the face.
+        region:SetFrameLevel(frame:GetFrameLevel() + 1)
     end
     region:Show()
 end
@@ -1768,6 +1804,7 @@ function SetupQuestLogPortrait(frame)
             PlacePortraitOnFrame(tex, frame)
         end
         ApplyPortraitTexture(tex, PORTRAIT_TEXTURE, container or frame)
+        EnsurePortraitBorderMetal(frame)
         return
     end
 
@@ -1780,6 +1817,190 @@ function SetupQuestLogPortrait(frame)
     icon:SetAllPoints(holder)
     ApplyPortraitTexture(icon, PORTRAIT_TEXTURE, holder)
     holder:Show()
+    EnsurePortraitBorderMetal(frame)
+end
+
+-- One scene file per class. Only the active class is SetTexture'd, so the
+-- other eight stay on disk until that class (or its simulator) is shown.
+local LOG_SCENE_TEXTURE = {
+    DRUID = LogSceneArt("GQ-LogScene-Druid.png"),
+    HUNTER = LogSceneArt("GQ-LogScene-Hunter.png"),
+    MAGE = LogSceneArt("GQ-LogScene-Mage.png"),
+    PALADIN = LogSceneArt("GQ-LogScene-Paladin.png"),
+    PRIEST = LogSceneArt("GQ-LogScene-Priest.png"),
+    ROGUE = LogSceneArt("GQ-LogScene-Rogue.png"),
+    SHAMAN = SHAMAN_LOG_SCENE,
+    WARLOCK = LogSceneArt("GQ-LogScene-Warlock.png"),
+    WARRIOR = LogSceneArt("GQ-LogScene-Warrior.png"),
+}
+
+-- Pixel size of each scene file. The log is taller than these pictures, so
+-- the visible window is a center crop. Nothing is scaled on one axis.
+local LOG_SCENE_SIZE = {
+    DRUID = { 1024, 572 },
+    HUNTER = { 1024, 572 },
+    MAGE = { 1024, 572 },
+    PALADIN = { 1024, 572 },
+    PRIEST = { 1024, 572 },
+    ROGUE = { 1024, 559 },
+    SHAMAN = { 1024, 512 },
+    WARLOCK = { 1024, 572 },
+    WARRIOR = { 1024, 572 },
+}
+
+local SIM_CLASS_ROW_SHADE = LogSceneArt("GQ-ClassRowShade.png")
+local SIM_CLASS_ROW_PAD = 10
+local SIM_CLASS_ROW_GAP = 1
+local SIM_CLASS_FONTS = { "QuestFont_Super_Huge", "QuestFont_Huge", "QuestTitleFont", "GameFontNormalLarge" }
+
+local function SimulatorClassInsetHeight(inset)
+    local h = inset and inset.GetHeight and inset:GetHeight() or 0
+    if h and h > 80 then
+        return h
+    end
+    return (FRAME_HEIGHT - TAB_TOP_OFFSET) + LOG_SECTION_TOP - FOOTER_OFFSET
+end
+
+local function ApplySimClassRowCrop(tex, classFile, rowW, rowH)
+    local size = LOG_SCENE_SIZE[classFile]
+    if not size or not rowW or not rowH or rowW <= 1 or rowH <= 1 then
+        tex:SetTexCoord(0, 1, 0, 1)
+        return
+    end
+    local rowAspect = rowW / rowH
+    local texAspect = size[1] / size[2]
+    if rowAspect >= texAspect then
+        local pad = (1 - (texAspect / rowAspect)) * 0.5
+        tex:SetTexCoord(0, 1, pad, 1 - pad)
+    else
+        local pad = (1 - (rowAspect / texAspect)) * 0.5
+        tex:SetTexCoord(pad, 1 - pad, 0, 1)
+    end
+end
+
+local function ApplyLogSceneCrop(tex, frame, classFile)
+    local size = classFile and LOG_SCENE_SIZE[classFile]
+    local viewW = (frame:GetWidth() or 0) - 4
+    local viewH = (frame:GetHeight() or 0) - 4
+    if not size or viewW <= 1 or viewH <= 1 then
+        tex:SetTexCoord(0, 1, 0, 1)
+        return
+    end
+    local viewAspect = viewW / viewH
+    local texAspect = size[1] / size[2]
+    if viewAspect < texAspect then
+        local pad = (1 - (viewAspect / texAspect)) * 0.5
+        tex:SetTexCoord(pad, 1 - pad, 0, 1)
+    else
+        local pad = (1 - (texAspect / viewAspect)) * 0.5
+        tex:SetTexCoord(0, 1, pad, 1 - pad)
+    end
+end
+
+function GQ.Log:LogSceneTexture()
+    local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+    if settings and settings.hideLogArt then
+        return nil
+    end
+    local classFile = GQ:GetEffectiveClass()
+    return classFile and LOG_SCENE_TEXTURE[classFile] or nil
+end
+
+function GQ.Log:UpdateLogScene()
+    local frame = self.frame
+    if not frame then
+        return
+    end
+
+    if not frame.gqLogScene then
+        local tex = frame:CreateTexture(nil, "BACKGROUND", nil, 1)
+        tex:SetPoint("TOPLEFT", frame, "TOPLEFT", 2, -2)
+        tex:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -2, 2)
+        frame.gqLogScene = tex
+        local shade = frame:CreateTexture(nil, "BACKGROUND", nil, 2)
+        shade:SetPoint("TOPLEFT", tex, "TOPLEFT", 0, 0)
+        shade:SetPoint("BOTTOMRIGHT", tex, "BOTTOMRIGHT", 0, 0)
+        frame.gqLogSceneShade = shade
+    end
+
+    local texture = self:LogSceneTexture()
+    if texture then
+        if frame.gqLogScenePath ~= texture then
+            frame.gqLogScene:SetTexture(texture)
+            frame.gqLogScenePath = texture
+        end
+        ApplyLogSceneCrop(frame.gqLogScene, frame, GQ:GetEffectiveClass())
+        if not frame.gqLogSceneShadeLoaded then
+            frame.gqLogSceneShade:SetTexture(SHAMAN_LOG_VIGNETTE)
+            frame.gqLogSceneShadeLoaded = true
+        end
+        frame.gqLogScene:Show()
+        frame.gqLogSceneShade:Show()
+        if frame.blackBg then
+            frame.blackBg:SetAlpha(0)
+        end
+    else
+        frame.gqLogScene:Hide()
+        frame.gqLogSceneShade:Hide()
+        if frame.blackBg then
+            frame.blackBg:SetAlpha(1)
+        end
+    end
+
+    local listBg = frame.listInset and frame.listInset.blackBg
+    if listBg then
+        -- Layout paints a solid fill on this same texture. Re-apply the shade
+        -- whenever a scene is showing so that fill cannot stick.
+        if texture then
+            listBg:SetTexture(SHAMAN_LIST_SHADE)
+            listBg:SetVertexColor(1, 1, 1, 1)
+        else
+            listBg:SetColorTexture(LIST_BG[1], LIST_BG[2], LIST_BG[3], LIST_BG[4] or 1)
+        end
+    end
+
+    local parchment = frame.detailBg and frame.detailBg.gqParchment
+    if parchment then
+        parchment:SetAlpha(texture and SHAMAN_PARCHMENT_ALPHA or 1)
+    end
+
+    if self.UpdateSimClassRowArt then
+        self:UpdateSimClassRowArt()
+    end
+end
+
+function GQ.Log:UpdateSimClassRowArt()
+    local frame = self.frame
+    local buttons = frame and frame.simClassButtons
+    if not buttons then
+        return
+    end
+    local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+    local show = self:GetPageTab() == "simulator" and not (settings and settings.hideLogArt)
+    for _, btn in ipairs(buttons) do
+        if not btn.scene then
+            return
+        end
+        if show then
+            local path = LOG_SCENE_TEXTURE[btn.classFile]
+            if path and btn.scenePath ~= path then
+                btn.scene:SetTexture(path)
+                btn.scenePath = path
+            end
+            ApplySimClassRowCrop(btn.scene, btn.classFile, btn.rowW, btn.rowH)
+            btn.scene:Show()
+            if not btn.shadeLoaded then
+                btn.shade:SetTexture(SIM_CLASS_ROW_SHADE)
+                btn.shadeLoaded = true
+            end
+            btn.shade:Show()
+        elseif btn.scenePath then
+            btn.scene:SetTexture(nil)
+            btn.scenePath = nil
+            btn.scene:Hide()
+            btn.shade:Hide()
+        end
+    end
 end
 
 function GQ.Log:GetListTab()
@@ -1960,22 +2181,52 @@ function GQ.Log:GetActiveListCacheContextKey()
     }, "|")
 end
 
-function GQ.Log:ForEachOwnedItemId(callback)
+function GQ.Log:ForEachOwnedItemLink(callback)
     if not callback then
         return
     end
     pcall(function()
         for invSlot = 1, 19 do
-            callback(ItemLinkToId(GetInventoryItemLink("player", invSlot)))
+            local link = GetInventoryItemLink("player", invSlot)
+            if link then
+                callback(link)
+            end
         end
         local numBags = NUM_BAG_SLOTS or 4
         for bag = 0, numBags do
             local numSlots = GetBagSlotCount(bag)
             for slot = 1, numSlots do
-                callback(ItemLinkToId(GetBagItemLink(bag, slot)))
+                local link = GetBagItemLink(bag, slot)
+                if link then
+                    callback(link)
+                end
             end
         end
     end)
+end
+
+function GQ.Log:ForEachOwnedItemId(callback)
+    if not callback then
+        return
+    end
+    self:ForEachOwnedItemLink(function(link)
+        callback(ItemLinkToId(link))
+    end)
+end
+
+function GQ.Log:EntrySuffixOwned(entry, links)
+    if not entry or not entry.suffix or entry.suffix == "" then
+        return false
+    end
+    if GQ.Data.EnrichEntrySuffix then
+        GQ.Data:EnrichEntrySuffix(entry)
+    end
+    for i = 1, #links do
+        if GQ.Data:EntrySuffixMatchesLink(entry, links[i]) then
+            return true
+        end
+    end
+    return false
 end
 
 function GQ.Log:InvalidateSourceFilterCache()
@@ -2521,6 +2772,9 @@ function GQ.Log:IsEntryObtained(id)
         return true
     end
     local entry = GQ.Data and GQ.Data.GetEntryById and GQ.Data:GetEntryById(id)
+    if entry and entry.suffix and entry.suffix ~= "" then
+        return false
+    end
     if entry and entry.itemId and self:IsItemIdObtained(entry.itemId) then
         return true
     end
@@ -2626,7 +2880,15 @@ function GQ.Log:EntryOnCurrentGearQuestList(entry)
 end
 
 function GQ.Log:ShouldAutoCompleteOnObtain(entry, includeReached)
-    if not entry or self:IsEntryObtained(entry.id) or self:HasObtainedItemId(entry.itemId) then
+    if not entry or self:IsEntryObtained(entry.id) then
+        return false
+    end
+    if entry.suffix and entry.suffix ~= "" then
+        local suffixKey = GQ.Data.EntryListKey and GQ.Data:EntryListKey(entry)
+        if suffixKey and self:HasObtainedItemId(suffixKey) then
+            return false
+        end
+    elseif self:HasObtainedItemId(entry.itemId) then
         return false
     end
 
@@ -2664,6 +2926,9 @@ function GQ.Log:RememberObtainedEntry(entry, now)
     progress.obtained[entry.id] = progress.obtained[entry.id] or now
     if entry.itemId then
         local itemKey = tostring(entry.itemId)
+        if entry.suffix and entry.suffix ~= "" and GQ.Data.EntryListKey then
+            itemKey = GQ.Data:EntryListKey(entry) or itemKey
+        end
         progress.obtainedItems[itemKey] = progress.obtainedItems[itemKey] or now
         GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
         local backup = GearQuestForeverDB.settings.completedItemBackup or {}
@@ -2686,8 +2951,17 @@ function GQ.Log:MarkEntryObtained(entry, options)
     end
 
     local now = time()
-    local alreadyHadItem = self:HasObtainedItemId(entry.itemId)
-        or (entry.itemId and self.ownedAtLogin and self.ownedAtLogin[entry.itemId])
+    local loginKey = entry.itemId
+    if entry.suffix and entry.suffix ~= "" and GQ.Data.GetEntryDisplayName then
+        local fullName = GQ.Data:GetEntryDisplayName(entry)
+        if fullName then
+            loginKey = fullName:lower()
+        end
+    end
+    local alreadyHadItem = self:HasObtainedItemId(loginKey)
+        or (entry.suffix and entry.suffix ~= "" and GQ.Data.EntryListKey and self:HasObtainedItemId(GQ.Data:EntryListKey(entry)))
+        or (not entry.suffix or entry.suffix == "") and self:HasObtainedItemId(entry.itemId)
+        or (loginKey and self.ownedAtLogin and self.ownedAtLogin[loginKey])
     self:RememberObtainedEntry(entry, now)
 
     -- Once per item, the first time it is in bags or on the character.
@@ -2915,22 +3189,30 @@ function GQ.Log:CollectReachedOwnedHunts()
     local candidates = {}
     local seenItem = {}
     local playerLevel = GQ:GetEffectiveLevel()
-    self:ForEachOwnedItemId(function(itemId)
+    self:ForEachOwnedItemLink(function(link)
+        local itemId = ItemLinkToId(link)
         if not itemId or seenItem[itemId] or self:HasObtainedItemId(itemId) then
             return
         end
-        seenItem[itemId] = true
         local entries = GQ.Data.GetEntriesByItemId and GQ.Data:GetEntriesByItemId(itemId) or {}
+        local matched = false
         for i = 1, #entries do
             local entry = entries[i]
             if entry and entry.id
                 and not entry.healOnly
                 and playerLevel >= (entry.minLevel or 1)
                 and GQ.Data:ShouldShowEntry(entry)
-                and self:EntryMatchesTrackedHunt(entry) then
+                and self:EntryMatchesTrackedHunt(entry)
+                and (not entry.suffix or entry.suffix == "" or GQ.Data:EntrySuffixMatchesLink(entry, link)) then
                 candidates[#candidates + 1] = entry
+                matched = true
                 break
             end
+        end
+        if matched and not (entries[1] and entries[1].suffix and entries[1].suffix ~= "") then
+            seenItem[itemId] = true
+        elseif matched then
+            seenItem[link] = true
         end
     end)
     return candidates
@@ -2941,9 +3223,12 @@ function GQ.Log:CheckAutoCompletion(includeReached)
 
     local ok, err = pcall(function()
         local owned = {}
-        self:ForEachOwnedItemId(function(itemId)
+        local ownedLinks = {}
+        self:ForEachOwnedItemLink(function(link)
+            local itemId = ItemLinkToId(link)
             if itemId then
                 owned[itemId] = true
+                ownedLinks[#ownedLinks + 1] = link
             end
         end)
 
@@ -2953,6 +3238,9 @@ function GQ.Log:CheckAutoCompletion(includeReached)
             end
             if entry.sourceType == "profession" and GetCraftedTimestamp(entry.itemId) then
                 return true
+            end
+            if entry.suffix and entry.suffix ~= "" then
+                return self:EntrySuffixOwned(entry, ownedLinks)
             end
             return owned[entry.itemId] == true
         end
@@ -3029,7 +3317,13 @@ function GQ.Log:UnionOwnedAtLogin()
 
     local function add(link)
         local id = ItemLinkToId(link)
-        if id then
+        if not id then
+            return
+        end
+        local fullName = GQ.Data and GQ.Data.ItemLinkFullName and GQ.Data:ItemLinkFullName(link)
+        if fullName and fullName:lower():find(" of ", 1, true) then
+            self.ownedAtLogin[fullName:lower()] = true
+        else
             self.ownedAtLogin[id] = true
         end
     end
@@ -4194,7 +4488,9 @@ function GQ.Log:LayoutLogColumns(frame)
         frame.listInset:SetPoint("TOPLEFT", logPage, "TOPLEFT", 0, listTop)
         frame.listInset:SetPoint("BOTTOMLEFT", logPage, "BOTTOMLEFT", 0, FOOTER_OFFSET)
         frame.listInset:SetWidth(LEFT_COLUMN_WIDTH)
-        ApplyBlackBackground(frame.listInset)
+        if not self:LogSceneTexture() then
+            ApplyBlackBackground(frame.listInset)
+        end
         ApplyMetalEdge(frame.listInset, 16)
     end
 
@@ -4225,6 +4521,10 @@ function GQ.Log:LayoutLogColumns(frame)
         frame.detailBg:SetPoint("TOPLEFT", logPage, "TOPLEFT", LEFT_COLUMN_WIDTH + COLUMN_GAP, listTop)
         frame.detailBg:SetPoint("BOTTOMRIGHT", logPage, "BOTTOMRIGHT", 0, FOOTER_OFFSET)
         ApplyMetalEdge(frame.detailBg, 16)
+    end
+
+    if self.UpdateLogScene then
+        self:UpdateLogScene()
     end
 
     if frame.detailChild then
@@ -4314,6 +4614,9 @@ function GQ.Log:ApplyPageTab()
         self:UpdateSpecButton()
     elseif self.frame.tabSpecControl then
         self.frame.tabSpecControl:Hide()
+    end
+    if self.UpdateSimClassRowArt then
+        self:UpdateSimClassRowArt()
     end
 end
 
@@ -4520,26 +4823,30 @@ function GQ.Log:EnsureSimulatorPage(frame)
     local classOrder = (GQ.Preview and GQ.Preview.CLASS_ORDER) or {
         "WARRIOR", "PALADIN", "HUNTER", "ROGUE", "PRIEST", "SHAMAN", "MAGE", "WARLOCK", "DRUID",
     }
-    local previous
     for i, classFile in ipairs(classOrder) do
         local btn = CreateFrame("Button", "GearQuestSimClass" .. classFile, classInset)
         btn:SetHeight(22)
-        if previous then
-            btn:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, -1)
-            btn:SetPoint("TOPRIGHT", previous, "BOTTOMRIGHT", 0, -1)
-        else
-            btn:SetPoint("TOPLEFT", classTitle, "BOTTOMLEFT", -4, -8)
-            btn:SetPoint("TOPRIGHT", classInset, "TOPRIGHT", -8, -30)
-        end
 
-        btn.highlight = btn:CreateTexture(nil, "BACKGROUND")
+        btn.scene = btn:CreateTexture(nil, "BACKGROUND", nil, 0)
+        btn.scene:SetAllPoints()
+        btn.scene:Hide()
+
+        btn.shade = btn:CreateTexture(nil, "BACKGROUND", nil, 1)
+        btn.shade:SetAllPoints()
+        btn.shade:Hide()
+
+        btn.highlight = btn:CreateTexture(nil, "ARTWORK")
         btn.highlight:SetAllPoints()
-        btn.highlight:SetColorTexture(0.28, 0.22, 0.08, 0.55)
+        btn.highlight:SetColorTexture(0.90, 0.75, 0.28, 1)
+        btn.highlight:SetAlpha(0.22)
         btn.highlight:Hide()
 
-        btn.text = btn:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-        btn.text:SetPoint("LEFT", btn, "LEFT", 12, 0)
+        btn.text = CreateFontStringWithFallback(btn, SIM_CLASS_FONTS)
+        btn.text:SetDrawLayer("OVERLAY")
+        btn.text:SetPoint("LEFT", btn, "LEFT", 14, 0)
         btn.text:SetJustifyH("LEFT")
+        btn.text:SetShadowColor(0, 0, 0, 0.85)
+        btn.text:SetShadowOffset(1, -1)
         local label = (GQ.Preview and GQ.Preview.FormatClassName and GQ.Preview:FormatClassName(classFile)) or classFile
         btn.text:SetText(label)
         local colors = _G.RAID_CLASS_COLORS and _G.RAID_CLASS_COLORS[classFile]
@@ -4556,6 +4863,8 @@ function GQ.Log:EnsureSimulatorPage(frame)
         end)
         btn:SetScript("OnEnter", function(self)
             if not self.selected then
+                local art = self.scene and self.scene:IsShown()
+                self.highlight:SetAlpha(art and 0.12 or 0.35)
                 self.highlight:Show()
             end
         end)
@@ -4566,7 +4875,6 @@ function GQ.Log:EnsureSimulatorPage(frame)
         end)
 
         frame.simClassButtons[i] = btn
-        previous = btn
     end
 
     local simDetail = CreateFrame("Frame", nil, simPage)
@@ -4737,6 +5045,31 @@ function GQ.Log:LayoutSimulatorPage(frame)
     ApplyBlackBackground(frame.simClassInset)
     ApplyMetalEdge(frame.simClassInset, 16)
 
+    if frame.simClassTitle then
+        frame.simClassTitle:Hide()
+    end
+    local buttons = frame.simClassButtons
+    if buttons and #buttons > 0 then
+        local n = #buttons
+        local innerH = SimulatorClassInsetHeight(frame.simClassInset) - (SIM_CLASS_ROW_PAD * 2)
+        local rowH = math.floor((innerH - (SIM_CLASS_ROW_GAP * (n - 1))) / n)
+        if rowH < 16 then
+            rowH = 16
+        end
+        local rowW = LEFT_COLUMN_WIDTH - (SIM_CLASS_ROW_PAD * 2)
+        for i, btn in ipairs(buttons) do
+            local y = -SIM_CLASS_ROW_PAD - ((i - 1) * (rowH + SIM_CLASS_ROW_GAP))
+            btn:ClearAllPoints()
+            btn:SetPoint("TOPLEFT", frame.simClassInset, "TOPLEFT", SIM_CLASS_ROW_PAD, y)
+            btn:SetSize(rowW, rowH)
+            btn.rowW = rowW
+            btn.rowH = rowH
+        end
+    end
+    if self.UpdateSimClassRowArt then
+        self:UpdateSimClassRowArt()
+    end
+
     frame.simDetail:ClearAllPoints()
     frame.simDetail:SetPoint("TOPLEFT", frame.simPage, "TOPLEFT", LEFT_COLUMN_WIDTH + COLUMN_GAP, LOG_SECTION_TOP)
     frame.simDetail:SetPoint("BOTTOMRIGHT", frame.simPage, "BOTTOMRIGHT", 0, FOOTER_OFFSET)
@@ -4854,6 +5187,54 @@ function GQ.Log:EnsureSettingsPage(frame)
     hint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
     frame.settingsHint = hint
 
+    local artLabel = CreateFontStringWithFallback(detail, QUEST_DETAIL_TITLE_FONTS)
+    artLabel:SetJustifyH("LEFT")
+    artLabel:SetText("Remove background art")
+    artLabel:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    frame.settingsArtLabel = artLabel
+
+    local artHit = CreateFrame("Button", nil, detail)
+    artHit:SetPoint("TOPLEFT", hint, "BOTTOMLEFT", 0, -16)
+    artHit:SetSize(math.max(artLabel:GetStringWidth() or 0, 1) + 4, math.max(artLabel:GetStringHeight() or 0, 18))
+    artLabel:SetParent(artHit)
+    artLabel:ClearAllPoints()
+    artLabel:SetPoint("LEFT", artHit, "LEFT", 0, 0)
+    frame.settingsArtLabelHit = artHit
+
+    local function ApplyArtCheck(checked)
+        GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+        GearQuestForeverDB.settings.hideLogArt = checked and true or false
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if log and log.UpdateLogScene then
+            log:UpdateLogScene()
+        end
+    end
+
+    local artCheck = CreateSettingsCheck(detail, "")
+    artCheck:SetPoint("RIGHT", artHit, "LEFT", -6, 0)
+    if artCheck.text then
+        artCheck.text:SetText("")
+        artCheck.text:Hide()
+    end
+    artCheck:SetScript("OnClick", function(self)
+        ApplyArtCheck(self:GetChecked())
+    end)
+    artHit:SetScript("OnClick", function()
+        local checked = not artCheck:GetChecked()
+        artCheck:SetChecked(checked)
+        ApplyArtCheck(checked)
+    end)
+    frame.settingsArtCheck = artCheck
+
+    local artHint = CreateFontStringWithFallback(detail, SETTINGS_NOTE_FONTS)
+    artHint:SetPoint("TOPLEFT", artHit, "BOTTOMLEFT", 0, -4)
+    artHint:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
+    artHint:SetJustifyH("LEFT")
+    artHint:SetWordWrap(true)
+    artHint:SetText("Shows the plain brown log background instead of the class art.")
+    artHint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
+    frame.settingsArtHint = artHint
+
     return page
 end
 
@@ -4893,6 +5274,24 @@ function GQ.Log:RefreshSettings()
         end
         if height and height > 1 then
             hit:SetHeight(height)
+        end
+    end
+
+    local artCheck = frame.settingsArtCheck
+    if artCheck then
+        local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+        artCheck:SetChecked(settings and settings.hideLogArt and true or false)
+    end
+    local artLabel = frame.settingsArtLabel
+    local artHit = frame.settingsArtLabelHit
+    if artLabel and artHit and artLabel.GetStringWidth then
+        local width = artLabel:GetStringWidth()
+        local height = artLabel.GetStringHeight and artLabel:GetStringHeight()
+        if width and width > 1 then
+            artHit:SetWidth(width + 4)
+        end
+        if height and height > 1 then
+            artHit:SetHeight(height)
         end
     end
 end
@@ -4941,6 +5340,8 @@ function GQ.Log:RefreshSimulator()
         local selected = btn.classFile == self.simClass
         btn.selected = selected
         if selected then
+            local art = btn.scene and btn.scene:IsShown()
+            btn.highlight:SetAlpha(art and 0.22 or 0.55)
             btn.highlight:Show()
         else
             btn.highlight:Hide()
@@ -5757,6 +6158,7 @@ end
 
 function GQ.Log:Refresh()
     self:HideSpecPicker()
+    self:UpdateLogScene()
     self:EnsureActiveListCaches()
 
     local classFile = GQ:GetEffectiveClass()

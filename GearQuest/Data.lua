@@ -7604,15 +7604,21 @@ function GQ.Data:EntrySuffixMatchesLink(entry, link)
         return true
     end
 
-    local rolledId = self:SuffixIdFromLink(link)
-    if entry.suffixId and entry.suffixId ~= 0 then
-        if not rolledId then
-            return false
-        end
-        return rolledId >= entry.suffixId
+    -- The full green name is the hunt. "of the Bear" is not "of the Falcon",
+    -- even though both share the base item id. A higher suffix id is a
+    -- different enchant, not a better roll of this one.
+    local fullName = self:ItemLinkFullName(link)
+    local target = self:GetEntryDisplayName(entry)
+    if fullName and target and not self:IsPlaceholderItemName(target, entry.itemId) then
+        return fullName:lower() == self:NormalizeItemName(target):lower()
     end
 
-    return self:ItemNameMatchesEntry(self:ItemNameFromLink(link), entry)
+    local rolledId = self:SuffixIdFromLink(link)
+    if entry.suffixId and entry.suffixId ~= 0 and rolledId then
+        return rolledId == entry.suffixId
+    end
+
+    return false
 end
 
 function GQ.Data:ResolveSuffixItemLink(entry)
@@ -8068,6 +8074,64 @@ function GQ.Data:ShowClientWaitTooltip(tooltip, entry, missing)
     end
 end
 
+local SCORED_STAT_ORDER = {
+    { key = "armor", label = "Armor" },
+    { key = "str", label = "Strength" },
+    { key = "agi", label = "Agility" },
+    { key = "sta", label = "Stamina" },
+    { key = "int", label = "Intellect" },
+    { key = "spi", label = "Spirit" },
+    { key = "sp", label = "Spell Power" },
+    { key = "heal", label = "Healing" },
+    { key = "ap", label = "Attack Power" },
+}
+
+function GQ.Data:TooltipPlainText(tooltip)
+    if not tooltip or not tooltip.GetName or not tooltip.NumLines then
+        return ""
+    end
+    local name = tooltip:GetName()
+    local parts = {}
+    for i = 1, tooltip:NumLines() or 0 do
+        local fs = name and _G[name .. "TextLeft" .. i]
+        local text = GQ.PublicText(fs and fs.GetText and fs:GetText())
+        if text and text ~= "" then
+            parts[#parts + 1] = text
+        end
+    end
+    return table.concat(parts, "\n")
+end
+
+-- Items with no Wowhead tip still have the stats we score from. If the
+-- client tooltip already printed them, leave it alone.
+function GQ.Data:AppendScoredStatLines(tooltip, itemId)
+    local row = self.scoredStats and itemId and self.scoredStats[itemId]
+    if not tooltip or not row then
+        return
+    end
+    local body = self:TooltipPlainText(tooltip):lower()
+    for i = 1, #SCORED_STAT_ORDER do
+        local spec = SCORED_STAT_ORDER[i]
+        local value = row[spec.key]
+        if type(value) == "number" and value ~= 0 and not body:find(spec.label:lower(), 1, true) then
+            local line
+            if spec.key == "armor" then
+                line = string.format("%d Armor", value)
+            elseif value > 0 then
+                line = string.format("+%d %s", value, spec.label)
+            else
+                line = string.format("%d %s", value, spec.label)
+            end
+            local r, g, b = 0, 1, 0
+            if value < 0 then
+                r, g, b = 1, 0.2, 0.2
+            end
+            tooltip:AddLine(line, r, g, b)
+            body = body .. "\n" .. spec.label:lower()
+        end
+    end
+end
+
 function GQ.Data:PopulateEntryItemTooltip(tooltip, entry)
     if not tooltip or not entry or not entry.itemId then
         return false
@@ -8102,7 +8166,16 @@ function GQ.Data:PopulateEntryItemTooltip(tooltip, entry)
         return true
     end
 
+    -- No stored tip. The client tooltip has the armor and stats when the
+    -- item is known. Scored stats fill in only the lines still missing.
+    if self:ShowClientItemTooltip(tooltip, entry) and not self:TooltipLooksRetrieving(tooltip) then
+        self:AppendScoredStatLines(tooltip, entry.itemId)
+        self:ClearPendingItemTooltip(tooltip)
+        return true
+    end
+
     self:ShowFactFallbackTooltip(tooltip, entry)
+    self:AppendScoredStatLines(tooltip, entry.itemId)
     self:ClearPendingItemTooltip(tooltip)
     return true
 end
@@ -8198,6 +8271,26 @@ function GQ.Data:ItemLinkToId(link)
     end
 
     return tonumber(link:match("item:(%d+)"))
+end
+
+function GQ.Data:ItemLinkFullName(link)
+    if not link then
+        return nil
+    end
+
+    local bracket = link:match("%[(.-)%]")
+    if bracket and bracket ~= "" and not self:IsPlaceholderItemName(bracket) then
+        return self:NormalizeItemName(bracket)
+    end
+
+    if GetItemInfo then
+        local name = GetItemInfo(link)
+        if type(name) == "string" and name ~= "" and not self:IsPlaceholderItemName(name) then
+            return self:NormalizeItemName(name)
+        end
+    end
+
+    return nil
 end
 
 function GQ.Data:ItemNameFromLink(link)

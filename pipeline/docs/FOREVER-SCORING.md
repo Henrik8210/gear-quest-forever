@@ -323,7 +323,19 @@ paragraph.
   line. A stored tip with real newlines from the nether HTML is the source.
   Client set-bonus overlay only when the bonuses are usable
   (`GetClientSetBlock` / `ApplyClientSetBlock`).
-- **No Forever tip** goes to `ShowClientItemTooltip` (`SetItemByID`).
+- **No Forever tip** goes to `ShowClientItemTooltip` (`SetItemByID`), then
+  `AppendScoredStatLines` from `GQ.Data.scoredStats` for any of armor, str,
+  agi, sta, int, spi, sp, heal, ap still missing from that tip. The same
+  lines are added to the fact fallback. **Belt of the Stars** (7107) has no
+  Forever tip: 117 armor, +6 Strength, +6 Stamina.
+  `Data.ScoredStats.generated.lua` must start with `local _, GQ = ...`
+  (`GQ` is the addon table, not a global). It loads after ForeverAudit.
+- A green random enchant completes on the **full name**, not the base item
+  id. `EntrySuffixMatchesLink` compares that name (case-insensitive).
+  `of the Bear` is not `of the Falcon`. An exact suffix id is only the
+  fallback when the name is not ready. Do not treat a higher suffix id as
+  this hunt. `ownedAtLogin` stores the lowercased full name when the link
+  contains ` of `, otherwise the item id.
 - Keep the Equip sentence `Increases damage and healing done by magical
   spells and effects by up to N`. That sentence **is** the spell power on a
   weapon. Do not strip it (`STALE_EQUIP` is gone). A green `+N Spell Power`
@@ -343,6 +355,49 @@ paragraph.
   them. Do not clip `GearQuestLogListScrollFrame` or
   `GearQuestLogDetailScrollFrame`. The ScrollFrame already clips its scroll
   child. The bar still hides when the content fits.
+- **Remove background art** sits under Hide minimap icon.
+  `GearQuestForeverDB.settings.hideLogArt`. Unchecked by default, so the
+  class scene is on. Checked restores the plain brown log and the solid
+  list fill.
+
+### Class identity scenes
+
+One backdrop per class, `GearQuest/Art/GQ-LogScene-<Class>.png`. `SetTexture`
+must include `.png` (without the extension WoW looks for `.blp` / `.tga`).
+
+Only the class you are playing or simulating is `SetTexture`'d
+(`LOG_SCENE_TEXTURE` / `LogSceneTexture`). The other eight stay on disk.
+Shared overlays, not per class: `GQ-LogScene-Vignette.png` (corner shadow)
+and `GQ-ListShade.png` (list darker on the left). Parchment alpha is
+**0.72** while a scene is showing.
+
+Do not stretch a scene to the window. The log is 768×512 and the pictures
+are wider. `ApplyLogSceneCrop` center-crops using `LOG_SCENE_SIZE` (the
+file's real pixels) against the texture rect (frame size minus 2px). A
+circle in the art stays a circle. Folder exports are **1024×572** except
+**Rogue 1024×559**. Shaman stays the existing **1024×512** file. Do not
+replace it with the folder `Shaman.jpg`. Export is color **0.58** and
+brightness **0.90** on the native pixels. No non-uniform scale.
+
+`ApplyBlackBackground` calls `SetColorTexture` on `listInset.blackBg`, which
+is the same texture as the list shade. `UpdateLogScene` runs after that and
+must `SetTexture` the shade again every time a scene is showing. A
+"already loaded" flag leaves the list solid black.
+
+### Simulator class rows
+
+The nine class buttons fill `simClassInset`. That frame keeps the same
+anchors as the parchment. No scroll. Rows share the inner width (10px pad,
+1px gap). The "Classes" title is hidden.
+
+Each row is a center horizontal band of that class's scene
+(`ApplySimClassRowCrop`), full width of the picture, top and bottom cut so
+the band matches the row. `GQ-ClassRowShade.png` darkens the left (about
+the first two-thirds) so the class-colored name reads, and the right side
+of the art stays clear. Names use `QuestFont_Super_Huge`.
+
+Those nine files load only while the Simulator tab is open and
+`hideLogArt` is off. Leaving the tab clears the textures.
 
 **Do not scan the live client for new items.** `Collector.lua` is gone. Do not
 hook `TRAINER_SHOW` / `TRAINER_UPDATE`, call `SetTrainerService`, rebuild the
@@ -737,6 +792,14 @@ Forever ones.
 physical specs carry no sp/heal except Ret, Enhance, Enhancement Tank, and
 Paladin Protection. Warrior Protection is physical (no SP/heal).
 
+### Wand damage
+
+Priest, mage, and warlock `dpsWeightRanged` is **0.25** from level 10
+(levels 1–9 stay 0.5). Wand damage is part of the score. A large DPS gap
+beats a small intellect or spirit roll. A wand that also has real stats
+still leads at 60. Greater Magic Wand is the client **17.5** DPS
+(22–41 Arcane), not the older 11.39 Wowhead line.
+
 ### Hunt instructions
 
 `sources.json` `instructions` are one short sentence. Zone, quest name, and
@@ -744,6 +807,12 @@ NPC live in their own fields — the log prints them once. World drops:
 `World drop around level X-Y.` Quests: `Reward from the quest 'Name'.`
 Vendors/bosses: `Bought from X.` / `Drops from X.` Auction House is a
 separate BoE line, not repeated inside the sentence.
+
+**Lookie's Spyglass** (273298) is `boss_drop`, "Drops from Cookie.", zone
+The Deadmines, npc Cookie. Do not patch that by replacing the first shared
+"Indexed from Wowhead Forever" sentence in a generated file. That sentence
+belongs to other items. Patch the spyglass fact line, or re-score from
+`sources.json`.
 
 Wowhead HTML tooltips must replace `<br>` / `</div>` with newlines before
 stripping tags (`probe_forever_hunt_tooltips.plain`). The log must not

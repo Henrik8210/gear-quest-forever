@@ -1568,7 +1568,7 @@
     "spellHit": 0.0,
     "spellPen": 0.0
    },
-   "dpsWeightRanged": 0.05
+   "dpsWeightRanged": 0.25
   },
   "discipline": {
    "label": "Discipline",
@@ -1620,7 +1620,7 @@
     "spellHit": 0.0,
     "spellPen": 0.0
    },
-   "dpsWeightRanged": 0.05
+   "dpsWeightRanged": 0.25
   },
   "shadow": {
    "label": "Shadow",
@@ -1672,10 +1672,10 @@
     "spellHit": 0.0,
     "spellPen": 0.05
    },
-   "dpsWeightRanged": 0.15
+   "dpsWeightRanged": 0.25
   },
   "levelling_1_9": {
-   "label": "Levels 1–9",
+   "label": "Levels 1\u20139",
    "weaponStyle": "twohand_or_onehand",
    "dpsWeight": 0.0,
    "armorClass": {
@@ -1784,7 +1784,7 @@
     "spellHit": 0.0,
     "spellPen": 0.05
    },
-   "dpsWeightRanged": 0.15
+   "dpsWeightRanged": 0.25
   },
   "demonology": {
    "label": "Demonology",
@@ -1836,7 +1836,7 @@
     "spellHit": 0.0,
     "spellPen": 0.05
    },
-   "dpsWeightRanged": 0.15
+   "dpsWeightRanged": 0.25
   },
   "destruction": {
    "label": "Destruction",
@@ -1888,10 +1888,10 @@
     "spellHit": 0.0,
     "spellPen": 0.05
    },
-   "dpsWeightRanged": 0.15
+   "dpsWeightRanged": 0.25
   },
   "levelling_1_9": {
-   "label": "Levels 1–9",
+   "label": "Levels 1\u20139",
    "weaponStyle": "twohand_or_onehand",
    "dpsWeight": 0.0,
    "armorClass": {
@@ -2000,7 +2000,7 @@
     "spellHit": 0.0,
     "spellPen": 0.05
    },
-   "dpsWeightRanged": 0.15
+   "dpsWeightRanged": 0.25
   },
   "fire": {
    "label": "Fire",
@@ -2052,7 +2052,7 @@
     "spellHit": 0.0,
     "spellPen": 0.05
    },
-   "dpsWeightRanged": 0.15
+   "dpsWeightRanged": 0.25
   },
   "arcane": {
    "label": "Arcane",
@@ -2104,7 +2104,7 @@
     "spellHit": 0.0,
     "spellPen": 0.05
    },
-   "dpsWeightRanged": 0.15
+   "dpsWeightRanged": 0.25
   },
   "battlemage_frost": {
    "label": "Battle Mage (Frost)",
@@ -2156,7 +2156,7 @@
     "spellHit": 0.0,
     "spellPen": 0.05
    },
-   "dpsWeightRanged": 0.15
+   "dpsWeightRanged": 0.25
   },
   "battlemage_fire": {
    "label": "Battle Mage (Fire)",
@@ -2208,7 +2208,7 @@
     "spellHit": 0.0,
     "spellPen": 0.05
    },
-   "dpsWeightRanged": 0.15
+   "dpsWeightRanged": 0.25
   },
   "battlemage_arcane": {
    "label": "Battle Mage (Arcane)",
@@ -2260,10 +2260,10 @@
     "spellHit": 0.0,
     "spellPen": 0.05
    },
-   "dpsWeightRanged": 0.15
+   "dpsWeightRanged": 0.25
   },
   "levelling_1_9": {
-   "label": "Levels 1–9",
+   "label": "Levels 1\u20139",
    "weaponStyle": "twohand_or_onehand",
    "dpsWeight": 0.0,
    "armorClass": {

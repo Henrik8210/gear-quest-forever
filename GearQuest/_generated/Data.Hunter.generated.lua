@@ -2459,7 +2459,7 @@ GQ.Data.hunterItemFacts = {
     [273046]={name="Guardian's Dualblade",quality=3,ilvl=33,reqLevel=28,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
     [273047]={name="Unstable Crystalline Shoulderpads",quality=3,ilvl=33,reqLevel=28,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
     [273088]={name="Snake Eye Kaleidoscope",quality=3,ilvl=22,reqLevel=17,sourceType="boss_drop",instructions="Drops from Lady Anacondra.",zone="Wailing Caverns",npc="Lady Anacondra"},
-    [273298]={name="Lookie's Spyglass",quality=3,ilvl=23,reqLevel=18,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
+    [273298]={name="Lookie's Spyglass",quality=3,ilvl=23,reqLevel=18,sourceType="boss_drop",instructions="Drops from Cookie.",zone="The Deadmines",npc="Cookie"},
     [273456]={name="Cell Keeper's Claws",quality=3,ilvl=22,reqLevel=17,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
     [273457]={name="Sorcerer Collar",quality=3,ilvl=22,reqLevel=17,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
     [273643]={name="Worgenbane Talisman",quality=3,ilvl=26,reqLevel=21,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},

@@ -3518,7 +3518,7 @@ GQ.Data.shamanItemFacts = {
     [273137]={name="Skum's Bucket",quality=3,ilvl=22,reqLevel=17,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
     [273289]={name="Ogre Loincloth",quality=3,ilvl=22,reqLevel=17,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
     [273297]={name="Goblin Hammer",quality=3,ilvl=23,reqLevel=18,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
-    [273298]={name="Lookie's Spyglass",quality=3,ilvl=23,reqLevel=18,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
+    [273298]={name="Lookie's Spyglass",quality=3,ilvl=23,reqLevel=18,sourceType="boss_drop",instructions="Drops from Cookie.",zone="The Deadmines",npc="Cookie"},
     [273336]={name="Premier Centurion's Mail Boots",quality=4,ilvl=65,reqLevel=60,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
     [273337]={name="Premier Champion's Mail Gauntlets",quality=4,ilvl=65,reqLevel=60,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
     [273338]={name="Premier Legionnaire's Mail Waistband",quality=4,ilvl=65,reqLevel=60,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},

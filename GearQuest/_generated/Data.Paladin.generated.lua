@@ -3446,7 +3446,7 @@ GQ.Data.itemFacts = {
     [273289]={name="Ogre Loincloth",quality=3,ilvl=22,reqLevel=17,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
     [273293]={name="Bandsaw Wristbands",quality=3,ilvl=21,reqLevel=16,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
     [273297]={name="Goblin Hammer",quality=3,ilvl=23,reqLevel=18,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
-    [273298]={name="Lookie's Spyglass",quality=3,ilvl=23,reqLevel=18,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
+    [273298]={name="Lookie's Spyglass",quality=3,ilvl=23,reqLevel=18,sourceType="boss_drop",instructions="Drops from Cookie.",zone="The Deadmines",npc="Cookie"},
     [273324]={name="Premier Mortarplate Girdle",quality=3,ilvl=60,reqLevel=55,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
     [273325]={name="Premier Plate Girdle",quality=3,ilvl=60,reqLevel=55,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
     [273327]={name="Premier Knight-Captain's Luminous Armguards",quality=4,ilvl=65,reqLevel=60,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},

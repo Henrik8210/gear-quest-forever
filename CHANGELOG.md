@@ -2,96 +2,59 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v0.2.19-beta
+## v0.2.20-beta
 
-Weapon hovers show spell power again, hunts follow the required level on the tooltip, and a filtered list no longer includes gear from a source you turned off.
+The log has a backdrop for your class. The simulator shows each class on a strip of that same art. Priest, mage, and warlock wands count their damage, and a green "of the …" hunt completes only when the name matches.
 
-The window title reads **GearQuest Forever v0.2.19-beta**.
+The window title reads **GearQuest Forever v0.2.20-beta**.
 
-### Spell power on weapons
+### Class art on the log
 
-Hovering a weapon that increases spell damage and healing used to drop that Equip line, so the weapon looked like it had no spell power. Chest pieces already showed it. The line is back, and it is scored.
+Every class has a scene behind the upgrade list and the parchment: warrior, paladin, hunter, rogue, priest, shaman, mage, warlock, and druid. The window shows the center of the picture and leaves out the edges that do not fit, so nothing is squeezed. A round shape in the art stays round. The corners are shadowed. The list is darker on the left and opens toward the art on the right. The parchment is slightly see-through, so the scene shows behind the text.
 
-"Increases damage and healing done by magical spells and effects by up to N" counts as both healing and spell damage. A green "+N Spell Power" line is spell power only. A line that affects the whole party is not treated as your own spell power. Green world drops are unchanged: **Barbed Club of Healing** still shows the best suffix roll and the slim-chance line.
+Only the class you are playing, or the class you are simulating, is loaded.
 
-**Alliance Holy and Discipline**
+**Settings**, under **Hide minimap icon**: **Remove background art**. Leave it unchecked and the scene stays on. Check it and the log goes back to the plain brown background.
 
-- From level **14**, **Staff of Westfall** is main hand rank **1**. It is the reward from **The Defias Brotherhood** in The Deadmines. It requires level 14. The tip is +5 Intellect, +6 Spirit, up to 48 healing, and up to 16 spell damage.
-- At level **13**, before that staff: **Trogg Scepter** rank 1, **Golemheart Stave** rank 2, **Fang of Magmatus** rank 3.
+### Simulator class list
 
-**Horde Holy and Discipline**
+The nine classes fill the list beside the parchment. The list does not scroll, and it stays the same height as the parchment. Each row uses the full width of that list and shows a slice of that class's scene, with the name in the class color. The left side of the row is dark so the name stays readable. The selected class has a light gold tint.
 
-- **Crescent Staff** (Leaders of the Fang, Wailing Caverns, requires 10) stays rank **1** from level 10 through 17.
-- **Staff of Orgrimmar** (Hidden Enemies, from Thrall in Orgrimmar, requires 9) is on the list from level **10** and is rank **3** from 10 through 17. **Kris of Orgrimmar** is the one-hand from the same quest.
-- **Fang of Magmatus** is scored for Horde Holy. It sits behind Crescent Staff, Trogg Scepter, and Staff of Orgrimmar, so it is not in the top three there.
+### Wands
 
-**Fang of Magmatus** requires level **13**. The item level is 18, and that no longer holds it back. It drops from Magmatus in Hall of Thanes: +4 Intellect, up to 18 healing, and up to 18 spell damage. **Golemheart Stave** drops from Plunder in the same dungeon, also requires 13, and adds stamina, intellect, and spirit on the same 18 / 18.
+From level **10**, priest, mage, and warlock ranged weapons count their damage. A large damage gap beats a small intellect or spirit roll. Levels **1–9** are unchanged.
 
-**Frost mages**, both factions: Golemheart Stave is rank **1** from 13 through 18, and Fang of Magmatus is rank **2**. Shadow priests follow the same shape at 13.
+**Greater Magic Wand** matches the client: **22–41 Arcane**, **17.5** damage per second. The old line was 14–27 and 11.39.
 
-**Royal Dagger** (A Friend of the Family, Stormwind, requires 20, Alliance) shows +4 Intellect and up to 18 healing and 18 spell damage on the hover.
+**Holy and Discipline, both factions**, levels **13–16**, ranged:
 
-### Required level, not item level
+- Rank **1**: **Deepblaze**, from the quest Old Ironforge Incursion.
+- Rank **2**: **Greater Magic Wand** (+2 spell damage, 17.5 dps).
+- Rank **3**: **Dwarven Flamestick** (+2 spirit, 8.89 dps).
 
-A hunt uses the **Requires Level** printed on the tooltip. Item level does not push the piece to a later band when the tooltip already states a level.
+### Lookie's Spyglass
 
-If the tooltip has no required level, that piece is treated as a quest reward, or as some other source that has a level gate, and the quest is looked up. The lowest level that can pick up that quest becomes the required level. Several quests use the lowest one. A required level already printed on the tooltip is never replaced.
+**Lookie's Spyglass** drops from **Cookie** in **The Deadmines**. It is not a world drop. The detail says "Drops from Cookie." Holy priests see it as trinket rank **1** from level **18** through **20**.
 
-- **Staff of Westfall** is 14, from The Defias Brotherhood.
-- **Grave Shroud** is 16.
-- **Staff of Orgrimmar** and **Kris of Orgrimmar** are 9, from Hidden Enemies, so Horde priests see the staff from level 10.
+### Hovers that skipped the stats
 
-Wowhead stopped answering partway through that lookup. Quest rewards that were reached now use the quest's pickup level. The ones that were not reached still use the previous gate.
+A hunt with no Wowhead tooltip now uses the client tip, and any scored stat still missing from that tip is written on the hover: armor, strength, agility, stamina, intellect, spirit, spell power, healing, and attack power.
 
-### Grave Shroud
+**Belt of the Stars** (Look To The Stars, Duskwood, requires level **20**) shows **117** armor, **+6 Strength**, and **+6 Stamina**.
 
-**Grave Shroud** is a back with 20 armor, +3 Strength, +2 Agility, and +5 Stamina. It requires level 16.
+### Green names
 
-- Alliance: quest **Abominable Creatures**.
-- Horde: quest **Unending Torment**.
+A random enchant completes on the full name, not the base item.
 
-Bear tank, both factions: rank **1** at level **16**. From 19 through 22 on Horde Bear it is rank **3**, behind **Sporid Cape** and **Sentry Cloak**.
+- Looting **Shimmering Gloves of Arcane Wrath** does not complete **Shimmering Gloves of Healing**.
+- Buying **Wrangler's Boots of the Bear** does not complete **Wrangler's Boots of the Falcon**.
 
-Cloaks, rings, necks, trinkets, and held-in-off-hand items that had no item type in the data can be hunts now. Grave Shroud was one of those.
+The toast names the piece you actually picked up.
 
-### Weapon slot headers
+### v0.2.19-beta
 
-The main-hand and off-hand lists stay separate. The header names the choice.
+Weapon hovers show spell power again, and a hunt uses the tooltip's required level instead of item level. **Fang of Magmatus** requires **13**. Alliance Holy and Discipline: **Staff of Westfall** is main hand rank **1** from level **14**. Fishing follows the Profession filter. A name that was only "Item" plus a number uses the real item name.
 
-- Mage, priest, and warlock: **Staff or main hand**. Off Hand stays Off Hand.
-- Druid and Enhancement shaman: **Two-hand or main hand**. Enhancement does not dual wield.
-- Hunter: **Two-hand or dual wield**. The ranged slot is labeled **Bow**.
-- Rogue, and Warrior Fury: **Dual wield**.
-- Paladin Retribution and Warrior Arms: **Two-hand**.
-- Paladin Protection and Holy, Warrior Protection, and Shaman Elemental, Restoration, and Enhancement Tank: the off-hand header reads **Shield**.
-
-If a staff is rank 1, rank 2 in that section is the one-hand, and Off Hand rank 1 is the piece that pairs with that one-hand. A second staff can sit at rank 3.
-
-### Source filter
-
-Fishing is a profession. With only **Boss drop** checked, **The 1 Ring** no longer appears. It follows the **Profession** box, and the detail line says Profession. The note still says it is fished up. **Steelscale Crushfish** and **Broken Wine Bottle** follow the same box.
-
-Items found inside another item follow **Container**. Mail and pickpocket follow **Special**. A piece with no known source stays off the list while a filter is on, and still shows when the filter is off.
-
-### Item names
-
-The list and the hover title use the real name when the game client only knows "Item" plus a number.
-
-- **Item 23173** is **Abomination Skin Leggings**.
-- **Item 6750** is **Snake Hoop**.
-
-Every hunt on the lists already had a stored name. Those rows no longer fall back to the number.
-
-### Sets and pinned hunts stay
-
-Re-scoring used the refreshed tooltips. It did not drop the set bonuses or the pieces already treated as the hunt.
-
-- **Embrace of the Viper** (Wailing Caverns) is still the hunt for hunter, rogue, Enhancement shaman, and Feral druid in the same level windows as before.
-- **Defias Leather** and **Chain of the Scarlet Crusade** still rank the way they did in 0.2.18.
-- **Wolfsbane** is still Horde Retribution only. Main hand, rank 1, from level 20 through 26.
-- **Snake Eye Kaleidoscope** is unchanged.
-
-### Earlier versions
 
 ### v0.2.18-beta
 
