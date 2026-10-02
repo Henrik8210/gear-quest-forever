@@ -1,0 +1,787 @@
+"""Index one map coordinate per hunt item and emit it for the log.
+
+Wowhead Forever entity pages carry g_mapperData. Dungeon bosses have an empty
+map, so their pin is the entrance in pipeline/data/dungeon_entrances.json
+(classic doors, plus the two Forever doors that have numbers).
+
+Resume-safe. The cache is pipeline/data/forever_wowhead/coord_cache.json.
+
+  python pipeline/scripts/index_coordinates.py
+  python pipeline/scripts/index_coordinates.py --smoke
+  python pipeline/scripts/index_coordinates.py --emit-only
+"""
+from __future__ import annotations
+
+import gzip
+import json
+import os
+import re
+import sys
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+from collections import Counter
+from pathlib import Path
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from gq_paths import ADDON_GEN, DATA
+
+UA = "wow-classic-data-research/1.0 (+contact: local script)"
+DELAY = float(os.environ.get("GQ_COORD_DELAY", "0.7"))
+DOORS = json.loads((Path(DATA) / "dungeon_entrances.json").read_text(encoding="utf-8"))
+CACHE_PATH = Path(DATA) / "forever_wowhead" / "coord_cache.json"
+QUEST_XML = Path(DATA) / "forever_wowhead" / "quest_req_cache.json"
+JSON_BLOCK = re.compile(r"<json><!\[CDATA\[(.*?)\]\]></json>", re.S)
+GAPS_PATH = Path(DATA) / "coordinate_gaps.json"
+LUA_PATH = Path(ADDON_GEN) / "Data.Coordinates.generated.lua"
+SOURCES = Path(DATA) / "sources.json"
+ITEMS = Path(DATA) / "items.json"
+GENERATED = Path(ADDON_GEN)
+
+NOTE_QUEST = "beginning of the quest or chain"
+NOTE_DOOR = "entrance to dungeon or raid"
+NOTE_VENDOR = "vendor that sells this"
+NOTE_FARM = "a farming spot"
+NOTE_OBJECT = "one of the spots to farm it"
+NOTE_BOSS = "where this boss spawns"
+
+_last = 0.0
+
+
+def fetch(url: str) -> str:
+    global _last
+    wait = DELAY - (time.time() - _last)
+    if wait > 0:
+        time.sleep(wait)
+    delay = 8.0
+    for attempt in range(6):
+        _last = time.time()
+        req = urllib.request.Request(
+            url, headers={"User-Agent": UA, "Accept-Encoding": "gzip"}
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=40) as resp:
+                raw = resp.read()
+                if resp.headers.get("Content-Encoding") == "gzip":
+                    raw = gzip.decompress(raw)
+                return raw.decode("utf-8", "replace")
+        except urllib.error.HTTPError as e:
+            if e.code in (403, 429) and attempt < 5:
+                print(f"  HTTP {e.code} retry in {delay:.0f}s", flush=True)
+                time.sleep(delay)
+                delay = min(delay * 2, 90)
+                continue
+            if e.code == 404:
+                return ""
+            raise
+    return ""
+
+
+def load_cache() -> dict:
+    cache = {"search": {}, "npc": {}, "quest": {}, "object": {}, "itemQuest": {}}
+    if CACHE_PATH.exists():
+        stored = json.loads(CACHE_PATH.read_text(encoding="utf-8"))
+        if isinstance(stored, dict):
+            cache.update(stored)
+    for key in ("search", "npc", "quest", "object", "itemQuest"):
+        if not isinstance(cache.get(key), dict):
+            cache[key] = {}
+    return cache
+
+
+def save_cache(cache: dict) -> None:
+    CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    tmp = CACHE_PATH.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(cache, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    tmp.replace(CACHE_PATH)
+
+
+def json_scripts(html: str) -> dict:
+    out = {}
+    for m in re.finditer(
+        r'<script type="application/json" id="data\.([^"]+)">(\[.*?\])</script>',
+        html,
+    ):
+        try:
+            out[m.group(1)] = json.loads(m.group(2))
+        except json.JSONDecodeError:
+            continue
+    return out
+
+
+def listviews(html: str) -> list[dict]:
+    blobs = json_scripts(html)
+    views = []
+    for m in re.finditer(r"new Listview\(\{(.*?)\}\);", html, re.S):
+        body = m.group(1)
+        template = re.search(r'template:\s*"([^"]+)"', body)
+        lid = re.search(r"\bid:\s*\"([^\"]+)\"", body)
+        page = re.search(r'getPageData\("([^"]+)"\)', body)
+        data = blobs.get(page.group(1)) if page else None
+        views.append(
+            {
+                "template": template.group(1) if template else "",
+                "id": lid.group(1) if lid else "",
+                "data": data if isinstance(data, list) else [],
+            }
+        )
+    return views
+
+
+def faction_from_react(react) -> str | None:
+    if not isinstance(react, list) or len(react) < 2:
+        return None
+    alliance, horde = react[0], react[1]
+    a = alliance == 1
+    h = horde == 1
+    if a and not h:
+        return "Alliance"
+    if h and not a:
+        return "Horde"
+    return None
+
+
+def mapper_spots(html: str) -> list[dict]:
+    i = html.find("g_mapperData")
+    if i < 0:
+        return []
+    eq = html.find("=", i)
+    if eq < 0:
+        return []
+    start = html.find("{", eq)
+    bracket = html.find("[", eq)
+    if start < 0 or (bracket >= 0 and bracket < start):
+        return []
+    depth = 0
+    for p in range(start, len(html)):
+        if html[p] == "{":
+            depth += 1
+        elif html[p] == "}":
+            depth -= 1
+            if depth == 0:
+                try:
+                    data = json.loads(html[start : p + 1])
+                except json.JSONDecodeError:
+                    return []
+                break
+    else:
+        return []
+    spots = []
+    seen = set()
+    if not isinstance(data, dict):
+        return []
+    for groups in data.values():
+        if not isinstance(groups, list):
+            continue
+        for group in groups:
+            if not isinstance(group, dict):
+                continue
+            map_name = group.get("uiMapName") or ""
+            for xy in group.get("coords") or []:
+                if not isinstance(xy, (list, tuple)) or len(xy) < 2:
+                    continue
+                x, y = xy[0], xy[1]
+                if not isinstance(x, (int, float)) or not isinstance(y, (int, float)):
+                    continue
+                if x < 0 or y < 0 or x > 100 or y > 100:
+                    continue
+                key = (map_name, round(float(x), 1), round(float(y), 1))
+                if key in seen or not map_name:
+                    continue
+                seen.add(key)
+                spots.append({"map": map_name, "x": key[1], "y": key[2]})
+    return spots
+
+
+def search_rows(kind: str, name: str, cache: dict) -> list[dict]:
+    key = kind + "\n" + name.casefold()
+    if key in cache["search"]:
+        return cache["search"][key]
+    url = "https://www.wowhead.com/forever/search?q=" + urllib.parse.quote(name)
+    try:
+        html = fetch(url)
+    except Exception as e:
+        print("  search fail", kind, name, e, flush=True)
+        return []
+    want = name.casefold()
+    rows = []
+    for view in listviews(html):
+        if view["template"] != kind:
+            continue
+        for row in view["data"]:
+            if not isinstance(row, dict):
+                continue
+            label = (row.get("displayName") or row.get("name") or "").casefold()
+            if label == want and row.get("id"):
+                rows.append(
+                    {
+                        "id": int(row["id"]),
+                        "name": row.get("displayName") or row.get("name") or name,
+                        "faction": faction_from_react(row.get("react")),
+                    }
+                )
+    cache["search"][key] = rows
+    return rows
+
+
+def npc_record(npc_id: int, cache: dict, hint_faction: str | None = None) -> dict:
+    key = str(npc_id)
+    if key in cache["npc"]:
+        row = cache["npc"][key]
+        if hint_faction and not row.get("faction"):
+            row["faction"] = hint_faction
+        return row
+    try:
+        html = fetch(f"https://www.wowhead.com/forever/npc={npc_id}?power")
+    except Exception as e:
+        print("  npc fail", npc_id, e, flush=True)
+        return {"spots": [], "faction": hint_faction}
+    row = {"spots": mapper_spots(html) if html else [], "faction": hint_faction}
+    cache["npc"][key] = row
+    return row
+
+
+def object_record(object_id: int, cache: dict) -> dict:
+    key = str(object_id)
+    if key in cache["object"]:
+        return cache["object"][key]
+    try:
+        html = fetch(f"https://www.wowhead.com/forever/object={object_id}?power")
+    except Exception as e:
+        print("  object fail", object_id, e, flush=True)
+        return {"spots": []}
+    row = {"spots": mapper_spots(html) if html else []}
+    cache["object"][key] = row
+    return row
+
+
+def quest_side(html: str) -> str | None:
+    i = html.find("Side:")
+    if i < 0:
+        return None
+    chunk = html[i : i + 240].lower()
+    alliance = "icon-alliance" in chunk
+    horde = "icon-horde" in chunk
+    if alliance and not horde:
+        return "Alliance"
+    if horde and not alliance:
+        return "Horde"
+    return None
+
+
+def series_info(html: str, quest_id: int) -> tuple[int | None, bool]:
+    """First quest id in the series, and whether this quest is the last step.
+
+    The current step is bold and has no link. Earlier and later steps are links.
+    A quest with no series table is both the start and the reward.
+    """
+    m = re.search(r'<table class="series">(.*?)</table>', html, re.S)
+    if not m:
+        return None, True
+    steps = []
+    for num, cell in re.findall(r"<th>(\d+)\.</th>\s*<td>(.*?)</td>", m.group(1), re.S):
+        link = re.search(r"quest=(\d+)", cell)
+        steps.append((int(num), int(link.group(1)) if link else quest_id))
+    if not steps:
+        return None, True
+    steps.sort()
+    first = steps[0][1]
+    last = steps[-1][1]
+    return (first if first != quest_id else None), last == quest_id
+
+
+def quest_record(quest_id: int, cache: dict) -> dict:
+    key = str(quest_id)
+    if key in cache["quest"] and "isLast" in cache["quest"][key]:
+        return cache["quest"][key]
+    try:
+        html = fetch(f"https://www.wowhead.com/forever/quest={quest_id}?power")
+    except Exception as e:
+        print("  quest fail", quest_id, e, flush=True)
+        return {
+            "startNpcs": [],
+            "startObjects": [],
+            "earlier": None,
+            "isLast": True,
+            "faction": None,
+        }
+    start = html.find("Start:")
+    end = html.find("End:", start if start >= 0 else 0)
+    chunk = html[start:end] if start >= 0 and end > start else ""
+    npcs = [int(n) for n in re.findall(r"npc=(\d+)", chunk)]
+    objects = [int(n) for n in re.findall(r"object=(\d+)", chunk)]
+    earlier, is_last = series_info(html, quest_id) if html else (None, True)
+    row = {
+        "startNpcs": npcs,
+        "startObjects": objects,
+        "earlier": earlier,
+        "isLast": is_last,
+        "faction": quest_side(html) if html else None,
+    }
+    cache["quest"][key] = row
+    return row
+
+
+def root_quest(quest_id: int, cache: dict, depth: int = 0) -> dict:
+    row = quest_record(quest_id, cache)
+    earlier = row.get("earlier")
+    if earlier and depth < 12 and earlier != quest_id:
+        return root_quest(int(earlier), cache, depth + 1)
+    return row
+
+
+def parse_item_xml(body: str) -> dict | None:
+    m = JSON_BLOCK.search(body or "")
+    if not m:
+        return None
+    blob = m.group(1).strip()
+    if not blob.startswith("{"):
+        blob = "{" + blob
+    if not blob.endswith("}"):
+        blob = blob + "}"
+    try:
+        return json.loads(blob)
+    except json.JSONDecodeError:
+        return None
+
+
+def quest_ids_for_item(item_id: int, quest_name: str, cache: dict, xml_cache: dict) -> list[int]:
+    key = str(item_id)
+    if key in cache["itemQuest"]:
+        return cache["itemQuest"][key]
+    ids = []
+    row = xml_cache.get(key) or {}
+    if not row:
+        try:
+            row = parse_item_xml(fetch(f"https://www.wowhead.com/forever/item={item_id}&xml")) or {}
+        except Exception as e:
+            print("  item xml fail", item_id, e, flush=True)
+            row = {}
+    want = (quest_name or "").casefold()
+    for entry in row.get("sourcemore") or []:
+        if entry.get("t") == 5 and entry.get("ti"):
+            if not want or (entry.get("n") or "").casefold() == want:
+                ids.append(int(entry["ti"]))
+    cache["itemQuest"][key] = ids
+    return ids
+
+
+def hunt_ids() -> list[int]:
+    ids = set()
+    for path in GENERATED.glob("Data.*.generated.lua"):
+        if "Audit" in path.name or "Scored" in path.name or "Stat" in path.name:
+            continue
+        text = path.read_text(encoding="utf-8", errors="replace")
+        ids.update(int(n) for n in re.findall(r"\[(\d+)\]=\{name=", text))
+    return sorted(ids)
+
+
+def door_key(zone: str | None) -> str | None:
+    if not zone:
+        return None
+    z = zone.casefold()
+    keys = sorted(DOORS["entrances"], key=len, reverse=True)
+    for key in keys:
+        k = key.casefold()
+        if z == k or k in z or z in k:
+            return key
+    return None
+
+
+def described_key(zone: str | None) -> str | None:
+    if not zone:
+        return None
+    z = zone.casefold()
+    for key in DOORS["describedOnly"]:
+        k = key.casefold()
+        if z == k or k in z or z in k:
+            return key
+    return None
+
+
+def copy_spots(spots: list[dict], faction: str | None = None) -> list[dict]:
+    out = []
+    for spot in spots:
+        row = {"map": spot["map"], "x": spot["x"], "y": spot["y"]}
+        fac = spot.get("faction") or faction
+        if fac:
+            row["faction"] = fac
+        out.append(row)
+    return out
+
+
+def spots_for_npc_name(name: str, cache: dict) -> list[dict]:
+    if not name or name.casefold() in ("a container", "none"):
+        return []
+    spots = []
+    for row in search_rows("npc", name, cache):
+        rec = npc_record(row["id"], cache, row.get("faction"))
+        fac = rec.get("faction") or row.get("faction")
+        spots.extend(copy_spots(rec.get("spots") or [], fac))
+    return spots
+
+
+def spots_for_object_name(name: str, cache: dict) -> list[dict]:
+    if not name:
+        return []
+    spots = []
+    for row in search_rows("object", name, cache):
+        rec = object_record(row["id"], cache)
+        spots.extend(copy_spots(rec.get("spots") or []))
+    return spots
+
+
+def quest_hits(name: str, item_id: int, cache: dict, xml_cache: dict) -> list[dict]:
+    ids = quest_ids_for_item(item_id, name, cache, xml_cache) if item_id else []
+    if ids:
+        return [{"id": qid, "faction": None} for qid in ids]
+    found = search_rows("quest", name, cache) if name else []
+    if len(found) <= 1:
+        return found
+    # Several quests share the name. The reward is the last step of the series.
+    last = []
+    for hit in found:
+        if quest_record(hit["id"], cache).get("isLast"):
+            last.append(hit)
+    return last or found
+
+
+def spots_for_quest(name: str, item_id: int, cache: dict, xml_cache: dict) -> list[dict]:
+    hits = quest_hits(name, item_id, cache, xml_cache)
+    spots = []
+    seen = set()
+    for hit in hits:
+        root = root_quest(hit["id"], cache)
+        faction = root.get("faction")
+        for npc_id in root.get("startNpcs") or []:
+            rec = npc_record(npc_id, cache)
+            for spot in copy_spots(rec.get("spots") or [], rec.get("faction") or faction):
+                key = (spot["map"], spot["x"], spot["y"], spot.get("faction"))
+                if key not in seen:
+                    seen.add(key)
+                    spots.append(spot)
+        for object_id in root.get("startObjects") or []:
+            rec = object_record(object_id, cache)
+            for spot in copy_spots(rec.get("spots") or [], faction):
+                key = (spot["map"], spot["x"], spot["y"], spot.get("faction"))
+                if key not in seen:
+                    seen.add(key)
+                    spots.append(spot)
+    return spots
+
+
+def faction_names(text: str) -> list[tuple[str, str]]:
+    """'Alliance: Illiyana Moonblaze at Silverwing Grove' -> named quartermasters."""
+    found = []
+    for faction, label in (("Alliance", "Alliance:"), ("Horde", "Horde:")):
+        match = re.search(re.escape(label) + r"\s+(.+?)\s+at\b", text)
+        if match:
+            found.append((match.group(1).strip(), faction))
+    return found
+
+
+def entrance_spots(key: str) -> list[dict]:
+    return copy_spots(DOORS["entrances"].get(key) or [])
+
+
+def resolve_item(item_id: int, src: dict, cache: dict, xml_cache: dict) -> tuple[dict | None, str | None]:
+    kind = src.get("sourceType") or ""
+    zone = src.get("zone")
+    npc = src.get("npc") or ""
+    door = door_key(zone)
+    if not door and npc:
+        mapped = DOORS["bossNpcs"].get(npc)
+        if mapped:
+            door = mapped
+    described = described_key(zone)
+
+    if kind == "boss_drop" or (kind == "world_drop" and door and not npc):
+        if door:
+            spots = entrance_spots(door)
+            return {"note": NOTE_DOOR, "spots": spots, "more": len(spots) > 1}, None
+        if described:
+            return None, "entrance has no exact coordinate yet (" + DOORS["describedOnly"][described] + ")"
+        if npc:
+            spots = spots_for_npc_name(npc, cache)
+            if spots:
+                return {"note": NOTE_BOSS, "spots": spots, "more": len(spots) > 1}, None
+        return None, "dungeon entrance is not known"
+
+    if kind == "quest_reward":
+        spots = spots_for_quest(src.get("questName") or "", item_id, cache, xml_cache)
+        if spots:
+            return {"note": NOTE_QUEST, "spots": spots, "more": len(spots) > 1}, None
+        return None, "quest starter has no map pin"
+
+    if kind == "vendor":
+        spots = spots_for_npc_name(npc, cache)
+        if not spots:
+            for named, fac in faction_names(src.get("instructions") or ""):
+                for spot in spots_for_npc_name(named, cache):
+                    spot["faction"] = fac
+                    spots.append(spot)
+        if spots:
+            return {"note": NOTE_VENDOR, "spots": spots, "more": len(spots) > 1}, None
+        if not npc and "quartermaster" not in (src.get("instructions") or "").lower():
+            return None, "vendor is not named"
+        return None, "vendor has no map pin"
+
+    if kind == "world_drop":
+        if door:
+            spots = entrance_spots(door)
+            return {"note": NOTE_DOOR, "spots": spots, "more": len(spots) > 1}, None
+        if not npc:
+            if described:
+                return None, "entrance has no exact coordinate yet (" + DOORS["describedOnly"][described] + ")"
+            return None, "world drop names no creature"
+        spots = spots_for_npc_name(npc, cache)
+        alts = [
+            a.get("npc")
+            for a in (src.get("alts") or [])
+            if isinstance(a, dict) and a.get("npc") and a.get("npc").casefold() != npc.casefold()
+        ]
+        if spots:
+            more = len(spots) > 1 or len(alts) > 0
+            return {"note": NOTE_FARM, "spots": spots, "more": more}, None
+        if door:
+            spots = entrance_spots(door)
+            return {"note": NOTE_DOOR, "spots": spots, "more": len(spots) > 1}, None
+        return None, "drop creature has no map pin"
+
+    if kind == "profession":
+        return None, "recipe trainer is not listed on the Wowhead page we can fetch"
+
+    if kind == "object_drop":
+        if npc and npc.casefold() not in ("a container",):
+            spots = spots_for_object_name(npc, cache)
+            if not spots:
+                spots = spots_for_npc_name(npc, cache)
+            if spots:
+                return {"note": NOTE_OBJECT, "spots": spots, "more": len(spots) > 1}, None
+        return None, "container is not a named object"
+
+    if kind == "container":
+        return None, "found inside another item, and that container has no pin"
+
+    if kind == "fishing":
+        return None, "fished up, with no pool or zone"
+
+    if kind == "mail":
+        return None, "delivered by mail"
+
+    if kind == "special":
+        if "Ragnaros" in (src.get("instructions") or ""):
+            spots = entrance_spots("Molten Core")
+            return {"note": NOTE_DOOR, "spots": spots, "more": len(spots) > 1}, None
+        return None, "source is a special chain with no starter pin"
+
+    return None, "source type has no coordinate"
+
+
+def lua_spot(spot: dict) -> str:
+    parts = [
+        f'map="{spot["map"].replace(chr(92), "").replace(chr(34), "")}"',
+        f'x={spot["x"]}',
+        f'y={spot["y"]}',
+    ]
+    if spot.get("faction"):
+        parts.append(f'faction="{spot["faction"]}"')
+    return "{" + ",".join(parts) + "}"
+
+
+def emit(rows: dict[int, dict]) -> None:
+    lines = []
+    for iid in sorted(rows):
+        row = rows[iid]
+        spots = ",".join(lua_spot(s) for s in row["spots"])
+        more = ",more=true" if row.get("more") else ""
+        note = row["note"].replace('"', "")
+        lines.append(f'    [{iid}]={{note="{note}"{more},spots={{{spots}}}}},')
+    text = """local _, GQ = ...
+GQ.Data = GQ.Data or {}
+
+-- GENERATED by pipeline/scripts/index_coordinates.py
+-- One displayed coordinate per hunt item. more=true means another valid
+-- spot exists, so the log says so. Faction spots are filtered in the log.
+
+GQ.Data.coordinates = {
+""" + "\n".join(lines) + """
+}
+"""
+    LUA_PATH.write_text(text, encoding="utf-8", newline="\n")
+
+
+def write_gaps(gaps: list[dict], by_type: dict) -> None:
+    summary = {}
+    for kind, ctr in sorted(by_type.items()):
+        summary[kind] = dict(ctr)
+    GAPS_PATH.write_text(
+        json.dumps({"summary": summary, "gaps": gaps}, indent=2, ensure_ascii=False),
+        encoding="utf-8",
+    )
+
+
+def smoke(cache: dict) -> None:
+    samples = [
+        ("npc", "Deputy Willem"),
+        ("quest", "Bounty on Garrick Padfoot"),
+        ("quest", "The Defias Brotherhood"),
+        ("object", "Wooden Chair"),
+    ]
+    for kind, name in samples:
+        rows = search_rows(kind, name, cache)
+        print(kind, name, "->", rows)
+        if kind == "quest" and rows:
+            rec = quest_record(rows[0]["id"], cache)
+            print("  quest", rec)
+            root = root_quest(rows[0]["id"], cache)
+            print("  root start", root.get("startNpcs"), "earlier chain", rec.get("earlier"))
+        if kind == "npc" and rows:
+            print("  spots", npc_record(rows[0]["id"], cache, rows[0].get("faction")))
+        if kind == "object" and rows:
+            print("  spots", object_record(rows[0]["id"], cache))
+    rec = quest_record(166, cache)
+    print("quest 166", rec)
+    print("chain root npcs", root_quest(166, cache).get("startNpcs"), "faction", root_quest(166, cache).get("faction"))
+    save_cache(cache)
+
+
+def main() -> None:
+    cache = load_cache()
+    if "--smoke" in sys.argv:
+        smoke(cache)
+        return
+
+    ids = hunt_ids()
+    sources = json.loads(SOURCES.read_text(encoding="utf-8"))
+    items = json.loads(ITEMS.read_text(encoding="utf-8"))
+    xml_cache = json.loads(QUEST_XML.read_text(encoding="utf-8")) if QUEST_XML.exists() else {}
+    print(f"hunt items {len(ids)}", flush=True)
+
+    if "--emit-only" not in sys.argv:
+        # Touch every entity the resolver needs. Cache makes a rerun cheap.
+        names = {"npc": set(), "quest": set(), "object": set()}
+        checked = 0
+        for iid in ids:
+            src = sources.get(str(iid)) or {}
+            kind = src.get("sourceType")
+            npc = src.get("npc") or ""
+            if kind == "quest_reward" and src.get("questName"):
+                checked += 1
+                if not quest_ids_for_item(iid, src["questName"], cache, xml_cache):
+                    names["quest"].add(src["questName"])
+                if checked % 40 == 0:
+                    save_cache(cache)
+                    print(f"  quest items {checked}", flush=True)
+            elif kind == "vendor" and npc:
+                names["npc"].add(npc)
+            elif kind == "world_drop" and npc and not door_key(src.get("zone")):
+                names["npc"].add(npc)
+            elif kind == "boss_drop" and npc and not door_key(src.get("zone")) and npc not in DOORS["bossNpcs"]:
+                names["npc"].add(npc)
+            elif kind == "object_drop" and npc and npc.casefold() != "a container":
+                names["object"].add(npc)
+        print(
+            f"lookup npc {len(names['npc'])} quest {len(names['quest'])} object {len(names['object'])}",
+            flush=True,
+        )
+        done = 0
+        for kind in ("quest", "npc", "object"):
+            for name in sorted(names[kind]):
+                search_rows(kind, name, cache)
+                done += 1
+                if done % 25 == 0:
+                    save_cache(cache)
+                    print(f"  searched {done}", flush=True)
+        save_cache(cache)
+        # Pages for every id the searches found, plus quest-chain starters.
+        seen_q = set()
+
+        def walk_quest(qid: int) -> None:
+            guard = 0
+            while qid and qid not in seen_q and guard < 12:
+                seen_q.add(qid)
+                row = quest_record(qid, cache)
+                qid = row.get("earlier")
+                guard += 1
+                if len(seen_q) % 25 == 0:
+                    save_cache(cache)
+                    print(f"  quests {len(seen_q)}", flush=True)
+
+        for iid in ids:
+            src = sources.get(str(iid)) or {}
+            if src.get("sourceType") != "quest_reward":
+                continue
+            for qid in quest_ids_for_item(iid, src.get("questName") or "", cache, xml_cache):
+                walk_quest(qid)
+        for name in names["quest"]:
+            for hit in search_rows("quest", name, cache):
+                if quest_record(hit["id"], cache).get("isLast", True):
+                    walk_quest(hit["id"])
+        save_cache(cache)
+        npc_ids = {}
+        for name in names["npc"]:
+            for hit in search_rows("npc", name, cache):
+                npc_ids[hit["id"]] = hit.get("faction")
+        for qid in seen_q:
+            root = root_quest(qid, cache)
+            for npc_id in root.get("startNpcs") or []:
+                npc_ids.setdefault(npc_id, root.get("faction"))
+        n = 0
+        for npc_id, fac in npc_ids.items():
+            npc_record(npc_id, cache, fac)
+            n += 1
+            if n % 25 == 0:
+                save_cache(cache)
+                print(f"  npcs {n}/{len(npc_ids)}", flush=True)
+        obj_ids = []
+        for name in names["object"]:
+            for hit in search_rows("object", name, cache):
+                obj_ids.append(hit["id"])
+        for qkey, row in cache["quest"].items():
+            obj_ids.extend(row.get("startObjects") or [])
+        for i, object_id in enumerate(dict.fromkeys(obj_ids)):
+            object_record(object_id, cache)
+            if (i + 1) % 25 == 0:
+                save_cache(cache)
+        save_cache(cache)
+        print(f"fetched quests {len(seen_q)} npcs {len(npc_ids)} objects {len(set(obj_ids))}", flush=True)
+
+    rows = {}
+    gaps = []
+    by_type = {}
+    for iid in ids:
+        src = sources.get(str(iid)) or {}
+        kind = src.get("sourceType") or "?"
+        ctr = by_type.setdefault(kind, Counter())
+        try:
+            row, reason = resolve_item(iid, src, cache, xml_cache)
+        except Exception as e:
+            row, reason = None, "lookup failed: " + str(e)[:80]
+        if row and row.get("spots"):
+            rows[iid] = row
+            ctr["ok"] += 1
+        else:
+            ctr["gap"] += 1
+            ctr["gap:" + (reason or "unknown")] += 1
+            gaps.append(
+                {
+                    "id": iid,
+                    "name": (items.get(str(iid)) or {}).get("name"),
+                    "sourceType": kind,
+                    "reason": reason,
+                    "zone": src.get("zone"),
+                    "npc": src.get("npc"),
+                    "questName": src.get("questName"),
+                }
+            )
+    emit(rows)
+    write_gaps(gaps, {k: dict(v) for k, v in by_type.items()})
+    print(f"coordinates {len(rows)} gaps {len(gaps)}", flush=True)
+    for kind, ctr in sorted(by_type.items()):
+        print(f"  {kind}: ok {ctr.get('ok', 0)} gap {ctr.get('gap', 0)}", flush=True)
+
+
+if __name__ == "__main__":
+    main()

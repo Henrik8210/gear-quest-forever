@@ -1937,7 +1937,7 @@ GQ.Data.mageItemFacts = {
     [275982]={name="Brilliant Watcher's Signet",quality=4,ilvl=65,reqLevel=60,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
     [276204]={name="Thrash's Trash",quality=3,ilvl=45,reqLevel=40,sourceType="vendor",instructions="Bought from Friz Frazzlespark.",npc="Friz Frazzlespark"},
     [276274]={name="Surfer Shoes",quality=3,ilvl=25,reqLevel=20,sourceType="vendor",instructions="Bought from Jang.",npc="Jang"},
-    [276631]={name="Coldflame Saber",quality=3,ilvl=29,reqLevel=21,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet.",proc="Equip: Melee attacks deal 98 Fire additional damage against Frozen targets."},
+    [276631]={name="Coldflame Saber",quality=3,ilvl=29,reqLevel=21,sourceType="boss_drop",instructions="Drops from Baron Silverlaine.",zone="Shadowfang Keep",npc="Baron Silverlaine",proc="Equip: Melee attacks deal 98 Fire additional damage against Frozen targets."},
     [276765]={name="Leafre's Ring of Precise Spell Power",quality=4,ilvl=66,reqLevel=60,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},
     [276888]={name="Quilboar Toothpick",quality=2,ilvl=24,reqLevel=19,sourceType="quest_reward",instructions="Quest reward."},
     [276897]={name="A Lesson in Destruction",quality=3,ilvl=38,reqLevel=33,sourceType="world_drop",instructions="Indexed from Wowhead Forever. Source not listed yet."},

@@ -7061,6 +7061,35 @@ function GQ.Data:GetEntryInstructions(entry)
     return text
 end
 
+-- One coordinate under the source line. more=true, or a second spot the
+-- viewer's faction can use, adds "more coordinates for this".
+function GQ.Data:CoordinateLine(itemId)
+    local row = self.coordinates and itemId and self.coordinates[itemId]
+    if not row or not row.spots or #row.spots == 0 then
+        return nil
+    end
+    local faction = GQ.GetEffectiveFaction and GQ:GetEffectiveFaction() or nil
+    local mine = {}
+    for i = 1, #row.spots do
+        local spot = row.spots[i]
+        if not spot.faction or spot.faction == "" or spot.faction == faction then
+            mine[#mine + 1] = spot
+        end
+    end
+    if #mine == 0 then
+        return nil
+    end
+    local spot = mine[1]
+    local line = string.format("Coordinates: %s %.1f, %.1f", spot.map or "", spot.x or 0, spot.y or 0)
+    if #mine > 1 or row.more then
+        line = line .. " more coordinates for this"
+    end
+    if row.note and row.note ~= "" then
+        line = line .. " (" .. row.note .. ")"
+    end
+    return line
+end
+
 function GQ.Data:ShouldShowEntry(entry)
     if not entry or self:IsNoveltyProcItem(entry) or self:IsExcludedItem(entry) then
         return false

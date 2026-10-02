@@ -1058,6 +1058,9 @@ function GQ.Tracker:BeginResize()
 end
 
 function GQ.Tracker:Refresh(widthOverride, heightOverride)
+    if GQ.Pins and GQ.Pins.Sync then
+        GQ.Pins:Sync()
+    end
     if not self.frame then
         return
     end

@@ -16,10 +16,11 @@ local PORTRAIT_DISPLAY_SIZE = 61
 local PORTRAIT_OFFSET_X = -6
 local PORTRAIT_OFFSET_Y = 7
 
--- Content area below title bar and above footer buttons.
+-- Track and Show on map sit inside the description. Exit sits in the footer on every tab.
 local HEADER_OFFSET = 74
 local FOOTER_OFFSET = 42
 local FOOTER_BUTTON_Y = 14
+local DETAIL_BUTTON_BAND = 36
 local CONTENT_LEFT = 14
 local CONTENT_RIGHT_GUTTER = 14
 local COLUMN_GAP = 8
@@ -1494,7 +1495,7 @@ local function WireMouseWheel(frame, scroll)
     end)
 end
 
-local function LayoutColumnScroll(scroll, host)
+local function LayoutColumnScroll(scroll, host, bottomPad)
     if not scroll or not host then
         return
     end
@@ -1502,7 +1503,7 @@ local function LayoutColumnScroll(scroll, host)
     scroll:SetParent(host)
     scroll:ClearAllPoints()
     scroll:SetPoint("TOPLEFT", host, "TOPLEFT", PANEL_INSET, -PANEL_INSET)
-    scroll:SetPoint("BOTTOMRIGHT", host, "BOTTOMRIGHT", -(PANEL_INSET + SCROLLBAR_WIDTH + 6), PANEL_INSET)
+    scroll:SetPoint("BOTTOMRIGHT", host, "BOTTOMRIGHT", -(PANEL_INSET + SCROLLBAR_WIDTH + 6), bottomPad or PANEL_INSET)
 
     local scrollName = scroll.GetName and scroll:GetName()
     local bar = scrollName and _G[scrollName .. "ScrollBar"]
@@ -1577,7 +1578,7 @@ local function LayoutDetailScroll(frame)
         return
     end
 
-    LayoutColumnScroll(frame.detailScroll, frame.detailBg)
+    LayoutColumnScroll(frame.detailScroll, frame.detailBg, DETAIL_BUTTON_BAND)
     local log = _G.GearQuest and _G.GearQuest.Log
     if log and log.GetPageTab and log:GetPageTab() == "simulator" then
         frame.detailScroll:Hide()
@@ -4204,29 +4205,22 @@ function GQ.Log:UpdateFooterButtons()
         return
     end
 
-    if self:GetPageTab() == "simulator" then
-        if self.frame.trackBtn then
-            self.frame.trackBtn:Hide()
-        end
-        if self.frame.untrackBtn then
-            self.frame.untrackBtn:Hide()
-        end
-        if self.frame.exitBtn then
-            self.frame.exitBtn:Show()
-        end
-        return
+    local track = self.frame.trackBtn
+    local mapBtn = self.frame.mapBtn
+    if self.frame.untrackBtn then
+        self.frame.untrackBtn:Hide()
     end
 
     if self.frame.exitBtn then
-        self.frame.exitBtn:Hide()
+        self.frame.exitBtn:Show()
     end
 
-    if self:GetPageTab() == "settings" then
-        if self.frame.trackBtn then
-            self.frame.trackBtn:Hide()
+    if self:GetPageTab() ~= "log" then
+        if track then
+            track:Hide()
         end
-        if self.frame.untrackBtn then
-            self.frame.untrackBtn:Hide()
+        if mapBtn then
+            mapBtn:Hide()
         end
         return
     end
@@ -4236,24 +4230,28 @@ function GQ.Log:UpdateFooterButtons()
     local status = selectedId and GetHuntStatus(selectedId) or nil
     local isTracked = status == "tracked"
 
-    if tab == "completed" then
-        self.frame.trackBtn:Hide()
-        self.frame.untrackBtn:Show()
-        self.frame.untrackBtn:SetText("Remove")
-        self.frame.untrackBtn:SetEnabled(selectedId ~= nil)
-    else
-        self.frame.trackBtn:Show()
-        self.frame.untrackBtn:Show()
-        self.frame.trackBtn:SetText("Track")
-        self.frame.untrackBtn:SetText("Untrack")
-
-        if not selectedId then
-            self.frame.trackBtn:SetEnabled(false)
-            self.frame.untrackBtn:SetEnabled(false)
+    if track then
+        track:Show()
+        if tab == "completed" then
+            track:SetText("Remove")
+            track:SetEnabled(selectedId ~= nil)
+        elseif isTracked then
+            track:SetText("Untrack")
+            track:SetEnabled(selectedId ~= nil)
         else
-            self.frame.trackBtn:SetEnabled(not isTracked)
-            self.frame.untrackBtn:SetEnabled(isTracked)
+            track:SetText("Track")
+            track:SetEnabled(selectedId ~= nil)
         end
+    end
+    if mapBtn then
+        mapBtn:Show()
+        local entry = self.selectedEntry
+        if not entry and selectedId and GQ.Data and GQ.Data.GetEntryById then
+            entry = GQ.Data:GetEntryById(selectedId)
+        end
+        local hasSpot = entry and GQ.Map and GQ.Map.HasSpot and GQ.Map:HasSpot(entry)
+        mapBtn:SetEnabled(hasSpot and true or false)
+        mapBtn.missingCoords = entry and not hasSpot and true or false
     end
 end
 
@@ -4535,21 +4533,30 @@ function GQ.Log:LayoutLogColumns(frame)
 end
 
 function GQ.Log:LayoutFooterButtons(frame)
-    if not frame.trackBtn then
+    if not frame.trackBtn or not frame.detailBg then
         return
     end
 
-    local chromeLevel = (frame.gqOuterBorder and frame.gqOuterBorder.GetFrameLevel and frame.gqOuterBorder:GetFrameLevel() or (frame:GetFrameLevel() or 1)) + 2
+    local chromeLevel = (frame.detailBg:GetFrameLevel() or 1) + 5
+    frame.trackBtn:SetParent(frame.detailBg)
     frame.trackBtn:SetFrameLevel(chromeLevel)
     frame.trackBtn:ClearAllPoints()
-    frame.trackBtn:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", CONTENT_LEFT, FOOTER_BUTTON_Y)
+    frame.trackBtn:SetPoint("BOTTOMLEFT", frame.detailBg, "BOTTOMLEFT", 8, 8)
 
-    frame.untrackBtn:SetFrameLevel(chromeLevel)
-    frame.untrackBtn:ClearAllPoints()
-    frame.untrackBtn:SetPoint("LEFT", frame.trackBtn, "RIGHT", 4, 0)
+    if frame.untrackBtn then
+        frame.untrackBtn:Hide()
+    end
+
+    if frame.mapBtn then
+        frame.mapBtn:SetParent(frame.detailBg)
+        frame.mapBtn:SetFrameLevel(chromeLevel)
+        frame.mapBtn:ClearAllPoints()
+        frame.mapBtn:SetPoint("LEFT", frame.trackBtn, "RIGHT", 4, 0)
+    end
 
     if frame.exitBtn then
-        frame.exitBtn:SetFrameLevel(chromeLevel)
+        local windowLevel = (frame.gqOuterBorder and frame.gqOuterBorder.GetFrameLevel and frame.gqOuterBorder:GetFrameLevel() or (frame:GetFrameLevel() or 1)) + 2
+        frame.exitBtn:SetFrameLevel(windowLevel)
         frame.exitBtn:ClearAllPoints()
         frame.exitBtn:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -CONTENT_RIGHT_GUTTER, FOOTER_BUTTON_Y)
     end
@@ -5127,7 +5134,35 @@ function GQ.Log:EnsureSettingsPage(frame)
     general.text:SetJustifyH("LEFT")
     general.text:SetText("General")
     general.text:SetTextColor(GOLD[1], GOLD[2], GOLD[3])
+    general:SetScript("OnClick", function()
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if log then
+            log:SetSettingsSection("general")
+        end
+    end)
     frame.settingsGeneralBtn = general
+
+    local credits = CreateFrame("Button", "GearQuestSettingsCredits", list)
+    credits:SetHeight(22)
+    credits:SetPoint("TOPLEFT", general, "BOTTOMLEFT", 0, -2)
+    credits:SetPoint("TOPRIGHT", general, "BOTTOMRIGHT", 0, -2)
+    credits.highlight = credits:CreateTexture(nil, "BACKGROUND")
+    credits.highlight:SetAllPoints()
+    credits.highlight:SetColorTexture(0.28, 0.22, 0.08, 0.85)
+    credits.highlight:Hide()
+    credits.text = credits:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    credits.text:SetPoint("LEFT", credits, "LEFT", 8, 0)
+    credits.text:SetPoint("RIGHT", credits, "RIGHT", -8, 0)
+    credits.text:SetJustifyH("LEFT")
+    credits.text:SetText("Credits to collaborators")
+    credits.text:SetTextColor(GOLD[1], GOLD[2], GOLD[3])
+    credits:SetScript("OnClick", function()
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if log then
+            log:SetSettingsSection("credits")
+        end
+    end)
+    frame.settingsCreditsBtn = credits
 
     local detail = CreateFrame("Frame", nil, page)
     EnableClipping(detail)
@@ -5235,7 +5270,64 @@ function GQ.Log:EnsureSettingsPage(frame)
     artHint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
     frame.settingsArtHint = artHint
 
+    local creditsBody = CreateFontStringWithFallback(detail, QUEST_DETAIL_BODY_FONTS)
+    creditsBody:SetPoint("TOPLEFT", detail, "TOPLEFT", 16, -18)
+    creditsBody:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
+    creditsBody:SetJustifyH("LEFT")
+    creditsBody:SetText("Credits to collaborators\n\nEao\nMainWon")
+    creditsBody:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    creditsBody:Hide()
+    frame.settingsCreditsBody = creditsBody
+
     return page
+end
+
+function GQ.Log:SetSettingsSection(section)
+    self.settingsSection = section == "credits" and "credits" or "general"
+    local frame = self.frame
+    if not frame then
+        return
+    end
+    local generalOn = self.settingsSection == "general"
+    if frame.settingsGeneralBtn and frame.settingsGeneralBtn.highlight then
+        if generalOn then
+            frame.settingsGeneralBtn.highlight:Show()
+        else
+            frame.settingsGeneralBtn.highlight:Hide()
+        end
+    end
+    if frame.settingsCreditsBtn and frame.settingsCreditsBtn.highlight then
+        if generalOn then
+            frame.settingsCreditsBtn.highlight:Hide()
+        else
+            frame.settingsCreditsBtn.highlight:Show()
+        end
+    end
+    local widgets = {
+        frame.settingsMinimapLabelHit,
+        frame.settingsMinimapCheck,
+        frame.settingsHint,
+        frame.settingsArtLabelHit,
+        frame.settingsArtCheck,
+        frame.settingsArtHint,
+    }
+    for i = 1, #widgets do
+        local widget = widgets[i]
+        if widget then
+            if generalOn then
+                widget:Show()
+            else
+                widget:Hide()
+            end
+        end
+    end
+    if frame.settingsCreditsBody then
+        if generalOn then
+            frame.settingsCreditsBody:Hide()
+        else
+            frame.settingsCreditsBody:Show()
+        end
+    end
 end
 
 function GQ.Log:LayoutSettingsPage(frame)
@@ -5478,7 +5570,13 @@ end
 function GQ.Log:WireControls(frame)
     frame.trackBtn:SetScript("OnClick", function()
         local log = _G.GearQuest and _G.GearQuest.Log
-        if log and log.selectedHuntId then
+        if not log or not log.selectedHuntId then
+            return
+        end
+        local status = GetHuntStatus(log.selectedHuntId)
+        if log:GetListTab() == "completed" or status == "tracked" then
+            log:RequestUntrackHunt(log.selectedHuntId)
+        else
             log:TrackHunt(log.selectedHuntId)
         end
     end)
@@ -5489,6 +5587,22 @@ function GQ.Log:WireControls(frame)
             log:RequestUntrackHunt(log.selectedHuntId)
         end
     end)
+
+    if frame.mapBtn then
+        frame.mapBtn:SetScript("OnClick", function()
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if not log or not GQ.Map or not GQ.Map.Show then
+                return
+            end
+            local entry = log.selectedEntry
+            if not entry and log.selectedHuntId and GQ.Data and GQ.Data.GetEntryById then
+                entry = GQ.Data:GetEntryById(log.selectedHuntId)
+            end
+            if entry then
+                GQ.Map:Show(entry)
+            end
+        end)
+    end
 
     frame.exitBtn:SetScript("OnClick", function()
         local log = _G.GearQuest and _G.GearQuest.Log
@@ -5765,15 +5879,32 @@ function GQ.Log:Init()
     frame.detailEmpty:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
     frame.detailEmpty:Show()
 
-    frame.trackBtn = CreateFrame("Button", "GearQuestLogTrackButton", frame, "UIPanelButtonTemplate")
+    frame.trackBtn = CreateFrame("Button", "GearQuestLogTrackButton", frame.detailBg, "UIPanelButtonTemplate")
     frame.trackBtn:SetSize(106, 22)
-    frame.trackBtn:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 18, 12)
     frame.trackBtn:SetText("Track")
 
     frame.untrackBtn = CreateFrame("Button", "GearQuestLogUntrackButton", frame, "UIPanelButtonTemplate")
     frame.untrackBtn:SetSize(106, 22)
-    frame.untrackBtn:SetPoint("LEFT", frame.trackBtn, "RIGHT", 2, 0)
     frame.untrackBtn:SetText("Untrack")
+    frame.untrackBtn:Hide()
+
+    frame.mapBtn = CreateFrame("Button", "GearQuestLogMapButton", frame.detailBg, "UIPanelButtonTemplate")
+    frame.mapBtn:SetSize(120, 22)
+    frame.mapBtn:SetText("Show on map")
+    if frame.mapBtn.SetMotionScriptsWhileDisabled then
+        frame.mapBtn:SetMotionScriptsWhileDisabled(true)
+    end
+    frame.mapBtn:SetScript("OnEnter", function(self)
+        if not self.missingCoords then
+            return
+        end
+        GameTooltip:SetOwner(self, "ANCHOR_TOP")
+        GameTooltip:SetText("We are missing exact coordinates for this item.", nil, nil, nil, nil, true)
+        GameTooltip:Show()
+    end)
+    frame.mapBtn:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
 
     frame.exitBtn = CreateFrame("Button", "GearQuestLogExitButton", frame, "UIPanelButtonTemplate")
     frame.exitBtn:SetSize(106, 22)
@@ -6022,7 +6153,21 @@ function GQ.Log:BuildDetailLines(entry)
     if entry.npc and not alreadySays(entry.npc) then
         table.insert(lines, "NPC: " .. entry.npc)
     end
+
+    -- The tooltip stays the Wowhead tip. How an imbued weapon is made lives
+    -- here in the description, since Wowhead does not say it.
+    local imbue = GQ.Data and GQ.Data.ImbueInfo and GQ.Data:ImbueInfo(entry.itemId)
+    local combine = imbue and GQ.Data:ImbueCombineLine(imbue)
+    if combine then
+        table.insert(lines, "\n" .. combine)
+    end
+
     table.insert(lines, "\nSource: " .. GQ:GetSourceLabel(entry.sourceType))
+
+    local coordLine = GQ.Data and GQ.Data.CoordinateLine and entry.itemId and GQ.Data:CoordinateLine(entry.itemId)
+    if coordLine then
+        table.insert(lines, "\n" .. coordLine)
+    end
 
     local record = GetHuntRecord(entry.id)
     local completed = record and NormalizeHuntStatus(record.status) == "completed"

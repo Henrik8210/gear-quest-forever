@@ -2,54 +2,59 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v0.2.20-beta
+## v0.3.0-beta
 
-The log has a backdrop for your class. The simulator shows each class on a strip of that same art. Priest, mage, and warlock wands count their damage, and a green "of the …" hunt completes only when the name matches.
+Hunts that have a place to go now say where, and you can open that spot on the map. Track and Untrack are one button under the reward. **Coldflame Saber** drops in Shadowfang Keep, and its hover uses the Equip line.
 
-The window title reads **GearQuest Forever v0.2.20-beta**.
+The window title reads **GearQuest Forever v0.3.0-beta**.
 
-### Class art on the log
+### Where to get it
 
-Every class has a scene behind the upgrade list and the parchment: warrior, paladin, hunter, rogue, priest, shaman, mage, warlock, and druid. The window shows the center of the picture and leaves out the edges that do not fit, so nothing is squeezed. A round shape in the art stays round. The corners are shadowed. The list is darker on the left and opens toward the art on the right. The parchment is slightly see-through, so the scene shows behind the text.
+Under **Source** in the hunt description, a coordinate line appears when we know a spot:
 
-Only the class you are playing, or the class you are simulating, is loaded.
+```
+Coordinates: Elwynn Forest 48.2, 42.8 (beginning of the quest or chain)
+Coordinates: Silverpine Forest 44.8, 67.8 (entrance to dungeon or raid)
+Coordinates: Ashenvale 61.4, 83.8 more coordinates for this (vendor that sells this)
+```
 
-**Settings**, under **Hide minimap icon**: **Remove background art**. Leave it unchecked and the scene stays on. Check it and the log goes back to the plain brown background.
+The zone name is part of the line, because a dungeon door is on a different map than the dungeon. You see your faction, or the faction the simulator is using, plus neutral spots. **more coordinates for this** means another valid spot exists. The line shows the first one.
 
-### Simulator class list
+The note depends on how you get the item:
 
-The nine classes fill the list beside the parchment. The list does not scroll, and it stays the same height as the parchment. Each row uses the full width of that list and shows a slice of that class's scene, with the name in the class color. The left side of the row is dark so the name stays readable. The selected class has a light gold tint.
+- A quest reward points at the start of the quest or its chain.
+- A boss drop or raid trash points at the dungeon or raid entrance, not the boss's room. Classic doors use the classic entrance. **Hall of Thanes** is Ironforge 43.6, 51.7. **Ruins of Lordaeron** is Tirisfal Glades 71.6, 11.4.
+- A vendor is the NPC who sells it.
+- A named world drop is one farming spot for that creature.
+- A crafted piece points at a capital-city trainer for your faction.
 
-### Wands
+**5,555** hunts have a line. **2,541** do not. Most of those are world drops whose text is only "World drop around level X–Y", with no creature to stand on. **Staff of Jordan**, **Fiery War Axe**, and **Hammer of the Northern Wind** are in that group. Some vendors are unnamed, or they stand inside a battleground.
 
-From level **10**, priest, mage, and warlock ranged weapons count their damage. A large damage gap beats a small intellect or spirit roll. Levels **1–9** are unchanged.
+### Show on map, and the pin
 
-**Greater Magic Wand** matches the client: **22–41 Arcane**, **17.5** damage per second. The old line was 14–27 and 11.39.
+**Show on map** sits beside Track, under the reward. It opens the zone and places a waypoint on that coordinate.
 
-**Holy and Discipline, both factions**, levels **13–16**, ranged:
+If the hunt has no coordinate, **Show on map** stays grey. Hovering it says: "We are missing exact coordinates for this item."
 
-- Rank **1**: **Deepblaze**, from the quest Old Ironforge Incursion.
-- Rank **2**: **Greater Magic Wand** (+2 spell damage, 17.5 dps).
-- Rank **3**: **Dwarven Flamestick** (+2 spirit, 8.89 dps).
+**Track** puts one pin on the world map, the same spot as the coordinate line. The icon matches the source: quest, boss, profession, vendor, or world drop. The pin also shows on the minimap when you are close. Click the pin to toggle a blue circle. **Untrack** removes the pin. Hovering the pin shows the hunt name and the coordinate.
 
-### Lookie's Spyglass
+### Track, and Exit
 
-**Lookie's Spyglass** drops from **Cookie** in **The Deadmines**. It is not a world drop. The detail says "Drops from Cookie." Holy priests see it as trinket rank **1** from level **18** through **20**.
+Track and Untrack are one button. It reads **Track** until you track the hunt, then **Untrack**. On **Completed** it reads **Remove**.
 
-### Hovers that skipped the stats
+The list and the description stop above the footer on the log, the simulator, and settings. **Exit** is in that footer on all three.
 
-A hunt with no Wowhead tooltip now uses the client tip, and any scored stat still missing from that tip is written on the hover: armor, strength, agility, stamina, intellect, spirit, spell power, healing, and attack power.
+### Coldflame Saber
 
-**Belt of the Stars** (Look To The Stars, Duskwood, requires level **20**) shows **117** armor, **+6 Strength**, and **+6 Stamina**.
+Mage main hand from level **21**. It drops from **Baron Silverlaine** in **Shadowfang Keep**. It is not a world drop. The hover uses the Equip line, "Increases damage and healing done by magical spells and effects by up to 32," instead of separate spell power and healing lines. The description still says how to combine the Blade of Silverlaine and Imbue Blade.
 
-### Green names
+### Credits
 
-A random enchant completes on the full name, not the base item.
+**Settings** has **Credits to collaborators** under **General**, listing **Eao** and **MainWon**.
 
-- Looting **Shimmering Gloves of Arcane Wrath** does not complete **Shimmering Gloves of Healing**.
-- Buying **Wrangler's Boots of the Bear** does not complete **Wrangler's Boots of the Falcon**.
+### v0.2.20-beta
 
-The toast names the piece you actually picked up.
+Class art behind the log and the simulator class rows. Priest, mage, and warlock wands count damage from level 10. Greater Magic Wand is 17.5 dps. Lookie's Spyglass drops from Cookie. A green "of the …" hunt completes only when the full name matches.
 
 ### v0.2.19-beta
 

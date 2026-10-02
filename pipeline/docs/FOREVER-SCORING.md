@@ -169,11 +169,14 @@ skeleton with that school in front.
 
 - Damage is frost / fire / arcane spell power, plus a small weapon DPS weight
   (`0.35`, so a swing is real and still loses to spell power).
-- **Coldflame Saber** (276631) is mage-only. Client tooltip, not the Wowhead
-  nether tip: 17–32 damage, 12.2 DPS, +7 Intellect, +32 spell power and
-  healing, 98 Fire on melee against Frozen targets, requires level 21.
-  Pinned in `client_item_overrides.json`. Wowhead’s higher white damage and
-  missing spell power must not be synced back.
+- **Coldflame Saber** (276631) is mage-only. The hover is the Wowhead tip:
+  17–32 damage, 12.2 DPS, +7 Intellect, requires level 21, Classes: Mage, and
+  `Equip: Increases damage and healing done by magical spells and effects by
+  up to 32.` That sentence is stored as heal 32 and damageDone 32, never as
+  two green `+32 Spell Power` / `+32 Healing Done` lines. 98 Fire on melee
+  against Frozen targets. Pinned in `client_item_overrides.json`. The 22 Sep
+  nether tip (25–48 damage, 18.25 DPS, no spell bonus) was the stale one; the
+  current page matches the client. Do not sync an older cached tip back over it.
 - The 98 Fire line is every swing while Frozen, priced at 25% of swings for
   frost battle mage and 15% for fire and arcane (`FROZEN_MELEE_UPTIME`).
   Retune if a melee hit breaks the freeze.
@@ -220,8 +223,13 @@ python pipeline/scripts/probe_forever_hunt_tooltips.py
 python pipeline/scripts/sync_forever_item_stats.py --apply
 python pipeline/scripts/rescore_hunter_shaman.py
 python pipeline/scripts/emit_forever_audit.py
+python pipeline/scripts/index_coordinates.py
 .\scripts\sync-addon.ps1
 ```
+
+`index_coordinates.py` is part of the scrape, not a later backfill. A new or
+updated hunt id is not finished until that script has looked for its
+coordinate. The rules are under **Map tracking** below.
 
 `sync_forever_item_stats.py` dry-run first. `--apply` only when the parse of
 known items is sane (Imperial Plate Helm **18/17** Str/Sta, not 38 from the
@@ -238,7 +246,7 @@ the client tip.
 
 | Item | Wowhead nether | Forever client (22 Sep 2026) |
 |------|----------------|------------------------------|
-| Coldflame Saber (276631) | 25–48 damage, 18.25 DPS, +7 Int, no spell power, rlvl stored as 24 | 17–32 damage, 12.2 DPS, +7 Int, +32 spell power and healing, 98 Fire vs Frozen, requires 21, Classes: Mage |
+| Coldflame Saber (276631) | 25–48 damage, 18.25 DPS, +7 Int, no spell power, rlvl stored as 24 | 17–32 damage, 12.2 DPS, +7 Int, +32 spell power and healing, 98 Fire vs Frozen, requires 21, Classes: Mage. **30 Sep 2026:** Wowhead now serves the same numbers and prints `Equip: Increases damage and healing done by magical spells and effects by up to 32.` The hover uses that sentence. The hand-written `+32 Spell Power` / `+32 Healing Done` lines were wrong and are gone. |
 | Blade of Silverlaine (273637) | 26–50 damage, 16.52 DPS, +6 Shadow Resistance, no spell power | 17–33 damage, 10.9 DPS, +6 Shadow Resistance, +28 spell power and healing, requires 21 |
 
 Coldflame is mage-only. After the client stats, it is the mage main hand from
@@ -555,6 +563,8 @@ Hunt-id probe (`pipeline/scripts/probe_forever_hunt_tooltips.py`) labels 200 vs 
 
 **Boss pins** live in `pipeline/data/forever_boss_sources.json`. `apply_pinned_boss_sources` runs after `source_from_row`, which would otherwise clear zone and instructions on every id ≥ 200000. A later ingest must keep that call. Ruins of Lordaeron: Witherfang, The Baron, Viktor the Vile, The Abandoned, Bjork, Rath'Mael. Hall of Thanes: Faldrim Anvilmar, Magmatus, Plunder, Durgen Dirgehammer. Kaleidoscope is on the same pin list. Wowhead renamed **Rotmender's Leggings** (271207) and **Rotmender's Treads** (271214).
 
+**Coldflame Saber (276631)** is on the same pin list: `boss_drop`, Baron Silverlaine, Shadowfang Keep. It was `world_drop` with "Source not listed yet" because the listview names no source. The Blade of Silverlaine it is made from drops there too. The log description adds `Use: Combine the Blade of Silverlaine and Imbue Blade.` The hover does not — it stays the Wowhead tip. A re-score reads the pin from `sources.json`, so the generated mage file does not need a hand edit after one.
+
 **Faction zone pins** live in `pipeline/data/forever_faction_zones.json`. `apply_pinned_faction_zones` sets `zone` only. `zone_ok` is what gates the faction; quest text that names Stormwind does nothing if zone is null. Stormwind City and Teldrassil are Alliance. Thunder Bluff is Horde. Wailing Caverns is both.
 
 - 279868 Duty Bound Leggings, 279869 Remembrance Armor → Stormwind City (Bloodied Insignia, General Marcus Jonathan). Horde must not see them.
@@ -820,3 +830,140 @@ paste `foreverAudit.tip` into the parchment (that is how
 `ItemLevel27Bindswhenequipped` happened).
 
 Full write-up: [../../docs/FOREVER-DATA-MIGRATION.md](../../docs/FOREVER-DATA-MIGRATION.md).
+
+## Map tracking
+
+### Coordinate line (built)
+
+The log description prints one coordinate line **below** the Source line
+when a pin exists. Tracked hunts also pin that spot on the world map and,
+when you are close enough, on the minimap. Clicking a pin toggles a blue
+circle. Show on map opens that zone.
+
+```
+Coordinates: Elwynn Forest 48.2, 42.8 (beginning of the quest or chain)
+Coordinates: Ashenvale 61.4, 83.8 more coordinates for this (vendor that sells this)
+```
+
+The zone name is part of the line because a dungeon door sits on a different
+map than the dungeon. Faction is a filter: the viewer sees their faction
+(or the simulated faction) plus neutral spots. "more coordinates for this"
+means another valid spot exists for that faction, even when only the first
+pin is stored.
+
+`GQ.Data.coordinates` lives in
+`GearQuest/_generated/Data.Coordinates.generated.lua`. `Data.lua`
+`CoordinateLine` formats it. Rebuild with
+`python pipeline/scripts/index_coordinates.py` (resume cache in
+`pipeline/data/forever_wowhead/coord_cache.json`). Items with no pin are
+listed in `pipeline/data/coordinate_gaps.json`.
+
+Notes by source:
+
+- Quest: the giver that starts the quest, or the first step of its Wowhead
+  series. `(beginning of the quest or chain)`
+- Boss and raid trash: the dungeon or raid entrance, not the boss room.
+  `(entrance to dungeon or raid)`
+- Vendor: the NPC that sells it, one pin, faction filtered.
+  `(vendor that sells this)`
+- World drop: the first spawn Wowhead lists for the named creature.
+  `(a farming spot)`
+- World boss with an outdoor pin: `(where this boss spawns)`
+
+Classic dungeon doors are the pre-Cataclysm Questie entrance table (Forever
+still uses classic geography). Forever doors with exact numbers: Hall of
+Thanes 43.6, 51.7 in Ironforge, and Ruins of Lordaeron 71.6, 11.4 in
+Tirisfal Glades. These seven have a description only, so nothing is pinned
+there: Excavation Site (southern Wetlands), City of Dalaran (Alterac
+Mountains boundary), The Drowned City (Gillijim's Isle), Krol'dok Stronghold
+(Riverglades), Alcaz Prison (Alcaz Island), Blackmaw Hold (northern
+Azshara), Shaper's Terrace (northern Un'Goro). Table:
+`pipeline/data/dungeon_entrances.json`.
+
+### What could not be indexed (2 Oct 2026)
+
+Of 8,096 hunt items, **5,555** have a line and **2,541** do not. A second
+pass filled gaps from the Questie location index
+(`pipeline/scripts/enrich_coordinates.py`) and left every pin we already
+had in place. That index is not loaded at runtime.
+
+| Source | With a line | Without | Why the rest are missing |
+|---|---:|---:|---|
+| Boss drop | 663 | 0 | Classic entrance, or the two Forever doors above |
+| Profession | 1,082 | 0 | Capital-city trainer for each faction |
+| Quest reward | 1,501 | 103 | Starter has no outdoor pin in either index |
+| Vendor | 768 | 661 | 257 unnamed; the rest have no outdoor pin |
+| World drop | 1,521 | 1,757 | No named creature, and Questie has no classic-map spawn either |
+| Object | 15 | 9 | Container was not a named object |
+| Container / fishing / mail | 4 | 10 | The container, pool, or mailbox is still unnamed |
+| Special | 1 | 1 | Sulfuras uses the Molten Core door; Ashbringer names no quest |
+
+Do not invent a city pin for a battleground vendor, and do not invent
+numbers for the seven Forever doors above.
+
+### Pins (built)
+
+Tracking a gearquest puts one pin on the world map, the same spot the
+coordinate line shows for the viewer's faction. The pin leaves when the
+hunt is untracked. The icon follows the source: quest, boss, profession,
+vendor, world drop. Clicking the pin toggles a blue circle. The same pin
+shows on the minimap while you are in that zone and close enough. Show on
+map opens the zone and sets the user waypoint.
+
+The pin table is ours. Questie is not required in game.
+
+### Indexing a new or updated item
+
+A Wowhead Forever scrape that adds or changes a hunt item looks up the
+coordinate in the same pass as the usual facts: tooltip stats, required
+level, source, zone, npc, and quest. Run
+`python pipeline/scripts/index_coordinates.py` before syncing the addon.
+It is resume-safe. The cache is
+`pipeline/data/forever_wowhead/coord_cache.json` (gitignored). Use the
+research user agent in that script. A Chrome user agent is rejected. An
+HTTP 403 is not cached as "no pin"; the next run retries it.
+
+The script writes `GearQuest/_generated/Data.Coordinates.generated.lua`
+and `pipeline/data/coordinate_gaps.json`. The toc must keep loading
+`Data.Coordinates.generated.lua`, `Map.lua`, and `Pins.lua`. An item that
+lands in the gap file ships without a coordinate line. **Show on map**
+stays disabled, and hovering it says we are missing exact coordinates.
+Do not invent a pin so the button lights up.
+
+What the lookup uses:
+
+- Quest reward: the giver that starts the quest, or the first step of its
+  Wowhead series. Note `(beginning of the quest or chain)`.
+- Boss drop and raid trash: the dungeon or raid entrance in
+  `pipeline/data/dungeon_entrances.json`, not the boss's room. Note
+  `(entrance to dungeon or raid)`. Classic doors are the pre-Cataclysm
+  entrance table. Forever doors with numbers are Hall of Thanes
+  (Ironforge 43.6, 51.7) and Ruins of Lordaeron (Tirisfal Glades 71.6,
+  11.4). The other seven Forever doors have a description and no numbers.
+  Leave them unpinned until someone measures the door.
+- Vendor: the NPC that sells it, one pin per faction. Note
+  `(vendor that sells this)`. A battleground quartermaster with no outdoor
+  pin stays a gap.
+- Named world drop: the first spawn Wowhead lists for that creature. Note
+  `(a farming spot)`. A line that only says "World drop around level X–Y"
+  names no creature, so it stays a gap. Do not use the center of the zone.
+- Profession: Wowhead spell pages do not list the trainer. The capital-city
+  trainer pins already in the file came from a one-time Questie gap fill
+  (`pipeline/scripts/enrich_coordinates.py`). A later Wowhead scrape will
+  not discover a new trainer. Do not guess a city.
+- World boss with an outdoor pin: `(where this boss spawns)`.
+
+Faction is a filter. Neutral spots show for both. Store one spot per
+faction and set `more=true` when another valid spot exists. The log prints
+`more coordinates for this`. The map pin is that same first spot, not every
+spawn. Continent maps and a 50, 50 zone center are not coordinates.
+
+`enrich_coordinates.py` only fills gaps. It must not replace a Wowhead pin
+or a dungeon door. It does not run on the scrape. Unnamed world drops that
+Questie also cannot place stay in `coordinate_gaps.json`.
+
+Show on map opens that zone and sets the user waypoint. Tracked hunts draw
+one world-map pin and a minimap pin when the player is close. Clicking the
+pin toggles a blue circle. Untrack removes the pin. Track and Untrack are
+one button under the reward, beside Show on map. Exit sits in the footer
+on the log, the simulator, and settings.
