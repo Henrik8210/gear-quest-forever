@@ -1,14 +1,21 @@
 """Refresh Forever nether tooltips onto items we already score.
 
+The id list is every hunt id in the generated class files plus the Forever
+index. Classic pieces are not in the index. Leaving them out keeps the old
+rebuild hover. Do not shrink this list back to index.json.
+
 Does not replace sources.json, except Grave Shroud's quest text and level.
-Does not touch client-pinned items. A stated Requires Level wins over item level.
+Does not touch client-pinned items or Greater Magic Wand 11288. A stated
+Requires Level wins over item level.
 """
 from __future__ import annotations
 
 import json
 import os
+import re
 import sys
 import time
+import urllib.error
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -26,21 +33,50 @@ PINS = Path(DATA) / "client_item_overrides.json"
 CACHE = Path(DATA) / "forever_wowhead" / "refresh_cache.json"
 URL = "https://nether.wowhead.com/forever/tooltip/item/{}"
 UA = "GearQuestForever-data/1.0"
-WORKERS = 8
+WORKERS = 4
+# Client wand. Nether still prints the old 11.39 DPS line. Do not refresh it.
+WAND = 11288
 
 GRAVE = "279865"
 
 
 def fetch(iid: int):
-    req = urllib.request.Request(URL.format(iid), headers={"User-Agent": UA})
-    try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-        if not data.get("tooltip"):
-            return iid, {"error": "no tooltip"}
-        return iid, data
-    except Exception as e:
-        return iid, {"error": str(e)}
+    delay = 4.0
+    last = None
+    for attempt in range(6):
+        req = urllib.request.Request(URL.format(iid), headers={"User-Agent": UA})
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            if not data.get("tooltip"):
+                return iid, {"error": "no tooltip"}
+            return iid, data
+        except urllib.error.HTTPError as e:
+            last = f"http {e.code}"
+            if e.code in (403, 429) and attempt < 5:
+                time.sleep(delay)
+                delay = min(delay * 2, 60)
+                continue
+            return iid, {"error": last}
+        except Exception as e:
+            last = str(e)
+            if attempt < 2:
+                time.sleep(delay)
+                delay = min(delay * 2, 30)
+                continue
+            return iid, {"error": last}
+    return iid, {"error": last or "fetch failed"}
+
+
+def hunt_ids_from_addon() -> list[int]:
+    root = Path(__file__).resolve().parents[2] / "GearQuest" / "_generated"
+    ids = set()
+    for path in root.glob("Data.*.generated.lua"):
+        if any(x in path.name for x in ("Audit", "Scored", "Stat", "Coordinates", "QuestFaction")):
+            continue
+        text = path.read_text(encoding="utf-8", errors="replace")
+        ids.update(int(n) for n in re.findall(r"\[(\d+)\]=\{name=", text))
+    return sorted(ids)
 
 
 def apply_row(item: dict, raw: dict) -> bool:
@@ -120,15 +156,28 @@ def main():
             fixed_kind += 1
 
     if "--missing" in sys.argv:
-        ids = [i for i in missing_ids() if str(i) in items and str(i) not in pins]
+        ids = [i for i in missing_ids() if str(i) in items and str(i) not in pins and i != WAND]
     else:
-        ids = []
+        # Forever index plus every hunt id. Classic pieces such as Ghostly
+        # Mantle are not in the Forever index, so a cache hit there left the
+        # rebuild tooltip in place.
+        ids = set()
         for row in index["items"]:
             iid = int(row["id"])
-            if str(iid) in pins or str(iid) not in items:
+            if str(iid) in pins or str(iid) not in items or iid == WAND:
                 continue
-            ids.append(iid)
-    pending = [i for i in ids if str(i) not in cache or cache[str(i)].get("error")]
+            ids.add(iid)
+        for iid in hunt_ids_from_addon():
+            if str(iid) in pins or str(iid) not in items or iid == WAND:
+                continue
+            ids.add(iid)
+        ids = sorted(ids)
+    def retryable(raw: dict) -> bool:
+        err = raw.get("error") or ""
+        # 404 is a real miss. Do not hammer Wowhead for it again.
+        return bool(err) and "404" not in err
+
+    pending = [i for i in ids if str(i) not in cache or retryable(cache[str(i)])]
     print(f"kind fixes {fixed_kind}; refresh {len(pending)} of {len(ids)}")
 
     done = 0
@@ -203,21 +252,20 @@ def main():
         })
         sources[GRAVE] = src
 
-    ITEMS.write_text(
-        json.dumps(items, separators=(",", ":"), ensure_ascii=False),
-        encoding="utf-8",
-    )
-    SOURCES.write_text(
-        json.dumps(sources, separators=(",", ":"), ensure_ascii=True),
-        encoding="utf-8",
-    )
-    HUNT.write_text(json.dumps(hunt, ensure_ascii=False), encoding="utf-8")
+    def dump(path: Path, obj, **kwargs) -> None:
+        tmp = path.with_suffix(path.suffix + ".tmp")
+        tmp.write_text(json.dumps(obj, **kwargs), encoding="utf-8")
+        tmp.replace(path)
+
+    dump(ITEMS, items, separators=(",", ":"), ensure_ascii=False)
+    dump(SOURCES, sources, separators=(",", ":"), ensure_ascii=True)
+    dump(HUNT, hunt, ensure_ascii=False)
     spell.sort()
     print(f"updated {changed} items; spell-line changes {len(spell)}")
     for row in spell:
         if row[0] in (2042, 270228, 271095, 281297, 279865) or len(spell) <= 30:
             print(f"  {row[0]} {row[1]}: {row[2]} -> {row[3]} rlvl {row[4]}->{row[5]}")
-    focus = [2042, 270228, 271095, 281297, 279865]
+    focus = [2042, 270228, 271095, 281297, 279865, 3324, 6461, 11288]
     print("--- focus ---")
     for iid in focus:
         it = items.get(str(iid)) or {}

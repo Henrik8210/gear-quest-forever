@@ -13,9 +13,14 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
+import sys
 from collections import Counter
 from pathlib import Path
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from commerce_camps import CAMP_NOTE, camp_pins
 
 ROOT = Path(__file__).resolve().parents[2]
 OURS = ROOT / "GearQuest" / "_generated" / "Data.Coordinates.generated.lua"
@@ -85,6 +90,7 @@ GROUP_FOR = {
     "boss_drop": "b",
     "vendor": "v",
     "world_drop": "w",
+    "rare_npc": "w",
 }
 
 NOTES = {
@@ -93,6 +99,7 @@ NOTES = {
     "boss_drop": "entrance to dungeon or raid",
     "vendor": "vendor that sells this",
     "world_drop": "a farming spot",
+    "rare_npc": "where this rare spawns",
     "profession": "the trainer that teaches this",
     "object_drop": "one of the spots to farm it",
     "container": "one of the spots to farm it",
@@ -259,7 +266,16 @@ def main() -> None:
             continue
         source_type = gap.get("sourceType") or ""
         if source_type == "profession":
-            prof = (sources.get(str(item_id)) or {}).get("profession") or ""
+            src = sources.get(str(item_id)) or {}
+            pins = camp_pins(src.get("instructions") or "", src.get("profession"))
+            if pins:
+                spots, more = pins, False
+                note = CAMP_NOTE
+                rows.append((item_id, lua_row(item_id, note, spots, more)))
+                filled_ids.add(item_id)
+                by_type[source_type] += 1
+                continue
+            prof = src.get("profession") or ""
             prof = str(prof).strip().lower()
             body = trainers.get(prof)
             if not body:

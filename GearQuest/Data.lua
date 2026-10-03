@@ -6988,19 +6988,36 @@ GQ.Data.RUNE_BROKER_INSTRUCTIONS = {
         .. "and in Orgrimmar, Thunder Bluff, Undercity, Durotar, Mulgore, and Tirisfal Glades.",
 }
 
--- Quest hubs that are genuinely one-faction (mirrors pipeline ALLIANCE_ZONES / HORDE_ZONES).
+-- One-faction maps (mirrors pipeline ALLIANCE_MAPS / HORDE_MAPS). A pin in the
+-- other faction's city is never shown, even when the spot was tagged wrong.
 GQ.Data.FACTION_ZONE_DENY = {
     Alliance = {
         ["Valley of Trials"] = true, ["Durotar"] = true, ["Razor Hill"] = true, ["Orgrimmar"] = true,
         ["Mulgore"] = true, ["Camp Narache"] = true, ["Thunder Bluff"] = true, ["Deathknell"] = true,
         ["Tirisfal Glades"] = true, ["Brill"] = true, ["Undercity"] = true,
+        ["Silverpine Forest"] = true, ["The Barrens"] = true, ["Camp Mojache"] = true,
     },
     Horde = {
         ["Northshire Valley"] = true, ["Elwynn Forest"] = true, ["Dun Morogh"] = true,
         ["Coldridge Valley"] = true, ["Kharanos"] = true, ["Teldrassil"] = true, ["Shadowglen"] = true,
-        ["Darnassus"] = true, ["Ironforge"] = true, ["Stormwind City"] = true,
+        ["Darnassus"] = true, ["Ironforge"] = true, ["Stormwind City"] = true, ["Loch Modan"] = true,
+        ["Westfall"] = true, ["Darkshore"] = true, ["Redridge Mountains"] = true, ["Duskwood"] = true,
     },
 }
+
+function GQ.Data:SpotVisible(spot, faction)
+    if not spot then
+        return false
+    end
+    local deny = faction and self.FACTION_ZONE_DENY[faction]
+    if deny and spot.map and deny[spot.map] then
+        return false
+    end
+    if spot.faction and spot.faction ~= "" and faction and spot.faction ~= faction then
+        return false
+    end
+    return true
+end
 
 -- On-use AOE / novelty trinkets that are not real stat upgrades for leveling BiS.
 GQ.Data.EXCLUDED_ITEMS = {
@@ -7035,6 +7052,28 @@ function GQ.Data:EntryMatchesPlayerFaction(entry)
     local zone = entry.zone
     if zone and self.FACTION_ZONE_DENY[faction] and self.FACTION_ZONE_DENY[faction][zone] then
         return false
+    end
+
+    local locked = self.questFaction and entry.itemId and self.questFaction[entry.itemId]
+    if locked and locked ~= faction then
+        return false
+    end
+
+    -- A quest whose every pin is the other faction's city is not this side's quest.
+    if entry.sourceType == "quest_reward" and entry.itemId and self.coordinates then
+        local row = self.coordinates[entry.itemId]
+        if row and row.spots and #row.spots > 0 then
+            local any = false
+            for i = 1, #row.spots do
+                if self:SpotVisible(row.spots[i], faction) then
+                    any = true
+                    break
+                end
+            end
+            if not any then
+                return false
+            end
+        end
     end
 
     return true
@@ -7072,7 +7111,7 @@ function GQ.Data:CoordinateLine(itemId)
     local mine = {}
     for i = 1, #row.spots do
         local spot = row.spots[i]
-        if not spot.faction or spot.faction == "" or spot.faction == faction then
+        if self:SpotVisible(spot, faction) then
             mine[#mine + 1] = spot
         end
     end
@@ -8061,7 +8100,8 @@ function GQ.Data:EntryUsesRebuiltTooltip(entry)
     if entry.suffix and entry.suffix ~= "" then
         return true
     end
-    if entry.sourceType ~= "world_drop" then
+    -- Green rare drops are the same jackpot greens. A blue from a rare is not.
+    if entry.sourceType ~= "world_drop" and entry.sourceType ~= "rare_npc" then
         return false
     end
     local quality = self:GetItemQualityForDisplay(entry.itemId)

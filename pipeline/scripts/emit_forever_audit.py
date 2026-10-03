@@ -12,8 +12,12 @@ HUNT = json.loads((CACHE / "hunt_ids.json").read_text(encoding="utf-8"))
 TIPS = json.loads((CACHE / "hunt_tooltips.json").read_text(encoding="utf-8"))
 _PINS = ROOT / "pipeline" / "data" / "client_item_overrides.json"
 PINS = json.loads(_PINS.read_text(encoding="utf-8")) if _PINS.exists() else {}
+ITEMS = json.loads((ROOT / "pipeline" / "data" / "items.json").read_text(encoding="utf-8"))
+SOURCES = json.loads((ROOT / "pipeline" / "data" / "sources.json").read_text(encoding="utf-8"))
 ADDON = ROOT / "GearQuest" / "_generated" / "Data.ForeverAudit.generated.lua"
 SUMMARY = CACHE / "forever_audit.summary.json"
+# Nether still prints 11.39 DPS. The shipped tip is the client 17.5.
+WAND = 11288
 
 
 def lua_str(s: str) -> str:
@@ -36,6 +40,36 @@ def lua_str(s: str) -> str:
     return '"' + s + '"'
 
 
+def existing_rows() -> dict[int, str]:
+    if not ADDON.exists():
+        return {}
+    rows = {}
+    for line in ADDON.read_text(encoding="utf-8").splitlines():
+        match = re.match(r"    \[(\d+)\]=\{.*\},?$", line)
+        if match:
+            rows[int(match.group(1))] = line if line.endswith(",") else line + ","
+    return rows
+
+
+def keep_rebuilt_tip(iid: int) -> bool:
+    """Green random-suffix tooltips stay the rebuilt jackpot tip.
+
+    A green world drop or green rare drop is that hunt. Fixed blues, quests,
+    and boss pieces take the refreshed Wowhead tip instead.
+    """
+    if iid == WAND:
+        return True
+    item = ITEMS.get(str(iid)) or {}
+    if item.get("randomEnchant"):
+        return True
+    source = SOURCES.get(str(iid)) or {}
+    try:
+        quality = int(item.get("quality") or 0)
+    except (TypeError, ValueError):
+        quality = 0
+    return quality == 2 and source.get("sourceType") in ("world_drop", "rare_npc")
+
+
 def strip_leading_name(name: str, tip: str) -> str:
     if not tip:
         return ""
@@ -46,10 +80,17 @@ def strip_leading_name(name: str, tip: str) -> str:
 
 def main():
     names = HUNT.get("names") or {}
+    prior = existing_rows()
+    kept = 0
     rows = []
     status_by_id = {}
     for sid, row in sorted(TIPS.items(), key=lambda kv: int(kv[0])):
         iid = int(sid)
+        if iid in prior and keep_rebuilt_tip(iid):
+            rows.append(prior[iid])
+            status_by_id[iid] = row.get("status") or "ok"
+            kept += 1
+            continue
         status = row.get("status") or "unknown"
         status_by_id[iid] = status
         name = row.get("name") or names.get(sid) or names.get(str(iid))
@@ -152,7 +193,7 @@ GQ.Data.foreverAudit = {
         "source": "Wowhead Forever nether tooltip /forever/tooltip/item/{id}",
     }
     SUMMARY.write_text(json.dumps(summary, indent=2), encoding="utf-8")
-    print("wrote", ADDON, "rows", len(rows))
+    print("wrote", ADDON, "rows", len(rows), "kept rebuilt", kept)
     print("summary", counts, "ok-without-tip", len(empty_tip))
 
 

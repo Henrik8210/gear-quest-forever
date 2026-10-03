@@ -216,6 +216,17 @@ def npc_ok(src, faction):
     side=NPC_FACTION.get(src.get("npc") or "")
     return side is None or side==faction
 
+# Wowhead Side: Alliance / Side: Horde. Side: Both is absent, so both factions score it.
+# Written by index_coordinates.py --repair-quests.
+_QUEST_FACTION_PATH = os.path.join(G, "quest_faction.json")
+QUEST_FACTION = {}
+if os.path.exists(_QUEST_FACTION_PATH):
+    QUEST_FACTION = {int(k): v for k, v in json.load(open(_QUEST_FACTION_PATH, encoding="utf-8")).items()}
+
+def quest_side_ok(it, faction):
+    side = QUEST_FACTION.get(it["id"])
+    return side is None or side == faction
+
 def rep_ok(it, faction):
     for r in (it.get("reqRep") or []):
         side=REP_FACTION.get(r[0] if isinstance(r,(list,tuple)) else r)
@@ -408,6 +419,7 @@ def eligible(it, cls, spec, level, faction, prof, wsubs):
     qr=src.get("questRaces") or 0
     if qr and not (qr & mask): return False          # captured all along, never used
     if not zone_ok(src.get("zone"), faction): return False
+    if not quest_side_ok(it, faction): return False
     iid = it["id"]
     if iid in RUNE_BROKER_ALLIANCE and faction != "Alliance": return False
     if iid in RUNE_BROKER_HORDE and faction != "Horde": return False

@@ -26,6 +26,33 @@ VENDORS = {
     "Engineering": ("Fizzlefuse", "Fritz Fizzle"),
 }
 
+# Wowhead Forever pins for those vendors. One stall each; a second spawn a
+# step away is the same NPC. Fizzlefuse 240654 is a continent pin — the camp
+# vendor is 248200. Horde map 1413, Alliance map 1433.
+CAMP_PINS = {
+    "Leatherworking": (
+        {"map": "The Barrens", "mapId": 1413, "x": 49.6, "y": 29.6, "faction": "Horde"},
+        {"map": "Redridge Mountains", "mapId": 1433, "x": 10.0, "y": 72.4, "faction": "Alliance"},
+    ),
+    "Blacksmithing": (
+        {"map": "The Barrens", "mapId": 1413, "x": 49.8, "y": 29.6, "faction": "Horde"},
+        {"map": "Redridge Mountains", "mapId": 1433, "x": 10.4, "y": 74.4, "faction": "Alliance"},
+    ),
+    "Tailoring": (
+        {"map": "The Barrens", "mapId": 1413, "x": 49.6, "y": 29.4, "faction": "Horde"},
+        {"map": "Redridge Mountains", "mapId": 1433, "x": 10.0, "y": 72.2, "faction": "Alliance"},
+    ),
+    "Enchanting": (
+        {"map": "The Barrens", "mapId": 1413, "x": 49.6, "y": 29.8, "faction": "Horde"},
+        {"map": "Redridge Mountains", "mapId": 1433, "x": 11.2, "y": 71.4, "faction": "Alliance"},
+    ),
+    "Engineering": (
+        {"map": "The Barrens", "mapId": 1413, "x": 49.8, "y": 29.6, "faction": "Horde"},
+        {"map": "Redridge Mountains", "mapId": 1433, "x": 10.4, "y": 74.2, "faction": "Alliance"},
+    ),
+}
+CAMP_NOTE = "vendor that sells the recipe"
+
 # Crafted item names (the recipe name without Pattern / Plans / Formula / Schematic).
 OUTPUTS = {
     "Leatherworking": [
@@ -166,6 +193,27 @@ def camp_profession(item_name):
             if item_name.startswith(prefix):
                 return prof
     return None
+
+
+def camp_pins(instructions, profession=None):
+    """Vendor pins when this hunt sentence is a Merchant's Favor recipe.
+
+    Returns a copy of the two faction spots, or None for a trainer recipe.
+    The sentence is the test. A name prefix is not: Black Mageweave and
+    Golden Scale are trainer crafts that share a dye word with camp sets.
+    """
+    text = instructions or ""
+    if "Durotar Supply" not in text and "Azeroth Commerce Authority" not in text:
+        return None
+    prof = profession if profession in CAMP_PINS else None
+    if not prof:
+        for name, pair in VENDORS.items():
+            if pair[0] in text or pair[1] in text:
+                prof = name
+                break
+    if not prof:
+        return None
+    return [dict(spot) for spot in CAMP_PINS[prof]]
 
 
 def camp_instructions(item_name, profession=None):

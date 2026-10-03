@@ -25,6 +25,7 @@ from collections import Counter
 from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from commerce_camps import CAMP_NOTE, camp_pins
 from gq_paths import ADDON_GEN, DATA
 
 UA = "wow-classic-data-research/1.0 (+contact: local script)"
@@ -43,6 +44,7 @@ NOTE_QUEST = "beginning of the quest or chain"
 NOTE_DOOR = "entrance to dungeon or raid"
 NOTE_VENDOR = "vendor that sells this"
 NOTE_FARM = "a farming spot"
+NOTE_RARE = "where this rare spawns"
 NOTE_OBJECT = "one of the spots to farm it"
 NOTE_BOSS = "where this boss spawns"
 
@@ -256,18 +258,154 @@ def object_record(object_id: int, cache: dict) -> dict:
     return row
 
 
+# Maps that belong to one faction. A pin here is that faction's, even when the
+# quest page says Side: Both and the other faction turns in somewhere else.
+ALLIANCE_MAPS = {
+    "Northshire Valley", "Elwynn Forest", "Dun Morogh", "Coldridge Valley", "Kharanos",
+    "Teldrassil", "Shadowglen", "Darnassus", "Ironforge", "Stormwind City", "Loch Modan",
+    "Westfall", "Darkshore", "Redridge Mountains", "Duskwood",
+}
+HORDE_MAPS = {
+    "Valley of Trials", "Durotar", "Razor Hill", "Orgrimmar", "Mulgore", "Camp Narache",
+    "Thunder Bluff", "Deathknell", "Tirisfal Glades", "Brill", "Undercity",
+    "Silverpine Forest", "The Barrens", "Camp Mojache",
+}
+MAP_IDS = {
+    "Stormwind City": 1453, "Orgrimmar": 1454, "Ironforge": 1455,
+    "Thunder Bluff": 1456, "Darnassus": 1457, "Undercity": 1458,
+    "Durotar": 1411, "Mulgore": 1412, "The Barrens": 1413,
+    "Teldrassil": 1438, "Dun Morogh": 1426, "Elwynn Forest": 1429,
+    "Redridge Mountains": 1433, "Tirisfal Glades": 1420, "Silverpine Forest": 1421,
+    "Westfall": 1436, "Darkshore": 1439, "Loch Modan": 1432, "Duskwood": 1431,
+}
+
+
 def quest_side(html: str) -> str | None:
+    """Alliance, Horde, or None when the quest is Side: Both.
+
+    The end-NPC icons sit in the same infobox. Reading those marked every
+    both-faction quest as Horde and then stamped the Alliance turn-in with
+    that side. Friend of the Library starts in Stormwind and also turns in
+    to Owen Thadd in Undercity.
+    """
     i = html.find("Side:")
     if i < 0:
         return None
-    chunk = html[i : i + 240].lower()
-    alliance = "icon-alliance" in chunk
-    horde = "icon-horde" in chunk
-    if alliance and not horde:
+    match = re.search(r"Side:\s*([A-Za-z]+)", html[i : i + 40])
+    if not match:
+        return None
+    word = match.group(1).lower()
+    if word == "alliance":
         return "Alliance"
-    if horde and not alliance:
+    if word == "horde":
         return "Horde"
     return None
+
+
+def faction_for_map(map_name: str, faction: str | None) -> str | None:
+    if map_name in ALLIANCE_MAPS:
+        return "Alliance"
+    if map_name in HORDE_MAPS:
+        return "Horde"
+    return faction
+
+
+def _json_object_at(html: str, start: int) -> dict | None:
+    if start < 0 or start >= len(html) or html[start] != "{":
+        return None
+    depth = 0
+    for p in range(start, len(html)):
+        if html[p] == "{":
+            depth += 1
+        elif html[p] == "}":
+            depth -= 1
+            if depth == 0:
+                try:
+                    data = json.loads(html[start : p + 1])
+                except json.JSONDecodeError:
+                    return None
+                return data if isinstance(data, dict) else None
+    return None
+
+
+def mapper_places(html: str) -> list[dict]:
+    """One pin per quest NPC, faction taken from react and from the map."""
+    i = html.find("new Mapper(")
+    if i < 0:
+        return []
+    data = _json_object_at(html, html.find("{", i))
+    if not data:
+        return []
+    places = []
+    seen = set()
+    for zone_obj in (data.get("objectives") or {}).values():
+        if not isinstance(zone_obj, dict):
+            continue
+        map_name = zone_obj.get("zone") or ""
+        for level in zone_obj.get("levels") or []:
+            if not isinstance(level, list):
+                continue
+            for pin in level:
+                if not isinstance(pin, dict):
+                    continue
+                coords = pin.get("coords") or []
+                if not coords and pin.get("coord"):
+                    coords = [pin["coord"]]
+                if not coords or not map_name:
+                    continue
+                xy = coords[0]
+                if not isinstance(xy, (list, tuple)) or len(xy) < 2:
+                    continue
+                react_a = pin.get("reactalliance")
+                react_h = pin.get("reacthorde")
+                if react_a == 1 and react_h != 1:
+                    fac = "Alliance"
+                elif react_h == 1 and react_a != 1:
+                    fac = "Horde"
+                else:
+                    fac = None
+                fac = faction_for_map(map_name, fac)
+                npc_id = pin.get("id")
+                key = (fac, npc_id or map_name, pin.get("point") or "")
+                if key in seen:
+                    continue
+                seen.add(key)
+                spot = {
+                    "map": map_name,
+                    "x": round(float(xy[0]), 1),
+                    "y": round(float(xy[1]), 1),
+                    "point": pin.get("point") or "",
+                    "npc": npc_id,
+                }
+                if fac:
+                    spot["faction"] = fac
+                if map_name in MAP_IDS:
+                    spot["mapId"] = MAP_IDS[map_name]
+                places.append(spot)
+    return places
+
+
+def choose_quest_places(places: list[dict], side: str | None) -> list[dict]:
+    """Start pin for each faction. An end pin is used when that side has no start."""
+    grouped: dict[str | None, list[dict]] = {}
+    for place in places:
+        fac = place.get("faction")
+        if side == "Alliance" and fac == "Horde":
+            continue
+        if side == "Horde" and fac == "Alliance":
+            continue
+        grouped.setdefault(fac, []).append(place)
+    chosen = []
+    seen = set()
+    for rows in grouped.values():
+        starts = [row for row in rows if row.get("point") == "start"]
+        for row in starts or rows:
+            key = (row.get("faction"), row.get("npc") or (row["map"], row["x"], row["y"]))
+            if key in seen:
+                continue
+            seen.add(key)
+            chosen.append(row)
+    return chosen
 
 
 def series_info(html: str, quest_id: int) -> tuple[int | None, bool]:
@@ -293,18 +431,22 @@ def series_info(html: str, quest_id: int) -> tuple[int | None, bool]:
 
 def quest_record(quest_id: int, cache: dict) -> dict:
     key = str(quest_id)
-    if key in cache["quest"] and "isLast" in cache["quest"][key]:
-        return cache["quest"][key]
+    cached = cache["quest"].get(key)
+    if cached and "isLast" in cached and "places" in cached:
+        return cached
     try:
         html = fetch(f"https://www.wowhead.com/forever/quest={quest_id}?power")
     except Exception as e:
         print("  quest fail", quest_id, e, flush=True)
+        if cached:
+            return cached
         return {
             "startNpcs": [],
             "startObjects": [],
             "earlier": None,
             "isLast": True,
             "faction": None,
+            "places": [],
         }
     start = html.find("Start:")
     end = html.find("End:", start if start >= 0 else 0)
@@ -318,6 +460,7 @@ def quest_record(quest_id: int, cache: dict) -> dict:
         "earlier": earlier,
         "isLast": is_last,
         "faction": quest_side(html) if html else None,
+        "places": mapper_places(html) if html else [],
     }
     cache["quest"][key] = row
     return row
@@ -447,27 +590,61 @@ def quest_hits(name: str, item_id: int, cache: dict, xml_cache: dict) -> list[di
     return last or found
 
 
+def _stamp_spot(spot: dict, faction: str | None) -> dict:
+    row = {
+        "map": spot["map"],
+        "x": spot["x"],
+        "y": spot["y"],
+    }
+    if spot.get("mapId"):
+        row["mapId"] = spot["mapId"]
+    fac = faction_for_map(spot.get("map") or "", spot.get("faction") or faction)
+    if fac:
+        row["faction"] = fac
+    return row
+
+
 def spots_for_quest(name: str, item_id: int, cache: dict, xml_cache: dict) -> list[dict]:
     hits = quest_hits(name, item_id, cache, xml_cache)
     spots = []
     seen = set()
     for hit in hits:
+        reward = quest_record(hit["id"], cache)
         root = root_quest(hit["id"], cache)
-        faction = root.get("faction")
-        for npc_id in root.get("startNpcs") or []:
+        side = reward.get("faction")
+        places = list(reward.get("places") or [])
+        have = {(p.get("faction"), p.get("npc")) for p in places}
+        for place in root.get("places") or []:
+            key = (place.get("faction"), place.get("npc"))
+            if key not in have:
+                places.append(place)
+                have.add(key)
+        chosen = choose_quest_places(places, side)
+        if chosen:
+            for place in chosen:
+                spot = _stamp_spot(place, place.get("faction"))
+                key = (spot["map"], spot["x"], spot["y"], spot.get("faction"))
+                if key not in seen:
+                    seen.add(key)
+                    spots.append(spot)
+            continue
+        faction = side or root.get("faction")
+        for npc_id in (root.get("startNpcs") or reward.get("startNpcs") or []):
             rec = npc_record(npc_id, cache)
-            for spot in copy_spots(rec.get("spots") or [], rec.get("faction") or faction):
-                key = (spot["map"], spot["x"], spot["y"], spot.get("faction"))
+            for spot in rec.get("spots") or []:
+                row = _stamp_spot(spot, rec.get("faction") or faction)
+                key = (row["map"], row["x"], row["y"], row.get("faction"))
                 if key not in seen:
                     seen.add(key)
-                    spots.append(spot)
-        for object_id in root.get("startObjects") or []:
+                    spots.append(row)
+        for object_id in (root.get("startObjects") or reward.get("startObjects") or []):
             rec = object_record(object_id, cache)
-            for spot in copy_spots(rec.get("spots") or [], faction):
-                key = (spot["map"], spot["x"], spot["y"], spot.get("faction"))
+            for spot in rec.get("spots") or []:
+                row = _stamp_spot(spot, faction)
+                key = (row["map"], row["x"], row["y"], row.get("faction"))
                 if key not in seen:
                     seen.add(key)
-                    spots.append(spot)
+                    spots.append(row)
     return spots
 
 
@@ -511,7 +688,7 @@ def resolve_item(item_id: int, src: dict, cache: dict, xml_cache: dict) -> tuple
     if kind == "quest_reward":
         spots = spots_for_quest(src.get("questName") or "", item_id, cache, xml_cache)
         if spots:
-            return {"note": NOTE_QUEST, "spots": spots, "more": len(spots) > 1}, None
+            return {"note": NOTE_QUEST, "spots": spots, "more": faction_more(spots)}, None
         return None, "quest starter has no map pin"
 
     if kind == "vendor":
@@ -526,6 +703,17 @@ def resolve_item(item_id: int, src: dict, cache: dict, xml_cache: dict) -> tuple
         if not npc and "quartermaster" not in (src.get("instructions") or "").lower():
             return None, "vendor is not named"
         return None, "vendor has no map pin"
+
+    if kind == "rare_npc":
+        if door:
+            spots = entrance_spots(door)
+            return {"note": NOTE_DOOR, "spots": spots, "more": len(spots) > 1}, None
+        if not npc:
+            return None, "rare npc is not named"
+        spots = spots_for_npc_name(npc, cache)
+        if spots:
+            return {"note": NOTE_RARE, "spots": spots, "more": len(spots) > 1}, None
+        return None, "rare npc has no map pin"
 
     if kind == "world_drop":
         if door:
@@ -550,6 +738,9 @@ def resolve_item(item_id: int, src: dict, cache: dict, xml_cache: dict) -> tuple
         return None, "drop creature has no map pin"
 
     if kind == "profession":
+        pins = camp_pins(src.get("instructions") or "", src.get("profession"))
+        if pins:
+            return {"note": CAMP_NOTE, "spots": pins, "more": False}, None
         return None, "recipe trainer is not listed on the Wowhead page we can fetch"
 
     if kind == "object_drop":
@@ -579,12 +770,63 @@ def resolve_item(item_id: int, src: dict, cache: dict, xml_cache: dict) -> tuple
     return None, "source type has no coordinate"
 
 
+def faction_more(spots: list[dict]) -> bool:
+    """True when the viewer's own faction has a second place, not the other faction."""
+    counts: dict[str | None, int] = {}
+    for spot in spots:
+        key = spot.get("faction")
+        counts[key] = counts.get(key, 0) + 1
+    return any(n > 1 for n in counts.values())
+
+
+def lua_row(item_id: int, row: dict) -> str:
+    spots = ",".join(lua_spot(s) for s in row["spots"])
+    more = ",more=true" if row.get("more") else ""
+    note = row["note"].replace('"', "")
+    return f'    [{item_id}]={{note="{note}"{more},spots={{{spots}}}}},'
+
+
+def patch_coordinate_rows(updates: dict[int, str]) -> None:
+    """Replace or append coordinate rows. Leaves every other pin alone."""
+    text = LUA_PATH.read_text(encoding="utf-8")
+    nl = "\r\n" if "\r\n" in text else "\n"
+    lines = text.splitlines()
+    seen = set()
+    out = []
+    for line in lines:
+        match = re.match(r"    \[(\d+)\]=\{", line)
+        if match and int(match.group(1)) in updates:
+            iid = int(match.group(1))
+            if iid not in seen:
+                out.append(updates[iid])
+                seen.add(iid)
+            continue
+        out.append(line)
+    missing = [iid for iid in updates if iid not in seen]
+    if missing:
+        while out and not out[-1].strip():
+            out.pop()
+        if not out or out[-1].strip() != "}":
+            raise SystemExit("coordinate file does not end with }")
+        close = out.pop()
+        if out and not out[-1].rstrip().endswith(","):
+            out[-1] = out[-1].rstrip() + ","
+        for iid in sorted(missing):
+            out.append(updates[iid])
+        out.append(close)
+    LUA_PATH.write_text(nl.join(out) + nl, encoding="utf-8", newline="")
+
+
 def lua_spot(spot: dict) -> str:
     parts = [
         f'map="{spot["map"].replace(chr(92), "").replace(chr(34), "")}"',
+    ]
+    if spot.get("mapId"):
+        parts.append(f'mapId={int(spot["mapId"])}')
+    parts.extend([
         f'x={spot["x"]}',
         f'y={spot["y"]}',
-    ]
+    ])
     if spot.get("faction"):
         parts.append(f'faction="{spot["faction"]}"')
     return "{" + ",".join(parts) + "}"
@@ -604,6 +846,7 @@ GQ.Data = GQ.Data or {}
 -- GENERATED by pipeline/scripts/index_coordinates.py
 -- One displayed coordinate per hunt item. more=true means another valid
 -- spot exists, so the log says so. Faction spots are filtered in the log.
+-- Merchant's Favor recipes use the camp vendor, not a city trainer.
 
 GQ.Data.coordinates = {
 """ + "\n".join(lines) + """
@@ -647,10 +890,119 @@ def smoke(cache: dict) -> None:
     save_cache(cache)
 
 
+QUEST_FACTION_JSON = Path(DATA) / "quest_faction.json"
+QUEST_FACTION_LUA = Path(ADDON_GEN) / "Data.QuestFaction.generated.lua"
+
+
+def write_quest_faction(sides: dict[int, str]) -> None:
+    payload = {str(iid): side for iid, side in sorted(sides.items())}
+    QUEST_FACTION_JSON.write_text(
+        json.dumps(payload, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    lines = [f'    [{iid}] = "{side}",' for iid, side in sorted(sides.items())]
+    QUEST_FACTION_LUA.write_text(
+        "local _, GQ = ...\n"
+        "GQ.Data = GQ.Data or {}\n"
+        "\n"
+        "-- Exclusive quest rewards. Side: Both is omitted, so both factions see it.\n"
+        "GQ.Data.questFaction = {\n"
+        + "\n".join(lines)
+        + "\n}\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+
+
+def repair_quests(cache: dict) -> None:
+    """Re-read quest Side and give each faction its own turn-in pin."""
+    sources = json.loads(SOURCES.read_text(encoding="utf-8"))
+    xml_cache = json.loads(QUEST_XML.read_text(encoding="utf-8")) if QUEST_XML.exists() else {}
+    ids = [
+        iid
+        for iid in hunt_ids()
+        if (sources.get(str(iid)) or {}).get("sourceType") == "quest_reward"
+    ]
+    item_hits: dict[int, list] = {}
+    quest_ids = set()
+    for iid in ids:
+        src = sources.get(str(iid)) or {}
+        hits = quest_hits(src.get("questName") or "", iid, cache, xml_cache)
+        item_hits[iid] = hits
+        for hit in hits:
+            quest_ids.add(int(hit["id"]))
+    print(f"quest hunts {len(ids)} unique quests {len(quest_ids)}", flush=True)
+    for n, qid in enumerate(sorted(quest_ids), 1):
+        quest_record(qid, cache)
+        root_quest(qid, cache)
+        if n % 20 == 0:
+            save_cache(cache)
+            print(f"  quests {n}/{len(quest_ids)}", flush=True)
+    save_cache(cache)
+    updates = {}
+    exclusive: dict[int, str] = {}
+    counts: dict[str, int] = {}
+    for iid in ids:
+        src = sources.get(str(iid)) or {}
+        side = None
+        for hit in item_hits.get(iid) or []:
+            rec = quest_record(int(hit["id"]), cache)
+            if rec.get("faction") in ("Alliance", "Horde"):
+                side = rec["faction"]
+                break
+        counts[side or "Both"] = counts.get(side or "Both", 0) + 1
+        if side:
+            exclusive[iid] = side
+        spots = spots_for_quest(src.get("questName") or "", iid, cache, xml_cache)
+        if not spots:
+            continue
+        updates[iid] = lua_row(
+            iid,
+            {"note": NOTE_QUEST, "spots": spots, "more": faction_more(spots)},
+        )
+    patch_coordinate_rows(updates)
+    write_quest_faction(exclusive)
+    print(f"quest pins rewritten {len(updates)} sides {counts}", flush=True)
+
+
+def index_item_ids(cache: dict, only: list[int]) -> None:
+    """Look up coordinates for these hunt ids and patch them in. Does not rebuild the file."""
+    sources = json.loads(SOURCES.read_text(encoding="utf-8"))
+    xml_cache = json.loads(QUEST_XML.read_text(encoding="utf-8")) if QUEST_XML.exists() else {}
+    updates = {}
+    missed = 0
+    for n, iid in enumerate(only, 1):
+        src = sources.get(str(iid)) or {}
+        try:
+            row, _reason = resolve_item(iid, src, cache, xml_cache)
+        except Exception as e:
+            print("  fail", iid, e, flush=True)
+            row = None
+        if row and row.get("spots"):
+            updates[iid] = lua_row(iid, row)
+        else:
+            missed += 1
+        if n % 25 == 0:
+            save_cache(cache)
+            print(f"  indexed {n}/{len(only)}", flush=True)
+    save_cache(cache)
+    if updates:
+        patch_coordinate_rows(updates)
+    print(f"patched {len(updates)} left without a pin {missed}", flush=True)
+
+
 def main() -> None:
     cache = load_cache()
     if "--smoke" in sys.argv:
         smoke(cache)
+        return
+    if "--repair-quests" in sys.argv:
+        repair_quests(cache)
+        return
+    if "--ids" in sys.argv:
+        i = sys.argv.index("--ids")
+        blob = json.loads(Path(sys.argv[i + 1]).read_text(encoding="utf-8"))
+        index_item_ids(cache, [int(n) for n in blob])
         return
 
     ids = hunt_ids()
@@ -676,7 +1028,7 @@ def main() -> None:
                     print(f"  quest items {checked}", flush=True)
             elif kind == "vendor" and npc:
                 names["npc"].add(npc)
-            elif kind == "world_drop" and npc and not door_key(src.get("zone")):
+            elif kind in ("world_drop", "rare_npc") and npc and not door_key(src.get("zone")):
                 names["npc"].add(npc)
             elif kind == "boss_drop" and npc and not door_key(src.get("zone")) and npc not in DOORS["bossNpcs"]:
                 names["npc"].add(npc)

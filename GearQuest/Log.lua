@@ -2105,6 +2105,7 @@ end
 
 local SOURCE_FILTERS = {
     { id = "world_drop", label = "World drop" },
+    { id = "rare_npc", label = "Rare NPC" },
     { id = "boss_drop", label = "Boss drop" },
     { id = "raid_trash", label = "Raid trash" },
     { id = "quest_reward", label = "Quest reward" },
@@ -6131,7 +6132,7 @@ function GQ.Log:BuildDetailLines(entry)
         return needle and needle ~= "" and how:find(string.lower(needle), 1, true)
     end
 
-    if entry.sourceType == "world_drop" or entry.sourceType == "profession" then
+    if entry.sourceType == "world_drop" or entry.sourceType == "rare_npc" or entry.sourceType == "profession" then
         local mentionsAh = how:find("auction", 1, true)
         if not mentionsAh then
             local isBoE = GQ.Equip and GQ.Equip.IsBindOnEquip and GQ.Equip:IsBindOnEquip(entry.itemId)

@@ -2,55 +2,48 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v0.3.0-beta
+## v0.3.1-beta
 
-Hunts that have a place to go now say where, and you can open that spot on the map. Track and Untrack are one button under the reward. **Coldflame Saber** drops in Shadowfang Keep, and its hover uses the Equip line.
+Hovers use the current Wowhead Forever tooltip. A dungeon boss is a boss drop. An open-world rare is a new source, **Rare NPC**, with a pin on that rare. Camp recipes point at the profession hubs again, and a Horde character no longer sees an Alliance-only quest.
 
-The window title reads **GearQuest Forever v0.3.0-beta**.
+The window title reads **GearQuest Forever v0.3.1-beta**.
 
-### Where to get it
+### Wowhead tooltips
 
-Under **Source** in the hunt description, a coordinate line appears when we know a spot:
+Fixed pieces no longer show the old rebuild tooltip. **Ghostly Mantle** (shoulders, Holy priest at 22, and the other caster specs that list it) is +9 Spirit, then Equip: healing done by up to 8 and damage done by up to 2. It is not +3 Damage Done and +9 Healing Done. **Slime-encrusted Pads** is +3 mana per 5 and +10 health per 5, requires level 20.
 
-```
-Coordinates: Elwynn Forest 48.2, 42.8 (beginning of the quest or chain)
-Coordinates: Silverpine Forest 44.8, 67.8 (entrance to dungeon or raid)
-Coordinates: Ashenvale 61.4, 83.8 more coordinates for this (vendor that sells this)
-```
+This is every fixed hunt, all nine classes. A green **of the …** world drop or green rare still uses the jackpot tooltip, with the roll range, the same as before. **Greater Magic Wand** stays 22–41 Arcane, 17.5 damage per second.
 
-The zone name is part of the line, because a dungeon door is on a different map than the dungeon. You see your faction, or the faction the simulator is using, plus neutral spots. **more coordinates for this** means another valid spot exists. The line shows the first one.
+### Boss drops
 
-The note depends on how you get the item:
+**Slime-encrusted Pads** drops from **Mutanus the Devourer**, the last boss of **Wailing Caverns**. The source line says **Boss drop**. The pin is the cave entrance in the Barrens, 46.0, 36.5. The same correction covers the other named dungeon bosses that were filed as world drops, including Sneed, Ironaya, Gahz'rilla, and Shadowpriest Sezz'ziz. The description names the boss and the dungeon. The pin stays the entrance.
 
-- A quest reward points at the start of the quest or its chain.
-- A boss drop or raid trash points at the dungeon or raid entrance, not the boss's room. Classic doors use the classic entrance. **Hall of Thanes** is Ironforge 43.6, 51.7. **Ruins of Lordaeron** is Tirisfal Glades 71.6, 11.4.
-- A vendor is the NPC who sells it.
-- A named world drop is one farming spot for that creature.
-- A crafted piece points at a capital-city trainer for your faction.
+### Rare NPC
 
-**5,555** hunts have a line. **2,541** do not. Most of those are world drops whose text is only "World drop around level X–Y", with no creature to stand on. **Staff of Jordan**, **Fiery War Axe**, and **Hammer of the Northern Wind** are in that group. Some vendors are unnamed, or they stand inside a battleground.
+The source filter has **Rare NPC**. The description says **Source: Rare NPC**, and the coordinate is where that rare walks.
 
-### Show on map, and the pin
+Pieces that are best in slot from an open-world rare:
 
-**Show on map** sits beside Track, under the reward. It opens the zone and places a waypoint on that coordinate.
+- **Adept's Gloves**, Elder Mystic Razorsnout. Hands at level 12–14 for the mage specs, Shadow priest, and Balance druid.
+- **Bashing Pauldrons**, Haren Swifthoof. Shoulders at level 15 for the hunter specs, the druid specs, and the rogue specs.
+- **Black Ogre Kickers**, Lo'Grosh. Feet around level 36–39 for Arms, Fury, Retribution, and Protection.
+- **Howling Blade**, Skhowl. Weapons at level 33 for Assassination, Combat, and Subtlety.
+- **Wax-polished Armor**, Grizlak. Chest at level 12 for Arms, Fury, and Retribution.
+- **Buckskin Cape**, Stonearm. Back at level 12 for Beast Mastery and Marksmanship.
+- **Runic Cane**, Brokespear. Off-hand around level 14–17 for Feral bear.
+- **Burrowing Shovel**, Master Digger. Main hand at level 12 for Enhancement.
 
-If the hunt has no coordinate, **Show on map** stays grey. Hovering it says: "We are missing exact coordinates for this item."
+### Profession camps
 
-**Track** puts one pin on the world map, the same spot as the coordinate line. The icon matches the source: quest, boss, profession, vendor, or world drop. The pin also shows on the minimap when you are close. Click the pin to toggle a blue circle. **Untrack** removes the pin. Hovering the pin shows the hunt name and the coordinate.
+Leatherworking, blacksmithing, tailoring, enchanting, and engineering recipes bought at the camps are no longer pinned to Orgrimmar or Stormwind trainers. Horde buys them at the Durotar Supply and Logistics hub northwest of the Crossroads. Alliance buys them at the Azeroth Commerce Authority hub at the start of Redridge. **Trapper's**, **Brawler's**, and **Defender's** leather hoods are in that set, along with the rest of the camp catalog. Trainer recipes such as linen, mageweave, and mithril stay on the trainers.
 
-### Track, and Exit
+### Faction quests
 
-Track and Untrack are one button. It reads **Track** until you track the hunt, then **Untrack**. On **Completed** it reads **Remove**.
+An Alliance-only quest is not shown to Horde, and a Horde-only quest is not shown to Alliance. A quest both factions can do uses your faction's pin. **Friend of the Library** (Scholarly Pendant, Erudite's Amulet) is Stormwind for Alliance and Undercity for Horde.
 
-The list and the description stop above the footer on the log, the simulator, and settings. **Exit** is in that footer on all three.
+### v0.3.0-beta
 
-### Coldflame Saber
-
-Mage main hand from level **21**. It drops from **Baron Silverlaine** in **Shadowfang Keep**. It is not a world drop. The hover uses the Equip line, "Increases damage and healing done by magical spells and effects by up to 32," instead of separate spell power and healing lines. The description still says how to combine the Blade of Silverlaine and Imbue Blade.
-
-### Credits
-
-**Settings** has **Credits to collaborators** under **General**, listing **Eao** and **MainWon**.
+Hunts that have a place to go now say where, and **Show on map** opens that spot. Track and Untrack are one button. **Coldflame Saber** drops from Baron Silverlaine in Shadowfang Keep.
 
 ### v0.2.20-beta
 

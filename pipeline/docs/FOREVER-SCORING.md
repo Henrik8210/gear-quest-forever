@@ -211,18 +211,30 @@ stats until you sync.
 
 Scoring reads `items.json`. `foreverAudit.tip` is still stored for class
 gates and the random-suffix rebuild. Every hover except a green world drop
-uses that Wowhead tip. Do not replace it with the client tooltip, and do not
-paint "Not found in the client" on the hover. If the client has no such item,
-the hunt description may say `Not found in the client yet.` Green world drops
-keep the rebuilt jackpot tooltip. An imbued weapon still greys the scroll
-effect and adds `Use: Combine the <base> and <scroll>.`
+or a green rare uses that Wowhead tip. Do not replace it with the client
+tooltip, and do not paint "Not found in the client" on the hover. If the
+client has no such item, the hunt description may say `Not found in the
+client yet.` Green world drops and green rares keep the rebuilt jackpot
+tooltip. An imbued weapon still greys the scroll effect and adds
+`Use: Combine the <base> and <scroll>.`
+
+**A tip sync that only walks the Forever index is not a tip sync.** Classic
+hunt ids (Ghostly Mantle **3324**, Slime-encrusted Pads **6461**) are not in
+`index.json`. `refresh_forever_tips.py` must take every hunt id from the
+generated class files **and** the Forever index. Skipping an id because it
+is below 200000 leaves the old rebuild hover (`+3 Damage Done` / `+9 Healing
+Done` instead of the Equip sentence). Do not run `sync_forever_item_stats.py`
+to invent green `+N Damage Done` lines from a rebuild string.
+
+`emit_forever_audit.py` `keep_rebuilt_tip` copies the previous audit line for
+a random enchant, a quality-2 world drop, a quality-2 rare, and Greater
+Magic Wand **11288**. Those hovers stay the jackpot tooltip and the client
+**17.5** DPS wand. Everything else takes the nether tip.
 
 ```powershell
-python pipeline/scripts/inventory_hunt_ids.py
-python pipeline/scripts/probe_forever_hunt_tooltips.py
-python pipeline/scripts/sync_forever_item_stats.py --apply
-python pipeline/scripts/rescore_hunter_shaman.py
+python pipeline/scripts/refresh_forever_tips.py
 python pipeline/scripts/emit_forever_audit.py
+python pipeline/scripts/rescore_hunter_shaman.py
 python pipeline/scripts/index_coordinates.py
 .\scripts\sync-addon.ps1
 ```
@@ -292,6 +304,18 @@ Alchemy (Horde: Apothecary Durelle, Alliance: Nina Surefire) and cooking
 make worn gear, so those recipes are not hunt text.
 
 The hunt line is `Crafted with <profession>. You can buy the recipe from <Horde vendor> at <Horde camp>, or from <Alliance vendor> at <Alliance camp>.` The pattern and the crafted piece often use different slot words (Stormrider's Leather Armor and Tunic; Gilded Sandals and Gilded Slippers; Waistcord and Cord). Every piece of those named sets gets the camp sentence (`pipeline/scripts/commerce_camps.py`). Trainer recipes (linen, mageweave, mithril, scorpid, and the rest) stay on the short profession line.
+
+The coordinate for a camp recipe is that vendor, not a capital-city trainer. Horde is The Barrens (map 1413), northwest of the Crossroads. Alliance is Redridge Mountains (map 1433), at Three Corners. The note is `(vendor that sells the recipe)`. One pin per faction.
+
+| Profession | Horde | Alliance |
+|---|---|---|
+| Leatherworking | Pawani, 49.6, 29.6 | Daniel Stitchsong, 10.0, 72.4 |
+| Blacksmithing | Gor'mak, 49.8, 29.6 | Stondry Darkhammer, 10.4, 74.4 |
+| Tailoring | Jim'bek, 49.6, 29.4 | Mivin Shadowweave, 10.0, 72.2 |
+| Enchanting | Beneris, 49.6, 29.8 | Alynsia, 11.2, 71.4 |
+| Engineering | Fizzlefuse, 49.8, 29.6 | Fritz Fizzle, 10.4, 74.2 |
+
+`camp_pins()` in `commerce_camps.py` is the test: the hunt sentence names the camp. A dye word is not enough (Black Mageweave and Golden Scale are trainer crafts). `index_coordinates.py` writes these pins. `enrich_coordinates.py` must not replace them with Stormwind or Orgrimmar.
 
 Index listview rows are not item facts. Veldt is not item facts. A client
 tooltip overrides a Forever tip only when it is pinned above. Otherwise the
@@ -535,10 +559,14 @@ The Forever catalog is not finished. Plan **many** scrape → ingest → re-scor
 ```powershell
 node scripts/scrape-forever-wowhead-items.mjs
 python pipeline/scripts/ingest_forever_wowhead.py
+python pipeline/scripts/refresh_forever_tips.py
+python pipeline/scripts/index_coordinates.py --ids pipeline/data/forever_wowhead/coord_needed.json
 node scripts/diff-veldt-wowhead.mjs
 ```
 
-Then `score.py` / `reemit_all.py` and copy `pipeline/out/Data.*.generated.lua` into `GearQuest/_generated/`. Ingest does **not** overwrite existing classic ids in `items.json` / `sources.json` (so the WSG rune vendor fix survives a re-ingest). New Forever-only ids (≥ 200000) merge in as Wowhead grows.
+Then `score.py` one class at a time (`GQ_NO_GUIDES=1`) and copy the emitted Lua into `GearQuest/_generated/`. Ingest does **not** overwrite a source that already names a quest, vendor, drop, or profession. A row whose text is still `Source not listed yet` is replaced when the new listview names one, and that id is written to `coord_needed.json` so the coordinate lookup runs for it. New Forever-only ids (≥ 200000) merge in the same way. Stats on those rows come from the refreshed nether tooltip, not the listview.
+
+Quest Side is the word after `Side:` (`Alliance`, `Horde`, or `Both`). Do not read the end-NPC icon. A both-faction quest gets one pin per faction (Friend of the Library: Garion Wendell in Stormwind for Alliance, Owen Thadd in Undercity for Horde). An Alliance-only quest never scores or displays for Horde, and the reverse. `index_coordinates.py --repair-quests` rewrites those pins and `quest_faction.json`.
 
 `diff-veldt-wowhead.mjs` is **not** a second ingest. It diffs the Wowhead cache against [veldt1 wowf-items](https://veldt1.github.io/wowf-items/) (client `1.60.1` vs `1.15.9`) and writes `pipeline/data/forever_wowhead/veldt_wowhead_diff.json`. Use that to chase empty tooltips and missing Wowhead pages; do not copy veldt stats into `items.json`.
 
@@ -613,18 +641,23 @@ A full ingest rewrites sources.json for every id >= 200000. That cleared 162 zon
 
 **29 Sep 2026 (v0.2.19-beta). Score from the refreshed Wowhead Forever tooltip.**
 
-`pipeline/scripts/refresh_forever_tips.py` re-fetched nether tips for the
-Forever index (except the nine client pins) and for classic ids the audit
-had marked missing. `emit_forever_audit.py` ran **before** the re-score, so
-recovered ids leave `FOREVER_MISSING`. Then `rescore_hunter_shaman.py` with
-`GQ_NO_GUIDES=1` for all nine classes. Do not `reemit_all.py` from stale
-JSON. Do not run a full ingest to refresh tips: a full ingest replaces
-existing `sources.json` rows for id ≥ 200000. Restore existing source keys
-and only append new ids. Re-apply boss pins and faction zone pins.
-Wolfsbane's Tirisfal zone is hand-maintained. Kaleidoscope (273088) resist
-5 must survive a refresh (`refresh_forever_tips.py` keeps resist when the
-new parse has none). Client pins (Coldflame, Silverlaine, Wolfsbane rlvl 20)
-must not be overwritten by the nether tip.
+`pipeline/scripts/refresh_forever_tips.py` re-fetches nether tips for **every
+hunt id** (the generated class files) plus the Forever index. The index
+alone is not enough: classic ids are absent from it, and that is how Ghostly
+Mantle kept a rebuild tooltip. Do not pass a list that is only `index.json`.
+`emit_forever_audit.py` runs **before** the re-score, and it keeps the
+previous line for jackpot greens and the wand. Then
+`rescore_hunter_shaman.py` with `GQ_NO_GUIDES=1` for all nine classes. Do
+not `reemit_all.py` from stale JSON. Do not run a full ingest to refresh
+tips: a full ingest replaces existing `sources.json` rows for id ≥ 200000.
+Restore existing source keys and only append new ids. Re-apply boss pins,
+faction zone pins, and `apply_named_drop_kinds` (dungeon bosses stay
+`boss_drop`; "(rare spawn)" stays `rare_npc`). Wolfsbane's Tirisfal zone is
+hand-maintained. Kaleidoscope (273088) resist 5 must survive a refresh
+(`refresh_forever_tips.py` keeps resist when the new parse has none). Client
+pins (Coldflame, Silverlaine, Wolfsbane rlvl 20) must not be overwritten by
+the nether tip. Greater Magic Wand **11288** is not refreshed: nether still
+prints 11.39 DPS. `sources.json` stays ASCII (`ensure_ascii=True`).
 
 **Spell line → stats.** The equal sentence `Increases damage and healing
 done by magical spells and effects by up to N` stores **both** `heal=N` and
@@ -818,6 +851,15 @@ NPC live in their own fields — the log prints them once. World drops:
 Vendors/bosses: `Bought from X.` / `Drops from X.` Auction House is a
 separate BoE line, not repeated inside the sentence.
 
+A named dungeon boss is `boss_drop`, even when the old sentence said
+"(rare elite)". Mutanus the Devourer is Wailing Caverns, not a world drop.
+`apply_named_drop_kinds` in the ingest promotes those from
+`dungeon_entrances.json` `bossNpcs` and sets the zone to that dungeon.
+"(rare spawn)" and a "(rare elite)" that is not one of those bosses is
+`rare_npc` ("Rare NPC"). The pin is where that rare spawns. A rare inside a
+dungeon uses the entrance. A green from a world drop or a rare keeps the
+rebuilt jackpot tooltip. Do not replace that hover with the base Wowhead tip.
+
 **Lookie's Spyglass** (273298) is `boss_drop`, "Drops from Cookie.", zone
 The Deadmines, npc Cookie. Do not patch that by replacing the first shared
 "Indexed from Wowhead Forever" sentence in a generated file. That sentence
@@ -947,10 +989,16 @@ What the lookup uses:
 - Named world drop: the first spawn Wowhead lists for that creature. Note
   `(a farming spot)`. A line that only says "World drop around level X–Y"
   names no creature, so it stays a gap. Do not use the center of the zone.
-- Profession: Wowhead spell pages do not list the trainer. The capital-city
-  trainer pins already in the file came from a one-time Questie gap fill
-  (`pipeline/scripts/enrich_coordinates.py`). A later Wowhead scrape will
-  not discover a new trainer. Do not guess a city.
+- Profession taught by a trainer: Wowhead spell pages do not list the
+  trainer. The capital-city trainer pins already in the file came from a
+  one-time Questie gap fill (`pipeline/scripts/enrich_coordinates.py`). A
+  later Wowhead scrape will not discover a new trainer. Do not guess a city.
+  Note `(the trainer that teaches this)`.
+- Profession bought at a Merchant's Favor camp: the vendor pin in the camps
+  table above, for every leatherworking, blacksmithing, tailoring,
+  enchanting, and engineering piece whose hunt sentence names that camp.
+  Note `(vendor that sells the recipe)`. Do not put these on Orgrimmar or
+  Stormwind. Trainer recipes stay on the trainer pins.
 - World boss with an outdoor pin: `(where this boss spawns)`.
 
 Faction is a filter. Neutral spots show for both. Store one spot per

@@ -437,6 +437,51 @@ def apply_pinned_boss_sources(sources):
     return n
 
 
+def apply_named_drop_kinds(sources):
+    """A named dungeon boss is a boss drop. A rare is a Rare NPC.
+
+    Wowhead's listview calls both a drop, and the old creature ranks stored
+    dungeon bosses as "(rare elite)". Bosses listed in dungeon_entrances.json
+    stay boss drops. "(rare spawn)" and any other "(rare elite)" is the rare.
+    """
+    path = os.path.join(G, "dungeon_entrances.json")
+    bosses = {}
+    if os.path.exists(path):
+        bosses = json.load(open(path, encoding="utf-8")).get("bossNpcs") or {}
+    # Rares that only exist inside an instance. The pin is that entrance.
+    rare_dungeon = {
+        "Eviscerator": "Blackrock Depths",
+        "Balzaphon": "Stratholme",
+        "Revanchion": "Dire Maul",
+        "Scorn": "Scarlet Monastery",
+        "Sever": "Shadowfang Keep",
+    }
+    bosses_n = rares_n = 0
+    for src in sources.values():
+        if not isinstance(src, dict):
+            continue
+        npc = src.get("npc") or ""
+        if src.get("sourceType") == "rare_npc" and npc in rare_dungeon and not src.get("zone"):
+            src["zone"] = rare_dungeon[npc]
+            continue
+        if src.get("sourceType") != "world_drop":
+            continue
+        text = src.get("instructions") or ""
+        if npc and npc in bosses:
+            src["sourceType"] = "boss_drop"
+            src["zone"] = bosses[npc]
+            src["instructions"] = f"Drops from {npc}."
+            bosses_n += 1
+            continue
+        if "(rare spawn)" in text or "(rare elite)" in text:
+            src["sourceType"] = "rare_npc"
+            src["instructions"] = f"Drops from {npc}." if npc else "Drops from a rare."
+            if npc in rare_dungeon:
+                src["zone"] = rare_dungeon[npc]
+            rares_n += 1
+    return bosses_n, rares_n
+
+
 def apply_pinned_faction_zones(sources):
     """Forever quests whose turn-in city is one faction.
 
@@ -543,9 +588,11 @@ def main():
 
     added_items = 0
     added_sources = 0
+    filled_sources = 0
     added_pool = 0
     skipped = 0
     no_tip = 0
+    coord_ids = []
 
     for row in index["items"]:
         iid = row["id"]
@@ -576,10 +623,30 @@ def main():
                 "block", "effectDriven", "randomEnchant",
             ):
                 keep[fld] = item[fld]
-        if iid >= 200000 or key not in sources:
-            if key not in sources:
-                added_sources += 1
-            sources[key] = source_from_row(row, parsed, item["name"])
+        new_src = source_from_row(row, parsed, item["name"])
+        old_src = sources.get(key)
+        old_text = (old_src or {}).get("instructions") or ""
+        new_text = new_src.get("instructions") or ""
+        placeholder = "Source not listed yet" in old_text or old_src is None
+        specific = (
+            "Source not listed yet" not in new_text
+            and (
+                new_src.get("npc")
+                or new_src.get("questName")
+                or new_src.get("profession")
+                or new_src.get("sourceType") not in (None, "", "world_drop")
+            )
+        )
+        if old_src is None:
+            sources[key] = new_src
+            added_sources += 1
+            coord_ids.append(iid)
+        elif placeholder and specific:
+            # Wowhead listed a source that used to be empty. Keep a real source
+            # that is already on the row (boss pin, camp vendor, hand edit).
+            sources[key] = new_src
+            filled_sources += 1
+            coord_ids.append(iid)
         if iid not in pool_set:
             pool.append(iid)
             pool_set.add(iid)
@@ -598,12 +665,16 @@ def main():
     pool = cleaned
     apply_pinned_boss_sources(sources)
     apply_pinned_faction_zones(sources)
+    apply_named_drop_kinds(sources)
     json.dump(items, open(G + "items.json", "w", encoding="utf-8"), separators=(",", ":"))
     json.dump(sources, open(G + "sources.json", "w", encoding="utf-8"), indent=2)
     json.dump(pool, open(G + "classic_item_ids.json", "w", encoding="utf-8"))
+    need = os.path.join(os.path.dirname(INDEX), "coord_needed.json")
+    json.dump(sorted(set(coord_ids)), open(need, "w", encoding="utf-8"))
     print(
         f"merged Forever Wowhead: +{added_items} items, +{added_sources} sources, "
-        f"+{added_pool} pool ids; skipped {skipped}, no tooltip {no_tip}"
+        f"{filled_sources} empty sources filled, +{added_pool} pool ids; "
+        f"skipped {skipped}, no tooltip {no_tip}"
     )
     if UNKNOWN_RTG:
         print("unmapped tooltip rtg ids (count):", dict(sorted(UNKNOWN_RTG.items())))

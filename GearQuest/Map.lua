@@ -54,7 +54,7 @@ function GQ.Map:DisplaySpot(entry)
     local faction = GQ.GetEffectiveFaction and GQ:GetEffectiveFaction() or nil
     for i = 1, #row.spots do
         local spot = row.spots[i]
-        if spot.x and spot.y and (not spot.faction or spot.faction == "" or spot.faction == faction) then
+        if spot.x and spot.y and GQ.Data:SpotVisible(spot, faction) then
             return spot
         end
     end
