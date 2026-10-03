@@ -52,9 +52,10 @@ function GQ.Map:DisplaySpot(entry)
         return nil
     end
     local faction = GQ.GetEffectiveFaction and GQ:GetEffectiveFaction() or nil
+    local openWorld = row.note == "where this rare spawns" or row.note == "a farming spot"
     for i = 1, #row.spots do
         local spot = row.spots[i]
-        if spot.x and spot.y and GQ.Data:SpotVisible(spot, faction) then
+        if spot.x and spot.y and GQ.Data:SpotVisible(spot, faction, openWorld) then
             return spot
         end
     end

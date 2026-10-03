@@ -3,6 +3,7 @@ import os
 import shutil
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 from gq_paths import OUT, ADDON_GEN
@@ -55,7 +56,16 @@ def main():
         dest.mkdir(parents=True, exist_ok=True)
         for name in lua_names:
             src = Path(OUT) / name
-            shutil.copy2(src, dest / name)
+            target = dest / name
+            for attempt in range(6):
+                try:
+                    shutil.copy2(src, target)
+                    break
+                except OSError as err:
+                    # The game or the editor still has the generated file mapped.
+                    if getattr(err, "winerror", None) != 1224 or attempt == 5:
+                        raise
+                    time.sleep(1.5 * (attempt + 1))
             copied.append(name)
             print("copied", name)
     print("done:", ", ".join(copied))

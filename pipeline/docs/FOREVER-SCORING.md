@@ -210,13 +210,13 @@ Chain Legguards +34 Agi and no AP, Jouster's Crest 1051+50 armor) keep stale
 stats until you sync.
 
 Scoring reads `items.json`. `foreverAudit.tip` is still stored for class
-gates and the random-suffix rebuild. Every hover except a green world drop
-or a green rare uses that Wowhead tip. Do not replace it with the client
-tooltip, and do not paint "Not found in the client" on the hover. If the
-client has no such item, the hunt description may say `Not found in the
-client yet.` Green world drops and green rares keep the rebuilt jackpot
-tooltip. An imbued weapon still greys the scroll effect and adds
-`Use: Combine the <base> and <scroll>.`
+gates and the random-suffix rebuild. Hovers use that Wowhead Forever tip.
+Do not replace it with the client tooltip, and do not paint "Not found in
+the client" on the hover. If the client has no such item, the hunt
+description may say `Not found in the client yet.` A random-suffix green
+keeps the rebuilt jackpot tooltip. A fixed green, including a world drop
+or a rare, takes the Forever tip, weapon damage included. An imbued weapon
+still greys the scroll effect and adds `Use: Combine the <base> and <scroll>.`
 
 **A tip sync that only walks the Forever index is not a tip sync.** Classic
 hunt ids (Ghostly Mantle **3324**, Slime-encrusted Pads **6461**) are not in
@@ -227,9 +227,13 @@ Done` instead of the Equip sentence). Do not run `sync_forever_item_stats.py`
 to invent green `+N Damage Done` lines from a rebuild string.
 
 `emit_forever_audit.py` `keep_rebuilt_tip` copies the previous audit line for
-a random enchant, a quality-2 world drop, a quality-2 rare, and Greater
-Magic Wand **11288**. Those hovers stay the jackpot tooltip and the client
-**17.5** DPS wand. Everything else takes the nether tip.
+a random enchant and Greater Magic Wand **11288**. Those hovers stay the
+jackpot tooltip and the client **17.5** DPS wand. Everything else takes the
+nether tip. A quality-2 world drop is not a reason to keep the old line.
+Heavy Shortbow was still showing classic 17–33 (10.00 DPS) after Forever
+had moved it to 10–20 (6.00 DPS). Daryl's Hunting Rifle **2904** is the
+Forever gun: 11–21, 6.40 DPS. The classic 18–35 (10.60 DPS) line is a
+different item (Blackrock Mace **1296**).
 
 ```powershell
 python pipeline/scripts/refresh_forever_tips.py
@@ -691,9 +695,11 @@ Frost mage 13–18: Golemheart rank 1, Fang rank 2. Do not pin Fang over
 Golemheart.
 
 **Required level is the tooltip, never item level.** `build_item`: if the
-tip states `Requires Level` greater than 1, that number is `rlvl`. A stated
-level is never replaced. Fang's tip is `<!--rlvl-->13`. It was never gated
-at item level 18. It ranked low because spell power was stored as 0.
+tip states `Requires Level` greater than 1, that number is the equip level.
+Fang's tip is `<!--rlvl-->13`. It was never gated at item level 18. It
+ranked low because spell power was stored as 0. Do not lower a stated equip
+level. A quest reward may still be raised when the quest itself opens later
+than that line. The hunt level is the higher of the two.
 
 **No required level means look the item up.** Every time an item has no
 `Requires Level` (nothing on the tip, or Wowhead's stub of 1), assume it is
@@ -716,13 +722,65 @@ is. Do not treat a drop's page level as a quest pickup. Staff of Nobles
 
 `apply_quest_req_levels.py` writes through a `.json.tmp` then `Path.replace`
 (`items.json` `write_text` raises `OSError` 22). Cache is
-`pipeline/data/forever_wowhead/quest_req_cache.json`. 686 quest levels were
-applied, including Kris of Orgrimmar (15443) and Staff of Orgrimmar (15444)
-at 9 (Hidden Enemies, 5730). Staff of Westfall stays 14. Grave Shroud stays
-16. Fang stays 13. Wowhead returned HTTP 403 after ~914 lookups. The items
-still sitting on no required level still need this lookup. Resume with
-`--apply-only` for successes already in the cache, and retry only rows whose
-error starts with `HTTP Error 403`. Do not refetch the good rows.
+`pipeline/data/forever_wowhead/quest_req_cache.json`. Kris of Orgrimmar
+(15443) and Staff of Orgrimmar (15444) are 9 (Hidden Enemies, 5730). Staff
+of Westfall stays 14. Grave Shroud stays 16. Fang stays 13. Wolfsbane stays
+the pinned 20. The first lookup used a browser user agent and cached HTTP
+403 for most rows. Retry those with `wow-classic-data-research/1.0`. Do not
+refetch a row that already has `reqlevel`. A cached 403 is not a level.
+
+**Wowhead www is blocked. Use another Forever database.**
+`www.wowhead.com` returns CloudFront HTTP 403 from this machine for item
+XML, quest HTML, and NPC pages, including a normal browser user agent. Do
+not cache that 403 as an empty source, and do not start another wide scrape
+of www.
+
+The tooltip still comes from Nether when it answers:
+`https://nether.wowhead.com/forever/tooltip/item/{id}`. `Requires Level` on
+that tip is the equip level. Item level is not. ForeverDB field `rl` is the
+same required level. ForeverDB field `il` is item level. Do not equip from
+`il`. A stated level greater than 1 is never replaced by either database.
+An item with no required level (or Wowhead's stub of 1) is still looked up,
+and the hunt level is the source gate, not the item-level floor.
+
+When Nether or www does not have the fact, ForeverDB
+(`https://foreverdb.net`) is the source. The files are static. No key.
+
+- `data/items.json` — name, class, subclass, inventory type, quality, `il`, `rl`, stats.
+- `data/sources/{id % 64}.json` — drop, quest, and vendor rows.
+- `data/questguides/index.json` — `min` is the pickup level. `lv` is the suggested level. Do not use `lv`.
+- `data/questguides/{id % 64}.json` — quest giver, faction (`side`), and coordinates.
+- `data/rares.json` — rare zone and spawns.
+- `data/world.json` — map id to zone name. Type 3 is a zone. Type 2 is a continent.
+
+The browsable lists are `https://foreverdb.net/items?cls=2` (weapons) and
+`https://foreverdb.net/items?cls=4` (armor). A new equippable piece is built
+from the Nether tooltip plus that ForeverDB row. An item with no inventory
+slot (seals, toys, hidden placeholders, a deprecated name) is not hunt gear.
+
+Quest pickup from ForeverDB: Arachnophobia (6284) is min 15 and lv 21. The
+Tower of Althalaxx is min 13. A quest source row has `t` `quest` and quest
+id `q`. Only fill an item whose `rlvl` is still 0 or 1. Do not lower a
+level the tooltip already set.
+
+The hunt zone is the zone, not a place inside it. Tower of Ilgalar is
+Redridge Mountains. ForeverDB `data/world.json` pins name that parent, and
+an existing coordinate row that sits entirely on one zone map wins over the
+area name. An open-world rare stays on both factions' lists when that zone
+is the other side's territory, and the rare pin ignores the faction map
+deny. A world drop that was already listed under the area name stays listed
+after the label becomes the parent zone (`zoneOpen`). Do not rename a
+dungeon to the zone its entrance sits in. Do not turn Refuge Pointe or
+Hammerfall into Arathi Highlands: that name is what keeps the other faction
+off those vendors.
+
+**Vendor reputation is part of the source line.** A Forever tip
+`Requires Booty Bay - Honored` is `reqRep` and the instructions
+`Bought from Gezzy Gunkgear. Requires Booty Bay - Honored.` Souvenier Sea
+Shell **274749** is that neck. Darkspear Raiders is Horde, so those pieces
+are not on the Alliance list. League of Arathor is Alliance. The Defilers
+are Horde. Goblin towns (Booty Bay, Ratchet, Gadgetzan, Everlook) stay on
+both lists, with the standing written out.
 
 **Blank item kind.** Subclass −2 ring, −3 neck, −4 trinket, −5 held, −6
 cloak must be `kind` `Misc` (`ARMOR_SUB`). `kind` `?` makes `eligible()`

@@ -2,7 +2,41 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v0.3.1-beta
+## v0.3.2-beta
+
+The zone line names the zone, a quest reward opens at the quest's pickup level, and several pieces that were missing from the lists are hunts now. Equip level is still **Requires Level**. Item level does not decide when you can wear a piece.
+
+The window title reads **GearQuest Forever v0.3.2-beta**.
+
+### Zones
+
+**Blackvenom Blade** (Rohh the Silent) is **Redridge Mountains**, for Enhancement and every other spec that lists it. The zone line no longer says Tower of Ilgalar. The coordinates show for Horde as well as Alliance.
+
+The same parent-zone name is used for other places inside a zone. Lakeshire and Stonewatch are Redridge Mountains. Camp Taurajo is The Barrens. Northshire is Elwynn Forest. Coldridge Valley is Dun Morogh. A dungeon stays the dungeon. Refuge Pointe and Hammerfall stay those names, so the other faction still does not see those vendors.
+
+### Quest levels
+
+A quest reward with no **Requires Level** on the tooltip now starts at the lowest level that can pick up the quest. All nine classes.
+
+- **Phytoblade** is level **20** (Blisters on The Land).
+- **Sword of Omen** and **Prophetic Cane** are level **33** (Into The Scarlet Monastery).
+- **Servomechanic Sledgehammer** is level **35** (Sunken Treasure).
+
+A piece that already states a required level keeps that level. Fang of Magmatus stays 13. Staff of Westfall stays 14. Wolfsbane stays 20.
+
+### New pieces
+
+**Fallen Guard's Pendant** is a neck from level **31**. Rank **2** at 31–35 for Retribution, Arms, and Fury, both factions, and rank **3** at 36–37. +6 Strength and +8 Stamina. The drop is not listed yet.
+
+**Arcane Infused Rod** is an off-hand from level **31**. Rank **2** at 31 for Arcane, Battle Mage Arcane, and Balance, both factions. +8 Intellect and +9 Arcane spell damage. The tooltip has no required level, so the hunt uses 31. The drop is not listed yet.
+
+**Restorer's Fine Gloves** are cloth hands from level **35**. Rank **2** at 35 for Holy and Discipline, both factions, and for Horde Shadow, Affliction, Demonology, and Destruction. +8 Stamina, +11 Spirit, healing up to 14 and damage up to 5. The drop is not listed yet.
+
+**Arena Master** is a trinket from level **35**, found in the Arena Treasure Chest. Rank **1** at 35–37 for Protection and Bear, both factions. +7 Stamina.
+
+**Dog Whistle** is a trinket from level **25**. It drops from Houndmaster Loksey. The pin is the Scarlet Monastery entrance in Tirisfal Glades. Rank **2** at 25–27 for Arms, Fury, Protection, and Feral.
+
+### v0.3.1-beta
 
 Hovers use the current Wowhead Forever tooltip. A dungeon boss is a boss drop. An open-world rare is a new source, **Rare NPC**, with a pin on that rare. Camp recipes point at the profession hubs again, and a Horde character no longer sees an Alliance-only quest.
 

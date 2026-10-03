@@ -210,6 +210,24 @@ def parse_tooltip(t):
     for amt in re.findall(r"Restores \+(\d+) mana per 5", text, re.I):
         if "mp5" not in o["stats"]:
             add("mp5", int(amt))
+    for school, amt in re.findall(
+        r"Increases damage done by (Shadow|Fire|Frost|Nature|Arcane|Holy) spells and effects by up to (\d+)",
+        text,
+    ):
+        if f"sp{school}" not in o["stats"]:
+            add("spSchool", int(amt))
+            add("sp" + school, int(amt))
+    for amt in re.findall(r"\+(\d+) Attack Power against Humanoids", text):
+        if "apVs" not in o["stats"]:
+            add("apVs", int(amt))
+    for amt in re.findall(r"\+(\d+) (?:Arcane|Fire|Frost|Nature|Shadow) Resistance", text):
+        if "resist" not in o["stats"]:
+            add("resist", int(amt))
+    for prof, rank in re.findall(
+        r"Requires (Alchemy|Blacksmithing|Engineering|Enchanting|Tailoring|Leatherworking) \((\d+)\)",
+        text,
+    ):
+        o.setdefault("reqSkills", []).append([prof, int(rank)])
 
     eff = []
     for m in re.finditer(r'<span class="q2">((?:Equip|Use|Chance on hit):.*?)</span>', t, re.S):
@@ -224,10 +242,25 @@ def parse_tooltip(t):
         v for k, v in o["stats"].items() if k not in ("armor", "block")
     ) <= 40
 
-    if "Conjured Item" in t or re.search(r"Duration: \d+ (?:min|sec|hour)", t):
+    if "Conjured Item" in t or re.search(r"Duration: \d+ (?:min|sec|hour|day)", t):
         o["temporary"] = True
     if "&lt;Random enchantment&gt;" in t or "Random enchantment" in text:
         o["randomEnchant"] = True
+    reps = []
+    seen_rep = set()
+    for fac, standing in re.findall(
+        r"Requires\s+([A-Za-z][A-Za-z' ]{1,40}?)\s+-\s+(Friendly|Honored|Revered|Exalted)",
+        text,
+    ):
+        fac = re.sub(r"\s+", " ", fac).strip()
+        standing = standing.title()
+        key = (fac, standing)
+        if not fac or key in seen_rep:
+            continue
+        seen_rep.add(key)
+        reps.append([fac, standing])
+    if reps:
+        o["reqRep"] = reps
     idx = text.find("Classes:")
     if idx >= 0:
         after = text[idx + 8:].lstrip()

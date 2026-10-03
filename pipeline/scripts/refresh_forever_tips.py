@@ -109,6 +109,8 @@ def apply_row(item: dict, raw: dict) -> bool:
         item["procs"] = parsed.get("procs") or []
     if parsed.get("randomEnchant"):
         item["randomEnchant"] = True
+    if parsed.get("reqRep"):
+        item["reqRep"] = parsed["reqRep"]
     item["hasTip"] = True
     sub = item.get("sub")
     if item.get("kind") == "?" and sub in ARMOR_SUB:

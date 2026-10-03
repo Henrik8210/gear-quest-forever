@@ -226,6 +226,7 @@ def build_facts(used):
                       ("questName",s.get("questName")),("profession",s.get("profession"))):
             if val: kv.append(f'{k}={lua(val)}')
         if s.get("seasonal"): kv.append("seasonal=true")
+        if s.get("zoneOpen"): kv.append("zoneOpen=true")
         if LORE.get(str(iid)): kv.append(f'lore={lua(LORE[str(iid)])}')
         pr=(it.get("procs") or [])
         if pr: kv.append(f'proc={lua(pr[0][:180])}')

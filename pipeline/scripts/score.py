@@ -198,6 +198,13 @@ GONE_ZONES={"Azuremyst Isle","Bloodmyst Isle","The Exodar","Ammen Vale",
 REP_FACTION={
  "Honor Hold":"Alliance", "Kurenai":"Alliance",
  "Thrallmar":"Horde", "The Mag'har":"Horde", "Tranquillien":"Horde",
+ # Battleground and Forever faction vendors. The other side cannot earn these,
+ # so the piece must not show up as something they can buy.
+ "The League of Arathor":"Alliance", "Stormpike Guard":"Alliance",
+ "Silverwing Sentinels":"Alliance", "The Watchers":"Alliance",
+ "Theramore Expeditionary Force":"Alliance",
+ "The Defilers":"Horde", "Frostwolf Clan":"Horde",
+ "Warsong Outriders":"Horde", "Darkspear Raiders":"Horde",
 }
 # Vendor-based faction gate. Better than the zone whenever a camp hosts BOTH sides'
 # quartermasters -- "Mor'shan Base Camp" holds Illiyana Moonblaze (Alliance) and Kelm
@@ -418,7 +425,15 @@ def eligible(it, cls, spec, level, faction, prof, wsubs):
     if ar not in (-1,0) and not (ar & mask): return False
     qr=src.get("questRaces") or 0
     if qr and not (qr & mask): return False          # captured all along, never used
-    if not zone_ok(src.get("zone"), faction): return False
+    # An open-world rare keeps its pin in whichever zone it patrols, even when
+    # that zone is the other faction's leveling territory (Rohh in Redridge).
+    # zoneOpen is a world drop that was listed under a subzone name (Tower of
+    # Ilgalar). The label is now the parent zone, and the drop stays listed.
+    if src.get("zone") in GONE_ZONES:
+        return False
+    if (src.get("sourceType") != "rare_npc" and not src.get("zoneOpen")
+            and not zone_ok(src.get("zone"), faction)):
+        return False
     if not quest_side_ok(it, faction): return False
     iid = it["id"]
     if iid in RUNE_BROKER_ALLIANCE and faction != "Alliance": return False

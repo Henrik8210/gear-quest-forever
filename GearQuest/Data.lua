@@ -7005,13 +7005,17 @@ GQ.Data.FACTION_ZONE_DENY = {
     },
 }
 
-function GQ.Data:SpotVisible(spot, faction)
+-- ignoreMapDeny is an open-world rare. Rohh patrols Redridge, and a Horde
+-- player still needs that pin. Quest pins stay on the deny list.
+function GQ.Data:SpotVisible(spot, faction, ignoreMapDeny)
     if not spot then
         return false
     end
-    local deny = faction and self.FACTION_ZONE_DENY[faction]
-    if deny and spot.map and deny[spot.map] then
-        return false
+    if not ignoreMapDeny then
+        local deny = faction and self.FACTION_ZONE_DENY[faction]
+        if deny and spot.map and deny[spot.map] then
+            return false
+        end
     end
     if spot.faction and spot.faction ~= "" and faction and spot.faction ~= faction then
         return false
@@ -7049,8 +7053,10 @@ function GQ.Data:EntryMatchesPlayerFaction(entry)
         return false
     end
 
+    -- Open-world rares stay listed for both factions. The patrol may sit in
+    -- the other side's leveling zone (Rohh the Silent, Redridge Mountains).
     local zone = entry.zone
-    if zone and self.FACTION_ZONE_DENY[faction] and self.FACTION_ZONE_DENY[faction][zone] then
+    if not entry.zoneOpen and entry.sourceType ~= "rare_npc" and zone and self.FACTION_ZONE_DENY[faction] and self.FACTION_ZONE_DENY[faction][zone] then
         return false
     end
 
@@ -7108,10 +7114,11 @@ function GQ.Data:CoordinateLine(itemId)
         return nil
     end
     local faction = GQ.GetEffectiveFaction and GQ:GetEffectiveFaction() or nil
+    local openWorld = row.note == "where this rare spawns" or row.note == "a farming spot"
     local mine = {}
     for i = 1, #row.spots do
         local spot = row.spots[i]
-        if self:SpotVisible(spot, faction) then
+        if self:SpotVisible(spot, faction, openWorld) then
             mine[#mine + 1] = spot
         end
     end
@@ -8095,12 +8102,12 @@ function GQ.Data:EntryUsesRebuiltTooltip(entry)
     if not entry then
         return false
     end
-    -- Random-suffix greens keep the rebuilt jackpot tooltip. A green world
-    -- drop is that hunt even when this row has not stored a suffix yet.
+    -- Random-suffix greens keep the rebuilt jackpot tooltip.
     if entry.suffix and entry.suffix ~= "" then
         return true
     end
-    -- Green rare drops are the same jackpot greens. A blue from a rare is not.
+    -- A fixed green world drop or rare uses the Wowhead tip. A blue from a
+    -- rare is not a jackpot green either.
     if entry.sourceType ~= "world_drop" and entry.sourceType ~= "rare_npc" then
         return false
     end

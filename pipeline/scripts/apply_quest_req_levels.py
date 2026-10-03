@@ -10,6 +10,7 @@ import json
 import os
 import re
 import sys
+import time
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -22,16 +23,28 @@ SOURCES = Path(DATA) / "sources.json"
 CACHE_TIPS = Path(DATA) / "forever_wowhead" / "refresh_cache.json"
 CACHE_XML = Path(DATA) / "forever_wowhead" / "quest_req_cache.json"
 PINS = Path(DATA) / "client_item_overrides.json"
-UA = "Mozilla/5.0"
-WORKERS = 8
+UA = "wow-classic-data-research/1.0 (+contact: local script)"
+WORKERS = 2
 JSON_BLOCK = re.compile(r"<json><!\[CDATA\[(.*?)\]\]></json>", re.S)
 QUEST_REQ = re.compile(r"Requires level (\d+)", re.I)
 
 
 def fetch(url: str) -> str:
-    req = urllib.request.Request(url, headers={"User-Agent": UA})
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        return resp.read().decode("utf-8", "replace")
+    last = None
+    for attempt in range(4):
+        time.sleep(0.35)
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": UA})
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                return resp.read().decode("utf-8", "replace")
+        except Exception as e:
+            last = e
+            msg = str(e)
+            if "403" in msg or "429" in msg or "timed out" in msg.lower():
+                time.sleep(1.5 * (attempt + 1))
+                continue
+            raise
+    raise last
 
 
 def parse_item_xml(body: str):
@@ -49,11 +62,15 @@ def parse_item_xml(body: str):
         return None
 
 
-def tooltip_states_level(raw: dict) -> bool:
+def tooltip_states_level(raw: dict) -> int:
+    """Stated Requires Level, or 0 when the tip does not give one."""
     html = (raw or {}).get("tooltip") or ""
     if not html or raw.get("error"):
-        return False
-    return "Requires Level" in html or "<!--rlvl-->" in html
+        return 0
+    match = re.search(r"Requires Level (\d+)", html) or re.search(r"<!--rlvl-->(\d+)", html)
+    if not match:
+        return 0
+    return int(match.group(1))
 
 
 def main():
@@ -67,8 +84,17 @@ def main():
     for iid, it in items.items():
         if iid in pins:
             continue
+        src = sources.get(iid) or {}
         raw = tips.get(iid)
-        if raw and tooltip_states_level(raw):
+        stated = tooltip_states_level(raw) if raw else 0
+        # Quest rewards are looked up even when the tip states a level, so a
+        # pickup level above that equip level can raise the hunt.
+        if src.get("sourceType") == "quest_reward":
+            candidates.append(int(iid))
+            continue
+        if "--quests-only" in sys.argv:
+            continue
+        if stated > 1:
             continue
         if raw and not raw.get("error"):
             candidates.append(int(iid))
@@ -111,15 +137,19 @@ def main():
     # Quest pages only when one item lists more than one quest.
     quest_level = {}
     need_quests = []
+    seen_quests = set()
     for iid in candidates:
         row = xml_cache.get(str(iid)) or {}
         if row.get("error"):
             continue
         more = [e for e in (row.get("sourcemore") or []) if e.get("t") == 5 and e.get("ti")]
-        if len(more) > 1:
+        # Several quests: the page level, and take the lowest later.
+        # One quest whose item record has no pickup level: the page is the level.
+        if len(more) > 1 or (len(more) == 1 and int(row.get("reqlevel") or 0) <= 1):
             for e in more:
                 qid = int(e["ti"])
-                if qid not in quest_level:
+                if qid not in seen_quests:
+                    seen_quests.add(qid)
                     need_quests.append(qid)
 
     print(f"multi-quest lookups {len(need_quests)}", flush=True)
@@ -150,19 +180,24 @@ def main():
         if 4 not in source and not more:
             continue
         levels = []
-        if len(more) > 1:
+        if len(more) > 1 or (len(more) == 1 and int(row.get("reqlevel") or 0) <= 1):
             for e in more:
                 lv = quest_level.get(int(e["ti"]))
                 if lv:
                     levels.append(lv)
-        if not levels and row.get("reqlevel"):
+        if not levels and int(row.get("reqlevel") or 0) > 1:
             levels.append(int(row["reqlevel"]))
         if not levels:
             continue
         level = min(levels)
-        if level <= 0:
+        if level <= 1:
             continue
         it = items[str(iid)]
+        stated = tooltip_states_level(tips.get(str(iid)) or {})
+        # A stated equip level stays. The hunt cannot start before the quest
+        # accepts, so a higher pickup level raises it.
+        if stated > 1:
+            level = max(stated, level)
         old = it.get("rlvl") or 0
         if old == level:
             continue

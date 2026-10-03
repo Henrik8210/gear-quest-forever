@@ -52,22 +52,16 @@ def existing_rows() -> dict[int, str]:
 
 
 def keep_rebuilt_tip(iid: int) -> bool:
-    """Green random-suffix tooltips stay the rebuilt jackpot tip.
+    """Random-suffix greens keep the rebuilt jackpot tip.
 
-    A green world drop or green rare drop is that hunt. Fixed blues, quests,
-    and boss pieces take the refreshed Wowhead tip instead.
+    A fixed green, including a world drop or a rare, takes the Wowhead Forever
+    tip. Keeping every quality-2 drop left classic weapon damage on the hover
+    (Heavy Shortbow 17-33 instead of Forever 10-20).
     """
     if iid == WAND:
         return True
     item = ITEMS.get(str(iid)) or {}
-    if item.get("randomEnchant"):
-        return True
-    source = SOURCES.get(str(iid)) or {}
-    try:
-        quality = int(item.get("quality") or 0)
-    except (TypeError, ValueError):
-        quality = 0
-    return quality == 2 and source.get("sourceType") in ("world_drop", "rare_npc")
+    return bool(item.get("randomEnchant"))
 
 
 def strip_leading_name(name: str, tip: str) -> str:
