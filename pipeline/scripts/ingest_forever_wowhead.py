@@ -7,8 +7,8 @@ scripts/scrape-forever-wowhead-items.mjs and merges new ids into:
   pipeline/data/sources.json
   pipeline/data/classic_item_ids.json
 
-New Forever-only ids are inserted. Existing Classic ids keep race/source
-gates but take Forever tooltip stats (re-itemization). Re-score after this:
+New Forever-only ids are inserted. An id already in items.json keeps its
+facts. Re-score after this:
 
   $env:GQ_CLASS="SHAMAN"; $env:GQ_GUIDES="guides_shaman.json"; $env:GQ_OUT="shaman.json"
   python pipeline/scripts/score.py
@@ -109,6 +109,8 @@ PATS = [
 PATS = [(re.compile(p), k) for p, k in PATS]
 rx_tag = re.compile(r"<[^>]+>")
 SKIP_NAME = re.compile(r"\(DNT\)|\AHidden |\AMonster ", re.I)
+# Not hunt gear. The chisel is a Jewelcrafting tool. The shield is a creature model.
+SKIP_IDS = {271965, 286140}
 UNKNOWN_RTG = {}
 
 
@@ -288,6 +290,8 @@ def parse_tooltip(t):
     elif "Binds when equipped" in t:
         o["bind"] = "BoE"
     m = re.search(r'whtt-droppedby">Dropped by: ([^<]+)', t)
+    if not m:
+        m = re.search(r"Dropped by: ([^\n<]+)", t)
     if m:
         o["droppedBy"] = html.unescape(m.group(1)).strip()
     return o
@@ -424,7 +428,16 @@ def source_from_row(row, parsed, name):
     elif npc:
         instructions = f"Drops from {npc}."
     else:
-        instructions = "Indexed from Wowhead Forever. Source not listed yet."
+        dropped = (parsed.get("droppedBy") or "").strip()
+        if dropped:
+            # The listview named no source, but the tooltip names the dropper.
+            instructions = f"Drops from {dropped}."
+            npc = dropped
+            source_type = "world_drop"
+        else:
+            # No creature, quest, vendor, or profession. Not a world drop.
+            instructions = "Indexed from Wowhead Forever. Source not listed yet."
+            source_type = "unsourced"
     return {
         "sourceType": source_type,
         "instructions": instructions,
@@ -602,6 +615,9 @@ def build_item(row, tip):
     # earlier than the item-level floor of 18.
     if item["id"] == 279865:
         item["rlvl"] = 16
+    # Leafre's Ring requires level 60. The nether tooltip omits that line.
+    if item["id"] == 276765:
+        item["rlvl"] = 60
     parsed["rlvl"] = item["rlvl"]
     return item, parsed
 
@@ -638,24 +654,15 @@ def main():
         if not item:
             skipped += 1
             continue
-        if SKIP_NAME.search(item["name"] or ""):
+        if iid in SKIP_IDS or SKIP_NAME.search(item["name"] or ""):
             skipped += 1
             continue
         if key not in items:
             items[key] = item
             added_items += 1
-        elif key in _client_pins():
-            # Client-confirmed facts. The nether tip is not Forever-client compatible.
-            pass
-        else:
-            # Classic id, Forever stats. Keep allowRace / allowClass / sources.
-            keep = items[key]
-            for fld in (
-                "stats", "dps", "speed", "dmgMin", "dmgMax", "delay",
-                "effects", "procs", "ilvl", "rlvl", "quality", "name",
-                "block", "effectDriven", "randomEnchant",
-            ):
-                keep[fld] = item[fld]
+        # An existing row keeps its facts. Refreshing every cached tooltip
+        # put Erudite's Amulet back to the stale blue +4/+6 and dropped
+        # school damage the parser does not store. New ids are the ingest.
         new_src = source_from_row(row, parsed, item["name"])
         old_src = sources.get(key)
         old_text = (old_src or {}).get("instructions") or ""
@@ -667,7 +674,7 @@ def main():
                 new_src.get("npc")
                 or new_src.get("questName")
                 or new_src.get("profession")
-                or new_src.get("sourceType") not in (None, "", "world_drop")
+                or new_src.get("sourceType") not in (None, "", "world_drop", "unsourced")
             )
         )
         if old_src is None:
@@ -699,9 +706,19 @@ def main():
     apply_pinned_boss_sources(sources)
     apply_pinned_faction_zones(sources)
     apply_named_drop_kinds(sources)
-    json.dump(items, open(G + "items.json", "w", encoding="utf-8"), separators=(",", ":"))
-    json.dump(sources, open(G + "sources.json", "w", encoding="utf-8"), indent=2)
-    json.dump(pool, open(G + "classic_item_ids.json", "w", encoding="utf-8"))
+    def dump_json(path, obj):
+        tmp = path + ".tmp"
+        with open(tmp, "w", encoding="utf-8", newline="\n") as handle:
+            json.dump(obj, handle, ensure_ascii=True, separators=(",", ":"))
+        try:
+            os.chmod(path, 0o666)
+        except OSError:
+            pass
+        os.replace(tmp, path)
+
+    dump_json(G + "items.json", items)
+    dump_json(G + "sources.json", sources)
+    dump_json(G + "classic_item_ids.json", pool)
     need = os.path.join(os.path.dirname(INDEX), "coord_needed.json")
     json.dump(sorted(set(coord_ids)), open(need, "w", encoding="utf-8"))
     print(

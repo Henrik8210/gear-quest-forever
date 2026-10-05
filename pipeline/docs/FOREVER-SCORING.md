@@ -49,6 +49,51 @@ of Agility at 22 is +6–7 Agi (~9.5%). If +7 would be #1, the item **is** #1.
 `suffixChance` tells the player the roll is slim; chance never buries the
 hunt. Implemented in `score.py` `best_variant` (`ROLL_POLICY="bestRoll"`).
 
+## Rules that stay unless you ask
+
+**Do not change weights unless asked.** `pipeline/data/weights.json`, the
+numbers in `score.py` `weights_at_level()`, and
+`GearQuest/_generated/ScoringWeights.generated.lua` stay as they are until
+you explicitly ask for a retune. A piece ranking first because of an
+existing weight is the model working.
+
+Priest, mage, and warlock ranged damage (`dpsWeightRanged`) is **7**, the
+same scale as a warrior's melee weapon. These classes cast, then wand. A
+higher-DPS wand is the ranged hunt. **White Obsidian Wand** (274425) is
+rank 1 ranged at 39 for mage (including Battle Mage), priest, and warlock
+because 7 × 41.47 DPS dominates the slot. Do not lower that weight to bury
+the wand. Greater Magic Wand stays the client **17.5** DPS (22–41 Arcane,
++2 spell power, requires 13). Warlock school weights stay as written under
+Stat weights: Affliction is shadow, Destruction is fire, Demonology is
+generic spell power, and a healing-only line scores as nothing for those
+three. Enhancement Tank armor stays **0.20** (0.40 below 60), with one
+agility also counting as 2 armor plus dodge and crit.
+
+**A hunt gets a coordinate when one can be found.** Quest start, dungeon or
+raid entrance, named creature, vendor, or object. Shared dungeon, farm,
+rare, boss, and object pins ignore the faction-zone deny. Do not invent a
+pin, a zone center, or a city for a battleground vendor. An Unsourced item
+has no pin until a source exists. Ruins of Lordaeron is **Undercity**
+(map 1458) at 71.6, 11.4. Patch with
+`python pipeline/scripts/index_coordinates.py --ids <json list>`. Do not
+full-emit. `emit()` rewrites the whole coordinate file.
+
+**A re-score always counts set bonuses.** Embrace of the Viper,
+Rotmender's Raiment, and any later `(N) Set` are part of the score for the
+specs that wear them. Scoring the pieces on their own stats and skipping
+`apply_embrace_package` / `apply_rotmender_package` produces the wrong list.
+
+**Tooltip layout stays the Wowhead line order.** Slot and type are one
+double line (`Feet` | `Cloth`), and so are Damage and Speed. The client set
+is spliced where the Wowhead set sat. Drop Chance, Requires Level, and
+Sell Price stay in the tail. If the stored tip already has `(N) Set`, do
+not add the client set again. `Unique-Equipped` splits only when the next
+character is not `:` or a space. Random-suffix greens keep the jackpot
+tooltip. The hover background is opaque.
+
+**A Wowhead Forever scrape also rechecks Unsourced.** See
+[Scraping Wowhead Forever](#scraping-wowhead-forever).
+
 ## Embrace of the Viper (set 162)
 
 Forever reworked this Wailing Caverns leather set. The pieces were already
@@ -123,6 +168,43 @@ Pieces that rank do it on their own stats:
 
 The list tags Defias and Scarlet rows `(Set piece)` on the classes above.
 
+**Rotmender's Raiment (2133),** Ruins of Lordaeron cloth. Five pieces,
+requires 17-19. Stats are the Forever tooltip (4 Oct 2026). The chest is
+Rotmender's Garb, not Robes: +10 Intellect, healing 10 and damage 3.
+Leggings are +5 Stamina and +4 mana per 5, not the old intellect and
+spirit. Treads are +7 Stamina, healing 15 and damage 5. Gloves are +3
+Intellect and +8 Spirit. Sash is +6 Stamina and +6 Intellect. Leggings
+drop from The Abandoned, treads from Rath'mael, and the garb has no named
+npc. Gloves drop from Stone Watcher. The sash drops from Shrieking Banshee.
+
+`apply_rotmender_package` uses the item-set page. The leggings and treads
+tooltips also print an older +10 Intellect at 2 pieces and 5% less threat
+at 3. The set page, garb, gloves, and sash do not, so those two lines are
+not scored. Bonuses:
+
+- 2 pieces: +5 Shadow Resistance, at the resist weight
+- 3 pieces: +10 Intellect
+- 4 pieces: 200 mana when mana falls below 15%, once per 5 min. Priced
+  like Embrace's 100 mana (the amount, not a permanent aura). The doubled
+  restore in Haunted and Wasteland is not in the score
+- 5 pieces: a chance to heal 40 every 3 sec for 15 sec. The chance is not
+  stated, so one proc is priced as 200 health (20 stamina), not as +200
+  healing power
+
+Healer specs only: priest Holy and Discipline, druid Restoration, paladin
+Holy, shaman Restoration. A piece is still scored alone. The package
+promotes a 4- or 5-piece set only when the bonuses pay for the slots you
+give up. Checked 4 Oct 2026, both factions:
+
+- Holy and Discipline: at 18 the chest, sash, gloves, and leggings. At 19
+  all five. From 20 the leggings fall off. Chest, sash, and gloves stay
+  through 21. The treads stay in the top 3 into the high 20s.
+- Restoration druid: all five at 19. On Horde the chest, sash, and gloves
+  stay through 21. Treads stay through about 29.
+- Restoration shaman: all five at 19. Treads stay through about 29.
+- Holy paladin: the treads from 19 through 29. The other four do not beat
+  mail and plate.
+
 Smaller sets left on their own stats until the same check: Stormshroud
 (rogue energy, about 50), Black Dragon Mail (1% hit at 2 pieces, 2% melee
 crit at 3, about 53), Ironfeather (2 pieces, +20 spell power, about 49),
@@ -158,8 +240,10 @@ Protection still scores holy/spell threat; Ret and Enhance stay hybrids.
 **Shaman Enhancement Tank is a hybrid**, like paladin Protection: 1h + shield,
 stamina / armor / defense first, then Rockbiter melee threat, then Earth Shock /
 Lightning Shield spell threat. Not dual-wield (Forever has no shaman DW).
-`enhancement_tank` in `weights.json`. No combat log sim — EP only; retune
-tankier vs threatier in the weights if play disagrees.
+`enhancement_tank` in `weights.json`. No combat log sim — EP only. Do not
+retune tankier vs threatier unless asked.
+
+Armor weight is **0.20** (0.40 below 60). A mail shaman has no plate multiplier, so the armor on the piece is a large part of staying alive while questing. One agility is also **2 armor**, **1% dodge per 20**, and **1% crit per 20**. That is added on top of the listed agility weight, using the same armor weight as armor on the item. Below 60, +6 stamina and +4 agility beats +7 stamina. A much larger stamina gap still wins, which is the early-leveling rule. At 60 the stamina tripling drops off, so agility's armor and dodge are a larger share.
 
 **Mage Battle Mage is a caster who swings.** Three specs, same pillars as every
 other class: damage, then survivability, then endurance. Stamina is only a
@@ -615,7 +699,7 @@ Hunt-id probe (`pipeline/scripts/probe_forever_hunt_tooltips.py`) labels 200 vs 
 
 **Spec switch does not scan gear.** `SetSelectedSpec` refreshes the UI and does not call `CheckAutoCompletion`. Completion is by item id (`obtainedItems`). A hunt already completed on this character is completed on the new spec immediately (`IsEntryObtained` checks the item id) and does not toast. A piece you are wearing that was never recorded stays on Active until the next bag update, equip change, or login scan. That scan marks it completed. No toast if `ownedAtLogin` or `obtainedItems` already has the id. A random-enchant hunt still needs the matching suffix.
 
-**Finger gap (Horde, levels 9–14):** curated level-9 rings are Alliance paladin/warrior only. Generated shaman Finger starts at 10 with **The 1 Ring (8350)**, which 404s on Forever and is pruned. **Woven Copper Ring (21931)** also 404s. Horde enhancement rings that exist are Bounty Hunter's Ring (5351, Barrens) and Ring of Scorn (3235, Silverpine) around 15. Do not toast “ring slot eligible” unless `SlotHasHunts("Finger")`.
+**Finger gap (Horde, levels 9–14):** curated level-9 rings are Alliance paladin/warrior only. Generated shaman Finger starts at 10 with **The 1 Ring (8350)**, which 404s on Forever and is pruned. Jewelcrafting is not in the Forever client. Woven Copper Ring and the rest of that catalog are not hunts. Horde enhancement rings that exist are Bounty Hunter's Ring (5351, Barrens) and Ring of Scorn (3235, Silverpine) around 15. Do not toast “ring slot eligible” unless `SlotHasHunts("Finger")`.
 
 **28 Sep 2026 (v0.2.15-beta).**
 
@@ -729,19 +813,46 @@ the pinned 20. The first lookup used a browser user agent and cached HTTP
 403 for most rows. Retry those with `wow-classic-data-research/1.0`. Do not
 refetch a row that already has `reqlevel`. A cached 403 is not a level.
 
-**Wowhead www is blocked. Use another Forever database.**
-`www.wowhead.com` returns CloudFront HTTP 403 from this machine for item
-XML, quest HTML, and NPC pages, including a normal browser user agent. Do
-not cache that 403 as an empty source, and do not start another wide scrape
-of www.
+## Scraping Wowhead Forever
 
-The tooltip still comes from Nether when it answers:
-`https://nether.wowhead.com/forever/tooltip/item/{id}`. `Requires Level` on
-that tip is the equip level. Item level is not. ForeverDB field `rl` is the
-same required level. ForeverDB field `il` is item level. Do not equip from
-`il`. A stated level greater than 1 is never replaced by either database.
-An item with no required level (or Wowhead's stub of 1) is still looked up,
-and the hunt level is the source gate, not the item-level floor.
+On 5 Oct 2026 the Forever listview and item XML on `www.wowhead.com`
+returned HTTP 200 (`node scripts/scrape-forever-wowhead-items.mjs --index`,
+then diff against `items.json`). Nether
+(`https://nether.wowhead.com/forever/tooltip/item/{id}`) is still the
+tooltip. When Nether 404s, the item page
+`https://www.wowhead.com/forever/item={id}&xml` has `htmlTooltip`. A 403 is
+not an empty source and is not cached as "no pin". ForeverDB
+(`https://foreverdb.net`) is the fallback when neither has the fact. The
+5 Oct pieces were not in ForeverDB.
+
+Ingest **inserts new ids only**. An existing `items.json` row keeps its
+facts. Refreshing every cached tooltip put Erudite's Amulet back to a stale
+blue +4 Agility / +6 Stamina and dropped school damage. A source row is
+replaced only when the old text is missing or still says
+"Source not listed yet" **and** the new row names an npc, a quest, a
+profession, or a source type other than world drop or unsourced. A real
+boss pin, camp vendor, or hand edit stays.
+
+**Then recheck every item that is still Unsourced.** If the new listview or
+the tooltip now names a quest, a vendor, or `Dropped by`, fill that source
+(`boss_drop` when the npc is in `dungeon_entrances.json` `bossNpcs`,
+otherwise the specific type the page names) and run
+`index_coordinates.py --ids` for those ids. On 5 Oct that pass filled 45
+placeholder sources and turned tooltip-only droppers (Worgpelt Leggings /
+Wolf Master Nandos, and the other named bosses in WC, SFK, RFK, Stockade,
+and Scarlet Monastery) into real sources with entrance pins. Thirteen new
+items stayed Unsourced because the tooltip named no dropper. Do not call
+those world drops.
+
+Re-score with `python pipeline/scripts/rescore_hunter_shaman.py` after new
+gear is actually ingested. One class name does one class. Do not
+`reemit_all.py` from stale JSON.
+
+`Requires Level` on the tooltip is the equip level. Item level is not.
+ForeverDB field `rl` is that same required level. ForeverDB field `il` is
+item level. Do not equip from `il`. A stated level greater than 1 is never
+replaced. An item with no required level (or Wowhead's stub of 1) is still
+looked up, and the hunt level is the source gate, not the item-level floor.
 
 When Nether or www does not have the fact, ForeverDB
 (`https://foreverdb.net`) is the source. The files are static. No key.
@@ -895,11 +1006,27 @@ Paladin Protection. Warrior Protection is physical (no SP/heal).
 
 ### Wand damage
 
-Priest, mage, and warlock `dpsWeightRanged` is **0.25** from level 10
-(levels 1–9 stay 0.5). Wand damage is part of the score. A large DPS gap
-beats a small intellect or spirit roll. A wand that also has real stats
-still leads at 60. Greater Magic Wand is the client **17.5** DPS
+Priest, mage, and warlock `dpsWeightRanged` is **7**, the same scale as a
+warrior's melee weapon. These classes cast, then wand. A higher-DPS wand
+is the ranged hunt. Greater Magic Wand is the client **17.5** DPS
 (22–41 Arcane), not the older 11.39 Wowhead line.
+
+### Warlock schools
+
+Healing Done is not spell damage for Affliction, Demonology, or
+Destruction. A line that is only healing scores as nothing. An unequal
+"healing up to X and damage up to Y" scores the damage half.
+
+`Increases damage done by Shadow/Fire/Frost/Nature/Arcane/Holy spells`
+is that school's spell power. It has to be on the item stats, not only
+in the effect sentence.
+
+Affliction is shadow (`spShadow` 0.95, fire near 0). Spirit is raised
+because Life Tap scales with it, and crit is real because DoTs can crit.
+Demonology prefers generic spell power; shadow and fire are both partial.
+Destruction prefers fire (`spFire` 0.95) over shadow (`spShadow` 0.2),
+and crit is its highest of the three specs because of Ruin. Hit stays
+above crit on all three.
 
 ### Hunt instructions
 
@@ -973,7 +1100,7 @@ Notes by source:
 Classic dungeon doors are the pre-Cataclysm Questie entrance table (Forever
 still uses classic geography). Forever doors with exact numbers: Hall of
 Thanes 43.6, 51.7 in Ironforge, and Ruins of Lordaeron 71.6, 11.4 in
-Tirisfal Glades. These seven have a description only, so nothing is pinned
+Undercity. These seven have a description only, so nothing is pinned
 there: Excavation Site (southern Wetlands), City of Dalaran (Alterac
 Mountains boundary), The Drowned City (Gillijim's Isle), Krol'dok Stronghold
 (Riverglades), Alcaz Prison (Alcaz Island), Blackmaw Hold (northern
@@ -1016,9 +1143,10 @@ The pin table is ours. Questie is not required in game.
 
 A Wowhead Forever scrape that adds or changes a hunt item looks up the
 coordinate in the same pass as the usual facts: tooltip stats, required
-level, source, zone, npc, and quest. Run
-`python pipeline/scripts/index_coordinates.py` before syncing the addon.
-It is resume-safe. The cache is
+level, source, zone, npc, and quest. Also recheck items that are still
+Unsourced; if Wowhead now names a source, index those ids too. Patch with
+`python pipeline/scripts/index_coordinates.py --ids <json list>`. A full
+`emit()` rewrites every coordinate. The cache is
 `pipeline/data/forever_wowhead/coord_cache.json` (gitignored). Use the
 research user agent in that script. A Chrome user agent is rejected. An
 HTTP 403 is not cached as "no pin"; the next run retries it.
@@ -1038,7 +1166,7 @@ What the lookup uses:
   `pipeline/data/dungeon_entrances.json`, not the boss's room. Note
   `(entrance to dungeon or raid)`. Classic doors are the pre-Cataclysm
   entrance table. Forever doors with numbers are Hall of Thanes
-  (Ironforge 43.6, 51.7) and Ruins of Lordaeron (Tirisfal Glades 71.6,
+  (Ironforge 43.6, 51.7) and Ruins of Lordaeron (Undercity 71.6,
   11.4). The other seven Forever doors have a description and no numbers.
   Leave them unpinned until someone measures the door.
 - Vendor: the NPC that sells it, one pin per faction. Note

@@ -547,11 +547,20 @@ def copy_spots(spots: list[dict], faction: str | None = None) -> list[dict]:
     out = []
     for spot in spots:
         row = {"map": spot["map"], "x": spot["x"], "y": spot["y"]}
+        if spot.get("mapId"):
+            row["mapId"] = int(spot["mapId"])
         fac = spot.get("faction") or faction
         if fac:
             row["faction"] = fac
         out.append(row)
     return out
+
+
+def shared_drop_spots(spots: list[dict]) -> list[dict]:
+    """A creature, rare, or open boss is the same place for both factions."""
+    for spot in spots:
+        spot.pop("faction", None)
+    return spots
 
 
 def spots_for_npc_name(name: str, cache: dict) -> list[dict]:
@@ -680,7 +689,7 @@ def resolve_item(item_id: int, src: dict, cache: dict, xml_cache: dict) -> tuple
         if described:
             return None, "entrance has no exact coordinate yet (" + DOORS["describedOnly"][described] + ")"
         if npc:
-            spots = spots_for_npc_name(npc, cache)
+            spots = shared_drop_spots(spots_for_npc_name(npc, cache))
             if spots:
                 return {"note": NOTE_BOSS, "spots": spots, "more": len(spots) > 1}, None
         return None, "dungeon entrance is not known"
@@ -710,10 +719,13 @@ def resolve_item(item_id: int, src: dict, cache: dict, xml_cache: dict) -> tuple
             return {"note": NOTE_DOOR, "spots": spots, "more": len(spots) > 1}, None
         if not npc:
             return None, "rare npc is not named"
-        spots = spots_for_npc_name(npc, cache)
+        spots = shared_drop_spots(spots_for_npc_name(npc, cache))
         if spots:
             return {"note": NOTE_RARE, "spots": spots, "more": len(spots) > 1}, None
         return None, "rare npc has no map pin"
+
+    if kind == "unsourced":
+        return None, "source not listed yet"
 
     if kind == "world_drop":
         if door:
@@ -723,7 +735,7 @@ def resolve_item(item_id: int, src: dict, cache: dict, xml_cache: dict) -> tuple
             if described:
                 return None, "entrance has no exact coordinate yet (" + DOORS["describedOnly"][described] + ")"
             return None, "world drop names no creature"
-        spots = spots_for_npc_name(npc, cache)
+        spots = shared_drop_spots(spots_for_npc_name(npc, cache))
         alts = [
             a.get("npc")
             for a in (src.get("alts") or [])

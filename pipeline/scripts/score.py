@@ -26,6 +26,20 @@ NO_GUIDES = os.environ.get("GQ_NO_GUIDES") == "1"
 ILVL_FLOOR = json.load(open(G+"ilvl_floor.json"))
 
 items  = json.load(open(G+"items.json"))
+# "Increases damage done by Shadow spells and effects by up to N" is the
+# item's spell damage. Some rows kept that sentence on effects and never
+# copied it into stats, so a +14 shadow circlet scored as stamina only.
+_SCHOOL_EQUIP = re.compile(
+    r"Increases damage done by (Shadow|Fire|Frost|Nature|Arcane|Holy) spells and effects by up to (\d+)"
+)
+for _it in items.values():
+    _st = _it.get("stats")
+    if not isinstance(_st, dict):
+        continue
+    for _school, _amt in _SCHOOL_EQUIP.findall(" ".join(_it.get("effects") or [])):
+        _key = "sp" + _school
+        if not _st.get(_key):
+            _st[_key] = int(_amt)
 rand   = json.load(open(G+"items_random.json"))
 srcs   = json.load(open(G+"sources.json"))
 W      = json.load(open(G+"weights.json"))
@@ -795,6 +809,94 @@ def apply_embrace_package(per, faction, level, cls, spec_key, wl, dps_w, found):
         cur.insert(0, promoted)
         per[key] = cur[:8]
 
+# Rotmender's Raiment (Forever set 2133). Five cloth pieces from the Ruins
+# of Lordaeron, requires 17-19. The item-set page is the bonus list. Two of
+# the piece tooltips also print an older pair (+10 Intellect at 2, and 5%
+# less threat at 3). The set page and the garb, gloves, and sash do not, so
+# those two lines are not scored.
+#
+#   (2) +5 Shadow Resistance
+#   (3) +10 Intellect
+#   (4) Below 15% mana, restore 200 mana over 10 sec, once per 5 min.
+#       Twice as much in Haunted and Wasteland. That doubling is the zone,
+#       not the baseline.
+#   (5) Healing spells can add 40 health every 3 sec for 15 sec (200 per
+#       proc). The chance is not stated, so this is priced as one proc of
+#       health, not as +200 healing power.
+ROTMENDER_PIECES = {
+    286978: "Chest",   # Rotmender's Garb
+    286980: "Waist",   # Rotmender's Sash
+    271207: "Legs",    # Rotmender's Leggings
+    271214: "Feet",    # Rotmender's Treads
+    286979: "Hands",   # Rotmender's Gloves
+}
+ROTMENDER_SPECS = {
+    "PRIEST": {"holy", "discipline"},
+    "DRUID": {"restoration"},
+    "PALADIN": {"holy"},
+    "SHAMAN": {"restoration"},
+}
+
+def rotmender_bonus(wl, pieces):
+    """Points for wearing `pieces` of Rotmender's Raiment. Same currency as stats."""
+    pts = 0.0
+    if pieces >= 2:
+        pts += 5.0 * wl.get("resist", 0.0)
+    if pieces >= 3:
+        pts += 10.0 * wl.get("int", 0.0)
+    if pieces >= 4:
+        # 200 mana when you fall under 15%, once per 5 min. Same treatment
+        # as Embrace's 100 mana: the lockout is why this is not a permanent
+        # aura, and the amount is still their mana.
+        mana_w = wl.get("mana", 0.0)
+        if mana_w:
+            pts += 200.0 * mana_w
+        elif wl.get("int", 0.0):
+            pts += (200.0 / 15.0) * wl.get("int", 0.0)
+    if pieces >= 5 and wl.get("heal", 0.0) > 0:
+        pts += (200.0 / PROCS.HP_PER_STA) * wl.get("sta", 0.0)
+    return pts
+
+def apply_rotmender_package(per, faction, level, cls, spec_key, wl, found):
+    """If the cloth set outscores the mixed best, hunt those pieces."""
+    if spec_key not in ROTMENDER_SPECS.get(cls, ()):
+        return
+    if len(found) < 4:
+        return
+    options = []
+    if len(found) == 5:
+        options.append(dict(found))
+    if len(found) >= 4:
+        slots = list(found)
+        for drop in slots:
+            if len(found) == 4 and drop:
+                options.append(dict(found))
+                break
+            sub = {sl: row for sl, row in found.items() if sl != drop}
+            if len(sub) == 4:
+                options.append(sub)
+    best = None
+    best_margin = None
+    for chosen in options:
+        n = len(chosen)
+        bonus = rotmender_bonus(wl, n)
+        margin = bonus - _embrace_cost(per, faction, level, chosen)
+        if margin < 0:
+            continue
+        if best is None or n > len(best) or (n == len(best) and margin > best_margin):
+            best = chosen
+            best_margin = margin
+    if not best:
+        return
+    bonus = rotmender_bonus(wl, len(best))
+    share = bonus / float(len(best))
+    for sl, row in best.items():
+        key = (faction, level, sl)
+        cur = [r for r in (per.get(key) or []) if r[1]["id"] != row[1]["id"]]
+        promoted = (row[0] + share,) + row[1:]
+        cur.insert(0, promoted)
+        per[key] = cur[:8]
+
 def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
     cfg=W[cls][spec_key]
     w=dict(cfg["weights"]); style=cfg["weaponStyle"]; dpsW=cfg.get("dpsWeight",0.0)
@@ -815,6 +917,15 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
         for level in levels:
             rscale=70.0/max(1,level)
             wl=weights_at_level(w, level)
+            if cls == "SHAMAN" and spec_key == "enhancement_tank":
+                # 1 agility is 2 armor, 1% dodge per 20, and 1% crit per 20.
+                # The listed agility weight is the rest. Armor from agility
+                # uses the same armor weight as armor on the piece, including
+                # the leveling multiplier.
+                wl["agi"] = (wl.get("agi", 0.0)
+                    + 2.0 * wl.get("armor", 0.0)
+                    + wl.get("dodge", 0.0) / 20.0
+                    + wl.get("crit", 0.0) / 20.0)
             if not spec_wants_heal(cls, spec_key):
                 # Healing Done is a healer stat. Damage specs score Damage Done
                 # (folded into spell power) and do not treat +healing as spell power.
@@ -822,6 +933,7 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                 wl["sp_from_heal"] = 0.0
             buckets=collections.defaultdict(list)
             embrace_found={}
+            rotmender_found={}
             for it in pool:
                 if not eligible(it,cls,spec_key and spec_key or "",level,faction,prof,wsubs): continue
                 sl=slot_for(it,cls)
@@ -966,6 +1078,8 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     buckets[sl].append(row)
                     if it["id"] in EMBRACE_PIECES:
                         embrace_found[sl]=row
+                    if it["id"] in ROTMENDER_PIECES:
+                        rotmender_found[sl]=row
 
                 # A one-hander (InventoryType 13) can be held in EITHER hand. slot_for
                 # returns one slot per item, so every inv-13 weapon was MainHand-only
@@ -1084,6 +1198,7 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     extra.append(r)
                 source_alts[(faction,level,sl)]=extra
             apply_embrace_package(per, faction, level, cls, spec_key, wl, dpsW, embrace_found)
+            apply_rotmender_package(per, faction, level, cls, spec_key, wl, rotmender_found)
     return per,cfg,notable,full60,source_alts
 
 # ---------------------------------------------------------------------------

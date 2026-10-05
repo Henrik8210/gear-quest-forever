@@ -9,6 +9,19 @@ Item facts come from Wowhead Forever ingest. All nine classes are on this model.
 
 **Order:** damage (spec primary) first, then survivability (sta/armor below 60), then endurance (mana keep-up, less than stam). Level 60 is raw raid weights. Max 3 unique names + 1 notable per slot.
 
+## Do not change weights unless asked
+
+`weights.json`, the numbers in `score.py` `weights_at_level()`, and `ScoringWeights.generated.lua` stay until the user explicitly asks for a retune. A piece ranking first because of an existing weight is the model working.
+
+Priest, mage, and warlock `dpsWeightRanged` is **7** (same scale as a warrior melee weapon). These classes cast, then wand. **White Obsidian Wand** (274425) is rank 1 ranged at 39 for mage, priest, and warlock because 7 × 41.47 DPS wins the slot. Do not lower that weight to bury it. Greater Magic Wand stays the client 17.5 DPS. Warlock schools and Enhancement Tank armor (0.20, 0.40 below 60) stay as they are.
+
+## Coordinates, sets, tooltips, scrapes
+
+- A hunt gets a coordinate whenever a real spot exists (quest start, dungeon or raid entrance, named creature, vendor, object). Do not invent one. Unsourced has none until a source exists. Ruins of Lordaeron is Undercity map 1458 at 71.6, 11.4. Patch with `index_coordinates.py --ids`. Do not full-emit (`emit()` rewrites the whole file).
+- Every re-score counts set bonuses (Embrace of the Viper, Rotmender's Raiment, any `(N) Set`) via `apply_embrace_package` / `apply_rotmender_package`. Pieces scored alone are the wrong list.
+- Tooltip layout stays Wowhead line order. Slot and type are one double line, and so are Damage and Speed. The client set is spliced in place. Drop Chance, Requires Level, and Sell Price stay in the tail. If the stored tip already has `(N) Set`, do not add the client set again. Random-suffix greens keep the jackpot tooltip.
+- A Wowhead Forever scrape **inserts new ids only**. Do not refresh existing `items.json` facts from the tooltip cache (that reverted Erudite to a stale blue). Then recheck every item still marked Unsourced: if the listview or tooltip now names a quest, a vendor, or Dropped by, fill that source and `index_coordinates.py --ids` those ids. Do not call a still-empty row a world drop.
+
 ## Random-enchant jackpot is BiS
 
 Rank a random-enchant green on the **best suffix it can roll** (top of that suffix’s range), not the expected value across every suffix.

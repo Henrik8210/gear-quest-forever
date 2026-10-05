@@ -2,78 +2,95 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v0.3.2-beta
+## v0.3.3-beta
 
-The zone line names the zone, a quest reward opens at the quest's pickup level, and several pieces that were missing from the lists are hunts now. Equip level is still **Requires Level**. Item level does not decide when you can wear a piece.
+Hunts with no known source are **Unsourced**, not world drops. Pieces whose tooltip already named a boss now say so, and point at the dungeon door. A fresh Wowhead Forever pass added new gear, and priest, mage, and warlock wands rank on wand damage.
 
-The window title reads **GearQuest Forever v0.3.2-beta**.
+The window title reads **GearQuest Forever v0.3.3-beta**.
 
-### Zones
+### Unsourced
 
-**Blackvenom Blade** (Rohh the Silent) is **Redridge Mountains**, for Enhancement and every other spec that lists it. The zone line no longer says Tower of Ilgalar. The coordinates show for Horde as well as Alliance.
+The source filter has **Unsourced**, directly under World drop. It starts checked. The source line reads **Source: Unsourced**, in grey. These are pieces Wowhead Forever has not given a drop, a quest, a vendor, or a profession. They are no longer mixed into World drop. An Unsourced hunt has no map pin until a source exists.
 
-The same parent-zone name is used for other places inside a zone. Lakeshire and Stonewatch are Redridge Mountains. Camp Taurajo is The Barrens. Northshire is Elwynn Forest. Coldridge Valley is Dun Morogh. A dungeon stays the dungeon. Refuge Pointe and Hammerfall stay those names, so the other faction still does not see those vendors.
+### Drops the tooltip already named
 
-### Quest levels
+**Worgpelt Leggings** drop from **Wolf Master Nandos** in **Shadowfang Keep**. The source line says **Boss drop**. The pin is the keep entrance in Silverpine Forest, 44.8, 67.8.
 
-A quest reward with no **Requires Level** on the tooltip now starts at the lowest level that can pick up the quest. All nine classes.
+The same correction covers the other dungeon bosses whose tooltip already said Dropped by:
 
-- **Phytoblade** is level **20** (Blisters on The Land).
-- **Sword of Omen** and **Prophetic Cane** are level **33** (Into The Scarlet Monastery).
-- **Servomechanic Sledgehammer** is level **35** (Sunken Treasure).
+- Wailing Caverns: **Cloak of Hermitic Bliss** (Kresh), **Slither Cord** (Lord Pythas). Entrance in the Barrens, 46.0, 36.5.
+- Shadowfang Keep: Rethilgore, Commander Springvale, Odo the Blindwatcher, Fenrus the Devourer, and Wolf Master Nandos. Entrance in Silverpine Forest.
+- Razorfen Kraul: Aggem Thorncurse, Agathelos the Raging, Overlord Ramtusk. Entrance in the Barrens, 42.3, 89.9.
+- The Stockade: **Bazil Thredd**. Entrance in Stormwind, 40.5, 55.9.
+- Scarlet Monastery: Interrogator Vishas, Bloodmage Thalnos. Entrance in Tirisfal Glades, 82.6, 33.8.
 
-A piece that already states a required level keeps that level. Fang of Magmatus stays 13. Staff of Westfall stays 14. Wolfsbane stays 20.
+Open-world droppers that the tooltip names, and that are not dungeon bosses, stay world drops. The description says who drops the piece.
+
+A later Wowhead pass also filled quests and named droppers on other hunts that used to say the source was not listed yet. Those hunts show the quest or the creature, and a coordinate when a spot exists.
 
 ### New pieces
 
-**Fallen Guard's Pendant** is a neck from level **31**. Rank **2** at 31–35 for Retribution, Arms, and Fury, both factions, and rank **3** at 36–37. +6 Strength and +8 Stamina. The drop is not listed yet.
+**White Obsidian Wand** is a ranged weapon from level **39**. Rank **1** at 39–41 for every mage spec, including Battle Mage, for Holy, Discipline, and Shadow at 39, and for Affliction, Demonology, and Destruction at 39. 49–92 Arcane, 41.5 damage per second, and healing and damage up to 6. The drop is not listed yet.
 
-**Arcane Infused Rod** is an off-hand from level **31**. Rank **2** at 31 for Arcane, Battle Mage Arcane, and Balance, both factions. +8 Intellect and +9 Arcane spell damage. The tooltip has no required level, so the hunt uses 31. The drop is not listed yet.
+**Unbreakable Golem Grips** are plate hands from level **43**. Rank **1** at 43–44 for Protection paladin and Protection warrior. +10 Stamina. The drop is not listed yet.
 
-**Restorer's Fine Gloves** are cloth hands from level **35**. Rank **2** at 35 for Holy and Discipline, both factions, and for Horde Shadow, Affliction, Demonology, and Destruction. +8 Stamina, +11 Spirit, healing up to 14 and damage up to 5. The drop is not listed yet.
+**Horseman's Unyielding Shroud** is a back from level **57**, part of Rider of the Plaguelands with **Blade of Senseless Slaughter** and **Signet of the Soulless Rider**. The shroud is rank **1** at 57–59 for Retribution, Arms, and Fury. +13 Stamina and +27 Attack Power. The blade is rank **2** main hand at 57 for Horde Combat. The drop is not listed yet.
 
-**Arena Master** is a trinket from level **35**, found in the Arena Treasure Chest. Rank **1** at 35–37 for Protection and Bear, both factions. +7 Stamina.
+**Molok's Masher** is a two-hander from level **36**. Rank **2** main hand at 36 for Bear. +17 Stamina. The drop is not listed yet.
 
-**Dog Whistle** is a trinket from level **25**. It drops from Houndmaster Loksey. The pin is the Scarlet Monastery entrance in Tirisfal Glades. Rank **2** at 25–27 for Arms, Fury, Protection, and Feral.
+### Greens that were showing as blue
+
+**Erudite's Amulet** is a green: +2 Agility and +3 Stamina, requires level 20, from Friend of the Library. It is not the Enhancement Tank neck. **Gnomeregan Amulet of the Monkey** is that neck from level **26**.
+
+**Scholarly Pendant** is a green: +3 Stamina and +2 Spirit, requires level 20, from the same quest. It is not a top neck.
+
+### Wands
+
+Priest, mage, and warlock ranged hunts follow wand damage the way a warrior follows weapon damage. A higher-DPS wand is the hunt. **Greater Magic Wand** stays 22–41 Arcane, 17.5 damage per second, requires level 13. **White Obsidian Wand** is the new one at 39, above.
+
+### Warlock schools
+
+Affliction hunts shadow damage. Destruction hunts fire damage. Demonology hunts generic spell power, with shadow and fire both partial. A line that is only healing does not score for those three specs. An unequal "healing up to X and damage up to Y" uses the damage half. School damage has to be on the item, not only in a grey sentence.
+
+### Enhancement Tank
+
+Enhancement Tank still wants a one-hander and a shield: stamina and armor first, then threat. Armor counts while leveling, and agility adds armor as well as dodge and crit. A neck with stamina and agility can beat a larger stamina roll. **Erudite's Amulet** is the green above, not rank 1.
+
+### Set bonuses
+
+Set bonuses are in the score, not only on the tooltip.
+
+**Rotmender's Raiment** is cloth from the Ruins of Lordaeron, requires 17–19. The pieces are Rotmender's Garb, Sash, Leggings, Treads, and Gloves. Leggings drop from The Abandoned. Treads drop from Rath'mael. The pin is the ruins entrance in Undercity, 71.6, 11.4.
+
+- Holy and Discipline: chest, sash, gloves, and leggings at **18**. All five at **19**. From 20 the leggings fall off. Chest, sash, and gloves stay through 21. The treads stay in the top 3 into the high 20s.
+- Restoration druid and Restoration shaman: all five at **19**. The treads stay through about 29.
+- Holy paladin: the treads from **19** through about 29. The other four do not beat mail and plate.
+
+**Embrace of the Viper** still uses its set bonuses for hunter, rogue, Enhancement, and Feral in the high teens and twenties.
+
+### Hovers
+
+A set hover keeps Wowhead's order. The set name, the pieces, and the bonuses stay together. Drop Chance stays with the drop, not between Equip and Requires Level. Slot and armor type share one line, and so do Damage and Speed. If the stored tip already lists the set, the client set is not printed a second time. A green **of the …** piece still uses the jackpot tooltip, with the roll range. The hover background is solid.
+
+### Where to go
+
+A hunt that has a place shows that coordinate under the source line, and **Show on map** opens it. The pin is the quest start, the dungeon or raid entrance, the vendor, or where a named creature walks. Ruins of Lordaeron opens in **Undercity**. A spot that both factions can use shows for both. Unsourced hunts have no pin.
+
+### Removed
+
+**Active**, **Completed**, and **Removed**. **Remove** on a hunt takes it off Active and puts it on Removed. That parchment shows **Restore**, which puts it back. The choice stays after logout.
+
+### Professions
+
+Under Profession, each craft has its own box: Alchemy, Blacksmithing, Enchanting, Engineering, Leatherworking, Tailoring, and Fishing. Clearing one stays cleared when you change level or simulate another class. Trainer recipes stay on the trainers. Camp recipes stay on the camp vendors.
+
+### v0.3.2-beta
+
+The zone line names the parent zone. A quest reward with no Requires Level opens at the quest's pickup level. Fallen Guard's Pendant, Arcane Infused Rod, Restorer's Fine Gloves, Arena Master, and Dog Whistle are hunts.
 
 ### v0.3.1-beta
 
-Hovers use the current Wowhead Forever tooltip. A dungeon boss is a boss drop. An open-world rare is a new source, **Rare NPC**, with a pin on that rare. Camp recipes point at the profession hubs again, and a Horde character no longer sees an Alliance-only quest.
-
-The window title reads **GearQuest Forever v0.3.1-beta**.
-
-### Wowhead tooltips
-
-Fixed pieces no longer show the old rebuild tooltip. **Ghostly Mantle** (shoulders, Holy priest at 22, and the other caster specs that list it) is +9 Spirit, then Equip: healing done by up to 8 and damage done by up to 2. It is not +3 Damage Done and +9 Healing Done. **Slime-encrusted Pads** is +3 mana per 5 and +10 health per 5, requires level 20.
-
-This is every fixed hunt, all nine classes. A green **of the …** world drop or green rare still uses the jackpot tooltip, with the roll range, the same as before. **Greater Magic Wand** stays 22–41 Arcane, 17.5 damage per second.
-
-### Boss drops
-
-**Slime-encrusted Pads** drops from **Mutanus the Devourer**, the last boss of **Wailing Caverns**. The source line says **Boss drop**. The pin is the cave entrance in the Barrens, 46.0, 36.5. The same correction covers the other named dungeon bosses that were filed as world drops, including Sneed, Ironaya, Gahz'rilla, and Shadowpriest Sezz'ziz. The description names the boss and the dungeon. The pin stays the entrance.
-
-### Rare NPC
-
-The source filter has **Rare NPC**. The description says **Source: Rare NPC**, and the coordinate is where that rare walks.
-
-Pieces that are best in slot from an open-world rare:
-
-- **Adept's Gloves**, Elder Mystic Razorsnout. Hands at level 12–14 for the mage specs, Shadow priest, and Balance druid.
-- **Bashing Pauldrons**, Haren Swifthoof. Shoulders at level 15 for the hunter specs, the druid specs, and the rogue specs.
-- **Black Ogre Kickers**, Lo'Grosh. Feet around level 36–39 for Arms, Fury, Retribution, and Protection.
-- **Howling Blade**, Skhowl. Weapons at level 33 for Assassination, Combat, and Subtlety.
-- **Wax-polished Armor**, Grizlak. Chest at level 12 for Arms, Fury, and Retribution.
-- **Buckskin Cape**, Stonearm. Back at level 12 for Beast Mastery and Marksmanship.
-- **Runic Cane**, Brokespear. Off-hand around level 14–17 for Feral bear.
-- **Burrowing Shovel**, Master Digger. Main hand at level 12 for Enhancement.
-
-### Profession camps
-
-Leatherworking, blacksmithing, tailoring, enchanting, and engineering recipes bought at the camps are no longer pinned to Orgrimmar or Stormwind trainers. Horde buys them at the Durotar Supply and Logistics hub northwest of the Crossroads. Alliance buys them at the Azeroth Commerce Authority hub at the start of Redridge. **Trapper's**, **Brawler's**, and **Defender's** leather hoods are in that set, along with the rest of the camp catalog. Trainer recipes such as linen, mageweave, and mithril stay on the trainers.
-
-### Faction quests
-
-An Alliance-only quest is not shown to Horde, and a Horde-only quest is not shown to Alliance. A quest both factions can do uses your faction's pin. **Friend of the Library** (Scholarly Pendant, Erudite's Amulet) is Stormwind for Alliance and Undercity for Horde.
+Hovers use the current Wowhead Forever tooltip. Dungeon bosses are boss drops. Open-world rares are Rare NPC, with a pin. Camp recipes point at the profession hubs. An Alliance-only quest stays off Horde.
 
 ### v0.3.0-beta
 

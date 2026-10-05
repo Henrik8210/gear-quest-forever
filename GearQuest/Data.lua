@@ -85,7 +85,6 @@ local PROFESSION_ITEM_NAMES = {
     [3473] = "Runed Copper Pants",
     [3474] = "Gemmed Copper Gauntlets",
     [3488] = "Copper Battle Axe",
-    [21931] = "Woven Copper Ring",
     [253887] = "Novice Ardent's Sash",
     [253885] = "Novice Arcanist's Sash",
     [250482] = "Glowing Copper Boots",
@@ -3417,21 +3416,6 @@ GQ.Data.entries = {
 
     -- Finger — Alliance mail melee (level 9)
     {
-        id = "early9_finger_woven_copper_ring",
-        itemId = 21931,
-        slot = "Finger",
-        minLevel = LEVEL9_MIN,
-        maxLevel = LEVEL9_MAX,
-        classes = MAIL_MELEE,
-        factions = ALLIANCE,
-        specs = SPEC_MELEE,
-        curatedRank = 1,
-        sourceType = "profession",
-        profession = "Jewelcrafting",
-        instructions = "Learn Woven Copper Ring from a Jewelcrafting trainer and craft at a workbench (Jewelcrafting 30).",
-        zone = "Stormwind City",
-    },
-    {
         id = "early9_finger_ring_of_fortitude",
         itemId = 2237,
         slot = "Finger",
@@ -3965,22 +3949,6 @@ GQ.Data.entries = {
         npc = "Magistrate Bluntnose",
         questName = "WANTED: Chok'sul",
     },
-    {
-        id = "early10_finger_woven_copper_ring",
-        itemId = 21931,
-        slot = "Finger",
-        minLevel = LEVEL10_MIN,
-        maxLevel = LEVEL10_MAX,
-        classes = MAIL_MELEE,
-        factions = ALLIANCE,
-        specs = SPEC_RET,
-        curatedRank = 3,
-        sourceType = "profession",
-        profession = "Jewelcrafting",
-        instructions = "Learn Woven Copper Ring from a Jewelcrafting trainer and craft at a workbench (Jewelcrafting 30).",
-        zone = "Stormwind City",
-    },
-
     -- Feet — Alliance Ret (level 10)
     {
         id = "early10_feet_quagmire_galoshes",
@@ -6083,6 +6051,17 @@ function GQ.Data:FormatAuditTip(tip)
     if not tip or tip == "" then
         return tip
     end
+    -- Wowhead already broke the lines. Rebuilding them is what glued
+    -- "Restores" to the next stat and shoved Drop Chance into the middle.
+    if tip:find("\n", 1, true) then
+        tip = tip:gsub("(Binds when equipped)", "%1\n")
+        tip = tip:gsub("(Binds when picked up)", "%1\n")
+        -- "Unique-Equipped Finger" is a slot. "Unique-Equipped: Talisman of
+        -- Battle (1)" is one Wowhead line; a break there leaves the colon.
+        tip = tip:gsub("(Unique%-Equipped)%s*([^:%s])", "%1\n%2")
+        tip = tip:gsub("\n+", "\n")
+        return tip:match("^%s*(.-)%s*$")
+    end
     tip = tip:gsub("(%d)(%u)", "%1 %2")
     tip = tip:gsub("(%l)(%u)", "%1 %2")
     tip = tip:gsub("(%l)(%d)", "%1 %2")
@@ -6108,6 +6087,9 @@ function GQ.Data:FormatAuditTip(tip)
     tip = tip:gsub("%+(%d+)%s+", "\n+%1 ")
     tip = tip:gsub("(%(%d+%)%s*Set%s*:%s*)\1(%d+)", "%1+%2")
     tip = tip:gsub("(%(%d+%)%s*Set%s*:)%s*\n%s*(%+%d+)", "%1 %2")
+    -- "Unique-EquippedFinger" is a slot on the next line. A colon stays,
+    -- so "Unique-Equipped: Talisman of Battle (1)" is not split.
+    tip = tip:gsub("(Unique%-Equipped)%s*([^:%s])", "%1\n%2")
     tip = tip:gsub(" +", " ")
     tip = tip:gsub("\n+", "\n")
     return tip:match("^%s*(.-)%s*$")
@@ -6309,7 +6291,7 @@ function GQ.Data:ForeverTooltipLines(tip)
     while i <= #lines do
         local line = lines[i]
         local nxt = lines[i + 1]
-        if line == "Restores" and nxt and nxt:find("^%+%d+ mana") then
+        if line == "Restores" and nxt and (nxt:find("^%+%d+ mana") or nxt:find("^%+%d+ health")) then
             merged[#merged + 1] = "Restores " .. nxt
             i = i + 2
         else
@@ -6356,16 +6338,46 @@ function GQ.Data:IsSetHeaderLine(line)
 end
 
 -- Client tooltips put slot on the left and armor/weapon type on the right.
--- Wowhead Forever mashes them ("ShoulderLeather" -> "Shoulder Leather").
-local EQUIP_SLOT_PAT = "Held In Off%-hand|Held In Off%-Hand|One%-Hand|Two%-Hand|Main Hand|Off Hand|Shoulder|Finger|Trinket|Chest|Wrist|Hands|Waist|Legs|Feet|Head|Neck|Back|Ranged|Thrown|Relic"
-local EQUIP_TYPE_PAT = "Fist Weapon|Fishing Pole|Leather|Cloth|Mail|Plate|Shield|Sword|Dagger|Staff|Polearm|Mace|Axe|Crossbow|Wand|Bow|Gun|Thrown|Libram|Totem|Idol|Miscellaneous"
+-- Wowhead Forever prints them on two lines ("Feet" then "Cloth") or mashes
+-- them ("Shoulder Leather"). Lua patterns have no alternation, so this is a
+-- lookup, not a "|" pattern.
+local EQUIP_SLOTS = {
+    "Held In Off-hand", "Held In Off-Hand", "One-Hand", "Two-Hand",
+    "Main Hand", "Off Hand", "Shoulder", "Finger", "Trinket", "Chest",
+    "Wrist", "Hands", "Waist", "Legs", "Feet", "Head", "Neck", "Back",
+    "Ranged", "Thrown", "Relic",
+}
+local EQUIP_TYPES = {
+    "Fist Weapon", "Fishing Pole", "Leather", "Cloth", "Mail", "Plate",
+    "Shield", "Sword", "Dagger", "Staff", "Polearm", "Mace", "Axe",
+    "Crossbow", "Wand", "Bow", "Gun", "Thrown", "Libram", "Totem", "Idol",
+    "Miscellaneous",
+}
+local EQUIP_SLOT_SET, EQUIP_TYPE_SET = {}, {}
+for _, name in ipairs(EQUIP_SLOTS) do
+    EQUIP_SLOT_SET[name] = true
+end
+for _, name in ipairs(EQUIP_TYPES) do
+    EQUIP_TYPE_SET[name] = true
+end
+table.sort(EQUIP_SLOTS, function(a, b)
+    return #a > #b
+end)
+
+local function mashedSlotType(line)
+    for _, slot in ipairs(EQUIP_SLOTS) do
+        if line:sub(1, #slot) == slot then
+            local rest = line:sub(#slot + 1):match("^%s*(.-)%s*$")
+            if rest and rest ~= "" and EQUIP_TYPE_SET[rest] then
+                return slot, rest
+            end
+        end
+    end
+end
 
 function GQ.Data:SplitForeverLayoutLines(lines)
     local out = {}
     local i = 1
-    local combo = "^(" .. EQUIP_SLOT_PAT .. ")%s+(" .. EQUIP_TYPE_PAT .. ")$"
-    local slotOnly = "^(" .. EQUIP_SLOT_PAT .. ")$"
-    local typeOnly = "^(" .. EQUIP_TYPE_PAT .. ")$"
     while i <= #lines do
         local line = lines[i]
         local nxt = lines[i + 1]
@@ -6373,11 +6385,11 @@ function GQ.Data:SplitForeverLayoutLines(lines)
             out[#out + 1] = line
             i = i + 1
         else
-            local left, right = line:match(combo)
+            local left, right = mashedSlotType(line)
             if left and right then
                 out[#out + 1] = { left = left, right = right }
                 i = i + 1
-            elseif line:match(slotOnly) and type(nxt) == "string" and nxt:match(typeOnly) then
+            elseif EQUIP_SLOT_SET[line] and type(nxt) == "string" and EQUIP_TYPE_SET[nxt] then
                 out[#out + 1] = { left = line, right = nxt }
                 i = i + 2
             else
@@ -6402,6 +6414,7 @@ function GQ.Data:AddForeverTooltipLines(tooltip, lines, displayName, auditName)
     local setPhase
     local worn = 0
     local lastBlank = false
+    local wrapWidth = 300
 
     local function addBlank()
         if lastBlank then
@@ -6411,6 +6424,34 @@ function GQ.Data:AddForeverTooltipLines(tooltip, lines, displayName, auditName)
         lastBlank = true
     end
 
+    -- A width has to exist before wrap, or the words sit on one row.
+    -- SetMinimumWidth is what gives Equip and set-bonus lines a real edge
+    -- to break on, instead of chopping them into 64-character rows.
+    if wrapWidth and tooltip.SetMinimumWidth then
+        tooltip:SetMinimumWidth(wrapWidth)
+    end
+
+    local function addText(text, r, g, b, wrap)
+        if not wrap or not text or tooltip.SetMinimumWidth then
+            tooltip:AddLine(text, r, g, b, wrap and true or false)
+            return
+        end
+        local current = ""
+        for word in text:gmatch("%S+") do
+            if current ~= "" and (#current + 1 + #word) > 72 then
+                tooltip:AddLine(current, r, g, b, false)
+                current = word
+            elseif current == "" then
+                current = word
+            else
+                current = current .. " " .. word
+            end
+        end
+        if current ~= "" then
+            tooltip:AddLine(current, r, g, b, false)
+        end
+    end
+
     for _, line in ipairs(lines) do
         if type(line) == "table" then
             tooltip:AddDoubleLine(line.left or "", line.right or "", 1, 1, 1, 1, 1, 1)
@@ -6418,7 +6459,7 @@ function GQ.Data:AddForeverTooltipLines(tooltip, lines, displayName, auditName)
         else
             local isHeader = self:IsSetHeaderLine(line)
             local isBonus = line:find("^%(%d+%) Set")
-            local isTail = line:find("^Sell Price") or line:find("^Dropped")
+            local isTail = line:find("^Sell Price") or line:find("^Dropped by") or line:find("^Drop Chance")
             if isHeader then
                 addBlank()
                 setPhase = "pieces"
@@ -6455,7 +6496,7 @@ function GQ.Data:AddForeverTooltipLines(tooltip, lines, displayName, auditName)
                 end
 
                 local wrap = isBonus or (not isHeader and setPhase ~= "pieces" and not isTail)
-                tooltip:AddLine(text, lr, lg, lb, wrap)
+                addText(text, lr, lg, lb, wrap)
                 lastBlank = false
             end
         end
@@ -6602,68 +6643,90 @@ function GQ.Data:GetClientSetBlock(itemId)
     return nil, true
 end
 
+function GQ.Data:SetBlockEnds(line)
+    return type(line) == "string" and (
+        line:find("^Sell Price") or line:find("^Dropped by") or line:find("^Drop Chance")
+        or line:find("^Requires Level") or line:find("^Classes:")
+        or line:find("^Equip:") or line:find("^Use:") or line:find("^Chance on hit")
+        or line:find("^Item Level") or line:find("^Binds") or line:find("^Durability")
+        or line:find("^%+") or line:find(" Armor$")
+    )
+end
+
+-- Swap in the live client set where the Wowhead set sits. Leave every other
+-- line where Wowhead put it. Pulling Requires Level and Drop Chance out is
+-- what parked Drop Chance between Equip and Requires Level.
 function GQ.Data:ReplaceSetBlock(lines, block)
     if not block or not block.header then
         return lines
     end
-    local body, classes, requires, sell = {}, {}, {}, {}
-    local dropping = false
-    for i = 1, #lines do
-        local line = lines[i]
-        if type(line) == "table" then
-            if not dropping then
-                body[#body + 1] = line
-            end
-        else
-        if self:IsSetHeaderLine(line) or line:find("^Item #") or line:find("^%(%d+%) Set") then
-            dropping = true
-        elseif dropping then
-            if line:find("^Sell Price") or line:find("^Dropped") or line:find("^Requires Level")
-                or line:find("^Classes:") or line:find("^Equip:") or line:find("^Use:")
-                or line:find("^Item Level") or line:find("^Binds") or line:find("^Durability") then
-                dropping = false
-            end
+    local function emitSet(out)
+        out[#out + 1] = block.header
+        for p = 1, #block.pieces do
+            out[#out + 1] = block.pieces[p]
         end
-        if dropping then
-            -- Wowhead set leftovers
-        elseif line:find("^Sell Price") or line:find("^Dropped") then
-            sell[#sell + 1] = line
-        elseif line:find("^Requires Level") then
-            requires[#requires + 1] = line
-        elseif line:find("^Classes:") then
-            classes[#classes + 1] = line
-        else
-            body[#body + 1] = line
-        end
+        for b = 1, #block.bonuses do
+            out[#out + 1] = block.bonuses[b]
         end
     end
 
     local out = {}
-    for i = 1, #body do
-        out[#out + 1] = body[i]
+    local i = 1
+    local replaced = false
+    while i <= #lines do
+        local line = lines[i]
+        local start = type(line) == "string" and (
+            self:IsSetHeaderLine(line) or line:find("^Item #") or line:find("^%(%d+%) Set"))
+        if start and not replaced then
+            emitSet(out)
+            replaced = true
+            i = i + 1
+            while i <= #lines do
+                local nxt = lines[i]
+                if type(nxt) ~= "string" or self:SetBlockEnds(nxt) then
+                    break
+                end
+                i = i + 1
+            end
+        else
+            out[#out + 1] = line
+            i = i + 1
+        end
     end
-    for i = 1, #classes do
-        out[#out + 1] = classes[i]
+    if replaced then
+        return out
     end
-    for i = 1, #requires do
-        out[#out + 1] = requires[i]
+
+    local inserted = {}
+    local did = false
+    for n = 1, #lines do
+        local line = lines[n]
+        if not did and self:SetBlockEnds(line) and (
+            line:find("^Sell Price") or line:find("^Dropped by") or line:find("^Drop Chance")) then
+            emitSet(inserted)
+            did = true
+        end
+        inserted[#inserted + 1] = line
     end
-    out[#out + 1] = block.header
-    for p = 1, #block.pieces do
-        out[#out + 1] = block.pieces[p]
+    if not did then
+        emitSet(inserted)
     end
-    for b = 1, #block.bonuses do
-        out[#out + 1] = block.bonuses[b]
-    end
-    for i = 1, #sell do
-        out[#out + 1] = sell[i]
-    end
-    return out
+    return inserted
 end
 
 function GQ.Data:LinesHaveSetHeader(lines)
     for i = 1, #lines do
         if self:IsSetHeaderLine(lines[i]) then
+            return true
+        end
+    end
+    return false
+end
+
+function GQ.Data:TipLinesHaveSetBonus(lines)
+    for i = 1, #lines do
+        local line = lines[i]
+        if type(line) == "string" and line:find("^%(%d+%) Set") then
             return true
         end
     end
@@ -6849,9 +6912,14 @@ function GQ.Data:ShowForeverItemTooltip(tooltip, entry)
     end
 
     local lines = self:ForeverTooltipLines(audit.tip)
-    local clientSet, setPending = self:GetClientSetBlock(entry.itemId)
-    if clientSet and clientSet.bonuses and #clientSet.bonuses > 0 then
-        lines = self:ApplyClientSetBlock(lines, clientSet)
+    -- Wowhead already listed the bonuses. The client block was moving
+    -- Requires Level and Drop Chance out of that order.
+    local clientSet, setPending
+    if not self:TipLinesHaveSetBonus(lines) then
+        clientSet, setPending = self:GetClientSetBlock(entry.itemId)
+        if clientSet and clientSet.bonuses and #clientSet.bonuses > 0 then
+            lines = self:ApplyClientSetBlock(lines, clientSet)
+        end
     end
     self._pendingClientSet = setPending and self:LinesHaveSetHeader(lines)
     self:AddForeverTooltipLines(tooltip, lines, displayName, audit.name)
@@ -7005,8 +7073,39 @@ GQ.Data.FACTION_ZONE_DENY = {
     },
 }
 
--- ignoreMapDeny is an open-world rare. Rohh patrols Redridge, and a Horde
--- player still needs that pin. Quest pins stay on the deny list.
+-- A dungeon door, a boss, a rare, or a farm is the place itself. Wailing
+-- Caverns is in the Barrens and both factions walk in, so that pin is not
+-- a Horde leveling pin. Quest starts and city vendors stay on the deny list.
+function GQ.Data:PinIgnoresFactionZone(row)
+    local note = row and row.note
+    if note == "where this rare spawns"
+        or note == "a farming spot"
+        or note == "entrance to dungeon or raid"
+        or note == "where this boss spawns"
+        or note == "one of the spots to farm it" then
+        return true
+    end
+    -- Ratchet sits on the Barrens map, and both factions shop there. A row
+    -- whose pins are all untagged and all on that one map is the shop.
+    -- Darkmoon Faire keeps one pin in Elwynn and one in Mulgore, so the
+    -- map list still shows each faction its own faire.
+    if note == "vendor that sells this" or note == "vendor that sells the recipe" then
+        local spots = row.spots
+        if not spots or #spots == 0 then
+            return false
+        end
+        local map = spots[1].map
+        for i = 1, #spots do
+            local spot = spots[i]
+            if (spot.faction and spot.faction ~= "") or spot.map ~= map then
+                return false
+            end
+        end
+        return true
+    end
+    return false
+end
+
 function GQ.Data:SpotVisible(spot, faction, ignoreMapDeny)
     if not spot then
         return false
@@ -7114,7 +7213,7 @@ function GQ.Data:CoordinateLine(itemId)
         return nil
     end
     local faction = GQ.GetEffectiveFaction and GQ:GetEffectiveFaction() or nil
-    local openWorld = row.note == "where this rare spawns" or row.note == "a farming spot"
+    local openWorld = self:PinIgnoresFactionZone(row)
     local mine = {}
     for i = 1, #row.spots do
         local spot = row.spots[i]
@@ -7803,9 +7902,11 @@ function GQ.Data:ShowFactFallbackTooltip(tooltip, entry)
     end
     if audit and audit.tip and audit.tip ~= "" then
         local lines = self:ForeverTooltipLines(audit.tip)
-        local clientSet = self:GetClientSetBlock(entry.itemId)
-        if clientSet and clientSet.bonuses and #clientSet.bonuses > 0 then
-            lines = self:ApplyClientSetBlock(lines, clientSet)
+        if not self:TipLinesHaveSetBonus(lines) then
+            local clientSet = self:GetClientSetBlock(entry.itemId)
+            if clientSet and clientSet.bonuses and #clientSet.bonuses > 0 then
+                lines = self:ApplyClientSetBlock(lines, clientSet)
+            end
         end
         self:AddForeverTooltipLines(tooltip, lines, displayName, audit.name)
     else
@@ -8264,7 +8365,31 @@ function GQ.Data:ShowEntryItemTooltip(tooltip, owner, entry, anchor, ...)
     tooltip:SetOwner(owner, anchor or "ANCHOR_RIGHT", ...)
     self:PopulateEntryItemTooltip(tooltip, entry)
     tooltip:Show()
+    self:SolidItemTooltip(tooltip)
     self:ApplyImbueTooltipLines(tooltip, entry.itemId)
+end
+
+-- The log sits under this hover. A clear tooltip center lets "Select an
+-- upgrade..." show through the set list.
+function GQ.Data:SolidItemTooltip(tooltip)
+    if not tooltip or not tooltip.CreateTexture then
+        return
+    end
+    tooltip:SetFrameStrata("TOOLTIP")
+    local bg = tooltip.gqSolidBg
+    if not bg then
+        bg = tooltip:CreateTexture(nil, "BACKGROUND", nil, -8)
+        bg:SetPoint("TOPLEFT", tooltip, "TOPLEFT", 2, -2)
+        bg:SetPoint("BOTTOMRIGHT", tooltip, "BOTTOMRIGHT", -2, 2)
+        if bg.SetColorTexture then
+            bg:SetColorTexture(0.07, 0.07, 0.07, 1)
+        else
+            bg:SetTexture("Interface\\Buttons\\WHITE8X8")
+            bg:SetVertexColor(0.07, 0.07, 0.07, 1)
+        end
+        tooltip.gqSolidBg = bg
+    end
+    bg:Show()
 end
 
 function GQ.Data:CacheContainerItemLinks()
@@ -9321,13 +9446,25 @@ function GQ.Data:GetTopUpgradesForSlot(slotName, maxResults)
         return cached
     end
 
-    local candidates = {}
+    local removedAny = false
+    local mains = {}
+    local reserves = {}
     for _, entry in ipairs(self:GetCandidatesForSlot(slotName)) do
-        if not entry.reserve then
-            candidates[#candidates + 1] = entry
+        if GQ.Log and GQ.Log.IsHuntRemoved and GQ.Log:IsHuntRemoved(entry) then
+            removedAny = true
+        elseif entry.reserve then
+            reserves[#reserves + 1] = entry
+        else
+            mains[#mains + 1] = entry
         end
     end
-    local ranked = GQ.Compare:RankEntries(candidates, slotName, maxResults)
+    local ranked = GQ.Compare:RankEntries(mains, slotName, maxResults)
+    if removedAny and #ranked < maxResults and #reserves > 0 then
+        local fill = GQ.Compare:RankEntries(reserves, slotName, maxResults - #ranked)
+        for i = 1, #fill do
+            ranked[#ranked + 1] = fill[i]
+        end
+    end
     local results = {}
     for i = 1, #ranked do
         results[i] = self:AsMainBiSEntry(ranked[i])

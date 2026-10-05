@@ -44,6 +44,7 @@ PLUS = [(re.compile(p, re.I), k) for p, k in PLUS]
 EQUIP = [
     (re.compile(r"Increases healing done by up to (\d+) and damage done by up to (\d+)", re.I), "heal_sp"),
     (re.compile(r"Increases damage and healing done by magical spells and effects by up to (\d+)", re.I), "both"),
+    (re.compile(r"Increases damage done by (Shadow|Fire|Frost|Nature|Arcane|Holy) spells and effects by up to (\d+)", re.I), "school"),
     (re.compile(r"Increases (?:your )?(?:melee and ranged )?attack power by (\d+)(?! when)", re.I), "ap"),
     (re.compile(r"Increases ranged attack power by (\d+)", re.I), "rap"),
     (re.compile(r"Restores \+?(\d+) mana per 5", re.I), "mp5"),
@@ -61,6 +62,7 @@ SCORE = (
     "str", "agi", "sta", "int", "spi", "ap", "rap", "sp", "heal", "sp_from_heal",
     "damageDone", "hit", "crit", "haste", "mp5", "hp5", "feralAp", "defense",
     "dodge", "parry", "blockValue", "armor",
+    "spShadow", "spFire", "spFrost", "spNature", "spArcane", "spHoly",
 )
 BONUS_ARMOR = re.compile(r"\+(\d+)\s+Bonus Armor", re.I)
 SET_CUT = re.compile(
@@ -100,7 +102,10 @@ def parse_tip(tip: str) -> dict:
             continue
         if key == "heal_sp":
             add("heal", int(m.group(1)))
-            add("sp_from_heal", int(m.group(2)))
+            add("damageDone", int(m.group(2)))
+        elif key == "school":
+            school = m.group(1).lower()
+            add("sp" + school[:1].upper() + school[1:], int(m.group(2)))
         elif key == "both":
             add("heal", int(m.group(1)))
             add("damageDone", int(m.group(1)))

@@ -27,16 +27,52 @@ URL = "https://nether.wowhead.com/forever/tooltip/item/{}"
 TAG = re.compile(r"<[^>]+>")
 
 
+WIDTH_TABLE = re.compile(r"<table\b[^>]*\bwidth\s*=\s*[\"']100%[\"'][^>]*>.*?</table>", re.I | re.S)
+CELL = re.compile(r"<t[dh]\b[^>]*>(.*?)</t[dh]>", re.I | re.S)
+
+
+def _cell_text(fragment: str) -> str:
+    fragment = re.sub(r"<br\s*/?>", " ", fragment, flags=re.I)
+    fragment = html.unescape(TAG.sub("", fragment))
+    fragment = fragment.replace("\xa0", " ")
+    return re.sub(r"\s+", " ", fragment).strip()
+
+
 def plain(text: str) -> str:
+    """Wowhead tooltip HTML as the lines the hover should show.
+
+    Slot and weapon-speed sit in a 100% width table, one cell per side.
+    Those become their own lines. A later pass pairs them. Drop chance
+    stays on the line Wowhead gave it.
+    """
     if not text:
         return ""
+    text = re.sub(r"<!--.*?-->", "", text, flags=re.S)
+
+    def cells(match: re.Match) -> str:
+        parts = [_cell_text(cell) for cell in CELL.findall(match.group(0))]
+        parts = [part for part in parts if part]
+        if not parts:
+            return "\n"
+        return "\n" + "\n".join(parts) + "\n"
+
+    text = WIDTH_TABLE.sub(cells, text)
+    text = re.sub(r"<div\b", "\n<div", text, flags=re.I)
     text = re.sub(r"<br\s*/?>", "\n", text, flags=re.I)
     text = re.sub(r"</(?:div|tr|p|li|h\d)>", "\n", text, flags=re.I)
     text = html.unescape(TAG.sub("", text))
     text = text.replace("\xa0", " ")
-    text = re.sub(r"[ \t]+", " ", text)
-    text = re.sub(r"\n{3,}", "\n\n", text)
-    return text.strip()
+    lines = []
+    for raw in text.split("\n"):
+        line = re.sub(r"[ \t]+", " ", raw).strip()
+        line = re.sub(r"(\(\d+/\d+\))(?=\S)", r"\1\n", line)
+        for piece in line.split("\n"):
+            piece = piece.strip()
+            if piece:
+                lines.append(piece)
+    if len(lines) >= 2 and lines[1].startswith("Item Level ") and not lines[0].startswith("Item Level "):
+        lines = lines[1:]
+    return "\n".join(lines).strip()
 
 
 def load_json(path: Path, default):

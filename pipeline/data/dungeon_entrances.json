@@ -63,7 +63,7 @@
       {"map": "Alterac Mountains", "x": 39.5, "y": 80.2, "faction": "Horde"}
     ],
     "Hall of Thanes": [{"map": "Ironforge", "x": 43.6, "y": 51.7}],
-    "Ruins of Lordaeron": [{"map": "Tirisfal Glades", "x": 71.6, "y": 11.4}]
+    "Ruins of Lordaeron": [{"map": "Undercity", "mapId": 1458, "x": 71.6, "y": 11.4}]
   },
   "describedOnly": {
     "Excavation Site": "Southern Wetlands mountain boundary, where the raptor quests are",
@@ -112,6 +112,21 @@
     "Ok'thor the Breaker": "Blackrock Depths",
     "Anub'shiah": "Blackrock Depths",
     "Hurley Blackbreath": "Blackrock Depths",
-    "Lord Hel'nurath": "Dire Maul"
+    "Lord Hel'nurath": "Dire Maul",
+    "Kresh": "Wailing Caverns",
+    "Lord Pythas": "Wailing Caverns",
+    "Rethilgore": "Shadowfang Keep",
+    "Commander Springvale": "Shadowfang Keep",
+    "Odo the Blindwatcher": "Shadowfang Keep",
+    "Fenrus the Devourer": "Shadowfang Keep",
+    "Wolf Master Nandos": "Shadowfang Keep",
+    "Bazil Thredd": "The Stockade",
+    "Aggem Thorncurse": "Razorfen Kraul",
+    "Agathelos the Raging": "Razorfen Kraul",
+    "Overlord Ramtusk": "Razorfen Kraul",
+    "Interrogator Vishas": "Scarlet Monastery",
+    "Bloodmage Thalnos": "Scarlet Monastery",
+    "Baron Silverlaine": "Shadowfang Keep",
+    "Roogug": "Razorfen Kraul"
   }
 }

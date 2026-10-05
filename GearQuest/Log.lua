@@ -16,7 +16,8 @@ local PORTRAIT_DISPLAY_SIZE = 61
 local PORTRAIT_OFFSET_X = -6
 local PORTRAIT_OFFSET_Y = 7
 
--- Track and Show on map sit inside the description. Exit sits in the footer on every tab.
+-- Track and Show on map sit inside the description. Remove sits to the right of those.
+-- A removed hunt's parchment shows Restore only. Exit sits in the footer on every tab.
 local HEADER_OFFSET = 74
 local FOOTER_OFFSET = 42
 local FOOTER_BUTTON_Y = 14
@@ -601,6 +602,9 @@ local function ShowItemTooltipForRow(row)
     end
 
     GameTooltip:Show()
+    if GQ.Data.SolidItemTooltip then
+        GQ.Data:SolidItemTooltip(GameTooltip)
+    end
     if row.entry.itemId and GQ.Data.ApplyImbueTooltipLines then
         GQ.Data:ApplyImbueTooltipLines(GameTooltip, row.entry.itemId)
     end
@@ -2105,6 +2109,7 @@ end
 
 local SOURCE_FILTERS = {
     { id = "world_drop", label = "World drop" },
+    { id = "unsourced", label = "Unsourced" },
     { id = "rare_npc", label = "Rare NPC" },
     { id = "boss_drop", label = "Boss drop" },
     { id = "raid_trash", label = "Raid trash" },
@@ -2116,10 +2121,41 @@ local SOURCE_FILTERS = {
     { id = "special", label = "Special" },
 }
 
+-- Every profession that has a hunt item, at any level and for any class.
+-- The branch stays this full list so a box you clear stays cleared when you
+-- level up or simulate a class that gains a different craft.
+local PROFESSION_FILTERS = {
+    "Alchemy",
+    "Blacksmithing",
+    "Enchanting",
+    "Engineering",
+    "Leatherworking",
+    "Tailoring",
+    "Fishing",
+}
+
 function GQ.Log:GetHiddenSources()
     GearQuestForeverDB.ui = GearQuestForeverDB.ui or {}
     GearQuestForeverDB.ui.hiddenSources = GearQuestForeverDB.ui.hiddenSources or {}
     return GearQuestForeverDB.ui.hiddenSources
+end
+
+function GQ.Log:GetHiddenProfessions()
+    -- Same saved table as the source filter, so it is still there after logout.
+    GearQuestForeverDB.ui = GearQuestForeverDB.ui or {}
+    GearQuestForeverDB.ui.hiddenProfessions = GearQuestForeverDB.ui.hiddenProfessions or {}
+    return GearQuestForeverDB.ui.hiddenProfessions
+end
+
+function GQ.Log:ProfessionSubfilterActive()
+    if self:GetHiddenSources().profession then
+        return false
+    end
+    local hidden = self:GetHiddenProfessions()
+    for _ in pairs(hidden) do
+        return true
+    end
+    return false
 end
 
 function GQ.Log:SourceFilterActive()
@@ -2129,7 +2165,7 @@ function GQ.Log:SourceFilterActive()
             return true
         end
     end
-    return false
+    return self:ProfessionSubfilterActive()
 end
 
 function GQ.Log:EntrySourceAllowed(entry)
@@ -2160,7 +2196,23 @@ function GQ.Log:EntrySourceAllowed(entry)
     if not known then
         return false
     end
-    return not hidden[src]
+    if hidden[src] then
+        return false
+    end
+    if src == "profession" then
+        local name = entry and entry.profession
+        if (not name or name == "") and entry and entry.sourceType == "fishing" then
+            name = "Fishing"
+        end
+        if name and name ~= "" and self:GetHiddenProfessions()[name] then
+            return false
+        end
+    end
+    return true
+end
+
+function GQ.Log:GetBisProfessionNames()
+    return PROFESSION_FILTERS
 end
 
 function GQ.Log:InvalidateActiveListCaches()
@@ -2334,6 +2386,9 @@ function GQ.Log:EntryHiddenFromActiveFast(entry, slotName)
     if entry.itemId and self._obtainedItemIdSet and self._obtainedItemIdSet[tostring(entry.itemId)] then
         return true
     end
+    if self:IsHuntRemoved(entry) then
+        return true
+    end
     return false
 end
 
@@ -2430,6 +2485,10 @@ function GQ.Log:ShouldHideFromActiveList(entry, slotName, completedItemKeys)
     end
 
     if self:IsEntryObtained(entry.id) or PlayerHasObtainedEntryItem(entry) then
+        return true
+    end
+
+    if self:IsHuntRemoved(entry) then
         return true
     end
 
@@ -2683,10 +2742,139 @@ function GQ.Log:GetCompletedSlotListEntries(slotName)
     return bySlot[slotName] or {}
 end
 
+function GQ.Log:GetRemovedScope()
+    local classFile = GQ:GetEffectiveClass() or ""
+    local spec = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec() or ""
+    return classFile .. ":" .. tostring(spec)
+end
+
+function GQ.Log:GetRemovedMap(create)
+    local progress = CharProgress()
+    local all = progress.removedItems
+    if not all then
+        if not create then
+            return nil
+        end
+        all = {}
+        progress.removedItems = all
+    end
+    local scope = self:GetRemovedScope()
+    local map = all[scope]
+    if not map then
+        if not create then
+            return nil
+        end
+        map = {}
+        all[scope] = map
+    end
+    return map
+end
+
+function GQ.Log:IsHuntRemoved(entry)
+    if not entry or not GQ.Data or not GQ.Data.EntryListKey then
+        return false
+    end
+    local map = self:GetRemovedMap(false)
+    if not map then
+        return false
+    end
+    local key = GQ.Data:EntryListKey(entry)
+    return key ~= nil and map[key] == true
+end
+
+function GQ.Log:GetRemovedSlotListEntries(slotName)
+    local results = {}
+    local seen = {}
+
+    local function consider(entry)
+        if not self:IsHuntRemoved(entry) then
+            return
+        end
+        local key = GQ.Data:EntryListKey(entry)
+        if not key or seen[key] then
+            return
+        end
+        seen[key] = true
+        results[#results + 1] = entry
+    end
+
+    for _, entry in ipairs(GQ.Data:GetCandidatesForSlot(slotName)) do
+        consider(entry)
+    end
+    if GQ.Data.GetNotableForSlot then
+        for _, entry in ipairs(GQ.Data:GetNotableForSlot(slotName)) do
+            consider(entry)
+        end
+    end
+
+    table.sort(results, function(a, b)
+        return (a.curatedRank or 99) < (b.curatedRank or 99)
+    end)
+    return results
+end
+
+function GQ.Log:RemoveHunt(entry)
+    if not entry or not GQ.Data or not GQ.Data.EntryListKey then
+        return
+    end
+    local key = GQ.Data:EntryListKey(entry)
+    if not key then
+        return
+    end
+
+    self:GetRemovedMap(true)[key] = true
+    if entry.id then
+        CharProgress().hunts[entry.id] = nil
+    end
+
+    self.selectedHuntId = nil
+    self.selectedEntry = nil
+    self:ClearDetail()
+    if GQ.Data.InvalidateQueryCache then
+        GQ.Data:InvalidateQueryCache()
+    end
+    self:InvalidateActiveListCaches()
+    self:Refresh()
+    if GQ.Indicator and GQ.Indicator.ScheduleRebuildCache then
+        GQ.Indicator:ScheduleRebuildCache()
+    end
+    if GQ.Tracker then
+        GQ.Tracker:Refresh()
+    end
+end
+
+function GQ.Log:RestoreHunt(entry)
+    if not entry or not GQ.Data or not GQ.Data.EntryListKey then
+        return
+    end
+    local key = GQ.Data:EntryListKey(entry)
+    local map = key and self:GetRemovedMap(false)
+    if not key or not map then
+        return
+    end
+
+    map[key] = nil
+    self.selectedHuntId = nil
+    self.selectedEntry = nil
+    self:ClearDetail()
+    if GQ.Data.InvalidateQueryCache then
+        GQ.Data:InvalidateQueryCache()
+    end
+    self:InvalidateActiveListCaches()
+    self:Refresh()
+    if GQ.Indicator and GQ.Indicator.ScheduleRebuildCache then
+        GQ.Indicator:ScheduleRebuildCache()
+    end
+end
+
 -- Backwards-compatible alias
 function GQ.Log:GetSlotListEntries(slotName)
-    if self:GetListTab() == "completed" then
+    local tab = self:GetListTab()
+    if tab == "completed" then
         return self:GetCompletedSlotListEntries(slotName)
+    end
+    if tab == "removed" then
+        return self:GetRemovedSlotListEntries(slotName)
     end
     return self:GetActiveSlotListEntries(slotName)
 end
@@ -2837,7 +3025,8 @@ function GQ.Log:AnnounceObtained(entry)
     if not entry or not self.obtainToastsEnabled then
         return
     end
-    if GQ.Toast then
+    local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+    if GQ.Toast and not (settings and settings.hideObtainToast) then
         GQ.Toast:ShowForEntry(entry)
     end
     local itemName = (GQ.Data and GQ.Data.GetEntryDisplayName and GQ.Data:GetEntryDisplayName(entry))
@@ -3124,6 +3313,8 @@ function GQ.Log:WipeCharacterData()
     GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
     GearQuestForeverDB.settings.completedItemBackup = {}
     GearQuestForeverDB.settings.completedWipeAt = time()
+    progress.removedItems = {}
+    GearQuestForeverCharDB.removedItems = progress.removedItems
     GearQuestForeverDB.obtainedItems = {}
     self.ownedAtLogin = {}
     self:InvalidateActiveListCaches()
@@ -4064,9 +4255,15 @@ function GQ.Log:UpdateTabVisuals()
     local tab = self:GetListTab()
     StyleGoldTab(self.frame.tabActive, tab == "active")
     StyleGoldTab(self.frame.tabCompleted, tab == "completed")
+    if self.frame.tabRemoved then
+        StyleGoldTab(self.frame.tabRemoved, tab == "removed")
+    end
     local listLevel = (self.frame.listInset and self.frame.listInset:GetFrameLevel()) or (self.frame:GetFrameLevel() + 2)
     self.frame.tabActive:SetFrameLevel(tab == "active" and (listLevel + 8) or math.max(1, listLevel - 1))
     self.frame.tabCompleted:SetFrameLevel(tab == "completed" and (listLevel + 8) or math.max(1, listLevel - 1))
+    if self.frame.tabRemoved then
+        self.frame.tabRemoved:SetFrameLevel(tab == "removed" and (listLevel + 8) or math.max(1, listLevel - 1))
+    end
     self:UpdatePageTabVisuals()
     self:UpdateSpecButton()
 end
@@ -4223,6 +4420,12 @@ function GQ.Log:UpdateFooterButtons()
         if mapBtn then
             mapBtn:Hide()
         end
+        if self.frame.removeBtn then
+            self.frame.removeBtn:Hide()
+        end
+        if self.frame.restoreBtn then
+            self.frame.restoreBtn:Hide()
+        end
         return
     end
 
@@ -4244,15 +4447,39 @@ function GQ.Log:UpdateFooterButtons()
             track:SetEnabled(selectedId ~= nil)
         end
     end
+    local onRemovedTab = tab == "removed"
     if mapBtn then
-        mapBtn:Show()
-        local entry = self.selectedEntry
-        if not entry and selectedId and GQ.Data and GQ.Data.GetEntryById then
-            entry = GQ.Data:GetEntryById(selectedId)
+        if onRemovedTab then
+            mapBtn:Hide()
+        else
+            mapBtn:Show()
+            local entry = self.selectedEntry
+            if not entry and selectedId and GQ.Data and GQ.Data.GetEntryById then
+                entry = GQ.Data:GetEntryById(selectedId)
+            end
+            local hasSpot = entry and GQ.Map and GQ.Map.HasSpot and GQ.Map:HasSpot(entry)
+            mapBtn:SetEnabled(hasSpot and true or false)
+            mapBtn.missingCoords = entry and not hasSpot and true or false
         end
-        local hasSpot = entry and GQ.Map and GQ.Map.HasSpot and GQ.Map:HasSpot(entry)
-        mapBtn:SetEnabled(hasSpot and true or false)
-        mapBtn.missingCoords = entry and not hasSpot and true or false
+    end
+    if track and onRemovedTab then
+        track:Hide()
+    end
+    if self.frame.removeBtn then
+        if tab == "active" and selectedId then
+            self.frame.removeBtn:Show()
+            self.frame.removeBtn:SetEnabled(true)
+        else
+            self.frame.removeBtn:Hide()
+        end
+    end
+    if self.frame.restoreBtn then
+        if onRemovedTab and selectedId then
+            self.frame.restoreBtn:Show()
+            self.frame.restoreBtn:SetEnabled(true)
+        else
+            self.frame.restoreBtn:Hide()
+        end
     end
 end
 
@@ -4533,6 +4760,59 @@ function GQ.Log:LayoutLogColumns(frame)
     LayoutDetailScroll(frame)
 end
 
+local function WireHuntButtonTooltip(btn, text)
+    if not btn or btn.gqTipWired then
+        return
+    end
+    btn.gqTipWired = true
+    btn:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_TOP")
+        GameTooltip:SetText(text, nil, nil, nil, nil, true)
+        GameTooltip:Show()
+    end)
+    btn:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+end
+
+function GQ.Log:EnsureOmitButtons(frame)
+    if not frame or not frame.detailBg then
+        return
+    end
+
+    if not frame.removeBtn then
+        local btn = CreateFrame("Button", "GearQuestLogRemoveButton", frame.detailBg, "UIPanelButtonTemplate")
+        btn:SetSize(78, 22)
+        btn:SetText("Remove")
+        btn:Hide()
+        btn:SetScript("OnClick", function()
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if not log or not log.selectedEntry then
+                return
+            end
+            log:RemoveHunt(log.selectedEntry)
+        end)
+        WireHuntButtonTooltip(btn, "The hunt will be removed.")
+        frame.removeBtn = btn
+    end
+
+    if not frame.restoreBtn then
+        local btn = CreateFrame("Button", "GearQuestLogRestoreButton", frame.detailBg, "UIPanelButtonTemplate")
+        btn:SetSize(84, 22)
+        btn:SetText("Restore")
+        btn:Hide()
+        btn:SetScript("OnClick", function()
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if not log or not log.selectedEntry then
+                return
+            end
+            log:RestoreHunt(log.selectedEntry)
+        end)
+        WireHuntButtonTooltip(btn, "Puts the hunt back into its rightful place.")
+        frame.restoreBtn = btn
+    end
+end
+
 function GQ.Log:LayoutFooterButtons(frame)
     if not frame.trackBtn or not frame.detailBg then
         return
@@ -4553,6 +4833,24 @@ function GQ.Log:LayoutFooterButtons(frame)
         frame.mapBtn:SetFrameLevel(chromeLevel)
         frame.mapBtn:ClearAllPoints()
         frame.mapBtn:SetPoint("LEFT", frame.trackBtn, "RIGHT", 4, 0)
+    end
+
+    self:EnsureOmitButtons(frame)
+    if frame.removeBtn then
+        frame.removeBtn:SetParent(frame.detailBg)
+        frame.removeBtn:SetFrameLevel(chromeLevel)
+        frame.removeBtn:ClearAllPoints()
+        if frame.mapBtn then
+            frame.removeBtn:SetPoint("LEFT", frame.mapBtn, "RIGHT", 4, 0)
+        else
+            frame.removeBtn:SetPoint("LEFT", frame.trackBtn, "RIGHT", 4, 0)
+        end
+    end
+    if frame.restoreBtn then
+        frame.restoreBtn:SetParent(frame.detailBg)
+        frame.restoreBtn:SetFrameLevel(chromeLevel)
+        frame.restoreBtn:ClearAllPoints()
+        frame.restoreBtn:SetPoint("BOTTOMLEFT", frame.detailBg, "BOTTOMLEFT", 8, 8)
     end
 
     if frame.exitBtn then
@@ -4635,7 +4933,7 @@ function GQ.Log:EnsureTabBar(frame)
     if not frame.tabBar then
         local tabBar = CreateFrame("Frame", nil, pageBar)
         tabBar:SetHeight(TAB_HEIGHT)
-        tabBar:SetWidth(FILTER_TAB_WIDTH * 2 + 4)
+        tabBar:SetWidth(FILTER_TAB_WIDTH * 3 + 8)
         tabBar:SetPoint("TOPLEFT", pageBar, "TOPLEFT", FILTER_TAB_LEFT, 0)
         frame.tabBar = tabBar
         tabBar.tabGroup = tabBar
@@ -4647,6 +4945,10 @@ function GQ.Log:EnsureTabBar(frame)
         local tabCompleted = CreateGoldTab(tabBar, "GearQuestLogTabCompleted", "Completed", FILTER_TAB_WIDTH)
         tabCompleted:SetPoint("TOPLEFT", tabActive, "TOPRIGHT", 4, 0)
         frame.tabCompleted = tabCompleted
+
+        local tabRemoved = CreateGoldTab(tabBar, "GearQuestLogTabRemoved", "Removed", FILTER_TAB_WIDTH)
+        tabRemoved:SetPoint("TOPLEFT", tabCompleted, "TOPRIGHT", 4, 0)
+        frame.tabRemoved = tabRemoved
 
         tabActive:SetScript("OnClick", function()
             local log = _G.GearQuest and _G.GearQuest.Log
@@ -4663,14 +4965,38 @@ function GQ.Log:EnsureTabBar(frame)
                 log:SetListTab("completed")
             end
         end)
+
+        tabRemoved:SetScript("OnClick", function()
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if log then
+                log:HideSpecPicker()
+                log:SetListTab("removed")
+            end
+        end)
     else
         if frame.tabBar:GetParent() ~= pageBar then
             frame.tabBar:SetParent(pageBar)
         end
         frame.tabBar:ClearAllPoints()
+        frame.tabBar:SetWidth(FILTER_TAB_WIDTH * 3 + 8)
         frame.tabBar:SetPoint("TOPLEFT", pageBar, "TOPLEFT", FILTER_TAB_LEFT, 0)
+        if not frame.tabRemoved and frame.tabCompleted then
+            local tabRemoved = CreateGoldTab(frame.tabBar, "GearQuestLogTabRemoved", "Removed", FILTER_TAB_WIDTH)
+            tabRemoved:SetPoint("TOPLEFT", frame.tabCompleted, "TOPRIGHT", 4, 0)
+            tabRemoved:SetScript("OnClick", function()
+                local log = _G.GearQuest and _G.GearQuest.Log
+                if log then
+                    log:HideSpecPicker()
+                    log:SetListTab("removed")
+                end
+            end)
+            frame.tabRemoved = tabRemoved
+        end
         StyleGoldTab(frame.tabActive, self:GetListTab() == "active")
         StyleGoldTab(frame.tabCompleted, self:GetListTab() == "completed")
+        if frame.tabRemoved then
+            StyleGoldTab(frame.tabRemoved, self:GetListTab() == "removed")
+        end
     end
 
     self:EnsureSourceFilter(frame)
@@ -4744,7 +5070,67 @@ function GQ.Log:EnsureSourceFilter(frame)
         self:SetFrameStrata("TOOLTIP")
         self:SetFrameLevel(50)
     end)
+    menu:SetScript("OnHide", function(self)
+        if self.profBranch then
+            self.profBranch:Hide()
+        end
+    end)
     frame.sourceFilterMenu = menu
+
+    local branch = CreateFrame("Frame", "GearQuestProfessionFilterBranch", menu, "BackdropTemplate")
+    branch:SetFrameStrata("TOOLTIP")
+    branch:SetFrameLevel(60)
+    branch:EnableMouse(true)
+    branch:SetSize(168, 28)
+    branch:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8X8",
+        edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+        tile = true, tileSize = 16, edgeSize = 16,
+        insets = { left = 4, right = 4, top = 4, bottom = 4 },
+    })
+    if branch.SetBackdropColor then
+        branch:SetBackdropColor(0.07, 0.06, 0.05, 1)
+    end
+    if branch.SetBackdropBorderColor then
+        branch:SetBackdropBorderColor(0.78, 0.72, 0.58, 1)
+    end
+    if branch.SetClampedToScreen then
+        branch:SetClampedToScreen(true)
+    end
+    branch:Hide()
+    branch.rows = {}
+    branch.empty = branch:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    branch.empty:SetPoint("LEFT", branch, "LEFT", 12, 0)
+    branch.empty:SetText("No profession hunts")
+    branch:SetScript("OnEnter", function()
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if log then
+            log._profBranchHot = true
+            log._profHideGen = (log._profHideGen or 0) + 1
+        end
+        HideItemTooltip()
+    end)
+    branch:SetScript("OnLeave", function()
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if log then
+            log._profBranchHot = false
+            log:ScheduleHideProfessionBranch()
+        end
+    end)
+    menu.profBranch = branch
+
+    local function applyFilterChange()
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if not log then
+            return
+        end
+        log:UpdateSourceFilterButton()
+        log:InvalidateSourceFilterCache()
+        log:ScheduleListRefresh()
+        if GQ.Indicator and GQ.Indicator.ScheduleRebuildCache then
+            GQ.Indicator:ScheduleRebuildCache()
+        end
+    end
 
     local previous
     for _, opt in ipairs(SOURCE_FILTERS) do
@@ -4759,8 +5145,27 @@ function GQ.Log:EnsureSourceFilter(frame)
         local label = check:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
         label:SetPoint("LEFT", check, "RIGHT", 2, 0)
         label:SetText(opt.label)
+        check.label = label
         check:SetHitRectInsets(0, -((label:GetStringWidth() or 90) + 8), -2, -2)
-        check:SetScript("OnEnter", HideItemTooltip)
+        check:SetScript("OnEnter", function(self)
+            HideItemTooltip()
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if not log then
+                return
+            end
+            if self.sourceId == "profession" then
+                log:ShowProfessionBranch(self)
+            else
+                log:ScheduleHideProfessionBranch()
+            end
+        end)
+        check:SetScript("OnLeave", function(self)
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if log and self.sourceId == "profession" then
+                log._profRowHot = false
+                log:ScheduleHideProfessionBranch()
+            end
+        end)
         check:SetScript("OnClick", function(self)
             local log = _G.GearQuest and _G.GearQuest.Log
             if not log then
@@ -4772,13 +5177,17 @@ function GQ.Log:EnsureSourceFilter(frame)
             else
                 hidden[self.sourceId] = true
             end
-            log:UpdateSourceFilterButton()
-            log:InvalidateSourceFilterCache()
-            log:ScheduleListRefresh()
-            if GQ.Indicator and GQ.Indicator.ScheduleRebuildCache then
-                GQ.Indicator:ScheduleRebuildCache()
+            if self.sourceId == "profession" then
+                log:SyncProfessionRowLabel(self)
+                if not self:GetChecked() and menu.profBranch then
+                    menu.profBranch:Hide()
+                end
             end
+            applyFilterChange()
         end)
+        if opt.id == "profession" then
+            menu.profRow = check
+        end
         previous = check
     end
 
@@ -4788,10 +5197,149 @@ function GQ.Log:EnsureSourceFilter(frame)
         for _, childBtn in ipairs(kids) do
             if childBtn.sourceId then
                 childBtn:SetChecked(not hidden[childBtn.sourceId])
+                if childBtn.sourceId == "profession" then
+                    GQ.Log:SyncProfessionRowLabel(childBtn)
+                end
             end
         end
     end
     self:UpdateSourceFilterButton()
+end
+
+function GQ.Log:SyncProfessionRowLabel(check)
+    if not check or not check.label then
+        return
+    end
+    local text = check:GetChecked() and "Profession >" or "Profession"
+    check.label:SetText(text)
+    check:SetHitRectInsets(0, -((check.label:GetStringWidth() or 90) + 8), -2, -2)
+end
+
+function GQ.Log:PopulateProfessionBranch(menu)
+    local branch = menu and menu.profBranch
+    if not branch then
+        return
+    end
+    local names = self:GetBisProfessionNames()
+    local hidden = self:GetHiddenProfessions()
+    local width = 148
+    for i, name in ipairs(names) do
+        local row = branch.rows[i]
+        if not row then
+            row = CreateFrame("CheckButton", nil, branch, "UICheckButtonTemplate")
+            row:SetSize(22, 22)
+            if i == 1 then
+                row:SetPoint("TOPLEFT", branch, "TOPLEFT", 8, -6)
+            else
+                row:SetPoint("TOPLEFT", branch.rows[i - 1], "BOTTOMLEFT", 0, 2)
+            end
+            local label = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+            label:SetPoint("LEFT", row, "RIGHT", 2, 0)
+            row.label = label
+            row:SetScript("OnEnter", function()
+                HideItemTooltip()
+                local log = _G.GearQuest and _G.GearQuest.Log
+                if log then
+                    log._profBranchHot = true
+                    log._profHideGen = (log._profHideGen or 0) + 1
+                end
+            end)
+            row:SetScript("OnClick", function(self)
+                local log = _G.GearQuest and _G.GearQuest.Log
+                if not log or not self.professionName then
+                    return
+                end
+                local hiddenProfs = log:GetHiddenProfessions()
+                if self:GetChecked() then
+                    hiddenProfs[self.professionName] = nil
+                else
+                    hiddenProfs[self.professionName] = true
+                end
+                log:UpdateSourceFilterButton()
+                log:InvalidateSourceFilterCache()
+                log:ScheduleListRefresh()
+                if GQ.Indicator and GQ.Indicator.ScheduleRebuildCache then
+                    GQ.Indicator:ScheduleRebuildCache()
+                end
+            end)
+            branch.rows[i] = row
+        end
+        row.professionName = name
+        row.label:SetText(name)
+        row:SetChecked(not hidden[name])
+        row:SetHitRectInsets(0, -((row.label:GetStringWidth() or 90) + 8), -2, -2)
+        row:Show()
+        local rowWidth = (row.label:GetStringWidth() or 80) + 46
+        if rowWidth > width then
+            width = rowWidth
+        end
+    end
+    for i = #names + 1, #branch.rows do
+        branch.rows[i]:Hide()
+    end
+    if #names == 0 then
+        branch.empty:Show()
+        branch:SetSize(168, 32)
+    else
+        branch.empty:Hide()
+        branch:SetSize(width, 12 + (#names * 20))
+    end
+end
+
+function GQ.Log:ShowProfessionBranch(check)
+    local menu = self.frame and self.frame.sourceFilterMenu
+    local branch = menu and menu.profBranch
+    if not branch or not check then
+        return
+    end
+    self._profHideGen = (self._profHideGen or 0) + 1
+    if not check:GetChecked() then
+        self._profRowHot = false
+        branch:Hide()
+        return
+    end
+    self._profRowHot = true
+    branch:ClearAllPoints()
+    branch:SetPoint("TOPLEFT", check.label or check, "TOPRIGHT", 0, 6)
+    self:PopulateProfessionBranch(menu)
+    branch:Show()
+end
+
+function GQ.Log:ScheduleHideProfessionBranch()
+    local gen = (self._profHideGen or 0) + 1
+    self._profHideGen = gen
+    local function hide()
+        if self._profHideGen ~= gen then
+            return
+        end
+        if self._profRowHot or self._profBranchHot then
+            return
+        end
+        local menu = self.frame and self.frame.sourceFilterMenu
+        local branch = menu and menu.profBranch
+        if branch then
+            branch:Hide()
+        end
+    end
+    if C_Timer and C_Timer.After then
+        C_Timer.After(0.2, hide)
+    else
+        hide()
+    end
+end
+
+function GQ.Log:RefreshProfessionBranch()
+    local menu = self.frame and self.frame.sourceFilterMenu
+    local branch = menu and menu.profBranch
+    if not branch or not branch:IsShown() then
+        return
+    end
+    local row = menu.profRow
+    if not row or not row:GetChecked() then
+        branch:Hide()
+        return
+    end
+    self:PopulateProfessionBranch(menu)
 end
 
 function GQ.Log:ToggleSourceFilterMenu()
@@ -5143,10 +5691,31 @@ function GQ.Log:EnsureSettingsPage(frame)
     end)
     frame.settingsGeneralBtn = general
 
+    local hunts = CreateFrame("Button", "GearQuestSettingsHunts", list)
+    hunts:SetHeight(22)
+    hunts:SetPoint("TOPLEFT", general, "BOTTOMLEFT", 0, -2)
+    hunts:SetPoint("TOPRIGHT", general, "BOTTOMRIGHT", 0, -2)
+    hunts.highlight = hunts:CreateTexture(nil, "BACKGROUND")
+    hunts.highlight:SetAllPoints()
+    hunts.highlight:SetColorTexture(0.28, 0.22, 0.08, 0.85)
+    hunts.highlight:Hide()
+    hunts.text = hunts:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    hunts.text:SetPoint("LEFT", hunts, "LEFT", 8, 0)
+    hunts.text:SetJustifyH("LEFT")
+    hunts.text:SetText("Hunts")
+    hunts.text:SetTextColor(GOLD[1], GOLD[2], GOLD[3])
+    hunts:SetScript("OnClick", function()
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if log then
+            log:SetSettingsSection("hunts")
+        end
+    end)
+    frame.settingsHuntsBtn = hunts
+
     local credits = CreateFrame("Button", "GearQuestSettingsCredits", list)
     credits:SetHeight(22)
-    credits:SetPoint("TOPLEFT", general, "BOTTOMLEFT", 0, -2)
-    credits:SetPoint("TOPRIGHT", general, "BOTTOMRIGHT", 0, -2)
+    credits:SetPoint("TOPLEFT", hunts, "BOTTOMLEFT", 0, -2)
+    credits:SetPoint("TOPRIGHT", hunts, "BOTTOMRIGHT", 0, -2)
     credits.highlight = credits:CreateTexture(nil, "BACKGROUND")
     credits.highlight:SetAllPoints()
     credits.highlight:SetColorTexture(0.28, 0.22, 0.08, 0.85)
@@ -5271,6 +5840,56 @@ function GQ.Log:EnsureSettingsPage(frame)
     artHint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
     frame.settingsArtHint = artHint
 
+    local toastLabel = CreateFontStringWithFallback(detail, QUEST_DETAIL_TITLE_FONTS)
+    toastLabel:SetJustifyH("LEFT")
+    toastLabel:SetText("Hide obtain popup")
+    toastLabel:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    frame.settingsToastLabel = toastLabel
+
+    local toastHit = CreateFrame("Button", nil, detail)
+    toastHit:SetPoint("TOPLEFT", detail, "TOPLEFT", 48, -18)
+    toastHit:SetSize(math.max(toastLabel:GetStringWidth() or 0, 1) + 4, math.max(toastLabel:GetStringHeight() or 0, 18))
+    toastLabel:SetParent(toastHit)
+    toastLabel:ClearAllPoints()
+    toastLabel:SetPoint("LEFT", toastHit, "LEFT", 0, 0)
+    toastHit:Hide()
+    frame.settingsToastLabelHit = toastHit
+
+    local function ApplyToastCheck(checked)
+        GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+        GearQuestForeverDB.settings.hideObtainToast = checked and true or false
+        if checked and GQ.Toast and GQ.Toast.ClearQueue then
+            GQ.Toast:ClearQueue()
+        end
+    end
+
+    local toastCheck = CreateSettingsCheck(detail, "")
+    toastCheck:SetPoint("RIGHT", toastHit, "LEFT", -6, 0)
+    if toastCheck.text then
+        toastCheck.text:SetText("")
+        toastCheck.text:Hide()
+    end
+    toastCheck:SetScript("OnClick", function(self)
+        ApplyToastCheck(self:GetChecked())
+    end)
+    toastHit:SetScript("OnClick", function()
+        local checked = not toastCheck:GetChecked()
+        toastCheck:SetChecked(checked)
+        ApplyToastCheck(checked)
+    end)
+    toastCheck:Hide()
+    frame.settingsToastCheck = toastCheck
+
+    local toastHint = CreateFontStringWithFallback(detail, SETTINGS_NOTE_FONTS)
+    toastHint:SetPoint("TOPLEFT", toastHit, "BOTTOMLEFT", 0, -4)
+    toastHint:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
+    toastHint:SetJustifyH("LEFT")
+    toastHint:SetWordWrap(true)
+    toastHint:SetText("Stops the popup when you obtain a BiS item from the hunt list.")
+    toastHint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
+    toastHint:Hide()
+    frame.settingsToastHint = toastHint
+
     local creditsBody = CreateFontStringWithFallback(detail, QUEST_DETAIL_BODY_FONTS)
     creditsBody:SetPoint("TOPLEFT", detail, "TOPLEFT", 16, -18)
     creditsBody:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
@@ -5284,49 +5903,60 @@ function GQ.Log:EnsureSettingsPage(frame)
 end
 
 function GQ.Log:SetSettingsSection(section)
-    self.settingsSection = section == "credits" and "credits" or "general"
+    if section ~= "hunts" and section ~= "credits" then
+        section = "general"
+    end
+    self.settingsSection = section
     local frame = self.frame
     if not frame then
         return
     end
-    local generalOn = self.settingsSection == "general"
-    if frame.settingsGeneralBtn and frame.settingsGeneralBtn.highlight then
-        if generalOn then
-            frame.settingsGeneralBtn.highlight:Show()
-        else
-            frame.settingsGeneralBtn.highlight:Hide()
+
+    local function setHighlight(btn, on)
+        if btn and btn.highlight then
+            if on then
+                btn.highlight:Show()
+            else
+                btn.highlight:Hide()
+            end
         end
     end
-    if frame.settingsCreditsBtn and frame.settingsCreditsBtn.highlight then
-        if generalOn then
-            frame.settingsCreditsBtn.highlight:Hide()
-        else
-            frame.settingsCreditsBtn.highlight:Show()
+
+    setHighlight(frame.settingsGeneralBtn, section == "general")
+    setHighlight(frame.settingsHuntsBtn, section == "hunts")
+    setHighlight(frame.settingsCreditsBtn, section == "credits")
+
+    local function setShown(widgets, on)
+        for i = 1, #widgets do
+            local widget = widgets[i]
+            if widget then
+                if on then
+                    widget:Show()
+                else
+                    widget:Hide()
+                end
+            end
         end
     end
-    local widgets = {
+
+    setShown({
         frame.settingsMinimapLabelHit,
         frame.settingsMinimapCheck,
         frame.settingsHint,
         frame.settingsArtLabelHit,
         frame.settingsArtCheck,
         frame.settingsArtHint,
-    }
-    for i = 1, #widgets do
-        local widget = widgets[i]
-        if widget then
-            if generalOn then
-                widget:Show()
-            else
-                widget:Hide()
-            end
-        end
-    end
+    }, section == "general")
+    setShown({
+        frame.settingsToastLabelHit,
+        frame.settingsToastCheck,
+        frame.settingsToastHint,
+    }, section == "hunts")
     if frame.settingsCreditsBody then
-        if generalOn then
-            frame.settingsCreditsBody:Hide()
-        else
+        if section == "credits" then
             frame.settingsCreditsBody:Show()
+        else
+            frame.settingsCreditsBody:Hide()
         end
     end
 end
@@ -5385,6 +6015,24 @@ function GQ.Log:RefreshSettings()
         end
         if height and height > 1 then
             artHit:SetHeight(height)
+        end
+    end
+
+    local toastCheck = frame.settingsToastCheck
+    if toastCheck then
+        local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+        toastCheck:SetChecked(settings and settings.hideObtainToast and true or false)
+    end
+    local toastLabel = frame.settingsToastLabel
+    local toastHit = frame.settingsToastLabelHit
+    if toastLabel and toastHit and toastLabel.GetStringWidth then
+        local width = toastLabel:GetStringWidth()
+        local height = toastLabel.GetStringHeight and toastLabel:GetStringHeight()
+        if width and width > 1 then
+            toastHit:SetWidth(width + 4)
+        end
+        if height and height > 1 then
+            toastHit:SetHeight(height)
         end
     end
 end
@@ -5996,8 +6644,11 @@ function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry)
         row.text:ClearAllPoints()
         row.text:SetPoint("LEFT", row, "LEFT", 20, 0)
         row.text:SetPoint("RIGHT", row, "RIGHT", -6, 0)
-        if self:GetListTab() == "completed" then
+        local listTab = self:GetListTab()
+        if listTab == "completed" then
             row.text:SetText("No completed hunts in this slot.")
+        elseif listTab == "removed" then
+            row.text:SetText("No removed hunts in this slot.")
         else
             row.text:SetText("No upgrades for your level yet.")
         end
@@ -6010,7 +6661,11 @@ function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry)
         row.text:ClearAllPoints()
         row.text:SetPoint("LEFT", row, "LEFT", 8, 0)
         row.text:SetPoint("RIGHT", row, "RIGHT", -6, 0)
-        row.text:SetText("No completed hunts yet.")
+        if self:GetListTab() == "removed" then
+            row.text:SetText("No removed hunts.")
+        else
+            row.text:SetText("No completed hunts yet.")
+        end
         row.text:SetTextColor(0.6, 0.6, 0.6)
         row.highlight:Hide()
         row:SetScript("OnClick", nil)
@@ -6037,7 +6692,7 @@ function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry)
         PrimeListEntryItemInfo(entry)
         local r, g, b = GetListItemQualityColor(entry.itemId)
         local status = GetHuntStatus(entry.id)
-        local onCompletedTab = self:GetListTab() == "completed"
+        local listTab = self:GetListTab()
         local isObtained = entry.id and self:IsEntryObtained(entry.id)
 
         row.icon:Hide()
@@ -6046,7 +6701,7 @@ function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry)
         row.text:SetPoint("LEFT", row, "LEFT", LIST_ROW_ITEM_LEFT, 0)
         row.text:SetPoint("RIGHT", row, "RIGHT", -LIST_ROW_RIGHT_PAD, 0)
 
-        local showNewLabel = not onCompletedTab and not isObtained and status ~= "completed"
+        local showNewLabel = listTab == "active" and not isObtained and status ~= "completed"
         SetListRowItemText(row, LIST_ROW_ITEM_LEFT, name, entry, status, showNewLabel, r, g, b, slotName)
 
         UpdateListRowHighlight(row)
@@ -6284,7 +6939,12 @@ function GQ.Log:SelectHunt(id, scrollToSelection, entryOverride)
         return
     end
 
-    local targetTab = self:IsEntryObtained(id) and "completed" or "active"
+    local targetTab = "active"
+    if self:IsHuntRemoved(entry) then
+        targetTab = "removed"
+    elseif self:IsEntryObtained(id) then
+        targetTab = "completed"
+    end
     if self:GetListTab() ~= targetTab then
         GearQuestForeverDB.ui = GearQuestForeverDB.ui or {}
         GearQuestForeverDB.ui.listTab = targetTab
@@ -6337,6 +6997,26 @@ function GQ.Log:Refresh()
         end
 
         if not anyCompleted then
+            table.insert(layoutRows, { type = "empty_all" })
+        end
+    elseif tab == "removed" then
+        local anyRemoved = false
+
+        for _, slotName in ipairs(slots) do
+            local removed = self:GetRemovedSlotListEntries(slotName)
+            if #removed > 0 then
+                anyRemoved = true
+                table.insert(layoutRows, { type = "header", slotName = slotName })
+
+                if not self:IsSlotCollapsed(slotName, removed) then
+                    for _, entry in ipairs(removed) do
+                        table.insert(layoutRows, { type = "item", slotName = slotName, entry = entry })
+                    end
+                end
+            end
+        end
+
+        if not anyRemoved then
             table.insert(layoutRows, { type = "empty_all" })
         end
     else
@@ -6427,7 +7107,9 @@ function GQ.Log:Refresh()
             clearSelection = true
         elseif tab == "completed" and status ~= "completed" and not self:IsEntryObtained(self.selectedHuntId) then
             clearSelection = true
-        elseif tab == "active" and status == "completed" then
+        elseif tab == "removed" and not self:IsHuntRemoved(entry) then
+            clearSelection = true
+        elseif tab == "active" and (status == "completed" or self:IsHuntRemoved(entry)) then
             clearSelection = true
         end
 
@@ -6486,6 +7168,7 @@ function GQ.Log:ReleaseMouseForGameUI()
         end
     end
     self:ClampListRowMouse()
+    self:RefreshProfessionBranch()
 end
 
 function GQ.Log:Show()

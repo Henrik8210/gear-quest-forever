@@ -108,6 +108,51 @@ SCARLET_WHY = {
     ),
 }
 
+# Rotmender's Raiment (Forever set 2133), Ruins of Lordaeron. The bonus
+# list is the item-set page. Piece tooltips on the leggings and treads also
+# print an older +10 Intellect at 2 pieces and a 5% threat cut at 3. The
+# set page does not, so those lines are not part of this note.
+ROTMENDER_IDS = {271207, 271214, 286978, 286979, 286980}
+_ROTMENDER_BONUS = (
+    "Set piece of Rotmender's Raiment (Ruins of Lordaeron). "
+    "(2) +5 Shadow Resistance. (3) +10 Intellect. "
+    "(4) When mana falls below 15%, restore 200 mana over 10 sec, once every 5 min. "
+    "Twice as much mana in Haunted and Wasteland. "
+    "(5) Healing spells can heal for an additional 40 every 3 sec for 15 sec. "
+)
+# Package check 4 Oct 2026, both factions, levels 16-33.
+ROTMENDER_WINDOW = {
+    "PRIEST": (
+        "Holy and Discipline: at 18 the chest, sash, gloves, and leggings are the hunt. "
+        "At 19 all five pieces are together. From 20 the leggings fall off. "
+        "The chest, sash, and gloves stay through 21, and the treads stay in the top 3 into the high 20s."
+    ),
+    "DRUID": (
+        "Restoration: all five pieces are the hunt together at 19. "
+        "On Horde the chest, sash, and gloves stay through 21. "
+        "The treads stay in the top 3 through about 29."
+    ),
+    "SHAMAN": (
+        "Restoration: all five pieces are the hunt together at 19. "
+        "The treads stay in the top 3 through about 29."
+    ),
+    "PALADIN": (
+        "Holy: the treads are a hunt from 19 through 29. "
+        "The other four pieces do not beat mail and plate, even with the set."
+    ),
+}
+
+def rotmender_instructions(src):
+    raw = (src.get("instructions") or "").strip()
+    drop = raw.split(". ")[0].strip()
+    if drop and not drop.endswith("."):
+        drop += "."
+    text = (drop + " " + _ROTMENDER_BONUS).strip()
+    window = ROTMENDER_WINDOW.get(CLS)
+    if window:
+        text = (text + " " + window).strip()
+    return text
+
 def set_piece_instructions(iid, src):
     if iid in VIPER_IDS:
         return viper_instructions(src)
@@ -115,6 +160,8 @@ def set_piece_instructions(iid, src):
         return _drop_plus(src, DEFIAS_WHY.get(CLS))
     if iid in SCARLET_IDS:
         return _drop_plus(src, SCARLET_WHY.get(CLS))
+    if iid in ROTMENDER_IDS:
+        return rotmender_instructions(src)
     return src["instructions"]
 
 def is_labeled_set_piece(iid):
@@ -123,6 +170,8 @@ def is_labeled_set_piece(iid):
     if iid in DEFIAS_IDS and CLS in DEFIAS_WHY:
         return True
     if iid in SCARLET_IDS and CLS in SCARLET_WHY:
+        return True
+    if iid in ROTMENDER_IDS:
         return True
     return False
 

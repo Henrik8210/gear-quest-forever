@@ -734,6 +734,16 @@ function GQ.Compare:GetEffectiveScoringRows(classFile, specId, playerLevel)
             mult = leveling[key]
         end
         local value = raw * mult
+        -- Enhancement tank: 1 agility is also 2 armor, plus 1% dodge and
+        -- 1% crit per 20. Show that in the same number the scorer uses.
+        if specId == "enhancement_tank" and key == "agi" then
+            local armorMult = 1
+            if useLeveling and leveling.armor then
+                armorMult = leveling.armor
+            end
+            local armorW = (specRow.weights.armor or 0) * armorMult
+            value = value + 2 * armorW + (specRow.weights.dodge or 0) / 20 + (specRow.weights.crit or 0) / 20
+        end
         if value > 0 then
             local label = (GQ.ScoringWeightLabels and GQ.ScoringWeightLabels[key]) or key
             rows[#rows + 1] = { label = label, value = value }

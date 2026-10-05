@@ -155,7 +155,7 @@ def insert_source() -> bool:
     if key in text:
         return False
     block = """  "284403": {
-    "sourceType": "world_drop",
+    "sourceType": "unsourced",
     "instructions": "Indexed from Wowhead Forever. Source not listed yet.",
     "zone": null,
     "npc": null,

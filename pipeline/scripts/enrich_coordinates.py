@@ -170,7 +170,7 @@ def points_of(group_body: str) -> list[tuple[int, float, float, str, int]]:
     return found
 
 
-def pick_spots(points: list[tuple[int, float, float, str, int]]) -> tuple[list[dict], bool]:
+def pick_spots(points: list[tuple[int, float, float, str, int]], keep_faction: bool = True) -> tuple[list[dict], bool]:
     if not points:
         return [], False
     buckets: dict[str, list] = {"A": [], "H": [], "B": []}
@@ -200,7 +200,7 @@ def pick_spots(points: list[tuple[int, float, float, str, int]]) -> tuple[list[d
             "x": round(x, 1),
             "y": round(y, 1),
         }
-        if fac in FACTION:
+        if keep_faction and fac in FACTION:
             spot["faction"] = FACTION[fac]
         spots.append(spot)
     return spots, more
@@ -282,7 +282,7 @@ def main() -> None:
                 if not prof:
                     no_profession += 1
                 continue
-            spots, more = pick_spots(points_of(body))
+            spots, more = pick_spots(points_of(body), keep_faction=source_type not in ("world_drop", "rare_npc"))
         else:
             groups = items.get(item_id) or {}
             key = GROUP_FOR.get(source_type)
@@ -292,7 +292,10 @@ def main() -> None:
                     if groups.get(fallback):
                         body = groups[fallback]
                         break
-            spots, more = pick_spots(points_of(body or ""))
+            spots, more = pick_spots(
+                points_of(body or ""),
+                keep_faction=source_type not in ("world_drop", "rare_npc"),
+            )
             if not spots and body:
                 for match in TUPLE_RE.finditer(body):
                     map_id = int(match.group(1))
