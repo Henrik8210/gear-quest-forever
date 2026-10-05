@@ -15,7 +15,7 @@ GearQuest uses **two different pipelines**. Do not apply one pipeline’s rules 
 
 **Forever max level is 60** (`GQ.MAX_PLAYER_LEVEL` in `Core.lua`). TBC **level 70** curated data was removed; do not re-import Phase 3 AtlasLoot into this repo. Generated bands are capped at **60**. Migration phases: [FOREVER-DATA-MIGRATION.md](./FOREVER-DATA-MIGRATION.md).
 
-**Paladin 10–60** comes from the generated pipeline (`paladinPicks` + `paladinHorde1to9`). All seven classes merge into `GQ.Data.entries` at load time via `DataAdapter.lua`. Sanity check:
+**Paladin 10–60** comes from the generated pipeline (`paladinPicks` + `paladinHorde1to9`). All nine classes merge into `GQ.Data.entries` at load time via `DataAdapter.lua`. Sanity check:
 
 ```powershell
 node scripts/verify-generated-bis.mjs
@@ -30,7 +30,7 @@ Always use `node scripts/verify-generated-bis.mjs` for the live entry count, not
 | **Curated (early bands)** | Human judgment: realistic upgrades for that level band, correct armor tier, obtainability considered when hand-picking. |
 | **Generated (all classes 1–60)** | **Combat value** in this order: **damage** (spec primary) first, then **survivability** below 60 (sta / health / hp5 ×3, armor ×2), then **endurance** (int / spirit / mp5 / mana ×2, less than stam). Random-enchant greens rank on the **jackpot** (top of the suffix range) — a 9.5% +7 Agi roll that would be #1 must appear as BiS #1. Warrior Protection does not score spell power; defense on a caster piece is a notable, not rank 1. Shaman **Enhancement Tank** is a hybrid (1h + shield, like paladin Protection). Max **3 unique names + 1 notable** per slot. Level 60 uses raw raid-scale weights (`GQ_NO_GUIDES=1`). Item facts for scoring come from Forever hunt tips (`sync_forever_item_stats.py`), not stale Classic `items.json`. |
 
-At **runtime**, `Compare.lua` ranks most generated candidates by item level vs equipped, armor-tier penalties, and small source bonuses — it does **not** re-run the full stat-weight model. Generated rows arrive with `curatedRank` from the pipeline; hand-curated rows keep author rank. **Exceptions:** (1) bands with `origin="guide"` (level-60 guide tiers) **must never be re-sorted by score**; (2) **Priest, Mage, and Warlock** always keep pipeline `curatedRank` (weapon pairing — staff vs 1H+off-hand). **`Compare.lua`’s ≥8 ilvl lower-tier armor rule applies to runtime re-ranking only**, not to how generated picks were chosen (those used armour multipliers in the pipeline).
+At **runtime**, a generated hunt with `curatedRank` keeps that pipeline order. `Compare.lua` `GetSortScore` sorts those rows as `500000 - curatedRank` for every class. Guide rows (`origin="guide"`) and level-60 hand-curated rows use `1000000 - curatedRank`. Item level versus what you have equipped is the fallback when a row has no `curatedRank`. The ≥8 ilvl lower-tier armor penalty is that fallback only. Generated picks were chosen by the Forever weights in [`FOREVER-SCORING.md`](../pipeline/docs/FOREVER-SCORING.md).
 
 **Faction gating (pipeline):** wrong-faction rows are stripped at emit time using vendor stock analysis (`npc_faction.json`), PvP prefix rules (`pvp_prefix_faction.json`), reputation exclusivity (mirror pairs + hand-verified names like Tranquillien), and quest/class locks on adjacent rows — **not** sub-zone lists alone (shared camps can host both factions’ vendors).
 
@@ -149,9 +149,9 @@ Prefer the **highest armor tier the class can wear** at that level:
 
 **Data rule:** entries for a class/level band should use that class's best tier (mail for a level-4 paladin). Do not add cloth/leather filler unless the item is a genuine stat exception (see below).
 
-**Ranking rule (runtime):** `Compare.lua` heavily penalizes lower-tier armor in Head/Chest/Legs/Feet/Hands/Wrist/Waist/Shoulder slots when re-sorting candidates. A cloth or leather piece only appears in the top 3 if its item level is **≥ 8 above** the best preferred-tier option for that slot. Cloaks (`Back`) and non-armor slots are exempt. **This is not how generated Paladin picks were selected** — see [GEARQUEST-BIS-PIPELINE.md](../GearQuest/_generated/GEARQUEST-BIS-PIPELINE.md) for armour multipliers and stat weights.
+**Ranking rule (runtime):** generated hunts keep pipeline `curatedRank` for every class. The ≥8 item-level armor penalty in `Compare.lua` applies only to a row that has no `curatedRank`. Cloaks (`Back`) and non-armor slots are exempt from that penalty. Armour multipliers and stat weights are in [`FOREVER-SCORING.md`](../pipeline/docs/FOREVER-SCORING.md).
 
-When **hand-curating** early bands, prefer items that are **actually obtainable** at the target level (quest available, vendor visited, dungeon reachable). That preference does **not** apply to generated 10–69 data.
+When **hand-curating** early bands, prefer items that are **actually obtainable** at the target level (quest available, vendor visited, dungeon reachable). Generated 1–60 lists are the scorer's combat order.
 
 ### Class armor profiles (can wear vs should wear)
 
@@ -407,11 +407,10 @@ Do **not** mention Holy/Protection availability in the message — the picker al
 |------|------|
 | `GearQuest/Data.lua` | Curated entries |
 | `GearQuest/DataAdapter.lua` | Merges generated class tables into `entries` at load; suffix lookup/enrichment |
-| `GearQuest/_generated/*.generated.lua` | Generated picks + item facts + notables (10–69, seven classes) |
-| `GearQuest/_generated/GEARQUEST-BIS-PIPELINE.md` | Generated pipeline rules (stat weights, R1–R9) |
+| `GearQuest/_generated/*.generated.lua` | Generated picks + item facts + notables (1–60, nine classes) |
+| `pipeline/docs/FOREVER-SCORING.md` | Forever scoring model: weights, sets, tooltips, coordinates |
 | `docs/SUFFIX-RANDOM-ENCHANT.md` | **Random enchant addon rules** — suffixId matching, negative ids, notables, tooltips |
-| `scripts/clone-level70-specs.mjs` | Stand-in level-70 curated copies for specs that share gear pools |
-| `scripts/verify-generated-bis.mjs` | Post-merge entry count + suffixId spot checks (all seven classes) |
+| `scripts/verify-generated-bis.mjs` | Post-merge entry count + suffixId spot checks (all nine classes) |
 | `GearQuest/Spec.lua` | Spec definitions, icons, `comingLater`, saved choice, picker filtering |
 | `GearQuest/Log.lua` | Spec icon + arrow UI, spec picker chrome |
 | `GearQuest/Equip.lua` | Equippability, required level, armor tier, spec, level grace |
@@ -705,13 +704,13 @@ Re-run after any `instructions` / `npc` / token-boss edits. Wowhead tooltip API 
 |------|--------|
 | **Level 1–9 Alliance** | Curated Warrior & Paladin; early generated bands for Hunter, Druid, Shaman, Rogue (`*Early1to9`) |
 | **Level 1–9 Horde** | Generated Horde bands: Paladin (`paladinHorde1to9`), Warrior (`warriorHorde1to9`); early 1–9 for Hunter/Druid/Shaman/Rogue |
-| **Level 10–69 all seven classes** | Generated (`*Picks`) — all specs per class, faction-gated rows in pipeline (TBC-era pool until Classic/Forever regen) |
+| **Level 10–60 all nine classes** | Generated (`*Picks`) on the Forever model. Faction-gated. Bands stop at 60. |
 | **Level 60 cap** | Addon and preview simulate **1–60** only |
 | **Total** | **67,320** entries (287 curated + 67,033 generated) — `node scripts/verify-generated-bis.mjs` |
 
 Empty Neck / Trinket / Head slots while leveling usually mean **missing data** for that class/band, not a broken addon.
 
-**Open (addon UI):** Hunter/enhancement shaman can show a two-hander as #1 MainHand and dual-wield off-hand picks at the same time — the guide lists both routes; the addon should label or grey incompatible pairs (see weapon-slots note).
+**Weapon headers** are labels. Rank 1 stays the best weapon. When a spec can use two hand styles, rank 2 is the other style. Forever Enhancement has no dual wield. Hunter ranged is a bow, gun, or crossbow. See [`FOREVER-SCORING.md`](../pipeline/docs/FOREVER-SCORING.md).
 
 ---
 
@@ -738,9 +737,9 @@ Classic **Phase 6 (Naxx)** BiS is **not** in the Hoizame AtlasLoot zip. AtlasLoo
 | `Spec.lua` | Preview spec choice overwrote real `specByClass` | `settings.preview.specByClass` when preview on |
 | `Equip.lua` | Hunter/Shaman preferred Plate at 40 | `unlockMail = 40` → Mail |
 | `Log.lua` | `arrowBtn` undefined → duplicate spec arrow | Removed bad assignment |
-| Pipeline | Faction/rep leaks in generated 10–69 (BG sets, Tranquillien, mirrored reps) | Vendor/rep emit gates; `npc_faction.json` |
+| Pipeline | Faction/rep leaks in generated 10–60 (BG sets, Tranquillien, mirrored reps) | Vendor/rep emit gates; `npc_faction.json` |
 | `Compare.lua` | Level-60 guide bands re-sorted by runtime score | `origin="guide"` keeps pipeline `curatedRank` |
-| `Compare.lua` | Priest staff lost to ilvl vs 1H+off-hand | Pipeline rank preserved for Priest/Mage/Warlock |
+| `Compare.lua` | Generated hunts re-sorted by item level | Every class keeps pipeline `curatedRank` (`500000 - rank`) |
 | `Data.lua` | Rogue item facts missing from `GetItemFact` | Added `rogueItemFacts` / `rogueEarly1to9Facts` |
 | `Preview.lua` / `Minimap.lua` | Preview only via slash commands | Simulator handle tab (class/faction/spec/level); minimap any-click opens GearQuest |
 | `Preview.lua` / `Core.lua` | Preview persisted across character logins | Reset preview on new character GUID at login |

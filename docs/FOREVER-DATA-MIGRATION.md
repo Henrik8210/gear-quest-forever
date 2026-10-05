@@ -27,7 +27,7 @@ Fork base: GearQuest **v0.1.1-beta.3-bcc**, not a greenfield Classic regen.
 |-------|--------|--------|
 | **1** | Product scope: max level **60**, remove TBC **level 70** curated data, clamp preview/simulate | **Done** |
 | **2** | Random green suffix tables: Classic-era scrapes (not TBC R34) | **Done** — `count-suffix-coverage.mjs` **≥80% of scrapeable** IDs (Classic Wowhead 404 rows excluded via `noClassicPage`; gate: `--phase2-gate`) |
-| **3** | Classic item pool: strip TBC/Outland IDs, cap generated bands at 60, then full re-score | **Done** — all classes re-scored via `pipeline/` (weights still TBC-derived) |
+| **3** | Classic item pool: strip TBC/Outland IDs, cap generated bands at 60, then full re-score | **Done** — nine classes, Forever weights, bands 1–60. See [FOREVER-SCORING.md](../pipeline/docs/FOREVER-SCORING.md) |
 | **4** | Forever delta: beta tooltips, retuned item IDs, new quests/items, new zones | **Horde `foreverDelta` in `Data.lua` done.** New Forever-only loot (id ≥ 200000) comes from Wowhead ingest. Alliance Wowhead coverage still incomplete. |
 | **5** | Tag rows `forever-verified` vs `classic-assumption` as needed | Ongoing |
 
@@ -41,7 +41,7 @@ python pipeline/scripts/ingest_forever_wowhead.py
 node scripts/diff-veldt-wowhead.mjs
 ```
 
-That writes ids ≥ 200000 into `pipeline/data/{items,sources,classic_item_ids}.json`. The scrape cache itself (`pipeline/data/forever_wowhead/`) is gitignored. Re-score the class, then `python pipeline/scripts/reemit_all.py` (or `payload.py` + `emit_early.py` / `emit_horde19.py`) and copy Lua into `GearQuest/_generated/`.
+Ingest inserts new ids only. An existing `items.json` row keeps its facts. Then recheck every item still marked Unsourced: if Wowhead now names a quest, a vendor, or a dropper, fill that source and run `index_coordinates.py --ids` for those ids. Re-score with `python pipeline/scripts/rescore_hunter_shaman.py`, one class at a time. Do not `reemit_all.py` from stale `pipeline/out/*.json`. The scrape cache (`pipeline/data/forever_wowhead/`) is gitignored. Full steps: [FOREVER-SCORING.md](../pipeline/docs/FOREVER-SCORING.md).
 
 **Wowhead is still the ingest source.** [veldt1 Forever Item Explorer](https://veldt1.github.io/wowf-items/) is a second reference: a client-diff of beta `1.60.1` vs Classic `1.15.9` with stats computed from DBC (`StatPercentEditor × RandPropPoints`). `diff-veldt-wowhead.mjs` downloads that table and reports (1) Forever equipment veldt has that Wowhead has not indexed yet, and (2) Wowhead tooltips still missing combat stats where veldt already has numbers. Do **not** merge veldt rows into `items.json` from that report — use it to decide what to re-scrape or verify on Wowhead.
 
@@ -154,7 +154,7 @@ Operational lessons from finishing the Classic random-enchant pass. Use this bef
 
 | Item | Notes |
 |------|--------|
-| **Stat weights** | Still TBC-derived in `pipeline/data/weights.json`. See [Stat weights](#stat-weights-tbc-model--forever-client) below. Do **not** invent a full Forever scale until the beta client is in hand. |
+| **Stat weights** | Forever scale in `pipeline/data/weights.json`. Do not retune unless asked. Live rules: [FOREVER-SCORING.md](../pipeline/docs/FOREVER-SCORING.md). |
 | **Forever client** | Interface version, tooltips, new/retuned items — phase 4. |
 | **Push hygiene** | After regen, commit **generated Lua + pipeline inputs + scripts** together. |
 
@@ -179,42 +179,20 @@ have stats). New Forever items can displace Classic rows in the top 3.
 The older filter (`filter-generated-classic.mjs`) is only for emergency rollback;
 do not re-run it over a Classic regen.
 
-**Honest limit:** rank order is a real Classic-pool top 3 plus indexed Forever
-gear, but **stat weights** are still the TBC model (expertise, armour pen, TBC
-paladin seals). Horde Forever starter rows in `Data.lua` still use
-`foreverDelta`. Alliance Forever starter pieces now come from the generated
-Early 1–9 files after the Wowhead ingest.
+Rank order is the Forever model: Classic pool plus indexed Forever gear, jackpot suffixes, and the weights in `weights.json`. Priest, mage, and warlock ranged damage is 7. Hunter ranged is a bow, gun, or crossbow. Horde Forever starter rows in `Data.lua` still use `foreverDelta`. Alliance early pieces come from the generated Early 1–9 files.
 
 ### Still required after phase 3
 
-1. **Stat weights** — see below. Optional Classic zero-out now; real Forever scale after the beta client.
-2. Phase 4: Forever-only item ids and tooltip retunes as the beta client shows them.
+Phase 4 continues as Wowhead Forever gains items: ingest new ids, recheck Unsourced, index coordinates, re-score the class. Do not retune weights unless asked.
 
 Keep the pipeline **out of the CurseForge addon zip** (`.pkgmeta` already ignores `pipeline/`).
 
-## Stat weights (TBC model → Forever client)
+## Stat weights
 
-**Update (v0.2.5–0.2.6):** `weights.json` is the Forever combat scale (no expertise / armor pen, unified Hit/Crit/Haste, leveling survivability + endurance, Enhancement Tank). Do not treat the TBC leftover notes below as current. Live authoring: [FOREVER-SCORING.md](../pipeline/docs/FOREVER-SCORING.md).
+`pipeline/data/weights.json` is the Forever scale. Damage first, then survivability below 60, then endurance. Level 60 is the raw raid-scale weights. Priest, mage, and warlock `dpsWeightRanged` is **7**. Hunter ranged damage is real, and the ranged weapon is a bow, gun, or crossbow. Do not change a weight unless asked. The rules live in [FOREVER-SCORING.md](../pipeline/docs/FOREVER-SCORING.md).
 
-`pipeline/data/weights.json` was the **TBC Anniversary** scale through phase 3. The paragraphs below are historical: Phase 3 re-scored the **item pool** (Classic IDs, Classic suffixes, cap 60) but did not retune what a point of each stat is worth. Level **60** rows mostly come from Wowhead Classic guides, so bad weights hurt **10–59** the most.
+Re-score with `python pipeline/scripts/rescore_hunter_shaman.py` and the class name. Do not `reemit_all.py` from stale JSON.
 
-What is TBC-specific today (not just “a bit off”):
-
-- **Expertise** and **armor penetration** are non-zero on melee specs. Classic 1–60 does not have those ratings, so leftover TBC rating lines in `items.json` can still steal ranks.
-- Paladin **`dpsWeight` 4.31** was derived from TBC seal/judgement math (including Seal of Blood). Classic seals differ.
-- Hunter ranged weight includes **TBC Steady Shot** scaling off weapon damage.
-
-**Do this on the Forever client (phase 4), not from memory:**
-
-1. After first login, note whether rating stats exist, how seals/shots/talents work, and any Forever-only stats.
-2. Edit `pipeline/data/weights.json` (and `score.py` comments such as `DPS_PER_STR` if seal math changes).
-3. Re-run `score.py` / `payload.py` / the 1–9 emitter per affected class; copy Lua into `GearQuest/_generated/`.
-4. Run `node scripts/verify-generated-bis.mjs`.
-
-Forever is Classic+, so do **not** blindly paste vanilla 1.12 weights if the combat model moved.
-
-**Optional before beta** (cheap Classic cleanup, redo after Forever): set `expertise` and `armorPen` to `0` on every spec, and stop using TBC-only weapon formulas. Do not invent a full Forever scale until you have played the client.
-
-After a Classic/`score.py` regen, do **not** run `apply-classic-random-enchants.mjs` — that patches TBC-scored Lua against Classic tables. Suffixes are already Classic in `pipeline/data/items_random.json`.
+After a re-score, do **not** run `apply-classic-random-enchants.mjs`. Suffixes are already Classic in `pipeline/data/items_random.json`.
 
 See also [FOREVER-SCORING.md](../pipeline/docs/FOREVER-SCORING.md), [DATA_RULES.md](./DATA_RULES.md), [SUFFIX-RANDOM-ENCHANT.md](./SUFFIX-RANDOM-ENCHANT.md), and [PROJECT_BRIEF.md](./PROJECT_BRIEF.md).

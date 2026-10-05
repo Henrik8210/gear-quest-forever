@@ -14,7 +14,7 @@ Forever is a new 1–60 Classic+ client (original continents, before Molten Core
 
 Install folder is `_classic_beta_` (Forever beta). `scripts/sync-addon.ps1` looks for that first, then a few other likely names, or set `$env:GEARQUEST_WOW_CLIENT`.
 
-Current BiS data is Classic-pool generated 10–60 plus curated 1–9 Alliance bands, with **Horde Forever deltas** (Zephras Isle / Shen'dar crafts) overlaid via `foreverDelta`. **Max level is 60** — TBC level-70 endgame lists were removed. Alliance Forever items and StatWeights are still outstanding; see [docs/FOREVER-DATA-MIGRATION.md](docs/FOREVER-DATA-MIGRATION.md).
+Lists are the Forever scoring model for all nine classes, levels 1–60. Alliance paladin and warrior levels 1–9 stay curated. Scoring rules: [pipeline/docs/FOREVER-SCORING.md](pipeline/docs/FOREVER-SCORING.md).
 
 ## Commands
 
@@ -29,8 +29,7 @@ Current BiS data is Classic-pool generated 10–60 plus curated 1–9 Alliance b
 | `/gq set on` / `/gq set off` | Enable or disable preview mode |
 | `/gq set me` | Copy your real character into preview (Reset on the Simulator tab) |
 | `/gq help` | List commands |
-| `/gq seen` | Open a list of unique equip items recorded locally |
-| `/gq seen wipe` | Clear the local seen-item notebook |
+| `/gq seen` | The seen-item notebook is retired. Item facts come from Wowhead Forever. |
 
 **Minimap:** any click opens GearQuest. Use the **Simulator** handle tab (class, faction, spec, level 1–60). Reset = `/gq set me`.
 

@@ -76,7 +76,18 @@ pin, a zone center, or a city for a battleground vendor. An Unsourced item
 has no pin until a source exists. Ruins of Lordaeron is **Undercity**
 (map 1458) at 71.6, 11.4. Patch with
 `python pipeline/scripts/index_coordinates.py --ids <json list>`. Do not
-full-emit. `emit()` rewrites the whole coordinate file.
+full-emit. `emit()` rewrites the whole coordinate file. A source `zone` is
+not a pin. The log reads `Data.Coordinates.generated.lua`. A boss drop
+whose zone is already a known door still has no **Show on map** until that
+file has a row. On 5 Oct 2026, 25 boss drops had the dungeon and no row.
+**Embrace of the Viper** (6473 Armor of the Fang, 10410 Leggings, 10411
+Footpads, 10412 Belt, 10413 Gloves) now pins Wailing Caverns at The Barrens
+46.0, 36.5, the same door as the other cavern hunts. The same pass pinned
+Blackened Defias (Deadmines, Westfall 42.5, 71.7), Scarlet chest, legs,
+wrists, Mantle of Doan, and Dog Training Gloves (Scarlet Monastery), the
+four Gnomeregan boss weapons, Wind Spirit Staff and the two Agamaggan pieces
+(Razorfen Kraul), Windshrieker Pauldrons (Stratholme), Emberweave Leggings
+(Blackwing Lair), and Ring of Entropy (Lord Kazzak, Blasted Lands 45.3, 55.0).
 
 **A re-score always counts set bonuses.** Embrace of the Viper,
 Rotmender's Raiment, and any later `(N) Set` are part of the score for the
@@ -465,11 +476,39 @@ paragraph.
 
 ## Log window
 
-- **Settings** is the third side handle (cog, `Interface\Icons\Trade_Engineering`).
-  Simulator stays the red question mark. The page heading is centered. The
-  setting name is the large text; the note under it is smaller and not bold.
-  Clicking the label toggles the checkbox. Hide minimap is
-  `GearQuestForeverDB.settings.hideMinimapIcon`.
+- **Side handles** are Log (gold exclamation), Simulator (gold question mark,
+  stem clear of the dot), and Settings (gold gear). Files are
+  `GearQuest/Art/GQ-Handle-Log.png`, `GQ-Handle-Simulator.png`, and
+  `GQ-Handle-Settings.png`, 64×64, drawn at 36px in the 53px tab. Hover
+  shows `GQ-Handle-InnerGlow.png`: a soft gold rim just inside the metal
+  edge. It must not halo the icon. Unselected icons are dimmed
+  (0.55, 0.50, 0.42).
+- **Active, Completed, and Removed** take a faint gold wash on hover
+  (0.90, 0.75, 0.28, alpha 0.14). The selected tab keeps the brighter label.
+- The status line uses `GameFontNormalLarge`. **Simulation mode:** is
+  `|cffe6bf47` (gold 0.90, 0.75, 0.28). The rest of that sentence,
+  **Settings**, and **Viewing upgrades…** are solid `1, 0.97, 0.88` with a
+  1px black shadow, so the sky art does not wash them out. The spec control
+  on that row is larger: icon 22, arrow 30, label width 130.
+- **Reset** on the Simulator is enabled only while a simulation is applied.
+  On your own character it stays grey. The hover says you are already seeing
+  your character unsimulated.
+- **Settings** pages are General, Hunts, GearQuest Commands, and Credits.
+  Rows highlight on hover (0.62, 0.50, 0.18, 0.55). The selected row keeps
+  its gold bar. The page heading is centered. The setting name is the large
+  text; the note under it is smaller. Clicking the label toggles the
+  checkbox. Hide minimap is `GearQuestForeverDB.settings.hideMinimapIcon`.
+  **Hide upgrade arrows** is under Hunts
+  (`settings.hideUpgradeArrows`). It removes the green arrow from the quest
+  log, quest giver, loot, and vendors. **GearQuest Commands** lists each
+  slash command with a 1px shadow and the explanation in plain text under it.
+- The source **Filter** closes on a click outside the menu. The Profession
+  flyout closes when the cursor leaves both the row and the flyout. Menu
+  text uses the Filter button's font.
+- Shift-click on a Blizzard map pin still inserts the chat link. Do not call
+  `CopyToClipboard`. Open the map with `C_Map.OpenWorldMap`, not
+  `ShowUIPanel` or `WorldMapFrame:SetMapID`. The close button is anchored
+  `TOPRIGHT` **-6, 1**.
 - **Scrollbars** on the hunt list and the parchment sit just outside the
   scroll frame, as children of it. `SetClipsChildren` on that frame hides
   them. Do not clip `GearQuestLogListScrollFrame` or
@@ -587,34 +626,18 @@ re-score the class, then copy Lua back.
 
    Era fingerprint: Vice Grips **9640** must stay **+17 Strength @ 9%**.
 
-5. **Re-score** (needs Python 3, run from `pipeline/scripts`):
+5. **Re-score** with the Forever model. One class at a time. `GQ_NO_GUIDES=1`
+   is set inside the script. It writes `pipeline/out/` and copies the Lua
+   into `GearQuest/_generated/`.
 
    ```powershell
-   $env:GQ_CLASS = "HUNTER"
-   $env:GQ_GUIDES = "guides_hunter.json"
-   $env:GQ_OUT = "hunter.json"
-   python score.py
-   python payload.py
-   python emit_early.py
-   ```
-
-   Copy the emitted Lua into `GearQuest/_generated/` (`python reemit_all.py` copies
-   `pipeline/out/` → `GearQuest/_generated/`), then sync the game folder:
-
-   ```powershell
-   node scripts/verify-generated-bis.mjs
+   python pipeline/scripts/rescore_hunter_shaman.py HUNTER
    .\scripts\sync-addon.ps1
    ```
 
-   All nine classes at once (Forever model, `GQ_NO_GUIDES=1`):
-
-   ```powershell
-   python pipeline/scripts/rescore_hunter_shaman.py
-   .\scripts\sync-addon.ps1
-   ```
-
-   One class: `python pipeline/scripts/rescore_hunter_shaman.py SHAMAN`.
-   Do not `reemit_all.py` from stale `pipeline/out/*.json` after a tip sync.
+   All nine classes is the same command with no class name. Do not
+   `reemit_all.py` from stale `pipeline/out/*.json`. Do not run a bare
+   `score.py` plus `payload.py` plus `emit_early.py` for a Forever list.
 
    After a Classic `score.py` regen, do **not** run `apply-classic-random-enchants.mjs`
    (that tool patches TBC-scored Lua). Suffixes already come from Classic
@@ -684,7 +707,7 @@ Hunt-id probe (`pipeline/scripts/probe_forever_hunt_tooltips.py`) labels 200 vs 
 **Faction zone pins** live in `pipeline/data/forever_faction_zones.json`. `apply_pinned_faction_zones` sets `zone` only. `zone_ok` is what gates the faction; quest text that names Stormwind does nothing if zone is null. Stormwind City and Teldrassil are Alliance. Thunder Bluff is Horde. Wailing Caverns is both.
 
 - 279868 Duty Bound Leggings, 279869 Remembrance Armor → Stormwind City (Bloodied Insignia, General Marcus Jonathan). Horde must not see them.
-- 281250 Forest Oracle's Cloak → Teldrassil. Still `kind` `?`, so it does not score until that is patched on purpose.
+- 281250 Forest Oracle's Cloak → Teldrassil. `kind` is `Misc`, so it can score.
 - 270008 Heat Resistant Mitts, 270009 Safety Boots → Thunder Bluff (Serpentbloom, Apothecary Zamah). Alliance must not see them. Instructions may still mention Wailing Caverns; the displayed zone is what gates.
 
 **Clicks.** Do not parent a fullscreen mouse catcher to `UIParent`. `GearQuestPopupDismiss` exists only under `CharacterFrame`, and hides when that frame hides. Log list and detail scrolls use `SetClipsChildren`. Scroll children are not mouse-enabled. Tracker and log rows outside the visible scroll have mouse off and a shrunk hit rect. Opening the profession book (`TRADE_SKILL_SHOW` / `CRAFT_SHOW`) drops the log from DIALOG to MEDIUM so the book receives clicks. Clicking the log calls `BringLogWindowToFront` and puts it back on DIALOG.
@@ -917,10 +940,32 @@ higher score than rank 2. That is intentional. Off hand stays score-sorted.
 |---|---|---|
 | Mage, priest, warlock | Staff or main hand | Off Hand |
 | Druid, Enhancement, paladin/warrior levelling when a route exists | Two-hand or main hand | Off Hand |
-| Hunter | Two-hand or dual wield | Off Hand. Ranged label is **Bow** |
+| Hunter | Two-hand or dual wield | Off Hand. The ranged slot title is **Ranged** |
 | Rogue (combat, assassination, subtlety), Warrior Fury | Dual wield | Off Hand |
 | Paladin Retribution, Warrior Arms | Two-hand | Off Hand |
 | Paladin Protection and Holy, Warrior Protection, Shaman Elemental, Restoration, Enhancement Tank | Main Hand | Shield |
+
+Hunter ranged weapons are **Bow, Gun, and Crossbow** only. The slot title
+is **Ranged**, the same word a warrior sees, because the list is not only
+bows. A thrown weapon does not fire Auto Shot, so `HUNTER`
+`_weaponSubclasses` does not include `Thrown`. Houndmaster Boomerang,
+Quilrager Throwing Axe, Vicious Throwing Stars, and Assassin's Throwing Axe
+are not hunter hunts. Rogue and warrior still list thrown weapons. Do not
+put Thrown back on the hunter list.
+
+Ranged DPS, damage, and speed are the Forever tooltip, not a stale stored
+number. Beast Mastery and Marksmanship `dpsWeightRanged` is **14**. Survival
+is **6**. Defense on every hunter spec is **0.02**. A gun with defense and a
+lower DPS loses to the higher-DPS bow, gun, or crossbow. Do not retune
+defense to bury it. **Hi-tech Supergun** (9487) is not rank 1 at 26 for that
+reason. After the 5 Oct 2026 fact pass, level 22 Beast Mastery Horde ranged
+is **Alliance Outrunner Bow** (285347, 13.33 DPS, +4 Agility, +3 Spirit),
+**Double-barreled Shotgun** (2098), and **Naga Heartpiercer** (3078, same
+13.33 DPS; the wound proc is not in `items.json`, so it is not scored).
+Notable is **Venomstrike** (6469). **Steelarrow Crossbow** (6315) is 10.88
+DPS, 29–45, speed 3.40, +3 Agility, and is not in that top 3. Level 26 Beast
+Mastery Horde is **Concealed Hand Crossbow** (273829), **Dun Garok Rifle**
+(282710), and **Outrider's Bow** (212585).
 
 Forever Enhancement has no dual wield. Do not label it Dual-wield.
 Rogues cannot wear two-hand. Hunters: the bow is its own slot.

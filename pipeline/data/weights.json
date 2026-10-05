@@ -512,8 +512,7 @@
    "Staff",
    "Bow",
    "Gun",
-   "Crossbow",
-   "Thrown"
+   "Crossbow"
   ],
   "beast_mastery": {
    "label": "Beast Mastery",

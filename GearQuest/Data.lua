@@ -9506,9 +9506,6 @@ local TWO_HAND_SPECS = {
 function GQ.Data:WeaponHeaderSuffix(slotName)
     local classFile = GQ:GetEffectiveClass()
     local spec = GQ:GetEffectiveSpec()
-    if slotName == "Ranged" and classFile == "HUNTER" then
-        return "Bow"
-    end
     local shield = SHIELD_SPECS[classFile]
     if shield and shield[spec] then
         if slotName == "SecondaryHand" then

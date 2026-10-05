@@ -86,6 +86,68 @@ function GQ.Map:SpotForEntry(entry)
     }
 end
 
+-- Shift-click on a user waypoint inserts the pin in chat, then copies a
+-- /mappin command with CopyToClipboard. That copy is reserved for Blizzard
+-- UI. A pin placed from this addon runs the click tainted, so the copy pops
+-- "blocked from an action only available to the Blizzard UI" after the chat
+-- link is already in. Skip the clipboard step; chat share stays.
+local function SkipWaypointClipboard()
+end
+
+local function GuardWaypointClipboard()
+    if type(WaypointLocationPinMixin) == "table"
+        and type(WaypointLocationPinMixin.CopySlashCommandToClipboard) == "function"
+        and WaypointLocationPinMixin.CopySlashCommandToClipboard ~= SkipWaypointClipboard
+    then
+        WaypointLocationPinMixin.CopySlashCommandToClipboard = SkipWaypointClipboard
+    end
+
+    local pools = WorldMapFrame and WorldMapFrame.pinPools
+    local pool = pools and pools["WaypointLocationPinTemplate"]
+    if not pool then
+        return
+    end
+    local function patch(pin)
+        if type(pin) == "table" or (pin and pin.CopySlashCommandToClipboard) then
+            if pin.CopySlashCommandToClipboard ~= SkipWaypointClipboard then
+                pin.CopySlashCommandToClipboard = SkipWaypointClipboard
+            end
+        end
+    end
+    if pool.EnumerateActive then
+        for pin in pool:EnumerateActive() do
+            patch(pin)
+        end
+    end
+    if pool.EnumerateInactive then
+        for pin in pool:EnumerateInactive() do
+            patch(pin)
+        end
+    end
+end
+
+local clipboardGuard = CreateFrame("Frame")
+clipboardGuard:RegisterEvent("ADDON_LOADED")
+clipboardGuard:RegisterEvent("PLAYER_LOGIN")
+clipboardGuard:SetScript("OnEvent", function()
+    GuardWaypointClipboard()
+end)
+
+local function OpenToMap(mapId)
+    GuardWaypointClipboard()
+    if mapId and C_Map and C_Map.OpenWorldMap then
+        C_Map.OpenWorldMap(mapId)
+        return
+    end
+    if mapId and OpenWorldMap then
+        OpenWorldMap(mapId)
+        return
+    end
+    if WorldMapFrame and not WorldMapFrame:IsShown() and ToggleWorldMap then
+        ToggleWorldMap()
+    end
+end
+
 local function SetPin(mapId, x, y, label)
     x, y = x / 100, y / 100
     if TomTom and TomTom.AddWaypoint then
@@ -110,21 +172,7 @@ function GQ.Map:Show(entry)
     local mapId = spot and spot.mapId or self:ZoneMap(entry.zone)
     local label = entry.questName or entry.npc or entry.zone or "GearQuest"
 
-    if WorldMapFrame then
-        if not WorldMapFrame:IsShown() then
-            ShowUIPanel(WorldMapFrame)
-        end
-        if mapId then
-            WorldMapFrame:SetMapID(mapId)
-            C_Timer.After(0, function()
-                if WorldMapFrame and WorldMapFrame:IsShown() and mapId then
-                    WorldMapFrame:SetMapID(mapId)
-                end
-            end)
-        end
-    elseif OpenWorldMap and mapId then
-        OpenWorldMap(mapId)
-    end
+    OpenToMap(mapId)
 
     if not spot then
         print(PREFIX .. "No exact spot for this item.")
@@ -132,6 +180,10 @@ function GQ.Map:Show(entry)
     end
 
     local pinned = SetPin(spot.mapId, spot.x, spot.y, label)
+    GuardWaypointClipboard()
+    if C_Timer and C_Timer.After then
+        C_Timer.After(0, GuardWaypointClipboard)
+    end
     local where = string.format("%s %.1f, %.1f", spot.map or label, spot.x, spot.y)
     print(PREFIX .. where .. (pinned and " — pin placed" or ""))
 end

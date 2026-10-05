@@ -14,7 +14,7 @@ Paths: `scripts/gq_paths.py` (repo-relative). Scoring is capped at **level 60** 
 the item pool is `classic_item_ids.json`. Random suffixes are Classic (Vice Grips
 **+17 @ 9%**), converted from `GearQuest/_generated/data/items_random.classic.json`.
 
-Original archive notes below.
+The notes below are the September TBC build archive. Current rules are [docs/FOREVER-SCORING.md](docs/FOREVER-SCORING.md). Do not apply the weights or level bands in the archive.
 
 ---
 

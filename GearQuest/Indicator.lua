@@ -589,6 +589,19 @@ function GQ.Indicator:GetIconAnchor(button)
         if anchor then
             return anchor
         end
+        if button.Icon.icon then
+            anchor = AcceptIconAnchor(button.Icon.icon, button.Icon)
+            if anchor then
+                return anchor
+            end
+        end
+        if button.Icon.GetNormalTexture then
+            local normal = button.Icon:GetNormalTexture()
+            anchor = AcceptIconAnchor(normal, button.Icon)
+            if anchor then
+                return anchor
+            end
+        end
     end
 
     if button.IconTexture then
@@ -604,6 +617,17 @@ function GQ.Indicator:GetIconAnchor(button)
         local anchor = AcceptIconAnchor(named, button)
         if anchor then
             return anchor
+        end
+        local iconButton = _G[name .. "Icon"]
+        if iconButton and iconButton ~= button then
+            local tex = iconButton.icon or iconButton.Icon
+            if (not tex or not tex.GetObjectType or tex:GetObjectType() ~= "Texture") and iconButton.GetNormalTexture then
+                tex = iconButton:GetNormalTexture()
+            end
+            anchor = AcceptIconAnchor(tex, iconButton)
+            if anchor then
+                return anchor
+            end
         end
     end
 
@@ -720,7 +744,12 @@ function GQ.Indicator:ApplyOverlayLayout(overlay, anchor)
 
     overlay:SetSize(ARROW_WIDTH, ARROW_HEIGHT)
     overlay:ClearAllPoints()
-    overlay:SetPoint("BOTTOMRIGHT", anchor, "TOPRIGHT", 0, ARROW_OVERLAP)
+    if overlay.gqInset then
+        -- Sit on the icon. A scroll frame clips anything drawn above the row.
+        overlay:SetPoint("TOPRIGHT", anchor, "TOPRIGHT", 1, 1)
+    else
+        overlay:SetPoint("BOTTOMRIGHT", anchor, "TOPRIGHT", 0, ARROW_OVERLAP)
+    end
 
     arrow:ClearAllPoints()
     arrow:SetAllPoints(overlay)
@@ -730,6 +759,36 @@ function GQ.Indicator:ApplyOverlayLayout(overlay, anchor)
         glow:SetPoint("CENTER", arrow, "CENTER", 0, 0)
         glow:SetSize(ARROW_WIDTH * ARROW_GLOW_SCALE, ARROW_HEIGHT * ARROW_GLOW_SCALE)
     end
+end
+
+local function AncestorClips(frame)
+    local current = frame
+    for _ = 1, 12 do
+        if not current or not current.GetParent then
+            break
+        end
+        local name = current.GetName and current:GetName() or ""
+        if name:find("Scroll", 1, true) or current.ScrollBar or current.scrollBar then
+            return true
+        end
+        current = current:GetParent()
+    end
+    return false
+end
+
+local function IsQuestSurface(frame)
+    local current = frame
+    for _ = 1, 16 do
+        if not current then
+            break
+        end
+        local name = current.GetName and current:GetName() or ""
+        if name:find("Quest", 1, true) or name:find("WorldMap", 1, true) then
+            return true
+        end
+        current = current.GetParent and current:GetParent()
+    end
+    return false
 end
 
 function GQ.Indicator:EnsureOverlay(button)
@@ -773,6 +832,11 @@ function GQ.Indicator:EnsureOverlay(button)
             overlay:SetFrameStrata("HIGH")
             overlay:SetFrameLevel(frameLevel + 25)
         end
+        local buttonName = button.GetName and button:GetName()
+        if IsQuestSurface(button) or (buttonName and (buttonName:find("QuestLog", 1, true) or buttonName:find("QuestInfo", 1, true) or buttonName:find("QuestReward", 1, true))) then
+            overlay:SetFrameStrata("HIGH")
+            overlay:SetFrameLevel(frameLevel + 20)
+        end
         self:CreateOverlayTextures(overlay)
         button.gqUpgradeOverlay = overlay
         overlay.gqAnchor = anchor
@@ -780,6 +844,24 @@ function GQ.Indicator:EnsureOverlay(button)
         overlay.gqAnchor = anchor
     end
 
+    if IsQuestSurface(button) then
+        overlay:SetFrameStrata("HIGH")
+    end
+    local onQuestGiver = false
+    if QuestFrame then
+        local current = button
+        for _ = 1, 16 do
+            if not current then
+                break
+            end
+            if current == QuestFrame then
+                onQuestGiver = true
+                break
+            end
+            current = current.GetParent and current:GetParent()
+        end
+    end
+    overlay.gqInset = (not onQuestGiver) and (AncestorClips(button) or IsQuestSurface(button))
     self:ApplyOverlayLayout(overlay, anchor)
     overlay:Hide()
     return overlay
@@ -792,8 +874,30 @@ function GQ.Indicator:HideButton(button)
     end
 end
 
+function GQ.Indicator:UpgradeArrowsHidden()
+    local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+    return settings and settings.hideUpgradeArrows and true or false
+end
+
+function GQ.Indicator:ApplyArrowVisibility()
+    if self:UpgradeArrowsHidden() and self.pulseOverlays then
+        for overlay in pairs(self.pulseOverlays) do
+            self:UnregisterOverlayPulse(overlay)
+            overlay:Hide()
+        end
+    end
+    if self.RefreshAll then
+        self:RefreshAll()
+    end
+end
+
 function GQ.Indicator:UpdateButton(button, link)
     if not button then
+        return
+    end
+
+    if self:UpgradeArrowsHidden() then
+        self:HideButton(button)
         return
     end
 
@@ -979,17 +1083,15 @@ function GQ.Indicator:CollectItemButtons(root, results, depth, seen)
     end
     seen[root] = true
 
-    if root.GetObjectType and root:GetObjectType() == "Button" and self:GetIconAnchor(root) then
-        table.insert(results, root)
+    local typeOk, objectType = pcall(function()
+        return root:GetObjectType()
+    end)
+    if not typeOk then
+        return
     end
 
-    if root.GetChildren then
-        local ok, children = pcall(root.GetChildren, root)
-        if ok and children then
-            for _, child in ipairs(children) do
-                self:CollectItemButtons(child, results, depth + 1, seen)
-            end
-        end
+    if objectType == "Button" and self:GetIconAnchor(root) then
+        table.insert(results, root)
     end
 
     if root.GetNumChildren then
@@ -1005,44 +1107,152 @@ function GQ.Indicator:CollectItemButtons(root, results, depth, seen)
     end
 end
 
+local function FrameShown(frame)
+    if not frame then
+        return false
+    end
+    local ok, shown = pcall(function()
+        return frame:IsShown()
+    end)
+    return ok and shown and true or false
+end
+
+function GQ.Indicator:AddShownRewardButton(results, seen, btn)
+    if not btn or seen[btn] or not FrameShown(btn) then
+        return
+    end
+    seen[btn] = true
+    table.insert(results, btn)
+end
+
+function GQ.Indicator:QuestLogWindowShown()
+    if FrameShown(QuestFrame) then
+        return false
+    end
+    local map = _G.QuestMapFrame
+    local details = map and (map.DetailsFrame or (map.QuestsFrame and map.QuestsFrame.DetailsFrame))
+    if FrameShown(details) or FrameShown(_G.QuestLogPopupDetailFrame) or FrameShown(_G.QuestLogFrame) or FrameShown(_G.QuestLogDetailFrame) or FrameShown(_G.MapQuestInfoRewardsFrame) then
+        return true
+    end
+    return FrameShown(_G.QuestInfoRewardsFrame)
+end
+
+function GQ.Indicator:QuestLogDetailShown()
+    return self:QuestLogWindowShown()
+end
+
+function GQ.Indicator:AddQuestRewardRoots(frame, roots, seen, depth)
+    if not frame or depth > 8 or seen[frame] then
+        return
+    end
+    seen[frame] = true
+
+    local ok, name = pcall(function()
+        return frame.GetName and frame:GetName() or ""
+    end)
+    name = ok and name or ""
+    local rewards = frame.RewardsFrame or frame.rewardsFrame
+    if rewards then
+        roots[rewards] = true
+    end
+    local rewardsContainer = frame.RewardsFrameContainer
+    if rewardsContainer then
+        roots[rewardsContainer] = true
+        if rewardsContainer.RewardsFrame then
+            roots[rewardsContainer.RewardsFrame] = true
+        end
+    end
+    if frame.RewardButtons or frame.rewardButtons or frame.RewardFrames
+        or name:find("Reward", 1, true) or name:find("QuestInfo", 1, true) then
+        roots[frame] = true
+    end
+
+    local details = frame.DetailsFrame or frame.detailsFrame
+    if details then
+        self:AddQuestRewardRoots(details, roots, seen, depth + 1)
+    end
+    if frame.QuestsFrame then
+        self:AddQuestRewardRoots(frame.QuestsFrame, roots, seen, depth + 1)
+    end
+    local scroll = frame.ScrollFrame or frame.scrollFrame
+    if scroll then
+        local child = scroll.Contents or scroll.ScrollChild or scroll.scrollChild
+        if child then
+            self:AddQuestRewardRoots(child, roots, seen, depth + 1)
+        end
+    end
+end
+
 function GQ.Indicator:GetQuestLogRewardButtons()
     local results = {}
     local seen = {}
-    local roots = {
-        _G.QuestLogQuestDetail,
-        _G.QuestLogDetailScrollChildFrame,
-        _G.QuestLogDetailScrollFrameScrollChild,
-        QuestLogDetailScrollFrame and QuestLogDetailScrollFrame.ScrollChild,
-    }
+    local roots = {}
+    local function consider(frame)
+        if frame then
+            self:AddQuestRewardRoots(frame, roots, {}, 0)
+        end
+    end
 
-    for _, root in ipairs(roots) do
-        if root then
-            local rewardsFrame = root.rewardsFrame or root.RewardsFrame or _G.QuestLogQuestDetailRewardsFrame
-            if rewardsFrame then
-                if rewardsFrame.RewardFrames then
-                    for _, frame in ipairs(rewardsFrame.RewardFrames) do
-                        local btn = frame.Item or frame.item or frame
-                        if btn and not seen[btn] then
-                            seen[btn] = true
-                            table.insert(results, btn)
-                        end
+    consider(_G.QuestLogFrame)
+    consider(_G.QuestLogQuestDetail)
+    consider(_G.QuestLogDetailScrollChildFrame)
+    consider(_G.QuestLogDetailScrollFrameScrollChild)
+    consider(QuestLogDetailScrollFrame and QuestLogDetailScrollFrame.ScrollChild)
+    consider(_G.QuestLogPopupDetailFrame)
+    consider(_G.QuestLogDetailFrame)
+    consider(_G.QuestMapFrame)
+    consider(_G.MapQuestInfoRewardsFrame)
+    consider(_G.QuestInfoRewardsFrame)
+    local mapDetails = _G.QuestMapFrame and _G.QuestMapFrame.DetailsFrame
+    if mapDetails and mapDetails.RewardsFrameContainer then
+        consider(mapDetails.RewardsFrameContainer.RewardsFrame or mapDetails.RewardsFrameContainer)
+    end
+
+    for root in pairs(roots) do
+        if root.RewardButtons then
+            for _, btn in ipairs(root.RewardButtons) do
+                self:AddShownRewardButton(results, seen, btn)
+            end
+        end
+        if root.RewardFrames then
+            for _, frame in ipairs(root.RewardFrames) do
+                self:AddShownRewardButton(results, seen, frame.Item or frame.item or frame)
+            end
+        end
+        for i = 1, 12 do
+            self:AddShownRewardButton(results, seen, root["Item" .. i])
+            self:AddShownRewardButton(results, seen, root["QuestInfoItem" .. i])
+        end
+        self:CollectItemButtons(root, results, 0, seen)
+    end
+
+    for i = 1, 20 do
+        self:AddShownRewardButton(results, seen, _G["QuestLogItem" .. i])
+    end
+
+    local shown = {}
+    for _, btn in ipairs(results) do
+        if not FrameShown(btn) then
+            -- Hidden reward rows stay unpainted.
+        else
+            local nested = false
+            local parent = btn.GetParent and btn:GetParent()
+            while parent and not nested do
+                for _, other in ipairs(results) do
+                    if other == parent then
+                        nested = true
+                        break
                     end
                 end
-
-                for i = 1, 12 do
-                    local btn = rewardsFrame["Item" .. i]
-                    if btn and not seen[btn] then
-                        seen[btn] = true
-                        table.insert(results, btn)
-                    end
-                end
-
-                self:CollectItemButtons(rewardsFrame, results, 0, seen)
+                parent = parent.GetParent and parent:GetParent()
+            end
+            if not nested then
+                table.insert(shown, btn)
             end
         end
     end
 
-    return results
+    return shown
 end
 
 function GQ.Indicator:CollectQuestOfferButtons()
@@ -1115,40 +1325,163 @@ function GQ.Indicator:UpdateQuestOfferRewards()
     end
 end
 
+function GQ.Indicator:EnsureQuestLogHooks()
+    local function refresh()
+        GQ.Indicator:UpdateQuestLogRewards()
+        if C_Timer and C_Timer.After then
+            C_Timer.After(0.2, function()
+                if GQ.Indicator then
+                    GQ.Indicator:UpdateQuestLogRewards()
+                end
+            end)
+        end
+    end
+
+    self:HookFunction("QuestMapFrame_ShowQuestDetails", refresh)
+    self:HookFunction("QuestMapFrame_UpdateAll", refresh)
+    self:HookFunction("QuestMapLogTitleButton_OnClick", refresh)
+    self:HookFunction("QuestMapFrame_ShowQuestLog", refresh)
+
+    if WorldMapFrame and not self._worldMapHooked and WorldMapFrame.HookScript then
+        self._worldMapHooked = true
+        WorldMapFrame:HookScript("OnShow", refresh)
+    end
+    if MapQuestInfoRewardsFrame and not self._mapRewardsHooked and MapQuestInfoRewardsFrame.HookScript then
+        self._mapRewardsHooked = true
+        MapQuestInfoRewardsFrame:HookScript("OnShow", refresh)
+    end
+    local mapDetails = QuestMapFrame and QuestMapFrame.DetailsFrame
+    if mapDetails and not self._mapDetailsHooked and mapDetails.HookScript then
+        self._mapDetailsHooked = true
+        mapDetails:HookScript("OnShow", refresh)
+    end
+    if QuestMapFrame and not self._questMapHooked and QuestMapFrame.HookScript then
+        self._questMapHooked = true
+        QuestMapFrame:HookScript("OnShow", refresh)
+    end
+end
+
+function GQ.Indicator:MatchUpgradeName(text)
+    if type(text) ~= "string" or text == "" or not self.upgradeItemNames then
+        return nil
+    end
+    text = text:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", "")
+    text = text:gsub("^%s+", ""):gsub("%s+$", "")
+    if text == "" then
+        return nil
+    end
+    local id = self.upgradeItemNames[text:lower()]
+    if id then
+        return id
+    end
+    local stripped = text:lower():gsub("%s*x%d+$", ""):gsub("^%d+%s*x%s*", "")
+    return self.upgradeItemNames[stripped]
+end
+
+function GQ.Indicator:LinkFromHost(host)
+    if not host then
+        return nil
+    end
+    local itemId = host.itemID or host.itemId
+    if type(itemId) == "number" and itemId > 0 then
+        return "item:" .. itemId
+    end
+    if type(host.itemLink) == "string" then
+        return host.itemLink
+    end
+    local itemType = host.type or host.rewardType
+    local index = host.GetID and host:GetID() or 0
+    if (itemType == "choice" or itemType == "reward") and index > 0 then
+        local query = itemType == "choice" and GetQuestLogChoiceInfo or GetQuestLogRewardInfo
+        if query then
+            local queried, name, _, _, _, _, itemID = pcall(query, index)
+            if queried and type(itemID) == "number" and itemID > 0 then
+                return "item:" .. itemID
+            end
+            if queried then
+                local namedId = self:MatchUpgradeName(name)
+                if namedId then
+                    return "item:" .. namedId
+                end
+            end
+        end
+        if GetQuestLogItemLink then
+            local linked, link = pcall(GetQuestLogItemLink, itemType, index)
+            if linked and type(link) == "string" then
+                return link
+            end
+        end
+    end
+    local fields = { host.Name, host.name, host.Text, host.ItemName }
+    local hostName = host.GetName and host:GetName()
+    if hostName then
+        table.insert(fields, _G[hostName .. "Name"])
+    end
+    for _, fs in ipairs(fields) do
+        if fs and fs.GetText then
+            local id = self:MatchUpgradeName(fs:GetText())
+            if id then
+                return "item:" .. id
+            end
+        end
+    end
+    if host.GetRegions then
+        local ok, regions = pcall(function()
+            return { host:GetRegions() }
+        end)
+        if ok and type(regions) == "table" then
+            for _, region in ipairs(regions) do
+                if region.GetObjectType and region:GetObjectType() == "FontString" and region.GetText then
+                    local id = self:MatchUpgradeName(region:GetText())
+                    if id then
+                        return "item:" .. id
+                    end
+                end
+            end
+        end
+    end
+    return nil
+end
+
+function GQ.Indicator:LinkFromQuestButton(button)
+    if not button then
+        return nil
+    end
+    local current = button
+    for _ = 1, 4 do
+        local ok, link = pcall(self.LinkFromHost, self, current)
+        if ok and type(link) == "string" then
+            return link
+        end
+        local parentOk, parent = pcall(function()
+            return current:GetParent()
+        end)
+        if not parentOk or not parent then
+            break
+        end
+        current = parent
+    end
+    return nil
+end
+
 function GQ.Indicator:UpdateQuestLogRewards()
-    if not QuestLogFrame or not QuestLogFrame:IsShown() then
+    self:EnsureQuestLogHooks()
+    if not self:QuestLogDetailShown() then
         return
     end
 
-    if not GetQuestLogSelection or not GetQuestLogItemLink then
-        return
-    end
-
-    local questIndex = GetQuestLogSelection()
-    if not questIndex or questIndex <= 0 then
+    if not GetQuestLogItemLink and not self.upgradeItemNames then
         return
     end
 
     local buttons = self:GetQuestLogRewardButtons()
-    local buttonIndex = 1
-
-    local function ApplyLinks(itemType, countFn)
-        local count = countFn and countFn(questIndex) or 0
-        for i = 1, count do
-            local link = GetQuestLogItemLink(itemType, i)
-            local button = buttons[buttonIndex]
-            if button then
-                self:UpdateButton(button, link)
-                buttonIndex = buttonIndex + 1
-            end
+    for _, button in ipairs(buttons) do
+        local ok, link = pcall(self.LinkFromQuestButton, self, button)
+        if ok and link then
+            pcall(self.UpdateButton, self, button, link)
+        else
+            pcall(self.HideButton, self, button)
         end
-    end
-
-    ApplyLinks("choice", GetNumQuestLogChoices)
-    ApplyLinks("reward", GetNumQuestLogRewards)
-
-    for i = buttonIndex, #buttons do
-        self:HideButton(buttons[i])
     end
 end
 
@@ -1383,6 +1716,7 @@ function GQ.Indicator:Init()
 
     self:HookFunction("QuestInfo_ShowRewards", function()
         self:UpdateQuestOfferRewards()
+        self:UpdateQuestLogRewards()
     end)
 
     self:HookFunction("QuestFrameItems_Update", function()
@@ -1432,11 +1766,17 @@ function GQ.Indicator:Init()
         "QUEST_PROGRESS",
         "QUEST_COMPLETE",
         "QUEST_FINISHED",
+        "QUEST_LOG_UPDATE",
     }
     for i = 1, #events do
         GQ.RegisterEvent(eventFrame, events[i])
     end
     eventFrame:SetScript("OnEvent", function(_, event, arg1, arg2)
+        if event == "ADDON_LOADED" and (arg1 == "Blizzard_WorldMap" or arg1 == "Blizzard_QuestLog") then
+            GQ.Indicator:EnsureQuestLogHooks()
+            return
+        end
+
         if event == "ADDON_LOADED" and arg1 == "Blizzard_TradeSkillUI" then
             GQ.Indicator:HookFunction("TradeSkillFrame_Update", function()
                 GQ.Indicator:UpdateTradeSkillFrame()
@@ -1501,6 +1841,19 @@ function GQ.Indicator:Init()
                     end
                 end)
             end
+        end
+
+        if event == "QUEST_LOG_UPDATE" and C_Timer and C_Timer.After then
+            C_Timer.After(0, function()
+                if GQ.Indicator then
+                    GQ.Indicator:UpdateQuestLogRewards()
+                end
+            end)
+            C_Timer.After(0.2, function()
+                if GQ.Indicator then
+                    GQ.Indicator:UpdateQuestLogRewards()
+                end
+            end)
         end
 
         if (event == "MERCHANT_SHOW" or event == "MERCHANT_UPDATE") and C_Timer and C_Timer.After then

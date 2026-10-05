@@ -8,7 +8,7 @@ local ROW_HEIGHT = 16
 local TAB_HEIGHT = 24
 local TAB_BAR_PAD = 4
 local TAB_ROW_HEIGHT = TAB_HEIGHT + TAB_BAR_PAD
-local CONTEXT_BAND_HEIGHT = 14
+local CONTEXT_BAND_HEIGHT = 20
 local CONTEXT_BAND_TOP = -27
 local TAB_TOP_OFFSET = 56 + CONTEXT_BAND_HEIGHT
 local PORTRAIT_TEXTURE = "Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Art\\GearQuest-Portrait"
@@ -43,14 +43,15 @@ local SIDE_TAB_HEIGHT = 53
 local SIDE_TAB_WIDTH = 53
 local SIDE_TAB_OVERLAP = 8
 local SIDE_TAB_GAP = 10
-local SIDE_TAB_ICON_SIZE = 22
+local SIDE_TAB_ICON_SIZE = 36
 local SIDE_TAB_ICON_PAD = 8
 local SIDE_TAB_TOP = -(TAB_TOP_OFFSET - LOG_SECTION_TOP)
 local TAB_BORDER_EDGE = 12
 local FILTER_BORDER_EDGE = 8
-local LOG_TAB_ICON = "Interface\\GossipFrame\\AvailableQuestIcon"
-local SIM_TAB_ICON = "Interface\\Icons\\INV_Misc_QuestionMark"
-local SETTINGS_TAB_ICON = "Interface\\Icons\\Trade_Engineering"
+local LOG_TAB_ICON = "Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Art\\GQ-Handle-Log.png"
+local SIM_TAB_ICON = "Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Art\\GQ-Handle-Simulator.png"
+local SETTINGS_TAB_ICON = "Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Art\\GQ-Handle-Settings.png"
+local HANDLE_EDGE_GLOW = "Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Art\\GQ-Handle-InnerGlow.png"
 local SECTION_DIVIDER_HEIGHT = 3
 local METAL_EDGE = "Interface\\Tooltips\\UI-Tooltip-Border"
 local GOLD = { 0.90, 0.75, 0.28 }
@@ -223,10 +224,10 @@ end
 local SPEC_PICKER_WIDTH = 188
 local SPEC_PICKER_ROW_HEIGHT = 20
 local SPEC_PICKER_PAD = 4
-local SPEC_ICON_SIZE = 18
-local SPEC_ARROW_SIZE = 27
+local SPEC_ICON_SIZE = 22
+local SPEC_ARROW_SIZE = 30
 local SPEC_CONTROL_GAP = 2
-local SPEC_LABEL_WIDTH = 88
+local SPEC_LABEL_WIDTH = 130
 local SPEC_CONTROL_WIDTH = SPEC_LABEL_WIDTH + SPEC_CONTROL_GAP + SPEC_ICON_SIZE + SPEC_CONTROL_GAP + SPEC_ARROW_SIZE
 local SPEC_CONTROL_HEIGHT = math.max(SPEC_ICON_SIZE, SPEC_ARROW_SIZE)
 local SPEC_ROW_GAP = 2
@@ -1016,7 +1017,7 @@ local function ApplyOuterWindowBorder(frame)
     if close then
         close:SetParent(frame)
         close:ClearAllPoints()
-        close:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 4, 4)
+        close:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -6, 1)
         if close.SetFrameLevel then
             close:SetFrameLevel((frame:GetFrameLevel() or 1) + 10)
         end
@@ -1288,6 +1289,26 @@ local function StyleGoldTab(btn, selected)
         })
         fs:SetTextColor(GOLD_DIM[1], GOLD_DIM[2], GOLD_DIM[3])
     end
+
+    if not btn.gqHover then
+        local hover = btn:CreateTexture(nil, "ARTWORK", nil, 6)
+        hover:SetPoint("TOPLEFT", btn, "TOPLEFT", 2, -2)
+        hover:SetPoint("BOTTOMRIGHT", btn, "BOTTOMRIGHT", -2, 2)
+        hover:SetBlendMode("BLEND")
+        hover:SetColorTexture(0.90, 0.75, 0.28, 0.14)
+        hover:Hide()
+        btn.gqHover = hover
+        btn:HookScript("OnEnter", function(self)
+            if self.gqHover then
+                self.gqHover:Show()
+            end
+        end)
+        btn:HookScript("OnLeave", function(self)
+            if self.gqHover then
+                self.gqHover:Hide()
+            end
+        end)
+    end
 end
 
 local function CreateGoldTab(parent, name, label, width)
@@ -1374,6 +1395,15 @@ local function StyleHandleTab(btn, selected)
         })
         btn.gqIcon:SetVertexColor(0.55, 0.50, 0.42, 1)
     end
+
+    if not btn.gqEdgeGlow then
+        local glow = btn:CreateTexture(nil, "ARTWORK", nil, 4)
+        glow:SetAllPoints()
+        glow:SetTexture(HANDLE_EDGE_GLOW)
+        glow:SetBlendMode("BLEND")
+        glow:Hide()
+        btn.gqEdgeGlow = glow
+    end
 end
 
 local function CreateHandleTab(parent, name, label, iconPath)
@@ -1383,11 +1413,17 @@ local function CreateHandleTab(parent, name, label, iconPath)
     btn.gqIconPath = iconPath
     StyleHandleTab(btn, false)
     btn:SetScript("OnEnter", function(self)
+        if self.gqEdgeGlow then
+            self.gqEdgeGlow:Show()
+        end
         GameTooltip:SetOwner(self, "ANCHOR_LEFT")
         GameTooltip:SetText(self.gqLabel or "", 1, 1, 1)
         GameTooltip:Show()
     end)
-    btn:SetScript("OnLeave", function()
+    btn:SetScript("OnLeave", function(self)
+        if self.gqEdgeGlow then
+            self.gqEdgeGlow:Hide()
+        end
         GameTooltip:Hide()
     end)
     return btn
@@ -4108,7 +4144,7 @@ function GQ.Log:EnsureSpecControl(frame)
         frame.tabSpecControl:SetSize(SPEC_CONTROL_WIDTH, SPEC_CONTROL_HEIGHT)
         self:EnsureSpecArrow(frame)
         if frame.tabSpecIcon and not frame.tabSpecIcon.label then
-            frame.tabSpecIcon.label = frame.tabSpecControl:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+            frame.tabSpecIcon.label = frame.tabSpecControl:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
             frame.tabSpecIcon.label:SetPoint("LEFT", frame.tabSpecControl, "LEFT", 0, 0)
             frame.tabSpecIcon.label:SetPoint("RIGHT", frame.tabSpecIcon, "LEFT", -SPEC_CONTROL_GAP, 0)
             frame.tabSpecIcon.label:SetJustifyH("RIGHT")
@@ -4133,7 +4169,7 @@ function GQ.Log:EnsureSpecControl(frame)
     iconFrame:EnableMouse(true)
     SafeRegisterForClicks(iconFrame, "LeftButtonUp")
 
-    iconFrame.label = control:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    iconFrame.label = control:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     iconFrame.label:SetPoint("LEFT", control, "LEFT", 0, 0)
     iconFrame.label:SetPoint("RIGHT", iconFrame, "LEFT", -SPEC_CONTROL_GAP, 0)
     iconFrame.label:SetJustifyH("RIGHT")
@@ -4333,7 +4369,7 @@ function GQ.Log:UpdateContextStatus()
             or UnitFactionGroup("player")
             or "Alliance"
         text = string.format(
-            "Simulation mode: Level %d %s %s of the %s Faction.",
+            "|cffe6bf47Simulation mode:|r Level %d %s %s of the %s Faction.",
             level,
             spec,
             className,
@@ -4381,13 +4417,20 @@ function GQ.Log:EnsureContextStatus(frame)
 
     if not frame.contextStatus then
         frame.contextStatus = CreateFontStringWithFallback(frame.contextStatusBar, {
+            "GameFontNormalLarge",
             "GameFontHighlight",
             "QuestFont",
-            "GameFontNormal",
         })
         frame.contextStatus:SetJustifyH("CENTER")
         frame.contextStatus:SetJustifyV("MIDDLE")
-        frame.contextStatus:SetTextColor(0.85, 0.80, 0.68)
+        frame.contextStatus:SetTextColor(1, 0.97, 0.88, 1)
+        frame.contextStatus:SetAlpha(1)
+        if frame.contextStatus.SetShadowColor then
+            frame.contextStatus:SetShadowColor(0, 0, 0, 1)
+        end
+        if frame.contextStatus.SetShadowOffset then
+            frame.contextStatus:SetShadowOffset(1, -1)
+        end
     end
     frame.contextStatus:ClearAllPoints()
     frame.contextStatus:SetPoint("LEFT", frame.contextStatusBar, "LEFT", 0, 0)
@@ -5006,6 +5049,41 @@ function GQ.Log:EnsureTabBar(frame)
     self:UpdateTabVisuals()
 end
 
+local function ApplyFilterButtonFont(fs)
+    if not fs then
+        return
+    end
+    local btn = GQ.Log.frame and GQ.Log.frame.sourceFilterBtn
+    local buttonText = btn and btn.GetFontString and btn:GetFontString()
+    local font, size, flags
+    if buttonText then
+        font, size, flags = buttonText:GetFont()
+    end
+    if (not font or not size) and _G.GameFontHighlight then
+        font, size, flags = _G.GameFontHighlight:GetFont()
+    end
+    if font and size then
+        fs:SetFont(font, size, flags)
+    end
+end
+
+local function MouseOverFilterRow(check)
+    if not check or not check.IsShown or not check:IsShown() or not check.IsMouseOver then
+        return false
+    end
+    local right = 12
+    if check.label and check.label.GetStringWidth then
+        right = (check.label:GetStringWidth() or 0) + 20
+    end
+    local ok, over = pcall(function()
+        return check:IsMouseOver(3, 3, 4, right)
+    end)
+    if ok then
+        return over and true or false
+    end
+    return check:IsMouseOver() and true or false
+end
+
 function GQ.Log:UpdateSourceFilterButton()
     local btn = self.frame and self.frame.sourceFilterBtn
     if not btn then
@@ -5065,14 +5143,30 @@ function GQ.Log:EnsureSourceFilter(frame)
     menu:SetPoint("TOPRIGHT", frame.sourceFilterBtn, "BOTTOMRIGHT", 0, -2)
     menu:Hide()
     menu:SetScript("OnEnter", HideItemTooltip)
+    local catcher = CreateFrame("Frame", "GearQuestSourceFilterCatcher", UIParent)
+    catcher:SetAllPoints(UIParent)
+    catcher:SetFrameStrata("FULLSCREEN_DIALOG")
+    catcher:EnableMouse(true)
+    catcher:Hide()
+    catcher:SetScript("OnMouseDown", function()
+        menu:Hide()
+    end)
+    menu.catcher = catcher
+
     menu:SetScript("OnShow", function(self)
         HideItemTooltip()
         self:SetFrameStrata("TOOLTIP")
         self:SetFrameLevel(50)
+        if self.catcher then
+            self.catcher:Show()
+        end
     end)
     menu:SetScript("OnHide", function(self)
         if self.profBranch then
             self.profBranch:Hide()
+        end
+        if self.catcher then
+            self.catcher:Hide()
         end
     end)
     frame.sourceFilterMenu = menu
@@ -5099,7 +5193,8 @@ function GQ.Log:EnsureSourceFilter(frame)
     end
     branch:Hide()
     branch.rows = {}
-    branch.empty = branch:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    branch.empty = branch:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    ApplyFilterButtonFont(branch.empty)
     branch.empty:SetPoint("LEFT", branch, "LEFT", 12, 0)
     branch.empty:SetText("No profession hunts")
     branch:SetScript("OnEnter", function()
@@ -5133,6 +5228,7 @@ function GQ.Log:EnsureSourceFilter(frame)
     end
 
     local previous
+    local menuWidth = 168
     for _, opt in ipairs(SOURCE_FILTERS) do
         local check = CreateFrame("CheckButton", nil, menu, "UICheckButtonTemplate")
         check:SetSize(22, 22)
@@ -5142,10 +5238,15 @@ function GQ.Log:EnsureSourceFilter(frame)
             check:SetPoint("TOPLEFT", menu, "TOPLEFT", 8, -6)
         end
         check.sourceId = opt.id
-        local label = check:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        local label = check:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+        ApplyFilterButtonFont(label)
         label:SetPoint("LEFT", check, "RIGHT", 2, 0)
         label:SetText(opt.label)
         check.label = label
+        local rowWidth = 40 + (label:GetStringWidth() or 90)
+        if rowWidth > menuWidth then
+            menuWidth = rowWidth
+        end
         check:SetHitRectInsets(0, -((label:GetStringWidth() or 90) + 8), -2, -2)
         check:SetScript("OnEnter", function(self)
             HideItemTooltip()
@@ -5156,7 +5257,12 @@ function GQ.Log:EnsureSourceFilter(frame)
             if self.sourceId == "profession" then
                 log:ShowProfessionBranch(self)
             else
-                log:ScheduleHideProfessionBranch()
+                log._profRowHot = false
+                log._profBranchHot = false
+                log._profLeaveAt = nil
+                if menu.profBranch then
+                    menu.profBranch:Hide()
+                end
             end
         end)
         check:SetScript("OnLeave", function(self)
@@ -5190,6 +5296,33 @@ function GQ.Log:EnsureSourceFilter(frame)
         end
         previous = check
     end
+    menu:SetWidth(menuWidth)
+
+    menu:SetScript("OnUpdate", function(self)
+        local branch = self.profBranch
+        if not branch or not branch:IsShown() then
+            return
+        end
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if not log then
+            return
+        end
+        local overBranch = branch.IsMouseOver and branch:IsMouseOver(10, 10, 10, 10)
+        if MouseOverFilterRow(self.profRow) or overBranch then
+            log._profLeaveAt = nil
+            return
+        end
+        if not log._profLeaveAt then
+            log._profLeaveAt = GetTime()
+            return
+        end
+        if GetTime() - log._profLeaveAt > 0.2 then
+            log._profRowHot = false
+            log._profBranchHot = false
+            log._profLeaveAt = nil
+            branch:Hide()
+        end
+    end)
 
     menu.sync = function()
         local hidden = GQ.Log:GetHiddenSources()
@@ -5213,6 +5346,13 @@ function GQ.Log:SyncProfessionRowLabel(check)
     local text = check:GetChecked() and "Profession >" or "Profession"
     check.label:SetText(text)
     check:SetHitRectInsets(0, -((check.label:GetStringWidth() or 90) + 8), -2, -2)
+    local menu = self.frame and self.frame.sourceFilterMenu
+    if menu then
+        local needed = 40 + (check.label:GetStringWidth() or 90)
+        if needed > (menu:GetWidth() or 0) then
+            menu:SetWidth(needed)
+        end
+    end
 end
 
 function GQ.Log:PopulateProfessionBranch(menu)
@@ -5233,7 +5373,8 @@ function GQ.Log:PopulateProfessionBranch(menu)
             else
                 row:SetPoint("TOPLEFT", branch.rows[i - 1], "BOTTOMLEFT", 0, 2)
             end
-            local label = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+            local label = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+            ApplyFilterButtonFont(label)
             label:SetPoint("LEFT", row, "RIGHT", 2, 0)
             row.label = label
             row:SetScript("OnEnter", function()
@@ -5581,8 +5722,29 @@ function GQ.Log:EnsureSimulatorPage(frame)
     frame.simResetBtn = resetBtn
     resetBtn:SetScript("OnClick", function()
         local log = _G.GearQuest and _G.GearQuest.Log
-        if log then
+        if log and GQ.IsPreviewEnabled and GQ:IsPreviewEnabled() then
             log:ResetSimulator()
+        end
+    end)
+
+    -- A disabled button does not receive mouse events, so the hover tip sits on this frame.
+    local resetHover = CreateFrame("Frame", nil, simDetail)
+    resetHover:SetAllPoints(resetBtn)
+    resetHover:EnableMouse(true)
+    resetHover:SetFrameLevel((resetBtn:GetFrameLevel() or 1) + 5)
+    resetHover:Hide()
+    frame.simResetHover = resetHover
+    resetHover:SetScript("OnEnter", function(self)
+        if not GameTooltip then
+            return
+        end
+        GameTooltip:SetOwner(self, "ANCHOR_TOP")
+        GameTooltip:SetText("You are already seeing your character unsimulated.", 1, 1, 1, 1, true)
+        GameTooltip:Show()
+    end)
+    resetHover:SetScript("OnLeave", function()
+        if GameTooltip then
+            GameTooltip:Hide()
         end
     end)
 
@@ -5670,6 +5832,17 @@ function GQ.Log:EnsureSettingsPage(frame)
     ApplyMetalEdge(list, 16)
     frame.settingsList = list
 
+    local function WireSettingsListHover(btn)
+        if not btn or btn.gqHover then
+            return
+        end
+        local hover = btn:CreateTexture(nil, "HIGHLIGHT")
+        hover:SetAllPoints()
+        hover:SetColorTexture(0.62, 0.50, 0.18, 0.55)
+        btn:SetHighlightTexture(hover)
+        btn.gqHover = hover
+    end
+
     local general = CreateFrame("Button", "GearQuestSettingsGeneral", list)
     general:SetHeight(22)
     general:SetPoint("TOPLEFT", list, "TOPLEFT", 6, -8)
@@ -5689,6 +5862,7 @@ function GQ.Log:EnsureSettingsPage(frame)
             log:SetSettingsSection("general")
         end
     end)
+    WireSettingsListHover(general)
     frame.settingsGeneralBtn = general
 
     local hunts = CreateFrame("Button", "GearQuestSettingsHunts", list)
@@ -5710,12 +5884,36 @@ function GQ.Log:EnsureSettingsPage(frame)
             log:SetSettingsSection("hunts")
         end
     end)
+    WireSettingsListHover(hunts)
     frame.settingsHuntsBtn = hunts
+
+    local commands = CreateFrame("Button", "GearQuestSettingsCommands", list)
+    commands:SetHeight(22)
+    commands:SetPoint("TOPLEFT", hunts, "BOTTOMLEFT", 0, -2)
+    commands:SetPoint("TOPRIGHT", hunts, "BOTTOMRIGHT", 0, -2)
+    commands.highlight = commands:CreateTexture(nil, "BACKGROUND")
+    commands.highlight:SetAllPoints()
+    commands.highlight:SetColorTexture(0.28, 0.22, 0.08, 0.85)
+    commands.highlight:Hide()
+    commands.text = commands:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    commands.text:SetPoint("LEFT", commands, "LEFT", 8, 0)
+    commands.text:SetPoint("RIGHT", commands, "RIGHT", -8, 0)
+    commands.text:SetJustifyH("LEFT")
+    commands.text:SetText("GearQuest Commands")
+    commands.text:SetTextColor(GOLD[1], GOLD[2], GOLD[3])
+    commands:SetScript("OnClick", function()
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if log then
+            log:SetSettingsSection("commands")
+        end
+    end)
+    WireSettingsListHover(commands)
+    frame.settingsCommandsBtn = commands
 
     local credits = CreateFrame("Button", "GearQuestSettingsCredits", list)
     credits:SetHeight(22)
-    credits:SetPoint("TOPLEFT", hunts, "BOTTOMLEFT", 0, -2)
-    credits:SetPoint("TOPRIGHT", hunts, "BOTTOMRIGHT", 0, -2)
+    credits:SetPoint("TOPLEFT", commands, "BOTTOMLEFT", 0, -2)
+    credits:SetPoint("TOPRIGHT", commands, "BOTTOMRIGHT", 0, -2)
     credits.highlight = credits:CreateTexture(nil, "BACKGROUND")
     credits.highlight:SetAllPoints()
     credits.highlight:SetColorTexture(0.28, 0.22, 0.08, 0.85)
@@ -5732,6 +5930,7 @@ function GQ.Log:EnsureSettingsPage(frame)
             log:SetSettingsSection("credits")
         end
     end)
+    WireSettingsListHover(credits)
     frame.settingsCreditsBtn = credits
 
     local detail = CreateFrame("Frame", nil, page)
@@ -5890,6 +6089,56 @@ function GQ.Log:EnsureSettingsPage(frame)
     toastHint:Hide()
     frame.settingsToastHint = toastHint
 
+    local arrowLabel = CreateFontStringWithFallback(detail, QUEST_DETAIL_TITLE_FONTS)
+    arrowLabel:SetJustifyH("LEFT")
+    arrowLabel:SetText("Hide upgrade arrows")
+    arrowLabel:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    frame.settingsArrowLabel = arrowLabel
+
+    local arrowHit = CreateFrame("Button", nil, detail)
+    arrowHit:SetPoint("TOPLEFT", toastHint, "BOTTOMLEFT", 0, -16)
+    arrowHit:SetSize(math.max(arrowLabel:GetStringWidth() or 0, 1) + 4, math.max(arrowLabel:GetStringHeight() or 0, 18))
+    arrowLabel:SetParent(arrowHit)
+    arrowLabel:ClearAllPoints()
+    arrowLabel:SetPoint("LEFT", arrowHit, "LEFT", 0, 0)
+    arrowHit:Hide()
+    frame.settingsArrowLabelHit = arrowHit
+
+    local function ApplyArrowCheck(checked)
+        GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+        GearQuestForeverDB.settings.hideUpgradeArrows = checked and true or false
+        if GQ.Indicator and GQ.Indicator.ApplyArrowVisibility then
+            GQ.Indicator:ApplyArrowVisibility()
+        end
+    end
+
+    local arrowCheck = CreateSettingsCheck(detail, "")
+    arrowCheck:SetPoint("RIGHT", arrowHit, "LEFT", -6, 0)
+    if arrowCheck.text then
+        arrowCheck.text:SetText("")
+        arrowCheck.text:Hide()
+    end
+    arrowCheck:SetScript("OnClick", function(self)
+        ApplyArrowCheck(self:GetChecked())
+    end)
+    arrowHit:SetScript("OnClick", function()
+        local checked = not arrowCheck:GetChecked()
+        arrowCheck:SetChecked(checked)
+        ApplyArrowCheck(checked)
+    end)
+    arrowCheck:Hide()
+    frame.settingsArrowCheck = arrowCheck
+
+    local arrowHint = CreateFontStringWithFallback(detail, SETTINGS_NOTE_FONTS)
+    arrowHint:SetPoint("TOPLEFT", arrowHit, "BOTTOMLEFT", 0, -4)
+    arrowHint:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
+    arrowHint:SetJustifyH("LEFT")
+    arrowHint:SetWordWrap(true)
+    arrowHint:SetText("Removes the green arrow from the quest log, quest giver, loot window, and vendors.")
+    arrowHint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
+    arrowHint:Hide()
+    frame.settingsArrowHint = arrowHint
+
     local creditsBody = CreateFontStringWithFallback(detail, QUEST_DETAIL_BODY_FONTS)
     creditsBody:SetPoint("TOPLEFT", detail, "TOPLEFT", 16, -18)
     creditsBody:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
@@ -5899,11 +6148,153 @@ function GQ.Log:EnsureSettingsPage(frame)
     creditsBody:Hide()
     frame.settingsCreditsBody = creditsBody
 
+    local commandScroll = CreatePanelScrollFrame("GearQuestSettingsCommandsScroll", detail)
+    commandScroll:Hide()
+    frame.settingsCommandsScroll = commandScroll
+
+    local commandChild = CreateFrame("Frame", nil, commandScroll)
+    commandChild:SetSize(20, 20)
+    commandScroll:SetScrollChild(commandChild)
+    frame.settingsCommandsChild = commandChild
+
+    local commandTitle = CreateFontStringWithFallback(commandChild, QUEST_DETAIL_TITLE_FONTS)
+    commandTitle:SetPoint("TOPLEFT", commandChild, "TOPLEFT", 4, -2)
+    commandTitle:SetJustifyH("LEFT")
+    commandTitle:SetText("GearQuest Commands")
+    commandTitle:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    frame.settingsCommandsTitle = commandTitle
+
+    local commandEntries = {
+        { "/gq", "Opens or closes the GearQuest window. /gearquest does the same." },
+        { "/gq log", "Opens or closes the log. Same as /gq." },
+        { "/gq help", "Prints the command list in chat." },
+        { "/gq track", "Tracks the upgrade you have selected in the log." },
+        { "/gq untrack", "Stops tracking the selected upgrade." },
+        { "/gq set", "Shows the preview class, level, faction, and spec." },
+        { "/gq set on", "Shows upgrades for the preview character instead of yours." },
+        { "/gq set off", "Returns the lists to your own character." },
+        { "/gq set me", "Copies your class, level, and faction into the preview. /gq me does the same." },
+        { "/gq class hunter", "Sets the preview class. Use a class name, such as mage or shaman." },
+        { "/gq level 37", "Sets the preview level from 1 to 60. /gq lvl 37 does the same." },
+        { "/gq faction alliance", "Sets the preview faction to Alliance or Horde." },
+        { "/gq spec enhancement", "Sets the specialization. Available from level 10." },
+        { "/gq wipe data", "Clears tracked, completed, and obtained hunts for this character. Preview and these settings stay." },
+    }
+    local commandRows = {}
+    local commandAnchor = commandTitle
+    for i = 1, #commandEntries do
+        local entry = commandEntries[i]
+        local cmd = CreateFontStringWithFallback(commandChild, QUEST_DETAIL_BODY_FONTS)
+        cmd:SetPoint("TOPLEFT", commandAnchor, "BOTTOMLEFT", 0, i == 1 and -12 or -10)
+        cmd:SetJustifyH("LEFT")
+        cmd:SetWordWrap(true)
+        cmd:SetText(entry[1])
+        cmd:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+        if cmd.SetShadowColor then
+            cmd:SetShadowColor(0, 0, 0, 1)
+        end
+        if cmd.SetShadowOffset then
+            cmd:SetShadowOffset(1, -1)
+        end
+        local expl = CreateFontStringWithFallback(commandChild, QUEST_DETAIL_BODY_FONTS)
+        expl:SetPoint("TOPLEFT", cmd, "BOTTOMLEFT", 0, -1)
+        expl:SetJustifyH("LEFT")
+        expl:SetWordWrap(true)
+        expl:SetText(entry[2])
+        expl:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+        if expl.SetShadowOffset then
+            expl:SetShadowOffset(0, 0)
+        end
+        commandRows[#commandRows + 1] = { cmd = cmd, expl = expl }
+        commandAnchor = expl
+    end
+    frame.settingsCommandRows = commandRows
+
+    WireMouseWheel(commandScroll, commandScroll)
+    WireMouseWheel(detail, commandScroll)
+    WireMouseWheel(commandChild, commandScroll)
+
     return page
 end
 
+function GQ.Log:LayoutSettingsCommands(frame)
+    local scroll = frame and frame.settingsCommandsScroll
+    local detail = frame and frame.settingsDetail
+    if not scroll or not detail then
+        return
+    end
+
+    scroll:ClearAllPoints()
+    scroll:SetPoint("TOPLEFT", detail, "TOPLEFT", 14, -14)
+    scroll:SetPoint("BOTTOMRIGHT", detail, "BOTTOMRIGHT", -(14 + SCROLLBAR_WIDTH), 12)
+
+    local width = scroll:GetWidth()
+    if not width or width < 40 then
+        width = RIGHT_COLUMN_WIDTH - 56
+    end
+    local title = frame.settingsCommandsTitle
+    local rows = frame.settingsCommandRows
+    local child = frame.settingsCommandsChild
+    local textWidth = math.max(width - 8, 40)
+    if title then
+        title:SetWidth(textWidth)
+    end
+    if rows then
+        for i = 1, #rows do
+            rows[i].cmd:SetWidth(textWidth)
+            rows[i].expl:SetWidth(textWidth)
+        end
+    end
+    if child then
+        local function lineHeight(fs, fallback)
+            local h = fs and fs.GetStringHeight and fs:GetStringHeight() or 0
+            if not h or h < 1 then
+                return fallback
+            end
+            return h
+        end
+        local height = lineHeight(title, 18) + 12
+        if rows then
+            for i = 1, #rows do
+                height = height + lineHeight(rows[i].cmd, 14) + 1 + lineHeight(rows[i].expl, 14)
+                if i < #rows then
+                    height = height + 10
+                end
+            end
+        end
+        child:SetWidth(math.max(width, 40))
+        child:SetHeight(height + 16)
+    end
+    UpdateScrollChildRect(scroll)
+
+    local barName = scroll.GetName and scroll:GetName()
+    local bar = barName and _G[barName .. "ScrollBar"]
+    if self.settingsSection == "commands" then
+        scroll:Show()
+        ApplyScrollBarVisibility(scroll)
+        if bar and bar.SetFrameLevel and scroll.GetFrameLevel then
+            bar:SetFrameLevel(scroll:GetFrameLevel() + 5)
+        end
+    else
+        scroll:Hide()
+        if bar then
+            bar:Hide()
+        end
+    end
+
+    if not frame.settingsCommandsMeasured and C_Timer and C_Timer.After then
+        frame.settingsCommandsMeasured = true
+        C_Timer.After(0, function()
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if log and log.frame then
+                log:LayoutSettingsCommands(log.frame)
+            end
+        end)
+    end
+end
+
 function GQ.Log:SetSettingsSection(section)
-    if section ~= "hunts" and section ~= "credits" then
+    if section ~= "hunts" and section ~= "credits" and section ~= "commands" then
         section = "general"
     end
     self.settingsSection = section
@@ -5924,6 +6315,7 @@ function GQ.Log:SetSettingsSection(section)
 
     setHighlight(frame.settingsGeneralBtn, section == "general")
     setHighlight(frame.settingsHuntsBtn, section == "hunts")
+    setHighlight(frame.settingsCommandsBtn, section == "commands")
     setHighlight(frame.settingsCreditsBtn, section == "credits")
 
     local function setShown(widgets, on)
@@ -5951,6 +6343,9 @@ function GQ.Log:SetSettingsSection(section)
         frame.settingsToastLabelHit,
         frame.settingsToastCheck,
         frame.settingsToastHint,
+        frame.settingsArrowLabelHit,
+        frame.settingsArrowCheck,
+        frame.settingsArrowHint,
     }, section == "hunts")
     if frame.settingsCreditsBody then
         if section == "credits" then
@@ -5959,6 +6354,7 @@ function GQ.Log:SetSettingsSection(section)
             frame.settingsCreditsBody:Hide()
         end
     end
+    self:LayoutSettingsCommands(frame)
 end
 
 function GQ.Log:LayoutSettingsPage(frame)
@@ -5977,6 +6373,7 @@ function GQ.Log:LayoutSettingsPage(frame)
     frame.settingsDetail:SetPoint("TOPLEFT", frame.settingsPage, "TOPLEFT", LEFT_COLUMN_WIDTH + COLUMN_GAP, LOG_SECTION_TOP)
     frame.settingsDetail:SetPoint("BOTTOMRIGHT", frame.settingsPage, "BOTTOMRIGHT", 0, FOOTER_OFFSET)
     ApplyMetalEdge(frame.settingsDetail, 16)
+    self:LayoutSettingsCommands(frame)
 end
 
 function GQ.Log:RefreshSettings()
@@ -6015,6 +6412,24 @@ function GQ.Log:RefreshSettings()
         end
         if height and height > 1 then
             artHit:SetHeight(height)
+        end
+    end
+
+    local arrowCheck = frame.settingsArrowCheck
+    if arrowCheck then
+        local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+        arrowCheck:SetChecked(settings and settings.hideUpgradeArrows and true or false)
+    end
+    local arrowLabel = frame.settingsArrowLabel
+    local arrowHit = frame.settingsArrowLabelHit
+    if arrowLabel and arrowHit and arrowLabel.GetStringWidth then
+        local width = arrowLabel:GetStringWidth()
+        local height = arrowLabel.GetStringHeight and arrowLabel:GetStringHeight()
+        if width and width > 1 then
+            arrowHit:SetWidth(width + 4)
+        end
+        if height and height > 1 then
+            arrowHit:SetHeight(height)
         end
     end
 
@@ -6166,6 +6581,30 @@ function GQ.Log:RefreshSimulator()
     )
     if self.frame.simStatus then
         self.frame.simStatus:SetText(viewing)
+    end
+
+    self:UpdateSimulatorResetButton()
+end
+
+function GQ.Log:UpdateSimulatorResetButton()
+    local frame = self.frame
+    local btn = frame and frame.simResetBtn
+    if not btn then
+        return
+    end
+    local simulated = GQ.IsPreviewEnabled and GQ:IsPreviewEnabled()
+    btn:SetEnabled(simulated and true or false)
+    local hover = frame.simResetHover
+    if not hover then
+        return
+    end
+    if simulated then
+        hover:Hide()
+        if GameTooltip and GameTooltip.GetOwner and GameTooltip:GetOwner() == hover then
+            GameTooltip:Hide()
+        end
+    else
+        hover:Show()
     end
 end
 
@@ -6419,7 +6858,7 @@ function GQ.Log:Init()
                 insets = { left = 11, right = 12, top = 12, bottom = 11 },
             })
         end
-        CreateFrame("Button", nil, frame, "UIPanelCloseButton"):SetPoint("TOPRIGHT", frame, "TOPRIGHT", -4, -4)
+        CreateFrame("Button", nil, frame, "UIPanelCloseButton"):SetPoint("TOPRIGHT", frame, "TOPRIGHT", -6, 1)
     end
 
     frame:SetSize(FRAME_WIDTH, FRAME_HEIGHT)

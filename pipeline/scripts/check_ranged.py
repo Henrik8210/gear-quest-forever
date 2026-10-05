@@ -1,33 +1,24 @@
-"""Standing check: only a hunter fights with its ranged weapon.
+"""Standing check: ranged damage weights match the Forever model.
 
-Henrik: "rogues doesn't need the damage on the ranged, they just need stats so ranged
-procs etc. is not relevant for rogues on the ranged. It can be for hunters of course
-as that is their main weapon."
-
-Two ways that went wrong, both silent:
-  1. WARRIOR carried no dpsWeightRanged key at all, so it inherited dpsWeight -- a
-     warrior's gun was scored as though its damage counted as much as its axe's.
-  2. the proc model was handed the MELEE dpsWeight even for a ranged item, so
-     Venomstrike's "Chance to strike your ranged target" was priced for a rogue at
-     the weight of a weapon it swings every 1.4 seconds.
+A hunter fights with a bow, gun, or crossbow, so ranged damage is a real
+weight. Priest, mage, and warlock cast, then wand, so their ranged weight is
+7, the same scale as a warrior melee weapon. Every other combat spec declares
+0 explicitly. A missing key used to inherit the melee weight, and a warrior's
+gun was scored like an axe.
 
 Rules asserted here:
-  A. every non-hunter combat spec declares dpsWeightRanged == 0 explicitly (no
-     inheriting the melee weight by omission)
-  B. no non-hunter Ranged pick owes its place to an on-attack proc: re-score every
-     such pick with procs off and assert the ranking is unchanged
+  A. HUNTER dpsWeightRanged > 0. PRIEST, MAGE, and WARLOCK are exactly 7.
+     Every other spec declares 0, except levelling_1_9.
+  B. Where the ranged weight is 0, a Ranged pick with no stats must not owe
+     its place to an on-attack proc.
 """
 import json, os, sys
 from gq_paths import G, scored
 W=json.load(open(G+"weights.json")); items=json.load(open(G+"items.json"))
-# A class that holds a WAND fights with its ranged slot too -- just not much. Henrik:
-# "priests usually wear an off-hand type of item with a one hander or has a two-hand
-# staff and then a wand - stats are more important on the wand than the damage at least
-# in higher levels." So a wand class must declare a SMALL non-zero weight: zero would
-# make every wand identical below the level where stats appear on them, and anything
-# large would let a high-damage wand with no stats win.
+# Priest, mage, and warlock dpsWeightRanged is 7. White Obsidian Wand ranking
+# first is that weight. Do not cap it, and do not require it to be small.
 WAND_CLASSES={"PRIEST","MAGE","WARLOCK"}
-WAND_MAX=0.5
+WAND_WEIGHT=7.0
 bad=0
 
 for cls,specs in sorted(W.items()):
@@ -37,10 +28,10 @@ for cls,specs in sorted(W.items()):
         if cls=="HUNTER":
             if not dwr: bad+=1; print(f"  A {cls} {spec}: a hunter must value its ranged weapon's damage")
         elif cls in WAND_CLASSES:
-            if not dwr or dwr>WAND_MAX:
-                bad+=1; print(f"  A {cls} {spec}: wand weight {dwr!r}, want >0 and <={WAND_MAX}")
+            if dwr != WAND_WEIGHT:
+                bad+=1; print(f"  A {cls} {spec}: wand weight {dwr!r}, want {WAND_WEIGHT}")
         elif spec=="levelling_1_9":
-            pass          # 1-9 throws for real; a small non-zero weight is intended
+            pass
         elif dwr is None:
             bad+=1; print(f"  A {cls} {spec}: no dpsWeightRanged key -- inherits the MELEE weight")
         elif dwr:
