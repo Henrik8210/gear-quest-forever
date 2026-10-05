@@ -1101,7 +1101,10 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                 # warrior can dual wield mechanically, so one-handers appeared on its
                 # off-hand notable shelf, where the answer is always a shield.
                 _dw=dual_wield_level(cls,spec_key)
-                if (it["inv"]==13 and it["cls"]==2 and _dw is not None and level>=_dw
+                # A Forever tooltip that says "Main Hand" is that hand only.
+                # InventoryType 13 is the either-hand weapon. Do not copy the other.
+                if (it["inv"]==13 and it.get("slot") != "MainHand" and it["cls"]==2
+                        and _dw is not None and level>=_dw
                         and style in ("onehand_dual","twohand_or_onehand")):
                     # s was built with the MAIN-hand weight; rebuild the dps part
                     # at the off-hand rate so both routes into SecondaryHand agree.

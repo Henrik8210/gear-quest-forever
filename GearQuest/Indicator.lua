@@ -1801,8 +1801,8 @@ function GQ.Indicator:Init()
                 if GQ.Log and GQ.Log.ReleaseMouseForGameUI then
                     GQ.Log:ReleaseMouseForGameUI()
                 end
-                if GQ.Popup and GQ.Popup.dismissLayer and (not CharacterFrame or not CharacterFrame:IsShown()) then
-                    GQ.Popup.dismissLayer:Hide()
+                if GQ.Popup and GQ.Popup.Hide and (not CharacterFrame or not CharacterFrame:IsShown()) then
+                    GQ.Popup:Hide()
                 end
                 if GQ.Tracker and GQ.Tracker.ClampRowMouse then
                     GQ.Tracker:ClampRowMouse()

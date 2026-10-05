@@ -503,7 +503,7 @@ function GQ.Spec:EnsureTalentRefresh()
         return
     end
     local frame = CreateFrame("Frame")
-    local function onTalentChange()
+    local function applyTalentChange()
         if GQ.Data and GQ.Data.InvalidateSpecCache then
             GQ.Data:InvalidateSpecCache()
         end
@@ -513,6 +513,31 @@ function GQ.Spec:EnsureTalentRefresh()
         if GQ.RefreshUI then
             GQ:RefreshUI({ reason = "spec" })
         end
+    end
+    local function onTalentChange()
+        -- A ding fires this even when no talent changed, and that reload is the hitch.
+        -- On-demand keeps the current list until Level up!. A real spec change while
+        -- caught up still reloads, one frame later so the ding can mark the hold first.
+        if GQ.IsLevelUpOnDemand and GQ:IsLevelUpOnDemand() then
+            if frame._talentDefer then
+                return
+            end
+            frame._talentDefer = true
+            local function finish()
+                frame._talentDefer = nil
+                if GQ.LevelUpWorkHeld and GQ:LevelUpWorkHeld() then
+                    return
+                end
+                applyTalentChange()
+            end
+            if C_Timer and C_Timer.After then
+                C_Timer.After(0, finish)
+            else
+                finish()
+            end
+            return
+        end
+        applyTalentChange()
     end
     GQ.RegisterEvent(frame, "PLAYER_TALENT_UPDATE")
     GQ.RegisterEvent(frame, "CHARACTER_POINTS_CHANGED")

@@ -18,11 +18,15 @@ function GQ.PaperDoll:Init()
         if button and not button.GearQuestHooked then
             button.GearQuestHooked = true
             button:HookScript("OnClick", function(self, mouseButton)
+                local gq = _G.GearQuest
                 if mouseButton == "RightButton" and CharacterFrame and CharacterFrame:IsShown() then
-                    local gq = _G.GearQuest
                     if gq and gq.Popup then
                         gq.Popup:ShowForSlot(slotName, self)
                     end
+                    return
+                end
+                if gq and gq.Popup and gq.Popup.container and gq.Popup.container:IsShown() then
+                    gq.Popup:Hide()
                 end
             end)
         end

@@ -1142,9 +1142,11 @@ local function LayoutOpenCover(btn, opts, fill, edgeSize)
         cover:SetWidth(coverSize)
         cover:Show()
     elseif opts.hideBottom then
-        cover:SetPoint("BOTTOMLEFT", btn, "BOTTOMLEFT", 0, 0)
-        cover:SetPoint("BOTTOMRIGHT", btn, "BOTTOMRIGHT", 0, 0)
-        cover:SetHeight(coverSize)
+        -- Just inside the side metal, so the opening meets the borders.
+        cover:SetPoint("BOTTOMLEFT", btn, "BOTTOMLEFT", 2, 0)
+        cover:SetPoint("BOTTOMRIGHT", btn, "BOTTOMRIGHT", -2, 0)
+        cover:SetHeight(edgeSize)
+        cover:SetDrawLayer("OVERLAY", 5)
         cover:Show()
     else
         cover:Hide()
@@ -1284,10 +1286,14 @@ local function StyleGoldTab(btn, selected)
         LayoutTabChrome(btn, {
             fill = { 0.05, 0.05, 0.05, 1 },
             border = GOLD_DIM,
-            hideBottom = true,
+            hideBottom = false,
             edgeSize = FILTER_BORDER_EDGE,
         })
         fs:SetTextColor(GOLD_DIM[1], GOLD_DIM[2], GOLD_DIM[3])
+    end
+
+    if btn.gqOpenMask then
+        btn.gqOpenMask:Hide()
     end
 
     if not btn.gqHover then
@@ -1308,6 +1314,13 @@ local function StyleGoldTab(btn, selected)
                 self.gqHover:Hide()
             end
         end)
+    end
+    -- The open bottom edge sits above ARTWORK. Lift the wash over it, then the label.
+    if btn.gqHover then
+        btn.gqHover:SetDrawLayer("OVERLAY", 6)
+    end
+    if fs.SetDrawLayer then
+        fs:SetDrawLayer("OVERLAY", 7)
     end
 end
 
@@ -2069,6 +2082,7 @@ function GQ.Log:SetPageTab(tab)
     self:HideSpecPicker()
     self:ApplyPageTab()
     if self:GetPageTab() == "simulator" then
+        self:SeedSimulatorFromCharacter()
         self:RefreshSimulator()
     elseif self:GetPageTab() == "settings" then
         self:RefreshSettings()
@@ -2249,6 +2263,64 @@ end
 
 function GQ.Log:GetBisProfessionNames()
     return PROFESSION_FILTERS
+end
+
+function GQ.Log:CopyFilterDraft()
+    local sources = {}
+    local hidden = self:GetHiddenSources()
+    for _, opt in ipairs(SOURCE_FILTERS) do
+        if hidden[opt.id] then
+            sources[opt.id] = true
+        end
+    end
+    local professions = {}
+    local hiddenProfs = self:GetHiddenProfessions()
+    for i = 1, #PROFESSION_FILTERS do
+        local name = PROFESSION_FILTERS[i]
+        if hiddenProfs[name] then
+            professions[name] = true
+        end
+    end
+    self._filterDraft = { sources = sources, professions = professions }
+    return self._filterDraft
+end
+
+function GQ.Log:CommitSourceFilter()
+    self:UpdateSourceFilterButton()
+    self:InvalidateSourceFilterCache()
+    self:ScheduleListRefresh()
+    if GQ.Indicator and GQ.Indicator.ScheduleRebuildCache then
+        GQ.Indicator:ScheduleRebuildCache()
+    end
+end
+
+function GQ.Log:ApplyFilterDraft()
+    local draft = self._filterDraft
+    if not draft then
+        return
+    end
+    local hidden = self:GetHiddenSources()
+    for _, opt in ipairs(SOURCE_FILTERS) do
+        if draft.sources[opt.id] then
+            hidden[opt.id] = true
+        else
+            hidden[opt.id] = nil
+        end
+    end
+    local hiddenProfs = self:GetHiddenProfessions()
+    local clear = {}
+    for name in pairs(hiddenProfs) do
+        clear[#clear + 1] = name
+    end
+    for i = 1, #clear do
+        hiddenProfs[clear[i]] = nil
+    end
+    for name, hiddenName in pairs(draft.professions) do
+        if hiddenName then
+            hiddenProfs[name] = true
+        end
+    end
+    self:CommitSourceFilter()
 end
 
 function GQ.Log:InvalidateActiveListCaches()
@@ -3396,6 +3468,8 @@ function GQ.Log:CollectAutoCompletionCandidates()
         end
     end
 
+    -- The pinned list is already cached, so this compares bags to the list
+    -- on screen. Building the next level stays on the Level up! click.
     local classFile = GQ:GetEffectiveClass()
     if classFile and GQ.Data.GetSlotsForClass then
         for _, slotName in ipairs(GQ.Data:GetSlotsForClass(classFile)) do
@@ -4283,6 +4357,112 @@ function GQ.Log:RepositionSpecButton(frame)
     end
 end
 
+function GQ.Log:LayoutListTopOpening()
+    local frame = self.frame
+    local list = frame and frame.listInset
+    local top = list and list.TopEdge
+    if not list or not top then
+        return
+    end
+
+    if not list.gqTopLeft then
+        list.gqTopLeft = list:CreateTexture(nil, "BORDER")
+        list.gqTopRight = list:CreateTexture(nil, "BORDER")
+    end
+    local leftTex = list.gqTopLeft
+    local rightTex = list.gqTopRight
+
+    local function copyEdge(from, to)
+        local path = from.GetTexture and from:GetTexture()
+        if path then
+            to:SetTexture(path)
+        end
+        if from.GetTexCoord and to.SetTexCoord then
+            local u1, v1, u2, v2, u3, v3, u4, v4 = from:GetTexCoord()
+            if u3 then
+                to:SetTexCoord(u1, v1, u2, v2, u3, v3, u4, v4)
+            elseif u2 then
+                to:SetTexCoord(u1, v1, u2, v2)
+            end
+        end
+        if from.GetVertexColor and to.SetVertexColor then
+            local r, g, b, a = from:GetVertexColor()
+            if r then
+                to:SetVertexColor(r, g, b, a or 1)
+            end
+        end
+        if from.GetDrawLayer and to.SetDrawLayer then
+            local layer, sub = from:GetDrawLayer()
+            if layer then
+                to:SetDrawLayer(layer, sub)
+            end
+        end
+    end
+
+    local function restore()
+        top:Show()
+        leftTex:Hide()
+        rightTex:Hide()
+    end
+
+    local page = self.GetPageTab and self:GetPageTab()
+    local which = self.GetListTab and self:GetListTab()
+    local tab = which == "completed" and frame.tabCompleted
+        or which == "removed" and frame.tabRemoved
+        or frame.tabActive
+    if page ~= "log" or not tab or not tab:IsShown() or not list:IsShown() then
+        restore()
+        return
+    end
+
+    local listLeft, listRight = list:GetLeft(), list:GetRight()
+    local tabLeft, tabRight = tab:GetLeft(), tab:GetRight()
+    if not listLeft or not listRight or not tabLeft or not tabRight then
+        if C_Timer and C_Timer.After and not self.gqTopOpeningQueued then
+            self.gqTopOpeningQueued = true
+            C_Timer.After(0, function()
+                self.gqTopOpeningQueued = nil
+                if self.LayoutListTopOpening then
+                    self:LayoutListTopOpening()
+                end
+            end)
+        end
+        return
+    end
+
+    copyEdge(top, leftTex)
+    copyEdge(top, rightTex)
+    top:Hide()
+
+    local height = top:GetHeight()
+    if not height or height < 1 then
+        height = 16
+    end
+    local corner = height
+    local leftW = (tabLeft - listLeft) - corner
+    local rightW = (listRight - tabRight) - corner
+
+    leftTex:ClearAllPoints()
+    leftTex:SetPoint("TOPLEFT", list, "TOPLEFT", corner, 0)
+    leftTex:SetHeight(height)
+    if leftW > 1 then
+        leftTex:SetWidth(leftW)
+        leftTex:Show()
+    else
+        leftTex:Hide()
+    end
+
+    rightTex:ClearAllPoints()
+    rightTex:SetPoint("TOPRIGHT", list, "TOPRIGHT", -corner, 0)
+    rightTex:SetHeight(height)
+    if rightW > 1 then
+        rightTex:SetWidth(rightW)
+        rightTex:Show()
+    else
+        rightTex:Hide()
+    end
+end
+
 function GQ.Log:UpdateTabVisuals()
     if not self.frame or not self.frame.tabActive then
         return
@@ -4300,6 +4480,7 @@ function GQ.Log:UpdateTabVisuals()
     if self.frame.tabRemoved then
         self.frame.tabRemoved:SetFrameLevel(tab == "removed" and (listLevel + 8) or math.max(1, listLevel - 1))
     end
+    self:LayoutListTopOpening()
     self:UpdatePageTabVisuals()
     self:UpdateSpecButton()
 end
@@ -4455,6 +4636,7 @@ function GQ.Log:UpdateFooterButtons()
     if self.frame.exitBtn then
         self.frame.exitBtn:Show()
     end
+    self:UpdateLevelUpControls()
 
     if self:GetPageTab() ~= "log" then
         if track then
@@ -4761,6 +4943,9 @@ function GQ.Log:LayoutLogColumns(frame)
             ApplyBlackBackground(frame.listInset)
         end
         ApplyMetalEdge(frame.listInset, 16)
+        if self.LayoutListTopOpening then
+            self:LayoutListTopOpening()
+        end
     end
 
     if frame.scroll and frame.listInset then
@@ -4856,6 +5041,172 @@ function GQ.Log:EnsureOmitButtons(frame)
     end
 end
 
+function GQ.Log:EnsureLevelUpControls(frame)
+    if not frame or frame.levelUpCheck then
+        return
+    end
+
+    local hit = CreateFrame("Button", nil, frame)
+    hit:SetHeight(22)
+    local label = hit:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    label:SetPoint("LEFT", hit, "LEFT", 0, 0)
+    label:SetJustifyH("LEFT")
+    label:SetText("Enable Level Up On Demand")
+    label:SetTextColor(GOLD[1], GOLD[2], GOLD[3])
+    frame.levelUpHit = hit
+    frame.levelUpLabel = label
+
+    local check = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
+    check:SetSize(24, 24)
+    local templateText = check.Text
+    if not templateText and check.GetName and check:GetName() then
+        templateText = _G[check:GetName() .. "Text"]
+    end
+    if templateText then
+        templateText:SetText("")
+        templateText:Hide()
+    end
+    frame.levelUpCheck = check
+
+    local btn = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+    btn:SetSize(96, 22)
+    btn:SetText("Level up!")
+    btn:Hide()
+    frame.levelUpBtn = btn
+
+    local tipOff = "Once this is checked you no longer automatically load in new BiS lists when you level up. A Level up! button appears beside this box. Click it when you are ready to load the BiS list for the level you are now."
+    local tipOn = "Once this is unchecked you will automatically load in new BiS lists when you level up."
+    local function showTip(owner)
+        local heading, body
+        if GQ:IsLevelUpOnDemand() then
+            heading = "Switch to automatic level up!"
+            body = tipOn
+        else
+            heading = "Lag spikes on level up?"
+            body = tipOff
+        end
+        GameTooltip:SetOwner(owner, "ANCHOR_TOP")
+        GameTooltip:SetText(heading, 1, 0.82, 0, 1, true)
+        GameTooltip:AddLine(body, 1, 1, 1, true)
+        GameTooltip:Show()
+        local bodyLine = _G["GameTooltipTextLeft2"]
+        if bodyLine then
+            if bodyLine.SetFontObject and GameTooltipText then
+                bodyLine:SetFontObject(GameTooltipText)
+            end
+            bodyLine:SetTextColor(1, 1, 1)
+        end
+    end
+    local function toggle()
+        if not GQ.SetLevelUpOnDemand then
+            return
+        end
+        GQ:SetLevelUpOnDemand(not GQ:IsLevelUpOnDemand())
+    end
+    hit:SetScript("OnClick", toggle)
+    hit:SetScript("OnEnter", function(self)
+        showTip(self)
+    end)
+    hit:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+    check:SetScript("OnClick", function(self)
+        if GQ.SetLevelUpOnDemand then
+            GQ:SetLevelUpOnDemand(self:GetChecked())
+        end
+    end)
+    check:SetScript("OnEnter", function(self)
+        showTip(self)
+    end)
+    check:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+    local function showLevelTip(owner)
+        if not (GQ.CanLevelUpOnDemand and GQ:CanLevelUpOnDemand()) then
+            return
+        end
+        local fromLevel = GQ:GetLevelUpPin()
+        local toLevel = GQ:RealPlayerLevel()
+        GameTooltip:SetOwner(owner, "ANCHOR_TOP")
+        GameTooltip:SetText("Level up to " .. toLevel, 1, 0.82, 0, 1, true)
+        GameTooltip:AddLine("From level " .. fromLevel .. ".", 1, 1, 1, true)
+        GameTooltip:Show()
+        local bodyLine = _G["GameTooltipTextLeft2"]
+        if bodyLine then
+            if bodyLine.SetFontObject and GameTooltipText then
+                bodyLine:SetFontObject(GameTooltipText)
+            end
+            bodyLine:SetTextColor(1, 1, 1)
+        end
+    end
+    btn:SetScript("OnClick", function()
+        if GQ.LevelUpNow then
+            GQ:LevelUpNow()
+        end
+    end)
+    btn:SetScript("OnEnter", showLevelTip)
+    btn:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+
+    self:LayoutLevelUpControls(frame)
+    self:UpdateLevelUpControls()
+end
+
+function GQ.Log:LayoutLevelUpControls(frame)
+    frame = frame or self.frame
+    local hit = frame and frame.levelUpHit
+    local label = frame and frame.levelUpLabel
+    local check = frame and frame.levelUpCheck
+    local btn = frame and frame.levelUpBtn
+    if not hit or not label or not check then
+        return
+    end
+
+    local textWidth = label:GetStringWidth() or 180
+    if textWidth < 20 then
+        textWidth = 180
+    end
+    hit:SetWidth(textWidth + 2)
+    hit:ClearAllPoints()
+    hit:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", CONTENT_LEFT, FOOTER_BUTTON_Y)
+
+    check:ClearAllPoints()
+    check:SetPoint("LEFT", hit, "RIGHT", 2, 0)
+
+    if btn then
+        btn:ClearAllPoints()
+        btn:SetPoint("LEFT", check, "RIGHT", 2, 0)
+    end
+
+    local windowLevel = (frame.gqOuterBorder and frame.gqOuterBorder.GetFrameLevel and frame.gqOuterBorder:GetFrameLevel() or (frame:GetFrameLevel() or 1)) + 3
+    hit:SetFrameLevel(windowLevel)
+    check:SetFrameLevel(windowLevel)
+    if btn then
+        btn:SetFrameLevel(windowLevel)
+    end
+end
+
+function GQ.Log:UpdateLevelUpControls()
+    local frame = self.frame
+    if not frame or not frame.levelUpCheck then
+        return
+    end
+    local enabled = GQ.IsLevelUpOnDemand and GQ:IsLevelUpOnDemand()
+    frame.levelUpCheck:SetChecked(enabled and true or false)
+    local btn = frame.levelUpBtn
+    if not btn then
+        return
+    end
+    if enabled then
+        btn:Show()
+        local ready = GQ.CanLevelUpOnDemand and GQ:CanLevelUpOnDemand()
+        btn:SetEnabled(ready and true or false)
+    else
+        btn:Hide()
+    end
+end
+
 function GQ.Log:LayoutFooterButtons(frame)
     if not frame.trackBtn or not frame.detailBg then
         return
@@ -4902,6 +5253,8 @@ function GQ.Log:LayoutFooterButtons(frame)
         frame.exitBtn:ClearAllPoints()
         frame.exitBtn:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -CONTENT_RIGHT_GUTTER, FOOTER_BUTTON_Y)
     end
+
+    self:LayoutLevelUpControls(frame)
 end
 
 function GQ.Log:ApplyPageTab()
@@ -5127,7 +5480,7 @@ function GQ.Log:EnsureSourceFilter(frame)
     menu:SetFrameLevel(50)
     menu:EnableMouse(true)
     menu:EnableMouseWheel(true)
-    menu:SetSize(168, 12 + (#SOURCE_FILTERS * 20))
+    menu:SetSize(168, 12 + (#SOURCE_FILTERS * 20) + 36)
     menu:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8X8",
         edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
@@ -5214,17 +5567,12 @@ function GQ.Log:EnsureSourceFilter(frame)
     end)
     menu.profBranch = branch
 
-    local function applyFilterChange()
+    local function draftSources()
         local log = _G.GearQuest and _G.GearQuest.Log
         if not log then
-            return
+            return nil
         end
-        log:UpdateSourceFilterButton()
-        log:InvalidateSourceFilterCache()
-        log:ScheduleListRefresh()
-        if GQ.Indicator and GQ.Indicator.ScheduleRebuildCache then
-            GQ.Indicator:ScheduleRebuildCache()
-        end
+        return log._filterDraft or log:CopyFilterDraft()
     end
 
     local previous
@@ -5274,14 +5622,14 @@ function GQ.Log:EnsureSourceFilter(frame)
         end)
         check:SetScript("OnClick", function(self)
             local log = _G.GearQuest and _G.GearQuest.Log
-            if not log then
+            local draft = draftSources()
+            if not log or not draft then
                 return
             end
-            local hidden = log:GetHiddenSources()
             if self:GetChecked() then
-                hidden[self.sourceId] = nil
+                draft.sources[self.sourceId] = nil
             else
-                hidden[self.sourceId] = true
+                draft.sources[self.sourceId] = true
             end
             if self.sourceId == "profession" then
                 log:SyncProfessionRowLabel(self)
@@ -5289,7 +5637,6 @@ function GQ.Log:EnsureSourceFilter(frame)
                     menu.profBranch:Hide()
                 end
             end
-            applyFilterChange()
         end)
         if opt.id == "profession" then
             menu.profRow = check
@@ -5297,6 +5644,19 @@ function GQ.Log:EnsureSourceFilter(frame)
         previous = check
     end
     menu:SetWidth(menuWidth)
+
+    local applyBtn = CreateFrame("Button", nil, menu, "UIPanelButtonTemplate")
+    applyBtn:SetHeight(22)
+    applyBtn:SetText("Apply filter")
+    applyBtn:SetPoint("BOTTOMLEFT", menu, "BOTTOMLEFT", 10, 10)
+    applyBtn:SetPoint("BOTTOMRIGHT", menu, "BOTTOMRIGHT", -10, 10)
+    applyBtn:SetScript("OnClick", function()
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if log then
+            log:ApplyFilterDraft()
+        end
+    end)
+    menu.applyBtn = applyBtn
 
     menu:SetScript("OnUpdate", function(self)
         local branch = self.profBranch
@@ -5325,11 +5685,12 @@ function GQ.Log:EnsureSourceFilter(frame)
     end)
 
     menu.sync = function()
-        local hidden = GQ.Log:GetHiddenSources()
+        local log = GQ.Log
+        local draft = log._filterDraft or log:CopyFilterDraft()
         local kids = { menu:GetChildren() }
         for _, childBtn in ipairs(kids) do
             if childBtn.sourceId then
-                childBtn:SetChecked(not hidden[childBtn.sourceId])
+                childBtn:SetChecked(not draft.sources[childBtn.sourceId])
                 if childBtn.sourceId == "profession" then
                     GQ.Log:SyncProfessionRowLabel(childBtn)
                 end
@@ -5361,7 +5722,8 @@ function GQ.Log:PopulateProfessionBranch(menu)
         return
     end
     local names = self:GetBisProfessionNames()
-    local hidden = self:GetHiddenProfessions()
+    local draft = self._filterDraft or self:CopyFilterDraft()
+    local hidden = draft.professions
     local width = 148
     for i, name in ipairs(names) do
         local row = branch.rows[i]
@@ -5390,17 +5752,11 @@ function GQ.Log:PopulateProfessionBranch(menu)
                 if not log or not self.professionName then
                     return
                 end
-                local hiddenProfs = log:GetHiddenProfessions()
+                local pending = log._filterDraft or log:CopyFilterDraft()
                 if self:GetChecked() then
-                    hiddenProfs[self.professionName] = nil
+                    pending.professions[self.professionName] = nil
                 else
-                    hiddenProfs[self.professionName] = true
-                end
-                log:UpdateSourceFilterButton()
-                log:InvalidateSourceFilterCache()
-                log:ScheduleListRefresh()
-                if GQ.Indicator and GQ.Indicator.ScheduleRebuildCache then
-                    GQ.Indicator:ScheduleRebuildCache()
+                    pending.professions[self.professionName] = true
                 end
             end)
             branch.rows[i] = row
@@ -5492,6 +5848,7 @@ function GQ.Log:ToggleSourceFilterMenu()
         menu:Hide()
         return
     end
+    self:CopyFilterDraft()
     if menu.sync then
         menu.sync()
     end
@@ -6143,7 +6500,7 @@ function GQ.Log:EnsureSettingsPage(frame)
     creditsBody:SetPoint("TOPLEFT", detail, "TOPLEFT", 16, -18)
     creditsBody:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
     creditsBody:SetJustifyH("LEFT")
-    creditsBody:SetText("Credits to collaborators\n\nEao\nMainWon")
+    creditsBody:SetText("Credits to collaborators\n\nEao\nMainWon\nStikmyre")
     creditsBody:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
     creditsBody:Hide()
     frame.settingsCreditsBody = creditsBody
@@ -6452,6 +6809,20 @@ function GQ.Log:RefreshSettings()
     end
 end
 
+function GQ.Log:SeedSimulatorFromCharacter()
+    if GQ.IsPreviewEnabled and GQ:IsPreviewEnabled() then
+        return
+    end
+    self.simClass = GQ:GetEffectiveClass()
+    self.simFaction = GQ:GetEffectiveFaction() or "Alliance"
+    if GQ.Spec and GQ.Spec.GetDisplaySpec then
+        self.simSpec = GQ.Spec:GetDisplaySpec(self.simClass)
+    end
+    if self.frame and self.frame.simLevelEdit and not (self.frame.simLevelEdit.HasFocus and self.frame.simLevelEdit:HasFocus()) then
+        self.frame.simLevelEdit:SetText(tostring(GQ:GetEffectiveLevel() or 1))
+    end
+end
+
 function GQ.Log:SelectSimulatorClass(classFile)
     self.simClass = classFile
     if GQ.Spec then
@@ -6464,10 +6835,99 @@ function GQ.Log:SelectSimulatorClass(classFile)
             end
         end
         if not stillValid then
-            self.simSpec = GQ.Spec:GetSavedSpec(classFile) or GQ.Spec:GetDefaultSpec(classFile)
+            local ownClass = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+            local previewOn = GQ.IsPreviewEnabled and GQ:IsPreviewEnabled()
+            if not previewOn and classFile == ownClass and GQ.Spec.GetDisplaySpec then
+                self.simSpec = GQ.Spec:GetDisplaySpec(classFile)
+            else
+                self.simSpec = GQ.Spec:GetSavedSpec(classFile) or GQ.Spec:GetDefaultSpec(classFile)
+            end
         end
     end
     self:RefreshSimulator()
+end
+
+function GQ.Log:SetSimulatorChoiceHighlight(btn, selected)
+    if not btn then
+        return
+    end
+    btn:SetEnabled(true)
+    local border = btn.gqChoiceBorder
+    if not border then
+        border = CreateFrame("Frame", nil, btn)
+        border:SetPoint("TOPLEFT", btn, "TOPLEFT", -4, 4)
+        border:SetPoint("BOTTOMRIGHT", btn, "BOTTOMRIGHT", 4, -4)
+        border:EnableMouse(false)
+        border:SetFrameLevel((btn:GetFrameLevel() or 1) + 6)
+
+        local function rim(r, g, b, a1, a2, thickness, horizontal)
+            local tex = border:CreateTexture(nil, "ARTWORK", nil, 1)
+            tex:SetColorTexture(r, g, b, 1)
+            tex:SetPoint(a1, border, a1, 0, 0)
+            tex:SetPoint(a2, border, a2, 0, 0)
+            if horizontal then
+                tex:SetHeight(thickness)
+            else
+                tex:SetWidth(thickness)
+            end
+        end
+        rim(1, 0.84, 0.1, "TOPLEFT", "TOPRIGHT", 3, true)
+        rim(1, 0.7, 0.05, "BOTTOMLEFT", "BOTTOMRIGHT", 3, true)
+        rim(1, 0.8, 0.08, "TOPLEFT", "BOTTOMLEFT", 3, false)
+        rim(1, 0.74, 0.06, "TOPRIGHT", "BOTTOMRIGHT", 3, false)
+
+        local motes = {}
+        local moteCount = 28
+        for i = 1, moteCount do
+            local mote = border:CreateTexture(nil, "OVERLAY", nil, 7)
+            mote:SetTexture("Interface\\Minimap\\Ping\\ping4")
+            mote:SetBlendMode("ADD")
+            local size = 4 + (i % 3)
+            if i % 7 == 0 then
+                size = size + 1
+            end
+            mote:SetSize(size, size)
+            mote:SetVertexColor(1, 0.9, 0.35)
+            mote.gqOffset = (i - 1) / moteCount
+            mote.gqRadius = (i % 2 == 0) and 1 or 0.9
+            mote.gqSpeed = (i % 2 == 0) and (1 / 9) or (1 / 13)
+            mote.gqAlpha = 0.85 + ((i % 4) * 0.05)
+            motes[i] = mote
+        end
+        border.gqSparks = motes
+
+        border:SetScript("OnUpdate", function(self, elapsed)
+            elapsed = elapsed or 0
+            self.gqPhase = (self.gqPhase or 0) + elapsed
+            local w = self:GetWidth()
+            local h = self:GetHeight()
+            if not w or not h or w < 4 or h < 4 then
+                return
+            end
+            local cx = w * 0.5
+            local cy = h * 0.5
+            local rx = w * 0.5
+            local ry = h * 0.5
+            for i = 1, #self.gqSparks do
+                local mote = self.gqSparks[i]
+                local travel = (mote.gqOffset + (self.gqPhase * mote.gqSpeed)) % 1
+                local turn = travel * math.pi * 2
+                local breathe = 1 + (0.06 * math.sin((self.gqPhase * 1.3) + (i * 0.7)))
+                local reach = mote.gqRadius * breathe
+                local x = cx + (rx * reach * math.sin(turn))
+                local y = cy + (ry * reach * math.cos(turn))
+                mote:ClearAllPoints()
+                mote:SetPoint("CENTER", self, "BOTTOMLEFT", x, y)
+                mote:SetAlpha(mote.gqAlpha * (0.92 + (0.08 * math.sin((self.gqPhase * 0.8) + i))))
+            end
+        end)
+        btn.gqChoiceBorder = border
+    end
+    if selected then
+        border:Show()
+    else
+        border:Hide()
+    end
 end
 
 function GQ.Log:RefreshSimulator()
@@ -6505,8 +6965,8 @@ function GQ.Log:RefreshSimulator()
     end
 
     if self.frame.simAllianceBtn then
-        self.frame.simAllianceBtn:SetEnabled(self.simFaction ~= "Alliance")
-        self.frame.simHordeBtn:SetEnabled(self.simFaction ~= "Horde")
+        self:SetSimulatorChoiceHighlight(self.frame.simAllianceBtn, self.simFaction == "Alliance")
+        self:SetSimulatorChoiceHighlight(self.frame.simHordeBtn, self.simFaction == "Horde")
     end
 
     local level = tonumber(self.frame.simLevelEdit and self.frame.simLevelEdit:GetText()) or GQ:GetEffectiveLevel() or 1
@@ -6527,17 +6987,24 @@ function GQ.Log:RefreshSimulator()
         end
     end
     if not specValid then
-        local saved = GQ.Spec and GQ.Spec:GetSavedSpec(self.simClass)
-        local savedOk = false
-        if saved then
+        local ownClass = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+        local previewOn = GQ.IsPreviewEnabled and GQ:IsPreviewEnabled()
+        local picked = nil
+        if not previewOn and self.simClass == ownClass and GQ.Spec.GetDisplaySpec then
+            picked = GQ.Spec:GetDisplaySpec(self.simClass)
+        elseif GQ.Spec.GetSavedSpec then
+            picked = GQ.Spec:GetSavedSpec(self.simClass)
+        end
+        local pickedOk = false
+        if picked then
             for _, opt in ipairs(specOptions) do
-                if opt.id == saved then
-                    savedOk = true
+                if opt.id == picked then
+                    pickedOk = true
                     break
                 end
             end
         end
-        self.simSpec = savedOk and saved or (specOptions[1] and specOptions[1].id or nil)
+        self.simSpec = pickedOk and picked or (specOptions[1] and specOptions[1].id or nil)
     end
 
     if self.frame.simSpecHeader then
@@ -6554,7 +7021,7 @@ function GQ.Log:RefreshSimulator()
             specBtn:Show()
             specBtn:SetText(opt.label)
             specBtn.specId = opt.id
-            specBtn:SetEnabled(self.simSpec ~= opt.id)
+            self:SetSimulatorChoiceHighlight(specBtn, self.simSpec == opt.id)
         else
             specBtn:Hide()
             specBtn.specId = nil
@@ -6928,6 +7395,14 @@ function GQ.Log:Init()
     frame.detailGutter:Hide()
 
     ConfigurePanelScrollBar(frame.scroll)
+    local listBar = _G[frame.scroll:GetName() .. "ScrollBar"]
+    if listBar and listBar.HookScript then
+        listBar:HookScript("OnValueChanged", function()
+            if GQ.Log and GQ.Log.ClampListRowMouse then
+                GQ.Log:ClampListRowMouse()
+            end
+        end)
+    end
 
     frame.detailTitle = CreateFontStringWithFallback(frame.detailChild, QUEST_DETAIL_TITLE_FONTS)
     frame.detailTitle:SetPoint("TOPLEFT", frame.detailChild, "TOPLEFT", 8, -8)
@@ -6998,6 +7473,8 @@ function GQ.Log:Init()
     frame.exitBtn:SetSize(106, 22)
     frame.exitBtn:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -CONTENT_RIGHT_GUTTER, 12)
     frame.exitBtn:SetText("Exit")
+
+    self:EnsureLevelUpControls(frame)
 
     self:WireControls(frame)
     self:EnsureTrackerEvents()
@@ -7387,6 +7864,12 @@ function GQ.Log:SelectHunt(id, scrollToSelection, entryOverride)
     if self:GetListTab() ~= targetTab then
         GearQuestForeverDB.ui = GearQuestForeverDB.ui or {}
         GearQuestForeverDB.ui.listTab = targetTab
+    end
+    if self:GetPageTab() ~= "log" then
+        GearQuestForeverDB.ui = GearQuestForeverDB.ui or {}
+        GearQuestForeverDB.ui.pageTab = "log"
+        self:HideSpecPicker()
+        self:ApplyPageTab()
     end
 
     self.selectedHuntId = id

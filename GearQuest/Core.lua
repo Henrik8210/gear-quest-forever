@@ -9,7 +9,7 @@ end
 GQ = GQ or {}
 _G.GearQuest = GQ
 
-GQ.VERSION = "0.3.4-beta"
+GQ.VERSION = "0.3.5-beta"
 GQ.ADDON_NAME = ADDON_NAME
 -- WoW Forever: 1–60 Classic+ (no TBC level cap).
 GQ.MAX_PLAYER_LEVEL = 60
@@ -286,10 +286,126 @@ function GQ:SyncLevelOverride()
     end
 end
 
+function GQ:LevelUpCharDB()
+    self:BindSavedVariableGlobals()
+    if type(GearQuestForeverCharDB) ~= "table" then
+        return nil
+    end
+    return GearQuestForeverCharDB
+end
+
+function GQ:IsLevelUpOnDemand()
+    local db = self:LevelUpCharDB()
+    return db and db.levelUpOnDemand and true or false
+end
+
+function GQ:GetLevelUpPin()
+    local db = self:LevelUpCharDB()
+    local pin = db and tonumber(db.levelUpPin)
+    if not pin then
+        pin = UnitLevel("player") or 1
+        if db then
+            db.levelUpPin = self:ClampPlayerLevel(pin)
+        end
+    end
+    return self:ClampPlayerLevel(pin)
+end
+
+function GQ:RealPlayerLevel()
+    return self:ClampPlayerLevel(UnitLevel("player") or 1)
+end
+
+function GQ:SetLevelUpOnDemand(enabled)
+    self:BindSavedVariableGlobals()
+    if type(GearQuestForeverCharDB) ~= "table" then
+        GearQuestForeverCharDB = {}
+        _G.GearQuestForeverCharDB = GearQuestForeverCharDB
+    end
+    local db = GearQuestForeverCharDB
+    enabled = enabled and true or false
+    db.levelUpOnDemand = enabled
+    self._playerLevelOverride = nil
+    if enabled then
+        db.levelUpPin = self:RealPlayerLevel()
+    else
+        db.levelUpPin = nil
+        if self.Data and self.Data.InvalidateQueryCache then
+            self.Data:InvalidateQueryCache()
+        end
+        self:RefreshUI()
+    end
+    if self.Log and self.Log.UpdateLevelUpControls then
+        self.Log:UpdateLevelUpControls()
+    end
+end
+
+function GQ:CanLevelUpOnDemand()
+    if not self:IsLevelUpOnDemand() then
+        return false
+    end
+    return self:RealPlayerLevel() > self:GetLevelUpPin()
+end
+
+-- Level-up also fires talent and quest-log events in the same burst.
+-- Hold the gear-list rebuild until the player clicks Level up!.
+-- Bag checks keep running so a drop from the pinned list can still toast.
+function GQ:NoteLevelUpHold()
+    self._levelUpHoldBurst = true
+    if C_Timer and C_Timer.After then
+        C_Timer.After(1, function()
+            self._levelUpHoldBurst = nil
+        end)
+    end
+end
+
+function GQ:LevelUpWorkHeld()
+    if not self:IsLevelUpOnDemand() then
+        return false
+    end
+    if self._levelUpHoldBurst then
+        return true
+    end
+    return self:CanLevelUpOnDemand()
+end
+
+function GQ:LevelUpNow()
+    if not self:CanLevelUpOnDemand() then
+        return
+    end
+    local db = self:LevelUpCharDB()
+    if not db then
+        return
+    end
+    local previous = self:GetLevelUpPin()
+    local actual = self:RealPlayerLevel()
+    db.levelUpPin = actual
+    self._playerLevelOverride = nil
+    if self:IsPreviewEnabled() then
+        if self.Log and self.Log.UpdateLevelUpControls then
+            self.Log:UpdateLevelUpControls()
+        end
+        return
+    end
+    if self.Data and self.Data.InvalidateQueryCache then
+        self.Data:InvalidateQueryCache()
+    end
+    self:CheckLevelMilestones(previous, actual)
+    if self.Log and self.Log.CheckAutoCompletion then
+        self.Log:CheckAutoCompletion()
+    end
+    self:RefreshUI()
+end
+
 function GQ:GetEffectiveLevel()
+    if self._listProbeLevel then
+        return self:ClampPlayerLevel(self._listProbeLevel)
+    end
     self:SyncLevelOverride()
     if self._playerLevelOverride and not self:IsPreviewEnabled() then
         return self:ClampPlayerLevel(self._playerLevelOverride)
+    end
+    if not self:IsPreviewEnabled() and self:IsLevelUpOnDemand() then
+        return self:GetLevelUpPin()
     end
     return self:ClampPlayerLevel(self.Preview:GetEffectiveLevel())
 end
@@ -488,15 +604,25 @@ end
 
 function GQ:PLAYER_LEVEL_UP(_, newLevel)
     local previousLevel = newLevel and (newLevel - 1) or nil
-    if newLevel and not self:IsPreviewEnabled() then
+    local hold = self:IsLevelUpOnDemand()
+    if newLevel and not self:IsPreviewEnabled() and not hold then
         self._playerLevelOverride = newLevel
     end
-    if self.Data and self.Data.InvalidateQueryCache then
+    if not hold and self.Data and self.Data.InvalidateQueryCache then
         self.Data:InvalidateQueryCache()
     end
-    self:CheckLevelMilestones(previousLevel, newLevel)
-    if self.Log and self.Log.CheckAutoCompletion then
+    if not hold then
+        self:CheckLevelMilestones(previousLevel, newLevel)
+    end
+    if not hold and self.Log and self.Log.CheckAutoCompletion then
         self.Log:CheckAutoCompletion()
+    end
+    if hold then
+        self:NoteLevelUpHold()
+        if self.Log and self.Log.UpdateLevelUpControls then
+            self.Log:UpdateLevelUpControls()
+        end
+        return
     end
     self:RefreshUI()
 end

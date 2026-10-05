@@ -154,6 +154,15 @@ function GQ.Popup:HookCharacterFrameHide()
             popup:Hide()
         end
     end)
+    if PaperDollFrame and PaperDollFrame.HookScript and not PaperDollFrame.GearQuestOnHideHooked then
+        PaperDollFrame.GearQuestOnHideHooked = true
+        PaperDollFrame:HookScript("OnHide", function()
+            local popup = _G.GearQuest and _G.GearQuest.Popup
+            if popup then
+                popup:Hide()
+            end
+        end)
+    end
 end
 
 function GQ.Popup:EnsureDismissLayer()
@@ -181,7 +190,7 @@ function GQ.Popup:EnsureDismissLayer()
     layer:SetAllPoints(parent)
     layer:EnableMouse(true)
     layer:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-    layer:SetScript("OnClick", function()
+    layer:SetScript("OnMouseDown", function()
         local popup = _G.GearQuest and _G.GearQuest.Popup
         if popup then
             popup:Hide()
@@ -191,31 +200,103 @@ function GQ.Popup:EnsureDismissLayer()
     self.dismissLayer = layer
 end
 
+function GQ.Popup:EnsureOutsideCatcher()
+    if self.outsideCatcher then
+        return
+    end
+
+    -- World clicks only. Other windows sit above LOW, and this hides with the bar.
+    local catcher = CreateFrame("Button", "GearQuestPopupOutside", UIParent)
+    catcher:SetAllPoints(UIParent)
+    catcher:SetFrameStrata("LOW")
+    catcher:EnableMouse(true)
+    catcher:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+    catcher:SetScript("OnMouseDown", function()
+        local popup = _G.GearQuest and _G.GearQuest.Popup
+        if popup then
+            popup:Hide()
+        end
+    end)
+    catcher:Hide()
+    self.outsideCatcher = catcher
+end
+
 function GQ.Popup:ShowDismissLayer()
     if not CharacterFrame or not CharacterFrame:IsShown() then
         if self.dismissLayer then
             self.dismissLayer:Hide()
         end
+        if self.outsideCatcher then
+            self.outsideCatcher:Hide()
+        end
         return
     end
     self:EnsureDismissLayer()
+    self:EnsureOutsideCatcher()
     if not self.dismissLayer or not self.container then
         return
     end
-    -- Stay under the equipment slots. A catcher above them swallows the first
-    -- click, so a worn item cannot be dragged until something else is clicked.
-    local parent = self.dismissLayer:GetParent()
-    local base = (parent and parent.GetFrameLevel and parent:GetFrameLevel()) or 1
-    self.dismissLayer:SetFrameLevel(base)
+
+    local sheet = PaperDollFrame or self.dismissLayer:GetParent()
+    self.dismissLayer:ClearAllPoints()
+    self.dismissLayer:SetAllPoints(sheet)
+
+    local skip = {
+        [self.dismissLayer] = true,
+        [self.container] = true,
+    }
+    if self.container.bar then
+        skip[self.container.bar] = true
+        self.container.bar:EnableMouse(true)
+    end
     if GQ.Data and GQ.Data.PAPER_DOLL_SLOTS then
         for _, slotName in ipairs(GQ.Data.PAPER_DOLL_SLOTS) do
             local button = _G["Character" .. slotName .. "Slot"]
-            if button and button.SetFrameLevel and (button:GetFrameLevel() or 0) <= base then
-                button:SetFrameLevel(base + 5)
+            if button then
+                skip[button] = true
             end
         end
     end
+
+    local function treeTop(frame, best)
+        if not frame or skip[frame] then
+            return best
+        end
+        local level = frame.GetFrameLevel and frame:GetFrameLevel() or 0
+        if level > best then
+            best = level
+        end
+        if frame.GetChildren then
+            local children = { frame:GetChildren() }
+            for i = 1, #children do
+                best = treeTop(children[i], best)
+            end
+        end
+        return best
+    end
+
+    -- Above the model and stats, under the slots and the bar. A catcher
+    -- above the slots swallows the click that picks up a worn item.
+    local dismissLevel = treeTop(sheet, 0) + 2
+    self.dismissLayer:SetFrameLevel(dismissLevel)
+    local slotLevel = dismissLevel + 4
+    if GQ.Data and GQ.Data.PAPER_DOLL_SLOTS then
+        for _, slotName in ipairs(GQ.Data.PAPER_DOLL_SLOTS) do
+            local button = _G["Character" .. slotName .. "Slot"]
+            if button and button.SetFrameLevel and (button:GetFrameLevel() or 0) < slotLevel then
+                button:SetFrameLevel(slotLevel)
+            end
+        end
+    end
+    local barLevel = slotLevel + 4
+    if (self.container:GetFrameLevel() or 0) < barLevel then
+        self.container:SetFrameLevel(barLevel)
+    end
+
     self.dismissLayer:Show()
+    if self.outsideCatcher then
+        self.outsideCatcher:Show()
+    end
 end
 
 function GQ.Popup:EnsureItemInfoListener()
@@ -404,12 +485,14 @@ function GQ.Popup:RefreshIcons()
 end
 
 function GQ.Popup:Hide()
-    if not self.container then
-        return
-    end
-
     if self.dismissLayer then
         self.dismissLayer:Hide()
+    end
+    if self.outsideCatcher then
+        self.outsideCatcher:Hide()
+    end
+    if not self.container then
+        return
     end
 
     self.container:Hide()

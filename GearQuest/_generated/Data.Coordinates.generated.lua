@@ -5896,4 +5896,6 @@ GQ.Data.coordinates = {
     [13538]={note="entrance to dungeon or raid",more=true,spots={{map="Eastern Plaguelands",x=31.3,y=15.7},{map="Eastern Plaguelands",x=47.9,y=24.0}}},
     [18543]={note="entrance to dungeon or raid",spots={{map="Blasted Lands",x=45.3,y=55.0}}},
     [19433]={note="entrance to dungeon or raid",more=true,spots={{map="Searing Gorge",x=34.8,y=85.3},{map="Burning Steppes",x=29.4,y=38.3}}},
+    [273297]={note="entrance to dungeon or raid",spots={{map="Westfall",x=42.5,y=71.7}}},
+    [280805]={note="beginning of the quest or chain",spots={{map="Orgrimmar",mapId=1454,x=57.4,y=53.4,faction="Horde"}}},
 }

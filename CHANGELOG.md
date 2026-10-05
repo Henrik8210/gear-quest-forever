@@ -2,81 +2,83 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v0.3.4-beta
+## v0.3.5-beta
 
-Hunter ranged hunts follow the weapon's damage. Dungeon pieces that already named the instance now have a map pin. The log is easier to read and to click.
+You can hold your current hunts when you ding, then load the new level when you are ready. The log, the simulator, and the character panel are easier to click. A main-hand-only weapon no longer shows up as an off-hand hunt, and a Horde dagger no longer shows up for Alliance.
 
-The window title reads **GearQuest Forever v0.3.4-beta**.
+The window title reads **GearQuest Forever v0.3.5-beta**.
 
-### Hunter ranged
+### Level up On Demand
 
-Beast Mastery, Marksmanship, and Survival. The slot is titled **Ranged**. The list is bows, guns, and crossbows. Thrown weapons are not hunter hunts. Rogues and warriors still see thrown weapons in their own lists.
+**Enable Level Up On Demand** sits at the bottom of the log. It starts off. It is per character.
 
-A little defense does not put a slower gun ahead of a harder-hitting bow, gun, or crossbow.
+Leave it off and a ding still loads the new BiS lists immediately. Hovering the box says **Lag spikes on level up?**
 
-Level **22** Beast Mastery, Horde:
+Check it and the list stays on the level you were already hunting. A **Level up!** button appears beside the box. After you ding, hovering that button shows a yellow title for the level you jump to, and a smaller white line for the level you leave. If you are 26 and you have just become 27, the yellow line is **Level up to 27** and the white line is **From level 26.** One click covers every level you gained while the box was on.
 
-1. **Alliance Outrunner Bow**
-2. **Double-barreled Shotgun**
-3. **Naga Heartpiercer**
+Looting or equipping a hunt that is still on that held list still toasts, and the hunt still moves to **Completed**. **Hide obtain popup** only hides the popup. The hunt is still marked complete, and the chat line still prints.
 
-Notable: **Venomstrike**. **Steelarrow Crossbow** is no longer in that top three. It is 29–45 damage, 10.88 damage per second, speed 3.40, +3 Agility.
+The green upgrade arrows on the quest log, the quest giver, loot, and vendors keep painting for the list you are still on.
 
-Level **26** Beast Mastery, Horde:
+The spec picker still changes your spec immediately, including while **Level up!** is waiting. The list reloads for the spec you picked, at the level the list is held on.
 
-1. **Concealed Hand Crossbow**
-2. **Dun Garok Rifle**
-3. **Outrider's Bow**
+A hunt says **New** only when it was not on the previous level's list. **Trapper's Leather Helm** is on the Enhancement head list at 26 and still there at 27, so it does not say New again at 27. A piece that first shows up at the new level still says New. Level 1 has no New labels. This is every class, spec, slot, and level.
 
-**Hi-tech Supergun** is not rank 1. It has defense on it and a lower damage per second than those three.
+Uncheck the box and the lists follow your level automatically again. Hovering a checked box says **Switch to automatic level up!**
 
-### Dungeon pins
-
-**Armor of the Fang** drops from Lord Pythas in Wailing Caverns. It, and the rest of **Embrace of the Viper**, now pin the cavern entrance in **The Barrens, 46.0, 36.5**. The other pieces are **Leggings of the Fang** (Lord Cobrahn), **Footpads of the Fang** (Lord Serpentis), **Belt of the Fang** (Lady Anacondra), and **Gloves of the Fang** (Druid of the Fang). Hunter, rogue, Enhancement, and Feral still see that set in the high teens and twenties.
-
-The same missing door is filled for these boss drops:
-
-- **Blackened Defias Armor**, **Leggings**, **Gloves**, **Boots**, and **Belt** — Deadmines entrance in Westfall, 42.5, 71.7.
-- **Scarlet Chestpiece**, **Scarlet Leggings**, **Scarlet Wristguards**, **Mantle of Doan**, and **Dog Training Gloves** — Scarlet Monastery entrance in Tirisfal Glades, 82.6, 33.8.
-- **Glass Shooter**, **Royal Diplomatic Scepter**, **Thermaplugg's Left Arm**, and **Electromagnetic Gigaflux Reactivator** — Gnomeregan entrance in Dun Morogh, 24.4, 39.8.
-- **Wind Spirit Staff**, **Agamaggan's Clutch**, and **Heart of Agamaggan** — Razorfen Kraul entrance in The Barrens, 42.3, 89.9.
-- **Windshrieker Pauldrons** — Stratholme.
-- **Emberweave Leggings** — Blackwing Lair, with doors in Searing Gorge and Burning Steppes.
-- **Ring of Entropy** — Lord Kazzak, Blasted Lands, 45.3, 55.0.
-
-**Show on map** opens that entrance.
-
-### The log window
-
-The line above the hunt list is one size larger. While you are simulating, **Simulation mode:** is yellow, so it is obvious this is not your character. The rest of that sentence, and the word **Settings**, stay solid and readable on the sky art.
-
-**Active**, **Completed**, and **Removed** take a light gold tint when the cursor is on them. The tab you are on keeps the brighter label.
-
-The three handles on the right edge of the window light a soft gold rim just inside the metal frame when you hover them. The exclamation, the question mark, and the gear stay where they are. The question mark's dot stays separate from the mark.
-
-The close button sits in the corner of the frame, in line with the border behind it.
-
-The spec name, its icon, and the arrow beside it are larger.
-
-### Simulator
-
-**Reset** is grey when you are already looking at your own class, level, spec, and faction. Hovering the grey button says you are already seeing your character unsimulated. After you apply a simulation, Reset turns on and brings the lists back to you.
-
-### Settings
-
-**Hide upgrade arrows** is on the **Hunts** page, under the obtain-popup option. Turning it on removes the green arrow from the quest log, the quest giver, loot, and vendors.
-
-**GearQuest Commands** is a settings page. Each slash command is bold, with a short explanation under it: `/gq`, `/gq log`, `/gq help`, `/gq track`, `/gq untrack`, `/gq set`, `/gq set on`, `/gq set off`, `/gq set me`, `/gq class`, `/gq level`, `/gq faction`, `/gq spec`, and `/gq wipe data`.
-
-General, Hunts, GearQuest Commands, and Credits highlight when you hover the row, so they read as something you can click.
+The simulator is separate. While a simulation is on, the lists are the class, spec, faction, and level in the simulator. **Level up!** updates your own character's held level. It does not replace the simulation.
 
 ### Filter
 
-The Filter list, and the Profession list that opens from it, use the same text size as the Filter button. The Profession list closes when the cursor leaves both that row and the list. A click outside the Filter list closes it.
+Checking a source, or a profession in the sub-list, no longer rebuilds the log on every click. **Apply filter** sits at the bottom of the dropdown and applies every box at once, including professions. Close the menu without Apply and the list stays as it was.
 
-### Sharing a map pin
+### Simulator
 
-**Show on map**, then shift-click the pin to share it in chat, still posts the link. GearQuest no longer attempts the clipboard copy that only the Blizzard UI is allowed to do, so the "blocked from an action only available for Blizzard UI" window does not appear.
+The faction and specialization you have chosen are no longer greyed out. A bright gold rim sits around that button, and a slow river of small gold dust motes circles it. That is Alliance or Horde, and each spec button: Elemental, Enhancement, Enhancement Tank, Restoration, and the same kind of choice on every class.
+
+Open the simulator while you are not simulating and the form matches you. A level 27 Horde Enhancement shaman opens as Horde Enhancement, not as Elemental.
+
+**Reset** stays grey until you click **Simulate**. Hovering the grey button says you are already seeing your character unsimulated. After you apply a simulation, Reset turns on and brings the lists back to you.
+
+### The log
+
+Dragging the scrollbar to the bottom of **Active**, **Completed**, or **Removed** no longer leaves the hunts unclickable.
+
+Clicking a BiS icon on the character panel opens that hunt in the log, even when the window was sitting on **Simulator** or **Settings**.
+
+**Credits** lists Eao, MainWon, and Stikmyre.
+
+### Character panel
+
+Right-click a gear slot and the upgrade bar opens beside it, the same as before. Click outside that bar and it closes: the character model, the stats, the ground, or another window. You no longer have to right-click a second slot to dismiss the first. A right-click on a slot still opens that slot's bar. A left-click on a BiS icon still opens the hunt.
+
+### Goblin Hammer
+
+**Goblin Hammer** drops from **Gilnid** in the Deadmines. It is a boss drop, not a world drop. The tooltip says **Boss drop**. **Show on map** opens the Deadmines entrance in Westfall, 42.5, 71.7. It requires level 18. Shaman, warrior, paladin, rogue, and druid lists that include it use that source.
+
+### Off hand
+
+A weapon whose tooltip says **Main Hand** is no longer an off-hand hunt. **Royal Diplomatic Scepter** was an off-hand option for a level 30 Combat rogue. It is a main-hand mace. The same correction is on the rogue, warrior, and hunter off-hand lists, wherever a main-hand-only weapon had been copied into the off hand. A weapon whose tooltip says **One-Hand** can still sit in either hand.
+
+Level **30** Alliance **Combat** rogue, off hand:
+
+1. **Ironspine's Fist**
+2. **Bloody Brass Knuckles**
+3. **Sentinel's Blade**
+
+Level **28–30** Alliance **Assassination** and **Subtlety**, off hand:
+
+1. **Sentinel's Blade**
+2. **Thornspike**
+3. **Subdued Dragon's Fang**
+
+### Serrated Raptor Claw
+
+**Serrated Raptor Claw** is a one-hand dagger, item level 33, so the off hand is a legal slot. It is a reward from **Changing Tastes**, which starts with **Borstan** in Orgrimmar, 57.4, 53.4. That quest is Horde only. Alliance no longer sees the claw, in the main hand or the off hand. Horde still does. **Show on map** opens Borstan.
+
+### v0.3.4-beta
+
+Hunter ranged is bows, guns, and crossbows, ranked on the weapon's damage. Thrown weapons are not hunter hunts. Beast Mastery Horde at 22 is Alliance Outrunner Bow, Double-barreled Shotgun, and Naga Heartpiercer. At 26 it is Concealed Hand Crossbow, Dun Garok Rifle, and Outrider's Bow. Embrace of the Viper pins the Wailing Caverns entrance in the Barrens. Deadmines, Scarlet Monastery, Gnomeregan, Razorfen Kraul, Stratholme, Blackwing Lair, and Lord Kazzak have entrance pins. Simulation mode is yellow. Reset stays grey until you simulate. Hide upgrade arrows is on the Hunts page. GearQuest Commands is a settings page. Sharing a map pin no longer opens the Blizzard clipboard warning.
 
 ### v0.3.3-beta
 

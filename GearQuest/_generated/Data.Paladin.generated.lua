@@ -3726,7 +3726,7 @@ GQ.Data.itemFacts = {
     [273137]={name="Skum's Bucket",quality=3,ilvl=22,reqLevel=17,sourceType="world_drop",instructions="Drops from Skum.",npc="Skum"},
     [273289]={name="Ogre Loincloth",quality=3,ilvl=22,reqLevel=17,sourceType="world_drop",instructions="Drops from Rhahk'Zor.",npc="Rhahk'Zor"},
     [273293]={name="Bandsaw Wristbands",quality=3,ilvl=21,reqLevel=16,sourceType="boss_drop",instructions="Drops from Sneed.",zone="The Deadmines",npc="Sneed"},
-    [273297]={name="Goblin Hammer",quality=3,ilvl=23,reqLevel=18,sourceType="world_drop",instructions="Drops from Gilnid.",npc="Gilnid"},
+    [273297]={name="Goblin Hammer",quality=3,ilvl=23,reqLevel=18,sourceType="boss_drop",instructions="Drops from Gilnid.",zone="The Deadmines",npc="Gilnid"},
     [273298]={name="Lookie's Spyglass",quality=3,ilvl=23,reqLevel=18,sourceType="boss_drop",instructions="Drops from Cookie.",zone="The Deadmines",npc="Cookie"},
     [273324]={name="Premier Mortarplate Girdle",quality=3,ilvl=60,reqLevel=55,sourceType="unsourced",instructions="Indexed from Wowhead Forever. Source not listed yet."},
     [273325]={name="Premier Plate Girdle",quality=3,ilvl=60,reqLevel=55,sourceType="unsourced",instructions="Indexed from Wowhead Forever. Source not listed yet."},

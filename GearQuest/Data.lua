@@ -9240,17 +9240,71 @@ function GQ.Data:GetActiveBandMinLevel()
     return activeMinLevel
 end
 
+function GQ.Data:PreviousLevelShownKeys()
+    self:EnsureQueryCache()
+    local cache = self._queryCache
+    if cache.previousListKeys then
+        return cache.previousListKeys
+    end
+
+    local level = GQ:GetEffectiveLevel() or 1
+    if level <= 1 or GQ._listProbeLevel then
+        cache.previousListKeys = {}
+        return cache.previousListKeys
+    end
+
+    local savedCache = cache
+    local savedBand = self._activeBandCache
+    local keys = {}
+    GQ._listProbeLevel = level - 1
+    self._queryCache = nil
+    self._activeBandCache = nil
+    local ok = pcall(function()
+        local slots = self:GetSlotsForClass(GQ:GetEffectiveClass())
+        for i = 1, #slots do
+            local slotName = slots[i]
+            local top = self:GetTopUpgradesForSlot(slotName)
+            for j = 1, #top do
+                local key = self:EntryListKey(top[j])
+                if key then
+                    keys[key] = true
+                end
+            end
+            local notables = self:GetNotableForSlot(slotName) or {}
+            for j = 1, #notables do
+                local key = self:EntryListKey(notables[j])
+                if key then
+                    keys[key] = true
+                end
+            end
+        end
+    end)
+    GQ._listProbeLevel = nil
+    self._queryCache = savedCache
+    self._activeBandCache = savedBand
+    if not ok then
+        keys = {}
+    end
+    savedCache.previousListKeys = keys
+    return keys
+end
+
 function GQ.Data:IsEntryNewForPlayer(entry)
-    if not entry then
+    if not entry or GQ._listProbeLevel then
         return false
     end
 
-    local activeMinLevel = self:GetActiveBandMinLevel()
-    if not activeMinLevel then
+    local key = self:EntryListKey(entry)
+    if not key then
         return false
     end
 
-    return (entry.minLevel or 1) == activeMinLevel
+    local level = GQ:GetEffectiveLevel() or 1
+    if level <= 1 then
+        return false
+    end
+
+    return not self:PreviousLevelShownKeys()[key]
 end
 
 -- Active-band candidates the player can equip now (required level uses GetEffectiveLevel).

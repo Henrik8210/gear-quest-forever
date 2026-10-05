@@ -1032,6 +1032,7 @@ GQ.Data.questFaction = {
     [279898] = "Alliance",
     [280095] = "Alliance",
     [280096] = "Alliance",
+    [280805] = "Horde",
     [281250] = "Alliance",
     [281252] = "Horde",
     [281253] = "Alliance",
