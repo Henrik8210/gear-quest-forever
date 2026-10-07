@@ -113,10 +113,13 @@ function GQ.Preview:SetEnabled(enabled)
             if GQ.Data.InvalidateClassCache then
                 GQ.Data:InvalidateClassCache()
             end
-            if GQ.Log and GQ.Log.InvalidateActiveListCaches then
-                GQ.Log:InvalidateActiveListCaches()
-            end
         end
+    end
+    -- Same class at another level still has its hunt data loaded, so the
+    -- filtered list has to drop here too. Otherwise a profession filter
+    -- keeps the simulated rows after Reset.
+    if not enabled and GQ.Log and GQ.Log.InvalidateActiveListCaches then
+        GQ.Log:InvalidateActiveListCaches()
     end
 end
 

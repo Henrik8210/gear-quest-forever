@@ -9,7 +9,7 @@ end
 GQ = GQ or {}
 _G.GearQuest = GQ
 
-GQ.VERSION = "0.4.0-beta"
+GQ.VERSION = "0.4.1-beta"
 GQ.ADDON_NAME = ADDON_NAME
 -- WoW Forever: 1–60 Classic+ (no TBC level cap).
 GQ.MAX_PLAYER_LEVEL = 60
@@ -631,20 +631,29 @@ function GQ:PLAYER_LEVEL_UP(_, newLevel)
     if not hold and self.Data and self.Data.InvalidateQueryCache then
         self.Data:InvalidateQueryCache()
     end
-    if not hold then
-        self:CheckLevelMilestones(previousLevel, newLevel)
-    end
-    if not hold and self.Log and self.Log.CheckAutoCompletion then
-        self.Log:CheckAutoCompletion()
-    end
-    if hold then
-        self:NoteLevelUpHold()
-        if self.Log and self.Log.UpdateLevelUpControls then
-            self.Log:UpdateLevelUpControls()
+    -- Quest turn-in dings inside the gamepad focus change. Toasts and the
+    -- log refresh wait one frame so they are not on that call.
+    local function apply()
+        if not hold then
+            self:CheckLevelMilestones(previousLevel, newLevel)
         end
-        return
+        if not hold and self.Log and self.Log.CheckAutoCompletion then
+            self.Log:CheckAutoCompletion()
+        end
+        if hold then
+            self:NoteLevelUpHold()
+            if self.Log and self.Log.UpdateLevelUpControls then
+                self.Log:UpdateLevelUpControls()
+            end
+            return
+        end
+        self:RefreshUI()
     end
-    self:RefreshUI()
+    if C_Timer and C_Timer.After then
+        C_Timer.After(0, apply)
+    else
+        apply()
+    end
 end
 
 local eventFrame = CreateFrame("Frame")

@@ -755,6 +755,76 @@ def entrance_spots(key: str) -> list[dict]:
     return copy_spots(DOORS["entrances"].get(key) or [])
 
 
+# Generic drops at level 1-15 get one pin per faction. The numbers are spots
+# already published for quests and farms in those zones, not new guesses.
+# 1-7 is the starter valley. 8-15 is the next zone on that side.
+# Above 15 both factions share the catalog spot, with no faction tag.
+GENERIC_LOW_FARM = (
+    ("Alliance", "Elwynn Forest", 1429, 48.2, 42.8, 1, 7),
+    ("Alliance", "Westfall", 1436, 31.0, 46.2, 8, 15),
+    ("Horde", "Durotar", 1411, 42.0, 68.4, 1, 7),
+    ("Horde", "The Barrens", 1413, 51.0, 29.4, 8, 15),
+)
+GENERIC_LOW_MAX = 15
+
+
+def generic_world_drop(src: dict) -> bool:
+    if not src or src.get("sourceType") != "world_drop" or src.get("npc"):
+        return False
+    return (src.get("instructions") or "").startswith("World drop")
+
+
+def generic_level_span(src: dict) -> tuple[int, int]:
+    match = re.search(r"level (\d+)-(\d+)", src.get("instructions") or "")
+    if match:
+        return int(match.group(1)), int(match.group(2))
+    gate = int(src.get("gateLevel") or 1)
+    return gate, gate
+
+
+def generic_rep_spot(row: tuple, tagged: bool = True) -> dict:
+    spot = {
+        "map": row[1],
+        "mapId": row[2],
+        "x": row[3],
+        "y": row[4],
+    }
+    if tagged:
+        spot["faction"] = row[0]
+    return spot
+
+
+def pick_low_farm(faction: str, lo: int) -> dict:
+    band = 1 if lo <= 7 else 8
+    for row in GENERIC_LOW_FARM:
+        if row[0] == faction and row[5] == band:
+            return generic_rep_spot(row)
+    raise KeyError(faction)
+
+
+def shared_catalog_spot(home: dict | None) -> list[dict] | None:
+    if not home or home.get("x") is None or not home.get("map"):
+        return None
+    spot = {
+        "map": home["map"],
+        "x": home["x"],
+        "y": home["y"],
+    }
+    if home.get("mapId"):
+        spot["mapId"] = int(home["mapId"])
+    return [spot]
+
+
+def generic_faction_spots(src: dict, home: dict | None = None) -> list[dict] | None:
+    """Level 1-15: one pin per faction. Above that: the catalog spot for both."""
+    if not generic_world_drop(src):
+        return None
+    lo, _hi = generic_level_span(src)
+    if lo > GENERIC_LOW_MAX:
+        return shared_catalog_spot(home)
+    return [pick_low_farm("Alliance", lo), pick_low_farm("Horde", lo)]
+
+
 def resolve_item(item_id: int, src: dict, cache: dict, xml_cache: dict) -> tuple[dict | None, str | None]:
     kind = src.get("sourceType") or ""
     zone = src.get("zone")
@@ -818,6 +888,9 @@ def resolve_item(item_id: int, src: dict, cache: dict, xml_cache: dict) -> tuple
         if not npc:
             if described:
                 return None, "entrance has no exact coordinate yet (" + DOORS["describedOnly"][described] + ")"
+            spots = generic_faction_spots(src)
+            if spots:
+                return {"note": NOTE_FARM, "spots": spots, "more": False}, None
             return None, "world drop names no creature"
         spots = shared_drop_spots(spots_for_npc_name(npc, cache))
         alts = [

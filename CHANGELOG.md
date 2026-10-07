@@ -2,61 +2,67 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v0.4.0-beta
+## v0.4.1-beta
 
-You can hide the hunts that do not fit how you are playing, narrow a source down to one profession or one dungeon, and still see the real slot rank on the parchment. A few long quest chains now open at the level where you can finish them.
+Play style is now five pictured cards. A filter or a play style no longer takes the green arrow off your real best pieces, and Track still toasts when you loot a hunt the list is hiding. Crafted hunts name the materials and color the skill line.
 
-The window title reads **GearQuest Forever v0.4.0-beta**.
+The window title reads **GearQuest Forever v0.4.1-beta**.
 
 ### Play style
 
-**Play style** sits at the bottom of the log. It opens two cards, and both can be on at once. A gold rim shows which ones are on. A play style can hide several sources together. The filter still only chooses a source.
+**Play style** at the bottom of the log opens five cards. The name sits under the picture. Three are on the first row and two on the second. The heading says you can turn several on at once, and that each one can cover several sources. The filter still only chooses a source. A gold rim shows which cards are on.
 
-**No Dungeons!** hides a hunt that sends you into a dungeon or raid. That is a dungeon or raid boss, dungeon and raid trash, and a quest whose text names a dungeon or whose pin is a dungeon entrance. World bosses stay. A craft you can buy stays. Whelgar's dig site in the Wetlands is not the Excavation Site dungeon, so that hunt stays.
+**No Dungeons!** hides a hunt that sends you into a dungeon or raid: a boss, trash, and a quest that enters an instance at any step. A world drop stays, even when its zone is a dungeon name or the pin is that entrance. **Captain Melrache's Cape** drops from Captain Melrache in the outdoor graveyard. The stored zone is Scarlet Monastery, and the cape stays. World bosses stay. A craft you can buy stays.
 
-**Get it now!** hides a hunt this character cannot get yet. A vendor piece waits until you reach the reputation stored on that item. A bind-on-pickup craft waits until you have that profession and the skill printed on the hunt. A bind-on-equip craft stays on the list, unless the item itself requires the profession to wear. When you reach the standing or the skill, the hunt comes back on its own. You do not have to turn the style off.
+**Dungeon Enjoyer** keeps only those dungeon and raid hunts. World bosses, crafts, vendors, and outdoor hunts stay hidden. No Dungeons and Dungeon Enjoyer turn each other off.
 
-The character panel and the green arrows follow the same list. With a play style on, they show the hunts that are still allowed, not the full unfiltered top three.
+**Get it now!** hides a hunt this character cannot get yet. A vendor piece waits until you reach the reputation stored on that item. A bind-on-pickup craft waits until you have that profession and the skill printed on the hunt. A bind-on-equip craft stays, unless the item itself requires the profession to wear. When you reach the standing or the skill, the hunt comes back on its own.
 
-### Source filter
+**Don't look back** hides a hunt once its required level would be a gray quest. Green and yellow stay. On a live character that uses the game's own green range. A level 18 hunt is still on the list at 25 and drops off at 26.
 
-The filter list is alphabetical: Boss drop, Container, Dungeon & Raid trash, Profession, Quest reward, Rare NPC, Seasonal quest, Special, Unsourced, Vendor, and World drop.
+**Buy it** keeps hunts you can purchase. Vendor pieces stay. So does anything that binds when equipped, binds when used, or does not bind. Bind on pickup stays hidden, unless a vendor sells that piece. At level 27, Elemental Horde, Head with every source still checked: **Scaled Leather Headband** and **Robust Helm** stay, and **Holy Shroud** fills the open row. **Totemic Leather Helm** and **Totemic Leather Hood** leave, because both bind when picked up. The hood is the notable. Buy it hides it with the helm.
 
-Checking **Profession**, **Boss drop**, or **Dungeon & Raid trash** opens the list beside that row immediately. The label gains a `>`. You do not have to move the cursor away and back.
+Get it now, Don't look back, and Buy it can be on together, and with either dungeon card.
 
-**Profession** lists Alchemy, Blacksmithing, Enchanting, Engineering, Fishing, Leatherworking, and Tailoring. Clearing one craft hides only that craft.
+With any of them on, a slot still fills to three hunts that fit, then keeps the notable when that notable fits too. A bind-on-pickup notable does not stay under Buy it.
 
-**Boss drop** lists only the dungeons and raids that have a boss hunt for your class, spec, faction, and level, including ranks below the top three. Hall of Thanes, Ruins of Lordaeron, and Excavation Site are on that list. **Other** is a world boss, and it sits between Onyxia's Lair and Ragefire Chasm. Clearing Wailing Caverns hides Wailing Caverns bosses only.
+### Green arrows
 
-**Dungeon & Raid trash** has the same kind of list, for trash hunts at your level. Those boxes are separate. Clearing Wailing Caverns under trash does not hide the Wailing Caverns bosses, and the reverse is true too.
+The green arrow on the quest log, a quest giver, loot, and a vendor stays on the unfiltered best pieces when a filter or a play style hides them. It also stays on every hunt still on the list, including a later rank, a notable, and a tracked hunt.
 
-The flyouts do not scroll. A box you clear stays cleared when you level or change spec. **Select all** and **Deselect all** cover the sources and all three lists. **Apply filter** still commits the boxes.
+The character panel bar follows the list you are looking at. A piece a filter hid is not on that bar.
 
-### Rank on the parchment
+**Hide upgrade arrows** on the Hunts settings page still removes all of them.
 
-Above the item name, a black box reads **Rank #1**, **Rank #2**, and so on. The number is that hunt's place in the slot. A filter or a play style does not renumber it, so a piece that was rank 6 is still Rank #6 when it is the only row left.
+### Toasts and Track
 
-Hovering the box says what that means. On the normal list, with no filter and no play style, rank 1 says **This is the best in slot [slot] for you.** Rank 2 says **2nd best**, rank 3 says **3rd best**, and a notable in the fourth row says **4th best**. A hunt that is only on the list because a filter is on, a play style is on, or both, uses that same line from its stored rank, and then says which of those is on.
+The obtain toast follows the unfiltered top three and the notable. A filter or a play style does not change that. A rank 6 that is only on the list because of a filter does not toast when you loot it.
 
-Hunter and Enhancement two-hand weapons say **Two-hand**. A hunter weapon that can only go in the main hand says **Main hand**.
+**Track** does. Hovering Track, while the button still says Track, says: the toast still fires when you obtain it, rank does not matter, and a filter or a play style does not stop it. Untrack and Remove do not show that line. A piece you already own does not toast again. **Hide obtain toast** still skips the popup. The chat line still prints.
 
 ### Crafted hunts
 
-A crafted hunt says the Forever recipe skill on the line just before Source. Example: **Requires Leatherworking (155) to craft. Your Leatherworking is 157.** If you do not have the profession, it says **You don't have Leatherworking.** A craft with no Forever recipe does not invent a skill of 1.
+The old sentence **Crafted with Leatherworking (requires skill N).** is gone from the description. In its place, when Forever has the recipe, the description lists the materials. **Totemic Leather Hood** (Leatherworking 100) reads **Materials: Medium Leather (8), Cured Medium Hide (2), Pristine Leather (4), Fine Thread (2), Sulfuric Acid (4).** The recipe vendor sentence stays under that, when the hunt has one.
 
-### Quest chains that end in a dungeon
+The skill line just before Source is unchanged in wording. **Requires Leatherworking (100) to craft. Your Leatherworking is 157.** That status clause is green when your skill is at least the recipe, and red when you are short. **You don't have Leatherworking.** is red too. The words "Requires … to craft." stay the parchment color.
 
-These rewards were opening at the first step of a long chain. The dungeon step is much later, so the hunt now opens at that step.
+Learning the profession, or gaining a point, updates that line on an open craft hunt. The hunt list itself rebuilds only when Get it now is on and the skill number actually changed.
 
-**Windstorm Hammer** and **Dancing Flame** are the choice at the end of **Final Passage**, the tenth step after **Test of Faith** in Thousand Needles. The book is in Scarlet Monastery Library, a level 36 quest. Both now require **36**. They were showing from the mid 20s. **Dancing Flame** is ranged rank 1 at 36 for Horde mage (Frost, Fire, Arcane, and all three Battle Mage specs), Horde priest (Holy, Discipline, and Shadow), and Horde warlock (Affliction, Demonology, and Destruction). **Windstorm Hammer** is main hand rank 1 at 36–37 for Horde Combat.
+**Dress Shoes** have no Forever recipe, so they get neither a skill line nor a materials line.
 
-**Ragefire Wand**, **Icefury Wand**, and **Nether Force Wand** are the choice from **Mage's Wand**. The chain starts with Tabetha in Dustwallow Marsh. **Rituals of Power** sends you into Scarlet Monastery Library at level 40. All three now require **40**. They were 30.
+### World drop pins
 
-**Faded Hakkari Cloak** and **Tattered Hakkari Cape** are the choice from **Confront Yeh'kinya**. The chain starts with Prospector Ironboot in Tanaris. **The Final Tablets** are in Blackrock Spire at level 58. Both cloaks now require **58**. They were 40.
+A world drop with no named creature, through level 15, now has a map pin on your own side. Alliance 1–7 is Elwynn Forest (48.2, 42.8). Horde 1–7 is Durotar (42.0, 68.4). Alliance 8–15 is Westfall (31.0, 46.2). Horde 8–15 is the Crossroads in the Barrens (51.0, 29.4). Above 15 both factions share the catalog spot. A drop from a named creature stays on that creature's pin. **Show on map** opens that spot.
 
-**Drakefire Amulet** is the reward from **Drakefire Amulet**. The chain starts with Haleh in Winterspring. The blood comes from General Drakkisath in Blackrock Spire at level 60. The amulet now requires **60**. It was 50.
+### Smaller fixes
 
-**Crescent Staff** and **Wingblade** (Leaders of the Fang) stay **10**. **Staff of Westfall**, **Tunic of Westfall**, and **Chausses of Westfall** stay **14**.
+Reset on the Simulator, after a filter was on at a simulated level, returns the list to your character. It used to keep the simulated rows.
+
+Turning in a quest with a gamepad no longer locks the action bar. The upgrade arrows and the level-up refresh wait one frame, so they are not painted inside the gamepad's own focus change.
+
+### v0.4.0-beta
+
+**Play style** opened with **No Dungeons!** and **Get it now!**, and both could be on. The filter gained a profession list, a boss-drop dungeon list, and a separate trash list. The parchment shows **Rank #N** from the real slot rank. A crafted hunt states the recipe skill just before Source. **Windstorm Hammer** and **Dancing Flame** require **36**. **Ragefire Wand**, **Icefury Wand**, and **Nether Force Wand** require **40**. **Faded Hakkari Cloak** and **Tattered Hakkari Cape** require **58**. **Drakefire Amulet** requires **60**.
 
 ### v0.3.6-beta
 

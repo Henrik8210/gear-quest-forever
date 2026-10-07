@@ -522,20 +522,34 @@ paragraph.
   Checking Profession, Boss drop, or Dungeon & Raid trash opens that flyout
   on the click. You do not have to leave the row and come back.
 - **Play style** is the button at the bottom of the log
-  (`GearQuestForeverDB.ui`). The panel has two cards, and both can be on.
-  A play style hides hunts across several sources. The filter still only
-  chooses a source. Either one widens the slot list the same way a filter
-  does, so a later rank can show, and the rank box says why.
+  (`GearQuestForeverDB.ui`). Five cards, three on the first row and two on
+  the second. The name sits under the picture. **Get it now!** can be on
+  with either dungeon card, and with **Don't look back** and **Buy it**.
+  **No Dungeons!** and **Dungeon Enjoyer** turn each other off. A play
+  style hides hunts across several sources. The filter still only chooses a source. Any of them widens the slot list the
+  same way a filter does, so a later rank can show, and the rank box says why.
+  The green arrow on the quest log, quest giver, loot, and vendors is on
+  both lists. The unfiltered best pieces keep it when a filter or a play
+  style hides them. Every hunt still on the list keeps it too, including a
+  later rank, a notable, or a tracked hunt that the filter left showing.
   - **No Dungeons!** (`playNoDungeons`) hides a hunt that sends you into a
     dungeon or raid. Dungeon and raid trash always goes. A boss drop goes
     unless `BossDungeonKey` is **Other** (a world boss stays). A profession
-    craft stays. A quest goes when its instructions or quest name contain a
+    craft stays. A world drop stays, even when its zone is a dungeon or
+    raid name or the pin is that entrance. **Melrache's Cape** drops from
+    Captain Melrache in the outdoor graveyard, and the stored zone is
+    Scarlet Monastery. A quest goes when its instructions or quest name contain a
     catalog dungeon, or when the pin note says `entrance to dungeon`. The
     match is the catalog spelling, case-sensitive: **Whelgar Excavation
     Site** is not **Excavation Site**. **the Deadmines** is not **The
     Deadmines**, so Underground Assault stays. **Ahn'Qiraj** is not **Ruins
     of Ahn'Qiraj** or **Temple of Ahn'Qiraj**, so Genesis Helm and Savior
     of Kalimdor stay.
+  - **Dungeon Enjoyer** (`playDungeonEnjoyer`) is that same test, kept
+    instead of hidden. The list is dungeon and raid bosses, trash, and
+    quests that enter an instance. World bosses, crafts, vendors, and
+    outdoor hunts stay off. The Deadmines and Ahn'Qiraj misses above stay
+    off this list too, because they fail the same match.
   - **Get it now!** (`playGetItToday`) hides a hunt this character cannot
     get yet. Reputation uses the standing stored on that item (`reqRep`).
     A bind-on-pickup craft waits until the character has that profession
@@ -544,6 +558,18 @@ paragraph.
     standing or the skill shows the hunt without turning the style off.
     If the reputation scan fails, reputation hunts stay. A bind type that
     is still unknown does not hide the craft.
+  - **Don't look back** (`playDontLookBack`) hides a hunt whose `minLevel`
+    would be a gray quest at the effective level. Green and yellow stay:
+    hidden when `playerLevel - minLevel` is greater than the green range.
+    The live character uses `GetQuestGreenRange()`. A simulated level uses
+    the classic steps around the known samples (5 at level 9, 10 at 50,
+    12 at 60). A level 18 hunt is still shown at 25 and drops at 26 on
+    that scale. A missing `minLevel` stays.
+  - **Buy it** (`playBuyIt`) keeps a vendor or auction hunt, and any item
+    that is not bind on pickup or quest-bound (bind when equipped, bind
+    when used, or no bind). Bind on pickup stays hidden unless a vendor
+    sells it. An unknown bind stays. **Get it now!** still hides a vendor
+    piece until the stored standing is met.
 - **Rank on the parchment.** Above the item title, a black box reads
   `Rank #N` from the stored slot rank (`curatedRank`), so a filtered or
   play-style list still shows the real place. A notable with no stored
@@ -694,6 +720,26 @@ re-score the class, then copy Lua back.
    (that tool patches TBC-scored Lua). Suffixes already come from Classic
    `items_random.json`.
 
+6. **Profession recipe skill.** Do this for every new hunt whose source is
+   profession, and again whenever an existing indexed hunt with a profession
+   source is updated. The old sentence `requires skill 1` is not a lookup.
+
+   ForeverDB `https://foreverdb.net/data/crafting/{itemId % 64}.json` stores
+   `made` as `[profession, spellId, skill, name, count]`. The Wowhead Forever
+   item tooltip does not carry the recipe skill. The spell page does:
+   `Requires Leatherworking (40)`. When Wowhead is up, confirm the stored
+   skill against that line.
+
+   ```powershell
+   python pipeline/scripts/fetch_craft_skills.py
+   ```
+
+   That rewrites `GearQuest/_generated/CraftSkills.generated.lua` for every
+   profession hunt. A skill of 1 is real when ForeverDB and the spell page
+   say 1 (Linen Cloak, Copper Bracers, the first leather kits). Do not
+   invent 1 when both are empty. Dress Shoes (6836) has no recipe, so the
+   parchment line stays off.
+
 Python 3.12 is installed on the authoring PC. A one-off curated row in
 `GearQuest/Data.lua` is only for levels 1–9 Alliance bands (see
 `docs/DATA_RULES.md`).
@@ -788,7 +834,7 @@ Hunt-id probe (`pipeline/scripts/probe_forever_hunt_tooltips.py`) labels 200 vs 
 - **Source filter must not duplicate Completed onto Active.** The same item can exist under several generated hunt ids (level band vs the wide filter pool). `IsItemIdObtained` is true if any hunt id for that item is in `obtained` or a completed hunt, or `obtainedItems`. `ShouldHideFromActiveList` also hides an item whose list key is already on **Completed** for that slot. With a filter on, Active starts from the normal top upgrades / notables / tracked hunts (source-gated), then backfills from `GetFilteredTopForSlot` only while the slot has fewer than 3 rows. Example: level 20 Beast Mastery, World drop unchecked, **Snake Eye Kaleidoscope** stays on Completed only.
 - **Filter toggles stay cheap.** Do not bag-scan or walk every sibling hunt id per row in the wide pool. `EnsureActiveListCaches` builds completed keys, obtained item ids, and a bag/equip id set once per class/level/spec/faction. `GetFilteredTopForSlot` uses `EntryHiddenFromActiveFast` and caches per slot until `InvalidateSourceFilterCache`. Checkbox clicks call `ScheduleListRefresh` (debounced), not a synchronous `Refresh` plus a full indicator rebuild in the same frame. `InvalidateQueryCache` also drops the filtered-top cache.
 - **`/gq wipe data` then sim up.** Wipe clears character progress, `GearQuestForeverDB.obtainedItems`, and `completedItemBackup`, and sets `completedWipeAt`. Account `obtainedItems` with a timestamp at or before that wipe must not count (`AccountObtainedItemCounts`). Otherwise auto-complete skips pieces the player still wears, and Completed stays empty for them. A jump from 10 to 20 does not pass through earlier bands, so wipe and `Preview:SetLevel` call `ScheduleAutoCompletionCheck(true)`. That path records owned hunts with `minLevel <=` effective level (class/spec/faction via `EntryMatchesTrackedHunt`) and **does not toast**. It looks up `GetEntriesByItemId` for items already in bags. It must not walk `GetClassSlotEntryList`.
-- **Toasts are the current list only.** Bag, equip, loot, and a normal level-up call `CheckAutoCompletion()` with no reached-band scan. Complete and toast only top upgrades, the notable, and a tracked hunt that still `EntryMatchesPlayer`. A level 20 Enhancement shaman looting **Calico Cloak** (level 9 back) must not toast or complete it. Do not treat `GetCandidatesForSlot` as the list. The full catalog walk on `BAG_UPDATE` was the dungeon `Log.lua` "script ran too long" error.
+- **Toasts are the current list only.** Bag, equip, loot, and a normal level-up call `CheckAutoCompletion()` with no reached-band scan. Complete and toast only top upgrades, the notable, and a tracked hunt that still `EntryMatchesPlayer`. A filter or a play style does not change that list. A rank 6 that is only showing because of a filter does not toast. Tracking it does. Hovering **Track** says so. A level 20 Enhancement shaman looting **Calico Cloak** (level 9 back) must not toast or complete it. Do not treat `GetCandidatesForSlot` as the list. The full catalog walk on `BAG_UPDATE` was the dungeon `Log.lua` "script ran too long" error.
 
 **28 Sep 2026 (v0.2.17-beta).**
 
@@ -963,6 +1009,13 @@ area name. An open-world rare stays on both factions' lists when that zone
 is the other side's territory, and the rare pin ignores the faction map
 deny. A world drop that was already listed under the area name stays listed
 after the label becomes the parent zone (`zoneOpen`). Do not rename a
+dungeon to the zone its entrance sits in. Do not turn Refuge Pointe or
+Alliance. Through level 15 the log shows that faction's own farming pin
+and leaves the other faction's zone off the parchment. Above 15 both
+factions share the catalog spot. A named creature in that zone stays on
+that faction's list. A world drop that was already listed under the area
+name stays listed after the label becomes the parent zone (`zoneOpen`).
+Do not rename a
 dungeon to the zone its entrance sits in. Do not turn Refuge Pointe or
 Hammerfall into Arathi Highlands: that name is what keeps the other faction
 off those vendors.
@@ -1173,11 +1226,17 @@ separate BoE line, not repeated inside the sentence.
 
 A crafted hunt states the Forever recipe skill on the line just before
 Source: `Requires Leatherworking (155) to craft. Your Leatherworking is 157.`
-or `You don't have Leatherworking.` The skill comes from
-`GearQuest/_generated/CraftSkills.generated.lua` (`fetch_craft_skills.py`,
-ForeverDB recipes). The character's rank is `GetProfessions` /
-`GetProfessionInfo`, then the skill-line list. Do not print a stub skill of
-1. Dress Shoes (6836) have no Forever recipe, so that line stays off.
+or `You don't have Leatherworking.` That clause is green when the character's skill is at least the recipe, and red when it is short or the profession is missing. The description does not repeat that
+skill. `Crafted with Leatherworking (requires skill 130).` is stripped.
+In its place the description lists the recipe materials from the Wowhead
+Forever spell tooltip, `Materials: Light Leather (8), Coarse Thread (4).`,
+when that spell page has them. `fetch_craft_skills.py --reagents` writes
+those onto `GQ.CraftSkills`. Look the skill up for every new
+profession hunt, and again when an existing profession hunt is updated.
+See step 6 under **When you find a new or retuned item**. The character's
+rank is `GetProfessions` / `GetProfessionInfo`, then the skill-line list.
+Do not print a stub skill of 1. Dress Shoes (6836) have no Forever recipe,
+so that line stays off.
 
 A named dungeon boss is `boss_drop`, even when the old sentence said
 "(rare elite)". Mutanus the Devourer is Wailing Caverns, not a world drop.
@@ -1305,7 +1364,10 @@ coordinate in the same pass as the usual facts: tooltip stats, required
 level, source, zone, npc, and quest. Also recheck items that are still
 Unsourced; if Wowhead now names a source, index those ids too. Every new
 id is also checked for New in Forever (`build_forever_new.py`) and stamped
-on the parchment when the classic nether tooltip 404s. Patch with
+on the parchment when the classic nether tooltip 404s. A profession source,
+new or already indexed, is also checked for its recipe skill in that same
+pass (`fetch_craft_skills.py`, ForeverDB `made`, confirmed on the Wowhead
+spell page when it is up). Coordinates are patched with
 `python pipeline/scripts/index_coordinates.py --ids <json list>`. A full
 `emit()` rewrites every coordinate. The cache is
 `pipeline/data/forever_wowhead/coord_cache.json` (gitignored). Use the
@@ -1342,11 +1404,11 @@ What the lookup uses:
   pin stays a gap.
 - Named world drop: the first spawn Wowhead lists for that creature. Note
   `(a farming spot)`. A line that only says "World drop around level X–Y"
-  names no creature, so it stays a gap. Do not use the center of the zone.
-- Profession taught by a trainer: Wowhead spell pages do not list the
-  trainer. The capital-city trainer pins already in the file came from a
-  one-time Questie gap fill (`pipeline/scripts/enrich_coordinates.py`). A
-  later Wowhead scrape will not discover a new trainer. Do not guess a city.
+  names no creature. Through level 15, give each faction one pin already
+  published in that side's own zones (`GENERIC_LOW_FARM`): Elwynn Forest
+  48.2, 42.8 and Durotar 42.0, 68.4 for levels 1–7, Westfall 31.0, 46.2 and
+  the Crossroads in the Barrens 51.0, 29.4 for levels 8–15. Above 15 both
+  factions share the catalog spot, with no faction tag. Do not invent a
   Note `(the trainer that teaches this)`.
 - Profession bought at a Merchant's Favor camp: the vendor pin in the camps
   table above, for every leatherworking, blacksmithing, tailoring,

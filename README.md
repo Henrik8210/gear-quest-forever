@@ -16,11 +16,15 @@ Install folder is `_classic_beta_` (Forever beta). `scripts/sync-addon.ps1` look
 
 Lists are the Forever scoring model for all nine classes, levels 1–60. Alliance paladin and warrior levels 1–9 stay curated. Scoring rules: [pipeline/docs/FOREVER-SCORING.md](pipeline/docs/FOREVER-SCORING.md).
 
-**Play style** sits at the bottom of the log. **No Dungeons!** hides hunts that send you into a dungeon or raid, including a quest that enters one. World bosses and crafts you can buy stay. **Get it now!** hides a hunt until this character meets the reputation on that item, or can make a bind-on-pickup craft. A bind-on-equip craft stays unless the item itself requires the profession to wear. Both can be on.
+**Play style** sits at the bottom of the log. Five cards, names under the pictures, three then two. **No Dungeons!** hides hunts that send you into a dungeon or raid, including a quest that enters one. A world drop stays even when its zone is a dungeon name. World bosses and crafts you can buy stay. **Dungeon Enjoyer** keeps only those dungeon and raid hunts. The two turn each other off. **Get it now!** hides a hunt until this character meets the reputation on that item, or can make a bind-on-pickup craft. A bind-on-equip craft stays unless the item itself requires the profession to wear. **Don't look back** hides a hunt once its required level would be a gray quest. **Buy it** keeps vendor pieces and anything that is not bind on pickup, unless a vendor sells that bind-on-pickup piece. Get it now, Don't look back, and Buy it can be on with either dungeon card.
 
-The source **Filter** is alphabetical. Profession, Boss drop, and Dungeon & Raid trash each open a flyout when checked. The trash boxes are separate from Boss drop. Select all / Deselect all covers the sources and all three flyouts.
+The source **Filter** is alphabetical. Profession, Boss drop, and Dungeon & Raid trash each open a flyout when checked. The trash boxes are separate from Boss drop. Select all / Deselect all covers the sources and all three flyouts. A filter or a play style fills a slot back up to three matching hunts, then keeps the notable when that notable still fits.
 
 The parchment shows **Rank #N** in a black box above the item name. That number is the slot rank, so a filtered list still shows the real place. Hovering the box says best, 2nd, 3rd, or 4th, and why a later rank is on the list.
+
+The green upgrade arrow stays on the unfiltered best pieces when a filter or a play style hides them, and on every hunt still showing. The obtain toast follows the unfiltered top three, the notable, and any hunt you Track. A filter does not stop a tracked toast.
+
+A crafted hunt lists the recipe materials, and the skill line just before Source. That clause is green when you meet the recipe and red when you are short or do not have the profession.
 
 ## Commands
 

@@ -7154,8 +7154,15 @@ function GQ.Data:EntryMatchesPlayerFaction(entry)
 
     -- Open-world rares stay listed for both factions. The patrol may sit in
     -- the other side's leveling zone (Rohh the Silent, Redridge Mountains).
+    -- A generic world drop names no creature. The catalog zone is one example,
+    -- so Westfall does not hide Frayed Cloak from Horde. A named creature stays
+    -- in the zone it actually lives in.
     local zone = entry.zone
-    if not entry.zoneOpen and entry.sourceType ~= "rare_npc" and zone and self.FACTION_ZONE_DENY[faction] and self.FACTION_ZONE_DENY[faction][zone] then
+    local genericDrop = entry.sourceType == "world_drop"
+        and (not entry.npc or entry.npc == "")
+        and type(entry.instructions) == "string"
+        and entry.instructions:sub(1, 10) == "World drop"
+    if not genericDrop and not entry.zoneOpen and entry.sourceType ~= "rare_npc" and zone and self.FACTION_ZONE_DENY[faction] and self.FACTION_ZONE_DENY[faction][zone] then
         return false
     end
 
@@ -7507,31 +7514,69 @@ function GQ.Data:LookupProfessionCraftSkill(itemId, profession)
     return nil
 end
 
+function GQ.Data:ProfessionMaterialsLine(entry)
+    if not entry or not entry.itemId or not GQ.CraftSkills then
+        return nil
+    end
+    local known = GQ.CraftSkills[entry.itemId]
+    if not known then
+        return nil
+    end
+
+    local function formatReagentList(rows)
+        if not rows or #rows == 0 then
+            return nil
+        end
+        local parts = {}
+        for i = 1, #rows do
+            local row = rows[i]
+            local name = row and row[3]
+            local count = row and row[2] or 1
+            if name and name ~= "" then
+                parts[#parts + 1] = string.format("%s (%d)", name, count)
+            end
+        end
+        if #parts == 0 then
+            return nil
+        end
+        return table.concat(parts, ", ")
+    end
+
+    local required = formatReagentList(known.reagents)
+    if not required then
+        return nil
+    end
+    local line = "Materials: " .. required .. "."
+    local optional = formatReagentList(known.optional)
+    if optional then
+        line = line .. " Optional: " .. optional .. "."
+    end
+    return line
+end
+
 function GQ.Data:GetProfessionInstructions(entry)
     if not entry or entry.sourceType ~= "profession" then
         return entry and entry.instructions
     end
 
+    -- The skill lives on the line before Source. Drop the older
+    -- "Crafted with … (requires skill N)." sentence, and keep anything after it.
+    local rest
     local instructions = entry.instructions or ""
-    local isBoP = GQ.Equip and GQ.Equip.IsBindOnPickup and GQ.Equip:IsBindOnPickup(entry.itemId)
-    -- BoE profession gear can be bought on the AH; only BoP must be self-crafted.
-    if isBoP == false then
-        return instructions
-    end
-
-    local craftSkill = self:LookupProfessionCraftSkill(entry.itemId, entry.profession)
-    if craftSkill and craftSkill > 0 then
-        local profession = entry.profession or "Profession"
-        local head = string.format("Crafted with %s (requires skill %d).", profession, craftSkill)
-        -- Keep the camp vendor sentence that follows "Crafted with …."
-        local rest = instructions:match("^Crafted with [^.]*%.(.*)$")
-        if rest and rest:find("%S") then
-            return head .. rest
+    local after = instructions:match("^[Cc]rafted with [^.]*%.%s*(.*)$")
+    if after ~= nil then
+        if after:find("%S") then
+            rest = after:gsub("^%s+", ""):gsub("%s+$", "")
         end
-        return head
+    elseif instructions:find("%S") then
+        rest = instructions
     end
 
-    return instructions
+    local materials = self:ProfessionMaterialsLine(entry)
+    if materials and rest then
+        return materials .. "\n" .. rest
+    end
+    return materials or rest or ""
 end
 
 function GQ.Data:ProfessionCraftRequirement(entry)
@@ -7595,19 +7640,9 @@ function GQ.Data:EnrichProfessionEntry(entry)
     if not entry or entry.sourceType ~= "profession" then
         return entry
     end
-
-    local isBoP = GQ.Equip and GQ.Equip.IsBindOnPickup and GQ.Equip:IsBindOnPickup(entry.itemId)
-    if isBoP == false then
-        return entry
-    end
-
-    self:EnsureProfessionCraftSkillListener()
-
-    local instructions = self:GetProfessionInstructions(entry)
-    if instructions then
-        entry.instructions = instructions
-    end
-
+    -- Leave entry.instructions alone. The parchment strips the old skill
+    -- sentence at display time, and the stored sentence is still the
+    -- fallback when CraftSkills has no rank.
     return entry
 end
 

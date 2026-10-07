@@ -980,30 +980,37 @@ function GQ.Indicator:RebuildCacheForSlot(slotName)
     self.itemNameCache = self.itemNameCache or {}
 
     local maxUpgrades = GQ.Data.GetMaxUpgradesForSlot and GQ.Data:GetMaxUpgradesForSlot(slotName) or 3
-    local upgrades
-    if GQ.Log and GQ.Log.UsesWideHuntList and GQ.Log:UsesWideHuntList() and GQ.Log.GetFilteredTopForSlot then
-        upgrades = GQ.Log:GetFilteredTopForSlot(slotName)
-    else
-        upgrades = GQ.Data:GetTopUpgradesForSlot(slotName, maxUpgrades)
-    end
-    for _, entry in ipairs(upgrades) do
+
+    local function mark(entry)
         local hide = GQ.Log and GQ.Log.ShouldHideFromActiveList
             and GQ.Log:ShouldHideFromActiveList(entry, slotName)
-        if entry.itemId and not hide then
-            self.upgradeItems[entry.itemId] = true
-            local itemName = (GQ.Data.GetItemDisplayName and GQ.Data:GetItemDisplayName(entry.itemId))
-                or self.itemNameCache[entry.itemId]
-            if itemName and GQ.Data.IsPlaceholderItemName and GQ.Data:IsPlaceholderItemName(itemName, entry.itemId) then
-                itemName = nil
-            end
-            if itemName then
-                self.itemNameCache[entry.itemId] = itemName
-                self.upgradeItemNames[itemName:lower()] = entry.itemId
-            elseif GQ.Data and GQ.Data.RequestItemInfo then
-                GQ.Data:RequestItemInfo(entry.itemId)
-            else
-                GetItemInfo(entry.itemId)
-            end
+        if not entry or not entry.itemId or hide or self.upgradeItems[entry.itemId] then
+            return
+        end
+        self.upgradeItems[entry.itemId] = true
+        local itemName = (GQ.Data.GetItemDisplayName and GQ.Data:GetItemDisplayName(entry.itemId))
+            or self.itemNameCache[entry.itemId]
+        if itemName and GQ.Data.IsPlaceholderItemName and GQ.Data:IsPlaceholderItemName(itemName, entry.itemId) then
+            itemName = nil
+        end
+        if itemName then
+            self.itemNameCache[entry.itemId] = itemName
+            self.upgradeItemNames[itemName:lower()] = entry.itemId
+        elseif GQ.Data and GQ.Data.RequestItemInfo then
+            GQ.Data:RequestItemInfo(entry.itemId)
+        else
+            GetItemInfo(entry.itemId)
+        end
+    end
+
+    -- Unfiltered best pieces keep the arrow when a filter or a play style
+    -- hides them. The rows still on the hunt list keep one too.
+    for _, entry in ipairs(GQ.Data:GetTopUpgradesForSlot(slotName, maxUpgrades)) do
+        mark(entry)
+    end
+    if GQ.Log and GQ.Log.UsesWideHuntList and GQ.Log:UsesWideHuntList() and GQ.Log.GetActiveSlotListEntries then
+        for _, entry in ipairs(GQ.Log:GetActiveSlotListEntries(slotName)) do
+            mark(entry)
         end
     end
 end
@@ -1657,6 +1664,27 @@ function GQ.Indicator:RefreshAll()
     self:UpdateTradeSkillFrame()
     self:UpdateCraftFrame()
     self:UpdateMerchantFrame()
+end
+
+-- Gamepad UI calls SetPreferredGamepadInteractTarget from the quest giver's
+-- own update. Showing arrows inside that call taints it, and the action bar
+-- then stays blocked until /reload. Paint on the next frame instead.
+function GQ.Indicator:ScheduleRefreshAll()
+    if self._refreshAllQueued then
+        return
+    end
+    self._refreshAllQueued = true
+    local function fire()
+        self._refreshAllQueued = false
+        if GQ.Indicator then
+            GQ.Indicator:RefreshAll()
+        end
+    end
+    if C_Timer and C_Timer.After then
+        C_Timer.After(0, fire)
+    else
+        fire()
+    end
 end
 
 function GQ.Indicator:EnsureTrainerHooks()
