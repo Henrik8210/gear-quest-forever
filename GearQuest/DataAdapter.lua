@@ -258,6 +258,7 @@ local function Expand(src, data, out)
                 suffixId     = r.suffixId,
                 suffixRange  = r.suffixRange,
                 route        = r.route,
+                hand         = r.hand,
                 origin       = r.origin,
                 proc         = f.proc,
                 generated    = true,

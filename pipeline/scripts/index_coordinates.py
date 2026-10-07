@@ -42,6 +42,35 @@ GENERATED = Path(ADDON_GEN)
 
 NOTE_QUEST = "beginning of the quest or chain"
 NOTE_DOOR = "entrance to dungeon or raid"
+
+# The first quest in the chain starts inside this dungeon (a drop or an
+# indoor NPC), so the pin is the entrance. The turn-in on that quest page
+# is where you hand the step in, not where the chain begins.
+QUEST_START_DOOR = {
+    95810: "Excavation Site",  # Lost Relic Carry (Alliance) — Relic Guardian
+    95664: "Excavation Site",  # Elder Knowledge (Horde) — same dungeon
+    6522: "Razorfen Kraul",  # An Unholy Alliance — Small Scroll from Charlga Razorflank
+    6564: "Blackfathom Deeps",  # Allegiance to the Old Gods
+    7461: "Dire Maul",  # The Madness Within — Shen'dralar Ancient
+}
+# Wowhead's series on the reward is one faction's chain. The other faction
+# starts the same rewards at these quests. Pin those starts too.
+# Turn-ins with no Wowhead quest. --repair-quests rebuilds quest_faction from
+# quest rewards only, so these sides are merged back in on every write.
+# Malignant Root: Rotheap Inards to Rethiel the Greenwarden, who is hostile to the Horde.
+HAND_FACTION = {
+    282283: "Alliance",
+}
+
+EXTRA_CHAIN_ROOTS = {
+    96016: (1531, 1532),  # Alliance Tempest's Weapons — also pin Horde Call of Air
+}
+# The series begins at a later giver. Pin these quests instead of that root.
+# Horde Tempest's Weapons lists Elemental Aid (Rau Cliffrunner) as step 1.
+# Call of Air is the starter; Prate Cloudseer is where that step turns in.
+REPLACE_CHAIN_ROOTS = {
+    79442: (1531, 1532),
+}
 NOTE_VENDOR = "vendor that sells this"
 NOTE_FARM = "a farming spot"
 NOTE_RARE = "where this rare spawns"
@@ -613,47 +642,102 @@ def _stamp_spot(spot: dict, faction: str | None) -> dict:
     return row
 
 
-def spots_for_quest(name: str, item_id: int, cache: dict, xml_cache: dict) -> list[dict]:
-    hits = quest_hits(name, item_id, cache, xml_cache)
-    spots = []
+CONTINENT_MAPS = {"Eastern Kingdoms", "Kalimdor", "Azeroth", "Outland"}
+
+
+def _add_spot(spots: list[dict], seen: set, spot: dict) -> None:
+    if not spot.get("map") or spot.get("map") in CONTINENT_MAPS:
+        return
+    if spot.get("x") is None or spot.get("y") is None:
+        return
+    key = (spot["map"], spot["x"], spot["y"], spot.get("faction"))
+    if key in seen:
+        return
+    seen.add(key)
+    spots.append(spot)
+
+
+def chain_root_id(quest_id: int, cache: dict) -> int:
+    """First quest in the Wowhead series. That is where the chain begins."""
     seen = set()
-    for hit in hits:
-        reward = quest_record(hit["id"], cache)
-        root = root_quest(hit["id"], cache)
-        side = reward.get("faction")
-        places = list(reward.get("places") or [])
-        have = {(p.get("faction"), p.get("npc")) for p in places}
-        for place in root.get("places") or []:
-            key = (place.get("faction"), place.get("npc"))
-            if key not in have:
-                places.append(place)
-                have.add(key)
-        chosen = choose_quest_places(places, side)
-        if chosen:
-            for place in chosen:
-                spot = _stamp_spot(place, place.get("faction"))
-                key = (spot["map"], spot["x"], spot["y"], spot.get("faction"))
-                if key not in seen:
-                    seen.add(key)
-                    spots.append(spot)
+    current = int(quest_id)
+    for _ in range(12):
+        if current in seen:
+            break
+        seen.add(current)
+        earlier = quest_record(current, cache).get("earlier")
+        if not earlier or int(earlier) == current:
+            break
+        current = int(earlier)
+    return current
+
+
+def beginning_spots(quest_id: int, cache: dict, faction: str | None) -> list[dict]:
+    """Where this quest starts. An end pin is the turn-in, not the start.
+
+    A start inside a dungeon has no outdoor NPC pin. Use the entrance.
+    """
+    row = quest_record(quest_id, cache)
+    spots: list[dict] = []
+    seen: set = set()
+    for place in row.get("places") or []:
+        if place.get("point") != "start":
             continue
-        faction = side or root.get("faction")
-        for npc_id in (root.get("startNpcs") or reward.get("startNpcs") or []):
-            rec = npc_record(npc_id, cache)
-            for spot in rec.get("spots") or []:
-                row = _stamp_spot(spot, rec.get("faction") or faction)
-                key = (row["map"], row["x"], row["y"], row.get("faction"))
-                if key not in seen:
-                    seen.add(key)
-                    spots.append(row)
-        for object_id in (root.get("startObjects") or reward.get("startObjects") or []):
-            rec = object_record(object_id, cache)
-            for spot in rec.get("spots") or []:
-                row = _stamp_spot(spot, faction)
-                key = (row["map"], row["x"], row["y"], row.get("faction"))
-                if key not in seen:
-                    seen.add(key)
-                    spots.append(row)
+        _add_spot(spots, seen, _stamp_spot(place, place.get("faction") or faction))
+    if spots:
+        return spots
+    fac = faction or row.get("faction")
+    for npc_id in row.get("startNpcs") or []:
+        rec = npc_record(npc_id, cache)
+        for spot in rec.get("spots") or []:
+            _add_spot(spots, seen, _stamp_spot(spot, rec.get("faction") or fac))
+    for object_id in row.get("startObjects") or []:
+        rec = object_record(object_id, cache)
+        for spot in rec.get("spots") or []:
+            _add_spot(spots, seen, _stamp_spot(spot, fac))
+    if spots:
+        return spots
+    door = QUEST_START_DOOR.get(int(quest_id))
+    if door:
+        for spot in entrance_spots(door):
+            _add_spot(spots, seen, spot)
+    return spots
+
+
+def spots_for_quest(name: str, item_id: int, cache: dict, xml_cache: dict) -> list[dict]:
+    """Pin the start of the chain that awards the item.
+
+    A later quest's giver is where you continue. The coordinate is where the
+    first step begins. A one-step quest with no start pin still uses its end,
+    because that NPC both gives and completes it.
+    """
+    hits = quest_hits(name, item_id, cache, xml_cache)
+    spots: list[dict] = []
+    seen: set = set()
+    for hit in hits:
+        qid = int(hit["id"])
+        reward = quest_record(qid, cache)
+        replace = REPLACE_CHAIN_ROOTS.get(qid)
+        if replace:
+            for extra in replace:
+                for spot in beginning_spots(int(extra), cache, None):
+                    _add_spot(spots, seen, spot)
+            continue
+        root_id = chain_root_id(qid, cache)
+        side = reward.get("faction") or quest_record(root_id, cache).get("faction")
+        chosen = beginning_spots(root_id, cache, side)
+        if chosen:
+            for spot in chosen:
+                _add_spot(spots, seen, spot)
+        for extra in EXTRA_CHAIN_ROOTS.get(qid, ()):
+            for spot in beginning_spots(int(extra), cache, None):
+                _add_spot(spots, seen, spot)
+        if chosen or EXTRA_CHAIN_ROOTS.get(qid):
+            continue
+        if root_id != qid:
+            continue
+        for place in choose_quest_places(reward.get("places") or [], side):
+            _add_spot(spots, seen, _stamp_spot(place, place.get("faction") or side))
     return spots
 
 
@@ -907,6 +991,8 @@ QUEST_FACTION_LUA = Path(ADDON_GEN) / "Data.QuestFaction.generated.lua"
 
 
 def write_quest_faction(sides: dict[int, str]) -> None:
+    for iid, side in HAND_FACTION.items():
+        sides.setdefault(iid, side)
     payload = {str(iid): side for iid, side in sorted(sides.items())}
     QUEST_FACTION_JSON.write_text(
         json.dumps(payload, indent=2) + "\n",

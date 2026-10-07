@@ -726,6 +726,8 @@ def main():
         f"{filled_sources} empty sources filled, +{added_pool} pool ids; "
         f"skipped {skipped}, no tooltip {no_tip}"
     )
+    if added_items:
+        print("New ids need a New in Forever check: python pipeline/scripts/build_forever_new.py")
     if UNKNOWN_RTG:
         print("unmapped tooltip rtg ids (count):", dict(sorted(UNKNOWN_RTG.items())))
 

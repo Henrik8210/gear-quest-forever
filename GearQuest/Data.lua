@@ -9504,7 +9504,10 @@ function GQ.Data:GetTopUpgradesForSlot(slotName, maxResults)
     local mains = {}
     local reserves = {}
     for _, entry in ipairs(self:GetCandidatesForSlot(slotName)) do
-        if GQ.Log and GQ.Log.IsHuntRemoved and GQ.Log:IsHuntRemoved(entry) then
+        if not self:EntryFitsPaperDollSlot(entry, slotName) then
+            -- Main-hand-only weapons stay in the log. The Main Hand slot is the
+            -- two-hand list, and they cannot be equipped in the off hand.
+        elseif GQ.Log and GQ.Log.IsHuntRemoved and GQ.Log:IsHuntRemoved(entry) then
             removedAny = true
         elseif entry.reserve then
             reserves[#reserves + 1] = entry
@@ -9554,9 +9557,118 @@ local TWO_HAND_SPECS = {
     WARRIOR = { arms = true },
 }
 
--- The main-hand and off-hand lists stay separate. The main-hand header names
--- the choice. The off-hand header stays "Off Hand", and its rank 1 is the
--- piece that pairs with the one-hand (main-hand rank 2 when a staff is rank 1).
+-- Hunter: Two-hand on the Main Hand slot, either-hand weapons on the Off Hand
+-- slot. A main-hand weapon (tooltip "Main Hand") is one-handed but cannot go
+-- in the off hand, so it stays in the log and on neither paper-doll slot.
+-- Enhancement: two-handers only.
+function GQ.Data:UsesHunterWeaponPairs()
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    return classFile == "HUNTER"
+end
+
+function GQ.Data:UsesTwoHandOnlyWeapons()
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    local spec = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec()
+    return classFile == "SHAMAN" and spec == "enhancement"
+end
+
+function GQ.Data:EntryIsMainHandOnly(entry)
+    if not entry then
+        return false
+    end
+    if entry.hand == "main" then
+        return true
+    end
+    if entry.hand == "two" or entry.hand == "one" then
+        return false
+    end
+    if entry.itemId and GetItemInfo then
+        local equipLoc = select(9, GetItemInfo(entry.itemId))
+        return equipLoc == "INVTYPE_WEAPONMAINHAND"
+    end
+    return false
+end
+
+function GQ.Data:EntryIsEitherHand(entry)
+    if not entry then
+        return false
+    end
+    if entry.hand == "one" then
+        return true
+    end
+    if entry.hand == "main" or entry.hand == "two" then
+        return false
+    end
+    if entry.itemId and GetItemInfo then
+        local equipLoc = select(9, GetItemInfo(entry.itemId))
+        return equipLoc == "INVTYPE_WEAPON"
+    end
+    return false
+end
+
+function GQ.Data:EntryFitsPaperDollSlot(entry, slotName)
+    slotName = self:NormalizeSlotName(slotName)
+    if self:UsesTwoHandOnlyWeapons() then
+        if slotName == "SecondaryHand" then
+            return false
+        end
+        if slotName == "MainHand" then
+            return self:EntryIsTwoHand(entry)
+        end
+    end
+    if self:UsesHunterWeaponPairs() then
+        if slotName == "MainHand" then
+            return self:EntryIsTwoHand(entry)
+        end
+        if slotName == "SecondaryHand" then
+            return self:EntryIsEitherHand(entry)
+        end
+    end
+    return true
+end
+
+function GQ.Data:EntryIsTwoHand(entry)
+    if not entry then
+        return false
+    end
+    if entry.hand == "two" then
+        return true
+    end
+    if entry.hand == "main" or entry.hand == "one" then
+        return false
+    end
+    if entry.itemId and GQ.Equip and GQ.Equip.IsTwoHandWeapon then
+        return GQ.Equip:IsTwoHandWeapon(entry.itemId) and true or false
+    end
+    return false
+end
+
+function GQ.Data:TopUniqueEntries(entries, maxCount)
+    maxCount = maxCount or 3
+    table.sort(entries, function(a, b)
+        local rankA = a.curatedRank or 99
+        local rankB = b.curatedRank or 99
+        if rankA ~= rankB then
+            return rankA < rankB
+        end
+        return (a.pipelineScore or 0) > (b.pipelineScore or 0)
+    end)
+    local out = {}
+    local seen = {}
+    for i = 1, #entries do
+        local entry = entries[i]
+        local name = self.GetEntryDisplayName and self:GetEntryDisplayName(entry) or ""
+        if name ~= "" and not seen[name] then
+            seen[name] = true
+            out[#out + 1] = entry
+            if #out >= maxCount then
+                break
+            end
+        end
+    end
+    return out
+end
+
 function GQ.Data:WeaponHeaderSuffix(slotName)
     local classFile = GQ:GetEffectiveClass()
     local spec = GQ:GetEffectiveSpec()

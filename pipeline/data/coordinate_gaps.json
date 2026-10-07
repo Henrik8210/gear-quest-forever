@@ -7,8 +7,8 @@
       "ok": 768
     },
     "world_drop": {
-      "gap": 1757,
-      "gap:world drop names no creature": 1663,
+      "gap": 1756,
+      "gap:world drop names no creature": 1662,
       "gap:drop creature has no map pin": 94,
       "ok": 1521
     },
@@ -22049,15 +22049,6 @@
       "questName": null
     },
     {
-      "id": 282283,
-      "name": "Malignant Root",
-      "sourceType": "world_drop",
-      "reason": "world drop names no creature",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
       "id": 282556,
       "name": "Groundshaker's Bindings",
       "sourceType": "world_drop",
@@ -22402,15 +22393,6 @@
     {
       "id": 284399,
       "name": "Seared Grove Shoulderpads",
-      "sourceType": "world_drop",
-      "reason": "world drop names no creature",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 284400,
-      "name": "Foreman's Helm",
       "sourceType": "world_drop",
       "reason": "world drop names no creature",
       "zone": null,

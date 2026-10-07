@@ -2,12 +2,12 @@
  "_meta": {
   "scale": "Forever. All weights are in units of the spec primary stat (1.00 = one point of it).",
   "formula": "score = ( SUM(forever_stats(item) * weight) + dps * dpsWeight + procPoints ) * armorClass[itemArmourType]. forever_stats folds spellHit/spellCrit/spellHaste/hitRanged/critRanged into hit/crit/haste, zeros expertise/armorPen/resilience, and sets sp_from_heal = max(explicit, heal/3).",
-  "armorNote": "Armour class is a per-spec MULTIPLIER on the final score, never a filter, so a big enough stat upgrade still wins -- which is what lets Holy take cloth. See the armorClass table on each spec. This was documented long before it was implemented; until it was wired in, Hunter and Rogue tier 3 outranked Paladin tier 2.",
+  "armorNote": "Armour class is a per-spec MULTIPLIER on the final score, never a filter, so a big enough stat upgrade still wins. Holy paladin cloth is penalized: they solo in melee and wear mail, then plate, so a cloth piece appears only when its healing more than pays for the missing armor. See the armorClass table on each spec. This was documented long before it was implemented; until it was wired in, Hunter and Rogue tier 3 outranked Paladin tier 2.",
   "noLevelScaling": "There is NO rating-scale-by-level. An earlier version multiplied rating stats by 70/playerLevel on the grounds that a rating point buys more percent at low level. True, but the relative value of a primary stat point rises even faster down there, so scaling only the ratings left them badly overvalued below 60. That bug stays dead. Separately, score.py weights_at_level() below 60 boosts survivability (sta/health/hp5 x3, armor x2) and endurance (int/spi/mp5/mana x2, less than stam) so leveling BiS values staying alive and keeping mana. Level 60 uses the raw weights; guides may pin later.",
   "jackpotNote": "Random-enchant greens rank on the best suffix jackpot (top of the range, e.g. Superior of Agility +7), not the expected value across every suffix. suffixChance (~9.5%) tells the player the roll is slim; if that roll would be #1 it must appear as BiS #1.",
   "procNote": "Proc value is added in the same points currency by procs.py: damage -> dps -> x dpsWeight; stat buff -> stat x uptime x that stat's weight; mitigation -> effective HP -> x stamina weight / 10. Every scenario constant is named at the top of that file and is an estimate, not sim output.",
   "level60Note": "Forever scores every level from the model (GQ_NO_GUIDES=1). Classic Wowhead BiS guides are TBC/era and must not pin level 60.",
-  "hunterNote": "1 Str = 1 melee AP, 0 RAP. 1 Agi = 0 melee AP, 1 RAP. 14 AP = 1 DPS. No Steady Shot: BM/MM dpsWeightRanged is 14 Agi (1 bow DPS = 14 RAP = 14 Agi), melee dpsWeight 0 from 10. Survival is melee: dpsWeight 10, dpsWeightRanged 6, Strength 0.50. Marksmanship Int 0.40 assumes Careful Aim. Lone Wolf vs pet is one weight row (pet/BM default).",
+  "hunterNote": "1 Str = 1 melee AP, 0 RAP. 1 Agi = 0 melee AP, 1 RAP. 14 AP = 1 DPS. No Steady Shot: BM/MM dpsWeightRanged is 14 Agi (1 bow DPS = 14 RAP = 14 Agi), melee dpsWeight 0.05. Survival is melee: dpsWeight 10, dpsWeightRanged 6, Strength 0.7. Marksmanship Int 0.40 assumes Careful Aim. Lone Wolf vs pet is one weight row (pet/BM default).",
   "druidNote": "Druids are the first class where weapon DAMAGE is worth zero. In Cat and Bear form the weapon's dps is not used at all; attack power in form comes from the feralAp stat ('+N attack power in Cat, Bear, Dire Bear and Moonkin forms only', 72 items) which is weighted identically to plain ap because in form it IS plain ap. Balance and Restoration never swing either. dpsWeight is 0.0 for all four specs; only levelling_1_9 keeps a real one, because Bear form is not learned until 10. Leather and cloth only -- no mail, plate or shields -- and Staff/Mace/Dagger/Fist/Polearm only: no swords, no axes, no ranged weapon. The Ranged slot holds an Idol.",
   "roleNote": "Forever unifies hit, crit and haste across melee, ranged and spells. Those three are legal on every spec. expertise/armorPen/resilience/wpnSkill are dead. Pure casters still have no str/ap/rap; pure physical specs still have no sp/heal except Ret, Enhance, and Paladin Protection. Warrior Protection is a physical tank -- spell damage does not rank BiS (defense on a caster piece is a notable). check_roles.py enforces this.",
   "shamanNote": "Forever Enhancement cannot dual wield and can equip 2H without a talent. Mental Dexterity is 1 AP per intellect. Enhancement int is 0.6 raw so levels 1-59 (int x2) score it at 1.2, just above agility 1.0. Level 60 keeps the raw 0.6. Mental Quickness (30% Int->SP) and Maelstrom keep a smaller spell-power weight. Elemental/Restoration never hold an off-hand weapon. Axe/Mace/Staff/Dagger/Fist only. Ranged slot is a Totem. Enhancement Tank is a separate row and stays stamina-first.",
@@ -232,7 +232,7 @@
     "blockValue": 0.01,
     "resilience": 0.0,
     "resist": 0.02,
-    "mana": 0.05,
+    "mana": 0.04,
     "health": 0.02,
     "hp5": 0.05,
     "spSchool": 0.0,
@@ -247,19 +247,20 @@
     "spFrost": 0.0,
     "spNature": 0.0,
     "spArcane": 0.0,
-    "spHoly": 0.15,
-    "sp_from_heal": 1.35
+    "spHoly": 1.8,
+    "sp_from_heal": 1.8
    },
    "armorClass": {
     "Plate": 1.0,
-    "Mail": 0.99,
-    "Leather": 0.97,
-    "Cloth": 0.95
+    "Mail": 0.96,
+    "Leather": 0.82,
+    "Cloth": 0.62
    },
    "dpsWeightRanged": 0.0
   },
   "_dpsWeightNote": "Retribution 4.31 and levelling 4.31 are derived from mechanics: 1 Strength = 2 AP = 0.232 dps for a paladin, so 1 weapon dps = 1/0.232 = 4.31 Strength. Holy 0.086 follows the same ratio off its near-zero Strength weight. Protection is the exception: the same derivation gave 2.37, which put pure-DPS Naxxramas one-hand swords (The Hungering Cold, Gressil, Andonisus) at the top of the tank weapon list. A tank's threat comes overwhelmingly from Holy damage -- Seal and Judgement of Righteousness, Consecration, Holy Shield -- which scales off spell power and attack power, not weapon dps, so the ratio does not transfer. Swept 0.0 to 2.37 against Wowhead's Classic Naxxramas tank BiS guide; 0.0 and 0.5 tie for best agreement and 0.5 is chosen as the physically non-zero end of that tie.",
-  "_weightProvenance": "Ordinal priorities taken from Icy Veins TBC Classic stat-priority pages for each spec, then adapted for LEVELLING rather than raiding. That adaptation matters: the published priorities are for level-70 raiding, where hit-to-9%-cap, expertise and armour penetration dominate. Levelling gear from 1-69 carries almost none of those stats and the caps are irrelevant, so raw Strength, weapon damage and survivability stay ahead of them here. These are ordinal-derived, NOT sim-derived, and are the part of this model most worth Henrik's judgement -- editable live in the review page."
+  "_weightProvenance": "Ordinal priorities taken from Icy Veins TBC Classic stat-priority pages for each spec, then adapted for LEVELLING rather than raiding. That adaptation matters: the published priorities are for level-70 raiding, where hit-to-9%-cap, expertise and armour penetration dominate. Levelling gear from 1-69 carries almost none of those stats and the caps are irrelevant, so raw Strength, weapon damage and survivability stay ahead of them here. These are ordinal-derived, NOT sim-derived, and are the part of this model most worth Henrik's judgement -- editable live in the review page.",
+  "_holyNote": "Holy levels in melee. Shown below 60: healing, spell power, and holy spell power 1.8, intellect 1.2 (raw 0.60), spirit 1.5 (raw 0.75, Reverence), mana per 5 2.2, flat mana 0.08 (raw 0.04), crit 0.8, armor 0.15 (raw 0.075). +Holy Spell Damage is the same stat as generic spell power for this spec. Cloth armorClass 0.62, leather 0.82, mail 0.96, plate 1.0. A cloth piece shows up only when its healing pays for the missing armor. Blacksmithing mail and plate healing (Acolyte, Prefect, and the later plate sets) outrank tailoring cloth of the same band."
  },
  "WARRIOR": {
   "_weaponSubclasses": [
@@ -517,7 +518,7 @@
   "beast_mastery": {
    "label": "Beast Mastery",
    "weaponStyle": "twohand_or_onehand",
-   "dpsWeight": 0.0,
+   "dpsWeight": 0.05,
    "dpsWeightRanged": 14.0,
    "armorClass": {
     "Mail": 1.0,
@@ -550,7 +551,7 @@
     "dodge": 0.05,
     "parry": 0.0,
     "expertise": 0.0,
-    "str": 0.05,
+    "str": 0.0,
     "ap": 0.1,
     "agi": 1.0,
     "rap": 0.5,
@@ -571,7 +572,7 @@
   "marksmanship": {
    "label": "Marksmanship",
    "weaponStyle": "twohand_or_onehand",
-   "dpsWeight": 0.0,
+   "dpsWeight": 0.05,
    "dpsWeightRanged": 14.0,
    "armorClass": {
     "Mail": 1.0,
@@ -604,7 +605,7 @@
     "dodge": 0.05,
     "parry": 0.0,
     "expertise": 0.0,
-    "str": 0.05,
+    "str": 0.0,
     "ap": 0.1,
     "agi": 1.0,
     "rap": 0.45,
@@ -658,7 +659,7 @@
     "dodge": 0.05,
     "parry": 0.0,
     "expertise": 0.0,
-    "str": 0.5,
+    "str": 0.7,
     "ap": 0.45,
     "agi": 1.0,
     "rap": 0.42,
@@ -712,7 +713,7 @@
     "dodge": 0.05,
     "parry": 0.0,
     "expertise": 0.0,
-    "str": 0.05,
+    "str": 0.3,
     "ap": 0.1,
     "agi": 1.0,
     "rap": 0.45,

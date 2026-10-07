@@ -9,7 +9,7 @@ end
 GQ = GQ or {}
 _G.GearQuest = GQ
 
-GQ.VERSION = "0.3.5-beta"
+GQ.VERSION = "0.3.6-beta"
 GQ.ADDON_NAME = ADDON_NAME
 -- WoW Forever: 1–60 Classic+ (no TBC level cap).
 GQ.MAX_PLAYER_LEVEL = 60
@@ -209,7 +209,27 @@ function GQ:GetSourceTag(sourceType)
     return color .. (SOURCE_LABELS[sourceType] or sourceType) .. "|r"
 end
 
+-- Gamepad UI: Blizzard shows the "following UI restrictions" dialog when any
+-- addon is still on the stack, then the dialog itself changes gamepad focus
+-- and the same protected call fires again until the client stops responding.
+-- The warning is the hang. Mouse mode still shows it.
+function GQ:SilenceGamepadActionPopup()
+    local get = C_CVar and C_CVar.GetCVar or GetCVar
+    if not get or not UIParent or not UIParent.UnregisterEvent then
+        return
+    end
+    local ok, style = pcall(get, "InputDeviceInterfaceStyle")
+    style = ok and tostring(style):lower() or ""
+    if style ~= "1" and style ~= "gamepad" then
+        return
+    end
+    pcall(UIParent.UnregisterEvent, UIParent, "ADDON_ACTION_FORBIDDEN")
+    pcall(UIParent.UnregisterEvent, UIParent, "ADDON_ACTION_BLOCKED")
+end
+
 function GQ:PLAYER_LOGIN()
+    self:SilenceGamepadActionPopup()
+
     local function run(label, fn)
         local ok, err = pcall(fn)
         if not ok then

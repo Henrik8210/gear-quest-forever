@@ -134,7 +134,7 @@ GQ.StatWeights.HUNTER = {
     },
     default = {
         agi = 1,
-        str = 0.05,
+        str = 0,
         int = 0.15,
         sta = 0.1,
         spi = 0.02,
@@ -154,7 +154,7 @@ GQ.StatWeights.HUNTER = {
     },
     beast_mastery = {
         agi = 1,
-        str = 0.05,
+        str = 0,
         int = 0.15,
         sta = 0.1,
         spi = 0.02,

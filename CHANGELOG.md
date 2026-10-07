@@ -2,79 +2,48 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v0.3.5-beta
+## v0.3.6-beta
 
-You can hold your current hunts when you ding, then load the new level when you are ready. The log, the simulator, and the character panel are easier to click. A main-hand-only weapon no longer shows up as an off-hand hunt, and a Horde dagger no longer shows up for Alliance.
+Every class was scored again from the current Wowhead Forever tooltip, so a hunt's stats are the stats on the tooltip. A burnt Forever mark sits beside a reward that did not exist in classic. Holy paladin and hunter weights changed, and the Viper set windows follow those weights.
 
-The window title reads **GearQuest Forever v0.3.5-beta**.
+The window title reads **GearQuest Forever v0.3.6-beta**.
 
-### Level up On Demand
+### New in Forever
 
-**Enable Level Up On Demand** sits at the bottom of the log. It starts off. It is per character.
+A reward that Wowhead marks **New in Forever** has a burnt Forever mark to the right of the item icon, the same height as the icon. Hovering the mark says **New in Forever**.
 
-Leave it off and a ding still loads the new BiS lists immediately. Hovering the box says **Lag spikes on level up?**
+**Malignant Root** and **White Obsidian Wand** have the mark. **Blackened Defias Leggings** does not. An item number above 200000 is not enough: Season of Discovery pieces in that range already existed on classic, and they stay unmarked.
 
-Check it and the list stays on the level you were already hunting. A **Level up!** button appears beside the box. After you ding, hovering that button shows a yellow title for the level you jump to, and a smaller white line for the level you leave. If you are 26 and you have just become 27, the yellow line is **Level up to 27** and the white line is **From level 26.** One click covers every level you gained while the box was on.
+### Malignant Root
 
-Looting or equipping a hunt that is still on that held list still toasts, and the hunt still moves to **Completed**. **Hide obtain popup** only hides the popup. The hunt is still marked complete, and the chat line still prints.
+**Malignant Root** is the Alliance **Arms** and **Fury** finger at level **27**. It drops from the rare **Nightveiled Rotheap** in the Wetlands. **Show on map** opens where that rare spawns: 21.2, 43.2, and the two nearby points. **Rotheap Inards** are party loot at 100%. Turn them in to **Rethiel the Greenwarden**. The Greenwarden is hostile to Horde, so Horde does not see this hunt.
 
-The green upgrade arrows on the quest log, the quest giver, loot, and vendors keep painting for the list you are still on.
+### Holy paladin
 
-The spec picker still changes your spec immediately, including while **Level up!** is waiting. The list reloads for the spec you picked, at the level the list is held on.
+Holy levels in melee, then wears mail and, from 40, plate. Below 60 the log scores healing, spell power, and holy spell power at **1.8**, intellect at **1.2**, spirit at **1.5**, mana per 5 at **2.2**, flat mana at **0.08**, crit at **0.8**, and armor at **0.15**. Cloth is weighed lighter than mail, and mail lighter than plate, so a tailoring robe does not outrank blacksmithing healing mail or plate of the same band. **Acolyte's**, **Prefect's**, and the later plate sets are the armor those levels hunt.
 
-A hunt says **New** only when it was not on the previous level's list. **Trapper's Leather Helm** is on the Enhancement head list at 26 and still there at 27, so it does not say New again at 27. A piece that first shows up at the new level still says New. Level 1 has no New labels. This is every class, spec, slot, and level.
+### Hunters
 
-Uncheck the box and the lists follow your level automatically again. Hovering a checked box says **Switch to automatic level up!**
+Beast Mastery and Marksmanship now price a melee weapon's damage at **0.05**. Strength stays **0**. Ranged stays **14**. Survival is unchanged: melee damage **10**, strength **0.7**, ranged **6**. Levels 1–9 are unchanged.
 
-The simulator is separate. While a simulation is on, the lists are the class, spec, faction, and level in the simulator. **Level up!** updates your own character's held level. It does not replace the simulation.
+Because of that, **Armor of the Fang** is not a Beast Mastery or Marksmanship chest hunt. The chest has no agility, so the 5-piece stun is worth almost nothing to those two specs. The chest slot shows **Tunic of Westfall** for Alliance and **Trapper's Leather Armor** for Horde. The legs, feet, belt, and gloves of **Embrace of the Viper** stay the hunt from 18 through about 24, and the hunt text says the chest is not part of that list.
 
-### Filter
+Survival still hunts all five pieces through 23. At 24 the legs are what remain.
 
-Checking a source, or a profession in the sub-list, no longer rebuilds the log on every click. **Apply filter** sits at the bottom of the dropdown and applies every box at once, including professions. Close the menu without Apply and the list stays as it was.
+The hunter log shows **Two-hand**, then **Main hand + one-hand**. Under that second header, **Off hand** is the either-hand weapon. A tooltip that says **Main Hand** stays in the log and on neither paper-doll slot. Enhancement shows **Two-hand** only.
 
-### Simulator
+### Embrace of the Viper
 
-The faction and specialization you have chosen are no longer greyed out. A bright gold rim sits around that button, and a slow river of small gold dust motes circles it. That is Alliance or Horde, and each spec button: Elemental, Enhancement, Enhancement Tank, Restoration, and the same kind of choice on every class.
+Feral cat keeps all five pieces from 18 through 23, both factions, because of the 5-piece stun. At 24 the chest falls off. Combat, Assassination, and Subtlety keep all five from 18 through 23. Enhancement keeps all five from 18 through 28. At 29 the Enhancement chest falls off and the other four remain.
 
-Open the simulator while you are not simulating and the form matches you. A level 27 Horde Enhancement shaman opens as Horde Enhancement, not as Elemental.
+### Gamepad
 
-**Reset** stays grey until you click **Simulate**. Hovering the grey button says you are already seeing your character unsimulated. After you apply a simulation, Reset turns on and brings the lists back to you.
+Playing with a gamepad no longer opens Blizzard's restrictions dialog on login. That dialog was what froze the client. Untrack asks on GearQuest's own window, with **Agree** and **Cancel**.
 
-### The log
+### v0.3.5-beta
 
-Dragging the scrollbar to the bottom of **Active**, **Completed**, or **Removed** no longer leaves the hunts unclickable.
+You can hold your hunts when you ding with **Enable Level Up On Demand**, then press **Level up!** when you are ready. **Apply filter** commits the source boxes at once. The simulator marks your faction and spec with a gold rim. The character panel's upgrade bar closes when you click outside it. **Goblin Hammer** is a Deadmines boss drop. A weapon whose tooltip says **Main Hand** is no longer an off-hand hunt. **Serrated Raptor Claw** is Horde only.
 
-Clicking a BiS icon on the character panel opens that hunt in the log, even when the window was sitting on **Simulator** or **Settings**.
-
-**Credits** lists Eao, MainWon, and Stikmyre.
-
-### Character panel
-
-Right-click a gear slot and the upgrade bar opens beside it, the same as before. Click outside that bar and it closes: the character model, the stats, the ground, or another window. You no longer have to right-click a second slot to dismiss the first. A right-click on a slot still opens that slot's bar. A left-click on a BiS icon still opens the hunt.
-
-### Goblin Hammer
-
-**Goblin Hammer** drops from **Gilnid** in the Deadmines. It is a boss drop, not a world drop. The tooltip says **Boss drop**. **Show on map** opens the Deadmines entrance in Westfall, 42.5, 71.7. It requires level 18. Shaman, warrior, paladin, rogue, and druid lists that include it use that source.
-
-### Off hand
-
-A weapon whose tooltip says **Main Hand** is no longer an off-hand hunt. **Royal Diplomatic Scepter** was an off-hand option for a level 30 Combat rogue. It is a main-hand mace. The same correction is on the rogue, warrior, and hunter off-hand lists, wherever a main-hand-only weapon had been copied into the off hand. A weapon whose tooltip says **One-Hand** can still sit in either hand.
-
-Level **30** Alliance **Combat** rogue, off hand:
-
-1. **Ironspine's Fist**
-2. **Bloody Brass Knuckles**
-3. **Sentinel's Blade**
-
-Level **28–30** Alliance **Assassination** and **Subtlety**, off hand:
-
-1. **Sentinel's Blade**
-2. **Thornspike**
-3. **Subdued Dragon's Fang**
-
-### Serrated Raptor Claw
-
-**Serrated Raptor Claw** is a one-hand dagger, item level 33, so the off hand is a legal slot. It is a reward from **Changing Tastes**, which starts with **Borstan** in Orgrimmar, 57.4, 53.4. That quest is Horde only. Alliance no longer sees the claw, in the main hand or the off hand. Horde still does. **Show on map** opens Borstan.
 
 ### v0.3.4-beta
 

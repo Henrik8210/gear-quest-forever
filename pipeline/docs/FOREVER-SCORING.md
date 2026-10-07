@@ -129,21 +129,28 @@ stats:
 DPS specs only: hunter (all three), rogue (all three), enhancement, feral.
 Bear, Balance, Restoration, Elemental, and Enhancement Tank are not on it.
 
-Verified windows, both factions (27 Sep 2026):
+Verified windows, both factions (7 Oct 2026, after Beast Mastery and
+Marksmanship melee `dpsWeight` was set to **0.05** and every class was
+re-scored from the refreshed tooltips):
 
-- Beast Mastery and Marksmanship: all five together from 18 to 21. From 22
-  the chest falls off and the other four stay through about 24.
+- Beast Mastery and Marksmanship: legs, feet, belt, and gloves from 18
+  through about 24. **Armor of the Fang is not on the list.** The chest has
+  no agility, and Dream Venom is priced at `dpsWeight` 0.05, so the stun is
+  almost nothing. Alliance chest rank 1 in that band is **Tunic of Westfall**.
+  Horde is **Trapper's Leather Armor**. Do not force the chest back unless
+  asked. The hunt text must say the chest is not the hunt.
 - Survival: all five through 23. At 24 the legs are what remain.
 - Combat, Assassination, Subtlety: all five from 18 through 23.
 - Enhancement: all five from 18 through 28. At 29 the chest falls off and
   the other four remain. The 2-piece intellect is why it lasts.
-- Feral: all five from 18 through 23.
+- Feral: all five from 18 through 23. At 24 the chest falls off.
 
-The chest and the belt become BiS with the set. Gloves (from 14) and legs
-(from 17) are already hunts on their own stats. Dream Venom is priced at
-item level 22, not the wearer’s level, or Enhancement keeps the chest too
-long. Feral has no weapon `dpsWeight`; the stun uses 14 (cat: 1 AP = 1/14
-white dps).
+The belt becomes BiS with the set. For Survival, rogues, Enhancement, and
+Feral, the chest does too. Gloves (from 14) and legs (from 17) are already
+hunts on their own stats. Dream Venom is priced at item level 22, not the
+wearer’s level, or Enhancement keeps the chest too long. Feral has no
+weapon `dpsWeight`; the stun uses 14 (cat: 1 AP = 1/14 white dps) plus 1
+point, so the full set still wins through 23. Do not drop that extra point.
 
 The list tags these rows `(Set piece)`, the same way a proc row is tagged
 `(Notable)`. The drop text names the bonuses and the level window for that
@@ -750,6 +757,12 @@ Hunt-id probe (`pipeline/scripts/probe_forever_hunt_tooltips.py`) labels 200 vs 
 
 A full ingest rewrites sources.json for every id >= 200000. That cleared 162 zones, including Wolfsbane (Tirisfal / Diplomatic Incident became Old Fire-Eye) and dropped Kaleidoscope's hand-patched resist 5. After ingest, restore every source key that already existed and only add new ids. Keep Kaleidoscope resist 5. Client pins stay skipped. Do not rescore from the wiped sources.
 
+**7 Oct 2026 (v0.3.6-beta). Score the stored row only when it matches the tooltip.**
+
+`refresh_forever_tips.py` is the refresh. It reads the nether Forever tooltip and writes `items.json`. A full ingest is not a refresh: ingest inserts new ids and must not rewrite existing facts from the tooltip cache (that reverted Erudite). Client pins and Greater Magic Wand **11288** stay skipped. On 7 Oct this pass updated **1186** items, then all nine classes were re-scored with `rescore_hunter_shaman.py`. Holy paladin and Beast Mastery / Marksmanship weights in this file are the weights that score used. Do not rescore from a stale row.
+
+**Malignant Root (282283)** is a finger. Alliance Arms and Fury, rank 1 at level **27** only. Source is the rare **Nightveiled Rotheap** in the Wetlands (pins 21.2, 43.2 / 21.9, 43.3 / 23.0, 43.6). Rotheap Inards are party loot at 100%. Turn them in to Rethiel the Greenwarden. The Greenwarden is hostile to Horde, so `questRaces` 77 and `GQ.Data.questFaction[282283] = "Alliance"`. Do not pin the turn-in. The classic nether tooltip 404s, so the reward carries the New in Forever stamp.
+
 **29 Sep 2026 (v0.2.19-beta). Score from the refreshed Wowhead Forever tooltip.**
 
 `pipeline/scripts/refresh_forever_tips.py` re-fetches nether tips for **every
@@ -867,6 +880,8 @@ and Scarlet Monastery) into real sources with entrance pins. Thirteen new
 items stayed Unsourced because the tooltip named no dropper. Do not call
 those world drops.
 
+**Then check every newly indexed id for New in Forever.** Wowhead prints that badge when the id is absent from the classic item database. Probe `https://nether.wowhead.com/classic/tooltip/item/{id}`: HTTP 404 is the badge, HTTP 200 is a classic or Season of Discovery item and stays unstamped. `id >= 200000` is not the test. Privateer's Ornate Pistol (202256) is in that range and is not new. Run `python pipeline/scripts/build_forever_new.py`. It probes only ids missing from `pipeline/data/forever_wowhead/new_in_forever.json` and rewrites `GearQuest/_generated/Data.ForeverNew.generated.lua`. The log draws the burnt Forever mark beside the reward for those ids. Hovering it says "New in Forever".
+
 Re-score with `python pipeline/scripts/rescore_hunter_shaman.py` after new
 gear is actually ingested. One class name does one class. Do not
 `reemit_all.py` from stale JSON.
@@ -933,14 +948,25 @@ is MainHand and the style is `twohand_or_onehand`. Rank 1 stays the best
 weapon. Rank 2 is the best weapon of the **other** hand style, so a staff
 at rank 1 is followed by the one-hand that Off Hand rank 1 pairs with.
 Rank 3+ keeps score order, so a second staff can sit at rank 3 with a
-higher score than rank 2. That is intentional. Off hand stays score-sorted.
-`EntryOffWeaponRoute` is unused. Do not grey the off hand.
+higher score than rank 2. That is intentional for casters. Off hand stays
+score-sorted for them. `EntryOffWeaponRoute` is unused. Do not grey the off hand.
+
+**Hunter and Enhancement weapon categories.** The log does not mix them
+into one Main Hand list. **Two-hand** is its own block, the best two-handers
+by themselves, and it is what the Main Hand paper-doll slot shows. Under it,
+hunters get **Main hand + one-hand**. Above Off hand are main-hand weapons
+only: one-handed, tooltip says Main Hand, so they cannot go in the off hand.
+Those stay in the log and on neither paper-doll slot. **Off hand** is
+either-hand weapons (InventoryType 13, One-Hand), and that list is the Off
+Hand slot. Enhancement shows the **Two-hand** block only. No one-hand list
+and no off-hand list. Forever Enhancement does not dual wield.
 
 | Who | Main Hand header | Off Hand header |
 |---|---|---|
 | Mage, priest, warlock | Staff or main hand | Off Hand |
-| Druid, Enhancement, paladin/warrior levelling when a route exists | Two-hand or main hand | Off Hand |
-| Hunter | Two-hand or dual wield | Off Hand. The ranged slot title is **Ranged** |
+| Druid, paladin/warrior levelling when a route exists | Two-hand or main hand | Off Hand |
+| Enhancement | Two-hand | (no off-hand list) |
+| Hunter | Two-hand. The pair block is main-hand-only, then Off hand either-hand weapons | Off Hand is the either-hand list. The ranged slot title is **Ranged** |
 | Rogue (combat, assassination, subtlety), Warrior Fury | Dual wield | Off Hand |
 | Paladin Retribution, Warrior Arms | Two-hand | Off Hand |
 | Paladin Protection and Holy, Warrior Protection, Shaman Elemental, Restoration, Enhancement Tank | Main Hand | Shield |
@@ -954,8 +980,12 @@ are not hunter hunts. Rogue and warrior still list thrown weapons. Do not
 put Thrown back on the hunter list.
 
 Ranged DPS, damage, and speed are the Forever tooltip, not a stale stored
-number. Beast Mastery and Marksmanship `dpsWeightRanged` is **14**. Survival
-is **6**. Defense on every hunter spec is **0.02**. A gun with defense and a
+number. Beast Mastery and Marksmanship melee `dpsWeight` is **0.05** (they also
+melee: Raptor Strike, Wing Clip, Mongoose Bite). Strength is **0** for Beast
+Mastery and Marksmanship, and **0.7** for Survival. Levels 1–9 stay at **0.3**.
+Their `dpsWeightRanged` is
+**14**. Survival melee is **10** and ranged is **6**. Defense on every hunter
+spec is **0.02**. A gun with defense and a
 lower DPS loses to the higher-DPS bow, gun, or crossbow. Do not retune
 defense to bury it. **Hi-tech Supergun** (9487) is not rank 1 at 26 for that
 reason. After the 5 Oct 2026 fact pass, level 22 Beast Mastery Horde ranged
@@ -1073,6 +1103,19 @@ Destruction prefers fire (`spFire` 0.95) over shadow (`spShadow` 0.2),
 and crit is its highest of the three specs because of Ruin. Hit stays
 above crit on all three.
 
+### Holy paladin
+
+Holy levels in melee, then wears mail and, from 40, plate. Shown below 60:
+healing, spell power, and holy spell power **1.8**, intellect **1.2** (raw
+0.60), spirit **1.5** (raw 0.75; Reverence keeps spirit regen while casting),
+mana per 5 **2.2**, flat mana **0.08** (raw 0.04), crit **0.8**, armor
+**0.15** (raw 0.075). A line that says `+N Holy Spell Damage` is holy spell
+power only, and for this spec it is worth the same as generic spell power.
+Cloth is `armorClass` 0.62, leather 0.82, mail 0.96, plate 1.0. A cloth piece
+shows up only when its healing pays for the missing armor. Blacksmithing
+healing mail and plate (Acolyte's, Prefect's, and the later plate sets)
+outrank tailoring cloth of the same band.
+
 ### Hunt instructions
 
 `sources.json` `instructions` are one short sentence. Zone, quest name, and
@@ -1132,8 +1175,17 @@ listed in `pipeline/data/coordinate_gaps.json`.
 
 Notes by source:
 
-- Quest: the giver that starts the quest, or the first step of its Wowhead
-  series. `(beginning of the quest or chain)`
+- Quest: where the first step of the chain begins. Walk the Wowhead series
+  to that quest and pin its start. A later step's giver is where you
+  continue, not the pin. If the first step starts inside a dungeon, pin
+  that entrance. Heavehammer's chain starts at Lost Relic Carry (Alliance,
+  quest 95810) and Elder Knowledge (Horde, quest 95664), both at the
+  Excavation Site door in the Wetlands (47.8, 56.3), not at Whelgar or
+  Bashana. Rage of the Storm (280604) and the other Tempest's Weapons
+  rewards start at Call of Air: Alliance Ironforge 46.2, 13.0 (94789),
+  Horde Orgrimmar 37.4, 37.2 (1531) and Thunder Bluff 24.2, 20.4 (1532).
+  Wowhead's Horde series begins at Elemental Aid with Rau Cliffrunner;
+  that giver is the next step. `(beginning of the quest or chain)`
 - Boss and raid trash: the dungeon or raid entrance, not the boss room.
   `(entrance to dungeon or raid)`
 - Vendor: the NPC that sells it, one pin, faction filtered.
@@ -1144,9 +1196,10 @@ Notes by source:
 
 Classic dungeon doors are the pre-Cataclysm Questie entrance table (Forever
 still uses classic geography). Forever doors with exact numbers: Hall of
-Thanes 43.6, 51.7 in Ironforge, and Ruins of Lordaeron 71.6, 11.4 in
-Undercity. These seven have a description only, so nothing is pinned
-there: Excavation Site (southern Wetlands), City of Dalaran (Alterac
+Thanes 43.6, 51.7 in Ironforge, Ruins of Lordaeron 71.6, 11.4 in
+Undercity, and Excavation Site 47.8, 56.3 in the Wetlands (Wowhead Forever
+dungeon guide, zone 11 pin "Entrance to Excavation Site"). These six have a
+description only, so nothing is pinned there: City of Dalaran (Alterac
 Mountains boundary), The Drowned City (Gillijim's Isle), Krol'dok Stronghold
 (Riverglades), Alcaz Prison (Alcaz Island), Blackmaw Hold (northern
 Azshara), Shaper's Terrace (northern Un'Goro). Table:
@@ -1171,7 +1224,7 @@ had in place. That index is not loaded at runtime.
 | Special | 1 | 1 | Sulfuras uses the Molten Core door; Ashbringer names no quest |
 
 Do not invent a city pin for a battleground vendor, and do not invent
-numbers for the seven Forever doors above.
+numbers for the six Forever doors above.
 
 ### Pins (built)
 
@@ -1189,7 +1242,9 @@ The pin table is ours. Questie is not required in game.
 A Wowhead Forever scrape that adds or changes a hunt item looks up the
 coordinate in the same pass as the usual facts: tooltip stats, required
 level, source, zone, npc, and quest. Also recheck items that are still
-Unsourced; if Wowhead now names a source, index those ids too. Patch with
+Unsourced; if Wowhead now names a source, index those ids too. Every new
+id is also checked for New in Forever (`build_forever_new.py`) and stamped
+on the parchment when the classic nether tooltip 404s. Patch with
 `python pipeline/scripts/index_coordinates.py --ids <json list>`. A full
 `emit()` rewrites every coordinate. The cache is
 `pipeline/data/forever_wowhead/coord_cache.json` (gitignored). Use the
@@ -1205,14 +1260,21 @@ Do not invent a pin so the button lights up.
 
 What the lookup uses:
 
-- Quest reward: the giver that starts the quest, or the first step of its
-  Wowhead series. Note `(beginning of the quest or chain)`.
+- Quest reward: where the first step of the chain begins. Walk the Wowhead
+  series to that quest and pin its start. A later step's giver is where you
+  continue, not the pin. If the first step starts inside a dungeon, pin
+  that entrance. Heavehammer starts at Lost Relic Carry (Alliance) and
+  Elder Knowledge (Horde), both at the Excavation Site door. Tempest's
+  Weapons starts at Call of Air (Alliance Ironforge 46.2, 13.0; Horde
+  Orgrimmar 37.4, 37.2 and Thunder Bluff 24.2, 20.4), not at Rau
+  Cliffrunner. Note `(beginning of the quest or chain)`.
 - Boss drop and raid trash: the dungeon or raid entrance in
   `pipeline/data/dungeon_entrances.json`, not the boss's room. Note
   `(entrance to dungeon or raid)`. Classic doors are the pre-Cataclysm
   entrance table. Forever doors with numbers are Hall of Thanes
-  (Ironforge 43.6, 51.7) and Ruins of Lordaeron (Undercity 71.6,
-  11.4). The other seven Forever doors have a description and no numbers.
+  (Ironforge 43.6, 51.7), Ruins of Lordaeron (Undercity 71.6,
+  11.4), and Excavation Site (Wetlands 47.8, 56.3). The other six Forever
+  doors have a description and no numbers.
   Leave them unpinned until someone measures the door.
 - Vendor: the NPC that sells it, one pin per faction. Note
   `(vendor that sells this)`. A battleground quartermaster with no outdoor

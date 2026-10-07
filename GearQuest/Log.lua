@@ -687,6 +687,24 @@ local function CreateRewardItemButton(parent, name)
     button.icon = iconFrame:CreateTexture(nil, "ARTWORK")
     button.icon:SetAllPoints(iconFrame)
 
+    local foreverMark = CreateFrame("Frame", nil, button)
+    foreverMark:SetSize(REWARD_ICON_SIZE, REWARD_ICON_SIZE)
+    foreverMark:SetPoint("LEFT", button, "RIGHT", 12, 0)
+    foreverMark:EnableMouse(true)
+    foreverMark:Hide()
+    local foreverTex = foreverMark:CreateTexture(nil, "ARTWORK")
+    foreverTex:SetAllPoints()
+    foreverTex:SetTexture("Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Art\\GQ-ForeverMark.png")
+    foreverMark:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetText("New in Forever")
+        GameTooltip:Show()
+    end)
+    foreverMark:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+    button.foreverMark = foreverMark
+
     button.nameBg = button:CreateTexture(nil, "BACKGROUND")
     button.nameBg:SetPoint("LEFT", iconFrame, "RIGHT", 0, 0)
     button.nameBg:SetPoint("RIGHT", button, "RIGHT", 0, 0)
@@ -2141,6 +2159,12 @@ function GQ.Log:IsSlotCollapsed(slotName, cachedUpgrades)
         return #cachedUpgrades == 0
     end
 
+    -- WeaponPair is not a paper-doll slot, so the empty-slot fallback would
+    -- report it collapsed and the first header click would not fold it.
+    if slotName == "WeaponPair" then
+        return false
+    end
+
     local upgrades = GQ.Data:GetTopUpgradesForSlot(slotName, 1)
     return #upgrades == 0 and #self:GetActiveSlotListEntries(slotName) == 0
 end
@@ -3318,26 +3342,63 @@ function GQ.Log:WillHuntDisappearFromActiveList(id)
 end
 
 function GQ.Log:EnsureUntrackConfirmDialog()
-    if self.untrackDialogRegistered then
-        return
+    if self.untrackDialog then
+        return self.untrackDialog
     end
-    self.untrackDialogRegistered = true
 
-    StaticPopupDialogs["GEARQUEST_CONFIRM_UNTRACK"] = {
-        text = "Are you sure you want to untrack this gear quest? It will become unavailable once you do",
-        button1 = "Agree",
-        button2 = "Cancel",
-        OnAccept = function(dialog)
-            local id = dialog.data
-            if id and GQ.Log then
-                GQ.Log:UntrackHunt(id)
-            end
-        end,
-        timeout = 0,
-        whileDead = true,
-        hideOnEscape = 1,
-        preferredIndex = 3,
-    }
+    -- Our own frame. Blizzard's StaticPopup hands the dialog to the gamepad
+    -- focus manager, and that call freezes the client.
+    local ok, dialog = pcall(CreateFrame, "Frame", "GearQuestUntrackConfirm", UIParent, "BackdropTemplate")
+    if not ok or not dialog then
+        dialog = CreateFrame("Frame", "GearQuestUntrackConfirm", UIParent)
+    end
+    dialog:SetSize(380, 128)
+    dialog:SetPoint("CENTER")
+    dialog:SetFrameStrata("DIALOG")
+    dialog:EnableMouse(true)
+    dialog:Hide()
+    if dialog.SetBackdrop then
+        dialog:SetBackdrop({
+            bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+            edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+            tile = true,
+            tileSize = 32,
+            edgeSize = 32,
+            insets = { left = 11, right = 12, top = 12, bottom = 11 },
+        })
+    end
+
+    local text = dialog:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+    text:SetPoint("TOP", 0, -28)
+    text:SetWidth(330)
+    text:SetJustifyH("CENTER")
+    text:SetText("Are you sure you want to untrack this gear quest? It will become unavailable once you do")
+
+    local agree = CreateFrame("Button", nil, dialog, "UIPanelButtonTemplate")
+    agree:SetSize(100, 22)
+    agree:SetPoint("BOTTOM", -58, 18)
+    agree:SetText("Agree")
+    agree:SetScript("OnClick", function()
+        local id = dialog.huntId
+        dialog:Hide()
+        if id and GQ.Log then
+            GQ.Log:UntrackHunt(id)
+        end
+    end)
+
+    local cancel = CreateFrame("Button", nil, dialog, "UIPanelButtonTemplate")
+    cancel:SetSize(100, 22)
+    cancel:SetPoint("BOTTOM", 58, 18)
+    cancel:SetText("Cancel")
+    cancel:SetScript("OnClick", function()
+        dialog:Hide()
+    end)
+
+    dialog:SetScript("OnHide", function(self)
+        self.huntId = nil
+    end)
+    self.untrackDialog = dialog
+    return dialog
 end
 
 function GQ.Log:RequestUntrackHunt(id)
@@ -3345,10 +3406,10 @@ function GQ.Log:RequestUntrackHunt(id)
         return
     end
 
-    self:EnsureUntrackConfirmDialog()
-
     if self:WillHuntDisappearFromActiveList(id) then
-        StaticPopup_Show("GEARQUEST_CONFIRM_UNTRACK", nil, nil, id)
+        local dialog = self:EnsureUntrackConfirmDialog()
+        dialog.huntId = id
+        dialog:Show()
         return
     end
 
@@ -3782,6 +3843,10 @@ function GQ.Log:UpdateDetailReward(entryOrItemId)
         or ("Item " .. itemId)
     TruncateFontStringToWidth(icon.name, itemName, REWARD_NAME_MAX_WIDTH)
     icon:SetWidth(REWARD_ICON_SIZE + REWARD_NAME_MIN_WIDTH)
+    if icon.foreverMark then
+        local foreverNew = GQ.Data and GQ.Data.foreverNew and GQ.Data.foreverNew[itemId]
+        icon.foreverMark:SetShown(not not foreverNew)
+    end
 
     local texture = SafeGetItemIcon(itemId)
     if texture then
@@ -7527,7 +7592,7 @@ function GQ.Log:ClearDetail()
     self:SetDetailEmpty(true)
 end
 
-function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry)
+function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry, label)
     row:Show()
     local scrollChild = self.frame.scrollChild
     local scroll = self.frame.scroll
@@ -7545,7 +7610,7 @@ function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry)
         row.text:ClearAllPoints()
         row.text:SetPoint("LEFT", row.icon, "RIGHT", 4, 0)
         row.text:SetPoint("RIGHT", row, "RIGHT", -6, 0)
-        row.text:SetText(GQ.Data:SlotHeaderLabel(slotName))
+        row.text:SetText(label or GQ.Data:SlotHeaderLabel(slotName))
         row.text:SetTextColor(1, 0.82, 0)
         row.highlight:Hide()
         row:SetScript("OnClick", function()
@@ -7583,6 +7648,16 @@ function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry)
             row.text:SetText("No completed hunts yet.")
         end
         row.text:SetTextColor(0.6, 0.6, 0.6)
+        row.highlight:Hide()
+        row:SetScript("OnClick", nil)
+    elseif rowType == "subheader" then
+        row.icon:Hide()
+        row.icon:SetTexture(nil)
+        row.text:ClearAllPoints()
+        row.text:SetPoint("LEFT", row, "LEFT", 20, 0)
+        row.text:SetPoint("RIGHT", row, "RIGHT", -6, 0)
+        row.text:SetText(label or "")
+        row.text:SetTextColor(0.85, 0.75, 0.45)
         row.highlight:Hide()
         row:SetScript("OnClick", nil)
     elseif rowType == "notable" then
@@ -7884,6 +7959,68 @@ function GQ.Log:SelectHunt(id, scrollToSelection, entryOverride)
     self:Refresh()
 end
 
+function GQ.Log:EntryShownOnActiveList(entry, slotName)
+    if not entry then
+        return false
+    end
+    if self:ShouldHideFromActiveList(entry, slotName) then
+        return false
+    end
+    if self.SourceFilterActive and self:SourceFilterActive() and not self:EntrySourceAllowed(entry) then
+        return false
+    end
+    return true
+end
+
+function GQ.Log:EntryInWeaponHand(entry, slotName, handKind)
+    if handKind == "two" then
+        return GQ.Data:EntryIsTwoHand(entry)
+    end
+    if handKind == "main" then
+        return GQ.Data:EntryIsMainHandOnly(entry)
+    end
+    if slotName == "SecondaryHand" then
+        return GQ.Data:EntryIsEitherHand(entry)
+    end
+    return true
+end
+
+function GQ.Log:CollectWeaponCategory(slotName, handKind)
+    local pool = {}
+    for _, entry in ipairs(GQ.Data:GetCandidatesForSlot(slotName) or {}) do
+        if self:EntryShownOnActiveList(entry, slotName) and self:EntryInWeaponHand(entry, slotName, handKind) then
+            pool[#pool + 1] = entry
+        end
+    end
+    local list = GQ.Data:TopUniqueEntries(pool, 3)
+    if slotName == "MainHand" and GQ.Data.GetNotableForSlot then
+        for _, entry in ipairs(GQ.Data:GetNotableForSlot(slotName) or {}) do
+            if self:EntryShownOnActiveList(entry, slotName)
+                and self:EntryInWeaponHand(entry, slotName, handKind) then
+                local seen = false
+                for i = 1, #list do
+                    if list[i].itemId == entry.itemId then
+                        seen = true
+                        break
+                    end
+                end
+                if not seen then
+                    list[#list + 1] = entry
+                end
+                break
+            end
+        end
+    end
+    return list
+end
+
+function GQ.Log:AppendListedEntries(layoutRows, entries, slotName)
+    for _, entry in ipairs(entries) do
+        local rowType = GQ.Data:ShouldDisplayAsNotable(entry, slotName) and "notable" or "item"
+        layoutRows[#layoutRows + 1] = { type = rowType, slotName = slotName, entry = entry }
+    end
+end
+
 function GQ.Log:Refresh()
     self:HideSpecPicker()
     self:UpdateLogScene()
@@ -7943,6 +8080,53 @@ function GQ.Log:Refresh()
         end
     else
         for _, slotName in ipairs(slots) do
+            if slotName == "SecondaryHand" and (GQ.Data:UsesHunterWeaponPairs() or GQ.Data:UsesTwoHandOnlyWeapons()) then
+                -- Hunter off-hands are drawn under Main hand + one-hand.
+                -- Enhancement has no off-hand list.
+            elseif slotName == "MainHand" and GQ.Data:UsesTwoHandOnlyWeapons() then
+                local twos = self:CollectWeaponCategory("MainHand", "two")
+                table.insert(layoutRows, { type = "header", slotName = "MainHand", label = "Two-hand" })
+                if not self:IsSlotCollapsed("MainHand", twos) then
+                    if #twos == 0 then
+                        table.insert(layoutRows, { type = "empty", slotName = "MainHand" })
+                    else
+                        self:AppendListedEntries(layoutRows, twos, "MainHand")
+                    end
+                end
+            elseif slotName == "MainHand" and GQ.Data:UsesHunterWeaponPairs() then
+                local twos = self:CollectWeaponCategory("MainHand", "two")
+                local ones = self:CollectWeaponCategory("MainHand", "main")
+                local offs = self:CollectWeaponCategory("SecondaryHand")
+                local pairShown = {}
+                for i = 1, #ones do
+                    pairShown[#pairShown + 1] = ones[i]
+                end
+                for i = 1, #offs do
+                    pairShown[#pairShown + 1] = offs[i]
+                end
+
+                table.insert(layoutRows, { type = "header", slotName = "MainHand", label = "Two-hand" })
+                if not self:IsSlotCollapsed("MainHand", twos) then
+                    if #twos == 0 then
+                        table.insert(layoutRows, { type = "empty", slotName = "MainHand" })
+                    else
+                        self:AppendListedEntries(layoutRows, twos, "MainHand")
+                    end
+                end
+
+                table.insert(layoutRows, { type = "header", slotName = "WeaponPair", label = "Main hand + one-hand" })
+                if not self:IsSlotCollapsed("WeaponPair", pairShown) then
+                    if #ones == 0 and #offs == 0 then
+                        table.insert(layoutRows, { type = "empty", slotName = "WeaponPair" })
+                    else
+                        self:AppendListedEntries(layoutRows, ones, "MainHand")
+                        if #offs > 0 then
+                            table.insert(layoutRows, { type = "subheader", slotName = "SecondaryHand", label = "Off hand" })
+                            self:AppendListedEntries(layoutRows, offs, "SecondaryHand")
+                        end
+                    end
+                end
+            else
             local upgrades = self:GetActiveSlotListEntries(slotName)
             table.insert(layoutRows, { type = "header", slotName = slotName })
 
@@ -7956,6 +8140,7 @@ function GQ.Log:Refresh()
                     end
                 end
             end
+            end
         end
     end
 
@@ -7966,7 +8151,7 @@ function GQ.Log:Refresh()
         if not self.listRows[i] then
             self.listRows[i] = self:CreateListRow(i)
         end
-        local ok, err = pcall(self.ConfigureRow, self, self.listRows[i], yOffset, spec.type, spec.slotName, spec.entry)
+        local ok, err = pcall(self.ConfigureRow, self, self.listRows[i], yOffset, spec.type, spec.slotName, spec.entry, spec.label)
         if not ok then
             print("|cffff0000GearQuest row error:|r " .. tostring(err))
         end

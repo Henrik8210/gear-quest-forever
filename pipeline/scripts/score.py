@@ -752,6 +752,11 @@ def embrace_bonus(wl, _level, dps_w, spec_key, pieces):
             # item level so a level-18 stun does not grow into a level-40 one.
             white = EMBRACE_ITEM_LEVEL * 1.05
             pts += white * (PROCS.PPM_DEFAULT * 1.0 / 60.0) * dw
+        # A feral cat is the one swinging. Fourteen agility per white DPS
+        # leaves the full set 0.24 short at 23, and the 5-piece is why those
+        # slots stay together through that level.
+        if spec_key == "feral":
+            pts += 1.0
     return pts
 
 def _embrace_cost(per, faction, level, chosen):
@@ -954,11 +959,12 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     # InventoryType 23 is "Held In Off-hand" -- an orb, tome or stein.
                     # Any class can equip one, but it DISABLES off-hand attacks, so for
                     # anyone who can dual wield it is strictly worse than a weapon.
-                    # Henrik found Ritual Stein of the Wolf (+3 Agi, +3 Spi) sitting in
-                    # a rogue's off hand; the hunter off hand was 189 of these against
-                    # zero one-handers. Casters keep them -- a shaman holding an orb is
-                    # real -- because they never make an off-hand attack anyway.
-                    if it["inv"]==23 and canDW: continue
+                    # Hunters never hunt a held item here: the off-hand category is a
+                    # second weapon. Enhancement shaman off-hands are shields and held
+                    # items, never a weapon.
+                    if cls == "SHAMAN" and spec_key == "enhancement" and it.get("cls") == 2:
+                        continue
+                    if it["inv"]==23 and (canDW or cls == "HUNTER"): continue
                     # Two-hand specs still get a shield list: the log has an Off Hand
                     # row, and a warrior/paladin can swap to a shield. Skipping the
                     # whole slot left Arms/Ret empty from 20 up.
@@ -975,8 +981,9 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                 s,suf,ch,st,chAny,sBest,srange,sid=best_variant(it,wl,level,rscale)
                 _roll_gain=sBest-s
                 # Armour-class preference. A multiplier, never a filter: Protection strongly
-                # favours plate, Retribution mildly, Holy is near-indifferent and will take
-                # cloth when the stats are better. This was described in the review page from
+                # favours plate, Retribution mildly. Holy paladin solos in melee, so cloth
+                # is penalized and a cloth piece wins only when its healing pays for the
+                # missing armor. This was described in the review page from
                 # the start but was never actually wired in -- armorClass was None for every
                 # spec -- so until now only the raw `armor` stat weight distinguished them,
                 # which is far too weak: plate vs leather at level 60 is ~200 armour, worth
@@ -1042,10 +1049,11 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     # Generalised: if the spec's dps weight for THIS slot is zero,
                     # the character does not attack with the item at all, so nothing
                     # that triggers on an attack can fire. That is the ranged slot
-                    # for everyone but a hunter, the melee slots for a hunter (who
-                    # never swings), and both weapon hands for a druid (weapon procs
-                    # do not fire in cat or bear form) and for an elemental or
-                    # restoration shaman. It matters beyond damage procs: a
+                    # for everyone but a hunter, both weapon hands for a druid
+                    # (weapon procs do not fire in cat or bear form), and an
+                    # elemental or restoration shaman. Beast Mastery and
+                    # Marksmanship melee dpsWeight is 0.05, so their melee procs
+                    # fire. It matters beyond damage procs: a
                     # "Chance on hit: +30 Strength for 8 sec" line is priced by
                     # uptime x stat weight, not by dpsWeight, so it was scoring in
                     # full on weapons that are never swung.
@@ -1129,14 +1137,34 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                 # Wristguards of True Flight were all eligible and all invisible.
                 if level==60: full60[(faction,sl)]=list(rows)
                 ranked_all=rows
-                rows=unique_name_rows(rows, 8)
+                if cls == "SHAMAN" and spec_key == "enhancement" and sl == "SecondaryHand":
+                    # Enhancement shows two-handers only. Shields and held items stay off the list.
+                    rows = []
+                    ranked_all = []
+                if cls == "HUNTER" and sl == "SecondaryHand":
+                    # Off hand is the tooltip "One-Hand" (either hand). A "Main Hand"
+                    # weapon and an "Off Hand" weapon do not belong here.
+                    ranked_all = [r for r in ranked_all if is_either_hand(r[1])]
+                    rows = ranked_all
+                split_hands = sl == "MainHand" and cls == "HUNTER"
+                enh_two_only = sl == "MainHand" and cls == "SHAMAN" and spec_key == "enhancement"
+                if split_hands:
+                    # Two-handers, then main-hand-only one-handers. An either-hand
+                    # weapon (InventoryType 13) is an off-hand pick, not this list.
+                    two = unique_name_rows([r for r in ranked_all if is_two_hand_item(r[1])], 4)
+                    main_only = unique_name_rows([r for r in ranked_all if is_mainhand_only(r[1])], 4)
+                    rows = two + main_only
+                elif enh_two_only:
+                    rows = unique_name_rows([r for r in ranked_all if is_two_hand_item(r[1])], 8)
+                else:
+                    rows=unique_name_rows(rows, 8)
                 # Physical specs: +SP/+heal pieces (Silvered Gauntlets) must not
                 # take a top-3 hunt. If they also have defense, they are the notable.
                 spell_gear = []
                 if not spec_uses_spell_power(wl):
                     spell_gear = [r for r in rows if item_is_spell_gear(r[1])]
                     rows = [r for r in rows if not item_is_spell_gear(r[1])]
-                if sl == "MainHand" and style == "twohand_or_onehand":
+                if sl == "MainHand" and style == "twohand_or_onehand" and not split_hands:
                     rows = pair_weapon_styles(rows)
                 top3={r[1]["id"] for r in rows[:3]}
                 top3_names={r[1]["name"] for r in rows[:3]}
@@ -1188,6 +1216,14 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                 for r in ranked_all:
                     it=r[1]
                     if it["id"] in FOREVER_MISSING or it["id"] in held_ids or it["name"] in held_names:
+                        continue
+                    if cls == "HUNTER" and sl == "MainHand" and not is_two_hand_item(it) and not is_mainhand_only(it):
+                        continue
+                    if cls == "HUNTER" and sl == "SecondaryHand" and not is_either_hand(it):
+                        continue
+                    if cls == "SHAMAN" and spec_key == "enhancement" and sl == "MainHand" and not is_two_hand_item(it):
+                        continue
+                    if cls == "SHAMAN" and spec_key == "enhancement" and sl == "SecondaryHand":
                         continue
                     if skip_spell and item_is_spell_gear(it):
                         continue
@@ -1311,6 +1347,35 @@ def promote_hunter_ranged_proc(rows, cls):
 
 TWO_HAND_KINDS = {"Staff", "Polearm", "Mace2H", "Sword2H", "Axe2H", "FishingPole"}
 
+def is_two_hand_item(it):
+    return it.get("inv") == 17 or it.get("slot") == "TwoHand" or it.get("kind") in TWO_HAND_KINDS
+
+def is_mainhand_only(it):
+    """Tooltip says Main Hand. One-handed, and it cannot go in the off hand."""
+    if is_two_hand_item(it):
+        return False
+    return it.get("slot") == "MainHand" or it.get("inv") == 21
+
+def is_either_hand(it):
+    """Tooltip says One-Hand. It can be equipped in either hand."""
+    if is_two_hand_item(it) or is_mainhand_only(it):
+        return False
+    return it.get("slot") == "OneHand" or it.get("inv") == 13
+
+def weapon_hand(it, sl):
+    """two = two-hand, main = Main Hand, one = One-Hand."""
+    if sl == "MainHand":
+        if is_two_hand_item(it):
+            return "two"
+        if is_mainhand_only(it):
+            return "main"
+        if is_either_hand(it):
+            return "one"
+        return None
+    if sl == "SecondaryHand" and is_either_hand(it):
+        return "one"
+    return None
+
 def pair_weapon_styles(rows):
     """Rank 1 stays the best weapon. Rank 2 is the best of the other hand style.
 
@@ -1321,8 +1386,7 @@ def pair_weapon_styles(rows):
         return rows
 
     def is_two(r):
-        it = r[1]
-        return it.get("inv") == 17 or it.get("slot") == "TwoHand" or it.get("kind") in TWO_HAND_KINDS
+        return is_two_hand_item(r[1])
 
     two = next((r for r in rows if is_two(r)), None)
     one = next((r for r in rows if not is_two(r)), None)
@@ -1395,6 +1459,24 @@ def route_for(per, faction, level):
     pair = one + off
     return ("twohand" if two >= pair else "onehand"), round(two, 2), round(pair, 2)
 
+def style_band_key(rows):
+    """Packed two-hand then main-hand-only lists change identity when either group does."""
+    two, main, other = [], [], []
+    for r in rows:
+        if is_two_hand_item(r[1]):
+            two.append(r)
+        elif is_mainhand_only(r[1]):
+            main.append(r)
+        else:
+            other.append(r)
+    if two and main and not other:
+        picked = two[:3] + main[:3]
+    elif two and not main and not other:
+        picked = two[:3]
+    else:
+        picked = rows[:3]
+    return tuple((r[1]["id"], r[2]) for r in picked)
+
 def collapse(per, factions, slots, levels):
     """merge adjacent levels whose top-3 pick is identical"""
     bands=[]
@@ -1403,7 +1485,7 @@ def collapse(per, factions, slots, levels):
             run_key=None; start=None; prev=None
             for lv in list(levels)+[None]:
                 rows=per.get((faction,lv,sl),[]) if lv else []
-                key=tuple((r[1]["id"],r[2]) for r in rows[:3]) if rows else None
+                key=style_band_key(rows) if rows else None
                 if key!=run_key:
                     if run_key: bands.append((faction,sl,start,prev,run_key,per[(faction,prev,sl)][:8]))
                     run_key=key; start=lv
@@ -1454,7 +1536,8 @@ if __name__=="__main__":
                             "dps":r[1]["dps"],"speed":r[1]["speed"],
                             "stats":r[4],"src":srcs[str(r[1]["id"])],"seasonal":srcs[str(r[1]["id"])].get("seasonal",False),
                             "effects":r[1].get("effects") or [],
-                            "reqSkills":r[1].get("reqSkills") or [],"reqRep":r[1].get("reqRep") or []} for r in rows]})
+                            "reqSkills":r[1].get("reqSkills") or [],"reqRep":r[1].get("reqRep") or [],
+                            "hand": weapon_hand(r[1], sl)} for r in rows]})
                 for p in out[_spec]["bands"][-1]["picks"]:
                     if not spec_wants_heal(cls, _spec) and item_is_heal_only({"stats": p.get("stats") or {}}):
                         p["healOnly"] = True

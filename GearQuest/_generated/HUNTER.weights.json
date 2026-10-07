@@ -59,7 +59,7 @@
     "dodge": 0.05,
     "parry": 0.0,
     "expertise": 0.1,
-    "str": 0.05,
+    "str": 0.0,
     "ap": 0.1,
     "agi": 1.0,
     "rap": 0.5,

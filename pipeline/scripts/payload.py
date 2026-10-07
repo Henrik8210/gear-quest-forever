@@ -28,11 +28,11 @@ _VIPER_BONUS = (
 )
 VIPER_WHY = {
     "HUNTER": _VIPER_BONUS + (
-        "Beast Mastery and Marksmanship: all five pieces are BiS together from 18 to 21. "
-        "From 22 the chest falls off and the other four stay through about 24. "
+        "Beast Mastery and Marksmanship: the legs, feet, belt, and gloves are the hunt from 18 through about 24. "
+        "Armor of the Fang is not, because those specs barely count melee damage and the chest has no agility. "
         "Survival keeps all five through 23, and at 24 the legs are what remain. "
-        "Collect 4 pieces for the heal and mana, and all 5 for Dream Venom. "
-        "The chest and the belt become BiS with the set. Gloves are a hunt from 14 on their own, and the legs from 17. "
+        "Collect 4 pieces for the heal and mana. Survival wants all 5 for Dream Venom. "
+        "The belt becomes BiS with the set. Gloves are a hunt from 14 on their own, and the legs from 17. "
         "A druid in all five turns into a serpent. The color follows your race, and Prowl or Stealth slithers."
     ),
     "ROGUE": _VIPER_BONUS + (
@@ -350,6 +350,8 @@ for sp,blob in gen.items():
             # legally do both, and only on the two weapon slots. The addon uses it to
             # grey the row that does not apply, so a staff and an off-hand item are never
             # both presented as the answer.
+            if p.get("hand"):
+                extra+=f',hand={lua(p["hand"])}'
             if b.get("route"):
                 extra+=f',route={lua(b["route"])}'
             if p.get("healOnly"):

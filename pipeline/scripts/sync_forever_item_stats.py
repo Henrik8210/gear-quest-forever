@@ -56,7 +56,10 @@ ARMOR = re.compile(r"(?<![.\d])(\d+)\s*Armor")
 BLOCK = re.compile(r"(?<![.\d])(\d+)\s*Block")
 DPS = re.compile(r"\(([\d.]+)\s+damage per second\)", re.I)
 SPEED = re.compile(r"Speed\s+([\d.]+)")
-DMG = re.compile(r"(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)\s+Damage")
+DMG = re.compile(
+    r"(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)\s+(?:(?:Arcane|Fire|Frost|Nature|Shadow|Holy)\s+)?Damage",
+    re.I,
+)
 
 SCORE = (
     "str", "agi", "sta", "int", "spi", "ap", "rap", "sp", "heal", "sp_from_heal",
