@@ -981,7 +981,7 @@ function GQ.Indicator:RebuildCacheForSlot(slotName)
 
     local maxUpgrades = GQ.Data.GetMaxUpgradesForSlot and GQ.Data:GetMaxUpgradesForSlot(slotName) or 3
     local upgrades
-    if GQ.Log and GQ.Log.SourceFilterActive and GQ.Log:SourceFilterActive() and GQ.Log.GetFilteredTopForSlot then
+    if GQ.Log and GQ.Log.UsesWideHuntList and GQ.Log:UsesWideHuntList() and GQ.Log.GetFilteredTopForSlot then
         upgrades = GQ.Log:GetFilteredTopForSlot(slotName)
     else
         upgrades = GQ.Data:GetTopUpgradesForSlot(slotName, maxUpgrades)

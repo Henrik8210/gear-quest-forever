@@ -9,6 +9,7 @@ local KIND_FOR = {
     quest_reward = "q",
     seasonal_quest = "q",
     boss_drop = "b",
+    raid_trash = "b",
     profession = "p",
     vendor = "v",
 }

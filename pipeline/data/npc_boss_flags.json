@@ -1,0 +1,1707 @@
+{
+ "Agathelos the Raging": {
+  "status": "ok",
+  "id": 4422,
+  "boss": 0,
+  "classification": 1
+ },
+ "Aggem Thorncurse": {
+  "status": "ok",
+  "id": 4424,
+  "boss": 0,
+  "classification": 1
+ },
+ "Aku'mai": {
+  "status": "no-match"
+ },
+ "Alzzin the Wildshaper": {
+  "status": "ok",
+  "id": 11492,
+  "boss": 1,
+  "classification": 1
+ },
+ "Ambassador Flamelash": {
+  "status": "ok",
+  "id": 9156,
+  "boss": 1,
+  "classification": 1
+ },
+ "Amnennar the Coldbringer": {
+  "status": "ok",
+  "id": 7358,
+  "boss": 0,
+  "classification": 1
+ },
+ "Ancient Stone Keeper": {
+  "status": "ok",
+  "id": 7206,
+  "boss": 1,
+  "classification": 1
+ },
+ "Antu'sul": {
+  "status": "ok",
+  "id": 8127,
+  "boss": 1,
+  "classification": 1
+ },
+ "Anub'Rekhan": {
+  "status": "ok",
+  "id": 15956,
+  "boss": 1,
+  "classification": 3
+ },
+ "Anub'shiah": {
+  "status": "ok",
+  "id": 9031,
+  "boss": 1,
+  "classification": 1
+ },
+ "Anubisath Warder": {
+  "status": "ok",
+  "id": 15311,
+  "boss": 0,
+  "classification": 1
+ },
+ "Arcane Aberration": {
+  "status": "ok",
+  "id": 11480,
+  "boss": 0,
+  "classification": 1
+ },
+ "Arcane Torrent": {
+  "status": "ok",
+  "id": 14399,
+  "boss": 0,
+  "classification": 1
+ },
+ "Arcanist Doan": {
+  "status": "ok",
+  "id": 6487,
+  "boss": 0,
+  "classification": 1
+ },
+ "Archaedas": {
+  "status": "ok",
+  "id": 2748,
+  "boss": 1,
+  "classification": 1
+ },
+ "Archivist Galford": {
+  "status": "ok",
+  "id": 10811,
+  "boss": 1,
+  "classification": 1
+ },
+ "Archmage Arugal": {
+  "status": "ok",
+  "id": 4275,
+  "boss": 1,
+  "classification": 1
+ },
+ "Arugal's Voidwalker": {
+  "status": "ok",
+  "id": 4627,
+  "boss": 0,
+  "classification": 0
+ },
+ "Atal'alarion": {
+  "status": "ok",
+  "id": 8580,
+  "boss": 0,
+  "classification": 1
+ },
+ "Avatar of Hakkar": {
+  "status": "ok",
+  "id": 8443,
+  "boss": 1,
+  "classification": 1
+ },
+ "Ayamiss the Hunter": {
+  "status": "ok",
+  "id": 15369,
+  "boss": 1,
+  "classification": 3
+ },
+ "Azshir the Sleepless": {
+  "status": "ok",
+  "id": 6490,
+  "boss": 0,
+  "classification": 2
+ },
+ "Bael'Gar": {
+  "status": "ok",
+  "id": 9016,
+  "boss": 1,
+  "classification": 1
+ },
+ "Baelog": {
+  "status": "ok",
+  "id": 6906,
+  "boss": 1,
+  "classification": 1
+ },
+ "Balnazzar": {
+  "status": "ok",
+  "id": 10813,
+  "boss": 1,
+  "classification": 1
+ },
+ "Bannok Grimaxe": {
+  "status": "ok",
+  "id": 9596,
+  "boss": 1,
+  "classification": 2
+ },
+ "Baron Geddon": {
+  "status": "ok",
+  "id": 12056,
+  "boss": 1,
+  "classification": 3
+ },
+ "Baron Rivendare": {
+  "status": "ok",
+  "id": 10440,
+  "boss": 0,
+  "classification": 1
+ },
+ "Baron Silverlaine": {
+  "status": "ok",
+  "id": 3887,
+  "boss": 1,
+  "classification": 1
+ },
+ "Baroness Anastari": {
+  "status": "ok",
+  "id": 10436,
+  "boss": 1,
+  "classification": 1
+ },
+ "Battleguard Sartura": {
+  "status": "ok",
+  "id": 15516,
+  "boss": 1,
+  "classification": 3
+ },
+ "Bazil Thredd": {
+  "status": "ok",
+  "id": 1716,
+  "boss": 0,
+  "classification": 1
+ },
+ "Bjork": {
+  "status": "ok",
+  "id": 256097,
+  "boss": 0,
+  "classification": 1
+ },
+ "Blackhand Assassin": {
+  "status": "ok",
+  "id": 10318,
+  "boss": 0,
+  "classification": 1
+ },
+ "Blackhand Iron Guard": {
+  "status": "ok",
+  "id": 10319,
+  "boss": 0,
+  "classification": 1
+ },
+ "Blackhand Summoner": {
+  "status": "ok",
+  "id": 9818,
+  "boss": 0,
+  "classification": 1
+ },
+ "Blackwing Warlock": {
+  "status": "ok",
+  "id": 12459,
+  "boss": 0,
+  "classification": 1
+ },
+ "Blind Hunter": {
+  "status": "ok",
+  "id": 4425,
+  "boss": 0,
+  "classification": 2
+ },
+ "Bloodlord Mandokir": {
+  "status": "ok",
+  "id": 11382,
+  "boss": 1,
+  "classification": 3
+ },
+ "Bloodmage Thalnos": {
+  "status": "ok",
+  "id": 4543,
+  "boss": 0,
+  "classification": 1
+ },
+ "Broodlord Lashlayer": {
+  "status": "ok",
+  "id": 12017,
+  "boss": 1,
+  "classification": 3
+ },
+ "Bruegal Ironknuckle": {
+  "status": "ok",
+  "id": 1720,
+  "boss": 0,
+  "classification": 2
+ },
+ "Buru the Gorger": {
+  "status": "ok",
+  "id": 15370,
+  "boss": 1,
+  "classification": 3
+ },
+ "C'Thun": {
+  "status": "no-match"
+ },
+ "Cannon Master Willey": {
+  "status": "ok",
+  "id": 10997,
+  "boss": 1,
+  "classification": 1
+ },
+ "Captain Greenskin": {
+  "status": "ok",
+  "id": 647,
+  "boss": 0,
+  "classification": 1
+ },
+ "Captain Kromcrush": {
+  "status": "ok",
+  "id": 14325,
+  "boss": 1,
+  "classification": 1
+ },
+ "Celebras the Cursed": {
+  "status": "ok",
+  "id": 12225,
+  "boss": 1,
+  "classification": 1
+ },
+ "Charlga Razorflank": {
+  "status": "ok",
+  "id": 4421,
+  "boss": 0,
+  "classification": 1
+ },
+ "Chief Ukorz Sandscalp": {
+  "status": "ok",
+  "id": 7267,
+  "boss": 1,
+  "classification": 1
+ },
+ "Cho'Rush the Observer": {
+  "status": "ok",
+  "id": 14324,
+  "boss": 1,
+  "classification": 1
+ },
+ "Chromaggus": {
+  "status": "ok",
+  "id": 14020,
+  "boss": 1,
+  "classification": 3
+ },
+ "Colonel Zerran": {
+  "status": "ok",
+  "id": 15385,
+  "boss": 0,
+  "classification": 1
+ },
+ "Commander Springvale": {
+  "status": "ok",
+  "id": 4278,
+  "boss": 1,
+  "classification": 1
+ },
+ "Cookie": {
+  "status": "no-match"
+ },
+ "Coren Direbrew": {
+  "status": "no-json"
+ },
+ "Crimson Battle Mage": {
+  "status": "ok",
+  "id": 10425,
+  "boss": 0,
+  "classification": 1
+ },
+ "Crimson Gallant": {
+  "status": "ok",
+  "id": 10424,
+  "boss": 0,
+  "classification": 1
+ },
+ "Crimson Inquisitor": {
+  "status": "ok",
+  "id": 10426,
+  "boss": 0,
+  "classification": 1
+ },
+ "Crimson Monk": {
+  "status": "ok",
+  "id": 11043,
+  "boss": 0,
+  "classification": 1
+ },
+ "Crimson Priest": {
+  "status": "ok",
+  "id": 10423,
+  "boss": 0,
+  "classification": 1
+ },
+ "Crowd Pummeler 9-60": {
+  "status": "no-match"
+ },
+ "Crystal Fang": {
+  "status": "ok",
+  "id": 10376,
+  "boss": 1,
+  "classification": 2
+ },
+ "Dark Iron Ambassador": {
+  "status": "ok",
+  "id": 6228,
+  "boss": 1,
+  "classification": 2
+ },
+ "Darkmaster Gandling": {
+  "status": "ok",
+  "id": 1853,
+  "boss": 0,
+  "classification": 1
+ },
+ "Death Speaker Jargba": {
+  "status": "ok",
+  "id": 4428,
+  "boss": 0,
+  "classification": 1
+ },
+ "Death Talon Captain": {
+  "status": "ok",
+  "id": 12467,
+  "boss": 0,
+  "classification": 1
+ },
+ "Death Talon Wyrmguard": {
+  "status": "ok",
+  "id": 12460,
+  "boss": 0,
+  "classification": 1
+ },
+ "Death Talon Wyrmkin": {
+  "status": "ok",
+  "id": 12465,
+  "boss": 0,
+  "classification": 1
+ },
+ "Death's Head Priest": {
+  "status": "ok",
+  "id": 4517,
+  "boss": 0,
+  "classification": 1
+ },
+ "Deathsworn Captain": {
+  "status": "ok",
+  "id": 3872,
+  "boss": 1,
+  "classification": 2
+ },
+ "Defias Blackguard": {
+  "status": "ok",
+  "id": 636,
+  "boss": 0,
+  "classification": 1
+ },
+ "Defias Miner": {
+  "status": "ok",
+  "id": 598,
+  "boss": 0,
+  "classification": 0
+ },
+ "Defias Overseer": {
+  "status": "ok",
+  "id": 634,
+  "boss": 0,
+  "classification": 1
+ },
+ "Defias Prisoner": {
+  "status": "ok",
+  "id": 1706,
+  "boss": 0,
+  "classification": 1
+ },
+ "Defias Squallshaper": {
+  "status": "ok",
+  "id": 1732,
+  "boss": 0,
+  "classification": 1
+ },
+ "Defias Strip Miner": {
+  "status": "ok",
+  "id": 4416,
+  "boss": 0,
+  "classification": 0
+ },
+ "Defias Watchman": {
+  "status": "ok",
+  "id": 1725,
+  "boss": 0,
+  "classification": 1
+ },
+ "Defias Wizard": {
+  "status": "ok",
+  "id": 4418,
+  "boss": 0,
+  "classification": 1
+ },
+ "Deviate Faerie Dragon": {
+  "status": "ok",
+  "id": 5912,
+  "boss": 1,
+  "classification": 2
+ },
+ "Doctor Theolen Krastinov": {
+  "status": "no-match"
+ },
+ "Druid of the Fang": {
+  "status": "ok",
+  "id": 3840,
+  "boss": 0,
+  "classification": 1
+ },
+ "Durgen Dirgehammer": {
+  "status": "ok",
+  "id": 261319,
+  "boss": 0,
+  "classification": 1
+ },
+ "Dustwraith": {
+  "status": "ok",
+  "id": 10081,
+  "boss": 1,
+  "classification": 2
+ },
+ "Earthcaller Halmgar": {
+  "status": "ok",
+  "id": 4842,
+  "boss": 0,
+  "classification": 2
+ },
+ "Ebonroc": {
+  "status": "ok",
+  "id": 14601,
+  "boss": 1,
+  "classification": 3
+ },
+ "Edwin VanCleef": {
+  "status": "ok",
+  "id": 639,
+  "boss": 0,
+  "classification": 1
+ },
+ "Eldreth Apparition": {
+  "status": "ok",
+  "id": 11471,
+  "boss": 0,
+  "classification": 1
+ },
+ "Eldreth Spectre": {
+  "status": "ok",
+  "id": 11473,
+  "boss": 0,
+  "classification": 1
+ },
+ "Electrocutioner 6000": {
+  "status": "ok",
+  "id": 6235,
+  "boss": 1,
+  "classification": 1
+ },
+ "Emperor Dagran Thaurissan": {
+  "status": "ok",
+  "id": 9019,
+  "boss": 1,
+  "classification": 1
+ },
+ "Emperor Vek'lor": {
+  "status": "ok",
+  "id": 15276,
+  "boss": 1,
+  "classification": 3
+ },
+ "Emperor Vek'nilash": {
+  "status": "ok",
+  "id": 15275,
+  "boss": 1,
+  "classification": 3
+ },
+ "Eric \"The Swift\"": {
+  "status": "no-match"
+ },
+ "Faldrim Anvilmar": {
+  "status": "ok",
+  "id": 261306,
+  "boss": 0,
+  "classification": 1
+ },
+ "Fallen Champion": {
+  "status": "ok",
+  "id": 6488,
+  "boss": 0,
+  "classification": 2
+ },
+ "Fankriss the Unyielding": {
+  "status": "ok",
+  "id": 15510,
+  "boss": 1,
+  "classification": 3
+ },
+ "Fel Steed": {
+  "status": "ok",
+  "id": 3864,
+  "boss": 0,
+  "classification": 1
+ },
+ "Fenrus the Devourer": {
+  "status": "ok",
+  "id": 4274,
+  "boss": 1,
+  "classification": 1
+ },
+ "Fineous Darkvire": {
+  "status": "ok",
+  "id": 9056,
+  "boss": 1,
+  "classification": 1
+ },
+ "Firemaw": {
+  "status": "ok",
+  "id": 11983,
+  "boss": 1,
+  "classification": 3
+ },
+ "Flamegor": {
+  "status": "ok",
+  "id": 11981,
+  "boss": 1,
+  "classification": 3
+ },
+ "Gahz'rilla": {
+  "status": "no-match"
+ },
+ "Galgann Firehammer": {
+  "status": "ok",
+  "id": 7291,
+  "boss": 1,
+  "classification": 1
+ },
+ "Garr": {
+  "status": "no-match"
+ },
+ "Gehennas": {
+  "status": "ok",
+  "id": 12259,
+  "boss": 1,
+  "classification": 3
+ },
+ "Gelihast": {
+  "status": "ok",
+  "id": 6243,
+  "boss": 0,
+  "classification": 1
+ },
+ "General Angerforge": {
+  "status": "ok",
+  "id": 9033,
+  "boss": 1,
+  "classification": 1
+ },
+ "General Drakkisath": {
+  "status": "ok",
+  "id": 10363,
+  "boss": 0,
+  "classification": 3
+ },
+ "General Rajaxx": {
+  "status": "ok",
+  "id": 15341,
+  "boss": 1,
+  "classification": 3
+ },
+ "Geomancer Flintdagger": {
+  "status": "ok",
+  "id": 2609,
+  "boss": 0,
+  "classification": 4
+ },
+ "Ghamoo-ra": {
+  "status": "ok",
+  "id": 4887,
+  "boss": 0,
+  "classification": 1
+ },
+ "Ghok Bashguud": {
+  "status": "ok",
+  "id": 9718,
+  "boss": 1,
+  "classification": 2
+ },
+ "Gilnid": {
+  "status": "ok",
+  "id": 1763,
+  "boss": 0,
+  "classification": 1
+ },
+ "Gluth": {
+  "status": "ok",
+  "id": 15932,
+  "boss": 1,
+  "classification": 3
+ },
+ "Glutton": {
+  "status": "ok",
+  "id": 8567,
+  "boss": 0,
+  "classification": 1
+ },
+ "Goblin Craftsman": {
+  "status": "no-match"
+ },
+ "Goblin Engineer": {
+  "status": "no-match"
+ },
+ "Goblin Shipbuilder": {
+  "status": "ok",
+  "id": 3947,
+  "boss": 0,
+  "classification": 1
+ },
+ "Goblin Woodcarver": {
+  "status": "ok",
+  "id": 641,
+  "boss": 0,
+  "classification": 1
+ },
+ "Golem Lord Argelmach": {
+  "status": "ok",
+  "id": 8983,
+  "boss": 1,
+  "classification": 1
+ },
+ "Golemagg the Incinerator": {
+  "status": "ok",
+  "id": 11988,
+  "boss": 1,
+  "classification": 3
+ },
+ "Goraluk Anvilcrack": {
+  "status": "ok",
+  "id": 10899,
+  "boss": 0,
+  "classification": 1
+ },
+ "Gordok Mastiff": {
+  "status": "ok",
+  "id": 13036,
+  "boss": 0,
+  "classification": 0
+ },
+ "Gorosh the Dervish": {
+  "status": "ok",
+  "id": 9027,
+  "boss": 1,
+  "classification": 1
+ },
+ "Gothik the Harvester": {
+  "status": "ok",
+  "id": 16060,
+  "boss": 1,
+  "classification": 3
+ },
+ "Grand Widow Faerlina": {
+  "status": "ok",
+  "id": 15953,
+  "boss": 1,
+  "classification": 3
+ },
+ "Grimlok": {
+  "status": "ok",
+  "id": 4854,
+  "boss": 1,
+  "classification": 1
+ },
+ "Grobbulus": {
+  "status": "ok",
+  "id": 15931,
+  "boss": 1,
+  "classification": 3
+ },
+ "Grubbis": {
+  "status": "ok",
+  "id": 7361,
+  "boss": 1,
+  "classification": 1
+ },
+ "Guard Fengus": {
+  "status": "ok",
+  "id": 14321,
+  "boss": 1,
+  "classification": 1
+ },
+ "Guard Mol'dar": {
+  "status": "ok",
+  "id": 14326,
+  "boss": 1,
+  "classification": 1
+ },
+ "Gyth": {
+  "status": "ok",
+  "id": 10339,
+  "boss": 0,
+  "classification": 1
+ },
+ "Hakkar": {
+  "status": "no-match"
+ },
+ "Halycon": {
+  "status": "ok",
+  "id": 10220,
+  "boss": 1,
+  "classification": 1
+ },
+ "Hearthsinger Forresten": {
+  "status": "ok",
+  "id": 10558,
+  "boss": 1,
+  "classification": 2
+ },
+ "Hedrum the Creeper": {
+  "status": "ok",
+  "id": 9032,
+  "boss": 1,
+  "classification": 1
+ },
+ "Heigan the Unclean": {
+  "status": "ok",
+  "id": 15936,
+  "boss": 1,
+  "classification": 3
+ },
+ "Herod": {
+  "status": "ok",
+  "id": 3975,
+  "boss": 0,
+  "classification": 1
+ },
+ "High Inquisitor Fairbanks": {
+  "status": "ok",
+  "id": 4542,
+  "boss": 0,
+  "classification": 1
+ },
+ "High Inquisitor Whitemane": {
+  "status": "ok",
+  "id": 3977,
+  "boss": 1,
+  "classification": 1
+ },
+ "High Interrogator Gerstahn": {
+  "status": "ok",
+  "id": 9018,
+  "boss": 1,
+  "classification": 1
+ },
+ "High Priest Thekal": {
+  "status": "ok",
+  "id": 14509,
+  "boss": 1,
+  "classification": 3
+ },
+ "High Priest Venoxis": {
+  "status": "ok",
+  "id": 14507,
+  "boss": 1,
+  "classification": 3
+ },
+ "High Priestess Jeklik": {
+  "status": "ok",
+  "id": 14517,
+  "boss": 1,
+  "classification": 3
+ },
+ "High Priestess Mar'li": {
+  "status": "ok",
+  "id": 14510,
+  "boss": 0,
+  "classification": 3
+ },
+ "Highlord Omokk": {
+  "status": "ok",
+  "id": 9196,
+  "boss": 1,
+  "classification": 1
+ },
+ "Houndmaster Grebmar": {
+  "status": "ok",
+  "id": 9319,
+  "boss": 1,
+  "classification": 1
+ },
+ "Houndmaster Loksey": {
+  "status": "ok",
+  "id": 3974,
+  "boss": 0,
+  "classification": 1
+ },
+ "Hurley Blackbreath": {
+  "status": "no-match"
+ },
+ "Hydrospawn": {
+  "status": "ok",
+  "id": 13280,
+  "boss": 1,
+  "classification": 1
+ },
+ "Illyanna Ravenoak": {
+  "status": "ok",
+  "id": 11488,
+  "boss": 1,
+  "classification": 1
+ },
+ "Immol'thar": {
+  "status": "ok",
+  "id": 11496,
+  "boss": 1,
+  "classification": 1
+ },
+ "Instructor Malicia": {
+  "status": "ok",
+  "id": 10505,
+  "boss": 0,
+  "classification": 1
+ },
+ "Instructor Razuvious": {
+  "status": "ok",
+  "id": 16061,
+  "boss": 1,
+  "classification": 3
+ },
+ "Interrogator Vishas": {
+  "status": "ok",
+  "id": 3983,
+  "boss": 0,
+  "classification": 1
+ },
+ "Ironaya": {
+  "status": "ok",
+  "id": 7228,
+  "boss": 1,
+  "classification": 1
+ },
+ "Ironbark Protector": {
+  "status": "ok",
+  "id": 11459,
+  "boss": 0,
+  "classification": 1
+ },
+ "Ironspine": {
+  "status": "ok",
+  "id": 6489,
+  "boss": 0,
+  "classification": 2
+ },
+ "Ivus the Forest Lord": {
+  "status": "no-match"
+ },
+ "Jammal'an the Prophet": {
+  "status": "no-match"
+ },
+ "Jandice Barov": {
+  "status": "ok",
+  "id": 10503,
+  "boss": 0,
+  "classification": 1
+ },
+ "Jed Runewatcher": {
+  "status": "ok",
+  "id": 10509,
+  "boss": 0,
+  "classification": 2
+ },
+ "Jergosh the Invoker": {
+  "status": "ok",
+  "id": 11518,
+  "boss": 0,
+  "classification": 1
+ },
+ "Jin'do the Hexxer": {
+  "status": "ok",
+  "id": 11380,
+  "boss": 1,
+  "classification": 3
+ },
+ "Kam Deepfury": {
+  "status": "ok",
+  "id": 1666,
+  "boss": 0,
+  "classification": 1
+ },
+ "Kel'Thuzad": {
+  "status": "ok",
+  "id": 15990,
+  "boss": 1,
+  "classification": 3
+ },
+ "King Gordok": {
+  "status": "ok",
+  "id": 11501,
+  "boss": 1,
+  "classification": 1
+ },
+ "Kirtonos the Herald": {
+  "status": "no-match"
+ },
+ "Kormok": {
+  "status": "ok",
+  "id": 16118,
+  "boss": 0,
+  "classification": 1
+ },
+ "Kresh": {
+  "status": "ok",
+  "id": 3653,
+  "boss": 1,
+  "classification": 1
+ },
+ "Kurinnaxx": {
+  "status": "ok",
+  "id": 15348,
+  "boss": 1,
+  "classification": 3
+ },
+ "Lady Anacondra": {
+  "status": "ok",
+  "id": 3671,
+  "boss": 1,
+  "classification": 1
+ },
+ "Lady Sarevess": {
+  "status": "ok",
+  "id": 4831,
+  "boss": 0,
+  "classification": 1
+ },
+ "Landslide": {
+  "status": "ok",
+  "id": 12203,
+  "boss": 1,
+  "classification": 1
+ },
+ "Lethtendris": {
+  "status": "no-match"
+ },
+ "Loatheb": {
+  "status": "ok",
+  "id": 16011,
+  "boss": 1,
+  "classification": 3
+ },
+ "Lord Alexei Barov": {
+  "status": "ok",
+  "id": 10504,
+  "boss": 0,
+  "classification": 1
+ },
+ "Lord Cobrahn": {
+  "status": "ok",
+  "id": 3669,
+  "boss": 1,
+  "classification": 1
+ },
+ "Lord Hel'nurath": {
+  "status": "ok",
+  "id": 14506,
+  "boss": 1,
+  "classification": 1
+ },
+ "Lord Incendius": {
+  "status": "ok",
+  "id": 9017,
+  "boss": 1,
+  "classification": 1
+ },
+ "Lord Kazzak": {
+  "status": "ok",
+  "id": 12397,
+  "boss": 0,
+  "classification": 3
+ },
+ "Lord Kri": {
+  "status": "ok",
+  "id": 15511,
+  "boss": 1,
+  "classification": 3
+ },
+ "Lord Pythas": {
+  "status": "ok",
+  "id": 3670,
+  "boss": 1,
+  "classification": 1
+ },
+ "Lord Roccor": {
+  "status": "ok",
+  "id": 9025,
+  "boss": 1,
+  "classification": 1
+ },
+ "Lord Serpentis": {
+  "status": "ok",
+  "id": 3673,
+  "boss": 1,
+  "classification": 1
+ },
+ "Lord Vyletongue": {
+  "status": "ok",
+  "id": 12236,
+  "boss": 1,
+  "classification": 1
+ },
+ "Lorekeeper Polkelt": {
+  "status": "ok",
+  "id": 10901,
+  "boss": 0,
+  "classification": 1
+ },
+ "Lucifron": {
+  "status": "ok",
+  "id": 12118,
+  "boss": 1,
+  "classification": 3
+ },
+ "Maexxna": {
+  "status": "ok",
+  "id": 15952,
+  "boss": 1,
+  "classification": 3
+ },
+ "Magister Kalendris": {
+  "status": "ok",
+  "id": 11487,
+  "boss": 1,
+  "classification": 1
+ },
+ "Magistrate Barthilas": {
+  "status": "ok",
+  "id": 10435,
+  "boss": 1,
+  "classification": 1
+ },
+ "Magmadar": {
+  "status": "ok",
+  "id": 11982,
+  "boss": 1,
+  "classification": 3
+ },
+ "Magmatus": {
+  "status": "ok",
+  "id": 261316,
+  "boss": 0,
+  "classification": 1
+ },
+ "Magmus": {
+  "status": "ok",
+  "id": 9938,
+  "boss": 1,
+  "classification": 1
+ },
+ "Maleki the Pallid": {
+  "status": "ok",
+  "id": 10438,
+  "boss": 1,
+  "classification": 1
+ },
+ "Marduk Blackpool": {
+  "status": "ok",
+  "id": 10433,
+  "boss": 0,
+  "classification": 1
+ },
+ "Mekgineer Thermaplugg": {
+  "status": "ok",
+  "id": 7800,
+  "boss": 1,
+  "classification": 1
+ },
+ "Meshlok the Harvester": {
+  "status": "ok",
+  "id": 12237,
+  "boss": 1,
+  "classification": 2
+ },
+ "Miner Johnson": {
+  "status": "ok",
+  "id": 3586,
+  "boss": 1,
+  "classification": 2
+ },
+ "Moam": {
+  "status": "ok",
+  "id": 15340,
+  "boss": 1,
+  "classification": 3
+ },
+ "Mordresh Fire Eye": {
+  "status": "ok",
+  "id": 7357,
+  "boss": 0,
+  "classification": 1
+ },
+ "Morphaz": {
+  "status": "no-match"
+ },
+ "Mother Smolderweb": {
+  "status": "ok",
+  "id": 10596,
+  "boss": 1,
+  "classification": 1
+ },
+ "Mr. Smite": {
+  "status": "no-match"
+ },
+ "Mutanus the Devourer": {
+  "status": "ok",
+  "id": 3654,
+  "boss": 1,
+  "classification": 1
+ },
+ "Nerub'enkan": {
+  "status": "ok",
+  "id": 10437,
+  "boss": 1,
+  "classification": 1
+ },
+ "Noth the Plaguebringer": {
+  "status": "ok",
+  "id": 15954,
+  "boss": 1,
+  "classification": 3
+ },
+ "Noxxion": {
+  "status": "ok",
+  "id": 13282,
+  "boss": 1,
+  "classification": 1
+ },
+ "Obsidian Nullifier": {
+  "status": "ok",
+  "id": 15312,
+  "boss": 0,
+  "classification": 1
+ },
+ "Odo the Blindwatcher": {
+  "status": "ok",
+  "id": 4279,
+  "boss": 1,
+  "classification": 1
+ },
+ "Ogom the Wretched": {
+  "status": "ok",
+  "id": 5711,
+  "boss": 1,
+  "classification": 1
+ },
+ "Ok'thor the Breaker": {
+  "status": "ok",
+  "id": 9030,
+  "boss": 1,
+  "classification": 1
+ },
+ "Olaf": {
+  "status": "ok",
+  "id": 6908,
+  "boss": 1,
+  "classification": 1
+ },
+ "Old Serra'kis": {
+  "status": "ok",
+  "id": 4830,
+  "boss": 0,
+  "classification": 1
+ },
+ "Onyxia": {
+  "status": "no-match"
+ },
+ "Ossirian the Unscarred": {
+  "status": "ok",
+  "id": 15339,
+  "boss": 1,
+  "classification": 3
+ },
+ "Overlord Ramtusk": {
+  "status": "ok",
+  "id": 4420,
+  "boss": 0,
+  "classification": 1
+ },
+ "Overlord Wyrmthalak": {
+  "status": "ok",
+  "id": 9568,
+  "boss": 1,
+  "classification": 1
+ },
+ "Panzor the Invincible": {
+  "status": "ok",
+  "id": 8923,
+  "boss": 1,
+  "classification": 2
+ },
+ "Patchwerk": {
+  "status": "ok",
+  "id": 16028,
+  "boss": 1,
+  "classification": 3
+ },
+ "Patchwork Horror": {
+  "status": "ok",
+  "id": 10414,
+  "boss": 0,
+  "classification": 1
+ },
+ "Petrified Treant": {
+  "status": "ok",
+  "id": 11458,
+  "boss": 0,
+  "classification": 1
+ },
+ "Phalanx": {
+  "status": "no-match"
+ },
+ "Phase Lasher": {
+  "status": "ok",
+  "id": 13196,
+  "boss": 0,
+  "classification": 1
+ },
+ "Pimgib": {
+  "status": "ok",
+  "id": 14349,
+  "boss": 1,
+  "classification": 1
+ },
+ "Plugger Spazzring": {
+  "status": "ok",
+  "id": 9499,
+  "boss": 1,
+  "classification": 1
+ },
+ "Plunder": {
+  "status": "no-match"
+ },
+ "Postmaster Malown": {
+  "status": "ok",
+  "id": 11143,
+  "boss": 1,
+  "classification": 1
+ },
+ "Prince Tortheldrin": {
+  "status": "ok",
+  "id": 11486,
+  "boss": 1,
+  "classification": 1
+ },
+ "Princess Huhuran": {
+  "status": "ok",
+  "id": 15509,
+  "boss": 1,
+  "classification": 3
+ },
+ "Princess Moira Bronzebeard": {
+  "status": "ok",
+  "id": 8929,
+  "boss": 1,
+  "classification": 1
+ },
+ "Princess Theradras": {
+  "status": "ok",
+  "id": 12201,
+  "boss": 1,
+  "classification": 1
+ },
+ "Princess Yauj": {
+  "status": "ok",
+  "id": 15543,
+  "boss": 1,
+  "classification": 3
+ },
+ "Pyroguard Emberseer": {
+  "status": "ok",
+  "id": 9816,
+  "boss": 0,
+  "classification": 3
+ },
+ "Pyromancer Loregrain": {
+  "status": "ok",
+  "id": 9024,
+  "boss": 1,
+  "classification": 1
+ },
+ "Quartermaster Zigris": {
+  "status": "ok",
+  "id": 9736,
+  "boss": 1,
+  "classification": 1
+ },
+ "Rage Talon Dragonspawn": {
+  "status": "ok",
+  "id": 9096,
+  "boss": 0,
+  "classification": 1
+ },
+ "Rage Talon Fire Tongue": {
+  "status": "ok",
+  "id": 10372,
+  "boss": 0,
+  "classification": 1
+ },
+ "Rage Talon Flamescale": {
+  "status": "ok",
+  "id": 10083,
+  "boss": 0,
+  "classification": 1
+ },
+ "Ragglesnout": {
+  "status": "ok",
+  "id": 7354,
+  "boss": 0,
+  "classification": 1
+ },
+ "Ramstein the Gorger": {
+  "status": "ok",
+  "id": 10439,
+  "boss": 1,
+  "classification": 1
+ },
+ "Ras Frostwhisper": {
+  "status": "no-match"
+ },
+ "Rath'Mael": {
+  "status": "no-match"
+ },
+ "Rattlegore": {
+  "status": "ok",
+  "id": 11622,
+  "boss": 0,
+  "classification": 1
+ },
+ "Razorclaw the Butcher": {
+  "status": "ok",
+  "id": 3886,
+  "boss": 1,
+  "classification": 1
+ },
+ "Razorfen Spearhide": {
+  "status": "ok",
+  "id": 4438,
+  "boss": 0,
+  "classification": 1
+ },
+ "Razorgore the Untamed": {
+  "status": "ok",
+  "id": 12435,
+  "boss": 1,
+  "classification": 3
+ },
+ "Razorlash": {
+  "status": "ok",
+  "id": 12258,
+  "boss": 1,
+  "classification": 1
+ },
+ "Rethilgore": {
+  "status": "ok",
+  "id": 3914,
+  "boss": 1,
+  "classification": 1
+ },
+ "Revelosh": {
+  "status": "ok",
+  "id": 6910,
+  "boss": 1,
+  "classification": 1
+ },
+ "Rhahk'Zor": {
+  "status": "no-match"
+ },
+ "Roogug": {
+  "status": "ok",
+  "id": 6168,
+  "boss": 0,
+  "classification": 1
+ },
+ "Rotgrip": {
+  "status": "ok",
+  "id": 13596,
+  "boss": 1,
+  "classification": 1
+ },
+ "Saturated Ooze": {
+  "status": "ok",
+  "id": 5228,
+  "boss": 0,
+  "classification": 1
+ },
+ "Scarlet Centurion": {
+  "status": "ok",
+  "id": 4301,
+  "boss": 0,
+  "classification": 1
+ },
+ "Scarlet Champion": {
+  "status": "ok",
+  "id": 4302,
+  "boss": 0,
+  "classification": 1
+ },
+ "Scarlet Commander Mograine": {
+  "status": "ok",
+  "id": 3976,
+  "boss": 0,
+  "classification": 1
+ },
+ "Scarlet Myrmidon": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Scarlet Protector": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Scholomance Necromancer": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Shade of Eranikus": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Shadow Hunter Vosh'gajin": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Shadowpriest Sezz'ziz": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Shazzrah": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Skul": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Skum": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Smolderthorn Headhunter": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Smolderthorn Witch Doctor": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Sneed": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Sneed's Shredder": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Solakar Flamewreath": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Spawn of Hakkar": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Spire Spider": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Spirestone Battle Lord": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Spirestone Butcher": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Spirestone Lord Magus": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Splintered Skeleton": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Stomper Kreeg": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Stonespine": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Sulfuron Harbinger": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Summoned Blackhand Dreadweaver": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Taragaman the Hungerer": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Tendris Warpwood": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Thaddius": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "The Abandoned": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "The Baron": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "The Beast": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "The Prophet Skeram": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "The Ravenian": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "The Unforgiven": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Timmy the Cruel": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Tinkerer Gizlock": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Tsu'zee": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Tuten'kash": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Twilight Acolyte": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Twilight Lord Kelris": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Urok Doomhowl": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Vaelastrasz the Corrupt": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Vectus": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Vem": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Verdan the Everliving": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Verek": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Viktor the Vile": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Viscidus": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Viscous Fallout": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "War Master Voone": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Warder Stilgiss": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Warpwood Guardian": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Wildspawn Satyr": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Witch Doctor Zum'rah": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Witherfang": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Wolf Master Nandos": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Zerillis": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Zevrim Thornhoof": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "Zolo": {
+  "status": "error",
+  "error": "HTTP Error 403: Forbidden"
+ }
+}

@@ -766,7 +766,7 @@ def resolve_item(item_id: int, src: dict, cache: dict, xml_cache: dict) -> tuple
             door = mapped
     described = described_key(zone)
 
-    if kind == "boss_drop" or (kind == "world_drop" and door and not npc):
+    if kind in ("boss_drop", "raid_trash") or (kind == "world_drop" and door and not npc):
         if door:
             spots = entrance_spots(door)
             return {"note": NOTE_DOOR, "spots": spots, "more": len(spots) > 1}, None

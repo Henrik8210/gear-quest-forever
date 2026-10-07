@@ -58,8 +58,12 @@ Item facts come from Wowhead Forever, not from a TBC dump. When the catalog grow
 ### What you get in game
 
 - **Top 3 per slot** for all nine classes and every spec, levels 1–60, Alliance and Horde
+- **Rank #N** in a black box above the item name, still the real slot rank when a filter or a play style is on
+- **Play style** at the bottom of the log: **No Dungeons!** and **Get it now!**, and both can be on
+- **Filter** with a profession list, a boss-drop dungeon list, and a separate dungeon list for trash
 - **Track a hunt** and **toast on obtain**
-- **The Log** — parchment detail with how to get the piece, zone, quest, NPC, and always a Source line
+- **The Log** — parchment detail with how to get the piece, the craft skill, zone, quest, NPC, and always a Source line
+- **Show on map** opens the quest start, the dungeon entrance, the vendor, or the rare
 - **Simulator** — browse another class, spec, faction, or level (right-click the minimap button)
 - **Paper-doll** — right-click a character-panel slot
 - **Suffix names on the tooltip** so Forever's unsuffixed green tooltip still shows *of Agility* and the roll

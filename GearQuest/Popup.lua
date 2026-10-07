@@ -518,7 +518,7 @@ function GQ.Popup:ShowForSlot(slotName, slotButton)
     slotName = GQ.Data:NormalizeSlotName(slotName)
     local slotLabel = GQ.Data:SlotLabel(slotName)
     local upgrades
-    if GQ.Log and GQ.Log.SourceFilterActive and GQ.Log:SourceFilterActive() then
+    if GQ.Log and GQ.Log.UsesWideHuntList and GQ.Log:UsesWideHuntList() then
         upgrades = GQ.Log:GetFilteredTopForSlot(slotName)
     else
         upgrades = GQ.Data:GetTopUpgradesForSlot(slotName, MAX_OPTIONS)

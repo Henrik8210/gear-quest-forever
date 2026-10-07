@@ -276,6 +276,21 @@ def build_facts(used):
             if val: kv.append(f'{k}={lua(val)}')
         if s.get("seasonal"): kv.append("seasonal=true")
         if s.get("zoneOpen"): kv.append("zoneOpen=true")
+        skills = it.get("reqSkills") or []
+        if skills:
+            kv.append("reqSkills={" + ",".join(
+                '{"%s",%d}' % (str(row[0]).replace("\\", "\\\\").replace('"', '\\"'), int(row[1]))
+                for row in skills
+            ) + "}")
+        reps = it.get("reqRep") or []
+        if reps:
+            kv.append("reqRep={" + ",".join(
+                '{"%s","%s"}' % (
+                    str(row[0]).replace("\\", "\\\\").replace('"', '\\"'),
+                    str(row[1]).replace("\\", "\\\\").replace('"', '\\"'),
+                )
+                for row in reps
+            ) + "}")
         if LORE.get(str(iid)): kv.append(f'lore={lua(LORE[str(iid)])}')
         pr=(it.get("procs") or [])
         if pr: kv.append(f'proc={lua(pr[0][:180])}')
@@ -362,6 +377,28 @@ for sp,blob in gen.items():
                 p["id"], lua(b["slot"]), b["lo"], b["hi"], rank,
                 lua(spec), lua(b["faction"]), p["score"], extra))
 
+def stored_hand(slot, item_id):
+    """Same tags score.py writes on ranked picks. Notables need them too."""
+    it = items.get(str(item_id)) or {}
+    inv = it.get("inv")
+    sl = it.get("slot")
+    two = inv == 17 or sl == "TwoHand"
+    main = (not two) and (sl == "MainHand" or inv == 21)
+    either = (not two) and (not main) and (sl == "OneHand" or inv == 13)
+    if slot == "MainHand":
+        if two:
+            return "two"
+        if main:
+            return "main"
+        if either:
+            return "one"
+    if slot == "SecondaryHand":
+        if either:
+            return "one"
+        if sl == "OffHand" or inv == 22:
+            return "off"
+    return None
+
 notable=[]
 for sp,blob in gen.items():
     for b in blob["bands"]:
@@ -374,6 +411,10 @@ for sp,blob in gen.items():
                     extra+=',suffixChance=%s'%nb.get("chanceAny")
                 if nb.get("suffixId"):    extra+=',suffixId=%d'%nb["suffixId"]
                 if nb.get("suffixRange"): extra+=',suffixRange=%s'%lua(nb["suffixRange"])
+            if not extra or "hand=" not in extra:
+                hand = stored_hand(b["slot"], nb["id"])
+                if hand:
+                    extra += ",hand=%s" % lua(hand)
             notable.append('    {%d,%s,%d,%d,%s,%s%s},'%(
                 nb["id"], lua(b["slot"]), b["lo"], b["hi"], lua(SPEC.get(sp)), lua(b["faction"]), extra))
 

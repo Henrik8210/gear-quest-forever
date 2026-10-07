@@ -7534,6 +7534,36 @@ function GQ.Data:GetProfessionInstructions(entry)
     return instructions
 end
 
+function GQ.Data:ProfessionCraftRequirement(entry)
+    if not entry or entry.sourceType ~= "profession" then
+        return nil, nil
+    end
+    local profession = entry.profession
+    local known = GQ.CraftSkills and entry.itemId and GQ.CraftSkills[entry.itemId]
+    if known and known.skill and known.skill > 0 then
+        return known.profession or profession, known.skill
+    end
+    local skill = self:CraftSkillFromText(entry.instructions, profession)
+    if not skill or skill <= 1 then
+        skill = nil
+        if entry.reqSkills then
+            for i = 1, #entry.reqSkills do
+                local row = entry.reqSkills[i]
+                local rank = row and row[2]
+                if rank and rank > 1 and (not profession or not row[1] or row[1] == profession) then
+                    skill = rank
+                    profession = profession or row[1]
+                    break
+                end
+            end
+        end
+    end
+    if not profession or not skill or skill <= 0 then
+        return nil, nil
+    end
+    return profession, skill
+end
+
 function GQ.Data:EnsureProfessionCraftSkillListener()
     if self._professionCraftSkillListener then
         return
@@ -8612,6 +8642,9 @@ end
 
 function GQ.Data:ScheduleQueryRefresh()
     self:InvalidateQueryCache()
+    if GQ.Log and GQ.Log.GetItTodayEnabled and GQ.Log:GetItTodayEnabled() and GQ.Log.InvalidateSourceFilterCache then
+        GQ.Log:InvalidateSourceFilterCache()
+    end
     if self._queryRefreshScheduled then
         return
     end
@@ -9198,7 +9231,8 @@ function GQ.Data:GetNotableForSlot(slotName)
     local results = {}
     for i = 1, #slotRows do
         local entry = self:BuildNotableEntry(slotRows[i], facts, classFile)
-        if entry and self:ShouldShowEntry(entry) and self:EntryMatchesPlayer(entry) then
+        if entry and self:ShouldShowEntry(entry) and self:EntryMatchesPlayer(entry)
+            and self:EntryFitsPaperDollSlot(entry, slotName) then
             table.insert(results, entry)
         end
     end
@@ -9566,6 +9600,11 @@ function GQ.Data:UsesHunterWeaponPairs()
     return classFile == "HUNTER"
 end
 
+function GQ.Data:UsesRogueWeaponHands()
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    return classFile == "ROGUE"
+end
+
 function GQ.Data:UsesTwoHandOnlyWeapons()
     local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
     local spec = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec()
@@ -9596,12 +9635,29 @@ function GQ.Data:EntryIsEitherHand(entry)
     if entry.hand == "one" then
         return true
     end
-    if entry.hand == "main" or entry.hand == "two" then
+    if entry.hand == "main" or entry.hand == "two" or entry.hand == "off" then
         return false
     end
     if entry.itemId and GetItemInfo then
         local equipLoc = select(9, GetItemInfo(entry.itemId))
         return equipLoc == "INVTYPE_WEAPON"
+    end
+    return false
+end
+
+function GQ.Data:EntryIsOffHandOnly(entry)
+    if not entry then
+        return false
+    end
+    if entry.hand == "off" then
+        return true
+    end
+    if entry.hand == "main" or entry.hand == "two" or entry.hand == "one" then
+        return false
+    end
+    if entry.itemId and GetItemInfo then
+        local equipLoc = select(9, GetItemInfo(entry.itemId))
+        return equipLoc == "INVTYPE_WEAPONOFFHAND"
     end
     return false
 end
@@ -9621,7 +9677,16 @@ function GQ.Data:EntryFitsPaperDollSlot(entry, slotName)
             return self:EntryIsTwoHand(entry)
         end
         if slotName == "SecondaryHand" then
+            -- The off-hand character panel bar is one-handers only.
             return self:EntryIsEitherHand(entry)
+        end
+    end
+    if self:UsesRogueWeaponHands() then
+        if slotName == "MainHand" then
+            return self:EntryIsMainHandOnly(entry)
+        end
+        if slotName == "SecondaryHand" then
+            return self:EntryIsEitherHand(entry) or self:EntryIsOffHandOnly(entry)
         end
     end
     return true

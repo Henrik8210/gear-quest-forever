@@ -9,7 +9,7 @@ end
 GQ = GQ or {}
 _G.GearQuest = GQ
 
-GQ.VERSION = "0.3.6-beta"
+GQ.VERSION = "0.4.0-beta"
 GQ.ADDON_NAME = ADDON_NAME
 -- WoW Forever: 1–60 Classic+ (no TBC level cap).
 GQ.MAX_PLAYER_LEVEL = 60
@@ -161,7 +161,7 @@ local SOURCE_LABELS = {
     unsourced = "Unsourced",
     rare_npc = "Rare NPC",
     boss_drop = "Boss drop",
-    raid_trash = "Raid trash",
+    raid_trash = "Dungeon & Raid trash",
     quest_reward = "Quest reward",
     seasonal_quest = "Seasonal quest",
     vendor = "Vendor",

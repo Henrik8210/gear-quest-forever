@@ -51,6 +51,8 @@ for sp, blob in gen.items():
                 extra=(f',suffix={lua(p["suffix"])},suffixChance={p.get("chanceAny") or 0}')
                 if p.get("suffixId"):    extra+=f',suffixId={p["suffixId"]}'
                 if p.get("suffixRange"): extra+=f',suffixRange={lua(p["suffixRange"])}'
+            if p.get("hand"):
+                extra+=f',hand={lua(p["hand"])}'
             if b.get("route"):
                 extra+=f',route={lua(b["route"])}'
             if id(p) not in primary:
@@ -71,6 +73,21 @@ for iid in sorted(used):
     for k,val in (("zone",s.get("zone")),("npc",s.get("npc")),
                   ("questName",s.get("questName")),("profession",s.get("profession"))):
         if val: kv.append(f'{k}={lua(val)}')
+    skills = it.get("reqSkills") or []
+    if skills:
+        kv.append("reqSkills={" + ",".join(
+            '{"%s",%d}' % (str(row[0]).replace("\\", "\\\\").replace('"', '\\"'), int(row[1]))
+            for row in skills
+        ) + "}")
+    reps = it.get("reqRep") or []
+    if reps:
+        kv.append("reqRep={" + ",".join(
+            '{"%s","%s"}' % (
+                str(row[0]).replace("\\", "\\\\").replace('"', '\\"'),
+                str(row[1]).replace("\\", "\\\\").replace('"', '\\"'),
+            )
+            for row in reps
+        ) + "}")
     # Flavour shown under the item's name -- canonical quest text, a note about the boss,
     # or hand-written for a legendary. See build_lore.py. Absent where there is no story.
     if LORE.get(str(iid)): kv.append(f'lore={lua(LORE[str(iid)])}')

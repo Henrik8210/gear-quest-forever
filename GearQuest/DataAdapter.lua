@@ -253,6 +253,8 @@ local function Expand(src, data, out)
                 npc          = f.npc,
                 questName    = f.questName,
                 profession   = f.profession,
+                reqRep       = f.reqRep,
+                reqSkills    = f.reqSkills,
                 suffix       = r.suffix,
                 suffixChance = r.suffixChance,
                 suffixId     = r.suffixId,

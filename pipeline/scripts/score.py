@@ -1146,8 +1146,14 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     # weapon and an "Off Hand" weapon do not belong here.
                     ranked_all = [r for r in ranked_all if is_either_hand(r[1])]
                     rows = ranked_all
+                if cls == "ROGUE" and sl == "SecondaryHand":
+                    # Off hand is One-Hand or Off Hand. A tooltip "Main Hand" weapon
+                    # stays on the Main Hand list.
+                    ranked_all = [r for r in ranked_all if is_either_hand(r[1]) or is_offhand_only(r[1])]
+                    rows = ranked_all
                 split_hands = sl == "MainHand" and cls == "HUNTER"
                 enh_two_only = sl == "MainHand" and cls == "SHAMAN" and spec_key == "enhancement"
+                rogue_main_only = sl == "MainHand" and cls == "ROGUE"
                 if split_hands:
                     # Two-handers, then main-hand-only one-handers. An either-hand
                     # weapon (InventoryType 13) is an off-hand pick, not this list.
@@ -1156,6 +1162,10 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     rows = two + main_only
                 elif enh_two_only:
                     rows = unique_name_rows([r for r in ranked_all if is_two_hand_item(r[1])], 8)
+                elif rogue_main_only:
+                    # Main Hand is the tooltip "Main Hand". Either-hand weapons
+                    # (InventoryType 13) are off-hand picks.
+                    rows = unique_name_rows([r for r in ranked_all if is_mainhand_only(r[1])], 8)
                 else:
                     rows=unique_name_rows(rows, 8)
                 # Physical specs: +SP/+heal pieces (Silvered Gauntlets) must not
@@ -1220,6 +1230,10 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     if cls == "HUNTER" and sl == "MainHand" and not is_two_hand_item(it) and not is_mainhand_only(it):
                         continue
                     if cls == "HUNTER" and sl == "SecondaryHand" and not is_either_hand(it):
+                        continue
+                    if cls == "ROGUE" and sl == "MainHand" and not is_mainhand_only(it):
+                        continue
+                    if cls == "ROGUE" and sl == "SecondaryHand" and not (is_either_hand(it) or is_offhand_only(it)):
                         continue
                     if cls == "SHAMAN" and spec_key == "enhancement" and sl == "MainHand" and not is_two_hand_item(it):
                         continue
@@ -1362,8 +1376,14 @@ def is_either_hand(it):
         return False
     return it.get("slot") == "OneHand" or it.get("inv") == 13
 
+def is_offhand_only(it):
+    """Tooltip says Off Hand. It cannot go in the main hand."""
+    if is_two_hand_item(it) or is_mainhand_only(it) or is_either_hand(it):
+        return False
+    return it.get("slot") == "OffHand" or it.get("inv") == 22
+
 def weapon_hand(it, sl):
-    """two = two-hand, main = Main Hand, one = One-Hand."""
+    """two = two-hand, main = Main Hand, one = One-Hand, off = Off Hand."""
     if sl == "MainHand":
         if is_two_hand_item(it):
             return "two"
@@ -1372,8 +1392,11 @@ def weapon_hand(it, sl):
         if is_either_hand(it):
             return "one"
         return None
-    if sl == "SecondaryHand" and is_either_hand(it):
-        return "one"
+    if sl == "SecondaryHand":
+        if is_either_hand(it):
+            return "one"
+        if is_offhand_only(it):
+            return "off"
     return None
 
 def pair_weapon_styles(rows):

@@ -2,43 +2,65 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v0.3.6-beta
+## v0.4.0-beta
 
-Every class was scored again from the current Wowhead Forever tooltip, so a hunt's stats are the stats on the tooltip. A burnt Forever mark sits beside a reward that did not exist in classic. Holy paladin and hunter weights changed, and the Viper set windows follow those weights.
+You can hide the hunts that do not fit how you are playing, narrow a source down to one profession or one dungeon, and still see the real slot rank on the parchment. A few long quest chains now open at the level where you can finish them.
 
-The window title reads **GearQuest Forever v0.3.6-beta**.
+The window title reads **GearQuest Forever v0.4.0-beta**.
 
-### New in Forever
+### Play style
 
-A reward that Wowhead marks **New in Forever** has a burnt Forever mark to the right of the item icon, the same height as the icon. Hovering the mark says **New in Forever**.
+**Play style** sits at the bottom of the log. It opens two cards, and both can be on at once. A gold rim shows which ones are on. A play style can hide several sources together. The filter still only chooses a source.
 
-**Malignant Root** and **White Obsidian Wand** have the mark. **Blackened Defias Leggings** does not. An item number above 200000 is not enough: Season of Discovery pieces in that range already existed on classic, and they stay unmarked.
+**No Dungeons!** hides a hunt that sends you into a dungeon or raid. That is a dungeon or raid boss, dungeon and raid trash, and a quest whose text names a dungeon or whose pin is a dungeon entrance. World bosses stay. A craft you can buy stays. Whelgar's dig site in the Wetlands is not the Excavation Site dungeon, so that hunt stays.
 
-### Malignant Root
+**Get it now!** hides a hunt this character cannot get yet. A vendor piece waits until you reach the reputation stored on that item. A bind-on-pickup craft waits until you have that profession and the skill printed on the hunt. A bind-on-equip craft stays on the list, unless the item itself requires the profession to wear. When you reach the standing or the skill, the hunt comes back on its own. You do not have to turn the style off.
 
-**Malignant Root** is the Alliance **Arms** and **Fury** finger at level **27**. It drops from the rare **Nightveiled Rotheap** in the Wetlands. **Show on map** opens where that rare spawns: 21.2, 43.2, and the two nearby points. **Rotheap Inards** are party loot at 100%. Turn them in to **Rethiel the Greenwarden**. The Greenwarden is hostile to Horde, so Horde does not see this hunt.
+The character panel and the green arrows follow the same list. With a play style on, they show the hunts that are still allowed, not the full unfiltered top three.
 
-### Holy paladin
+### Source filter
 
-Holy levels in melee, then wears mail and, from 40, plate. Below 60 the log scores healing, spell power, and holy spell power at **1.8**, intellect at **1.2**, spirit at **1.5**, mana per 5 at **2.2**, flat mana at **0.08**, crit at **0.8**, and armor at **0.15**. Cloth is weighed lighter than mail, and mail lighter than plate, so a tailoring robe does not outrank blacksmithing healing mail or plate of the same band. **Acolyte's**, **Prefect's**, and the later plate sets are the armor those levels hunt.
+The filter list is alphabetical: Boss drop, Container, Dungeon & Raid trash, Profession, Quest reward, Rare NPC, Seasonal quest, Special, Unsourced, Vendor, and World drop.
 
-### Hunters
+Checking **Profession**, **Boss drop**, or **Dungeon & Raid trash** opens the list beside that row immediately. The label gains a `>`. You do not have to move the cursor away and back.
 
-Beast Mastery and Marksmanship now price a melee weapon's damage at **0.05**. Strength stays **0**. Ranged stays **14**. Survival is unchanged: melee damage **10**, strength **0.7**, ranged **6**. Levels 1–9 are unchanged.
+**Profession** lists Alchemy, Blacksmithing, Enchanting, Engineering, Fishing, Leatherworking, and Tailoring. Clearing one craft hides only that craft.
 
-Because of that, **Armor of the Fang** is not a Beast Mastery or Marksmanship chest hunt. The chest has no agility, so the 5-piece stun is worth almost nothing to those two specs. The chest slot shows **Tunic of Westfall** for Alliance and **Trapper's Leather Armor** for Horde. The legs, feet, belt, and gloves of **Embrace of the Viper** stay the hunt from 18 through about 24, and the hunt text says the chest is not part of that list.
+**Boss drop** lists only the dungeons and raids that have a boss hunt for your class, spec, faction, and level, including ranks below the top three. Hall of Thanes, Ruins of Lordaeron, and Excavation Site are on that list. **Other** is a world boss, and it sits between Onyxia's Lair and Ragefire Chasm. Clearing Wailing Caverns hides Wailing Caverns bosses only.
 
-Survival still hunts all five pieces through 23. At 24 the legs are what remain.
+**Dungeon & Raid trash** has the same kind of list, for trash hunts at your level. Those boxes are separate. Clearing Wailing Caverns under trash does not hide the Wailing Caverns bosses, and the reverse is true too.
 
-The hunter log shows **Two-hand**, then **Main hand + one-hand**. Under that second header, **Off hand** is the either-hand weapon. A tooltip that says **Main Hand** stays in the log and on neither paper-doll slot. Enhancement shows **Two-hand** only.
+The flyouts do not scroll. A box you clear stays cleared when you level or change spec. **Select all** and **Deselect all** cover the sources and all three lists. **Apply filter** still commits the boxes.
 
-### Embrace of the Viper
+### Rank on the parchment
 
-Feral cat keeps all five pieces from 18 through 23, both factions, because of the 5-piece stun. At 24 the chest falls off. Combat, Assassination, and Subtlety keep all five from 18 through 23. Enhancement keeps all five from 18 through 28. At 29 the Enhancement chest falls off and the other four remain.
+Above the item name, a black box reads **Rank #1**, **Rank #2**, and so on. The number is that hunt's place in the slot. A filter or a play style does not renumber it, so a piece that was rank 6 is still Rank #6 when it is the only row left.
 
-### Gamepad
+Hovering the box says what that means. On the normal list, with no filter and no play style, rank 1 says **This is the best in slot [slot] for you.** Rank 2 says **2nd best**, rank 3 says **3rd best**, and a notable in the fourth row says **4th best**. A hunt that is only on the list because a filter is on, a play style is on, or both, uses that same line from its stored rank, and then says which of those is on.
 
-Playing with a gamepad no longer opens Blizzard's restrictions dialog on login. That dialog was what froze the client. Untrack asks on GearQuest's own window, with **Agree** and **Cancel**.
+Hunter and Enhancement two-hand weapons say **Two-hand**. A hunter weapon that can only go in the main hand says **Main hand**.
+
+### Crafted hunts
+
+A crafted hunt says the Forever recipe skill on the line just before Source. Example: **Requires Leatherworking (155) to craft. Your Leatherworking is 157.** If you do not have the profession, it says **You don't have Leatherworking.** A craft with no Forever recipe does not invent a skill of 1.
+
+### Quest chains that end in a dungeon
+
+These rewards were opening at the first step of a long chain. The dungeon step is much later, so the hunt now opens at that step.
+
+**Windstorm Hammer** and **Dancing Flame** are the choice at the end of **Final Passage**, the tenth step after **Test of Faith** in Thousand Needles. The book is in Scarlet Monastery Library, a level 36 quest. Both now require **36**. They were showing from the mid 20s. **Dancing Flame** is ranged rank 1 at 36 for Horde mage (Frost, Fire, Arcane, and all three Battle Mage specs), Horde priest (Holy, Discipline, and Shadow), and Horde warlock (Affliction, Demonology, and Destruction). **Windstorm Hammer** is main hand rank 1 at 36–37 for Horde Combat.
+
+**Ragefire Wand**, **Icefury Wand**, and **Nether Force Wand** are the choice from **Mage's Wand**. The chain starts with Tabetha in Dustwallow Marsh. **Rituals of Power** sends you into Scarlet Monastery Library at level 40. All three now require **40**. They were 30.
+
+**Faded Hakkari Cloak** and **Tattered Hakkari Cape** are the choice from **Confront Yeh'kinya**. The chain starts with Prospector Ironboot in Tanaris. **The Final Tablets** are in Blackrock Spire at level 58. Both cloaks now require **58**. They were 40.
+
+**Drakefire Amulet** is the reward from **Drakefire Amulet**. The chain starts with Haleh in Winterspring. The blood comes from General Drakkisath in Blackrock Spire at level 60. The amulet now requires **60**. It was 50.
+
+**Crescent Staff** and **Wingblade** (Leaders of the Fang) stay **10**. **Staff of Westfall**, **Tunic of Westfall**, and **Chausses of Westfall** stay **14**.
+
+### v0.3.6-beta
+
+Every class was scored again from the current Wowhead Forever tooltip. A reward that is new in Forever has a burnt mark beside the icon. Malignant Root and White Obsidian Wand have it. Blackened Defias Leggings does not. Holy paladin prefers healing mail and plate over cloth. Beast Mastery and Marksmanship no longer hunt Armor of the Fang. Survival and Feral keep Embrace of the Viper through 23. A gamepad no longer opens Blizzard's restrictions dialog on login.
 
 ### v0.3.5-beta
 

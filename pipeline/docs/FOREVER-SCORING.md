@@ -510,8 +510,52 @@ paragraph.
   log, quest giver, loot, and vendors. **GearQuest Commands** lists each
   slash command with a 1px shadow and the explanation in plain text under it.
 - The source **Filter** closes on a click outside the menu. The Profession
-  flyout closes when the cursor leaves both the row and the flyout. Menu
-  text uses the Filter button's font.
+  flyout closes when the cursor leaves both the row and the flyout. Boss drop
+  has the same flyout, but only for dungeons that have a boss-drop hunt in
+  the current level window, including ranks below the top 3. Dungeon & Raid
+  trash has the same flyout for trash hunts in that window, and those boxes
+  are separate from Boss drop. Hall of Thanes,
+  Ruins of Lordaeron, and Excavation Site are dungeons on that list. Other
+  is bosses that are not in an instance. The flyouts do not scroll. A cleared box
+  stays cleared. Select all / Deselect all on the filter menu covers the source
+  list and the profession, boss, and trash sub-filters. Menu text uses the Filter button's font.
+  Checking Profession, Boss drop, or Dungeon & Raid trash opens that flyout
+  on the click. You do not have to leave the row and come back.
+- **Play style** is the button at the bottom of the log
+  (`GearQuestForeverDB.ui`). The panel has two cards, and both can be on.
+  A play style hides hunts across several sources. The filter still only
+  chooses a source. Either one widens the slot list the same way a filter
+  does, so a later rank can show, and the rank box says why.
+  - **No Dungeons!** (`playNoDungeons`) hides a hunt that sends you into a
+    dungeon or raid. Dungeon and raid trash always goes. A boss drop goes
+    unless `BossDungeonKey` is **Other** (a world boss stays). A profession
+    craft stays. A quest goes when its instructions or quest name contain a
+    catalog dungeon, or when the pin note says `entrance to dungeon`. The
+    match is the catalog spelling, case-sensitive: **Whelgar Excavation
+    Site** is not **Excavation Site**. **the Deadmines** is not **The
+    Deadmines**, so Underground Assault stays. **Ahn'Qiraj** is not **Ruins
+    of Ahn'Qiraj** or **Temple of Ahn'Qiraj**, so Genesis Helm and Savior
+    of Kalimdor stay.
+  - **Get it now!** (`playGetItToday`) hides a hunt this character cannot
+    get yet. Reputation uses the standing stored on that item (`reqRep`).
+    A bind-on-pickup craft waits until the character has that profession
+    and the recipe skill. A bind-on-equip craft stays, unless the item
+    itself requires the profession to wear (`reqSkills`). Reaching the
+    standing or the skill shows the hunt without turning the style off.
+    If the reputation scan fails, reputation hunts stay. A bind type that
+    is still unknown does not hide the craft.
+- **Rank on the parchment.** Above the item title, a black box reads
+  `Rank #N` from the stored slot rank (`curatedRank`), so a filtered or
+  play-style list still shows the real place. A notable with no stored
+  rank uses the scored twin in that slot (same item and minimum level).
+  Hovering the box says this is the best, 2nd, 3rd, or 4th in that slot
+  for a hunt on the unfiltered, no-play-style list. A hunt that is not on
+  that list uses the same line from `curatedRank`, then one sentence: a
+  filter is on, a play style is on, or both. Rank 1 says **best**, not
+  "1st best". Hunter and Enhancement two-hand say **Two-hand**. A hunter
+  main-hand-only weapon says **Main hand**. The box watches the mouse
+  itself. A frame inside the parchment scroll child often never receives
+  OnEnter.
 - Shift-click on a Blizzard map pin still inserts the chat link. Do not call
   `CopyToClipboard`. Open the map with `C_Map.OpenWorldMap`, not
   `ShowUIPanel` or `WorldMapFrame:SetMapID`. The close button is anchored
@@ -828,7 +872,7 @@ on Wowhead Forever. Do not leave it on the item-level floor (`ILVL_FLOOR`:
 ilvl 18 → 13, ilvl 23 → 18, ilvl 24 → 19). That floor is only a stand-in
 until the lookup has been done. Find the quest attached to the item. The
 **minimum** level required to pick up that quest becomes the item's `rlvl`
-and the source `gateLevel`. Several quests: take the lowest. `eff_req` then
+and the source `gateLevel`. Several quests: take the lowest. A chain of at least five steps that must enter a dungeon uses that step's quest level when it is at least 8 levels above the pickup. Final Passage (Windstorm Hammer 6804, Dancing Flame 6806) is 36 because Test of Lore in Scarlet Monastery Library is level 36. Mage's Wand (Ragefire Wand 7513, Icefury Wand 7514, Nether Force Wand 11263) is 40 because Rituals of Power is level 40. Confront Yeh'kinya (Faded Hakkari Cloak 20218, Tattered Hakkari Cape 20219) is 58 because The Final Tablets in Blackrock Spire are level 58. Drakefire Amulet (16309) is 60 because General Drakkisath is level 60. Leaders of the Fang stays 10. The Defias Brotherhood stays 14. `eff_req` then
 uses `rlvl` when it is &gt; 0.
 
 The item XML `https://www.wowhead.com/forever/item=ID&xml` first `<json>`
@@ -954,20 +998,23 @@ score-sorted for them. `EntryOffWeaponRoute` is unused. Do not grey the off hand
 **Hunter and Enhancement weapon categories.** The log does not mix them
 into one Main Hand list. **Two-hand** is its own block, the best two-handers
 by themselves, and it is what the Main Hand paper-doll slot shows. Under it,
-hunters get **Main hand + one-hand**. Above Off hand are main-hand weapons
-only: one-handed, tooltip says Main Hand, so they cannot go in the off hand.
-Those stay in the log and on neither paper-doll slot. **Off hand** is
-either-hand weapons (InventoryType 13, One-Hand), and that list is the Off
-Hand slot. Enhancement shows the **Two-hand** block only. No one-hand list
+hunters get a **Main hand** block of main-hand-only weapons, then an
+**Off Hand** slot. Main-hand weapons stay in that list. The Off Hand
+character panel bar shows either-hand weapons only (InventoryType 13,
+One-Hand), because a main-hand weapon cannot be equipped there. The Off
+Hand paper-doll slot is that either-hand list. Enhancement shows the **Two-hand** block only. No one-hand list
 and no off-hand list. Forever Enhancement does not dual wield.
+Rogue **Main Hand** is tooltip Main Hand only. Rogue **Off Hand** is
+One-Hand and Off Hand. An either-hand weapon does not sit under Main Hand.
 
 | Who | Main Hand header | Off Hand header |
 |---|---|---|
 | Mage, priest, warlock | Staff or main hand | Off Hand |
 | Druid, paladin/warrior levelling when a route exists | Two-hand or main hand | Off Hand |
 | Enhancement | Two-hand | (no off-hand list) |
-| Hunter | Two-hand. The pair block is main-hand-only, then Off hand either-hand weapons | Off Hand is the either-hand list. The ranged slot title is **Ranged** |
-| Rogue (combat, assassination, subtlety), Warrior Fury | Dual wield | Off Hand |
+| Hunter | Two-hand, then a Main hand list of main-hand-only weapons | Off Hand is either-hand only, and that is the character panel bar. The ranged slot title is **Ranged** |
+| Rogue (combat, assassination, subtlety) | Main Hand (tooltip Main Hand) | One-Hand and Off Hand |
+| Warrior Fury | Dual wield | Off Hand |
 | Paladin Retribution, Warrior Arms | Two-hand | Off Hand |
 | Paladin Protection and Holy, Warrior Protection, Shaman Elemental, Restoration, Enhancement Tank | Main Hand | Shield |
 
@@ -1124,8 +1171,22 @@ NPC live in their own fields — the log prints them once. World drops:
 Vendors/bosses: `Bought from X.` / `Drops from X.` Auction House is a
 separate BoE line, not repeated inside the sentence.
 
+A crafted hunt states the Forever recipe skill on the line just before
+Source: `Requires Leatherworking (155) to craft. Your Leatherworking is 157.`
+or `You don't have Leatherworking.` The skill comes from
+`GearQuest/_generated/CraftSkills.generated.lua` (`fetch_craft_skills.py`,
+ForeverDB recipes). The character's rank is `GetProfessions` /
+`GetProfessionInfo`, then the skill-line list. Do not print a stub skill of
+1. Dress Shoes (6836) have no Forever recipe, so that line stays off.
+
 A named dungeon boss is `boss_drop`, even when the old sentence said
 "(rare elite)". Mutanus the Devourer is Wailing Caverns, not a world drop.
+A generic mob in a dungeon or raid is not a boss. **Druid of the Fang**
+drops **Gloves of the Fang**, and that source is `raid_trash`. The log
+labels `raid_trash` **Dungeon & Raid trash**, one filter for dungeon trash
+and raid trash. Wowhead leaves the boss flag off real bosses (Edwin
+VanCleef has none), so a missing flag does not make a boss into trash.
+`bossNpcs` stays a boss. A rare that is not on that list is `rare_npc`.
 `apply_named_drop_kinds` in the ingest promotes those from
 `dungeon_entrances.json` `bossNpcs` and sets the zone to that dungeon.
 "(rare spawn)" and a "(rare elite)" that is not one of those bosses is

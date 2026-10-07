@@ -58,7 +58,7 @@ GQ.Data.paladinHorde1to9Facts = {
     [1377]={name="Frayed Gloves",quality=0,ilvl=3,reqLevel=1,sourceType="world_drop",instructions="World drop around level 1-5."},
     [1378]={name="Frayed Pants",quality=0,ilvl=2,reqLevel=1,sourceType="world_drop",instructions="World drop around level 1-5."},
     [1380]={name="Frayed Robe",quality=0,ilvl=4,reqLevel=1,sourceType="world_drop",instructions="World drop around level 1-5."},
-    [1382]={name="Rock Mace",quality=1,ilvl=5,reqLevel=1,sourceType="boss_drop",instructions="Drops from Splintered Skeleton.",zone="Scholomance",npc="Splintered Skeleton"},
+    [1382]={name="Rock Mace",quality=1,ilvl=5,reqLevel=1,sourceType="raid_trash",instructions="Drops from Splintered Skeleton.",zone="Scholomance",npc="Splintered Skeleton"},
     [1383]={name="Stone Tomahawk",quality=1,ilvl=5,reqLevel=1,sourceType="quest_reward",instructions="Reward from the quest 'Rite of Strength'. Pick it over the other reward choices. Starts with Seer Graytongue in Mulgore. Objective: Kill Bristlebacks in Brambleblade Ravine and bring 12 Bristleback Belts to Chief Hawkwind in Camp Narache.",zone="Red Cloud Mesa",questName="Rite of Strength",lore="The Rites of the Earthmother are the steps a young tauren needs to take to gain respect in Thunder Bluff. First you must pass the Rite of Strength."},
     [1384]={name="Dull Blade",quality=1,ilvl=3,reqLevel=1,sourceType="world_drop",instructions="Drops from Bristleback Quilboar.",zone="Kalimdor",npc="Bristleback Quilboar"},
     [1412]={name="Crude Bastard Sword",quality=0,ilvl=7,reqLevel=2,sourceType="world_drop",instructions="World drop around level 1-10.",zone="Westfall"},
