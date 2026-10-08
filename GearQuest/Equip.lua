@@ -335,6 +335,12 @@ function GQ.Equip:CanPlayerEquip(itemId, slotName)
         return false
     end
 
+    -- Simulation is a different character. Weapon skill and IsEquippableItem
+    -- describe whoever is logged in, so a level 2 would hide a level 15 hunt.
+    if GQ.IsPreviewEnabled and GQ:IsPreviewEnabled() then
+        return true
+    end
+
     -- Weapon slots: recommend by level + data rules; ignore equipped 1H/2H conflicts.
     if slotName and RECOMMENDATION_SLOTS[slotName] then
         return true

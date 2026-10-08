@@ -62,9 +62,11 @@ Item facts come from Wowhead Forever, not from a TBC dump. When the catalog grow
 - **Play style** at the bottom of the log, five cards with a picture and the name underneath: **No Dungeons!**, **Dungeon Enjoyer**, **Get it now!**, **Don't look back**, and **Buy it**. The two dungeon cards turn each other off. The other three can be on with either.
 - **Filter** with a profession list, a boss-drop dungeon list, and a separate dungeon list for trash. A filtered slot still fills to three matching hunts, then the notable when it fits.
 - **Green upgrade arrows** on the real best pieces even when a filter or a play style hides them, and on every hunt still showing
-- **Track a hunt** and **toast on obtain**. The toast follows the unfiltered top three, the notable, and anything you Track. Rank and filters do not stop a tracked toast.
-- **The Log** — parchment detail with how to get the piece, the craft materials, the recipe skill in green or red, zone, quest, NPC, and always a Source line
-- **Show on map** opens the quest start, the dungeon entrance, the vendor, or the rare
+- **Track a hunt** and **toast on obtain**. The toast follows the unfiltered top three, the notable, and anything you Track. Rank and filters do not stop a tracked toast. The first time Track can be clicked it pulses gold, once per account.
+- **Guide** on a tracked hunt. An arrow above the tracker points the way you are facing. On another continent it points at the zeppelin or ship, then back at the hunt. Logging out clears the guide. `/reload` keeps it.
+- **The Log** — parchment detail with how to get the piece, the craft materials, the recipe skill in green or red, a vendor standing in green or red just before Source, zone, quest, NPC, and always a Source line
+- **World map pins** for every tracked hunt, each source with its own icon. Left-click guides. Right-click opens the hunt. The minimap does not draw hunt pins.
+- **Show on map** opens the quest start, the dungeon entrance, the vendor, the rare, or a farming spot on a real mob
 - **Simulator** — browse another class, spec, faction, or level (right-click the minimap button)
 - **Paper-doll** — right-click a character-panel slot
 - **Suffix names on the tooltip** so Forever's unsuffixed green tooltip still shows *of Agility* and the roll

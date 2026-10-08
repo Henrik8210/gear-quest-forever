@@ -755,15 +755,16 @@ def entrance_spots(key: str) -> list[dict]:
     return copy_spots(DOORS["entrances"].get(key) or [])
 
 
-# Generic drops at level 1-15 get one pin per faction. The numbers are spots
-# already published for quests and farms in those zones, not new guesses.
-# 1-7 is the starter valley. 8-15 is the next zone on that side.
-# Above 15 both factions share the catalog spot, with no faction tag.
+# Generic drops at level 1-15 get one pin per faction. Each number is the
+# first Wowhead Forever spawn of a mob that actually drops that gear, not
+# the quest hub in the same valley. 1-7 is Kobold Vermin and Mottled Boar.
+# 8-15 is Harvest Watcher and Plainstrider. Above 15 both factions share
+# the catalog spot, with no faction tag.
 GENERIC_LOW_FARM = (
-    ("Alliance", "Elwynn Forest", 1429, 48.2, 42.8, 1, 7),
-    ("Alliance", "Westfall", 1436, 31.0, 46.2, 8, 15),
-    ("Horde", "Durotar", 1411, 42.0, 68.4, 1, 7),
-    ("Horde", "The Barrens", 1413, 51.0, 29.4, 8, 15),
+    ("Alliance", "Elwynn Forest", 1429, 47.4, 35.0, 1, 7),
+    ("Alliance", "Westfall", 1436, 36.4, 50.4, 8, 15),
+    ("Horde", "Durotar", 1411, 41.2, 64.4, 1, 7),
+    ("Horde", "The Barrens", 1413, 47.5, 26.8, 8, 15),
 )
 GENERIC_LOW_MAX = 15
 

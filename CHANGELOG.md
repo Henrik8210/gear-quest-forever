@@ -2,63 +2,61 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v0.4.1-beta
+## v0.4.2-beta
 
-Play style is now five pictured cards. A filter or a play style no longer takes the green arrow off your real best pieces, and Track still toasts when you loot a hunt the list is hiding. Crafted hunts name the materials and color the skill line.
+A tracked hunt can point the way. The world map uses a different icon for each source, a world drop sits on a mob instead of a quest camp, and Track pulses gold the first time you can click it.
 
-The window title reads **GearQuest Forever v0.4.1-beta**.
+The window title reads **GearQuest Forever v0.4.2-beta**.
 
-### Play style
+### Guide
 
-**Play style** at the bottom of the log opens five cards. The name sits under the picture. Three are on the first row and two on the second. The heading says you can turn several on at once, and that each one can cover several sources. The filter still only chooses a source. A gold rim shows which cards are on.
+Each row on the tracker has **Enable Guide**. One hunt is guided at a time. The arrow sits just above the tracker. Dragging the arrow moves the tracker with it. The picture is a strip of 32 frames. The frame changes so the tip points the way you are facing, including when that way is west. The picture itself does not spin.
 
-**No Dungeons!** hides a hunt that sends you into a dungeon or raid: a boss, trash, and a quest that enters an instance at any step. A world drop stays, even when its zone is a dungeon name or the pin is that entrance. **Captain Melrache's Cape** drops from Captain Melrache in the outdoor graveyard. The stored zone is Scarlet Monastery, and the cape stays. World bosses stay. A craft you can buy stays.
+Inside 12 yards the line says **Here**. On the same continent it says the yards. On another continent it aims at the boat or zeppelin you can board, and the line says **Ship** or **Zeppelin**. The map pin stays on the hunt. When you arrive on that continent the arrow aims at the pin again.
 
-**Dungeon Enjoyer** keeps only those dungeon and raid hunts. World bosses, crafts, vendors, and outdoor hunts stay hidden. No Dungeons and Dungeon Enjoyer turn each other off.
+Horde zeppelins: Durotar 50.8, 13.6, Tirisfal Glades 61.0, 59.0, and Grom'gol in Stranglethorn Vale 31.5, 29.6. Both factions: the ship at Ratchet 63.6, 38.7 and Booty Bay 26.0, 73.2. Alliance ships: Auberdine 32.7, 43.7 and Menethil Harbor 4.7, 57.0, and Menethil 5.0, 63.0 with Theramore 71.0, 56.0.
 
-**Get it now!** hides a hunt this character cannot get yet. A vendor piece waits until you reach the reputation stored on that item. A bind-on-pickup craft waits until you have that profession and the skill printed on the hunt. A bind-on-equip craft stays, unless the item itself requires the profession to wear. When you reach the standing or the skill, the hunt comes back on its own.
+**Hide guide arrow** on the Hunts settings page hides it for the account. The hunt you are guiding is stored on that character. Logging out clears it. `/reload` keeps it. The hunts you are tracking stay either way.
 
-**Don't look back** hides a hunt once its required level would be a gray quest. Green and yellow stay. On a live character that uses the game's own green range. A level 18 hunt is still on the list at 25 and drops off at 26.
+Left-click a world-map pin to guide. The tooltip says **Left-click to Guide**. Right-click says **Right click to open Hunt** and opens that hunt in the log.
 
-**Buy it** keeps hunts you can purchase. Vendor pieces stay. So does anything that binds when equipped, binds when used, or does not bind. Bind on pickup stays hidden, unless a vendor sells that piece. At level 27, Elemental Horde, Head with every source still checked: **Scaled Leather Headband** and **Robust Helm** stay, and **Holy Shroud** fills the open row. **Totemic Leather Helm** and **Totemic Leather Hood** leave, because both bind when picked up. The hood is the notable. Buy it hides it with the helm.
+### World map pins
 
-Get it now, Don't look back, and Buy it can be on together, and with either dungeon card.
+Tracked hunts pin the world map. The minimap does not draw them. The guided pin has a blue ring.
 
-With any of them on, a slot still fills to three hunts that fit, then keeps the notable when that notable fits too. A bind-on-pickup notable does not stay under Buy it.
+The icon matches the source, all the same size. A boss is a skull. A container is a chest. Dungeon and raid trash is the red raid mark. A profession, including fishing and skinning, is a book. A quest reward is a yellow exclamation. A rare is a silver dragon. A seasonal quest is a wrapped present. Special, including mail and pickpocket, is a gold star. Unsourced is a red X. A vendor is a sack. A world drop is a sunset over dark hills.
 
-### Green arrows
+The Filter list uses those same icons, after the checkbox and before the name. The profession, boss, and trash lists do not.
 
-The green arrow on the quest log, a quest giver, loot, and a vendor stays on the unfiltered best pieces when a filter or a play style hides them. It also stays on every hunt still on the list, including a later rank, a notable, and a tracked hunt.
+Hovering **Show on map**, in white, says: See where you can find this on the world map, and let the guide show directions. With no coordinates it still says, in white: We are missing exact coordinates for this item.
 
-The character panel bar follows the list you are looking at. A piece a filter hid is not on that bar.
+### Where a world drop is pinned
 
-**Hide upgrade arrows** on the Hunts settings page still removes all of them.
+A generic world drop through level 15 is on a published mob, not the quest camp.
 
-### Toasts and Track
+Alliance 1–7 is Kobold Vermin in Elwynn Forest, 47.4, 35.0. **Patchwork Cloak** is there. Horde 1–7 is a Mottled Boar in Durotar, 41.2, 64.4. The Den at 42.0, 68.4 stays the start of a Durotar quest. Alliance 8–15 is a Harvest Watcher in Westfall, 36.4, 50.4. **Calico** is there. Horde 8–15 is a Plainstrider in the Barrens, 47.5, 26.8. Above 15 both factions share the catalog spot. A named creature stays on that creature.
 
-The obtain toast follows the unfiltered top three and the notable. A filter or a play style does not change that. A rank 6 that is only on the list because of a filter does not toast when you loot it.
+When a hunt has several spots, the coordinate line and the guide use the closest. That spot stays until another is at least 20 yards closer.
 
-**Track** does. Hovering Track, while the button still says Track, says: the toast still fires when you obtain it, rank does not matter, and a filter or a play style does not stop it. Untrack and Remove do not show that line. A piece you already own does not toast again. **Hide obtain toast** still skips the popup. The chat line still prints.
+### Track
 
-### Crafted hunts
+The first time **Track** is on screen and can be clicked, it pulses gold, the same wash as Play Style. With no hunt selected it stays grey and still. It stays still on Removed, and on the Simulator and Settings. The first click marks it seen for the account.
 
-The old sentence **Crafted with Leatherworking (requires skill N).** is gone from the description. In its place, when Forever has the recipe, the description lists the materials. **Totemic Leather Hood** (Leatherworking 100) reads **Materials: Medium Leather (8), Cured Medium Hide (2), Pristine Leather (4), Fine Thread (2), Sulfuric Acid (4).** The recipe vendor sentence stays under that, when the hunt has one.
+Hovering Track, while the button still says Track, is white: Click to track this hunt. The Guide feature can be enabled.
 
-The skill line just before Source is unchanged in wording. **Requires Leatherworking (100) to craft. Your Leatherworking is 157.** That status clause is green when your skill is at least the recipe, and red when you are short. **You don't have Leatherworking.** is red too. The words "Requires … to craft." stay the parchment color.
+Untrack asks "Are you sure you want to untrack this gear quest? It will become unavailable once you do" only when that hunt would leave the active list. The dialog sits in front of the log.
 
-Learning the profession, or gaining a point, updates that line on an open craft hunt. The hunt list itself rebuilds only when Get it now is on and the skill number actually changed.
+### Hunt page
 
-**Dress Shoes** have no Forever recipe, so they get neither a skill line nor a materials line.
+The rank list beside a slot header, the one that says which pieces were ranked for your level, opens only when the cursor is on the info mark. The rest of that line still collapses the slot.
 
-### World drop pins
+A vendor with a required standing gets a line just before Source. **Requires Honored with Booty Bay. Your standing is Friendly.** The standing is green when you have met it and red when you have not. **Souvenier Sea Shell** is that kind of neck.
 
-A world drop with no named creature, through level 15, now has a map pin on your own side. Alliance 1–7 is Elwynn Forest (48.2, 42.8). Horde 1–7 is Durotar (42.0, 68.4). Alliance 8–15 is Westfall (31.0, 46.2). Horde 8–15 is the Crossroads in the Barrens (51.0, 29.4). Above 15 both factions share the catalog spot. A drop from a named creature stays on that creature's pin. **Show on map** opens that spot.
+The simulator can show a hunt the character you are logged in on could not equip, once the hunt's required level is met. A level 2 looking at level 15 still sees the weapon.
 
-### Smaller fixes
+### v0.4.1-beta
 
-Reset on the Simulator, after a filter was on at a simulated level, returns the list to your character. It used to keep the simulated rows.
-
-Turning in a quest with a gamepad no longer locks the action bar. The upgrade arrows and the level-up refresh wait one frame, so they are not painted inside the gamepad's own focus change.
+Play style is five cards: **No Dungeons!**, **Dungeon Enjoyer**, **Get it now!**, **Don't look back**, and **Buy it**. The two dungeon cards turn each other off. The other three can be on with either. The green arrow stays on the real best pieces when a filter hides them, and on every hunt still showing. **Track** still toasts when you loot a hunt the list is hiding. A crafted hunt lists its materials. **Totemic Leather Hood** (Leatherworking 100) names Medium Leather, Cured Medium Hide, Pristine Leather, Fine Thread, and Sulfuric Acid. The skill line is green when you meet the recipe and red when you are short. **Dress Shoes** have no recipe. Reset on the Simulator returns the list to your character.
 
 ### v0.4.0-beta
 

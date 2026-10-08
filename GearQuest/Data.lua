@@ -7212,12 +7212,10 @@ function GQ.Data:GetEntryInstructions(entry)
     return text
 end
 
--- One coordinate under the source line. more=true, or a second spot the
--- viewer's faction can use, adds "more coordinates for this".
-function GQ.Data:CoordinateLine(itemId)
+function GQ.Data:VisibleCoordinateSpots(itemId)
     local row = self.coordinates and itemId and self.coordinates[itemId]
     if not row or not row.spots or #row.spots == 0 then
-        return nil
+        return nil, nil
     end
     local faction = GQ.GetEffectiveFaction and GQ:GetEffectiveFaction() or nil
     local openWorld = self:PinIgnoresFactionZone(row)
@@ -7229,17 +7227,201 @@ function GQ.Data:CoordinateLine(itemId)
         end
     end
     if #mine == 0 then
+        return nil, row
+    end
+    return mine, row
+end
+
+function GQ.Data:SpotMapId(spot)
+    if not spot then
         return nil
     end
-    local spot = mine[1]
-    local line = string.format("Coordinates: %s %.1f, %.1f", spot.map or "", spot.x or 0, spot.y or 0)
-    if #mine > 1 or row.more then
-        line = line .. " more coordinates for this"
+    if spot.mapId then
+        return spot.mapId
     end
-    if row.note and row.note ~= "" then
+    if spot.map and GQ.Map and GQ.Map.ZoneMap then
+        return GQ.Map:ZoneMap(spot.map)
+    end
+    return nil
+end
+
+local function WorldXY(world)
+    if not world then
+        return nil
+    end
+    if world.GetXY then
+        return world:GetXY()
+    end
+    if world.x and world.y then
+        return world.x, world.y
+    end
+    return nil
+end
+
+function GQ.Data:PlayerWorld()
+    local now = GetTime and GetTime() or 0
+    if self._playerWorldAt and (now - self._playerWorldAt) < 0.4 then
+        return self._playerWorld or nil
+    end
+    self._playerWorldAt = now
+    self._playerWorld = nil
+    if not (C_Map and C_Map.GetBestMapForUnit and C_Map.GetPlayerMapPosition and CreateVector2D) then
+        return nil
+    end
+    local mapId = C_Map.GetBestMapForUnit("player")
+    local pos = mapId and C_Map.GetPlayerMapPosition(mapId, "player")
+    if not mapId or not pos or not pos.GetXY then
+        return nil
+    end
+    local px, py = pos:GetXY()
+    if not px or not py or (px == 0 and py == 0) then
+        return nil
+    end
+    local here = { mapId = mapId, x = px * 100, y = py * 100 }
+    if C_Map.GetWorldPosFromMapPos then
+        local ok, continent, world = pcall(C_Map.GetWorldPosFromMapPos, mapId, CreateVector2D(px, py))
+        local wx, wy = ok and WorldXY(world) or nil
+        if ok and continent and wx and wy then
+            here.continent = continent
+            here.wx = wx
+            here.wy = wy
+        end
+    end
+    self._playerWorld = here
+    return here
+end
+
+function GQ.Data:SpotWorld(spot)
+    local mapId = self:SpotMapId(spot)
+    if not mapId or not spot.x or not spot.y or not (C_Map and C_Map.GetWorldPosFromMapPos and CreateVector2D) then
+        return nil
+    end
+    self._spotWorld = self._spotWorld or {}
+    local key = mapId .. ":" .. tostring(spot.x) .. ":" .. tostring(spot.y)
+    local cached = self._spotWorld[key]
+    if cached then
+        return cached
+    end
+    local ok, continent, world = pcall(C_Map.GetWorldPosFromMapPos, mapId, CreateVector2D(spot.x / 100, spot.y / 100))
+    local wx, wy = ok and WorldXY(world) or nil
+    if not (continent and wx and wy) then
+        return nil
+    end
+    local row = { continent = continent, x = wx, y = wy, mapId = mapId }
+    self._spotWorld[key] = row
+    return row
+end
+
+-- Squared yards when both spots share a continent. Same-map fallback uses
+-- zone coordinates, which are only comparable on that one map.
+function GQ.Data:SpotDistance(spot, player)
+    if not spot or not player then
+        return nil
+    end
+    local world = self:SpotWorld(spot)
+    if world and player.continent and world.continent == player.continent and player.wx and player.wy then
+        local dx = world.x - player.wx
+        local dy = world.y - player.wy
+        return dx * dx + dy * dy
+    end
+    local mapId = self:SpotMapId(spot)
+    if mapId and mapId == player.mapId and spot.x and spot.y and player.x and player.y then
+        local dx = spot.x - player.x
+        local dy = spot.y - player.y
+        return dx * dx + dy * dy
+    end
+    return nil
+end
+
+local function SameCoordinateSpot(a, b)
+    return a and b and a.map == b.map and a.x == b.x and a.y == b.y and a.faction == b.faction
+end
+
+function GQ.Data:SortedCoordinateSpots(itemId)
+    local spots = self:VisibleCoordinateSpots(itemId)
+    if not spots then
+        return nil
+    end
+    if #spots < 2 then
+        return spots
+    end
+    local player = self:PlayerWorld()
+    if not player then
+        return spots
+    end
+    local dist = {}
+    for i = 1, #spots do
+        dist[spots[i]] = self:SpotDistance(spots[i], player)
+    end
+    table.sort(spots, function(a, b)
+        local da = dist[a]
+        local db = dist[b]
+        if da and db and da ~= db then
+            return da < db
+        end
+        if da and not db then
+            return true
+        end
+        if db and not da then
+            return false
+        end
+        return false
+    end)
+    -- Keep the last shown spot until another is clearly closer, so a camp of
+    -- spawn points does not swap the line on every step.
+    self._nearestChoice = self._nearestChoice or {}
+    local prev = self._nearestChoice[itemId]
+    local best = spots[1]
+    if prev and best and not SameCoordinateSpot(prev, best) then
+        local dPrev, dBest
+        for i = 1, #spots do
+            if SameCoordinateSpot(spots[i], prev) then
+                dPrev = dist[spots[i]]
+                break
+            end
+        end
+        dBest = dist[best]
+        if dPrev and dBest and (math.sqrt(dPrev) - math.sqrt(dBest)) < 20 then
+            local held
+            local rest = {}
+            for i = 1, #spots do
+                if not held and SameCoordinateSpot(spots[i], prev) then
+                    held = spots[i]
+                else
+                    rest[#rest + 1] = spots[i]
+                end
+            end
+            if held then
+                spots = { held }
+                for i = 1, #rest do
+                    spots[#spots + 1] = rest[i]
+                end
+            end
+        end
+    end
+    self._nearestChoice[itemId] = spots[1]
+    return spots
+end
+
+function GQ.Data:NearestCoordinateSpot(itemId)
+    local spots = self:SortedCoordinateSpots(itemId)
+    if not spots or #spots == 0 then
+        return nil
+    end
+    return spots[1], spots
+end
+
+function GQ.Data:CoordinateLine(itemId)
+    local spot, spots = self:NearestCoordinateSpot(itemId)
+    if not spot then
+        return nil
+    end
+    local row = self.coordinates and self.coordinates[itemId]
+    local line = string.format("Coordinates: %s %.1f, %.1f", spot.map or "", spot.x or 0, spot.y or 0)
+    if row and row.note and row.note ~= "" then
         line = line .. " (" .. row.note .. ")"
     end
-    return line
+    return line, spots
 end
 
 function GQ.Data:ShouldShowEntry(entry)

@@ -52,6 +52,7 @@ local ROW_TOOLTIP_STILL_DELAY = 3
 local ROW_TOOLTIP_MOVE_THRESHOLD = 1
 local COLLAPSE_BUTTON_SIZE = 16
 local COLLAPSED_HEIGHT_PAD = 4
+local GUIDE_FOOTER = 20
 
 local function NormalizeHuntStatus(status)
     if status == "active" then
@@ -559,7 +560,21 @@ function GQ.Tracker:LayoutEntries(entries, descWordLimit)
 
         local nameHeight = row.name:GetStringHeight() or 12
         local descHeight = row.desc:GetStringHeight() or 0
-        local rowHeight = nameHeight + 2 + descHeight
+        local rowHeight = nameHeight + 2 + descHeight + GUIDE_FOOTER
+        if row.guideCheck then
+            local guided = GQ.Guide and GQ.Guide.GuidedId and GQ.Guide:GuidedId() == entry.id
+            row.guideCheck:SetChecked(guided and true or false)
+            if row.GetFrameLevel and row.guideCheck.SetFrameLevel then
+                local level = row:GetFrameLevel() + 4
+                row.guideCheck:SetFrameLevel(level)
+                if row.guideHit then
+                    row.guideHit:SetFrameLevel(level)
+                end
+            end
+            if row.guideHit and row.guideLabel and row.guideLabel.GetStringWidth then
+                row.guideHit:SetWidth((row.guideLabel:GetStringWidth() or 70) + 8)
+            end
+        end
 
         row:ClearAllPoints()
         row:SetPoint("TOPLEFT", self.contentInner, "TOPLEFT", 0, -yOffset)
@@ -569,6 +584,19 @@ function GQ.Tracker:LayoutEntries(entries, descWordLimit)
     end
 
     return yOffset
+end
+
+function GQ.Tracker:UpdateGuideChecks()
+    if not self.entryRows then
+        return
+    end
+    local guided = GQ.Guide and GQ.Guide.GuidedId and GQ.Guide:GuidedId()
+    for i = 1, #self.entryRows do
+        local row = self.entryRows[i]
+        if row.guideCheck then
+            row.guideCheck:SetChecked(guided ~= nil and row.entryId == guided)
+        end
+    end
 end
 
 function GQ.Tracker:ApplyWidth(width)
@@ -715,7 +743,56 @@ function GQ.Tracker:EnsureEntryRows(count)
         ConfigureWrappedFontString(row.desc)
         row.desc:SetTextColor(ENTRY_DESC_COLOR[1], ENTRY_DESC_COLOR[2], ENTRY_DESC_COLOR[3], ENTRY_DESC_COLOR[4])
 
+        row.guideCheck = CreateFrame("CheckButton", nil, row)
+        row.guideCheck:SetSize(16, 16)
+        row.guideCheck:SetPoint("TOPLEFT", row.desc, "BOTTOMLEFT", 0, -3)
+        row.guideCheck:SetNormalTexture("Interface\\Buttons\\UI-CheckBox-Up")
+        row.guideCheck:SetPushedTexture("Interface\\Buttons\\UI-CheckBox-Down")
+        row.guideCheck:SetHighlightTexture("Interface\\Buttons\\UI-CheckBox-Highlight")
+        row.guideCheck:SetCheckedTexture("Interface\\Buttons\\UI-CheckBox-Check")
+        row.guideCheck:SetScript("OnClick", function(self)
+            local parent = self:GetParent()
+            if not parent or not parent.entryId or not GQ.Guide then
+                return
+            end
+            if self:GetChecked() then
+                local entry = GQ.Data and GQ.Data.GetEntryById and GQ.Data:GetEntryById(parent.entryId)
+                if entry then
+                    GQ.Guide:ShowEntry(entry)
+                end
+            else
+                GQ.Guide:Dismiss()
+            end
+        end)
+
+        row.guideLabel = CreateFontString(row, "GameFontHighlightSmall")
+        row.guideLabel:SetPoint("LEFT", row.guideCheck, "RIGHT", 2, 0)
+        row.guideLabel:SetText("Enable Guide")
+        row.guideLabel:SetTextColor(TITLE_COLOR[1], TITLE_COLOR[2], TITLE_COLOR[3])
+
+        row.guideHit = CreateFrame("Button", nil, row)
+        row.guideHit:SetPoint("LEFT", row.guideCheck, "RIGHT", 0, 0)
+        row.guideHit:SetSize(90, 16)
+        row.guideHit:SetScript("OnClick", function(self)
+            local parent = self:GetParent()
+            local check = parent and parent.guideCheck
+            if not check then
+                return
+            end
+            check:SetChecked(not check:GetChecked())
+            local click = check:GetScript("OnClick")
+            if click then
+                click(check)
+            end
+        end)
+
         row:SetScript("OnClick", function(self)
+            if self.guideCheck and self.guideCheck:IsMouseOver() then
+                return
+            end
+            if self.guideHit and self.guideHit:IsMouseOver() then
+                return
+            end
             if self.entryId and GQ.Tracker then
                 GQ.Tracker:CancelRowTooltipWatch(self)
                 GQ.Tracker:OpenHunt(self.entryId)

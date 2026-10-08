@@ -26,6 +26,30 @@ The green upgrade arrow stays on the unfiltered best pieces when a filter or a p
 
 A crafted hunt lists the recipe materials, and the skill line just before Source. That clause is green when you meet the recipe and red when you are short or do not have the profession.
 
+A vendor with a required standing gets its own line just before Source. The standing is green when you have met it and red when you have not. **Requires Honored with Booty Bay. Your standing is Friendly.**
+
+## Guide and the world map
+
+Each tracked hunt has **Enable Guide**. One hunt is guided at a time, stored on that character (`GearQuestForeverCharDB.guideEntryId`). Logging out clears it. `/reload` keeps it, because the reload flag is set before `ReloadUI` and `C_UI.Reload` fire `PLAYER_LOGOUT`. Tracked hunts stay either way. **Hide guide arrow** on the Hunts page hides the arrow for the whole account (`settings.hideGuideArrow`).
+
+The arrow sits just above the tracker, bottom-left of the arrow on the top-left of the tracker, with a 4px gap. Dragging the arrow moves the tracker. The art is `GearQuest/Art/GQ-GuideArrow3D.png`, a 32-frame horizontal strip, 4096×128, each cell 128. It is drawn at 110×110. Frame 0 points the way you are facing, including west. The frame changes with `SetTexCoord`. The texture is never rotated. Inside 12 yards the line says **Here** and the arrow uses the frame that points back at you.
+
+On the same continent the line is yards, from the world-position delta. On another continent the arrow aims at the nearest dock this faction can board whose other end is the hunt's continent. The line says **Zeppelin** or **Ship**. The world-map waypoint stays on the hunt. Arrival on that continent aims at the pin again.
+
+Published docks only. Horde zeppelins: Durotar 50.8, 13.6, Tirisfal Glades 61.0, 59.0, and Grom'gol in Stranglethorn Vale 31.5, 29.6. Both factions: Ratchet 63.6, 38.7 and Booty Bay 26.0, 73.2. Alliance ships: Auberdine 32.7, 43.7 and Menethil Harbor 4.7, 57.0; Menethil 5.0, 63.0 and Theramore 71.0, 56.0.
+
+When a hunt has several spots for this faction, the coordinate line and the guide use the closest. That spot stays until another is at least 20 yards closer, so a camp of spawns does not swap the line on every step.
+
+Tracked hunts pin the world map. The minimap does not. The icon matches the source: skull for a boss, chest for a container, red raid mark for trash, book for a profession, yellow exclamation for a quest, silver dragon for a rare, present for a seasonal quest, gold star for special, red X for unsourced, sack for a vendor, and the Far Sight sunset for a world drop. The guided pin has a blue ring. Left-click guides. Right-click opens that hunt in the log. The tooltip lines are **Left-click to Guide** and **Right click to open Hunt**.
+
+The Filter list uses the same icons, after the checkbox and before the name. Profession, Boss drop, and Dungeon & Raid trash flyout rows do not.
+
+The rank list on a slot header opens only while the cursor is on the info mark.
+
+The Track button pulses gold once per account, the same wash as Play Style (`ui.trackSeen`). The pulse runs only while the button is on screen and enabled: a hunt is selected, the log page is open, and the list is not Removed. The first click dismisses it. Hovering Track, in white, says the guide can be enabled. Hovering Show on map, in white, says where the pin is and that the guide can point there.
+
+A generic world drop through level 15 is pinned on a published mob, not the quest camp. Alliance 1–7 is Kobold Vermin in Elwynn Forest (47.4, 35.0). Horde 1–7 is a Mottled Boar in Durotar (41.2, 64.4). Alliance 8–15 is a Harvest Watcher in Westfall (36.4, 50.4). Horde 8–15 is a Plainstrider in the Barrens (47.5, 26.8). **Patchwork Cloak** uses the 1–7 pair. **Calico** uses the 8–15 pair. Quest starts stay where the quest begins. The Durotar quest camp is still 42.0, 68.4. Above 15 both factions share the catalog spot. A named creature stays on that creature.
+
 ## Commands
 
 | Command | Action |

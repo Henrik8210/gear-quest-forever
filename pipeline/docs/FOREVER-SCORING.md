@@ -519,6 +519,9 @@ paragraph.
   is bosses that are not in an instance. The flyouts do not scroll. A cleared box
   stays cleared. Select all / Deselect all on the filter menu covers the source
   list and the profession, boss, and trash sub-filters. Menu text uses the Filter button's font.
+  Each main-list row draws the source icon after the checkbox and before
+  the name, 18px, the same art as the world-map pin. Flyout rows keep the
+  chevron and do not get an icon. The row's hit width includes the icon.
   Checking Profession, Boss drop, or Dungeon & Raid trash opens that flyout
   on the click. You do not have to leave the row and come back.
 - **Play style** is the button at the bottom of the log
@@ -1020,13 +1023,16 @@ dungeon to the zone its entrance sits in. Do not turn Refuge Pointe or
 Hammerfall into Arathi Highlands: that name is what keeps the other faction
 off those vendors.
 
-**Vendor reputation is part of the source line.** A Forever tip
-`Requires Booty Bay - Honored` is `reqRep` and the instructions
-`Bought from Gezzy Gunkgear. Requires Booty Bay - Honored.` Souvenier Sea
-Shell **274749** is that neck. Darkspear Raiders is Horde, so those pieces
-are not on the Alliance list. League of Arathor is Alliance. The Defilers
-are Horde. Goblin towns (Booty Bay, Ratchet, Gadgetzan, Everlook) stay on
-both lists, with the standing written out.
+**Vendor reputation is a line of its own, just before Source.** A Forever tip
+`Requires Booty Bay - Honored` is `reqRep`. The parchment reads
+`Requires Honored with Booty Bay. Your standing is Friendly.` The standing
+is green (`|cff0c4a1c`) when this character has met it and red
+(`|cff6e1212`) when they are short or have not met the faction. The
+instructions can still say `Bought from Gezzy Gunkgear. Requires Booty Bay - Honored.`
+Souvenier Sea Shell **274749** is that neck. Darkspear Raiders is Horde, so
+those pieces are not on the Alliance list. League of Arathor is Alliance.
+The Defilers are Horde. Goblin towns (Booty Bay, Ratchet, Gadgetzan,
+Everlook) stay on both lists, with the standing written out.
 
 **Blank item kind.** Subclass −2 ring, −3 neck, −4 trinket, −5 held, −6
 cloak must be `kind` `Misc` (`ARMOR_SUB`). `kind` `?` makes `eligible()`
@@ -1271,9 +1277,11 @@ Full write-up: [../../docs/FOREVER-DATA-MIGRATION.md](../../docs/FOREVER-DATA-MI
 ### Coordinate line (built)
 
 The log description prints one coordinate line **below** the Source line
-when a pin exists. Tracked hunts also pin that spot on the world map and,
-when you are close enough, on the minimap. Clicking a pin toggles a blue
-circle. Show on map opens that zone.
+when a pin exists. When a hunt has more than one spot this faction can
+use, `NearestCoordinateSpot` picks the closest. The last shown spot stays
+until another is at least 20 yards closer, so a camp of spawns does not
+swap the line on every step. The guide aims at that same spot. Show on map
+opens the zone. Hunt pins are on the world map only.
 
 ```
 Coordinates: Elwynn Forest 48.2, 42.8 (beginning of the quest or chain)
@@ -1350,12 +1358,94 @@ numbers for the six Forever doors above.
 
 Tracking a gearquest puts one pin on the world map, the same spot the
 coordinate line shows for the viewer's faction. The pin leaves when the
-hunt is untracked. The icon follows the source: quest, boss, profession,
-vendor, world drop. Clicking the pin toggles a blue circle. The same pin
-shows on the minimap while you are in that zone and close enough. Show on
-map opens the zone and sets the user waypoint.
+hunt is untracked. The minimap does not draw hunt pins.
+
+`Pins.lua` `PIN_ICONS` is one texture per normalized source, drawn at 24px
+on the map and 18px in the filter list. `ApplyIcon` sets the texture. It
+does not clear the icon's anchors, so a filter icon keeps its own point.
+
+| Source | Art |
+|---|---|
+| Boss drop | `Interface\TargetingFrame\UI-RaidTargetingIcon_8` (skull) |
+| Container | `Interface\GossipFrame\BankerGossipIcon` (chest) |
+| Dungeon & Raid trash | `Interface\TargetingFrame\UI-RaidTargetingIcon_7` (red raid mark) |
+| Profession | `Interface\QuestFrame\UI-QuestLog-BookIcon` |
+| Quest reward | `Interface\GossipFrame\AvailableQuestIcon` |
+| Rare NPC | atlas `nameplates-icon-elite-silver`, else a crop of `UI-TargetingFrame-Rare` |
+| Seasonal quest | `Interface\Icons\INV_Holiday_Christmas_Present_01` |
+| Special | `Interface\TargetingFrame\UI-RaidTargetingIcon_1` (gold star) |
+| Unsourced | `Interface\RaidFrame\ReadyCheck-NotReady` |
+| Vendor | `Interface\Cursor\Buy` (the buy-cursor sack) |
+| World drop | `Interface\Icons\Spell_Nature_FarSight` (sunset over dark hills) |
+
+Fishing and skinning use the profession book. Mail and pickpocket use the
+star. A container source uses the chest. `Interface\GossipFrame\VendorIcon`
+is not on this client. The world-drop icon is not the micro-button globe:
+that texture is a tall button, and a crop of it draws as a dash or as
+nothing.
+
+The guided pin gets a blue ring (`UI-Minimap-Ping-Center`). Other pins do
+not. Left-click calls `GQ.Guide:ShowEntry`. Right-click calls
+`GQ.Tracker:OpenHunt`, which opens the log on Active and selects that hunt.
+The tooltip lines are exactly `Left-click to Guide` and
+`Right click to open Hunt`.
+
+The Filter menu draws the same icon after the checkbox and before the
+label. Profession, Boss drop, and Dungeon & Raid trash flyout rows do not.
+The row hit width includes the icon.
 
 The pin table is ours. Questie is not required in game.
+
+### Guide (built)
+
+`Guide.lua` loads after `Tracker.lua`. One guided hunt per character,
+`GearQuestForeverCharDB.guideEntryId`. `settings.hideGuideArrow` is
+account-wide and hides the arrow without clearing the id. Logout clears
+only `guideEntryId`. `/reload` keeps it: `ReloadUI` and `C_UI.Reload` are
+wrapped so `guideReloading` is set before they fire `PLAYER_LOGOUT`.
+Tracked hunts are not cleared. An old account-wide `settings.guideEntryId`
+is dropped on init.
+
+The frame `GearQuestGuide` is anchored `BOTTOMLEFT` of the arrow to
+`TOPLEFT` of the tracker, offset `0, 4`. Dragging the arrow calls
+`StartMoving` on the tracker. The texture is
+`Interface\AddOns\GearQuestForever\Art\GQ-GuideArrow3D.png`, 32 frames in
+one horizontal strip. Display size is 110×110. Frame 0 is the tip pointing
+forward. `SetTexCoord` selects the frame. `SetRotation` is never called.
+Inside 12 yards (`HERE_YARDS`) the text is `Here` and the frame is 16,
+which points back at the player.
+
+Aim matches TomTom and HereBeDragons. `atan2(east, north)` is normalized so
+0 is north and the angle grows counterclockwise, the same way
+`GetPlayerFacing` works. The sprite frames then turn clockwise, so the
+bearing is `facing - angle`. `angle - facing` points the wrong way,
+including west. If facing is not a number, facing stays 0.
+
+Yards come from `GetWorldPosFromMapPos`. `WorldBasis` samples a step east
+and a step north on that map, because world x is not east on every map.
+The player delta is projected onto those two axes.
+
+A hunt on another continent aims at the nearest `CROSSINGS` dock on the
+player's continent whose destination continent is the hunt's, for the real
+`UnitFactionGroup`. The label is `Zeppelin` or `Ship`. The user waypoint
+stays on the hunt (`PlaceForeverPin`). On arrival both are on one continent
+and the arrow aims at the pin.
+
+| Dock | Faction | Kind | Where |
+|---|---|---|---|
+| Durotar zeppelin | Horde | Zeppelin | 50.8, 13.6, to Tirisfal and Grom'gol |
+| Tirisfal zeppelin | Horde | Zeppelin | 61.0, 59.0, to Durotar |
+| Grom'gol | Horde | Zeppelin | Stranglethorn Vale 31.5, 29.6, to Durotar |
+| Ratchet | Both | Ship | The Barrens 63.6, 38.7, to Booty Bay |
+| Booty Bay | Both | Ship | Stranglethorn Vale 26.0, 73.2, to Ratchet |
+| Auberdine | Alliance | Ship | Darkshore 32.7, 43.7, to Menethil north |
+| Menethil north | Alliance | Ship | Wetlands 4.7, 57.0, to Auberdine |
+| Menethil south | Alliance | Ship | Wetlands 5.0, 63.0, to Theramore |
+| Theramore | Alliance | Ship | Dustwallow Marsh 71.0, 56.0, to Menethil south |
+
+Do not invent Stormwind Harbor, Southshore, Steamwheedle, Powderfuse, or
+Valanaar. Each tracker row has an **Enable Guide** checkbox. Checking it
+calls `ShowEntry`. Clearing it calls `Dismiss`.
 
 ### Indexing a new or updated item
 
@@ -1405,11 +1495,14 @@ What the lookup uses:
 - Named world drop: the first spawn Wowhead lists for that creature. Note
   `(a farming spot)`. A line that only says "World drop around level X–Y"
   names no creature. Through level 15, give each faction one pin already
-  published in that side's own zones (`GENERIC_LOW_FARM`): Elwynn Forest
-  48.2, 42.8 and Durotar 42.0, 68.4 for levels 1–7, Westfall 31.0, 46.2 and
-  the Crossroads in the Barrens 51.0, 29.4 for levels 8–15. Above 15 both
+  published on a mob, not the quest hub (`GENERIC_LOW_FARM`): Kobold
+  Vermin in Elwynn Forest 47.4, 35.0 and Mottled Boar in Durotar 41.2,
+  64.4 for levels 1–7, Harvest Watcher in Westfall 36.4, 50.4 and
+  Plainstrider in the Barrens 47.5, 26.8 for levels 8–15. Above 15 both
   factions share the catalog spot, with no faction tag. Do not invent a
-  Note `(the trainer that teaches this)`.
+  coordinate.
+- Profession taught by a trainer: the trainer pin. Note
+  `(the trainer that teaches this)`.
 - Profession bought at a Merchant's Favor camp: the vendor pin in the camps
   table above, for every leatherworking, blacksmithing, tailoring,
   enchanting, and engineering piece whose hunt sentence names that camp.
@@ -1427,7 +1520,27 @@ or a dungeon door. It does not run on the scrape. Unnamed world drops that
 Questie also cannot place stay in `coordinate_gaps.json`.
 
 Show on map opens that zone and sets the user waypoint. Tracked hunts draw
-one world-map pin and a minimap pin when the player is close. Clicking the
-pin toggles a blue circle. Untrack removes the pin. Track and Untrack are
-one button under the reward, beside Show on map. Exit sits in the footer
-on the log, the simulator, and settings.
+one world-map pin. The minimap does not. The guided pin has the blue ring.
+Left-click guides. Right-click opens the hunt. Untrack removes the pin.
+Track and Untrack are one button under the reward, beside Show on map.
+Exit sits in the footer on the log, the simulator, and settings. The first
+time that button is visible and enabled it pulses gold
+(`GearQuestForeverDB.ui.trackSeen`), the same wash as Play Style. A greyed
+or hidden button does not pulse. The first click sets `trackSeen`. Hover
+text on Track is white: `Click to track this hunt. The Guide feature can be enabled.`
+Show on map is white too: `See where you can find this on the world map, and let the guide show directions.`
+Missing coordinates stay `We are missing exact coordinates for this item.`
+
+The slot-rank list ("Ranked for your level") opens only from the 13×13 info
+button on that header. The rest of the header still collapses the slot.
+The open panel stays while the cursor is on that header or the panel.
+
+Untrack asks `Are you sure you want to untrack this gear quest? It will become unavailable once you do`
+only when that hunt would leave the active list. The dialog is
+`FULLSCREEN_DIALOG` at frame level 100, and it raises itself on show, so
+it sits in front of the log.
+
+A simulated character passes `CanPlayerEquip` after the required level.
+Weapon skill and `IsEquippableItem` describe whoever is logged in, so a
+level 2 would otherwise hide a level 15 hunt. The required level is still
+enforced.

@@ -5,15 +5,18 @@ GQ.Map = GQ.Map or {}
 local PREFIX = "|cff66ccffGearQuest|r: "
 local zoneCache = {}
 
-local KIND_FOR = {
-    quest_reward = "q",
-    seasonal_quest = "q",
-    boss_drop = "b",
-    raid_trash = "b",
-    profession = "p",
-    vendor = "v",
-}
+local ZONE_MAP = Enum and Enum.UIMapType and Enum.UIMapType.Zone or 3
 
+local function MapAcceptsWorld(mapId)
+    if not (mapId and C_Map and C_Map.GetWorldPosFromMapPos and CreateVector2D) then
+        return true
+    end
+    local ok, continent, world = pcall(C_Map.GetWorldPosFromMapPos, mapId, CreateVector2D(0.5, 0.5))
+    return ok and continent and world and true or false
+end
+
+-- The first id with this name is often a duplicate that cannot take a world
+-- position. Prefer the outdoor zone, and one the guide can measure yards on.
 local function FindMapId(zoneName)
     if not zoneName or zoneName == "" then
         return nil
@@ -22,12 +25,19 @@ local function FindMapId(zoneName)
         return zoneCache[zoneName] or nil
     end
     local found = false
+    local bestScore = -1
     if C_Map and C_Map.GetMapInfo then
         for id = 1, 3000 do
             local info = C_Map.GetMapInfo(id)
             if info and info.name == zoneName then
-                found = id
-                break
+                local score = info.mapType == ZONE_MAP and 100 or 10
+                if MapAcceptsWorld(id) then
+                    score = score + 50
+                end
+                if score > bestScore then
+                    bestScore = score
+                    found = id
+                end
             end
         end
     end
@@ -40,13 +50,20 @@ function GQ.Map:ZoneMap(zoneName)
 end
 
 function GQ.Map:KindFor(entry)
-    return KIND_FOR[entry and entry.sourceType] or "w"
+    local src = entry and entry.sourceType or ""
+    if GQ.NormalizeSourceType then
+        src = GQ:NormalizeSourceType(src) or src
+    end
+    return src
 end
 
 -- Faction-matching coordinate, before the zone name is turned into a map id.
 function GQ.Map:DisplaySpot(entry)
     if not entry or not entry.itemId or not GQ.Data or not GQ.Data.coordinates then
         return nil
+    end
+    if GQ.Data.NearestCoordinateSpot then
+        return GQ.Data:NearestCoordinateSpot(entry.itemId)
     end
     local row = GQ.Data.coordinates[entry.itemId]
     if not row or not row.spots or #row.spots == 0 then
@@ -168,6 +185,9 @@ end
 function GQ.Map:Show(entry)
     if not entry then
         return
+    end
+    if GQ.Guide and GQ.Guide.ShowEntry then
+        GQ.Guide:ShowEntry(entry)
     end
     local spot = self:SpotForEntry(entry)
     local mapId = spot and spot.mapId or self:ZoneMap(entry.zone)
