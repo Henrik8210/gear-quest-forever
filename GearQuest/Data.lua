@@ -8259,6 +8259,8 @@ function GQ.Data:RefreshPendingTooltip(tooltip, entry, forceFallback)
     end
 
     tooltip.gqItemInfoRefreshing = true
+    tooltip.gqSkipScoreHook = true
+    tooltip.gqScoreLineAdded = nil
     if forceFallback then
         if not self:ShowForeverItemTooltip(tooltip, entry) then
             self:ShowFactFallbackTooltip(tooltip, entry)
@@ -8267,12 +8269,14 @@ function GQ.Data:RefreshPendingTooltip(tooltip, entry, forceFallback)
     else
         self:PopulateEntryItemTooltip(tooltip, entry)
     end
-    if tooltip.Show then
-        tooltip:Show()
-    end
     if entry.itemId then
         self:ApplyImbueTooltipLines(tooltip, entry.itemId)
     end
+    self:AppendGearScoreLine(tooltip, entry)
+    if tooltip.Show then
+        tooltip:Show()
+    end
+    tooltip.gqSkipScoreHook = nil
     tooltip.gqItemInfoRefreshing = nil
 end
 
@@ -8609,11 +8613,15 @@ function GQ.Data:ShowEntryItemTooltip(tooltip, owner, entry, anchor, ...)
         return
     end
 
+    tooltip.gqSkipScoreHook = true
+    tooltip.gqScoreLineAdded = nil
     tooltip:SetOwner(owner, anchor or "ANCHOR_RIGHT", ...)
     self:PopulateEntryItemTooltip(tooltip, entry)
+    self:ApplyImbueTooltipLines(tooltip, entry.itemId)
+    self:AppendGearScoreLine(tooltip, entry)
     tooltip:Show()
     self:SolidItemTooltip(tooltip)
-    self:ApplyImbueTooltipLines(tooltip, entry.itemId)
+    tooltip.gqSkipScoreHook = nil
 end
 
 -- The log sits under this hover. A clear tooltip center lets "Select an
@@ -9715,6 +9723,501 @@ function GQ.Data:LookupPipelineScore(itemId, slot, minLevel, faction, spec)
     )
     return self._pipelineScoreLookup[key]
 end
+
+-- Tooltip display only. pipelineScore and curatedRank stay the hunt order.
+-- This maps the slot's raw scores onto -100..+100 so the best piece in the
+-- slot reads +100 and the worst reads -100.
+function GQ.Data:GearScoreIndex(score, minScore, maxScore)
+    if type(score) ~= "number" then
+        return nil
+    end
+    if type(minScore) ~= "number" or type(maxScore) ~= "number" or maxScore <= minScore then
+        return 100
+    end
+    local index = -100 + ((score - minScore) / (maxScore - minScore)) * 200
+    if index > 100 then
+        index = 100
+    elseif index < -100 then
+        index = -100
+    end
+    return math.floor(index + 0.5)
+end
+
+function GQ.Data:EquippedItemId(invSlot)
+    if not invSlot or not GetInventoryItemLink then
+        return nil
+    end
+    local link = GetInventoryItemLink("player", invSlot)
+    if not link then
+        return nil
+    end
+    return tonumber(string.match(link, "item:(%d+)"))
+end
+
+function GQ.Data:ShownPipelineScore(itemId, slotName)
+    if not itemId or not slotName then
+        return nil
+    end
+    local best
+    local function consider(entry)
+        if entry and entry.itemId == itemId and type(entry.pipelineScore) == "number"
+            and self:EntryMatchesPlayerBand(entry) then
+            if not best or entry.pipelineScore > best then
+                best = entry.pipelineScore
+            end
+        end
+    end
+    for _, entry in ipairs(self:GetCandidatesForSlot(slotName) or {}) do
+        consider(entry)
+    end
+    if self.GetNotableForSlot then
+        for _, entry in ipairs(self:GetNotableForSlot(slotName) or {}) do
+            consider(entry)
+        end
+    end
+    return best
+end
+
+function GQ.Data:GearScoreContext(slotName, handKind)
+    local dataSlot = slotName == "WeaponPair" and "MainHand" or slotName
+    local scores = {}
+    local bestList
+    local function push(score, fromList)
+        if type(score) ~= "number" then
+            return
+        end
+        scores[#scores + 1] = score
+        if fromList and (not bestList or score > bestList) then
+            bestList = score
+        end
+    end
+
+    if GQ.Log and GQ.Log.GetSlotRankList and slotName then
+        for _, entry in ipairs(GQ.Log:GetSlotRankList(slotName, handKind) or {}) do
+            push(entry.pipelineScore, true)
+        end
+    end
+    if dataSlot and self.GetNotableForSlot then
+        for _, notable in ipairs(self:GetNotableForSlot(dataSlot) or {}) do
+            if not handKind or not GQ.Log or not GQ.Log.EntryInWeaponHand
+                or GQ.Log:EntryInWeaponHand(notable, dataSlot, handKind) then
+                push(notable.pipelineScore, true)
+            end
+        end
+    end
+
+    local equippedIds = {}
+    local worn = {}
+    local empty = false
+    local slots = dataSlot and self:GetInventorySlots(dataSlot) or {}
+    for i = 1, #slots do
+        local itemId = self:EquippedItemId(slots[i])
+        if not itemId then
+            empty = true
+        else
+            equippedIds[itemId] = true
+            local score = self:EquippedPipelineScore(itemId, dataSlot)
+            if score then
+                worn[#worn + 1] = score
+                push(score)
+            end
+        end
+    end
+
+    if #scores == 0 then
+        return nil
+    end
+    local minScore, maxScore = scores[1], scores[1]
+    for i = 2, #scores do
+        if scores[i] < minScore then
+            minScore = scores[i]
+        end
+        if scores[i] > maxScore then
+            maxScore = scores[i]
+        end
+    end
+
+    local baseline
+    -- A free finger or trinket slot is a fill, not a replacement.
+    if #slots > 1 then
+        if not empty and #worn > 0 then
+            baseline = worn[1]
+            for i = 2, #worn do
+                if worn[i] < baseline then
+                    baseline = worn[i]
+                end
+            end
+        end
+    elseif #worn > 0 then
+        baseline = worn[1]
+    end
+    if baseline then
+        baseline = self:GearScoreIndex(baseline, minScore, maxScore)
+    end
+    return {
+        minScore = minScore,
+        maxScore = maxScore,
+        baseline = baseline,
+        equippedIds = equippedIds,
+        bestListScore = bestList,
+    }
+end
+
+function GQ.Data:EquippedPipelineScore(itemId, slotName)
+    local current = self:ShownPipelineScore(itemId, slotName)
+    if current then
+        return current
+    end
+    slotName = self:NormalizeSlotName(slotName)
+    local spec = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec()
+    local faction = GQ.GetEffectiveFaction and GQ:GetEffectiveFaction()
+    local level = GQ.GetEffectiveLevel and GQ:GetEffectiveLevel() or 1
+    local below, belowEnd, above, aboveStart
+    for _, entry in ipairs(self:GetEntriesByItemId(itemId)) do
+        if type(entry.pipelineScore) == "number"
+            and self:NormalizeSlotName(entry.slot) == slotName
+            and (not spec or not entry.specs or entry.specs[spec])
+            and (not faction or not entry.factions or entry.factions[faction]) then
+            local lo = entry.minLevel or 0
+            local hi = entry.maxLevel or lo
+            if hi <= level then
+                if not belowEnd or hi > belowEnd then
+                    below = entry.pipelineScore
+                    belowEnd = hi
+                end
+            elseif not aboveStart or lo < aboveStart then
+                above = entry.pipelineScore
+                aboveStart = lo
+            end
+        end
+    end
+    return below or above
+end
+
+function GQ.Data:GearScoreDeltaText(index, baseline)
+    if not index or not baseline then
+        return ""
+    end
+    local delta = index - baseline
+    if delta == 0 then
+        return ""
+    end
+    local addon = GQ.ADDON_NAME or "GearQuestForever"
+    local file = delta > 0 and "GQ-ArrowUp.png" or "GQ-ArrowDown.png"
+    local arrow = "|TInterface\\AddOns\\" .. addon .. "\\Art\\" .. file .. ":14:14:0:0|t"
+    if delta > 0 then
+        return string.format("  %s |cff00ff00+%d|r", arrow, delta)
+    end
+    return string.format("  %s |cffff4040%d|r", arrow, delta)
+end
+
+function GQ.Data:GearScoreTrail(entry, ctx)
+    if not ctx or not entry or type(entry.pipelineScore) ~= "number" then
+        return ""
+    end
+    local index = self:GearScoreIndex(entry.pipelineScore, ctx.minScore, ctx.maxScore)
+    if not index then
+        return ""
+    end
+    local delta = ""
+    if not (entry.itemId and ctx.equippedIds and ctx.equippedIds[entry.itemId]) then
+        delta = self:GearScoreDeltaText(index, ctx.baseline)
+    end
+    return string.format("|cffffffff%d|r%s", index, delta)
+end
+
+function GQ.Data:GearScoreTooltipLine(entry)
+    if GQ.IsPreviewEnabled and GQ:IsPreviewEnabled() then
+        return "|cffb0b0b0Turn off simulation mode to see your GearQuest Score for this item|r"
+    end
+    if not entry then
+        return nil
+    end
+    local slotName, handKind
+    if GQ.Log and GQ.Log.RankListContext then
+        slotName, handKind = GQ.Log:RankListContext(entry)
+    else
+        slotName = self:NormalizeSlotName(entry.slot)
+    end
+    local ctx = self:GearScoreContext(slotName, handKind)
+    local rankText
+    if entry.notable then
+        rankText = "Notable for your level"
+    elseif entry.curatedRank then
+        rankText = string.format("Rank #%d for your level", entry.curatedRank)
+    else
+        rankText = "For your level"
+    end
+    local trail = ctx and self:GearScoreTrail(entry, ctx) or ""
+    local note
+    if entry.setPiece and entry.curatedRank == 1 and ctx and ctx.bestListScore
+        and type(entry.pipelineScore) == "number"
+        and entry.pipelineScore < ctx.bestListScore - 0.01 then
+        note = "|cffd9bf73Rank 1 when you wear multiple pieces of this set.|r"
+    end
+    if trail == "" then
+        if not entry.curatedRank and not entry.notable then
+            return nil
+        end
+        return "|cffffd100" .. rankText .. "|r", note
+    end
+    return "|cffffd100" .. rankText .. "|r  " .. trail, note
+end
+
+function GQ.Data:GearScoreTooltipEnabled()
+    local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+    if settings and settings.showGearScore == false then
+        return false
+    end
+    return true
+end
+
+function GQ.Data:AppendGearScoreLine(tooltip, entry)
+    if not self:GearScoreTooltipEnabled() then
+        return
+    end
+    if not tooltip or not tooltip.AddLine or not entry or tooltip.gqScoreLineAdded then
+        return
+    end
+    local line, note = self:GearScoreTooltipLine(entry)
+    if not line then
+        return
+    end
+    tooltip.gqScoreLineAdded = true
+    tooltip:AddLine(" ")
+    tooltip:AddLine(line, 1, 1, 1)
+    if note then
+        tooltip:AddLine(note, 1, 1, 1)
+    end
+end
+
+function GQ.Data:EntryForItemLink(link)
+    local itemId = self:ItemLinkToId(link)
+    if not itemId then
+        return nil
+    end
+    local function prefer(current, entry)
+        if not current then
+            return entry
+        end
+        local rankA = current.curatedRank or 99
+        local rankB = entry.curatedRank or 99
+        if rankA ~= rankB then
+            if rankB < rankA then
+                return entry
+            end
+            return current
+        end
+        if (entry.pipelineScore or 0) > (current.pipelineScore or 0) then
+            return entry
+        end
+        return current
+    end
+    local suffixRows, rows = {}, {}
+    for _, entry in ipairs(self:GetEntriesByItemId(itemId)) do
+        if type(entry.pipelineScore) == "number" and self:EntryMatchesPlayerBand(entry) then
+            if entry.suffix and entry.suffix ~= "" then
+                if self:EntrySuffixMatchesLink(entry, link) then
+                    suffixRows[#suffixRows + 1] = entry
+                end
+            else
+                rows[#rows + 1] = entry
+            end
+        end
+    end
+    local pool = #suffixRows > 0 and suffixRows or rows
+    local active = self:FilterToActiveBand(pool)
+    if active and #active > 0 then
+        pool = active
+    end
+    local best
+    for i = 1, #pool do
+        best = prefer(best, pool[i])
+    end
+    return best
+end
+
+function GQ.Data:AddGearScoreToItemTooltip(tooltip)
+    if not tooltip or tooltip.gqSkipScoreHook or tooltip.gqScoreLineAdded then
+        return
+    end
+    if not self:GearScoreTooltipEnabled() then
+        return
+    end
+    local name = tooltip.GetName and tooltip:GetName()
+    if name and string.find(name, "ShoppingTooltip", 1, true) then
+        return
+    end
+    if not tooltip.GetItem then
+        return
+    end
+    local _, link = tooltip:GetItem()
+    local shown = tooltip.IsShown and tooltip:IsShown()
+    local entry = self:EntryForItemLink(link)
+    if not entry then
+        local miss = self:GearScoreMissText(link)
+        if not miss then
+            return
+        end
+        tooltip.gqScoreLineAdded = true
+        tooltip:AddLine(" ")
+        tooltip:AddLine(miss, 0.69, 0.69, 0.69)
+        if shown and tooltip.Show then
+            tooltip:Show()
+        end
+        return
+    end
+    self:AppendGearScoreLine(tooltip, entry)
+    if shown and tooltip.Show then
+        tooltip:Show()
+    end
+end
+
+function GQ.Data:LinkIsGear(link, itemId)
+    if itemId and #(self:GetEntriesByItemId(itemId) or {}) > 0 then
+        return true
+    end
+    if not GetItemInfo then
+        return false
+    end
+    local _, _, _, _, _, _, _, _, equipLoc = GetItemInfo(link or itemId)
+    if not equipLoc or equipLoc == "" then
+        return false
+    end
+    if equipLoc == "INVTYPE_BAG" or equipLoc == "INVTYPE_QUIVER" or equipLoc == "INVTYPE_AMMO" then
+        return false
+    end
+    return true
+end
+
+function GQ.Data:GearScoreMissText(link)
+    local itemId = self:ItemLinkToId(link)
+    if not itemId or not self:LinkIsGear(link, itemId) then
+        return nil
+    end
+    local rows = self:GetEntriesByItemId(itemId)
+    if #rows == 0 then
+        return "GearQuest has no score for this item."
+    end
+
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    local spec = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec()
+    local faction = GQ.GetEffectiveFaction and GQ:GetEffectiveFaction()
+    local level = GQ.GetEffectiveLevel and GQ:GetEffectiveLevel() or 1
+    local forClass, forSpec, forSide, forLevel = 0, 0, 0, 0
+    local lo, hi
+    local suffixNames = {}
+    for _, entry in ipairs(rows) do
+        if type(entry.pipelineScore) == "number" then
+            local classOk = not entry.classes or (classFile and entry.classes[classFile])
+            local specOk = not entry.specs or (spec and entry.specs[spec])
+            local sideOk = not entry.factions or (faction and entry.factions[faction])
+            local levelOk = level >= (entry.minLevel or 1) and level <= (entry.maxLevel or level)
+            if classOk then
+                forClass = forClass + 1
+                if specOk then
+                    forSpec = forSpec + 1
+                    if sideOk then
+                        forSide = forSide + 1
+                        local bandLo = entry.minLevel or 1
+                        local bandHi = entry.maxLevel or bandLo
+                        if not lo or bandLo < lo then
+                            lo = bandLo
+                        end
+                        if not hi or bandHi > hi then
+                            hi = bandHi
+                        end
+                        if levelOk then
+                            forLevel = forLevel + 1
+                            if entry.suffix and entry.suffix ~= "" then
+                                local label = self.GetEntryDisplayName and self:GetEntryDisplayName(entry)
+                                suffixNames[label or entry.suffix] = true
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    if forClass == 0 then
+        return "Not ranked for your class."
+    end
+    if forSpec == 0 then
+        local specName = spec
+        if GQ.Spec and GQ.Spec.GetOptions and classFile then
+            for _, opt in ipairs(GQ.Spec:GetOptions(classFile) or {}) do
+                if opt.id == spec then
+                    specName = opt.label
+                    break
+                end
+            end
+        end
+        return "Not ranked for " .. (specName or "your current spec") .. "."
+    end
+    if forSide == 0 then
+        return "Not ranked for your faction."
+    end
+    if forLevel == 0 then
+        if lo and hi and lo ~= hi then
+            return string.format("Not ranked at your level. Ranked from %d to %d.", lo, hi)
+        end
+        if lo then
+            return string.format("Not ranked at your level. Ranked at level %d.", lo)
+        end
+        return "Not ranked at your level."
+    end
+
+    local names = {}
+    for label in pairs(suffixNames) do
+        names[#names + 1] = label
+    end
+    table.sort(names)
+    if #names == 1 then
+        return "Only " .. names[1] .. " is ranked for your level."
+    end
+    if #names > 1 then
+        return "Not this roll. Ranked for your level: " .. table.concat(names, ", ") .. "."
+    end
+    return "Not ranked for your level."
+end
+
+function GQ.Data:HookItemScoreTooltips()
+    local function hook(tip)
+        if not tip or tip.gqScoreHooked or not tip.HookScript then
+            return
+        end
+        tip.gqScoreHooked = true
+        tip:HookScript("OnTooltipCleared", function(self)
+            self.gqScoreLineAdded = nil
+        end)
+        pcall(tip.HookScript, tip, "OnTooltipSetItem", function(self)
+            GQ.Data:AddGearScoreToItemTooltip(self)
+        end)
+    end
+    hook(GameTooltip)
+    hook(ItemRefTooltip)
+    if not self._scoreTooltipWatcher and CreateFrame then
+        local watcher = CreateFrame("Frame")
+        watcher:RegisterEvent("PLAYER_LOGIN")
+        watcher:SetScript("OnEvent", function()
+            GQ.Data:HookItemScoreTooltips()
+        end)
+        self._scoreTooltipWatcher = watcher
+    end
+    if self._scoreTooltipProcessor or not TooltipDataProcessor or not TooltipDataProcessor.AddTooltipPostCall then
+        return
+    end
+    if not Enum or not Enum.TooltipDataType or not Enum.TooltipDataType.Item then
+        return
+    end
+    self._scoreTooltipProcessor = true
+    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(tooltip)
+        GQ.Data:AddGearScoreToItemTooltip(tooltip)
+    end)
+end
+
+GQ.Data:HookItemScoreTooltips()
 
 function GQ.Data:GetRankableEntriesForSlot(slotName)
     slotName = self:NormalizeSlotName(slotName)

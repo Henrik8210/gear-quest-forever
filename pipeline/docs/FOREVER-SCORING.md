@@ -345,9 +345,15 @@ python pipeline/scripts/index_coordinates.py
 .\scripts\sync-addon.ps1
 ```
 
-`index_coordinates.py` is part of the scrape, not a later backfill. A new or
-updated hunt id is not finished until that script has looked for its
-coordinate. The rules are under **Map tracking** below.
+`index_coordinates.py` is part of the scrape, not a later backfill. A new
+hunt id is not finished until that script has stored the full coordinate
+list for the item. An existing item is re-indexed only when its places
+changed: new droppers, new sellers, a source that was empty, or a quest,
+door, or object pin that moved. A stat change, a tooltip rewrite, or a
+rename leaves the stored coordinates as they are. When coordinates are
+indexed, that is every published camp the pattern under **Map tracking**
+keeps, not one pin taken from the page. `NearestCoordinateSpot` then offers
+the closest of those spots to wherever the player is standing.
 
 `sync_forever_item_stats.py` dry-run first. `--apply` only when the parse of
 known items is sane (Imperial Plate Helm **18/17** Str/Sta, not 38 from the
@@ -481,6 +487,81 @@ paragraph.
   is not personal spell power. Set bonuses start with `(N) Set`, not
   `Equip:`, and stay on the set block.
 
+## GearQuest score (tooltip display)
+
+The hunt order is still the stored `pipelineScore`. The number on a tooltip
+is a display index only. Do not retune weights so the index and the rank
+agree, and do not write the index back onto a pick.
+
+`GearScoreIndex` maps the slot's raw scores onto **−100..+100**. The best
+score in that comparison is **+100**. The worst is **−100**. One score in
+the slot is **100**. The displayed index is clamped and rounded. The scale
+is the live level's rank list (`GetSlotRankList`), the notables, and the
+equipped piece's raw score (so a worn piece that has aged out of the band
+still sits on the same line). Rank text uses `curatedRank`: **Rank #N for
+your level**. A notable says **Notable for your level**.
+
+The line is inside the item tooltip, after the stats, before any addon
+source line. `AppendGearScoreLine` runs before `Show()`, so the dark
+backdrop grows to include it. It is not a second tooltip. It is not drawn
+on hunt-list rows. It is drawn on:
+
+- the hunt hover
+- each line of the (i) slot-rank tooltip (`GearScoreTrail`)
+- the character panel, including the upgrade hover (above **World drop**
+  and **Left-click to see more details.**)
+- chat links and quest-log items (`GameTooltip` and `ItemRefTooltip`,
+  plus `TooltipDataProcessor` for items)
+
+Bags, quivers, and ammo are skipped. **General → GearQuest score on
+tooltips** is on unless `settings.showGearScore` is false. Off hides the
+line on item tooltips and the (i) list. The hunt order does not change.
+
+Comparison is `index(hovered) − index(equipped)`, rounded. A positive delta
+is the green `GQ-ArrowUp.png` and a green **+N**. A negative delta is the
+red `GQ-ArrowDown.png` and a red **−N**. The Forever font has no arrows
+(they render as `[]`), and `Interface\BUTTONS\Arrow-Up-Up` is a caret, so
+the pictures ship with the addon. An empty slot shows the index only. The
+same item, or a delta of 0, shows no arrow. Rings and trinkets compare to
+the weaker equipped piece only when **both** slots are filled. A free slot
+is a fill, not a replacement.
+
+`EquippedPipelineScore` uses the current band first. If the worn piece has
+aged out, it uses the nearest same-spec, same-faction band: the highest
+`maxLevel` at or below the player, otherwise the soonest band above.
+**Slick Deviate Leggings** (6480) last score for Enhancement Horde at 21–23
+(7.11) still compare when worn at 27.
+
+`EntryForItemLink` prefers the suffix, then filters to the active band
+(exact min and max, not `LEVEL_GRACE`). A chat link then matches the hunt
+list. **Kodohide Legguards** (285338) is rank 4 for Enhancement Horde at
+25–27 (score 18.52). **Pathfinder Belt** (15347) is the unsuffixed base;
+Enhancement ranks **Pathfinder Belt of the Falcon**.
+
+When the hovered piece is gear and it is not the ranked row, say why
+(`GearScoreMissText`) instead of leaving the tooltip blank:
+
+- **Only &lt;Name of the Falcon&gt; is ranked for your level.** (one suffix)
+- **Not this roll. Ranked for your level: …** (several)
+- **Not ranked at your level. Ranked from N to M.** / **Ranked at level N.**
+- **Not ranked for &lt;spec label&gt;.**
+- **Not ranked for your class.** / **Not ranked for your faction.**
+- **GearQuest has no score for this item.**
+
+Simulation mode does not score. The line is **Turn off simulation mode to
+see your GearQuest Score for this item.** The Simulator page button says
+**Turn off simulation** (148px). The old preview dialog's Reset is unchanged.
+
+A set piece that is `curatedRank` 1, with `setPiece`, whose own stored
+score is below another piece in that slot, adds **Rank 1 when you wear
+multiple pieces of this set.** Embrace of the Viper inserts each piece at
+the front of the slot (`apply_embrace_package`): the score is the piece
+plus an equal share of the set bonus, which does not always beat the next
+individual piece. Enhancement Horde legs at 25–27: **Leggings of the Fang**
+(10410) rank 1, score 20.87, index 94; **Triprunner Dungarees** (9624)
+rank 2, score 21.56, index 100. Fang stays rank 1. Do not change the set
+promotion or the weights to make those two numbers match.
+
 ## Log window
 
 - **Side handles** are Log (gold exclamation), Simulator (gold question mark,
@@ -497,14 +578,17 @@ paragraph.
   **Settings**, and **Viewing upgrades…** are solid `1, 0.97, 0.88` with a
   1px black shadow, so the sky art does not wash them out. The spec control
   on that row is larger: icon 22, arrow 30, label width 130.
-- **Reset** on the Simulator is enabled only while a simulation is applied.
-  On your own character it stays grey. The hover says you are already seeing
-  your character unsimulated.
+- **Turn off simulation** on the Simulator page is enabled only while a
+  simulation is applied. On your own character it stays grey. The hover says
+  you are already seeing your character unsimulated. The button is 148px.
+  The older preview dialog still says Reset.
 - **Settings** pages are General, Hunts, GearQuest Commands, and Credits.
   Rows highlight on hover (0.62, 0.50, 0.18, 0.55). The selected row keeps
   its gold bar. The page heading is centered. The setting name is the large
   text; the note under it is smaller. Clicking the label toggles the
   checkbox. Hide minimap is `GearQuestForeverDB.settings.hideMinimapIcon`.
+  **GearQuest score on tooltips** is on the General page, under the
+  background-art row (`settings.showGearScore`, on when nil).
   **Hide upgrade arrows** is under Hunts
   (`settings.hideUpgradeArrows`). It removes the green arrow from the quest
   log, quest giver, loot, and vendors. **GearQuest Commands** lists each
@@ -525,7 +609,8 @@ paragraph.
   Checking Profession, Boss drop, or Dungeon & Raid trash opens that flyout
   on the click. You do not have to leave the row and come back.
 - **Play style** is the button at the bottom of the log
-  (`GearQuestForeverDB.ui`). Five cards, three on the first row and two on
+  (`GearQuestForeverDB.ui`). While any of the five is on, the button reads
+  **Play style***. Five cards, three on the first row and two on
   the second. The name sits under the picture. **Get it now!** can be on
   with either dungeon card, and with **Don't look back** and **Buy it**.
   **No Dungeons!** and **Dungeon Enjoyer** turn each other off. A play
@@ -777,6 +862,8 @@ node scripts/diff-veldt-wowhead.mjs
 
 Then `score.py` one class at a time (`GQ_NO_GUIDES=1`) and copy the emitted Lua into `GearQuest/_generated/`. Ingest does **not** overwrite a source that already names a quest, vendor, drop, or profession. A row whose text is still `Source not listed yet` is replaced when the new listview names one, and that id is written to `coord_needed.json` so the coordinate lookup runs for it. New Forever-only ids (≥ 200000) merge in the same way. Stats on those rows come from the refreshed nether tooltip, not the listview.
 
+Every id that scrape adds is indexed in that same pass with `index_coordinates.py --ids`. An existing id is indexed only when its places changed (new droppers, new sellers, or a source that was empty). A stat change or a tooltip rewrite leaves the stored coordinates as they are. When the index does run, it stores the full camp list for that item, not one coordinate. A world drop keeps a published camp in each zone its creatures live in (up to three when they are far apart, plus a dungeon entrance when a dropper is inside). A vendor keeps every NPC who sells it. The log, the guide, and the map pin then use the spot closest to the character, so a player in any zone is sent to a nearby farm or seller.
+
 Quest Side is the word after `Side:` (`Alliance`, `Horde`, or `Both`). Do not read the end-NPC icon. A both-faction quest gets one pin per faction (Friend of the Library: Garion Wendell in Stormwind for Alliance, Owen Thadd in Undercity for Horde). An Alliance-only quest never scores or displays for Horde, and the reverse. `index_coordinates.py --repair-quests` rewrites those pins and `quest_faction.json`.
 
 `diff-veldt-wowhead.mjs` is **not** a second ingest. It diffs the Wowhead cache against [veldt1 wowf-items](https://veldt1.github.io/wowf-items/) (client `1.60.1` vs `1.15.9`) and writes `pipeline/data/forever_wowhead/veldt_wowhead_diff.json`. Use that to chase empty tooltips and missing Wowhead pages; do not copy veldt stats into `items.json`.
@@ -924,6 +1011,24 @@ until the lookup has been done. Find the quest attached to the item. The
 and the source `gateLevel`. Several quests: take the lowest. A chain of at least five steps that must enter a dungeon uses that step's quest level when it is at least 8 levels above the pickup. Final Passage (Windstorm Hammer 6804, Dancing Flame 6806) is 36 because Test of Lore in Scarlet Monastery Library is level 36. Mage's Wand (Ragefire Wand 7513, Icefury Wand 7514, Nether Force Wand 11263) is 40 because Rituals of Power is level 40. Confront Yeh'kinya (Faded Hakkari Cloak 20218, Tattered Hakkari Cape 20219) is 58 because The Final Tablets in Blackrock Spire are level 58. Drakefire Amulet (16309) is 60 because General Drakkisath is level 60. Leaders of the Fang stays 10. The Defias Brotherhood stays 14. `eff_req` then
 uses `rlvl` when it is &gt; 0.
 
+The dungeon upgrade sets are level **60** quests. Classic **Feralheart**,
+**Beastmaster**, **Heroism**, **The Five Thunders**, **Darkmantle**,
+**Deathmist**, **Soulforge**, **Virtuous**, and **Sorcerer's** (72 pieces)
+were raised from the 58 pickup to required level 60 and gate 60. The Forever
+spec copies (144 pieces) are the same quests at 60, not world drops or
+vendors, with `questRaces` 0 so both factions see them. Slot to quest:
+wrists **An Earnest Proposition**; hands and waist **Just Compensation**;
+feet, legs, and shoulders **Anthion's Parting Words**; head and chest
+**Saving the Best for Last**. The pin is the start of that chain, An Earnest
+Proposition, not the turn-in for the piece. The hunt text is
+`Reward from the quest '{quest}'. The chain starts with An Earnest Proposition.`
+Leave these out of that retag: the Beaststalker drop set, Beastmaster's
+Girdle (5355), Darkmoon Card: Heroism, Uncle's Heroism, Violet Sorcerer's,
+Ogre Sorcerer Belt, and Sorcerer Collar. A piece with no quest and item
+level 15 or below, and no real Requires Level, is wearable at 1. A higher
+item level with no quest stays on the lookup. Do not mark the dungeon sets
+wearable at 1.
+
 The item XML `https://www.wowhead.com/forever/item=ID&xml` first `<json>`
 CDATA `reqlevel` matches the quest page `Requires level N`. `jsonEquip`
 reqlevel is often the stub 1. Ignore it. Quest HTML `Requires level N` is
@@ -1014,8 +1119,10 @@ deny. A world drop that was already listed under the area name stays listed
 after the label becomes the parent zone (`zoneOpen`). Do not rename a
 dungeon to the zone its entrance sits in. Do not turn Refuge Pointe or
 Alliance. Through level 15 the log shows that faction's own farming pin
-and leaves the other faction's zone off the parchment. Above 15 both
-factions share the catalog spot. A named creature in that zone stays on
+and leaves the other faction's zone off the parchment. Above 15 a
+world drop stores a published camp in every zone a dropping creature
+lives in, up to three spawns per zone when they are far apart, and the
+log shows the camp closest to the character. A named creature in that zone stays on
 that faction's list. A world drop that was already listed under the area
 name stays listed after the label becomes the parent zone (`zoneOpen`).
 Do not rename a
@@ -1316,10 +1423,11 @@ Notes by source:
   that giver is the next step. `(beginning of the quest or chain)`
 - Boss and raid trash: the dungeon or raid entrance, not the boss room.
   `(entrance to dungeon or raid)`
-- Vendor: the NPC that sells it, one pin, faction filtered.
-  `(vendor that sells this)`
-- World drop: the first spawn Wowhead lists for the named creature.
-  `(a farming spot)`
+- Vendor: every NPC who sells it. The line shows the seller closest to
+  the character. `(vendor that sells this)`
+- World drop: a published camp in every zone a dropping creature lives in,
+  up to three when they are far apart, plus a dungeon entrance when a
+  dropper is inside. The line shows the closest camp. `(a farming spot)`
 - World boss with an outdoor pin: `(where this boss spawns)`
 
 Classic dungeon doors are the pre-Cataclysm Questie entrance table (Forever
@@ -1376,13 +1484,15 @@ does not clear the icon's anchors, so a filter icon keeps its own point.
 | Special | `Interface\TargetingFrame\UI-RaidTargetingIcon_1` (gold star) |
 | Unsourced | `Interface\RaidFrame\ReadyCheck-NotReady` |
 | Vendor | `Interface\Cursor\Buy` (the buy-cursor sack) |
-| World drop | `Interface\Icons\Spell_Nature_FarSight` (sunset over dark hills) |
+| World drop | `GearQuest/Art/GQ-WorldDrop.png` (sunset over dark hills). `Interface\Icons\Spell_Nature_FarSight` is not in this client, so that path draws nothing. |
 
 Fishing and skinning use the profession book. Mail and pickpocket use the
 star. A container source uses the chest. `Interface\GossipFrame\VendorIcon`
 is not on this client. The world-drop icon is not the micro-button globe:
 that texture is a tall button, and a crop of it draws as a dash or as
-nothing.
+nothing. It is also not `Spell_Nature_FarSight`: that file is not in this
+client, and `SetTexture` on it leaves the pin blank. The sunset is
+`GQ-WorldDrop.png` in the addon, and the path includes `.png`.
 
 The guided pin gets a blue ring (`UI-Minimap-Ping-Center`). Other pins do
 not. Left-click calls `GQ.Guide:ShowEntry`. Right-click calls
@@ -1400,9 +1510,11 @@ The pin table is ours. Questie is not required in game.
 
 `Guide.lua` loads after `Tracker.lua`. One guided hunt per character,
 `GearQuestForeverCharDB.guideEntryId`. `settings.hideGuideArrow` is
-account-wide and hides the arrow without clearing the id. Logout clears
-only `guideEntryId`. `/reload` keeps it: `ReloadUI` and `C_UI.Reload` are
-wrapped so `guideReloading` is set before they fire `PLAYER_LOGOUT`.
+account-wide and hides the arrow without clearing the id. A logout
+countdown (`PLAYER_CAMPING`, cleared again if the player cancels) clears
+only `guideEntryId`. `/reload` keeps it. `ReloadUI` and `C_UI.Reload` are
+not replaced: `C_UI.Reload` is protected, and a replacement makes the
+AddOn List Reload button fail with `Interface action failed because of an AddOn`.
 Tracked hunts are not cleared. An old account-wide `settings.guideEntryId`
 is dropped on init.
 
@@ -1427,7 +1539,9 @@ The player delta is projected onto those two axes.
 
 A hunt on another continent aims at the nearest `CROSSINGS` dock on the
 player's continent whose destination continent is the hunt's, for the real
-`UnitFactionGroup`. The label is `Zeppelin` or `Ship`. The user waypoint
+`UnitFactionGroup`. The label is the dock, `Ship in Menethil Harbor` or
+`Zeppelin in Durotar`, not the word alone. Inside 12 yards it still says
+`Here`. The user waypoint
 stays on the hunt (`PlaceForeverPin`). On arrival both are on one continent
 and the arrow aims at the pin.
 
@@ -1449,15 +1563,22 @@ calls `ShowEntry`. Clearing it calls `Dismiss`.
 
 ### Indexing a new or updated item
 
-A Wowhead Forever scrape that adds or changes a hunt item looks up the
-coordinate in the same pass as the usual facts: tooltip stats, required
-level, source, zone, npc, and quest. Also recheck items that are still
-Unsourced; if Wowhead now names a source, index those ids too. Every new
-id is also checked for New in Forever (`build_forever_new.py`) and stamped
-on the parchment when the classic nether tooltip 404s. A profession source,
-new or already indexed, is also checked for its recipe skill in that same
-pass (`fetch_craft_skills.py`, ForeverDB `made`, confirmed on the Wowhead
-spell page when it is up). Coordinates are patched with
+Every Wowhead Forever item-database scrape indexes coordinates for each
+item it adds, in the same pass as the usual facts: tooltip stats, required
+level, source, zone, npc, and quest. An existing item is indexed in that
+pass only when its places changed: new droppers, new sellers, a source that
+was empty, or a quest, door, or object pin that moved. A stat change, a
+tooltip rewrite, or a rename leaves the stored coordinates as they are.
+The lookup, when it runs, stores every real spot the pattern below keeps.
+It does not store one pin chosen from the page. That list is what lets
+`NearestCoordinateSpot` offer a nearby farm or seller to a player standing
+anywhere. Also recheck items that are still Unsourced; if Wowhead now
+names a source, index those ids the same way. Every new id is also checked
+for New in Forever (`build_forever_new.py`) and stamped on the parchment
+when the classic nether tooltip 404s. A profession source, new or already
+indexed, is also checked for its recipe skill in that same pass
+(`fetch_craft_skills.py`, ForeverDB `made`, confirmed on the Wowhead spell
+page when it is up). Coordinates are patched with
 `python pipeline/scripts/index_coordinates.py --ids <json list>`. A full
 `emit()` rewrites every coordinate. The cache is
 `pipeline/data/forever_wowhead/coord_cache.json` (gitignored). Use the
@@ -1489,17 +1610,23 @@ What the lookup uses:
   11.4), and Excavation Site (Wetlands 47.8, 56.3). The other six Forever
   doors have a description and no numbers.
   Leave them unpinned until someone measures the door.
-- Vendor: the NPC that sells it, one pin per faction. Note
-  `(vendor that sells this)`. A battleground quartermaster with no outdoor
+- Vendor: every NPC who sells it, from the Forever sold-by list. Note
+  `(vendor that sells this)`. The log, the guide, and the map pin use the
+  vendor closest to the character, and a faction-only vendor stays on
+  that faction's list. A battleground quartermaster with no outdoor
   pin stays a gap.
-- Named world drop: the first spawn Wowhead lists for that creature. Note
-  `(a farming spot)`. A line that only says "World drop around level X–Y"
-  names no creature. Through level 15, give each faction one pin already
+- World drop: a published camp in every zone a dropping creature lives
+  in, from the Forever dropped-by list. Up to three spawns per zone, and
+  only when they sit far apart. A dropper inside a dungeon becomes that
+  dungeon's entrance. Note `(a farming spot)`. The log, the guide, and
+  the map pin use the camp closest to the character. Spots are not tagged
+  by faction, so both sides can farm a contested zone. Through level 15,
+  when Wowhead lists no dropper, give each faction one pin already
   published on a mob, not the quest hub (`GENERIC_LOW_FARM`): Kobold
   Vermin in Elwynn Forest 47.4, 35.0 and Mottled Boar in Durotar 41.2,
   64.4 for levels 1–7, Harvest Watcher in Westfall 36.4, 50.4 and
-  Plainstrider in the Barrens 47.5, 26.8 for levels 8–15. Above 15 both
-  factions share the catalog spot, with no faction tag. Do not invent a
+  Plainstrider in the Barrens 47.5, 26.8 for levels 8–15. Above 15, that
+  same missing-dropper case uses one shared catalog spot. Do not invent a
   coordinate.
 - Profession taught by a trainer: the trainer pin. Note
   `(the trainer that teaches this)`.
@@ -1510,17 +1637,30 @@ What the lookup uses:
   Stormwind. Trainer recipes stay on the trainer pins.
 - World boss with an outdoor pin: `(where this boss spawns)`.
 
-Faction is a filter. Neutral spots show for both. Store one spot per
-faction and set `more=true` when another valid spot exists. The log prints
-`more coordinates for this`. The map pin is that same first spot, not every
-spawn. Continent maps and a 50, 50 zone center are not coordinates.
+Faction is a filter on spots that carry one. A world-drop camp has no
+faction, so both sides can farm it. A vendor spot keeps the seller's
+faction. Set `more=true` when more than one spot is stored. The log prints
+`more coordinates for this` and shows the closest spot. The guide and the
+world-map pin use that same closest spot. The other spots stay in the row
+so the closest one can change as the character moves. Continent overview
+maps (Eastern Kingdoms, Kalimdor, Azeroth, Outland) and an exact 50, 50
+center are not coordinates.
 
 `enrich_coordinates.py` only fills gaps. It must not replace a Wowhead pin
 or a dungeon door. It does not run on the scrape. Unnamed world drops that
 Questie also cannot place stay in `coordinate_gaps.json`.
 
 Show on map opens that zone and sets the user waypoint. Tracked hunts draw
-one world-map pin. The minimap does not. The guided pin has the blue ring.
+their own frames on the map canvas. They are not registered with the map's
+pin pool, and they do not write `WorldMapFrame.pinPools`. Do not
+`AddDataProvider`, and do not hook `WorldMapFrame` OnShow. The map's hide
+must not run addon code: a data provider, or `Hide()` on a pin while the
+map hides, calls `SetPreferredGamepadInteractTarget` and taints gamepad
+focus, so jump and talking to an NPC stop working after the map closes.
+Pins are placed from the addon's own update only while the map is shown.
+The world-drop icon is the addon picture `GQ-WorldDrop.png`. The icon keeps
+its size when the map zooms. The same pin is translated onto a continent
+map. The minimap does not draw it. The guided pin has the blue ring.
 Left-click guides. Right-click opens the hunt. Untrack removes the pin.
 Track and Untrack are one button under the reward, beside Show on map.
 Exit sits in the footer on the log, the simulator, and settings. The first
@@ -1535,10 +1675,9 @@ The slot-rank list ("Ranked for your level") opens only from the 13×13 info
 button on that header. The rest of the header still collapses the slot.
 The open panel stays while the cursor is on that header or the panel.
 
-Untrack asks `Are you sure you want to untrack this gear quest? It will become unavailable once you do`
-only when that hunt would leave the active list. The dialog is
-`FULLSCREEN_DIALOG` at frame level 100, and it raises itself on show, so
-it sits in front of the log.
+Untrack removes the hunt immediately. There is no confirmation. A filtered
+hunt, a hunt outside the top three, and a hunt tracked during a simulation
+all untrack the same way.
 
 A simulated character passes `CanPlayerEquip` after the required level.
 Weapon skill and `IsEquippableItem` describe whoever is logged in, so a

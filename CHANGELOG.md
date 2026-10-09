@@ -2,57 +2,79 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v0.4.2-beta
+## v0.5.0-beta
 
-A tracked hunt can point the way. The world map uses a different icon for each source, a world drop sits on a mob instead of a quest camp, and Track pulses gold the first time you can click it.
+Hover any piece of gear and GearQuest tells you how it ranks for your level, how it compares with what you are wearing, and why a piece has no score. The dungeon upgrade sets are level 60 quests. Closing the world map with a gamepad no longer locks jump or talking to NPCs.
 
-The window title reads **GearQuest Forever v0.4.2-beta**.
+The window title reads **GearQuest Forever v0.5.0-beta**.
 
-### Guide
+### GearQuest score
 
-Each row on the tracker has **Enable Guide**. One hunt is guided at a time. The arrow sits just above the tracker. Dragging the arrow moves the tracker with it. The picture is a strip of 32 frames. The frame changes so the tip points the way you are facing, including when that way is west. The picture itself does not spin.
+Item tooltips gain a line after the stats. The same trail is on each row of the (i) rank list beside a slot header. The hunt list itself does not show the number.
 
-Inside 12 yards the line says **Here**. On the same continent it says the yards. On another continent it aims at the boat or zeppelin you can board, and the line says **Ship** or **Zeppelin**. The map pin stays on the hunt. When you arrive on that continent the arrow aims at the pin again.
+The line names the rank for your current level: **Rank #1 for your level**, or **Notable for your level**. Beside it is the GearQuest index, from **-100** to **+100**. **+100** is the best stored score in that slot at your level. **-100** is the worst. The number is only how the tooltip draws the score. The hunt order still uses the same scores as before.
 
-Horde zeppelins: Durotar 50.8, 13.6, Tirisfal Glades 61.0, 59.0, and Grom'gol in Stranglethorn Vale 31.5, 29.6. Both factions: the ship at Ratchet 63.6, 38.7 and Booty Bay 26.0, 73.2. Alliance ships: Auberdine 32.7, 43.7 and Menethil Harbor 4.7, 57.0, and Menethil 5.0, 63.0 with Theramore 71.0, 56.0.
+When that slot has something equipped, the same line compares this piece to it. A green up arrow and a green **+N** means this piece is better by that many index points. A red down arrow and a red **−N** means it is worse. An empty slot shows the index only. The same item, or a difference of zero, shows no arrow. Rings and trinkets compare to the weaker of the two pieces, and only when both slots are filled. An empty ring or trinket slot is a place to fill, not a piece to replace.
 
-**Hide guide arrow** on the Hunts settings page hides it for the account. The hunt you are guiding is stored on that character. Logging out clears it. `/reload` keeps it. The hunts you are tracking stay either way.
+A piece you are still wearing that has aged out of the current level band is still compared. **Slick Deviate Leggings**, last scored for Enhancement at 21-23, still compare when you are wearing them at 27.
 
-Left-click a world-map pin to guide. The tooltip says **Left-click to Guide**. Right-click says **Right click to open Hunt** and opens that hunt in the log.
+**Leggings of the Fang** stay rank 1 for Enhancement at 25-27 because **Embrace of the Viper** is scored as a set. The stored score on the legs can sit under **Triprunner Dungarees**, which then reads **+100**. When that happens the tooltip adds **Rank 1 when you wear multiple pieces of this set.**
 
-### World map pins
+The arrows are the green and red pictures shipped with the addon.
 
-Tracked hunts pin the world map. The minimap does not draw them. The guided pin has a blue ring.
+### Where the line shows
 
-The icon matches the source, all the same size. A boss is a skull. A container is a chest. Dungeon and raid trash is the red raid mark. A profession, including fishing and skinning, is a book. A quest reward is a yellow exclamation. A rare is a silver dragon. A seasonal quest is a wrapped present. Special, including mail and pickpocket, is a gold star. Unsourced is a red X. A vendor is a sack. A world drop is a sunset over dark hills.
+The line is inside the item tooltip. A hunt hover, the character panel, a chat link, and a quest-log item all get it. On the character-panel upgrade hover it sits above **World drop** and **Left-click to see more details.** Bags, quivers, and ammo are skipped.
 
-The Filter list uses those same icons, after the checkbox and before the name. The profession, boss, and trash lists do not.
+A chat link uses the same rank as the hunt list. **Pathfinder Belt** is the unsuffixed item. Enhancement ranks **Pathfinder Belt of the Falcon**. **Kodohide Legguards** is rank 4 for Enhancement Horde at 25-27, on the list and on a chat link.
 
-Hovering **Show on map**, in white, says: See where you can find this on the world map, and let the guide show directions. With no coordinates it still says, in white: We are missing exact coordinates for this item.
+### When there is no score
 
-### Where a world drop is pinned
+If the piece is gear and it is not on the ranked list, the tooltip says why.
 
-A generic world drop through level 15 is on a published mob, not the quest camp.
+**Only Pathfinder Belt of the Falcon is ranked for your level.** One ranked suffix.
 
-Alliance 1–7 is Kobold Vermin in Elwynn Forest, 47.4, 35.0. **Patchwork Cloak** is there. Horde 1–7 is a Mottled Boar in Durotar, 41.2, 64.4. The Den at 42.0, 68.4 stays the start of a Durotar quest. Alliance 8–15 is a Harvest Watcher in Westfall, 36.4, 50.4. **Calico** is there. Horde 8–15 is a Plainstrider in the Barrens, 47.5, 26.8. Above 15 both factions share the catalog spot. A named creature stays on that creature.
+**Not this roll. Ranked for your level:** and then the names, when several suffixes are ranked.
 
-When a hunt has several spots, the coordinate line and the guide use the closest. That spot stays until another is at least 20 yards closer.
+**Not ranked at your level. Ranked from 18 to 24.** Or **Ranked at level 20.**
 
-### Track
+**Not ranked for Enhancement.** The name is the spec you are on.
 
-The first time **Track** is on screen and can be clicked, it pulses gold, the same wash as Play Style. With no hunt selected it stays grey and still. It stays still on Removed, and on the Simulator and Settings. The first click marks it seen for the account.
+**Not ranked for your class.** **Not ranked for your faction.**
 
-Hovering Track, while the button still says Track, is white: Click to track this hunt. The Guide feature can be enabled.
+**GearQuest has no score for this item.**
 
-Untrack asks "Are you sure you want to untrack this gear quest? It will become unavailable once you do" only when that hunt would leave the active list. The dialog sits in front of the log.
+### The setting, simulation, and Play style
 
-### Hunt page
+**General** has **GearQuest score on tooltips**, under **Remove background art**, checked by default. Uncheck it and the line leaves item tooltips and the (i) rank list. The hunt order does not change.
 
-The rank list beside a slot header, the one that says which pieces were ranked for your level, opens only when the cursor is on the info mark. The rest of that line still collapses the slot.
+Simulation mode does not show a score. The line says **Turn off simulation mode to see your GearQuest Score for this item.** The Simulator button that used to say Reset now says **Turn off simulation**.
 
-A vendor with a required standing gets a line just before Source. **Requires Honored with Booty Bay. Your standing is Friendly.** The standing is green when you have met it and red when you have not. **Souvenier Sea Shell** is that kind of neck.
+The **Play style** button reads **Play style*** while any play style is on: **No Dungeons!**, **Dungeon Enjoyer**, **Get it now!**, **Don't look back**, or **Buy it**. It matches **Filter***.
 
-The simulator can show a hunt the character you are logged in on could not equip, once the hunt's required level is met. A level 2 looking at level 15 still sees the weapon.
+### Required level and the level 60 dungeon sets
+
+Pieces that had no Requires Level were looked up as quest rewards. The stored level is the minimum level that can pick up that quest. Starter pieces with item level 15 or below, and no quest, can be worn at level 1.
+
+The dungeon upgrade sets are level 60 quests for every class. **Feralheart**, **Beastmaster**, **Heroism**, **The Five Thunders**, **Darkmantle**, **Deathmist**, **Soulforge**, **Virtuous**, and **Sorcerer's**, including the Forever copies of those pieces, require **60**. They are quest rewards, not world drops. Both factions see the Forever copies. Wrists come from **An Earnest Proposition**. Hands and waist come from **Just Compensation**. Feet, legs, and shoulders come from **Anthion's Parting Words**. Head and chest come from **Saving the Best for Last**. The chain starts with **An Earnest Proposition**, and that is where the map pin sits.
+
+**Truthseeker's Bow** requires **40**.
+
+### Where to find a piece
+
+A new item stores every published spot in the same pass it is added. That is the first quest in the chain, a dungeon or raid entrance, a named creature, every vendor who sells it, and a farm in each zone a dropping creature lives in, up to three spawns per zone when they are far apart. The log, the guide, and the map use the spot closest to you.
+
+An item already in the list gets new coordinates only when its places change: new droppers, new sellers, a source that was empty, or a pin that moved. A stat or tooltip change leaves the stored spots where they are.
+
+A world drop uses the sunset picture shipped with the addon.
+
+### Gamepad and the world map
+
+Opening the world map and closing it, with a gamepad, no longer blocks jump or talking to an NPC. Map pins are drawn by GearQuest on the map. They are not registered with the map's own pin list, so closing the map does not run addon code inside the gamepad focus clear.
+
+### v0.4.2-beta
+
+A tracked hunt can point the way. The arrow sits above the tracker, and dragging it moves the tracker. On another continent it aims at the boat or zeppelin and names the dock. `/reload` keeps the guided hunt. World-map pins use a different icon per source, including the sunset for a world drop. Through level 15 a generic world drop is pinned on a published mob: Kobold Vermin, Mottled Boar, Harvest Watcher, or Plainstrider. **Track** pulses gold the first time you can click it.
 
 ### v0.4.1-beta
 

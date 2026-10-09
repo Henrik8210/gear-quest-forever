@@ -90,7 +90,9 @@ function GQ.Map:SpotForEntry(entry)
     if not spot then
         return nil
     end
-    local mapId = spot.mapId or self:ZoneMap(spot.map)
+    -- The client's map id for this zone name. A stored id can be a Wowhead
+    -- id the world map does not use, and then the pin never lands.
+    local mapId = self:ZoneMap(spot.map) or spot.mapId
     if not mapId then
         return nil
     end

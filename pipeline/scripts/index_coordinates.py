@@ -85,8 +85,9 @@ def fetch(url: str) -> str:
     wait = DELAY - (time.time() - _last)
     if wait > 0:
         time.sleep(wait)
-    delay = 8.0
-    for attempt in range(6):
+    # A 403 is Wowhead asking us to stop. Wait minutes, then try once more.
+    pauses = (180, 360)
+    for attempt in range(len(pauses) + 1):
         _last = time.time()
         req = urllib.request.Request(
             url, headers={"User-Agent": UA, "Accept-Encoding": "gzip"}
@@ -98,10 +99,10 @@ def fetch(url: str) -> str:
                     raw = gzip.decompress(raw)
                 return raw.decode("utf-8", "replace")
         except urllib.error.HTTPError as e:
-            if e.code in (403, 429) and attempt < 5:
-                print(f"  HTTP {e.code} retry in {delay:.0f}s", flush=True)
-                time.sleep(delay)
-                delay = min(delay * 2, 90)
+            if e.code in (403, 429) and attempt < len(pauses):
+                pause = pauses[attempt]
+                print(f"  HTTP {e.code} waiting {pause}s", flush=True)
+                time.sleep(pause)
                 continue
             if e.code == 404:
                 return ""
@@ -110,12 +111,12 @@ def fetch(url: str) -> str:
 
 
 def load_cache() -> dict:
-    cache = {"search": {}, "npc": {}, "quest": {}, "object": {}, "itemQuest": {}}
+    cache = {"search": {}, "npc": {}, "quest": {}, "object": {}, "itemQuest": {}, "itemLists": {}}
     if CACHE_PATH.exists():
         stored = json.loads(CACHE_PATH.read_text(encoding="utf-8"))
         if isinstance(stored, dict):
             cache.update(stored)
-    for key in ("search", "npc", "quest", "object", "itemQuest"):
+    for key in ("search", "npc", "quest", "object", "itemQuest", "itemLists"):
         if not isinstance(cache.get(key), dict):
             cache[key] = {}
     return cache
@@ -221,7 +222,11 @@ def mapper_spots(html: str) -> list[dict]:
                 if key in seen or not map_name:
                     continue
                 seen.add(key)
-                spots.append({"map": map_name, "x": key[1], "y": key[2]})
+                spot = {"map": map_name, "x": key[1], "y": key[2]}
+                ui_map = group.get("uiMapId")
+                if isinstance(ui_map, int):
+                    spot["mapId"] = ui_map
+                spots.append(spot)
     return spots
 
 
@@ -817,13 +822,162 @@ def shared_catalog_spot(home: dict | None) -> list[dict] | None:
 
 
 def generic_faction_spots(src: dict, home: dict | None = None) -> list[dict] | None:
-    """Level 1-15: one pin per faction. Above that: the catalog spot for both."""
+    """Level 1-15 fallback: one pin per faction. Above that: the catalog spot for both."""
     if not generic_world_drop(src):
         return None
     lo, _hi = generic_level_span(src)
     if lo > GENERIC_LOW_MAX:
         return shared_catalog_spot(home)
     return [pick_low_farm("Alliance", lo), pick_low_farm("Horde", lo)]
+
+
+def _array_at(html: str, start: int) -> list | None:
+    """JSON array that begins at start, ignoring braces inside strings."""
+    if start < 0 or start >= len(html) or html[start] != "[":
+        return None
+    depth = 0
+    in_str = False
+    esc = False
+    for i in range(start, min(len(html), start + 800000)):
+        ch = html[i]
+        if in_str:
+            if esc:
+                esc = False
+            elif ch == "\\":
+                esc = True
+            elif ch == '"':
+                in_str = False
+            continue
+        if ch == '"':
+            in_str = True
+        elif ch == "[":
+            depth += 1
+        elif ch == "]":
+            depth -= 1
+            if depth == 0:
+                try:
+                    data = json.loads(html[start : i + 1])
+                except json.JSONDecodeError:
+                    return None
+                return data if isinstance(data, list) else None
+    return None
+
+
+def listview_rows(html: str, view_id: str) -> list[dict]:
+    """Inline Forever listview rows. The item page uses single-quoted ids."""
+    for token in (f"id: '{view_id}'", f'id: "{view_id}"'):
+        at = 0
+        while True:
+            i = html.find(token, at)
+            if i < 0:
+                break
+            data_at = html.find("data:", i)
+            if data_at < 0 or data_at - i > 1200:
+                at = i + len(token)
+                continue
+            start = html.find("[", data_at)
+            if start < 0 or start - data_at > 40:
+                at = i + len(token)
+                continue
+            rows = _array_at(html, start)
+            if rows is not None:
+                return [row for row in rows if isinstance(row, dict)]
+            at = i + len(token)
+    return []
+
+
+def item_related(item_id: int, cache: dict) -> dict:
+    """NPC ids that drop this, and NPC ids that sell it, from the Forever item page."""
+    key = str(item_id)
+    stored = cache["itemLists"].get(key)
+    if isinstance(stored, dict):
+        return stored
+    html = fetch(f"https://www.wowhead.com/forever/item={item_id}")
+    drop = []
+    sell = []
+    if not html:
+        return {"drop": drop, "sell": sell}
+    for row in listview_rows(html, "dropped-by"):
+        npc_id = row.get("id")
+        if isinstance(npc_id, int):
+            drop.append({"id": npc_id, "react": row.get("react")})
+    for row in listview_rows(html, "sold-by"):
+        npc_id = row.get("id")
+        if isinstance(npc_id, int):
+            sell.append({"id": npc_id, "react": row.get("react")})
+    record = {"drop": drop, "sell": sell}
+    cache["itemLists"][key] = record
+    return record
+
+
+# A camp this far from the ones already kept is a different place to farm.
+CAMP_SEPARATION = 15.0
+MAX_CAMPS_PER_MAP = 3
+# A continent overview is not a place to stand.
+CONTINENT_MAPS = {"Eastern Kingdoms", "Kalimdor", "Azeroth", "Outland"}
+
+
+def _far_enough(spot: dict, kept: list[dict]) -> bool:
+    for other in kept:
+        dx = float(spot["x"]) - float(other["x"])
+        dy = float(spot["y"]) - float(other["y"])
+        if dx * dx + dy * dy < CAMP_SEPARATION * CAMP_SEPARATION:
+            return False
+    return True
+
+
+def camps_from_npcs(npcs: list[dict], cache: dict, tag_faction: bool) -> list[dict]:
+    """One to three published spawns per zone, plus a dungeon door when the drop is inside."""
+    by_map: dict[str, list[dict]] = {}
+    doors: list[str] = []
+    seen_door = set()
+    for npc in npcs:
+        rec = npc_record(int(npc["id"]), cache)
+        side = faction_from_react(npc.get("react")) if tag_faction else None
+        for spot in rec.get("spots") or []:
+            if spot.get("x") == 50.0 and spot.get("y") == 50.0:
+                continue
+            if (spot.get("map") or "") in CONTINENT_MAPS:
+                continue
+            door = door_key(spot.get("map") or "")
+            if door:
+                if door not in seen_door:
+                    seen_door.add(door)
+                    doors.append(door)
+                continue
+            row = {"map": spot["map"], "x": spot["x"], "y": spot["y"]}
+            if spot.get("mapId"):
+                row["mapId"] = spot["mapId"]
+            elif spot["map"] in MAP_IDS:
+                row["mapId"] = MAP_IDS[spot["map"]]
+            if side:
+                row["faction"] = side
+            elif tag_faction and spot.get("faction"):
+                row["faction"] = spot["faction"]
+            by_map.setdefault(row["map"], []).append(row)
+    chosen: list[dict] = []
+    seen = set()
+    for rows in by_map.values():
+        kept: list[dict] = []
+        for spot in rows:
+            if not _far_enough(spot, kept):
+                continue
+            key = (spot["map"], spot["x"], spot["y"], spot.get("faction"))
+            if key in seen:
+                continue
+            seen.add(key)
+            kept.append(spot)
+            if len(kept) >= MAX_CAMPS_PER_MAP:
+                break
+        chosen.extend(kept)
+    for door in doors:
+        for spot in entrance_spots(door):
+            key = (spot["map"], spot["x"], spot["y"])
+            if key in seen:
+                continue
+            seen.add(key)
+            chosen.append(spot)
+    return chosen
 
 
 def resolve_item(item_id: int, src: dict, cache: dict, xml_cache: dict) -> tuple[dict | None, str | None]:
@@ -837,7 +991,7 @@ def resolve_item(item_id: int, src: dict, cache: dict, xml_cache: dict) -> tuple
             door = mapped
     described = described_key(zone)
 
-    if kind in ("boss_drop", "raid_trash") or (kind == "world_drop" and door and not npc):
+    if kind in ("boss_drop", "raid_trash"):
         if door:
             spots = entrance_spots(door)
             return {"note": NOTE_DOOR, "spots": spots, "more": len(spots) > 1}, None
@@ -856,12 +1010,14 @@ def resolve_item(item_id: int, src: dict, cache: dict, xml_cache: dict) -> tuple
         return None, "quest starter has no map pin"
 
     if kind == "vendor":
-        spots = spots_for_npc_name(npc, cache)
+        spots = camps_from_npcs((item_related(item_id, cache).get("sell") or []), cache, True)
         if not spots:
-            for named, fac in faction_names(src.get("instructions") or ""):
-                for spot in spots_for_npc_name(named, cache):
-                    spot["faction"] = fac
-                    spots.append(spot)
+            spots = spots_for_npc_name(npc, cache)
+            if not spots:
+                for named, fac in faction_names(src.get("instructions") or ""):
+                    for spot in spots_for_npc_name(named, cache):
+                        spot["faction"] = fac
+                        spots.append(spot)
         if spots:
             return {"note": NOTE_VENDOR, "spots": spots, "more": len(spots) > 1}, None
         if not npc and "quartermaster" not in (src.get("instructions") or "").lower():
@@ -883,6 +1039,9 @@ def resolve_item(item_id: int, src: dict, cache: dict, xml_cache: dict) -> tuple
         return None, "source not listed yet"
 
     if kind == "world_drop":
+        spots = camps_from_npcs((item_related(item_id, cache).get("drop") or []), cache, False)
+        if spots:
+            return {"note": NOTE_FARM, "spots": spots, "more": len(spots) > 1}, None
         if door:
             spots = entrance_spots(door)
             return {"note": NOTE_DOOR, "spots": spots, "more": len(spots) > 1}, None
@@ -984,7 +1143,9 @@ def patch_coordinate_rows(updates: dict[int, str]) -> None:
         for iid in sorted(missing):
             out.append(updates[iid])
         out.append(close)
-    LUA_PATH.write_text(nl.join(out) + nl, encoding="utf-8", newline="")
+    tmp = LUA_PATH.with_suffix(".lua.tmp")
+    tmp.write_text(nl.join(out) + nl, encoding="utf-8", newline="")
+    tmp.replace(LUA_PATH)
 
 
 def lua_spot(spot: dict) -> str:
@@ -1156,7 +1317,9 @@ def index_item_ids(cache: dict, only: list[int]) -> None:
             missed += 1
         if n % 25 == 0:
             save_cache(cache)
-            print(f"  indexed {n}/{len(only)}", flush=True)
+            if updates:
+                patch_coordinate_rows(updates)
+            print(f"  indexed {n}/{len(only)} patched {len(updates)}", flush=True)
     save_cache(cache)
     if updates:
         patch_coordinate_rows(updates)
@@ -1175,6 +1338,17 @@ def main() -> None:
         i = sys.argv.index("--ids")
         blob = json.loads(Path(sys.argv[i + 1]).read_text(encoding="utf-8"))
         index_item_ids(cache, [int(n) for n in blob])
+        return
+    if "--places" in sys.argv:
+        ids = hunt_ids()
+        sources = json.loads(SOURCES.read_text(encoding="utf-8"))
+        want = [
+            iid
+            for iid in ids
+            if (sources.get(str(iid)) or {}).get("sourceType") in ("world_drop", "vendor")
+        ]
+        print(f"world drop and vendor hunts {len(want)}", flush=True)
+        index_item_ids(cache, want)
         return
 
     ids = hunt_ids()

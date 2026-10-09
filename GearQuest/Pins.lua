@@ -1,4 +1,4 @@
-local _, GQ = ...
+local ADDON_NAME, GQ = ...
 
 GQ.Pins = GQ.Pins or {}
 
@@ -19,18 +19,37 @@ local PIN_ICONS = {
     special = { path = "Interface\\TargetingFrame\\UI-RaidTargetingIcon_1" },
     unsourced = { path = "Interface\\RaidFrame\\ReadyCheck-NotReady" },
     vendor = { path = "Interface\\Cursor\\Buy" },
-    world_drop = { path = "Interface\\Icons\\Spell_Nature_FarSight" },
+    -- Far Sight is not in this client, so the sunset ships with the addon.
+    world_drop = { path = "Interface\\AddOns\\" .. ADDON_NAME .. "\\Art\\GQ-WorldDrop.png" },
 }
 
-local function ApplyPinIcon(icon, kind)
+local function ApplyPinIcon(icon, kind, owner)
     local spec = PIN_ICONS[kind] or PIN_ICONS.unsourced
     icon:SetVertexColor(1, 1, 1, 1)
     icon:SetTexCoord(0, 1, 0, 1)
     if spec.atlas and icon.SetAtlas and C_Texture and C_Texture.GetAtlasInfo and C_Texture.GetAtlasInfo(spec.atlas) then
         icon:SetAtlas(spec.atlas, false)
+        if owner and owner.SetNormalAtlas then
+            owner:SetNormalAtlas(spec.atlas)
+        end
+        icon:Show()
         return
     end
+    -- A previous atlas sticks and hides the file. World drops are the sunset.
+    if icon.SetAtlas then
+        pcall(icon.SetAtlas, icon, nil)
+    end
     icon:SetTexture(spec.path)
+    if owner and owner.SetNormalTexture then
+        owner:SetNormalTexture(spec.path)
+        local normal = owner.GetNormalTexture and owner:GetNormalTexture()
+        if normal then
+            normal:SetTexCoord(0, 1, 0, 1)
+            if spec.coord then
+                normal:SetTexCoord(spec.coord[1], spec.coord[2], spec.coord[3], spec.coord[4])
+            end
+        end
+    end
     if spec.coord then
         icon:SetTexCoord(spec.coord[1], spec.coord[2], spec.coord[3], spec.coord[4])
     end
@@ -43,16 +62,13 @@ function GQ.Pins:ApplyIcon(icon, kind)
     end
 end
 local AREA_TEXTURE = "Interface\\Minimap\\UI-Minimap-Ping-Center"
-local AREA_COLOR = { 0.3, 0.55, 1, 0.35 }
-local UPDATE_INTERVAL = 0.05
+local AREA_COLOR = { 0.3, 0.55, 1, 0.55 }
 local WORLD_PIN_SIZE = 24
 
 local pins = {}
+local frames = {}
 local driver
-local worldPool = {}
-local worldArea
-local elapsedAcc = 0
-local poolsActive = true
+local placed = 0
 
 local function ShowPinTooltip(frame)
     local pin = frame.pinData
@@ -101,11 +117,20 @@ local function GuidedEntryId()
     return GQ.Guide and GQ.Guide.GuidedId and GQ.Guide:GuidedId() or nil
 end
 
+-- Our own click handlers. The map pin pool is not used: registering a data
+-- provider makes the map call addon code while it hides, and that taints
+-- the gamepad focus clear (SetPreferredGamepadInteractTarget).
 local function WirePin(frame)
-    frame:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-    frame:SetScript("OnEnter", ShowPinTooltip)
-    frame:SetScript("OnLeave", function() GameTooltip:Hide() end)
-    frame:SetScript("OnClick", PinClick)
+    frame:EnableMouse(true)
+    frame:SetScript("OnEnter", function(self)
+        ShowPinTooltip(self)
+    end)
+    frame:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+    frame:SetScript("OnMouseUp", function(self, button)
+        PinClick(self, button)
+    end)
     return frame
 end
 
@@ -114,151 +139,206 @@ local function MapName(mapId)
     return info and info.name or nil
 end
 
-local function IsOverviewMap(mapId)
-    local info = mapId and C_Map and C_Map.GetMapInfo and C_Map.GetMapInfo(mapId)
-    local kind = info and info.mapType
-    if not kind then
-        return false
-    end
-    local types = Enum and Enum.UIMapType
-    if not types then
-        return kind < 3
-    end
-    return kind == types.Cosmic or kind == types.World or kind == types.Continent
-end
-
-local function PinOnShownMap(pin, mapId)
-    if not pin or not mapId then
-        return false
-    end
-    if pin.mapId == mapId then
-        return true
-    end
-    if IsOverviewMap(mapId) then
-        return false
-    end
-    local shown = MapName(mapId)
-    return shown and pin.map and shown == pin.map
-end
-
-local function EnsureWorldPin(index, canvas)
-    local frame = worldPool[index]
-    if frame then
-        if canvas and frame:GetParent() ~= canvas then
-            frame:SetParent(canvas)
-            frame:SetFrameStrata(canvas:GetFrameStrata() or "HIGH")
-            frame:SetFrameLevel((canvas:GetFrameLevel() or 1) + 20)
-        end
-        return frame
-    end
-    if not canvas then
+local function VecXY(v)
+    if not v then
         return nil
     end
-    frame = CreateFrame("Button", nil, canvas)
+    if v.GetXY then
+        return v:GetXY()
+    end
+    return v.x, v.y
+end
+
+-- The client's id for the zone name. A Wowhead id on the spot can be a map
+-- this world map does not draw.
+local function ClientMapId(pin)
+    if pin.map and GQ.Map and GQ.Map.ZoneMap then
+        local id = GQ.Map:ZoneMap(pin.map)
+        if id then
+            return id
+        end
+    end
+    return pin.mapId
+end
+
+-- Zone coordinates placed on whatever map is open, including the continent.
+local function ProjectPin(pin, shownMapId)
+    if not pin or not shownMapId or not pin.x or not pin.y then
+        return nil
+    end
+    local srcId = ClientMapId(pin)
+    local nx, ny = pin.x / 100, pin.y / 100
+    if srcId and srcId == shownMapId then
+        return nx, ny
+    end
+    if MapName(shownMapId) == pin.map then
+        return nx, ny
+    end
+    if not (srcId and C_Map and C_Map.GetWorldPosFromMapPos and C_Map.GetMapPosFromWorldPos and CreateVector2D) then
+        return nil
+    end
+    local ok, continent, world = pcall(C_Map.GetWorldPosFromMapPos, srcId, CreateVector2D(nx, ny))
+    if not ok or not continent or not world then
+        return nil
+    end
+    local wx, wy = VecXY(world)
+    if not wx or not wy then
+        return nil
+    end
+    local ok2, first, second = pcall(C_Map.GetMapPosFromWorldPos, continent, CreateVector2D(wx, wy), shownMapId)
+    if not ok2 then
+        return nil
+    end
+    local mx, my
+    if type(first) == "number" and type(second) == "number" then
+        mx, my = first, second
+    elseif type(first) == "table" then
+        mx, my = VecXY(first)
+    elseif type(second) == "table" then
+        mx, my = VecXY(second)
+    end
+    if type(mx) ~= "number" or type(my) ~= "number" then
+        return nil
+    end
+    if mx < -0.02 or my < -0.02 or mx > 1.02 or my > 1.02 then
+        return nil
+    end
+    if mx < 0 then
+        mx = 0
+    elseif mx > 1 then
+        mx = 1
+    end
+    if my < 0 then
+        my = 0
+    elseif my > 1 then
+        my = 1
+    end
+    return mx, my
+end
+
+local PinMixin = {}
+
+function PinMixin:OnLoad()
+    if self.owningMap and self.UseFrameLevelType then
+        self:UseFrameLevelType("PIN_FRAME_LEVEL_AREA_POI")
+    end
+    self:SetScalingLimits(1, 1, 1.2)
+end
+
+function PinMixin:OnAcquired(pin, x, y)
+    self.owningMap = WorldMapFrame
+    if self.UseFrameLevelType then
+        self:UseFrameLevelType("PIN_FRAME_LEVEL_AREA_POI")
+    end
+    self:SetScalingLimits(1, 1, 1.2)
+    self:SetPosition(x, y)
+    self.pinData = {
+        entry = pin.entry,
+        map = pin.map,
+        mapId = pin.mapId,
+        x = pin.x,
+        y = pin.y,
+        kind = pin.kind,
+    }
+    self.lastKind = pin.kind
+    if self.icon then
+        ApplyPinIcon(self.icon, pin.kind, self)
+    end
+    local guided = GuidedEntryId()
+    if self.ring then
+        if guided and pin.entry and pin.entry.id == guided then
+            self.ring:Show()
+        else
+            self.ring:Hide()
+        end
+    end
+    self:Show()
+end
+
+function PinMixin:OnReleased()
+    self.pinData = nil
+    if self.ring then
+        self.ring:Hide()
+    end
+end
+
+local function CreateMapPin()
+    local canvas = WorldMapFrame:GetCanvas()
+    -- A Frame, not a Button. A Button on the map canvas is a gamepad focus
+    -- target, and hiding it with the map calls SetPreferredGamepadInteractTarget.
+    local frame = CreateFrame("Frame", nil, canvas)
     frame:SetSize(WORLD_PIN_SIZE, WORLD_PIN_SIZE)
-    frame:SetFrameStrata(canvas:GetFrameStrata() or "HIGH")
-    frame:SetFrameLevel((canvas:GetFrameLevel() or 1) + 20)
     frame.icon = frame:CreateTexture(nil, "OVERLAY")
-    frame.icon:SetAllPoints()
+    frame.icon:SetSize(WORLD_PIN_SIZE, WORLD_PIN_SIZE)
+    frame.icon:SetPoint("CENTER")
+    frame.ring = frame:CreateTexture(nil, "BACKGROUND")
+    frame.ring:SetTexture(AREA_TEXTURE)
+    frame.ring:SetSize(48, 48)
+    frame.ring:SetPoint("CENTER")
+    frame.ring:SetVertexColor(AREA_COLOR[1], AREA_COLOR[2], AREA_COLOR[3], AREA_COLOR[4])
+    frame.ring:Hide()
+    Mixin(frame, MapCanvasPinMixin, PinMixin)
+    frame.owningMap = WorldMapFrame
+    if frame.OnLoad then
+        frame:OnLoad()
+    end
     WirePin(frame)
     frame:Hide()
-    worldPool[index] = frame
     return frame
 end
 
-local function EnsureWorldArea(canvas)
-    if worldArea and worldArea:GetParent() == canvas then
-        return worldArea
-    end
-    worldArea = CreateFrame("Frame", nil, canvas)
-    worldArea:SetSize(WORLD_PIN_SIZE, WORLD_PIN_SIZE)
-    worldArea:SetFrameStrata(canvas:GetFrameStrata() or "HIGH")
-    worldArea:SetFrameLevel((canvas:GetFrameLevel() or 1) + 2)
-    worldArea.tex = worldArea:CreateTexture(nil, "ARTWORK")
-    worldArea.tex:SetTexture(AREA_TEXTURE)
-    worldArea.tex:SetAllPoints()
-    worldArea.tex:SetVertexColor(AREA_COLOR[1], AREA_COLOR[2], AREA_COLOR[3], AREA_COLOR[4])
-    worldArea:EnableMouse(false)
-    worldArea:Hide()
-    return worldArea
+local function MapReady()
+    return WorldMapFrame and WorldMapFrame.GetCanvas and WorldMapFrame:GetCanvas()
+        and WorldMapFrame.GetMapID and MapCanvasPinMixin
 end
 
-local function HideWorldPins()
-    for _, frame in ipairs(worldPool) do
-        frame:Hide()
+local function EnsureFrame(index)
+    local frame = frames[index]
+    if not frame then
+        frame = CreateMapPin()
+        frames[index] = frame
     end
-    if worldArea then
-        worldArea:Hide()
-    end
+    return frame
 end
 
-local function UpdateWorldMap()
-    local mapId = WorldMapFrame and WorldMapFrame.GetMapID and WorldMapFrame:GetMapID()
-    local canvas = WorldMapFrame and WorldMapFrame.GetCanvas and WorldMapFrame:GetCanvas()
-    if not (WorldMapFrame and WorldMapFrame:IsShown() and mapId and canvas) then
-        HideWorldPins()
+-- Runs from our own OnUpdate, never from the map's show or hide.
+local function PlacePins()
+    if not MapReady() or not WorldMapFrame:IsShown() then
         return
     end
-    local width, height = canvas:GetWidth(), canvas:GetHeight()
-    if width <= 0 or height <= 0 then
-        HideWorldPins()
+    local mapId = WorldMapFrame:GetMapID()
+    if not mapId then
         return
     end
-
-    local used = 0
-    local guided = GuidedEntryId()
-    for _, pin in ipairs(pins) do
-        if PinOnShownMap(pin, mapId) then
-            used = used + 1
-            local frame = EnsureWorldPin(used, canvas)
-            if not frame then
-                break
-            end
-            local nx, ny = pin.x / 100, pin.y / 100
-            frame:ClearAllPoints()
-            frame:SetPoint("CENTER", canvas, "TOPLEFT", nx * width, -ny * height)
-            if frame.lastKind ~= pin.kind then
-                frame.lastKind = pin.kind
-                ApplyPinIcon(frame.icon, pin.kind)
-            end
-            frame.pinData = pin
-            frame:Show()
+    local n = 0
+    for i = 1, #pins do
+        local x, y = ProjectPin(pins[i], mapId)
+        if x and y then
+            n = n + 1
+            local frame = EnsureFrame(n)
+            frame.owningMap = WorldMapFrame
+            frame:OnAcquired(pins[i], x, y)
         end
     end
-    for index = used + 1, #worldPool do
-        worldPool[index]:Hide()
-    end
-
-    local area = EnsureWorldArea(canvas)
-    local selected
-    if guided then
-        for _, pin in ipairs(pins) do
-            if pin.entry and pin.entry.id == guided and PinOnShownMap(pin, mapId) then
-                selected = pin
-                break
+    for i = n + 1, placed do
+        local frame = frames[i]
+        if frame then
+            frame:Hide()
+            if frame.OnReleased then
+                frame:OnReleased()
             end
         end
     end
-    if not selected then
-        area:Hide()
-        return
-    end
-    area:ClearAllPoints()
-    area:SetPoint("CENTER", canvas, "TOPLEFT", selected.x / 100 * width, -selected.y / 100 * height)
-    area:SetSize(math.max(width * 0.08, 64), math.max(height * 0.08, 64))
-    area:Show()
+    placed = n
 end
 
-local function UpdateAll()
-    if #pins == 0 then
-        if poolsActive then
-            poolsActive = false
-            HideWorldPins()
-        end
+local function RefreshPins()
+    if not MapReady() then
         return
     end
-    poolsActive = true
-    UpdateWorldMap()
+    if WorldMapFrame:IsShown() then
+        PlacePins()
+    end
 end
 
 function GQ.Pins:Sync()
@@ -275,7 +355,7 @@ function GQ.Pins:Sync()
             end
         end
     end
-    UpdateAll()
+    RefreshPins()
 end
 
 function GQ.Pins:Init()
@@ -283,15 +363,16 @@ function GQ.Pins:Init()
         return
     end
     driver = CreateFrame("Frame")
-    driver:SetScript("OnUpdate", function(_, elapsed)
-        elapsedAcc = elapsedAcc + (elapsed or 0)
-        if elapsedAcc < UPDATE_INTERVAL then
+    -- Place pins on our own tick once the map is already open. The map's
+    -- show and hide must not call into this addon, or the gamepad cannot
+    -- clear its interact target when the map closes.
+    driver:SetScript("OnUpdate", function()
+        if not MapReady() or not WorldMapFrame:IsShown() then
             return
         end
-        elapsedAcc = 0
-        UpdateAll()
+        PlacePins()
     end)
-    UpdateAll()
+    RefreshPins()
     if GQ.Log and GQ.Log.EnsureCoordinateWatch then
         GQ.Log:EnsureCoordinateWatch()
     end

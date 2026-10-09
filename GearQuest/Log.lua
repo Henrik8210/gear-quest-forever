@@ -586,6 +586,8 @@ local function ShowItemTooltipForRow(row)
         return
     end
 
+    GameTooltip.gqSkipScoreHook = true
+    GameTooltip.gqScoreLineAdded = nil
     GameTooltip:SetOwner(row, "ANCHOR_RIGHT")
     GQ.Data:PopulateEntryItemTooltip(GameTooltip, row.entry)
 
@@ -605,13 +607,17 @@ local function ShowItemTooltipForRow(row)
         end
     end
 
+    if row.entry.itemId and GQ.Data.ApplyImbueTooltipLines then
+        GQ.Data:ApplyImbueTooltipLines(GameTooltip, row.entry.itemId)
+    end
+    if GQ.Data.AppendGearScoreLine then
+        GQ.Data:AppendGearScoreLine(GameTooltip, row.entry)
+    end
     GameTooltip:Show()
     if GQ.Data.SolidItemTooltip then
         GQ.Data:SolidItemTooltip(GameTooltip)
     end
-    if row.entry.itemId and GQ.Data.ApplyImbueTooltipLines then
-        GQ.Data:ApplyImbueTooltipLines(GameTooltip, row.entry.itemId)
-    end
+    GameTooltip.gqSkipScoreHook = nil
     ShowEquippedCompare(row.entry)
 end
 
@@ -4073,83 +4079,10 @@ function GQ.Log:WillHuntDisappearFromActiveList(id)
     return true
 end
 
-function GQ.Log:EnsureUntrackConfirmDialog()
-    if self.untrackDialog then
-        return self.untrackDialog
-    end
-
-    -- Our own frame. Blizzard's StaticPopup hands the dialog to the gamepad
-    -- focus manager, and that call freezes the client.
-    local ok, dialog = pcall(CreateFrame, "Frame", "GearQuestUntrackConfirm", UIParent, "BackdropTemplate")
-    if not ok or not dialog then
-        dialog = CreateFrame("Frame", "GearQuestUntrackConfirm", UIParent)
-    end
-    dialog:SetSize(380, 128)
-    dialog:SetPoint("CENTER")
-    dialog:SetFrameStrata("FULLSCREEN_DIALOG")
-    dialog:SetFrameLevel(100)
-    dialog:EnableMouse(true)
-    dialog:Hide()
-    if dialog.SetBackdrop then
-        dialog:SetBackdrop({
-            bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
-            edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
-            tile = true,
-            tileSize = 32,
-            edgeSize = 32,
-            insets = { left = 11, right = 12, top = 12, bottom = 11 },
-        })
-    end
-
-    local text = dialog:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-    text:SetPoint("TOP", 0, -28)
-    text:SetWidth(330)
-    text:SetJustifyH("CENTER")
-    text:SetText("Are you sure you want to untrack this gear quest? It will become unavailable once you do")
-
-    local agree = CreateFrame("Button", nil, dialog, "UIPanelButtonTemplate")
-    agree:SetSize(100, 22)
-    agree:SetPoint("BOTTOM", -58, 18)
-    agree:SetText("Agree")
-    agree:SetScript("OnClick", function()
-        local id = dialog.huntId
-        dialog:Hide()
-        if id and GQ.Log then
-            GQ.Log:UntrackHunt(id)
-        end
-    end)
-
-    local cancel = CreateFrame("Button", nil, dialog, "UIPanelButtonTemplate")
-    cancel:SetSize(100, 22)
-    cancel:SetPoint("BOTTOM", 58, 18)
-    cancel:SetText("Cancel")
-    cancel:SetScript("OnClick", function()
-        dialog:Hide()
-    end)
-
-    dialog:SetScript("OnHide", function(self)
-        self.huntId = nil
-    end)
-    self.untrackDialog = dialog
-    return dialog
-end
-
 function GQ.Log:RequestUntrackHunt(id)
     if not id then
         return
     end
-
-    if self:WillHuntDisappearFromActiveList(id) then
-        local dialog = self:EnsureUntrackConfirmDialog()
-        dialog.huntId = id
-        dialog:SetFrameStrata("FULLSCREEN_DIALOG")
-        if dialog.Raise then
-            dialog:Raise()
-        end
-        dialog:Show()
-        return
-    end
-
     self:UntrackHunt(id)
 end
 
@@ -6073,7 +6006,7 @@ function GQ.Log:EnsurePlayStyle(frame)
     end
 
     local btn = CreateFrame("Button", "GearQuestPlayStyleButton", frame, "UIPanelButtonTemplate")
-    btn:SetSize(110, 22)
+    btn:SetSize(118, 22)
     btn:SetText("Play style")
     btn:SetPoint("BOTTOM", frame, "BOTTOM", 0, FOOTER_BUTTON_Y)
     btn:SetScript("OnClick", function()
@@ -6086,6 +6019,7 @@ function GQ.Log:EnsurePlayStyle(frame)
     local windowLevel = (frame.gqOuterBorder and frame.gqOuterBorder.GetFrameLevel and frame.gqOuterBorder:GetFrameLevel() or (frame:GetFrameLevel() or 1)) + 3
     btn:SetFrameLevel(windowLevel)
     frame.playStyleBtn = btn
+    self:UpdatePlayStyleButton()
 
     local panel = CreateFrame("Frame", "GearQuestPlayStylePanel", frame, "BackdropTemplate")
     panel:SetFrameStrata("DIALOG")
@@ -6384,6 +6318,18 @@ function GQ.Log:SetBuyIt(enabled)
     self:SetPlayStyleFlag("playBuyIt", enabled)
 end
 
+function GQ.Log:UpdatePlayStyleButton()
+    local btn = self.frame and self.frame.playStyleBtn
+    if not btn then
+        return
+    end
+    if self:PlayStyleActive() then
+        btn:SetText("Play style*")
+    else
+        btn:SetText("Play style")
+    end
+end
+
 function GQ.Log:RefreshPlayStylePanel()
     local panel = self.frame and self.frame.playStylePanel
     local card = panel and panel.noDungeonsCard
@@ -6406,6 +6352,7 @@ function GQ.Log:RefreshPlayStylePanel()
     if buy then
         self:SetSimulatorChoiceHighlight(buy, self:BuyItEnabled(), 0.35)
     end
+    self:UpdatePlayStyleButton()
 end
 
 function GQ.Log:TogglePlayStylePanel()
@@ -7866,9 +7813,9 @@ function GQ.Log:EnsureSimulatorPage(frame)
     end)
 
     local resetBtn = CreateFrame("Button", "GearQuestSimResetButton", simDetail, "UIPanelButtonTemplate")
-    resetBtn:SetSize(80, 22)
+    resetBtn:SetSize(148, 22)
     resetBtn:SetPoint("LEFT", simulateBtn, "RIGHT", 6, 0)
-    resetBtn:SetText("Reset")
+    resetBtn:SetText("Turn off simulation")
     frame.simResetBtn = resetBtn
     resetBtn:SetScript("OnClick", function()
         local log = _G.GearQuest and _G.GearQuest.Log
@@ -7967,6 +7914,58 @@ local function CreateSettingsCheck(parent, label)
     text:SetTextColor(0, 0, 0)
     btn.text = text
     return btn
+end
+
+function GQ.Log:CreateGearScoreSetting(frame, detail, anchor)
+    local label = CreateFontStringWithFallback(detail, QUEST_DETAIL_TITLE_FONTS)
+    label:SetJustifyH("LEFT")
+    label:SetText("GearQuest score on tooltips")
+    label:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    frame.settingsScoreLabel = label
+
+    local hit = CreateFrame("Button", nil, detail)
+    hit:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 0, -16)
+    hit:SetSize(math.max(label:GetStringWidth() or 0, 1) + 4, math.max(label:GetStringHeight() or 0, 18))
+    label:SetParent(hit)
+    label:ClearAllPoints()
+    label:SetPoint("LEFT", hit, "LEFT", 0, 0)
+    frame.settingsScoreLabelHit = hit
+
+    local function ApplyScoreCheck(checked)
+        GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+        GearQuestForeverDB.settings.showGearScore = checked and true or false
+    end
+
+    local check = CreateSettingsCheck(detail, "")
+    check:SetPoint("RIGHT", hit, "LEFT", -6, 0)
+    check:SetChecked(true)
+    if check.text then
+        check.text:SetText("")
+        check.text:Hide()
+    end
+    check:SetScript("OnClick", function(self)
+        ApplyScoreCheck(self:GetChecked())
+    end)
+    hit:SetScript("OnClick", function()
+        local checked = not check:GetChecked()
+        check:SetChecked(checked)
+        ApplyScoreCheck(checked)
+    end)
+    frame.settingsScoreCheck = check
+
+    local hint = CreateFontStringWithFallback(detail, {
+        "QuestFontNormalSmall",
+        "SystemFont_Small",
+        "SystemFont_Shadow_Small",
+        "QuestFont",
+    })
+    hint:SetPoint("TOPLEFT", hit, "BOTTOMLEFT", 0, -4)
+    hint:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
+    hint:SetJustifyH("LEFT")
+    hint:SetWordWrap(true)
+    hint:SetText("Shows the rank, score, and comparison to your equipped gear on gear tooltips.")
+    hint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
+    frame.settingsScoreHint = hint
 end
 
 function GQ.Log:EnsureSettingsPage(frame)
@@ -8197,6 +8196,8 @@ function GQ.Log:EnsureSettingsPage(frame)
     artHint:SetText("Shows the plain brown log background instead of the class art.")
     artHint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
     frame.settingsArtHint = artHint
+
+    self:CreateGearScoreSetting(frame, detail, artHint)
 
     local toastLabel = CreateFontStringWithFallback(detail, QUEST_DETAIL_TITLE_FONTS)
     toastLabel:SetJustifyH("LEFT")
@@ -8649,6 +8650,9 @@ function GQ.Log:SetSettingsSection(section)
         frame.settingsArtLabelHit,
         frame.settingsArtCheck,
         frame.settingsArtHint,
+        frame.settingsScoreLabelHit,
+        frame.settingsScoreCheck,
+        frame.settingsScoreHint,
     }, section == "general")
     setShown({
         frame.settingsToastLabelHit,
@@ -8723,6 +8727,23 @@ function GQ.Log:RefreshSettings()
     if artCheck then
         local settings = GearQuestForeverDB and GearQuestForeverDB.settings
         artCheck:SetChecked(settings and settings.hideLogArt and true or false)
+    end
+    local scoreCheck = frame.settingsScoreCheck
+    if scoreCheck then
+        local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+        scoreCheck:SetChecked(not settings or settings.showGearScore ~= false)
+    end
+    local scoreLabel = frame.settingsScoreLabel
+    local scoreHit = frame.settingsScoreLabelHit
+    if scoreLabel and scoreHit and scoreLabel.GetStringWidth then
+        local width = scoreLabel:GetStringWidth()
+        local height = scoreLabel.GetStringHeight and scoreLabel:GetStringHeight()
+        if width and width > 1 then
+            scoreHit:SetWidth(width + 4)
+        end
+        if height and height > 1 then
+            scoreHit:SetHeight(height)
+        end
     end
     local artLabel = frame.settingsArtLabel
     local artHit = frame.settingsArtLabelHit
@@ -9866,11 +9887,20 @@ function GQ.Log:BuildDetailLines(entry)
         end
     end
 
-    if entry.zone and not alreadySays(entry.zone) then
+    local zoneName = entry.zone
+    if (entry.sourceType == "world_drop" or entry.sourceType == "vendor")
+        and entry.itemId and GQ.Data and GQ.Data.NearestCoordinateSpot then
+        local spot = GQ.Data:NearestCoordinateSpot(entry.itemId)
+        if spot and spot.map and spot.map ~= "" then
+            zoneName = spot.map
+        end
+    end
+    if zoneName and not alreadySays(zoneName) then
         local instructions = entry.instructions or ""
         local genericDrop = entry.sourceType == "world_drop"
             and (not entry.npc or entry.npc == "")
             and instructions:sub(1, 10) == "World drop"
+            and zoneName == entry.zone
         local hideCatalogZone = false
         if genericDrop then
             local faction = GQ.GetEffectiveFaction and GQ:GetEffectiveFaction()
@@ -9880,7 +9910,7 @@ function GQ.Log:BuildDetailLines(entry)
             end
         end
         if not hideCatalogZone then
-            table.insert(lines, "\nZone: " .. entry.zone)
+            table.insert(lines, "\nZone: " .. zoneName)
         end
     end
     if entry.questName and not alreadySays(entry.questName) then
@@ -10266,6 +10296,23 @@ function GQ.Log:ShowSlotRankTooltip(row)
         title = (GQ.Data.SlotHeaderLabel and GQ.Data:SlotHeaderLabel(slotName)) or slotName or "Slot"
     end
 
+    local scoreOn = GQ.Data.GearScoreTooltipEnabled and GQ.Data:GearScoreTooltipEnabled()
+    local scoreSim = scoreOn and GQ.IsPreviewEnabled and GQ:IsPreviewEnabled()
+    local scoreCtx
+    if scoreOn and not scoreSim and GQ.Data.GearScoreContext then
+        scoreCtx = GQ.Data:GearScoreContext(slotName, handKind)
+    end
+    local function scoreTrail(entry)
+        if scoreSim or not scoreCtx or not GQ.Data.GearScoreTrail then
+            return ""
+        end
+        local text = GQ.Data:GearScoreTrail(entry, scoreCtx)
+        if not text or text == "" then
+            return ""
+        end
+        return "  " .. text
+    end
+
     local lines = {}
     local function add(text, gap)
         lines[#lines + 1] = { text = text, gap = gap or 0 }
@@ -10278,7 +10325,7 @@ function GQ.Log:ShowSlotRankTooltip(row)
             local name = GQ.Data:GetEntryDisplayName(entry) or ("Item " .. tostring(entry.itemId))
             local r, g, b = GetListItemQualityColor(entry.itemId)
             local color = string.format("|cff%02x%02x%02x", math.floor(r * 255 + 0.5), math.floor(g * 255 + 0.5), math.floor(b * 255 + 0.5))
-            add(string.format("|cffffd100#%d|r %s%s|r", entry.curatedRank or i, color, name))
+            add(string.format("|cffffd100#%d|r %s%s|r%s", entry.curatedRank or i, color, name, scoreTrail(entry)))
         end
     end
 
@@ -10298,7 +10345,7 @@ function GQ.Log:ShowSlotRankTooltip(row)
                     local name = GQ.Data:GetEntryDisplayName(notable) or ("Item " .. tostring(notable.itemId))
                     local r, g, b = GetListItemQualityColor(notable.itemId)
                     local color = string.format("|cff%02x%02x%02x", math.floor(r * 255 + 0.5), math.floor(g * 255 + 0.5), math.floor(b * 255 + 0.5))
-                    add(string.format("|cffd9bf73Notable|r %s%s|r", color, name), addedNotable and 0 or 8)
+                    add(string.format("|cffd9bf73Notable|r %s%s|r%s", color, name, scoreTrail(notable)), addedNotable and 0 or 8)
                     addedNotable = true
                 end
             end
@@ -10312,7 +10359,8 @@ function GQ.Log:ShowSlotRankTooltip(row)
     local panel = self:EnsureSlotRankPanel()
     panel.owner = row
     panel.title:SetText(title)
-    panel.sub:SetText("Ranked for your level.")
+    panel.sub:SetWordWrap(true)
+    panel.sub:SetText(scoreSim and "Turn off simulation mode to see your GearQuest Score for this item" or "Ranked for your level.")
     panel.probe:SetText(title)
     local width = panel.probe:GetStringWidth() or 160
     panel.probe:SetText("Ranked for your level.")
@@ -10321,7 +10369,7 @@ function GQ.Log:ShowSlotRankTooltip(row)
         panel.probe:SetText(lines[i].text)
         width = math.max(width, panel.probe:GetStringWidth() or 0)
     end
-    width = math.min(440, math.max(200, width + 36))
+    width = math.min(560, math.max(200, width + 36))
     local yMeasure = 0
     for i = 1, #lines do
         yMeasure = yMeasure + lines[i].gap + 16
@@ -10332,6 +10380,21 @@ function GQ.Log:ShowSlotRankTooltip(row)
         panelH = 52
     end
     panel:SetSize(width, panelH)
+    local subH = panel.sub:GetStringHeight() or 14
+    if subH < 12 then
+        subH = 14
+    end
+    local header = 28 + subH
+    if panel.scroll then
+        panel.scroll:ClearAllPoints()
+        panel.scroll:SetPoint("TOPLEFT", panel, "TOPLEFT", 12, -header)
+        panel.scroll:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -14, 8)
+    end
+    panelH = math.min(screen - 24, header + 8 + yMeasure)
+    if panelH < header + 16 then
+        panelH = header + 16
+    end
+    panel:SetHeight(panelH)
     panel.child:SetWidth(width - 28)
 
     local y = 0

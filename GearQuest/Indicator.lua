@@ -1333,38 +1333,30 @@ function GQ.Indicator:UpdateQuestOfferRewards()
 end
 
 function GQ.Indicator:EnsureQuestLogHooks()
+    -- Do not paint during the hook. Opening or closing the world map with a
+    -- gamepad clears focus through SetPreferredGamepadInteractTarget, and
+    -- addon work on that same call blocks jump and NPC talk until /reload.
     local function refresh()
-        GQ.Indicator:UpdateQuestLogRewards()
-        if C_Timer and C_Timer.After then
-            C_Timer.After(0.2, function()
-                if GQ.Indicator then
-                    GQ.Indicator:UpdateQuestLogRewards()
-                end
-            end)
+        if not (C_Timer and C_Timer.After) then
+            return
         end
+        C_Timer.After(0, function()
+            if GQ.Indicator then
+                GQ.Indicator:UpdateQuestLogRewards()
+            end
+        end)
     end
 
-    self:HookFunction("QuestMapFrame_ShowQuestDetails", refresh)
-    self:HookFunction("QuestMapFrame_UpdateAll", refresh)
-    self:HookFunction("QuestMapLogTitleButton_OnClick", refresh)
-    self:HookFunction("QuestMapFrame_ShowQuestLog", refresh)
-
-    if WorldMapFrame and not self._worldMapHooked and WorldMapFrame.HookScript then
-        self._worldMapHooked = true
-        WorldMapFrame:HookScript("OnShow", refresh)
-    end
-    if MapQuestInfoRewardsFrame and not self._mapRewardsHooked and MapQuestInfoRewardsFrame.HookScript then
-        self._mapRewardsHooked = true
-        MapQuestInfoRewardsFrame:HookScript("OnShow", refresh)
-    end
-    local mapDetails = QuestMapFrame and QuestMapFrame.DetailsFrame
-    if mapDetails and not self._mapDetailsHooked and mapDetails.HookScript then
-        self._mapDetailsHooked = true
-        mapDetails:HookScript("OnShow", refresh)
-    end
-    if QuestMapFrame and not self._questMapHooked and QuestMapFrame.HookScript then
-        self._questMapHooked = true
-        QuestMapFrame:HookScript("OnShow", refresh)
+    if not self._mapWatch then
+        self._mapWatch = CreateFrame("Frame")
+        local wasShown = false
+        self._mapWatch:SetScript("OnUpdate", function()
+            local shown = WorldMapFrame and WorldMapFrame:IsShown() and true or false
+            if shown and not wasShown then
+                refresh()
+            end
+            wasShown = shown
+        end)
     end
 end
 

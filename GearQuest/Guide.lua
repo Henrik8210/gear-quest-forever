@@ -28,34 +28,32 @@ function GQ.Guide:GuidedId()
     return CharSettings().guideEntryId
 end
 
--- /reload keeps the guide. Logout clears it. Tracked hunts stay on this character.
--- The flag has to be set before ReloadUI runs, because that call fires
--- PLAYER_LOGOUT before a post-hook would get a turn.
-local guideReloading = false
-if ReloadUI then
-    local origReload = ReloadUI
-    ReloadUI = function(...)
-        guideReloading = true
-        return origReload(...)
-    end
-end
-if C_UI and C_UI.Reload then
-    local origReload = C_UI.Reload
-    function C_UI.Reload(...)
-        guideReloading = true
-        return origReload(...)
-    end
-end
+-- /reload keeps the guide. A logout countdown clears it. Tracked hunts stay.
+-- C_UI.Reload is protected. Replacing ReloadUI or C_UI.Reload puts this
+-- addon on that call, and the AddOn List Reload button then fails with
+-- "Interface action failed because of an AddOn". PLAYER_CAMPING fires when
+-- the logout countdown starts, and it does not fire for a reload.
+local guideLoggingOut = false
 local guideLogout = CreateFrame("Frame")
+guideLogout:RegisterEvent("PLAYER_CAMPING")
 guideLogout:RegisterEvent("PLAYER_LOGOUT")
-guideLogout:SetScript("OnEvent", function()
-    if guideReloading then
+guideLogout:SetScript("OnEvent", function(_, event)
+    if event == "PLAYER_CAMPING" then
+        guideLoggingOut = true
+        return
+    end
+    if not guideLoggingOut then
         return
     end
     if type(GearQuestForeverCharDB) == "table" then
         GearQuestForeverCharDB.guideEntryId = nil
     end
 end)
+if hooksecurefunc and type(CancelLogout) == "function" then
+    hooksecurefunc("CancelLogout", function()
+        guideLoggingOut = false
+    end)
+end
 
 local function WorldXY(world)
     if not world then
@@ -242,16 +240,23 @@ end
 -- back to the hunt, because both are then on the same continent.
 -- Wowhead Classic flight, zeppelin, and ship guide.
 local CROSSINGS = {
-    { id = "durotar", zone = "Durotar", x = 50.8, y = 13.6, faction = "Horde", kind = "Zeppelin", to = { "tirisfal", "gromgol" } },
-    { id = "tirisfal", zone = "Tirisfal Glades", x = 61.0, y = 59.0, faction = "Horde", kind = "Zeppelin", to = { "durotar" } },
-    { id = "gromgol", zone = "Stranglethorn Vale", x = 31.5, y = 29.6, faction = "Horde", kind = "Zeppelin", to = { "durotar" } },
-    { id = "ratchet", zone = "The Barrens", x = 63.6, y = 38.7, kind = "Ship", to = { "booty" } },
-    { id = "booty", zone = "Stranglethorn Vale", x = 26.0, y = 73.2, kind = "Ship", to = { "ratchet" } },
-    { id = "auberdine", zone = "Darkshore", x = 32.7, y = 43.7, faction = "Alliance", kind = "Ship", to = { "menethilNorth" } },
-    { id = "menethilNorth", zone = "Wetlands", x = 4.7, y = 57.0, faction = "Alliance", kind = "Ship", to = { "auberdine" } },
-    { id = "menethilSouth", zone = "Wetlands", x = 5.0, y = 63.0, faction = "Alliance", kind = "Ship", to = { "theramore" } },
-    { id = "theramore", zone = "Dustwallow Marsh", x = 71.0, y = 56.0, faction = "Alliance", kind = "Ship", to = { "menethilSouth" } },
+    { id = "durotar", zone = "Durotar", place = "Durotar", x = 50.8, y = 13.6, faction = "Horde", kind = "Zeppelin", to = { "tirisfal", "gromgol" } },
+    { id = "tirisfal", zone = "Tirisfal Glades", place = "Tirisfal Glades", x = 61.0, y = 59.0, faction = "Horde", kind = "Zeppelin", to = { "durotar" } },
+    { id = "gromgol", zone = "Stranglethorn Vale", place = "Grom'gol", x = 31.5, y = 29.6, faction = "Horde", kind = "Zeppelin", to = { "durotar" } },
+    { id = "ratchet", zone = "The Barrens", place = "Ratchet", x = 63.6, y = 38.7, kind = "Ship", to = { "booty" } },
+    { id = "booty", zone = "Stranglethorn Vale", place = "Booty Bay", x = 26.0, y = 73.2, kind = "Ship", to = { "ratchet" } },
+    { id = "auberdine", zone = "Darkshore", place = "Auberdine", x = 32.7, y = 43.7, faction = "Alliance", kind = "Ship", to = { "menethilNorth" } },
+    { id = "menethilNorth", zone = "Wetlands", place = "Menethil Harbor", x = 4.7, y = 57.0, faction = "Alliance", kind = "Ship", to = { "auberdine" } },
+    { id = "menethilSouth", zone = "Wetlands", place = "Menethil Harbor", x = 5.0, y = 63.0, faction = "Alliance", kind = "Ship", to = { "theramore" } },
+    { id = "theramore", zone = "Dustwallow Marsh", place = "Theramore", x = 71.0, y = 56.0, faction = "Alliance", kind = "Ship", to = { "menethilSouth" } },
 }
+
+local function DockLabel(dock)
+    if dock and dock.place and dock.place ~= "" then
+        return dock.kind .. " in " .. dock.place
+    end
+    return dock and dock.kind or ""
+end
 
 local crossingById = {}
 for i = 1, #CROSSINGS do
@@ -343,6 +348,9 @@ function GQ.Guide:ShowEntry(entry)
     self:Apply()
     self:PlaceForeverPin(entry)
     self:RefreshChecks()
+    if GQ.Pins and GQ.Pins.Sync then
+        GQ.Pins:Sync()
+    end
 end
 
 function GQ.Guide:PlaceForeverPin(entry)
@@ -383,6 +391,9 @@ function GQ.Guide:Dismiss()
     self:ClearForeverPin()
     self:Apply()
     self:RefreshChecks()
+    if GQ.Pins and GQ.Pins.Sync then
+        GQ.Pins:Sync()
+    end
 end
 
 function GQ.Guide:Apply()
