@@ -7246,13 +7246,16 @@ function GQ.Data:SpotMapId(spot)
 end
 
 local function WorldXY(world)
-    if not world then
+    if type(world) ~= "table" then
         return nil
     end
     if world.GetXY then
-        return world:GetXY()
+        local x, y = world:GetXY()
+        if type(x) == "number" and type(y) == "number" then
+            return x, y
+        end
     end
-    if world.x and world.y then
+    if type(world.x) == "number" and type(world.y) == "number" then
         return world.x, world.y
     end
     return nil
@@ -7950,15 +7953,15 @@ function GQ.Data:SuffixIdFromLink(link)
         return nil
     end
 
-    if strsplit then
-        local id = tonumber(select(7, strsplit(":", itemString)))
-        if id and id ~= 0 then
-            return id
-        end
-        return nil
+    -- suffixId sits after enchant and the four gem fields. Take that one
+    -- field only. select() would hand the rest of the link to tonumber,
+    -- and an empty field (Sorcerer Collar, any unsuffixed piece) errors.
+    local suffixField = itemString:match("^item:%d*:[^:]*:[^:]*:[^:]*:[^:]*:[^:]*:([^:]*)")
+    local id = tonumber(suffixField)
+    if id and id ~= 0 then
+        return id
     end
-
-    return self:ParseSuffixIdFromItemString(itemString)
+    return nil
 end
 
 function GQ.Data:ParseSuffixIdFromItemString(itemString)
@@ -8860,6 +8863,13 @@ function GQ.Data:InvalidateQueryCache()
     self._queryCache = nil
     self._activeBandCache = nil
     self._notableEntryCache = nil
+    self._gearScoreCache = nil
+    self._linkEntryCache = nil
+    self._scoreMissCache = nil
+    if GQ.Log then
+        GQ.Log._slotRankCache = nil
+        GQ.Log._slotRankBand = nil
+    end
     if GQ.Log and GQ.Log.InvalidateSourceFilterCache then
         GQ.Log:InvalidateSourceFilterCache()
     end
@@ -9778,8 +9788,23 @@ function GQ.Data:ShownPipelineScore(itemId, slotName)
     return best
 end
 
+function GQ.Data:GearScoreEquipKey(slotName)
+    local slots = slotName and self:GetInventorySlots(slotName) or {}
+    local parts = {}
+    for i = 1, #slots do
+        parts[i] = tostring(self:EquippedItemId(slots[i]) or 0)
+    end
+    return table.concat(parts, ",")
+end
+
 function GQ.Data:GearScoreContext(slotName, handKind)
     local dataSlot = slotName == "WeaponPair" and "MainHand" or slotName
+    local band = self:GetActiveBandCacheKey()
+    local cacheKey = band .. ":" .. tostring(slotName) .. ":" .. tostring(handKind) .. ":" .. self:GearScoreEquipKey(dataSlot)
+    local cache = self._gearScoreCache
+    if cache and cache.key == cacheKey then
+        return cache.ctx or nil
+    end
     local scores = {}
     local bestList
     local function push(score, fromList)
@@ -9825,6 +9850,7 @@ function GQ.Data:GearScoreContext(slotName, handKind)
     end
 
     if #scores == 0 then
+        self._gearScoreCache = { key = cacheKey, ctx = false }
         return nil
     end
     local minScore, maxScore = scores[1], scores[1]
@@ -9854,13 +9880,16 @@ function GQ.Data:GearScoreContext(slotName, handKind)
     if baseline then
         baseline = self:GearScoreIndex(baseline, minScore, maxScore)
     end
-    return {
+    local ctx = {
         minScore = minScore,
         maxScore = maxScore,
         baseline = baseline,
         equippedIds = equippedIds,
         bestListScore = bestList,
+        lines = {},
     }
+    self._gearScoreCache = { key = cacheKey, ctx = ctx }
+    return ctx
 end
 
 function GQ.Data:EquippedPipelineScore(itemId, slotName)
@@ -9892,6 +9921,47 @@ function GQ.Data:EquippedPipelineScore(itemId, slotName)
         end
     end
     return below or above
+end
+
+-- How much of an upgrade this piece is versus what is worn in the slot.
+-- Empty slot: the gain is the index lifted off the bottom of the scale,
+-- so filling a bare slot outranks a small swap. Already wearing it is 0.
+function GQ.Data:GearScoreUpgradeDelta(entry, slotName, handKind)
+    if not entry or type(entry.pipelineScore) ~= "number" then
+        return nil
+    end
+    local ctx = self:GearScoreContext(slotName, handKind)
+    if not ctx then
+        return nil
+    end
+    local index = self:GearScoreIndex(entry.pipelineScore, ctx.minScore, ctx.maxScore)
+    if not index then
+        return nil
+    end
+    if entry.itemId and ctx.equippedIds and ctx.equippedIds[entry.itemId] then
+        if not entry.suffix or entry.suffix == "" then
+            return 0
+        end
+        local dataSlot = slotName == "WeaponPair" and "MainHand" or slotName
+        local wearingRoll = false
+        if GetInventoryItemLink then
+            for _, invSlot in ipairs(self:GetInventorySlots(dataSlot) or {}) do
+                local link = GetInventoryItemLink("player", invSlot)
+                if link and self:ItemLinkToId(link) == entry.itemId
+                    and self:EntrySuffixMatchesLink(entry, link) then
+                    wearingRoll = true
+                    break
+                end
+            end
+        end
+        if wearingRoll then
+            return 0
+        end
+    end
+    if ctx.baseline then
+        return index - ctx.baseline
+    end
+    return index + 100
 end
 
 function GQ.Data:GearScoreDeltaText(index, baseline)
@@ -9940,9 +10010,20 @@ function GQ.Data:GearScoreTooltipLine(entry)
         slotName = self:NormalizeSlotName(entry.slot)
     end
     local ctx = self:GearScoreContext(slotName, handKind)
+    local lineKey = entry.id or entry.itemId
+    if ctx and ctx.lines and lineKey and ctx.lines[lineKey] ~= nil then
+        local cached = ctx.lines[lineKey]
+        if cached == false then
+            return nil
+        end
+        return cached.line, cached.note
+    end
+    local visibleRank = GQ.Log and GQ.Log.VisibleSlotRank and GQ.Log:VisibleSlotRank(entry)
     local rankText
     if entry.notable then
         rankText = "Notable for your level"
+    elseif visibleRank then
+        rankText = string.format("Rank #%d for your level", visibleRank)
     elseif entry.curatedRank then
         rankText = string.format("Rank #%d for your level", entry.curatedRank)
     else
@@ -9955,13 +10036,20 @@ function GQ.Data:GearScoreTooltipLine(entry)
         and entry.pipelineScore < ctx.bestListScore - 0.01 then
         note = "|cffd9bf73Rank 1 when you wear multiple pieces of this set.|r"
     end
+    local line
     if trail == "" then
         if not entry.curatedRank and not entry.notable then
-            return nil
+            line = nil
+        else
+            line = "|cffffd100" .. rankText .. "|r"
         end
-        return "|cffffd100" .. rankText .. "|r", note
+    else
+        line = "|cffffd100" .. rankText .. "|r  " .. trail
     end
-    return "|cffffd100" .. rankText .. "|r  " .. trail, note
+    if ctx and ctx.lines and lineKey then
+        ctx.lines[lineKey] = line and { line = line, note = note } or false
+    end
+    return line, note
 end
 
 function GQ.Data:GearScoreTooltipEnabled()
@@ -9995,6 +10083,19 @@ function GQ.Data:EntryForItemLink(link)
     local itemId = self:ItemLinkToId(link)
     if not itemId then
         return nil
+    end
+    local band = self:GetActiveBandCacheKey()
+    local bucket = self._linkEntryCache
+    if not bucket or bucket.band ~= band then
+        bucket = { band = band }
+        self._linkEntryCache = bucket
+    end
+    local suffixId = self:SuffixIdFromLink(link) or 0
+    local fullName = self:ItemLinkFullName(link)
+    local cacheKey = itemId .. ":" .. suffixId .. ":" .. (fullName and fullName:lower() or "")
+    local hit = bucket[cacheKey]
+    if hit ~= nil then
+        return hit or nil
     end
     local function prefer(current, entry)
         if not current then
@@ -10034,11 +10135,12 @@ function GQ.Data:EntryForItemLink(link)
     for i = 1, #pool do
         best = prefer(best, pool[i])
     end
+    bucket[cacheKey] = best or false
     return best
 end
 
 function GQ.Data:AddGearScoreToItemTooltip(tooltip)
-    if not tooltip or tooltip.gqSkipScoreHook or tooltip.gqScoreLineAdded then
+    if not tooltip or tooltip.gqSkipScoreHook or tooltip.gqScoreLineAdded or tooltip.gqScoreBusy then
         return
     end
     if not self:GearScoreTooltipEnabled() then
@@ -10053,10 +10155,12 @@ function GQ.Data:AddGearScoreToItemTooltip(tooltip)
     end
     local _, link = tooltip:GetItem()
     local shown = tooltip.IsShown and tooltip:IsShown()
+    tooltip.gqScoreBusy = true
     local entry = self:EntryForItemLink(link)
     if not entry then
         local miss = self:GearScoreMissText(link)
         if not miss then
+            tooltip.gqScoreBusy = nil
             return
         end
         tooltip.gqScoreLineAdded = true
@@ -10065,12 +10169,14 @@ function GQ.Data:AddGearScoreToItemTooltip(tooltip)
         if shown and tooltip.Show then
             tooltip:Show()
         end
+        tooltip.gqScoreBusy = nil
         return
     end
     self:AppendGearScoreLine(tooltip, entry)
     if shown and tooltip.Show then
         tooltip:Show()
     end
+    tooltip.gqScoreBusy = nil
 end
 
 function GQ.Data:LinkIsGear(link, itemId)
@@ -10095,9 +10201,26 @@ function GQ.Data:GearScoreMissText(link)
     if not itemId or not self:LinkIsGear(link, itemId) then
         return nil
     end
+    local band = self:GetActiveBandCacheKey()
+    local bucket = self._scoreMissCache
+    if not bucket or bucket.band ~= band then
+        bucket = { band = band }
+        self._scoreMissCache = bucket
+    end
+    local suffixId = self:SuffixIdFromLink(link) or 0
+    local fullName = self:ItemLinkFullName(link)
+    local cacheKey = itemId .. ":" .. suffixId .. ":" .. (fullName and fullName:lower() or "")
+    local hit = bucket[cacheKey]
+    if hit ~= nil then
+        return hit or nil
+    end
+    local function remember(text)
+        bucket[cacheKey] = text or false
+        return text
+    end
     local rows = self:GetEntriesByItemId(itemId)
     if #rows == 0 then
-        return "GearQuest has no score for this item."
+        return remember("GearQuest has no score for this item.")
     end
 
     local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
@@ -10141,7 +10264,7 @@ function GQ.Data:GearScoreMissText(link)
     end
 
     if forClass == 0 then
-        return "Not ranked for your class."
+        return remember("Not ranked for your class.")
     end
     if forSpec == 0 then
         local specName = spec
@@ -10153,19 +10276,19 @@ function GQ.Data:GearScoreMissText(link)
                 end
             end
         end
-        return "Not ranked for " .. (specName or "your current spec") .. "."
+        return remember("Not ranked for " .. (specName or "your current spec") .. ".")
     end
     if forSide == 0 then
-        return "Not ranked for your faction."
+        return remember("Not ranked for your faction.")
     end
     if forLevel == 0 then
         if lo and hi and lo ~= hi then
-            return string.format("Not ranked at your level. Ranked from %d to %d.", lo, hi)
+            return remember(string.format("Not ranked at your level. Ranked from %d to %d.", lo, hi))
         end
         if lo then
-            return string.format("Not ranked at your level. Ranked at level %d.", lo)
+            return remember(string.format("Not ranked at your level. Ranked at level %d.", lo))
         end
-        return "Not ranked at your level."
+        return remember("Not ranked at your level.")
     end
 
     local names = {}
@@ -10174,12 +10297,12 @@ function GQ.Data:GearScoreMissText(link)
     end
     table.sort(names)
     if #names == 1 then
-        return "Only " .. names[1] .. " is ranked for your level."
+        return remember("Only " .. names[1] .. " is ranked for your level.")
     end
     if #names > 1 then
-        return "Not this roll. Ranked for your level: " .. table.concat(names, ", ") .. "."
+        return remember("Not this roll. Ranked for your level: " .. table.concat(names, ", ") .. ".")
     end
-    return "Not ranked for your level."
+    return remember("Not ranked for your level.")
 end
 
 function GQ.Data:HookItemScoreTooltips()

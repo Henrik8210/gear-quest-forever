@@ -214,8 +214,11 @@ local function FormatListItemText(fontString, name, entry, status, includeNewLab
     return "|cff" .. hex .. truncatedName .. "|r" .. tags
 end
 
-local function SetListRowItemText(row, leftInset, name, entry, status, showNewLabel, r, g, b, slotName)
-    local maxWidth = GetListRowTextMaxWidth(row, leftInset)
+local function SetListRowItemText(row, leftInset, name, entry, status, showNewLabel, r, g, b, slotName, extraRight)
+    local maxWidth = GetListRowTextMaxWidth(row, leftInset) - (extraRight or 0)
+    if maxWidth < 20 then
+        maxWidth = 20
+    end
     local text = FormatListItemText(row.text, name, entry, status, showNewLabel, maxWidth, r, g, b, slotName)
     row.text:SetText(text)
     row.text:SetTextColor(1, 1, 1)
@@ -4632,6 +4635,10 @@ function GQ.Log:CreateListRow(index)
     end)
 
     row:SetScript("OnLeave", function(self)
+        if self.recommendInfo and self.recommendInfo:IsMouseOver() then
+            UpdateListRowHighlight(self)
+            return
+        end
         HideItemTooltip()
         UpdateListRowHighlight(self)
     end)
@@ -8367,7 +8374,7 @@ function GQ.Log:EnsureSettingsPage(frame)
     creditsBody:SetPoint("TOPLEFT", creditsTitle, "BOTTOMLEFT", 0, -6)
     creditsBody:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
     creditsBody:SetJustifyH("LEFT")
-    creditsBody:SetText("Eao\nMainWon\nStikmyre")
+    creditsBody:SetText("Eao\nMainWon\nStikmyre\nClick")
     creditsBody:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
     creditsBody:Hide()
     frame.settingsCreditsBody = creditsBody
@@ -9668,6 +9675,186 @@ function GQ.Log:ClearDetail()
     self:SetDetailEmpty(true)
 end
 
+function GQ.Log:RankOneEntry(slotName, handKind)
+    -- First piece this character can see. A rank stored for the other
+    -- faction is already absent, so the list's first row is rank 1.
+    local list = self:GetSlotRankList(slotName, handKind)
+    return list and list[1] or nil
+end
+
+function GQ.Log:PlayerOwnsRankOne(entry)
+    if not entry then
+        return false
+    end
+    if self:IsEntryObtained(entry.id) then
+        return true
+    end
+    if not entry.itemId or not GetInventoryItemLink or not GQ.Data or not GQ.Data.GetInventorySlots then
+        return false
+    end
+    local slotName = entry.slot
+    local slots = GQ.Data:GetInventorySlots(slotName) or {}
+    for i = 1, #slots do
+        local link = GetInventoryItemLink("player", slots[i])
+        if link and GQ.Data:ItemLinkToId(link) == entry.itemId then
+            if not entry.suffix or entry.suffix == "" or GQ.Data:EntrySuffixMatchesLink(entry, link) then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+function GQ.Log:UpdateHuntAdvice(layoutRows, tab)
+    self._rankOneOwned = {}
+    self._recommendHuntId = nil
+    self._recommendItemId = nil
+    self._recommendSuffix = nil
+    if not layoutRows then
+        return
+    end
+    if GQ.IsPreviewEnabled and GQ:IsPreviewEnabled() then
+        return
+    end
+    local wantRecommend = tab == "active"
+        and GQ.Data and GQ.Data.GearScoreTooltipEnabled and GQ.Data:GearScoreTooltipEnabled()
+    local bestDelta = 0
+    local bestEntry
+    for i = 1, #layoutRows do
+        local spec = layoutRows[i]
+        if spec.type == "header" and spec.slotName then
+            local rankOne = self:RankOneEntry(spec.slotName, spec.handKind)
+            if rankOne then
+                local key = tostring(spec.slotName) .. ":" .. tostring(spec.handKind)
+                if self:PlayerOwnsRankOne(rankOne) then
+                    self._rankOneOwned[key] = true
+                elseif wantRecommend then
+                    local dataSlot = spec.slotName == "WeaponPair" and "MainHand" or spec.slotName
+                    if self:EntryShownOnActiveList(rankOne, dataSlot)
+                        and (not spec.handKind or self:EntryInWeaponHand(rankOne, dataSlot, spec.handKind)) then
+                        local delta = GQ.Data.GearScoreUpgradeDelta and GQ.Data:GearScoreUpgradeDelta(rankOne, spec.slotName, spec.handKind)
+                        if delta and delta > bestDelta then
+                            bestDelta = delta
+                            bestEntry = rankOne
+                        end
+                    end
+                end
+            end
+        end
+    end
+    if not bestEntry then
+        return
+    end
+    self._recommendHuntId = bestEntry.id
+    self._recommendItemId = bestEntry.itemId
+    self._recommendSuffix = bestEntry.suffix or ""
+end
+
+function GQ.Log:EntryIsRecommended(entry)
+    if not entry or not self._recommendHuntId then
+        return false
+    end
+    if entry.id == self._recommendHuntId then
+        return true
+    end
+    return entry.itemId == self._recommendItemId
+        and (entry.suffix or "") == (self._recommendSuffix or "")
+end
+
+function GQ.Log:EnsureAcquiredLabel(row)
+    if row.acquired then
+        return row.acquired
+    end
+    local label = row:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    label:SetJustifyH("LEFT")
+    label:SetText("- Rank #1 BiS acquired")
+    label:SetTextColor(1, 1, 1)
+    label:Hide()
+    row.acquired = label
+    return label
+end
+
+function GQ.Log:EnsureRecommendWidgets(row)
+    if row.recommend then
+        return
+    end
+    local info = CreateFrame("Button", nil, row)
+    info:SetSize(13, 13)
+    info:SetFrameLevel(row:GetFrameLevel() + 6)
+    info.icon = info:CreateTexture(nil, "OVERLAY")
+    info.icon:SetAllPoints()
+    info.icon:SetTexture("Interface\\FriendsFrame\\InformationIcon")
+    info:SetScript("OnEnter", function(self)
+        HideItemTooltip()
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetText("GearQuest Recommends", 1, 0.82, 0)
+        GameTooltip:AddLine("This is what GearQuest recommends for your next hunt. This would be the biggest upgrade compared to the current piece of gear you are wearing.", 1, 1, 1, true)
+        GameTooltip:Show()
+    end)
+    info:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+    info:SetScript("OnClick", function() end)
+    info:EnableMouseWheel(true)
+    info:SetScript("OnMouseWheel", function(_, delta)
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if log and log.frame and log.frame.scroll then
+            ScrollFrameOnMouseWheel(log.frame.scroll, delta)
+        end
+    end)
+    info:Hide()
+    row.recommendInfo = info
+
+    local label = row:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    label:SetJustifyH("LEFT")
+    label:SetText("- Recommended")
+    label:SetTextColor(1, 0.82, 0)
+    label:Hide()
+    row.recommend = label
+end
+
+function GQ.Log:HideHuntAdvice(row)
+    if row.acquired then
+        row.acquired:Hide()
+    end
+    if row.recommend then
+        row.recommend:Hide()
+    end
+    if row.recommendInfo then
+        row.recommendInfo:Hide()
+    end
+end
+
+function GQ.Log:RecommendTailWidth(row, entry)
+    if not self:EntryIsRecommended(entry) then
+        return 0
+    end
+    self:EnsureRecommendWidgets(row)
+    local label = row.recommend
+    label:SetText("- Recommended")
+    label:SetJustifyH("LEFT")
+    local labelWidth = label:GetStringWidth() or 0
+    if labelWidth < 20 then
+        labelWidth = 100
+    end
+    return labelWidth + 13 + 10
+end
+
+function GQ.Log:PlaceRecommend(row)
+    local label = row.recommend
+    local info = row.recommendInfo
+    if not label or not info then
+        return
+    end
+    local textWidth = row.text:GetStringWidth() or 0
+    label:ClearAllPoints()
+    label:SetPoint("LEFT", row.text, "LEFT", textWidth + 6, 0)
+    info:ClearAllPoints()
+    info:SetPoint("LEFT", label, "RIGHT", 3, 0)
+    label:Show()
+    info:Show()
+end
+
 function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry, label, handKind)
     row:Show()
     local scrollChild = self.frame.scrollChild
@@ -9682,6 +9869,7 @@ function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry, label, hand
     if row.info then
         row.info:Hide()
     end
+    self:HideHuntAdvice(row)
 
     if rowType == "header" then
         row.icon:Show()
@@ -9700,6 +9888,15 @@ function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry, label, hand
             row.info:ClearAllPoints()
             row.info:SetPoint("LEFT", row.text, "LEFT", titleWidth + 4, 0)
             row.info:Show()
+            local owned = self._rankOneOwned
+            local key = tostring(slotName) .. ":" .. tostring(handKind)
+            if owned and owned[key] then
+                local acquired = self:EnsureAcquiredLabel(row)
+                acquired:SetTextColor(1, 1, 1)
+                acquired:ClearAllPoints()
+                acquired:SetPoint("LEFT", row.info, "RIGHT", 4, 0)
+                acquired:Show()
+            end
         end
         row.highlight:Hide()
         row:SetScript("OnClick", function()
@@ -9762,7 +9959,19 @@ function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry, label, hand
         row.text:ClearAllPoints()
         row.text:SetPoint("LEFT", row.icon, "RIGHT", 4, 0)
         row.text:SetPoint("RIGHT", row, "RIGHT", -LIST_ROW_RIGHT_PAD, 0)
-        SetListRowItemText(row, LIST_ROW_NOTABLE_LEFT, name, entry, status, false, r, g, b, slotName)
+        local tail = self:RecommendTailWidth(row, entry)
+        SetListRowItemText(row, LIST_ROW_NOTABLE_LEFT, name, entry, status, false, r, g, b, slotName, 0)
+        if tail > 0 then
+            local rowWidth = row:GetWidth()
+            if not rowWidth or rowWidth <= 0 then
+                rowWidth = LEFT_COLUMN_WIDTH - (PANEL_INSET * 2)
+            end
+            local textWidth = row.text:GetStringWidth() or 0
+            if LIST_ROW_NOTABLE_LEFT + textWidth + tail + LIST_ROW_RIGHT_PAD > rowWidth then
+                SetListRowItemText(row, LIST_ROW_NOTABLE_LEFT, name, entry, status, false, r, g, b, slotName, tail)
+            end
+            self:PlaceRecommend(row)
+        end
 
         UpdateListRowHighlight(row)
         row:SetScript("OnClick", function()
@@ -9783,7 +9992,19 @@ function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry, label, hand
         row.text:SetPoint("RIGHT", row, "RIGHT", -LIST_ROW_RIGHT_PAD, 0)
 
         local showNewLabel = listTab == "active" and not isObtained and status ~= "completed"
-        SetListRowItemText(row, LIST_ROW_ITEM_LEFT, name, entry, status, showNewLabel, r, g, b, slotName)
+        local tail = self:RecommendTailWidth(row, entry)
+        SetListRowItemText(row, LIST_ROW_ITEM_LEFT, name, entry, status, showNewLabel, r, g, b, slotName, 0)
+        if tail > 0 then
+            local rowWidth = row:GetWidth()
+            if not rowWidth or rowWidth <= 0 then
+                rowWidth = LEFT_COLUMN_WIDTH - (PANEL_INSET * 2)
+            end
+            local textWidth = row.text:GetStringWidth() or 0
+            if LIST_ROW_ITEM_LEFT + textWidth + tail + LIST_ROW_RIGHT_PAD > rowWidth then
+                SetListRowItemText(row, LIST_ROW_ITEM_LEFT, name, entry, status, showNewLabel, r, g, b, slotName, tail)
+            end
+            self:PlaceRecommend(row)
+        end
 
         UpdateListRowHighlight(row)
         row:SetScript("OnClick", function()
@@ -10017,9 +10238,35 @@ function GQ.Log:EnsureItemInfoListener()
     self.itemInfoListener = frame
 end
 
+function GQ.Log:VisibleSlotRank(entry)
+    if not entry or not entry.itemId then
+        return nil
+    end
+    local slotName, handKind = self:RankListContext(entry)
+    if not slotName then
+        return nil
+    end
+    local list = self:GetSlotRankList(slotName, handKind)
+    local suffix = entry.suffix or ""
+    for i = 1, #list do
+        local row = list[i]
+        if row == entry or row.id == entry.id
+            or (row.itemId == entry.itemId and (row.suffix or "") == suffix and row.minLevel == entry.minLevel) then
+            return i
+        end
+    end
+    return nil
+end
+
 function GQ.Log:HuntDisplayRank(entry)
     if not entry then
         return nil
+    end
+    -- Place among the pieces this faction can see. Stored ranks still
+    -- include the other side, and printing those leaves a hole.
+    local visible = self:VisibleSlotRank(entry)
+    if visible then
+        return visible
     end
     if type(entry.curatedRank) == "number" and entry.curatedRank > 0 then
         return entry.curatedRank
@@ -10153,21 +10400,47 @@ function GQ.Log:GetSlotRankList(slotName, handKind)
     if not dataSlot or not GQ.Data or not GQ.Data.GetClassSlotEntryList then
         return {}
     end
+    -- Reused by the (i) list and by every item hover. One build per slot
+    -- until level, spec, class, or faction changes.
+    local band = GQ.Data:GetActiveBandCacheKey()
+    if self._slotRankBand ~= band then
+        self._slotRankBand = band
+        self._slotRankCache = {}
+    end
+    local cacheKey = tostring(slotName) .. ":" .. tostring(handKind)
+    local cached = self._slotRankCache and self._slotRankCache[cacheKey]
+    if cached then
+        return cached
+    end
     -- The stored band for this level, spec, and faction. A simulated hunter
     -- is not limited to what the logged-in character can equip today.
+    -- Required level comes from the stored fact. Asking the client for every
+    -- item in the slot loads those tooltips and is what dropped FPS on hover.
+    local level = GQ:GetEffectiveLevel() or 1
     local pool = {}
     local seen = {}
+    local equip = GQ.Equip
+    local prevSuppress = equip and equip._suppressItemPrime
+    if equip then
+        equip._suppressItemPrime = true
+    end
     for _, key in ipairs(GQ.Data:GetCandidateSlotKeys(dataSlot)) do
         for _, entry in ipairs(GQ.Data:GetClassSlotEntryList(key) or {}) do
             if entry and entry.id and not seen[entry.id]
                 and GQ.Data:ShouldShowEntry(entry)
                 and GQ.Data:EntryMatchesPlayerBand(entry)
-                and (not GQ.Equip or not GQ.Equip.MeetsRequiredLevel or GQ.Equip:MeetsRequiredLevel(entry.itemId))
                 and (not handKind or self:EntryInWeaponHand(entry, dataSlot, handKind)) then
-                seen[entry.id] = true
-                pool[#pool + 1] = entry
+                local fact = GQ.Data:GetItemFact(entry.itemId)
+                local req = fact and fact.reqLevel
+                if not (type(req) == "number" and req > 1 and req > level) then
+                    seen[entry.id] = true
+                    pool[#pool + 1] = entry
+                end
             end
         end
+    end
+    if equip then
+        equip._suppressItemPrime = prevSuppress
     end
     pool = GQ.Data:FilterToActiveBand(pool)
     pool = GQ.Data:DeduplicateEntriesByItem(pool)
@@ -10179,6 +10452,7 @@ function GQ.Log:GetSlotRankList(slotName, handKind)
         end
         return (a.pipelineScore or 0) > (b.pipelineScore or 0)
     end)
+    self._slotRankCache[cacheKey] = pool
     return pool
 end
 
@@ -10325,7 +10599,7 @@ function GQ.Log:ShowSlotRankTooltip(row)
             local name = GQ.Data:GetEntryDisplayName(entry) or ("Item " .. tostring(entry.itemId))
             local r, g, b = GetListItemQualityColor(entry.itemId)
             local color = string.format("|cff%02x%02x%02x", math.floor(r * 255 + 0.5), math.floor(g * 255 + 0.5), math.floor(b * 255 + 0.5))
-            add(string.format("|cffffd100#%d|r %s%s|r%s", entry.curatedRank or i, color, name, scoreTrail(entry)))
+            add(string.format("|cffffd100#%d|r %s%s|r%s", i, color, name, scoreTrail(entry)))
         end
     end
 
@@ -10976,6 +11250,8 @@ function GQ.Log:Refresh()
             end
         end
     end
+
+    self:UpdateHuntAdvice(layoutRows, tab)
 
     for i, spec in ipairs(layoutRows) do
         if spec.entry then

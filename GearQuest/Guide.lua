@@ -56,13 +56,19 @@ if hooksecurefunc and type(CancelLogout) == "function" then
 end
 
 local function WorldXY(world)
-    if not world then
+    if type(world) ~= "table" then
         return nil
     end
     if world.GetXY then
-        return world:GetXY()
+        local x, y = world:GetXY()
+        if type(x) == "number" and type(y) == "number" then
+            return x, y
+        end
     end
-    return world.x, world.y
+    if type(world.x) == "number" and type(world.y) == "number" then
+        return world.x, world.y
+    end
+    return nil
 end
 
 local function WorldOn(mapId, x, y)
@@ -203,14 +209,23 @@ local function CommonMap(a, b)
     end
 end
 
+-- GetMapPosFromWorldPos leads with the map id (a number) and then the
+-- position. A transport load, such as the zeppelin into Tirisfal, does this
+-- every frame. Indexing that number is what made the guide error climb.
 local function VectorXY(pos)
-    if not pos then
+    if type(pos) ~= "table" then
         return nil
     end
     if pos.GetXY then
-        return pos:GetXY()
+        local x, y = pos:GetXY()
+        if type(x) == "number" and type(y) == "number" then
+            return x, y
+        end
     end
-    return pos.x, pos.y
+    if type(pos.x) == "number" and type(pos.y) == "number" then
+        return pos.x, pos.y
+    end
+    return nil
 end
 
 local function ProjectToMap(srcMap, x, y, destMap)
@@ -224,7 +239,7 @@ local function ProjectToMap(srcMap, x, y, destMap)
     if not (continent and wx and C_Map and C_Map.GetMapPosFromWorldPos and CreateVector2D) then
         return nil
     end
-    local ok, first, second = pcall(C_Map.GetMapPosFromWorldPos, continent, CreateVector2D(wx, wy), destMap)
+    local ok, first, second, third = pcall(C_Map.GetMapPosFromWorldPos, continent, CreateVector2D(wx, wy), destMap)
     if not ok then
         return nil
     end
@@ -232,23 +247,38 @@ local function ProjectToMap(srcMap, x, y, destMap)
     if not mx then
         mx, my = VectorXY(second)
     end
+    if not mx and type(second) == "number" and type(third) == "number" then
+        mx, my = second, third
+    elseif not mx and type(first) == "number" and type(second) == "number"
+        and first >= -0.05 and first <= 1.05 and second >= -0.05 and second <= 1.05 then
+        mx, my = first, second
+    end
     return mx, my
 end
 
--- Published docks that cross continents. A hunt on the other continent aims
--- at the nearest one this character can board. Arrival switches the arrow
--- back to the hunt, because both are then on the same continent.
--- Wowhead Classic flight, zeppelin, and ship guide.
+-- Published docks that cross continents. The arrow aims at the dock where
+-- this character boards. The ride it picks is the one with the shortest
+-- walk to that dock plus the shortest walk after the last landing.
+-- Menethil, Southshore, and Auberdine are one ship, both ways. Southshore
+-- is the stop in the middle. Stormwind Harbor and Auberdine are a separate ship.
 local CROSSINGS = {
     { id = "durotar", zone = "Durotar", place = "Durotar", x = 50.8, y = 13.6, faction = "Horde", kind = "Zeppelin", to = { "tirisfal", "gromgol" } },
-    { id = "tirisfal", zone = "Tirisfal Glades", place = "Tirisfal Glades", x = 61.0, y = 59.0, faction = "Horde", kind = "Zeppelin", to = { "durotar" } },
-    { id = "gromgol", zone = "Stranglethorn Vale", place = "Grom'gol", x = 31.5, y = 29.6, faction = "Horde", kind = "Zeppelin", to = { "durotar" } },
+    { id = "tirisfal", zone = "Tirisfal Glades", place = "Tirisfal Glades", x = 61.0, y = 59.0, faction = "Horde", kind = "Zeppelin", to = { "durotar", "gromgol" } },
+    { id = "gromgol", zone = "Stranglethorn Vale", place = "Grom'gol", x = 31.5, y = 29.6, faction = "Horde", kind = "Zeppelin", to = { "durotar", "tirisfal" } },
     { id = "ratchet", zone = "The Barrens", place = "Ratchet", x = 63.6, y = 38.7, kind = "Ship", to = { "booty" } },
     { id = "booty", zone = "Stranglethorn Vale", place = "Booty Bay", x = 26.0, y = 73.2, kind = "Ship", to = { "ratchet" } },
-    { id = "auberdine", zone = "Darkshore", place = "Auberdine", x = 32.7, y = 43.7, faction = "Alliance", kind = "Ship", to = { "menethilNorth" } },
-    { id = "menethilNorth", zone = "Wetlands", place = "Menethil Harbor", x = 4.7, y = 57.0, faction = "Alliance", kind = "Ship", to = { "auberdine" } },
+    { id = "auberdine", zone = "Darkshore", place = "Auberdine", x = 32.7, y = 43.7, faction = "Alliance", kind = "Ship", to = { "southshore", "stormwind" } },
+    { id = "menethilNorth", zone = "Wetlands", place = "Menethil Harbor", x = 4.7, y = 57.0, faction = "Alliance", kind = "Ship", to = { "southshore" } },
+    { id = "southshore", zone = "Hillsbrad Foothills", place = "Southshore", x = 50.6, y = 61.0, faction = "Alliance", kind = "Ship", to = { "auberdine", "menethilNorth" } },
+    { id = "stormwind", zone = "Stormwind City", place = "Stormwind Harbor", x = 22.6, y = 56.1, faction = "Alliance", kind = "Ship", to = { "auberdine" } },
     { id = "menethilSouth", zone = "Wetlands", place = "Menethil Harbor", x = 5.0, y = 63.0, faction = "Alliance", kind = "Ship", to = { "theramore" } },
     { id = "theramore", zone = "Dustwallow Marsh", place = "Theramore", x = 71.0, y = 56.0, faction = "Alliance", kind = "Ship", to = { "menethilSouth" } },
+    { id = "steamwheedle", zone = "Tanaris", place = "Steamwheedle Port", x = 66.6, y = 22.0, kind = "Ship", to = { "powderfuse" } },
+    { id = "powderfuse", zone = "Riverglades", place = "Powderfuse Port", x = 78.1, y = 51.9, kind = "Ship", to = { "steamwheedle" } },
+    { id = "valanaarEast", zone = "Zephras Isle", place = "Valanaar", x = 65.9, y = 83.5, faction = "Alliance", kind = "Skycutter", to = { "dalaran" } },
+    { id = "dalaran", zone = "Alterac Mountains", place = "Dalaran", x = 12.5, y = 51.8, faction = "Alliance", kind = "Skycutter", to = { "valanaarEast" } },
+    { id = "valanaarWest", zone = "Zephras Isle", place = "Valanaar", x = 57.9, y = 80.9, faction = "Horde", kind = "Zeppelin", to = { "skywatcher" } },
+    { id = "skywatcher", zone = "Mulgore", place = "Skywatcher Plateau", x = 34.3, y = 25.8, faction = "Horde", kind = "Zeppelin", to = { "valanaarWest" } },
 }
 
 local function DockLabel(dock)
@@ -282,37 +312,136 @@ local function DockWorld(place)
     return continent, wx, wy, mapId
 end
 
-local function NearestCrossing(playerContinent, pwx, pwy, huntContinent)
+-- Reused for every search. A new table each frame, while the arrow is up,
+-- is the same kind of churn the score hover used to cause.
+local crossCost, crossPrev, crossRide, crossOrigin = {}, {}, {}, {}
+local crossRev = {}
+
+local function NearestCrossing(playerContinent, pwx, pwy, huntContinent, hwx, hwy)
     local faction = UnitFactionGroup and UnitFactionGroup("player")
-    local best, bestDist
+    local function canBoard(dock)
+        return dock and (not dock.faction or dock.faction == faction)
+    end
+    local function hypot(ax, ay, bx, by)
+        local dx = ax - bx
+        local dy = ay - by
+        return math.sqrt(dx * dx + dy * dy)
+    end
+
+    local INF = 1e12
+    local cost, prev, viaRide, origin = crossCost, crossPrev, crossRide, crossOrigin
+    for i = 1, #CROSSINGS do
+        local id = CROSSINGS[i].id
+        cost[id] = INF
+        prev[id] = nil
+        viaRide[id] = nil
+        origin[id] = nil
+    end
     for i = 1, #CROSSINGS do
         local dock = CROSSINGS[i]
-        if not dock.faction or dock.faction == faction then
+        if canBoard(dock) then
             local continent, wx, wy = DockWorld(dock)
             if continent == playerContinent and wx then
-                local reaches
+                cost[dock.id] = hypot(wx, wy, pwx, pwy)
+                origin[dock.id] = dock
+            end
+        end
+    end
+
+    local guard = 0
+    local updated = true
+    while updated and guard < 24 do
+        updated = false
+        guard = guard + 1
+        for i = 1, #CROSSINGS do
+            local dock = CROSSINGS[i]
+            local base = cost[dock.id]
+            local boarded = origin[dock.id]
+            if base < INF and boarded and canBoard(dock) then
+                local continent, wx, wy = DockWorld(dock)
                 local tos = dock.to
                 for t = 1, #tos do
                     local dest = crossingById[tos[t]]
-                    local destContinent = dest and DockWorld(dest)
-                    if destContinent == huntContinent then
-                        reaches = true
-                        break
+                    if dest and base < cost[dest.id] then
+                        cost[dest.id] = base
+                        prev[dest.id] = dock.id
+                        viaRide[dest.id] = true
+                        origin[dest.id] = boarded
+                        updated = true
                     end
                 end
-                if reaches then
-                    local dx = wx - pwx
-                    local dy = wy - pwy
-                    local dist = dx * dx + dy * dy
-                    if not bestDist or dist < bestDist then
-                        best = dock
-                        bestDist = dist
+                if continent and wx then
+                    for j = 1, #CROSSINGS do
+                        local other = CROSSINGS[j]
+                        if other.id ~= dock.id and canBoard(other) then
+                            local otherContinent, ox, oy = DockWorld(other)
+                            if otherContinent == continent and ox then
+                                local nextCost = base + hypot(wx, wy, ox, oy)
+                                if nextCost < cost[other.id] then
+                                    cost[other.id] = nextCost
+                                    prev[other.id] = dock.id
+                                    viaRide[other.id] = false
+                                    origin[other.id] = boarded
+                                    updated = true
+                                end
+                            end
+                        end
                     end
                 end
             end
         end
     end
-    return best
+
+    local bestCost, bestDepart, bestArrive
+    for i = 1, #CROSSINGS do
+        local dock = CROSSINGS[i]
+        local base = cost[dock.id]
+        if base < INF and origin[dock.id] then
+            local continent, wx, wy = DockWorld(dock)
+            if continent == huntContinent and wx then
+                local total = base
+                if hwx and hwy then
+                    total = base + hypot(wx, wy, hwx, hwy)
+                end
+                if not bestCost or total < bestCost then
+                    bestCost = total
+                    bestDepart = origin[dock.id]
+                    bestArrive = dock
+                end
+            end
+        end
+    end
+    if not bestDepart or not bestArrive then
+        return nil
+    end
+
+    -- Stay aboard through stops that are still the same ride. Get off where
+    -- the next step is a walk, or at the landing on the hunt's continent.
+    local disembark = bestArrive
+    local rev = crossRev
+    for i = #rev, 1, -1 do
+        rev[i] = nil
+    end
+    local id = bestArrive.id
+    local steps = 0
+    while id and steps < 24 do
+        rev[#rev + 1] = crossingById[id]
+        if id == bestDepart.id then
+            break
+        end
+        id = prev[id]
+        steps = steps + 1
+    end
+    local departAt = #rev
+    if departAt > 1 and rev[departAt] and rev[departAt].id == bestDepart.id then
+        disembark = rev[departAt - 1]
+        local n = departAt - 1
+        while n > 1 and viaRide[rev[n].id] and viaRide[rev[n - 1].id] do
+            n = n - 1
+            disembark = rev[n]
+        end
+    end
+    return bestDepart, disembark
 end
 
 function GQ.Guide:AnchorToTracker()
@@ -443,6 +572,7 @@ local function UpdateGuide(frame)
         end
     end
     frame.crossing = nil
+    frame.crossingTo = nil
     local text = spot and spot.map or "No pin"
     local rotation = 0
     local spotMap = spot and GQ.Data and GQ.Data.SpotMapId and GQ.Data:SpotMapId(spot)
@@ -498,12 +628,36 @@ local function UpdateGuide(frame)
                 rotation = AimWorld(spotMap, dx, dy, facing)
             end
         else
-            local dock = pc and sc and pc ~= sc and NearestCrossing(pc, pwx, pwy, sc)
+            local dock, arrive
+            if pc and sc and pc ~= sc then
+                -- The dock does not change while you stand still. Searching
+                -- every frame rebuilt the route graph for the whole trip.
+                local cache = frame.crossingCache
+                local faction = UnitFactionGroup and UnitFactionGroup("player")
+                local sameHunt = cache and cache.pc == pc and cache.sc == sc
+                    and cache.faction == faction
+                    and cache.hwx and swx and math.abs(cache.hwx - swx) < 80
+                    and math.abs(cache.hwy - swy) < 80
+                local stillClose = sameHunt and cache.pwx
+                    and math.abs(cache.pwx - pwx) < 600
+                    and math.abs(cache.pwy - pwy) < 600
+                if stillClose then
+                    dock, arrive = cache.dock, cache.arrive
+                else
+                    dock, arrive = NearestCrossing(pc, pwx, pwy, sc, swx, swy)
+                    frame.crossingCache = {
+                        pc = pc, sc = sc, faction = faction,
+                        hwx = swx, hwy = swy, pwx = pwx, pwy = pwy,
+                        dock = dock, arrive = arrive,
+                    }
+                end
+            end
             if dock then
                 local dx = dock.wx - pwx
                 local dy = dock.wy - pwy
                 local dist = math.sqrt(dx * dx + dy * dy)
                 frame.crossing = dock
+                frame.crossingTo = arrive
                 if dist < HERE_YARDS then
                     rotation = math.pi
                     text = "Here"
@@ -600,7 +754,13 @@ function GQ.Guide:Init()
             GameTooltip:AddLine(string.format("%s %.1f, %.1f", spot.map, spot.x or 0, spot.y or 0), 1, 1, 1)
         end
         if self.crossing then
-            GameTooltip:AddLine(self.crossing.kind .. " in " .. self.crossing.zone, 1, 1, 1)
+            local depart = self.crossing
+            local dest = self.crossingTo
+            local line = depart.kind .. " in " .. (depart.place or depart.zone)
+            if dest and dest.place and dest.id ~= depart.id then
+                line = line .. " to " .. dest.place
+            end
+            GameTooltip:AddLine(line, 1, 1, 1)
         end
         GameTooltip:AddLine("Drag to move", 0.75, 0.75, 0.75)
         GameTooltip:Show()

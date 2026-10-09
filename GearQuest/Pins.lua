@@ -66,9 +66,11 @@ local AREA_COLOR = { 0.3, 0.55, 1, 0.55 }
 local WORLD_PIN_SIZE = 24
 
 local pins = {}
+local pinGen = 0
 local frames = {}
 local driver
 local placed = 0
+local placedMap, placedGen, placedGuided
 
 local function ShowPinTooltip(frame)
     local pin = frame.pinData
@@ -140,13 +142,19 @@ local function MapName(mapId)
 end
 
 local function VecXY(v)
-    if not v then
+    if type(v) ~= "table" then
         return nil
     end
     if v.GetXY then
-        return v:GetXY()
+        local x, y = v:GetXY()
+        if type(x) == "number" and type(y) == "number" then
+            return x, y
+        end
     end
-    return v.x, v.y
+    if type(v.x) == "number" and type(v.y) == "number" then
+        return v.x, v.y
+    end
+    return nil
 end
 
 -- The client's id for the zone name. A Wowhead id on the spot can be a map
@@ -310,6 +318,13 @@ local function PlacePins()
     if not mapId then
         return
     end
+    -- Normalized pin positions do not change while the same map stays open.
+    -- Projecting every pin on every frame was a steady map-API cost.
+    local guided = GuidedEntryId()
+    if mapId == placedMap and pinGen == placedGen and guided == placedGuided then
+        return
+    end
+    placedMap, placedGen, placedGuided = mapId, pinGen, guided
     local n = 0
     for i = 1, #pins do
         local x, y = ProjectPin(pins[i], mapId)
@@ -346,6 +361,7 @@ function GQ.Pins:Sync()
         self:Init()
     end
     pins = {}
+    pinGen = pinGen + 1
     local entries = GQ.Tracker and GQ.Tracker.GetTrackedEntries and GQ.Tracker:GetTrackedEntries()
     if entries and GQ.Map and GQ.Map.SpotForEntry then
         for _, entry in ipairs(entries) do

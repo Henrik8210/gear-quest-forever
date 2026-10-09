@@ -2,7 +2,57 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v0.5.0-beta
+## v0.5.1-beta
+
+The hunt list tells you when a slot's best piece is already yours, and which rank 1 is the biggest upgrade from what you are wearing. The guide follows the new ships and skyboats. Rank lists no longer skip numbers for a hunt the other faction cannot get.
+
+The window title reads **GearQuest Forever v0.5.1-beta**.
+
+### What to hunt next
+
+When you already have the rank #1 piece for a slot, obtained or worn, that slot's title reads **- Rank #1 BiS acquired** in white, immediately after the (i). Enhancement at 25-27 does this on Hands for **Gloves of the Fang** and on Waist for **Belt of the Fang** once those pieces are yours.
+
+Among the rank #1 pieces you do not have yet, one of them is marked **- Recommended** in gold, immediately after the item name, with its own (i). It is the rank #1 whose GearQuest score is the biggest step up from what you are wearing. An empty slot counts as a fill. A piece that would not be an upgrade is not marked. A later rank is never the recommendation. A long item name shortens so **- Recommended** stays whole.
+
+The (i) hover has a yellow header, **GearQuest Recommends**, and then: "This is what GearQuest recommends for your next hunt. This would be the biggest upgrade compared to the current piece of gear you are wearing."
+
+Simulation hides both lines. Turning **GearQuest score on tooltips** off hides **- Recommended** and leaves **- Rank #1 BiS acquired**.
+
+### Rank lists no longer skip numbers
+
+The (i) list and the **Rank #N** box count only the pieces this character can see. A hunt for the other faction is left out, and the numbers close up. The same is true the other way, for every class and every slot.
+
+Horde Enhancement at 26-27 used to jump from **#10 Snake Eye Kaleidoscope** to **#14 Glowing Green Talisman**, because **Erudite's Amulet** and **Scholarly Pendant** (Friend of the Library, Stormwind) were still numbered on the Horde list. **Glowing Green Talisman** now follows straight on. The parchment rank matches that place. **Rank #1 BiS acquired** uses the best piece this character can actually get.
+
+### The guide follows the new ships
+
+A hunt on another continent still aims at the dock with the shortest walk to the boat and the shortest walk after you get off. The arrow says **Ship**, **Zeppelin**, or **Skycutter**. Hovering it names the dock and where to step off, for example **Ship in Auberdine to Southshore**. Inside 12 yards it says **Here**.
+
+**Menethil Harbor**, **Southshore**, and **Auberdine** are one Alliance ship, both ways. Southshore is the stop in the middle. **Stormwind Harbor** and **Auberdine** are a separate Alliance ship, both ways. The southern pier from **Menethil Harbor** to **Theramore** is unchanged.
+
+**Steamwheedle Port** in Tanaris and **Powderfuse Port** in the Riverglades are one ship, both ways, for both factions. **Ratchet** and **Booty Bay** are unchanged.
+
+Horde zeppelins at **Durotar**, **Tirisfal Glades**, and **Grom'gol** each go to the other two towers.
+
+Alliance skycutters run from the eastern dock at **Valanaar** on Zephras Isle to the north side of **Dalaran** in Alterac Mountains, and back. Horde zeppelins run from the western dock at **Valanaar** to **Skywatcher Plateau** in Mulgore, and back.
+
+Crossing into Tirisfal no longer throws a Lua error. The route and the map pins also do less work each frame while a hunt is guided.
+
+### Coldspire Staff
+
+**Coldspire Staff** drops from **Rath'Mael** in the **Ruins of Lordaeron** and requires **19**. The tooltip is +13 Frost Resistance and +32 frost spell damage. The old line that added 26 damage and healing is gone. The drop chance reads 29.69%.
+
+Frost, Alliance and Horde, stays rank 1 at level 19. Enhancement Alliance at 19-20 sees it at rank 23. Priest, druid, and warlock no longer rank it for that old healing and spell damage line.
+
+### Smoother scores
+
+Hovering a piece of gear builds that slot's rank list once. Moving the mouse across the bag does not rebuild it, so the score line stays responsive. A piece with no random suffix, including **Sorcerer Collar**, no longer errors when that line is added.
+
+### Credits
+
+**Settings**, **Credits** lists **Click** with Eao, MainWon, and Stikmyre.
+
+### v0.5.0-beta
 
 Hover any piece of gear and GearQuest tells you how it ranks for your level, how it compares with what you are wearing, and why a piece has no score. The dungeon upgrade sets are level 60 quests. Closing the world map with a gamepad no longer locks jump or talking to NPCs.
 

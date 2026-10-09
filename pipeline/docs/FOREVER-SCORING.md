@@ -493,13 +493,24 @@ The hunt order is still the stored `pipelineScore`. The number on a tooltip
 is a display index only. Do not retune weights so the index and the rank
 agree, and do not write the index back onto a pick.
 
+A bag hover must not rebuild that slot, and it must not call `GetItemInfo`
+for every piece in it. `GetSlotRankList` and `GearScoreContext` are cached
+for the current level, spec, class, and faction. The context also remembers
+what is equipped, so the arrow updates when gear changes and stays put
+while the mouse moves across the bag. Required level on that list is the
+stored fact, not a client item query. The first hover of a slot does the
+scan once. The next piece in that slot reuses it. The line the player sees
+does not change.
+
 `GearScoreIndex` maps the slot's raw scores onto **−100..+100**. The best
 score in that comparison is **+100**. The worst is **−100**. One score in
 the slot is **100**. The displayed index is clamped and rounded. The scale
 is the live level's rank list (`GetSlotRankList`), the notables, and the
 equipped piece's raw score (so a worn piece that has aged out of the band
-still sits on the same line). Rank text uses `curatedRank`: **Rank #N for
-your level**. A notable says **Notable for your level**.
+still sits on the same line). Rank text is that piece's place on the list
+this character can see: **Rank #N for your level**. A piece the other
+faction cannot get is omitted and the numbers close up. Stored
+`curatedRank` still orders the list. A notable says **Notable for your level**.
 
 The line is inside the item tooltip, after the stats, before any addon
 source line. `AppendGearScoreLine` runs before `Show()`, so the dark
@@ -525,6 +536,17 @@ the pictures ship with the addon. An empty slot shows the index only. The
 same item, or a delta of 0, shows no arrow. Rings and trinkets compare to
 the weaker equipped piece only when **both** slots are filled. A free slot
 is a fill, not a replacement.
+
+The active hunt list uses that same comparison to point at the next hunt.
+A slot whose rank #1 the character already has, obtained or worn, shows
+**- Rank #1 BiS acquired** just after the header (i). Among the rank #1
+pieces they do not have, the largest gain versus what is worn is marked
+**- Recommended** right after the item name, with its own (i). A long item name truncates so that label stays whole. The hover says: "This is
+what GearQuest recommends for your next hunt. This would be the biggest
+upgrade compared to the current piece of gear you are wearing." An empty
+slot counts as a fill. A downgrade is not marked. A later rank is never
+the recommendation. Simulation hides both lines. Turning the score off
+hides the recommendation and leaves the acquired line.
 
 `EquippedPipelineScore` uses the current band first. If the worn piece has
 aged out, it uses the nearest same-spec, same-faction band: the highest
@@ -659,13 +681,15 @@ promotion or the weights to make those two numbers match.
     sells it. An unknown bind stays. **Get it now!** still hides a vendor
     piece until the stored standing is met.
 - **Rank on the parchment.** Above the item title, a black box reads
-  `Rank #N` from the stored slot rank (`curatedRank`), so a filtered or
-  play-style list still shows the real place. A notable with no stored
-  rank uses the scored twin in that slot (same item and minimum level).
-  Hovering the box says this is the best, 2nd, 3rd, or 4th in that slot
-  for a hunt on the unfiltered, no-play-style list. A hunt that is not on
-  that list uses the same line from `curatedRank`, then one sentence: a
-  filter is on, a play style is on, or both. Rank 1 says **best**, not
+  `Rank #N` from that piece's place on the rank list this character can
+  see. A hunt the other faction cannot get is left out and the numbers
+  close up, for every class. A source filter or a play style does not
+  change that number. A notable with no stored rank uses the scored twin
+  in that slot (same item and minimum level). Hovering the box says this
+  is the best, 2nd, 3rd, or 4th in that slot for a hunt on the unfiltered,
+  no-play-style list. A hunt that is not on that list uses the same place,
+  then one sentence: a filter is on, a play style is on, or both. Rank 1
+  says **best**, not
   "1st best". Hunter and Enhancement two-hand say **Two-hand**. A hunter
   main-hand-only weapon says **Main hand**. The box watches the mouse
   itself. A frame inside the parchment scroll child often never receives
@@ -888,6 +912,8 @@ Hunt-id probe (`pipeline/scripts/probe_forever_hunt_tooltips.py`) labels 200 vs 
 - **Heart of Alterac** (283254) held, `kind` Misc. Limited top-3 only (Guardian around 34–39, Destruction and Arcane Battle Mage at 34). Source still unknown. Do not invent a drop.
 
 **Boss pins** live in `pipeline/data/forever_boss_sources.json`. `apply_pinned_boss_sources` runs after `source_from_row`, which would otherwise clear zone and instructions on every id ≥ 200000. A later ingest must keep that call. Ruins of Lordaeron: Witherfang, The Baron, Viktor the Vile, The Abandoned, Bjork, Rath'Mael. Hall of Thanes: Faldrim Anvilmar, Magmatus, Plunder, Durgen Dirgehammer. Kaleidoscope is on the same pin list. Wowhead renamed **Rotmender's Leggings** (271207) and **Rotmender's Treads** (271214).
+
+**Coldspire Staff** (271215) is Rath'Mael's drop, required level 19. The Forever tooltip is +13 Frost Resistance and +32 frost spell damage. It does not have the old "damage and healing by up to 26" line. Drop chance 29.69%. Frost, both factions, stays rank 1 at 19 (score 29.83). Enhancement Alliance 19-20 is rank 23 (score 272.78). Priest, druid, and warlock were re-scored without that healing and generic spell-damage line, and the staff left their lists.
 
 **Coldflame Saber (276631)** is on the same pin list: `boss_drop`, Baron Silverlaine, Shadowfang Keep. It was `world_drop` with "Source not listed yet" because the listview names no source. The Blade of Silverlaine it is made from drops there too. The log description adds `Use: Combine the Blade of Silverlaine and Imbue Blade.` The hover does not — it stays the Wowhead tip. A re-score reads the pin from `sources.json`, so the generated mage file does not need a hand edit after one.
 
@@ -1537,28 +1563,40 @@ Yards come from `GetWorldPosFromMapPos`. `WorldBasis` samples a step east
 and a step north on that map, because world x is not east on every map.
 The player delta is projected onto those two axes.
 
-A hunt on another continent aims at the nearest `CROSSINGS` dock on the
-player's continent whose destination continent is the hunt's, for the real
-`UnitFactionGroup`. The label is the dock, `Ship in Menethil Harbor` or
-`Zeppelin in Durotar`, not the word alone. Inside 12 yards it still says
-`Here`. The user waypoint
-stays on the hunt (`PlaceForeverPin`). On arrival both are on one continent
-and the arrow aims at the pin.
+A hunt on another continent aims at the dock this character should board.
+The ride is the one with the shortest walk to that dock plus the shortest
+walk after the last landing, including a walk between two ships. The arrow
+text stays `Ship`, `Zeppelin`, or `Skycutter`. Hovering it names the dock
+and where to get off, `Ship in Auberdine to Southshore`. Inside 12 yards it
+still says `Here`. The user waypoint stays on the hunt (`PlaceForeverPin`).
+On arrival both are on one continent and the arrow aims at the pin.
+
+Menethil Harbor, Southshore, and Auberdine are one ship, both ways.
+Southshore is the stop in the middle, so the return from Auberdine calls
+at Southshore before Menethil. Stormwind Harbor and Auberdine are a
+separate ship, both ways.
 
 | Dock | Faction | Kind | Where |
 |---|---|---|---|
 | Durotar zeppelin | Horde | Zeppelin | 50.8, 13.6, to Tirisfal and Grom'gol |
-| Tirisfal zeppelin | Horde | Zeppelin | 61.0, 59.0, to Durotar |
-| Grom'gol | Horde | Zeppelin | Stranglethorn Vale 31.5, 29.6, to Durotar |
+| Tirisfal zeppelin | Horde | Zeppelin | 61.0, 59.0, to Durotar and Grom'gol |
+| Grom'gol | Horde | Zeppelin | Stranglethorn Vale 31.5, 29.6, to Durotar and Tirisfal |
 | Ratchet | Both | Ship | The Barrens 63.6, 38.7, to Booty Bay |
 | Booty Bay | Both | Ship | Stranglethorn Vale 26.0, 73.2, to Ratchet |
-| Auberdine | Alliance | Ship | Darkshore 32.7, 43.7, to Menethil north |
-| Menethil north | Alliance | Ship | Wetlands 4.7, 57.0, to Auberdine |
+| Auberdine | Alliance | Ship | Darkshore 32.7, 43.7, to Southshore and Stormwind Harbor |
+| Menethil north | Alliance | Ship | Wetlands 4.7, 57.0, to Southshore |
+| Southshore | Alliance | Ship | Hillsbrad Foothills 50.6, 61.0, to Auberdine and Menethil Harbor |
+| Stormwind Harbor | Alliance | Ship | Stormwind City 22.6, 56.1, to Auberdine |
 | Menethil south | Alliance | Ship | Wetlands 5.0, 63.0, to Theramore |
 | Theramore | Alliance | Ship | Dustwallow Marsh 71.0, 56.0, to Menethil south |
+| Steamwheedle Port | Both | Ship | Tanaris 66.6, 22.0, to Powderfuse Port |
+| Powderfuse Port | Both | Ship | Riverglades 78.1, 51.9, to Steamwheedle Port |
+| Valanaar east | Alliance | Skycutter | Zephras Isle 65.9, 83.5, to Dalaran |
+| Dalaran | Alliance | Skycutter | Alterac Mountains 12.5, 51.8, to Valanaar east |
+| Valanaar west | Horde | Zeppelin | Zephras Isle 57.9, 80.9, to Skywatcher Plateau |
+| Skywatcher Plateau | Horde | Zeppelin | Mulgore 34.3, 25.8, to Valanaar west |
 
-Do not invent Stormwind Harbor, Southshore, Steamwheedle, Powderfuse, or
-Valanaar. Each tracker row has an **Enable Guide** checkbox. Checking it
+Each tracker row has an **Enable Guide** checkbox. Checking it
 calls `ShowEntry`. Clearing it calls `Dismiss`.
 
 ### Indexing a new or updated item
