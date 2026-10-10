@@ -4587,6 +4587,17 @@ function GQ.Log:CreateListRow(index)
     row.icon:SetSize(16, 16)
     row.icon:SetPoint("LEFT", row, "LEFT", 4, 0)
 
+    row.itemIcon = row:CreateTexture(nil, "ARTWORK")
+    row.itemIcon:Hide()
+
+    row.rankMark = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    row.rankMark:SetSize(16, 16)
+    row.rankMark:SetPoint("LEFT", row, "LEFT", 4, 0)
+    row.rankMark:SetJustifyH("CENTER")
+    row.rankMark:SetJustifyV("MIDDLE")
+    row.rankMark:SetTextColor(0.55, 0.55, 0.55)
+    row.rankMark:Hide()
+
     row.text = row:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     row.text:SetPoint("LEFT", row.icon, "RIGHT", 4, 0)
     row.text:SetPoint("RIGHT", row, "RIGHT", -LIST_ROW_RIGHT_PAD, 0)
@@ -10023,14 +10034,37 @@ function GQ.Log:UpdateHuntAdvice(layoutRows, tab)
                     local dataSlot = spec.slotName == "WeaponPair" and "MainHand" or spec.slotName
                     if self:EntryShownOnActiveList(rankOne, dataSlot)
                         and (not spec.handKind or self:EntryInWeaponHand(rankOne, dataSlot, spec.handKind)) then
-                        local delta = GQ.Data.GearScoreUpgradeDelta and GQ.Data:GearScoreUpgradeDelta(rankOne, spec.slotName, spec.handKind)
+                        local delta, filled = nil, false
+                        if GQ.Data.GearScoreUpgradeDelta then
+                            delta, filled = GQ.Data:GearScoreUpgradeDelta(rankOne, spec.slotName, spec.handKind)
+                        end
                         if delta and delta > 0 then
-                            picks[#picks + 1] = { entry = rankOne, delta = delta, order = #picks }
+                            picks[#picks + 1] = { entry = rankOne, delta = delta, order = #picks, filled = filled }
                         end
                     end
                 end
             end
         end
+    end
+    if #picks == 0 then
+        return
+    end
+    local bestFilled
+    for i = 1, #picks do
+        local pick = picks[i]
+        if pick.filled and (not bestFilled or pick.delta > bestFilled) then
+            bestFilled = pick.delta
+        end
+    end
+    if bestFilled then
+        local kept = {}
+        for i = 1, #picks do
+            local pick = picks[i]
+            if pick.filled or pick.delta > bestFilled then
+                kept[#kept + 1] = pick
+            end
+        end
+        picks = kept
     end
     if #picks == 0 then
         return
@@ -10161,6 +10195,56 @@ function GQ.Log:PlaceRecommend(row)
     info:Show()
 end
 
+function GQ.Log:PlaceHuntItemIcon(row, itemId, left)
+    local icon = row and row.itemIcon
+    left = left or LIST_ROW_ITEM_LEFT
+    if not icon then
+        return left
+    end
+    local _, fontSize = row.text:GetFont()
+    fontSize = tonumber(fontSize) or 12
+    if fontSize < 8 then
+        fontSize = 12
+    end
+    local gap = 3
+    icon:ClearAllPoints()
+    icon:SetSize(fontSize, fontSize)
+    icon:SetPoint("LEFT", row, "LEFT", left, 0)
+    icon:SetVertexColor(1, 1, 1)
+    local texture = SafeGetItemIcon(itemId)
+    if texture then
+        icon:SetTexture(texture)
+    else
+        icon:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
+    end
+    icon:Show()
+    return left + fontSize + gap
+end
+
+function GQ.Log:HuntListRank(entry, slotName, handKind)
+    if not entry then
+        return nil
+    end
+    local dataSlot = slotName == "WeaponPair" and "MainHand" or slotName
+    local list = self:GetSlotRankList(dataSlot or slotName, handKind)
+    local suffix = entry.suffix or ""
+    for i = 1, list and #list or 0 do
+        local row = list[i]
+        if row == entry or row.id == entry.id
+            or (row.itemId == entry.itemId and (row.suffix or "") == suffix) then
+            return i
+        end
+    end
+    local display = self:HuntDisplayRank(entry)
+    if type(display) == "number" and display >= 1 then
+        return display
+    end
+    if type(entry.curatedRank) == "number" and entry.curatedRank >= 1 then
+        return entry.curatedRank
+    end
+    return nil
+end
+
 function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry, label, handKind)
     row:Show()
     local scrollChild = self.frame.scrollChild
@@ -10176,6 +10260,14 @@ function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry, label, hand
         row.info:Hide()
     end
     self:HideHuntAdvice(row)
+    if row.itemIcon then
+        row.itemIcon:Hide()
+        row.itemIcon:SetTexture(nil)
+    end
+    if row.rankMark then
+        row.rankMark:Hide()
+        row.rankMark:SetText("")
+    end
 
     if rowType == "header" then
         row.icon:Show()
@@ -10293,21 +10385,38 @@ function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry, label, hand
 
         row.icon:Hide()
         row.icon:SetTexture(nil)
+        local iconLeft = LIST_ROW_ITEM_LEFT
+        local rank = self:HuntListRank(entry, slotName, handKind)
+        if row.rankMark and type(rank) == "number" and rank >= 1 then
+            row.rankMark:SetText("#" .. rank)
+            row.rankMark:SetTextColor(0.55, 0.55, 0.55)
+            local markWidth = row.rankMark:GetStringWidth() or 16
+            if markWidth < 16 then
+                markWidth = 16
+            end
+            row.rankMark:SetWidth(markWidth)
+            row.rankMark:Show()
+            local markRight = 4 + markWidth + 1
+            if markRight > iconLeft then
+                iconLeft = markRight
+            end
+        end
+        local nameLeft = self:PlaceHuntItemIcon(row, entry.itemId, iconLeft)
         row.text:ClearAllPoints()
-        row.text:SetPoint("LEFT", row, "LEFT", LIST_ROW_ITEM_LEFT, 0)
+        row.text:SetPoint("LEFT", row, "LEFT", nameLeft, 0)
         row.text:SetPoint("RIGHT", row, "RIGHT", -LIST_ROW_RIGHT_PAD, 0)
 
         local showNewLabel = listTab == "active" and not isObtained and status ~= "completed"
         local tail = self:RecommendTailWidth(row, entry)
-        SetListRowItemText(row, LIST_ROW_ITEM_LEFT, name, entry, status, showNewLabel, r, g, b, slotName, 0)
+        SetListRowItemText(row, nameLeft, name, entry, status, showNewLabel, r, g, b, slotName, 0)
         if tail > 0 then
             local rowWidth = row:GetWidth()
             if not rowWidth or rowWidth <= 0 then
                 rowWidth = LEFT_COLUMN_WIDTH - (PANEL_INSET * 2)
             end
             local textWidth = row.text:GetStringWidth() or 0
-            if LIST_ROW_ITEM_LEFT + textWidth + tail + LIST_ROW_RIGHT_PAD > rowWidth then
-                SetListRowItemText(row, LIST_ROW_ITEM_LEFT, name, entry, status, showNewLabel, r, g, b, slotName, tail)
+            if nameLeft + textWidth + tail + LIST_ROW_RIGHT_PAD > rowWidth then
+                SetListRowItemText(row, nameLeft, name, entry, status, showNewLabel, r, g, b, slotName, tail)
             end
             self:PlaceRecommend(row)
         end
@@ -10480,6 +10589,14 @@ function GQ.Log:BuildDetailLines(entry)
             if faction and standing then
                 table.insert(lines, self:ReputationRequirementLine(faction, standing))
             end
+        end
+    end
+
+    if (src == "quest_reward" or src == "seasonal_quest") and entry.itemId and GQ.Data and GQ.Data.GetItemFact then
+        local fact = GQ.Data:GetItemFact(entry.itemId)
+        local pickup = fact and fact.reqLevel
+        if type(pickup) == "number" and pickup >= 1 then
+            table.insert(lines, "\nThis quest can be picked up at level " .. math.floor(pickup) .. ".")
         end
     end
 

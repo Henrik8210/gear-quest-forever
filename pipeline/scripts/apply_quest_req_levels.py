@@ -20,7 +20,8 @@ from gq_paths import DATA
 
 ITEMS = Path(DATA) / "items.json"
 SOURCES = Path(DATA) / "sources.json"
-CACHE_TIPS = Path(DATA) / "forever_wowhead" / "refresh_cache.json"
+CACHE_TIPS = Path(DATA) / "forever_wowhead" / "refresh_cache_env16.json"
+CACHE_TIPS_OLD = Path(DATA) / "forever_wowhead" / "refresh_cache.json"
 CACHE_XML = Path(DATA) / "forever_wowhead" / "quest_req_cache.json"
 PINS = Path(DATA) / "client_item_overrides.json"
 # The reward step says Requires level 24. The chain cannot start until the
@@ -34,7 +35,21 @@ CHAIN_PICKUP = {
     279844: 30,  # Striking Staff
 }
 UA = "wow-classic-data-research/1.0 (+contact: local script)"
-WORKERS = 2
+WORKERS = 1
+DELAY = float(os.environ.get("GQ_QUEST_DELAY", "1.5"))
+# Tooltip has no Requires Level. The quests require these levels.
+LOCK_RLVL = {279865: 16, 276765: 60}
+# The quest page says Requires level 58. These dungeon sets are worn at 60.
+DUNGEON_SET_60 = {
+    21994, 21995, 21996, 21997, 21998, 21999, 22000, 22001, 22002, 22003,
+    22004, 22005, 22006, 22007, 22008, 22009, 22010, 22011, 22013, 22015,
+    22016, 22017, 22060, 22061, 22062, 22063, 22064, 22065, 22066, 22067,
+    22068, 22069, 22070, 22071, 22072, 22073, 22074, 22075, 22076, 22077,
+    22078, 22079, 22080, 22081, 22082, 22083, 22084, 22085, 22086, 22087,
+    22088, 22089, 22090, 22091, 22092, 22093, 22095, 22096, 22097, 22098,
+    22099, 22100, 22101, 22102, 22106, 22107, 22108, 22109, 22110, 22111,
+    22112, 22113,
+}
 JSON_BLOCK = re.compile(r"<json><!\[CDATA\[(.*?)\]\]></json>", re.S)
 QUEST_REQ = re.compile(r"Requires level (\d+)", re.I)
 
@@ -42,7 +57,7 @@ QUEST_REQ = re.compile(r"Requires level (\d+)", re.I)
 def fetch(url: str) -> str:
     last = None
     for attempt in range(4):
-        time.sleep(0.35)
+        time.sleep(DELAY)
         try:
             req = urllib.request.Request(url, headers={"User-Agent": UA})
             with urllib.request.urlopen(req, timeout=30) as resp:
@@ -86,7 +101,11 @@ def tooltip_states_level(raw: dict) -> int:
 def main():
     items = json.loads(ITEMS.read_text(encoding="utf-8"))
     sources = json.loads(SOURCES.read_text(encoding="utf-8"))
-    tips = json.loads(CACHE_TIPS.read_text(encoding="utf-8")) if CACHE_TIPS.exists() else {}
+    tips = {}
+    if CACHE_TIPS_OLD.exists():
+        tips.update(json.loads(CACHE_TIPS_OLD.read_text(encoding="utf-8")))
+    if CACHE_TIPS.exists():
+        tips.update(json.loads(CACHE_TIPS.read_text(encoding="utf-8")))
     pins = set(json.loads(PINS.read_text(encoding="utf-8"))) if PINS.exists() else set()
     xml_cache = json.loads(CACHE_XML.read_text(encoding="utf-8")) if CACHE_XML.exists() else {}
 
@@ -209,6 +228,8 @@ def main():
         if stated > 1:
             level = max(stated, level)
         level = max(level, CHAIN_PICKUP.get(int(iid), 0))
+        if int(iid) in DUNGEON_SET_60:
+            level = max(level, 60)
         old = it.get("rlvl") or 0
         if old == level:
             continue
@@ -217,6 +238,15 @@ def main():
         if src is not None:
             src["gateLevel"] = level
         changed.append((iid, it.get("name"), old, level, [e.get("n") for e in more]))
+
+    for iid, level in LOCK_RLVL.items():
+        it = items.get(str(iid))
+        if not it:
+            continue
+        it["rlvl"] = level
+        src = sources.get(str(iid))
+        if src is not None:
+            src["gateLevel"] = level
 
     tmp_items = ITEMS.with_suffix(".json.tmp")
     tmp_src = SOURCES.with_suffix(".json.tmp")

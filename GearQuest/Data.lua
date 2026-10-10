@@ -9009,6 +9009,17 @@ function GQ.Data:EntryMatchesPlayer(entry)
         return false
     end
 
+    -- The stored band can cover levels before this piece can be worn. Fiery
+    -- War Axe is required level 35, and a 30-35 band was still listing it at
+    -- 30. Use the stored Wowhead required level. Do not ask the client while
+    -- building the list: priming every tooltip dropped FPS, and an uncached
+    -- GetItemInfo treated the requirement as unknown and let the piece show.
+    local fact = self:GetItemFact(entry.itemId)
+    local req = fact and fact.reqLevel
+    if type(req) == "number" and req > 1 and req > (GQ:GetEffectiveLevel() or 1) then
+        return false
+    end
+
     -- Required level, class equip, and spec. Simulator uses GetEffectiveLevel.
     if not GQ.Equip:EntryMatchesItemRules(entry) then
         return false
@@ -9935,8 +9946,8 @@ function GQ.Data:GearScoreContext(slotName, handKind)
     local band = self:GetActiveBandCacheKey()
     local cacheKey = band .. ":" .. tostring(slotName) .. ":" .. tostring(handKind) .. ":" .. self:GearScoreEquipKey(dataSlot)
     local cache = self._gearScoreCache
-    if cache and cache.key == cacheKey then
-        return cache.ctx or nil
+    if cache and cache[cacheKey] ~= nil then
+        return cache[cacheKey] or nil
     end
     local scores = {}
     local bestList
@@ -9983,7 +9994,8 @@ function GQ.Data:GearScoreContext(slotName, handKind)
     end
 
     if #scores == 0 then
-        self._gearScoreCache = { key = cacheKey, ctx = false }
+        self._gearScoreCache = self._gearScoreCache or {}
+        self._gearScoreCache[cacheKey] = false
         return nil
     end
     local minScore, maxScore = scores[1], scores[1]
@@ -9996,32 +10008,35 @@ function GQ.Data:GearScoreContext(slotName, handKind)
         end
     end
 
-    local baseline
+    local baselineScore
     -- A free finger or trinket slot is a fill, not a replacement.
     if #slots > 1 then
         if not empty and #worn > 0 then
-            baseline = worn[1]
+            baselineScore = worn[1]
             for i = 2, #worn do
-                if worn[i] < baseline then
-                    baseline = worn[i]
+                if worn[i] < baselineScore then
+                    baselineScore = worn[i]
                 end
             end
         end
     elseif #worn > 0 then
-        baseline = worn[1]
+        baselineScore = worn[1]
     end
-    if baseline then
-        baseline = self:GearScoreIndex(baseline, minScore, maxScore)
+    local baseline
+    if baselineScore ~= nil then
+        baseline = self:GearScoreIndex(baselineScore, minScore, maxScore)
     end
     local ctx = {
         minScore = minScore,
         maxScore = maxScore,
         baseline = baseline,
+        baselineScore = baselineScore,
         equippedIds = equippedIds,
         bestListScore = bestList,
         lines = {},
     }
-    self._gearScoreCache = { key = cacheKey, ctx = ctx }
+    self._gearScoreCache = self._gearScoreCache or {}
+    self._gearScoreCache[cacheKey] = ctx
     return ctx
 end
 
@@ -10057,18 +10072,16 @@ function GQ.Data:EquippedPipelineScore(itemId, slotName)
 end
 
 -- How much of an upgrade this piece is versus what is worn in the slot.
--- Empty slot: the gain is the index lifted off the bottom of the scale,
--- so filling a bare slot outranks a small swap. Already wearing it is 0.
+-- The number is raw pipeline score, the same currency in every slot, so a
+-- weapon upgrade can beat filling an empty shoulder. An empty slot's gain
+-- is the piece's own score. It is not the index jump from nothing to +100.
+-- Already wearing it is 0.
 function GQ.Data:GearScoreUpgradeDelta(entry, slotName, handKind)
     if not entry or type(entry.pipelineScore) ~= "number" then
         return nil
     end
     local ctx = self:GearScoreContext(slotName, handKind)
     if not ctx then
-        return nil
-    end
-    local index = self:GearScoreIndex(entry.pipelineScore, ctx.minScore, ctx.maxScore)
-    if not index then
         return nil
     end
     if entry.itemId and ctx.equippedIds and ctx.equippedIds[entry.itemId] then
@@ -10091,10 +10104,10 @@ function GQ.Data:GearScoreUpgradeDelta(entry, slotName, handKind)
             return 0
         end
     end
-    if ctx.baseline then
-        return index - ctx.baseline
+    if ctx.baselineScore ~= nil then
+        return entry.pipelineScore - ctx.baselineScore, true
     end
-    return index + 100
+    return entry.pipelineScore, false
 end
 
 function GQ.Data:GearScoreDeltaText(index, baseline)

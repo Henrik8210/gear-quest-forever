@@ -1,12 +1,21 @@
-"""Refresh Forever nether tooltips onto items we already score.
+"""Refresh live Forever tooltips onto items we already score.
 
 The id list is every hunt id in the generated class files plus the Forever
-index. Classic pieces are not in the index. Leaving them out keeps the old
-rebuild hover. Do not shrink this list back to index.json.
+index, including index ids that are not in items.json yet so a later ingest
+can add them. Classic pieces are not in the index. Leaving them out keeps
+the old rebuild hover. Do not shrink this list back to index.json.
+
+The item page and `tooltip/item/{id}?dataEnv=16` are the live Forever
+database. `nether.wowhead.com/forever/tooltip/item/` can lag that page
+(Talbar Mantle stayed rare/blue there after the page turned uncommon/green).
+This script stores its own cache and does not reuse that older feed.
 
 Does not replace sources.json, except Grave Shroud's quest text and level.
 Does not touch client-pinned items or Greater Magic Wand 11288. A stated
-Requires Level wins over item level.
+Requires Level wins over item level. Quality is taken from the live tooltip.
+
+One request at a time. GQ_TIP_DELAY seconds between items (default 1.5).
+`--ids 870,10657` refreshes only those rows.
 """
 from __future__ import annotations
 
@@ -17,7 +26,6 @@ import sys
 import time
 import urllib.error
 import urllib.request
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -30,10 +38,14 @@ SOURCES = Path(DATA) / "sources.json"
 HUNT = Path(DATA) / "forever_wowhead" / "hunt_tooltips.json"
 INDEX = Path(DATA) / "forever_wowhead" / "index.json"
 PINS = Path(DATA) / "client_item_overrides.json"
-CACHE = Path(DATA) / "forever_wowhead" / "refresh_cache.json"
-URL = "https://nether.wowhead.com/forever/tooltip/item/{}"
+CACHE = Path(DATA) / "forever_wowhead" / "refresh_cache_env16.json"
+TIPS = Path(DATA) / "forever_wowhead" / "tooltips.json"
+URL = "https://nether.wowhead.com/tooltip/item/{}?dataEnv=16"
 UA = "GearQuestForever-data/1.0"
-WORKERS = 4
+DELAY = float(os.environ.get("GQ_TIP_DELAY", "1.5"))
+# Quest or client levels the tooltip leaves blank. Do not let a missing line
+# replace them, and do not let a stub of 1 win.
+LOCK_RLVL = {279865: 16, 276765: 60}
 # Client wand. Nether still prints the old 11.39 DPS line. Do not refresh it.
 WAND = 11288
 
@@ -103,9 +115,22 @@ def apply_row(item: dict, raw: dict) -> bool:
         item["dmgMax"] = parsed["dmgMax"]
     if parsed.get("ilvl"):
         item["ilvl"] = parsed["ilvl"]
-    if parsed.get("effects") is not None:
-        item["effects"] = parsed.get("effects") or []
-    if parsed.get("procs") is not None:
+    quality = raw.get("quality")
+    if quality is not None:
+        try:
+            item["quality"] = int(quality)
+        except (TypeError, ValueError):
+            pass
+    name = raw.get("name")
+    if name:
+        item["name"] = name
+    locked = LOCK_RLVL.get(int(item.get("id") or 0))
+    if locked:
+        item["rlvl"] = locked
+    # An empty parse means the span did not match. Leave a stored proc in place
+    # rather than wiping it. A tooltip that did parse effect lines replaces both.
+    if parsed.get("effects"):
+        item["effects"] = parsed["effects"]
         item["procs"] = parsed.get("procs") or []
     if parsed.get("randomEnchant"):
         item["randomEnchant"] = True
@@ -128,7 +153,7 @@ def hunt_row(iid: int, raw: dict, item: dict) -> dict:
         "name": name,
         "quality": raw.get("quality", item.get("quality")),
         "tip": tip.strip(),
-        "source": "nether",
+        "source": "nether-env16",
     }
     if raw.get("icon"):
         row["icon"] = raw["icon"]
@@ -157,16 +182,25 @@ def main():
             it["kind"] = ARMOR_SUB[sub]
             fixed_kind += 1
 
+    only = None
+    if "--ids" in sys.argv:
+        only = {
+            int(part)
+            for part in sys.argv[sys.argv.index("--ids") + 1].split(",")
+            if part.strip()
+        }
+
     if "--missing" in sys.argv:
         ids = [i for i in missing_ids() if str(i) in items and str(i) not in pins and i != WAND]
     else:
         # Forever index plus every hunt id. Classic pieces such as Ghostly
         # Mantle are not in the Forever index, so a cache hit there left the
-        # rebuild tooltip in place.
+        # rebuild tooltip in place. Index ids missing from items.json are
+        # fetched too, so ingest can add them from this same live tooltip.
         ids = set()
         for row in index["items"]:
             iid = int(row["id"])
-            if str(iid) in pins or str(iid) not in items or iid == WAND:
+            if str(iid) in pins or iid == WAND:
                 continue
             ids.add(iid)
         for iid in hunt_ids_from_addon():
@@ -174,44 +208,66 @@ def main():
                 continue
             ids.add(iid)
         ids = sorted(ids)
+    if only is not None:
+        ids = [i for i in ids if i in only] or [
+            i for i in sorted(only) if str(i) not in pins and i != WAND and str(i) in items
+        ]
+
     def retryable(raw: dict) -> bool:
         err = raw.get("error") or ""
         # 404 is a real miss. Do not hammer Wowhead for it again.
         return bool(err) and "404" not in err
 
+    def dump(path: Path, obj, **kwargs) -> None:
+        tmp = path.with_suffix(path.suffix + ".tmp")
+        tmp.write_text(json.dumps(obj, **kwargs), encoding="utf-8")
+        tmp.replace(path)
+
     pending = [i for i in ids if str(i) not in cache or retryable(cache[str(i)])]
-    print(f"kind fixes {fixed_kind}; refresh {len(pending)} of {len(ids)}")
+    print(f"kind fixes {fixed_kind}; refresh {len(pending)} of {len(ids)}; delay {DELAY}s", flush=True)
 
     done = 0
     ok = err = 0
-    with ThreadPoolExecutor(max_workers=WORKERS) as pool:
-        futures = [pool.submit(fetch, iid) for iid in pending]
-        for fut in as_completed(futures):
-            iid, raw = fut.result()
-            cache[str(iid)] = raw
-            done += 1
-            if raw.get("error"):
-                err += 1
-            else:
-                ok += 1
-            if done % 200 == 0 or done == len(pending):
-                CACHE.write_text(json.dumps(cache), encoding="utf-8")
-                print(f"  {done}/{len(pending)} ok={ok} err={err}", flush=True)
+    for iid in pending:
+        _, raw = fetch(iid)
+        cache[str(iid)] = raw
+        done += 1
+        if raw.get("error"):
+            err += 1
+        else:
+            ok += 1
+        if done % 25 == 0 or done == len(pending):
+            dump(CACHE, cache)
+            print(f"  {done}/{len(pending)} ok={ok} err={err}", flush=True)
+        if done != len(pending):
+            time.sleep(DELAY)
     if pending:
-        CACHE.write_text(json.dumps(cache), encoding="utf-8")
+        dump(CACHE, cache)
 
     changed = 0
+    quality_changed = 0
     spell = []
+    tips = json.loads(TIPS.read_text(encoding="utf-8")) if TIPS.exists() else {}
     for iid in ids:
         raw = cache.get(str(iid)) or {}
         if raw.get("error") or not raw.get("tooltip"):
             continue
-        item = items[str(iid)]
+        tips[str(iid)] = {
+            "name": raw.get("name"),
+            "quality": raw.get("quality"),
+            "icon": raw.get("icon"),
+            "tooltip": raw.get("tooltip"),
+        }
+        item = items.get(str(iid))
+        if not item:
+            continue
+        item["id"] = iid
         before = (
             dict(item.get("stats") or {}),
             item.get("dps"),
             item.get("rlvl"),
             item.get("kind"),
+            item.get("quality"),
         )
         apply_row(item, raw)
         after = (
@@ -219,8 +275,11 @@ def main():
             item.get("dps"),
             item.get("rlvl"),
             item.get("kind"),
+            item.get("quality"),
         )
         hunt[str(iid)] = hunt_row(iid, raw, item)
+        if before[4] != after[4]:
+            quality_changed += 1
         if before != after:
             changed += 1
             st = item.get("stats") or {}
@@ -254,24 +313,24 @@ def main():
         })
         sources[GRAVE] = src
 
-    def dump(path: Path, obj, **kwargs) -> None:
-        tmp = path.with_suffix(path.suffix + ".tmp")
-        tmp.write_text(json.dumps(obj, **kwargs), encoding="utf-8")
-        tmp.replace(path)
-
     dump(ITEMS, items, separators=(",", ":"), ensure_ascii=False)
     dump(SOURCES, sources, separators=(",", ":"), ensure_ascii=True)
     dump(HUNT, hunt, ensure_ascii=False)
+    dump(TIPS, tips, ensure_ascii=False)
     spell.sort()
-    print(f"updated {changed} items; spell-line changes {len(spell)}")
+    print(f"updated {changed} items; quality changes {quality_changed}; spell-line changes {len(spell)}")
     for row in spell:
         if row[0] in (2042, 270228, 271095, 281297, 279865) or len(spell) <= 30:
             print(f"  {row[0]} {row[1]}: {row[2]} -> {row[3]} rlvl {row[4]}->{row[5]}")
-    focus = [2042, 270228, 271095, 281297, 279865, 3324, 6461, 11288]
+    focus = [870, 10657, 2042, 270228, 271095, 281297, 279865, 3324, 6461, 11288]
     print("--- focus ---")
     for iid in focus:
         it = items.get(str(iid)) or {}
-        print(iid, it.get("name"), "rlvl", it.get("rlvl"), "kind", it.get("kind"), "stats", it.get("stats"), "dps", it.get("dps"))
+        print(
+            iid, it.get("name"), "quality", it.get("quality"),
+            "rlvl", it.get("rlvl"), "kind", it.get("kind"),
+            "stats", it.get("stats"), "dps", it.get("dps"),
+        )
 
 
 if __name__ == "__main__":

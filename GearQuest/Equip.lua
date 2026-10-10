@@ -90,6 +90,12 @@ function GQ.Equip:IsItemDataCached(itemId)
         return C_Item.IsItemDataCachedByID(numericId) == true
     end
 
+    -- GetItemInfo on an uncached id asks the client to load it. Doing that
+    -- for every piece in a slot is what dropped FPS on a bag hover.
+    if self._suppressItemPrime then
+        return false
+    end
+
     if not GetItemInfo then
         return false
     end
@@ -229,6 +235,9 @@ function GQ.Equip:GetEquipSlot(itemId)
         return nil
     end
     self:PrimeItem(itemId)
+    if not self:IsItemInfoLoaded(itemId) then
+        return nil
+    end
     local _, _, _, _, _, _, _, _, equipSlot = GetItemInfo(itemId)
     return equipSlot
 end
@@ -297,6 +306,9 @@ function GQ.Equip:GetItemArmorSubclass(itemId)
     end
 
     self:PrimeItem(itemId)
+    if not self:IsItemInfoLoaded(itemId) then
+        return nil
+    end
     local _, _, _, _, _, class, subclass = GetItemInfo(itemId)
     if class == "Armor" and subclass then
         return subclass

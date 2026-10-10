@@ -25,8 +25,8 @@ const indexPath = path.join(outDir, "index.json");
 const tooltipPath = path.join(outDir, "tooltips.json");
 
 const UA = "GearQuestForever-data/1.0";
-const PAGE_DELAY = Number(process.env.GQ_SCRAPE_DELAY_MS || 1200);
-const TIP_DELAY = Number(process.env.GQ_TOOLTIP_DELAY_MS || 250);
+const PAGE_DELAY = Number(process.env.GQ_SCRAPE_DELAY_MS || 2000);
+const TIP_DELAY = Number(process.env.GQ_TOOLTIP_DELAY_MS || 1500);
 const MIN_ID = 200000;
 
 const SLOTS = [
@@ -190,15 +190,16 @@ async function fetchTooltips(items) {
     cache = JSON.parse(fs.readFileSync(tooltipPath, "utf8"));
   }
 
-  const missing = items.filter((it) => !cache[it.id]);
+  const missing = items.filter((it) => !cache[it.id] || cache[it.id]._env !== 16);
   console.log(`tooltips cached ${Object.keys(cache).length}, need ${missing.length}`);
 
   for (let i = 0; i < missing.length; i++) {
     const id = missing[i].id;
-    const url = `https://nether.wowhead.com/forever/tooltip/item/${id}`;
+    const url = `https://nether.wowhead.com/tooltip/item/${id}?dataEnv=16`;
     try {
       const text = await fetchText(url);
       cache[id] = JSON.parse(text);
+      cache[id]._env = 16;
     } catch (err) {
       console.warn(`tooltip ${id}: ${err.message}`);
       cache[id] = { error: String(err.message) };

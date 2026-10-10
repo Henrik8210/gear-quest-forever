@@ -232,7 +232,11 @@ def parse_tooltip(t):
         o.setdefault("reqSkills", []).append([prof, int(rank)])
 
     eff = []
-    for m in re.finditer(r'<span class="q2">((?:Equip|Use|Chance on hit):.*?)</span>', t, re.S):
+    for m in re.finditer(
+        r'<span[^>]*class="q2"[^>]*>((?:Equip|Use|Chance on hit):.*?)</span>',
+        t,
+        re.S,
+    ):
         line = plain(m.group(1)).strip()
         if line:
             eff.append(line[:400])
@@ -625,6 +629,44 @@ def build_item(row, tip):
     return item, parsed
 
 
+def _blank(value):
+    return value or None
+
+
+def places_differ(old, new):
+    if not old or not new:
+        return False
+    for key in ("sourceType", "npc", "questName", "profession"):
+        if _blank(old.get(key)) != _blank(new.get(key)):
+            return True
+    return False
+
+
+def should_update_places(old, new):
+    """A named quest, vendor, dropper, or profession on the live listview.
+
+    An unnamed world drop must not wipe a boss, a rare, or a hand-set source.
+    """
+    if not old or not new:
+        return False
+    new_type = new.get("sourceType")
+    if new_type in (None, "", "unsourced"):
+        return False
+    if new_type == "world_drop" and not new.get("npc"):
+        if old.get("npc") or old.get("sourceType") not in (None, "", "unsourced", "world_drop"):
+            return False
+    return places_differ(old, new)
+
+
+def merge_places(old, new):
+    merged = dict(old)
+    for key in ("sourceType", "npc", "questName", "profession", "instructions"):
+        merged[key] = new.get(key)
+    if _blank(old.get("npc")) != _blank(new.get("npc")) or _blank(old.get("sourceType")) != _blank(new.get("sourceType")):
+        merged["zone"] = None
+    return merged
+
+
 def main():
     if not os.path.exists(INDEX):
         sys.exit(f"missing {INDEX} — run node scripts/scrape-forever-wowhead-items.mjs --index")
@@ -641,6 +683,7 @@ def main():
     added_items = 0
     added_sources = 0
     filled_sources = 0
+    moved_sources = 0
     added_pool = 0
     skipped = 0
     no_tip = 0
@@ -690,6 +733,12 @@ def main():
             sources[key] = new_src
             filled_sources += 1
             coord_ids.append(iid)
+        elif specific and should_update_places(old_src, new_src):
+            # The listview named a different quest, vendor, dropper, or
+            # profession. Keep faction, alts, and gate. Re-pin this id.
+            sources[key] = merge_places(old_src, new_src)
+            moved_sources += 1
+            coord_ids.append(iid)
         if iid not in pool_set:
             pool.append(iid)
             pool_set.add(iid)
@@ -726,8 +775,8 @@ def main():
     json.dump(sorted(set(coord_ids)), open(need, "w", encoding="utf-8"))
     print(
         f"merged Forever Wowhead: +{added_items} items, +{added_sources} sources, "
-        f"{filled_sources} empty sources filled, +{added_pool} pool ids; "
-        f"skipped {skipped}, no tooltip {no_tip}"
+        f"{filled_sources} empty sources filled, {moved_sources} places updated, "
+        f"+{added_pool} pool ids; skipped {skipped}, no tooltip {no_tip}"
     )
     if added_items:
         print("New ids need a New in Forever check: python pipeline/scripts/build_forever_new.py")

@@ -81,7 +81,15 @@ def main():
     for sid, row in sorted(TIPS.items(), key=lambda kv: int(kv[0])):
         iid = int(sid)
         if iid in prior and keep_rebuilt_tip(iid):
-            rows.append(prior[iid])
+            line = prior[iid]
+            if row.get("quality") is not None:
+                try:
+                    q = int(row["quality"])
+                except (TypeError, ValueError):
+                    q = None
+                if q is not None and "quality=" in line:
+                    line = re.sub(r"quality=\d+", f"quality={q}", line, count=1)
+            rows.append(line)
             status_by_id[iid] = row.get("status") or "ok"
             kept += 1
             continue

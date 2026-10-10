@@ -2,59 +2,51 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v0.5.2-beta
+## v0.5.3-beta
 
-The log header shows your GearQuest Index Score while you are not simulating. Up to three rank #1 hunts are marked Recommended. Notables are gone, so a piece takes the rank its score earns. Heart of Disruption is the right faction, at level 30, with a pin on the quest that starts the chain.
+The hunt list shows an icon and a rank on every row. Quest rewards say the level they can be picked up. Recommendations no longer treat an empty slot as an automatic upgrade. Hovering gear in your bags no longer stalls the game. Scores were rebuilt from the current Forever item pages.
 
-The window title reads **GearQuest Forever v0.5.2-beta**.
+The window title reads **GearQuest Forever v0.5.3-beta**.
 
-### GearQuest Index Score
+### Icons on the hunt list
 
-When you are not simulating, the line "Viewing upgrades for your current level, class and faction" is a bar. White text above it reads **GearQuest Index Score - Collecting feedback on this**.
+Each hunt row shows a small item icon immediately before the name, the same height as the text. The icon is a question mark until the client knows that item. Slot headers stay the plus and minus.
 
-The bar is the average GearQuest index of the gear you are wearing, from **0** to **100**. Each 25 points fills one section. While the first section fills, the bar is green. From there the whole fill becomes blue, then purple, then orange.
+### Rank numbers on every row
 
-Hovering the bar says the score out of 100, a middle dot, and a word. **Below average** (0–25) is green. **Fair** (26–50) is blue. **Great** (51–75) is purple. **Legend** (76–100) is orange. Under that, one line: "The average GearQuest index of the gear you are wearing. Negative numbers are counted as 0."
+The column under the collapse button shows a faded grey **#N** on every hunt, including **#4** and later when an earlier piece was already obtained. The number is the same one the (i) tooltip uses. **Leafre's Ring** shows **#1** when that tooltip says it is first. A piece the other faction cannot get is left out, and the numbers close up.
 
-The list under that line is every slot in the average, highest index first. An empty slot shows **Empty**, **−100**, and **(empty slot)**. A piece you are wearing still shows its real number when that number is negative. Those negatives, and an empty slot, count as 0 in the bar, so they do not pull the fill down. An empty off hand is left out when you are wearing a two-hand weapon. Enhancement does not count an off hand.
+### Quest pickup level
 
-**General → GearQuest score bar** is on by default, under **GearQuest score on tooltips**. Turn it off and the viewing-upgrades line comes back. The bar updates when you equip or remove a piece from the character panel. Hovering the bar does not keep checking.
+A quest reward, including a seasonal quest, has a line just above Source: **This quest can be picked up at level N.** N is the level GearQuest uses for that hunt. **Windstorm Hammer** and **Dancing Flame** say 36. **Ragefire Wand**, **Icefury Wand**, and **Nether Force Wand** say 40. **Heart of Disruption** says 30. **Grave Shroud** says 16.
 
-### Three recommended hunts
+### Recommendations skip a naked slot
 
-Among the rank #1 pieces you do not already have, the three largest improvements over what you are wearing are marked **- Recommended** in gold, each with its own (i). The hover says: "One of the best upgrades for your level. GearQuest marks up to three rank #1 pieces, the ones that improve what you are wearing the most."
+**- Recommended** still marks up to three rank #1 hunts, the ones that improve what you are wearing the most. An empty slot is no longer treated as a jump from nothing to a perfect score. It is recommended only when that piece's raw score beats the best upgrade in a slot that already has gear.
 
-An empty slot counts as a fill. A piece that would be a downgrade is not marked. A later rank is never the recommendation. If fewer than three rank #1 pieces would actually be an upgrade, only those are marked.
+On a level 11 Retribution paladin with empty shoulders and a weapon already equipped, **Talbar Mantle** is a few points. **Hammerbone** is the hunt, because it does more than double the weapon you are wearing. A later rank is never the recommendation. A downgrade is not marked. Simulation hides the marks. Turning **GearQuest score on tooltips** off hides **- Recommended** and leaves **- Rank #1 BiS acquired**.
 
-A slot whose rank #1 you already have, obtained or worn, still reads **- Rank #1 BiS acquired** after that slot's (i). Simulation hides both lines. Turning **GearQuest score on tooltips** off hides **- Recommended** and leaves the acquired line.
+### Hovering bags stays smooth
 
-### Notables are gone
+Hovering an item in your bags, on the character panel, or in chat scores that slot once and remembers it. Moving the mouse to another slot and back does not scan the first slot again. GearQuest does not ask the client to load every other piece in the slot. The obtain popup is unchanged. Looting a hunt on the list still shows **BiS upgrade obtained!**
 
-There is no notable shelf. The hunt list still shows three pieces in a slot. A piece that used to sit beside the list as a notable now takes the rank its score earns, including rank 4 and later.
+### Scores from the current Forever pages
 
-A tooltip says **Rank #N for your level** only when that piece is on the list for the level you are at. **Twilight Maul** is a Horde Enhancement two-hand at level 23. At 27 it is not on that list, so the tooltip says it is not ranked at your level and names level 23.
+Every class was scored again from the live Forever tooltips.
 
-Warrior Protection still does not score spell power or healing. **Silvered Gauntlets** rank on the stamina, armor, and defense they have. They can be rank 1 when that score wins the slot.
+**Armor of the Fang** lost stamina and strength. The chest is now +3 Strength, +3 Intellect, and +10 Spirit. Beast Mastery and Marksmanship still hunt the legs, feet, belt, and gloves from about 18 to 24, not the chest. Survival and Feral keep that chest as the hunt only through level 21. Enhancement keeps the chest through 27. At 29 the other four Fang pieces leave as well.
 
-### Heart of Disruption
+**Blackened Defias** stats did not change. For Combat, Assassination, and Subtlety the legs are the hunt at 14–16 and the boots at 15–16. The belt moves into the top of the list from 17, and is rank 1 from 22, once Fang stops winning that slot.
 
-Heart of Disruption is two City of Dalaran quests with the same name. The dungeon step says level 24. The quest that starts the chain requires **30**, and that is the level on the rewards.
+**Chain of the Scarlet Crusade** is unchanged. Retribution still hunts the belt at 32–36. The chest stays in the top 3 at 34–39. The legs are rank 1 at 39.
 
-Alliance starts at **An Alarming Request**. The pin is Emissary Jacques in Hillsbrad Foothills, **48.3, 60.1**. The choice is **Spellguard Pauldrons**, **Renewing Footpads**, or **Defender of Dalaran**.
+**Rotmender's Garb** healing went from 10 to 11. Holy and Discipline priest still take the chest, sash, and gloves through 21, with the treads in the top 3 into the high 20s. Holy paladin **Rotmender's Treads** sit behind **Acolyte's Boots**, **Wisdom's Leather Boots**, and **Stormrider's Leather Boots**.
 
-Horde starts at **Blood in the Streets**. The pin is Magus Wordeen Voidglare in Tarren Mill, **61.4, 20.8**. The choice is **Battle Spaulders**, **Enchanted Sandals**, or **Striking Staff**.
+**Medal of Courage** requires 35. **Zandalar Illusionist's Wraps**, **Zandalar Demoniac's Wraps**, **Zandalar Demoniac's Mantle**, **Zandalar Demoniac's Robe**, and **Zandalar Illusionist's Robe** require 58. The level 60 dungeon upgrade sets still require 60. **Fiery War Axe** stays hidden until 35. **Talbar Mantle** is a green: +2 Stamina, +4 Intellect, +1 mana per 5, requires 10.
 
-A Tauren does not see Defender of Dalaran. On a Horde Feral druid at 30–31, Striking Staff is a two-hand hunt behind **Heavehammer**.
+### v0.5.2-beta
 
-### Leather helms
-
-**Brawler's Leather Helm**, **Trapper's Leather Helm**, **Stormrider's Leather Helm**, **Wisdom's Leather Helm**, **Defender's Leather Helm**, and **Totemic Leather Helm** are boss drops, not recipes on Pawani or Karolek. The pin is the dungeon entrance.
-
-All six drop in Blackfathom Deeps, Razorfen Kraul, and the Stockade. Scarlet Monastery drops Brawler's, Trapper's, and Defender's. Stormrider's, Wisdom's, and Totemic do not drop there.
-
-### The guide uses less memory
-
-The guide checks where you are once every 5 seconds and turns the arrow from that sample. Tracking a hunt on the world map does not keep asking for your position while you walk inside one zone. The closest camp updates when you change zone, when you track the hunt, and when you select it.
+The log header shows a GearQuest Index Score bar while you are not simulating. Up to three rank #1 hunts are marked Recommended. Notables are gone. Heart of Disruption is the right faction, at level 30, pinned on the quest that starts the chain. The leather helms are boss drops. The guide samples your position every 5 seconds. The window title reads **GearQuest Forever v0.5.2-beta**.
 
 ### v0.5.1-beta
 

@@ -109,9 +109,12 @@ tooltip. The hover background is opaque.
 
 Forever reworked this Wailing Caverns leather set. The pieces were already
 in `items.json` on Classic stats, and the tooltip scrape had 404'd them, so
-`forever_missing_ids()` hid every hunt. Stats are the Forever tooltip
-(27 Sep 2026): chest is +6 Strength, +4 Stamina, +7 Spirit, not the old
-+8/+8.
+`forever_missing_ids()` hid every hunt. The 10 Oct 2026 dataEnv 16 tooltip
+replaced the 27 Sep chest. **Armor of the Fang** (6473) is now 91 armor,
++3 Strength, +3 Intellect, +10 Spirit, required level 18, and no stamina.
+Legs, feet, belt, and gloves did not change. Do not retune weights to
+restore the older windows. The chest got worse, so the package stops
+winning earlier.
 
 A piece is still scored alone. After the slot lists exist,
 `apply_embrace_package` compares two packages in the same point currency:
@@ -129,28 +132,30 @@ stats:
 DPS specs only: hunter (all three), rogue (all three), enhancement, feral.
 Bear, Balance, Restoration, Elemental, and Enhancement Tank are not on it.
 
-Verified windows, both factions (7 Oct 2026, after Beast Mastery and
-Marksmanship melee `dpsWeight` was set to **0.05** and every class was
-re-scored from the refreshed tooltips):
+Verified windows, both factions (10 Oct 2026, after the chest tooltip
+above, with Beast Mastery and Marksmanship melee `dpsWeight` still **0.05**):
 
 - Beast Mastery and Marksmanship: legs, feet, belt, and gloves from 18
   through about 24. **Armor of the Fang is not on the list.** The chest has
   no agility, and Dream Venom is priced at `dpsWeight` 0.05, so the stun is
-  almost nothing. Alliance chest rank 1 in that band is **Tunic of Westfall**.
-  Horde is **Trapper's Leather Armor**. Do not force the chest back unless
-  asked. The hunt text must say the chest is not the hunt.
-- Survival: all five through 23. At 24 the legs are what remain.
-- Combat, Assassination, Subtlety: all five from 18 through 23.
-- Enhancement: all five from 18 through 28. At 29 the chest falls off and
-  the other four remain. The 2-piece intellect is why it lasts.
-- Feral: all five from 18 through 23. At 24 the chest falls off.
+  almost nothing. Do not force the chest back unless asked.
+- Survival: the chest is rank 1 only at 18–21. At 22 it falls off
+  (**Brawler's Leather Tunic**, 252508, takes the slot). The other four
+  pieces carry the set.
+- Combat, Assassination, Subtlety: the package still covers the early
+  leather slots. Once it stops, **Blackened Defias Belt** (10402) enters
+  the top 3 from 17 and is rank 1 from 22. That is the Fang chest getting
+  worse, not a Defias stat change.
+- Enhancement: the chest stays forced at rank 1 through 27. At 29 the
+  other four leave as well.
+- Feral: the chest is rank 1 only at 18–21. At 22 feet and waist lose the
+  set share. Legs stay rank 1 on agility.
 
-The belt becomes BiS with the set. For Survival, rogues, Enhancement, and
-Feral, the chest does too. Gloves (from 14) and legs (from 17) are already
-hunts on their own stats. Dream Venom is priced at item level 22, not the
-wearer’s level, or Enhancement keeps the chest too long. Feral has no
-weapon `dpsWeight`; the stun uses 14 (cat: 1 AP = 1/14 white dps) plus 1
-point, so the full set still wins through 23. Do not drop that extra point.
+Gloves (from 14) and legs (from 17) are already hunts on their own stats.
+Dream Venom is priced at item level 22, not the wearer’s level, or
+Enhancement keeps the chest too long. Feral has no weapon `dpsWeight`; the
+stun uses 14 (cat: 1 AP = 1/14 white dps) plus 1 point. Do not drop that
+extra point. The 10 Oct chest no longer pays for every slot through 23.
 
 The list tags these rows `(Set piece)`, the same way a proc row is tagged
 `(Notable)`. The drop text names the bonuses and the level window for that
@@ -168,9 +173,7 @@ Humanoids`) onto the item’s own stats. `wpnSkill` is 0 on every spec, so
 chest is item level 22, requires 17, 89 armor, +4 Strength, +3 Agility,
 +10 Stamina. Bonuses: +5 arcane resist, +15 attack power vs humanoids, a
 5% behind-only bleed, +1 daggers. Those bonuses do not carry the weak
-slots. For Combat, Assassination, and Subtlety, both factions: legs are a
-hunt at 14–15, boots at 15–16, then the Fang pieces take those slots.
-Chest, gloves, and belt stay off the top 3 even with all five.
+slots. Defias stats did not change on 10 Oct 2026. For Combat, Assassination, and Subtlety, both factions: legs are a hunt at 14–16, boots at 15–16, and gloves are rank 3 at 14. The chest touches rank 2–3 at 17–19. The belt is in the top 3 from 17 and rank 1 from 22, after Fang stops paying for that slot.
 
 **Chain of the Scarlet Crusade (163),** Scarlet Monastery mail. Bonuses:
 +10 shadow resist, +30 attack power vs undead, Enraging Light (20 Holy on
@@ -188,7 +191,7 @@ The list tags Defias and Scarlet rows `(Set piece)` on the classes above.
 
 **Rotmender's Raiment (2133),** Ruins of Lordaeron cloth. Five pieces,
 requires 17-19. Stats are the Forever tooltip (4 Oct 2026). The chest is
-Rotmender's Garb, not Robes: +10 Intellect, healing 10 and damage 3.
+Rotmender's Garb, not Robes: +10 Intellect, healing 11 and damage 4 (10 Oct 2026; the older tip was healing 10 and damage 3). Legs, treads, gloves, and sash did not change.
 Leggings are +5 Stamina and +4 mana per 5, not the old intellect and
 spirit. Treads are +7 Stamina, healing 15 and damage 5. Gloves are +3
 Intellect and +8 Spirit. Sash is +6 Stamina and +6 Intellect. Leggings
@@ -217,11 +220,9 @@ give up. Checked 4 Oct 2026, both factions:
 - Holy and Discipline: at 18 the chest, sash, gloves, and leggings. At 19
   all five. From 20 the leggings fall off. Chest, sash, and gloves stay
   through 21. The treads stay in the top 3 into the high 20s.
-- Restoration druid: all five at 19. On Horde the chest, sash, and gloves
-  stay through 21. Treads stay through about 29.
+- Restoration druid: all five at 19. On Horde the sash and gloves leave after 19. The chest stays in the top 3 through 21. Treads stay through about 29.
 - Restoration shaman: all five at 19. Treads stay through about 29.
-- Holy paladin: the treads from 19 through 29. The other four do not beat
-  mail and plate.
+- Holy paladin: the treads are rank 6–7 at 17–28. **Acolyte's Boots** (250506), **Wisdom's Leather Boots** (252444), and **Stormrider's Leather Boots** (252443) outrank them. The treads' own stats did not change. The other four do not beat mail and plate.
 
 Smaller sets left on their own stats until the same check: Stormshroud
 (rogue energy, about 50), Black Dragon Mail (1% hit at 2 pieces, 2% melee
@@ -494,14 +495,19 @@ The hunt order is still the stored `pipelineScore`. The number on a tooltip
 is a display index only. Do not retune weights so the index and the rank
 agree, and do not write the index back onto a pick.
 
-A bag hover must not rebuild that slot, and it must not call `GetItemInfo`
-for every piece in it. `GetSlotRankList` and `GearScoreContext` are cached
-for the current level, spec, class, and faction. The context also remembers
-what is equipped, so the arrow updates when gear changes and stays put
-while the mouse moves across the bag. Required level on that list is the
-stored fact, not a client item query. The first hover of a slot does the
-scan once. The next piece in that slot reuses it. The line the player sees
-does not change.
+A bag hover must not rebuild a slot it already scored, and it must not call
+`GetItemInfo` for an item the client has not already cached. Doing that for
+every piece in the slot is what dropped FPS on a bag hover. While item
+priming is suppressed, `IsItemDataCached` returns false instead of calling
+`GetItemInfo`. `GetEquipSlot` and `GetItemArmorSubclass` return before
+`GetItemInfo` when the item is not already cached. `GetSlotRankList` is
+cached per slot. `GearScoreContext` keeps every slot scored for this level,
+spec, class, faction, and equipped gear, so leaving a slot and coming back
+does not scan it again. The context remembers what is equipped, so the
+arrow updates when gear changes. Required level on that list is the stored
+fact, not a client item query. The first hover of a slot does the scan
+once. The line the player sees does not change. The obtain toast does not
+use this scan. It compares the item id in the bags to the hunt on the list.
 
 `GearScoreIndex` maps the slot's raw scores onto **−100..+100**. The best
 score in that comparison is **+100**. The worst is **−100**. One score in
@@ -538,14 +544,11 @@ same item, or a delta of 0, shows no arrow. Rings and trinkets compare to
 the weaker equipped piece only when **both** slots are filled. A free slot
 is a fill, not a replacement.
 
-The active hunt list uses that same comparison to point at the next hunt.
-A slot whose rank #1 the character already has, obtained or worn, shows
-**- Rank #1 BiS acquired** just after the header (i). Among the rank #1
-pieces they do not have, the three largest gains versus what is worn are marked
-**- Recommended** right after the item name, each with its own (i). A long item name truncates so that label stays whole. The hover says: "One of the best upgrades for your level. GearQuest marks up to three rank #1 pieces, the ones that improve what you are wearing the most." An empty
-slot counts as a fill. A downgrade is not marked. A later rank is never
-the recommendation. Fewer than three are marked when fewer rank #1 pieces would be an upgrade. Simulation hides both lines. Turning the score off
-hides the recommendation and leaves the acquired line.
+The active hunt list points at the next hunt with the raw pipeline score, not the tooltip index. A slot whose rank #1 the character already has, obtained or worn, shows **- Rank #1 BiS acquired** just after the header (i). Among the rank #1 pieces they do not have, the three largest raw gains are marked **- Recommended** right after the item name, each with its own (i). A filled slot's gain is the rank #1 score minus the worn piece's score. An empty slot's gain is the rank #1 score itself. It is not an index jump from nothing to +100. That piece is recommended only when its score is larger than the best raw upgrade in a slot that already has gear. Talbar Mantle at 11 is a few points. Hammerbone, against the weapon already worn, is the hunt. A long item name truncates so that label stays whole. The hover says: "One of the best upgrades for your level. GearQuest marks up to three rank #1 pieces, the ones that improve what you are wearing the most." A downgrade is not marked. A later rank is never the recommendation. Fewer than three are marked when fewer rank #1 pieces would be an upgrade. Simulation hides both lines. Turning the score off hides the recommendation and leaves the acquired line.
+
+Each hunt row shows a small item icon immediately before the name, the same height as the row font. A question mark stands in until the client has the icon. Slot headers stay the plus and minus. In the collapse-icon column, every hunt row shows `#N` in faded grey. N is that piece's place on the (i) rank tooltip (`GetSlotRankList`), including `#4` and later when an earlier piece was already obtained. Stored `curatedRank` is not that number: it still counts pieces this faction cannot see. **Leafre's Ring** can be stored rank 2 and still be `#1` on the list. A faction hole closes up, so the list number matches the tooltip.
+
+A quest reward, including a seasonal quest, states `This quest can be picked up at level N.` on the line just before Source. N is the stored required level, the same gate the hunt list uses. Skip the line when that level is missing.
 
 ## GearQuest Index Score bar
 
@@ -559,9 +562,9 @@ Each 25 points is one section. The fill color uses the raw average, before it is
 
 Under a blank line the tooltip lists every slot in the average, highest index first. Equal indexes keep the original slot order. The slot name is gold. The item name uses its quality color. **Empty** is grey.
 
-The bar does not tick while you hover it. Hover only draws the rows from the last update. `PLAYER_EQUIPMENT_CHANGED` clears the one-slot GearQuest score cache and refreshes the bar on the next tick. If the log is open, the hunt list refreshes too, so **- Recommended** and **- Rank #1 BiS acquired** follow the new gear. Bag updates do not rebuild the bar.
+The bar does not tick while you hover it. Hover only draws the rows from the last update. `PLAYER_EQUIPMENT_CHANGED` clears the GearQuest score cache and refreshes the bar on the next tick. If the log is open, the hunt list refreshes too, so **- Recommended** and **- Rank #1 BiS acquired** follow the new gear. Bag updates do not rebuild the bar.
 
-Do not call `GearScoreContext` once per slot to draw the bar. That cache holds one slot. The bar uses `GearScoreWornRows` and `WornSlotIndex`.
+Do not call `GearScoreContext` once per slot to draw the bar. The bar uses `GearScoreWornRows` and `WornSlotIndex`. The score cache keeps every slot scored for this level, spec, and gear, so a bag hover reuses a slot it already scanned. A scan must not call `GetItemInfo` for an item the client has not already cached.
 
 `EquippedPipelineScore` uses the current band first. If the worn piece has
 aged out, it uses the nearest same-spec, same-faction band: the highest
@@ -980,7 +983,7 @@ A full ingest rewrites sources.json for every id >= 200000. That cleared 162 zon
 
 **7 Oct 2026 (v0.3.6-beta). Score the stored row only when it matches the tooltip.**
 
-`refresh_forever_tips.py` is the refresh. It reads the nether Forever tooltip and writes `items.json`. A full ingest is not a refresh: ingest inserts new ids and must not rewrite existing facts from the tooltip cache (that reverted Erudite). Client pins and Greater Magic Wand **11288** stay skipped. On 7 Oct this pass updated **1186** items, then all nine classes were re-scored with `rescore_hunter_shaman.py`. Holy paladin and Beast Mastery / Marksmanship weights in this file are the weights that score used. Do not rescore from a stale row.
+`refresh_forever_tips.py` is the refresh. It reads the live Forever tooltip `https://nether.wowhead.com/tooltip/item/{id}?dataEnv=16` (the item-page database) and writes quality, required level, and stats to `items.json`. The older `nether.wowhead.com/forever/tooltip/item/` feed can lag that page: Talbar Mantle (10657) is uncommon/green on the page and on dataEnv 16, and was still rare/blue on the old feed. Do not reuse `refresh_cache.json` from that feed. The live cache is `refresh_cache_env16.json`. One request at a time, `GQ_TIP_DELAY` default 1.5 seconds. A full ingest is not a refresh: ingest inserts new ids and must not rewrite existing stat rows from `tooltips.json` (that reverted Erudite). It does fill an empty source, and when the listview names a different quest, vendor, dropper, or profession it updates that place and indexes coordinates for those ids. Client pins and Greater Magic Wand **11288** stay skipped. A stated Requires Level above 1 replaces the stored level. A tooltip with no Requires Level line does not. The hunt list hides a piece until the stored required level (Fiery War Axe is 35, so level 30 must not list it). On 7 Oct the previous feed updated **1186** items, then all nine classes were re-scored with `rescore_hunter_shaman.py`. Holy paladin and Beast Mastery / Marksmanship weights in this file are the weights that score used. Do not rescore from a stale row.
 
 **Heart of Disruption** is two City of Dalaran quests that share the name. Alliance quest 92458 chooses Spellguard Pauldrons (279839), Renewing Footpads (279840), or Defender of Dalaran (279841). Horde quest 96984 chooses Battle Spaulders (279842), Enchanted Sandals (279843), or Striking Staff (279844). A Tauren does not see Defender of Dalaran. Those six ids are exclusive in `quest_faction.json`. The dungeon step says Requires level 24. The chain starts earlier, and that first quest says Requires level 30, so the hunts are level 30. Alliance begins at An Alarming Request (92432), Emissary Jacques in Hillsbrad Foothills (48.3, 60.1). Horde begins at Blood in the Streets (92434), Magus Wordeen Voidglare in Tarren Mill (61.4, 20.8). The pin is that start, not Image of Archmage Modera.
 
@@ -1051,7 +1054,7 @@ on Wowhead Forever. Do not leave it on the item-level floor (`ILVL_FLOOR`:
 ilvl 18 → 13, ilvl 23 → 18, ilvl 24 → 19). That floor is only a stand-in
 until the lookup has been done. Find the quest attached to the item. The
 **minimum** level required to pick up that quest becomes the item's `rlvl`
-and the source `gateLevel`. Several quests: take the lowest. A chain of at least five steps that must enter a dungeon uses that step's quest level when it is at least 8 levels above the pickup. Final Passage (Windstorm Hammer 6804, Dancing Flame 6806) is 36 because Test of Lore in Scarlet Monastery Library is level 36. Mage's Wand (Ragefire Wand 7513, Icefury Wand 7514, Nether Force Wand 11263) is 40 because Rituals of Power is level 40. Confront Yeh'kinya (Faded Hakkari Cloak 20218, Tattered Hakkari Cape 20219) is 58 because The Final Tablets in Blackrock Spire are level 58. Drakefire Amulet (16309) is 60 because General Drakkisath is level 60. Leaders of the Fang stays 10. The Defias Brotherhood stays 14. `eff_req` then
+and the source `gateLevel`. Several quests: take the lowest. A chain of at least five steps that must enter a dungeon uses that step's quest level when it is at least 8 levels above the pickup. Final Passage (Windstorm Hammer 6804, Dancing Flame 6806) is 36 because Test of Lore in Scarlet Monastery Library is level 36. Mage's Wand (Ragefire Wand 7513, Icefury Wand 7514, Nether Force Wand 11263) is 40 because Rituals of Power is level 40. Confront Yeh'kinya (Faded Hakkari Cloak 20218, Tattered Hakkari Cape 20219) is 58 because The Final Tablets in Blackrock Spire are level 58. Drakefire Amulet (16309) is 60 because General Drakkisath is level 60. Leaders of the Fang stays 10. The Defias Brotherhood stays 14. Medal of Courage (6723) is 35. The five Zandalar pieces that the quest page listed at 58 are **Zandalar Illusionist's Wraps** (19846), **Zandalar Demoniac's Wraps** (19848), **Zandalar Demoniac's Mantle** (19849), **Zandalar Demoniac's Robe** (20033), and **Zandalar Illusionist's Robe** (20034). The level-60 dungeon upgrade sets stay locked at 60 in `DUNGEON_SET_60`. A quest lookup must not lower them to 58. `eff_req` then
 uses `rlvl` when it is &gt; 0.
 
 The dungeon upgrade sets are level **60** quests. Classic **Feralheart**,
