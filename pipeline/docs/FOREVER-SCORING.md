@@ -242,14 +242,15 @@ School-only damage stays on that school’s weight (Elemental nature is 0.8,
 because frost and fire still exist in the kit). Do not add Damage Done and
 Healing Done together, and do not count Damage Done twice.
 
-**Three + one.** Top 3 unique names per slot. One notable beside them: a
-proc the score cannot price, a leftover jackpot, or a tank-relevant extra
-(defense on a caster piece). Notables are not rank 1–3.
+**Three.** Top 3 unique names per slot. There is no notable shelf. A proc, a
+jackpot, or a spell-power piece on a physical spec takes whatever rank its
+score earns, including rank 4 and later on the rank list. The hunt list
+still shows three.
 
 **Warrior Protection is physical.** No spell power / healing weight. A glove
-with +SP and +healing (Silvered Gauntlets) is not tank BiS even if the stam
-is fat. If it also has +Defense, it is the Hands **notable**. Paladin
-Protection still scores holy/spell threat; Ret and Enhance stay hybrids.
+with +SP and +healing (Silvered Gauntlets) ranks on the stamina, armor, and
+defense it actually has. Paladin Protection still scores holy/spell threat;
+Ret and Enhance stay hybrids.
 
 **Wolfsbane (267369)** is the Horde paladin two-hander from the Diplomatic Incident chain (Danitha Morr, Bandarion Keep, Tirisfal). The quest can be finished at level 20. Wowhead has no Requires Level; the stored level 26 was inferred from item level 31. `client_item_overrides.json` pins required level 20 and Classes: Paladin, so Alliance and other classes do not get it. 25.59 weapon damage is why it is rank 1 for Horde Retribution at 20.
 
@@ -510,7 +511,7 @@ equipped piece's raw score (so a worn piece that has aged out of the band
 still sits on the same line). Rank text is that piece's place on the list
 this character can see: **Rank #N for your level**. A piece the other
 faction cannot get is omitted and the numbers close up. Stored
-`curatedRank` still orders the list. A notable says **Notable for your level**.
+`curatedRank` still orders the list. There is no notable line. Rank #N is only said when the piece is on the list for this level.
 
 The line is inside the item tooltip, after the stats, before any addon
 source line. `AppendGearScoreLine` runs before `Show()`, so the dark
@@ -540,13 +541,27 @@ is a fill, not a replacement.
 The active hunt list uses that same comparison to point at the next hunt.
 A slot whose rank #1 the character already has, obtained or worn, shows
 **- Rank #1 BiS acquired** just after the header (i). Among the rank #1
-pieces they do not have, the largest gain versus what is worn is marked
-**- Recommended** right after the item name, with its own (i). A long item name truncates so that label stays whole. The hover says: "This is
-what GearQuest recommends for your next hunt. This would be the biggest
-upgrade compared to the current piece of gear you are wearing." An empty
+pieces they do not have, the three largest gains versus what is worn are marked
+**- Recommended** right after the item name, each with its own (i). A long item name truncates so that label stays whole. The hover says: "One of the best upgrades for your level. GearQuest marks up to three rank #1 pieces, the ones that improve what you are wearing the most." An empty
 slot counts as a fill. A downgrade is not marked. A later rank is never
-the recommendation. Simulation hides both lines. Turning the score off
+the recommendation. Fewer than three are marked when fewer rank #1 pieces would be an upgrade. Simulation hides both lines. Turning the score off
 hides the recommendation and leaves the acquired line.
+
+## GearQuest Index Score bar
+
+When you are not simulating, and the log page is open, the header is a four-section bar instead of "Viewing upgrades for your current level, class and faction". **General → GearQuest score bar** (`settings.showGearScoreBar`) is on unless that setting is false. Off hides the bar and shows that sentence. Simulation and Settings keep their own header sentences. White text above the bar reads **GearQuest Index Score - Collecting feedback on this**.
+
+The fill is the average GearQuest index of every gear slot, then clamped to **0–100**. `GearScoreWornRows` builds one row per slot. Head, neck, shoulder, chest, waist, legs, feet, wrist, hands, back, main hand, and ranged each count once. Finger counts both rings. Trinket counts both trinkets. An empty off hand is left out when the main hand is a two-hand weapon, and Enhancement (`UsesTwoHandOnlyWeapons`) never counts an off hand. Hunter two-hand uses the two-hand list. Hunter one-hand main uses the main-hand list. Rogue main hand uses the main-hand list.
+
+An empty slot is stored as **−100** and the tooltip writes **(empty slot)** after that score. A worn piece with no pipeline score is **0**. A worn piece that aged out of the band still has an index, from the nearest same-spec, same-faction band (`EquippedPipelineScore`). Before the average, every slot below 0 is counted as 0. The tooltip list still shows the real number, including **−100** and a negative worn piece such as Twilight Maul at **−8**. The line above the list is one sentence: "The average GearQuest index of the gear you are wearing. Negative numbers are counted as 0."
+
+Each 25 points is one section. The fill color uses the raw average, before it is rounded for the word: above 75 legendary orange, above 50 epic purple, above 25 rare blue, otherwise uncommon green. The hover word uses the rounded integer: **Below average** (0–25, green), **Fair** (26–50, blue), **Great** (51–75, purple), **Legend** (76–100, orange). The number stays white. The header is yellow **GearQuest Score**, then `N / 100 · WORD`.
+
+Under a blank line the tooltip lists every slot in the average, highest index first. Equal indexes keep the original slot order. The slot name is gold. The item name uses its quality color. **Empty** is grey.
+
+The bar does not tick while you hover it. Hover only draws the rows from the last update. `PLAYER_EQUIPMENT_CHANGED` clears the one-slot GearQuest score cache and refreshes the bar on the next tick. If the log is open, the hunt list refreshes too, so **- Recommended** and **- Rank #1 BiS acquired** follow the new gear. Bag updates do not rebuild the bar.
+
+Do not call `GearScoreContext` once per slot to draw the bar. That cache holds one slot. The bar uses `GearScoreWornRows` and `WornSlotIndex`.
 
 `EquippedPipelineScore` uses the current band first. If the worn piece has
 aged out, it uses the nearest same-spec, same-faction band: the highest
@@ -886,7 +901,7 @@ node scripts/diff-veldt-wowhead.mjs
 
 Then `score.py` one class at a time (`GQ_NO_GUIDES=1`) and copy the emitted Lua into `GearQuest/_generated/`. Ingest does **not** overwrite a source that already names a quest, vendor, drop, or profession. A row whose text is still `Source not listed yet` is replaced when the new listview names one, and that id is written to `coord_needed.json` so the coordinate lookup runs for it. New Forever-only ids (≥ 200000) merge in the same way. Stats on those rows come from the refreshed nether tooltip, not the listview.
 
-Every id that scrape adds is indexed in that same pass with `index_coordinates.py --ids`. An existing id is indexed only when its places changed (new droppers, new sellers, or a source that was empty). A stat change or a tooltip rewrite leaves the stored coordinates as they are. When the index does run, it stores the full camp list for that item, not one coordinate. A world drop keeps a published camp in each zone its creatures live in (up to three when they are far apart, plus a dungeon entrance when a dropper is inside). A vendor keeps every NPC who sells it. The log, the guide, and the map pin then use the spot closest to the character, so a player in any zone is sent to a nearby farm or seller.
+Every id that scrape adds is indexed in that same pass with `index_coordinates.py --ids`. An existing id is indexed when its places changed (new droppers, new sellers, a source that was empty, or a pin that moved) and whenever its quest, source, or faction is updated. A stat change or a tooltip rewrite leaves the stored coordinates as they are. Updating an item's quest or faction without a pin is incomplete: the same pass runs `index_coordinates.py --ids` for those ids. The pin is the start of the first quest in the chain, not the reward step. When the index does run, it stores the full camp list for that item, not one coordinate. A world drop keeps a published camp in each zone its creatures live in (up to three when they are far apart, plus a dungeon entrance when a dropper is inside). A vendor keeps every NPC who sells it. The log, the guide, and the map pin then use the spot closest to the character, so a player in any zone is sent to a nearby farm or seller.
 
 Quest Side is the word after `Side:` (`Alliance`, `Horde`, or `Both`). Do not read the end-NPC icon. A both-faction quest gets one pin per faction (Friend of the Library: Garion Wendell in Stormwind for Alliance, Owen Thadd in Undercity for Horde). An Alliance-only quest never scores or displays for Horde, and the reverse. `index_coordinates.py --repair-quests` rewrites those pins and `quest_faction.json`.
 
@@ -966,6 +981,8 @@ A full ingest rewrites sources.json for every id >= 200000. That cleared 162 zon
 **7 Oct 2026 (v0.3.6-beta). Score the stored row only when it matches the tooltip.**
 
 `refresh_forever_tips.py` is the refresh. It reads the nether Forever tooltip and writes `items.json`. A full ingest is not a refresh: ingest inserts new ids and must not rewrite existing facts from the tooltip cache (that reverted Erudite). Client pins and Greater Magic Wand **11288** stay skipped. On 7 Oct this pass updated **1186** items, then all nine classes were re-scored with `rescore_hunter_shaman.py`. Holy paladin and Beast Mastery / Marksmanship weights in this file are the weights that score used. Do not rescore from a stale row.
+
+**Heart of Disruption** is two City of Dalaran quests that share the name. Alliance quest 92458 chooses Spellguard Pauldrons (279839), Renewing Footpads (279840), or Defender of Dalaran (279841). Horde quest 96984 chooses Battle Spaulders (279842), Enchanted Sandals (279843), or Striking Staff (279844). A Tauren does not see Defender of Dalaran. Those six ids are exclusive in `quest_faction.json`. The dungeon step says Requires level 24. The chain starts earlier, and that first quest says Requires level 30, so the hunts are level 30. Alliance begins at An Alarming Request (92432), Emissary Jacques in Hillsbrad Foothills (48.3, 60.1). Horde begins at Blood in the Streets (92434), Magus Wordeen Voidglare in Tarren Mill (61.4, 20.8). The pin is that start, not Image of Archmage Modera.
 
 **Malignant Root (282283)** is a finger. Alliance Arms and Fury, rank 1 at level **27** only. Source is the rare **Nightveiled Rotheap** in the Wetlands (pins 21.2, 43.2 / 21.9, 43.3 / 23.0, 43.6). Rotheap Inards are party loot at 100%. Turn them in to Rethiel the Greenwarden. The Greenwarden is hostile to Horde, so `questRaces` 77 and `GQ.Data.questFaction[282283] = "Alliance"`. Do not pin the turn-in. The classic nether tooltip 404s, so the reward carries the New in Forever stamp.
 
@@ -1667,7 +1684,12 @@ What the lookup uses:
   same missing-dropper case uses one shared catalog spot. Do not invent a
   coordinate.
 - Profession taught by a trainer: the trainer pin. Note
-  `(the trainer that teaches this)`.
+  `(the trainer that teaches this)`. The six leather helms with no pattern
+  (Brawler's, Trapper's, Stormrider's, Wisdom's, Defender's, Totemic) are
+  boss drops, not Karolek or Pawani. All six drop in Blackfathom Deeps,
+  Razorfen Kraul, and the Stockade. Scarlet Monastery drops Brawler's,
+  Trapper's, and Defender's only. Stormrider's, Wisdom's, and Totemic do
+  not. The pin is each dungeon entrance that helm actually drops in.
 - Profession bought at a Merchant's Favor camp: the vendor pin in the camps
   table above, for every leatherworking, blacksmithing, tailoring,
   enchanting, and engineering piece whose hunt sentence names that camp.

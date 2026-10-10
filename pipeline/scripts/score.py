@@ -1168,51 +1168,10 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     rows = unique_name_rows([r for r in ranked_all if is_mainhand_only(r[1])], 8)
                 else:
                     rows=unique_name_rows(rows, 8)
-                # Physical specs: +SP/+heal pieces (Silvered Gauntlets) must not
-                # take a top-3 hunt. If they also have defense, they are the notable.
-                spell_gear = []
-                if not spec_uses_spell_power(wl):
-                    spell_gear = [r for r in rows if item_is_spell_gear(r[1])]
-                    rows = [r for r in rows if not item_is_spell_gear(r[1])]
+                # Spell-power pieces stay in this list and take whatever rank
+                # their score earns. There is no separate notable shelf.
                 if sl == "MainHand" and style == "twohand_or_onehand" and not split_hands:
                     rows = pair_weapon_styles(rows)
-                top3={r[1]["id"] for r in rows[:3]}
-                top3_names={r[1]["name"] for r in rows[:3]}
-                nb=[]
-                for r in spell_gear:
-                    if r[1].get("quality", 0) >= 3 and item_tank_skill_note(r[1]):
-                        it2 = dict(r[1])
-                        it2["_notableOnly"] = True
-                        if not (it2.get("effects") or it2.get("procs")):
-                            it2["effects"] = ["Equip: %s." % ", ".join(item_tank_skill_note(it2))]
-                        nb = [(r[0], it2) + r[2:]]
-                        break
-                if not nb:
-                    nb=[r for r in rows if r[1].get("effectDriven")
-                        and r[1]["id"] not in top3 and r[1]["name"] not in top3_names
-                        and r[1]["quality"]>=3][:1]
-                # Random-enchantment items now rank on the jackpot, so a slim +7 Agi
-                # roll that is #1 in the slot appears as BiS #1 (suffixChance tells
-                # the player the odds). The notable shelf still catches a leftover
-                # jackpot that somehow missed the unique-name top 3.
-                cut = rows[2][0] if len(rows)>=3 else 0.0
-                shown={r[1]["id"] for r in rows[:3]} | {r[1]["id"] for r in nb}
-                shown_names=set(top3_names) | {r[1]["name"] for r in nb}
-                # One notable per slot. Jackpot items now rank in the top 3, so
-                # this shelf is only for a leftover proc or a near-miss Forever id.
-                if not nb:
-                    nb += [r for r in rows
-                           if r[2] and len(r)>6 and r[6]>cut and r[1]["id"] not in shown
-                           and r[1]["name"] not in shown_names][:1]
-                shown |= {r[1]["id"] for r in nb}
-                shown_names |= {r[1]["name"] for r in nb}
-                if cut and not nb:
-                    near=[r for r in rows
-                          if r[1]["id"]>=200000 and r[1]["id"] not in shown
-                          and r[1]["name"] not in shown_names
-                          and r[1]["quality"]>=3 and r[0]>=cut*0.98][:1]
-                    nb += near
-                notable[(faction,level,sl)]=nb[:1]
                 per[(faction,level,sl)]=rows[:8]
                 # Alternates for the source filter. The shipped top 3 (and the
                 # rest of this 8) stay exactly as ranked above. These are only
@@ -1220,7 +1179,6 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                 # fill three hunts without changing the unfiltered order.
                 held_ids={r[1]["id"] for r in rows[:8]}
                 held_names={r[1]["name"] for r in rows[:8]}
-                held_names |= {r[1]["name"] for r in nb}
                 skip_spell=not spec_uses_spell_power(wl)
                 counts={}; extra=[]
                 for r in ranked_all:
@@ -1573,22 +1531,6 @@ if __name__=="__main__":
                         out[_spec]["bands"][-1]["route"]=rt[0]
                         out[_spec]["bands"][-1]["routeTwoHand"]=rt[1]
                         out[_spec]["bands"][-1]["routeOneHand"]=rt[2]
-                nbs=_notable.get((faction,hi,sl)) or []
-                bis=out[_spec]["bands"][-1]["picks"][:3]
-                shown={p["id"] for p in bis}
-                cut_score=bis[-1]["score"] if bis else 0
-                nbs=[r for r in nbs if r[1]["id"] not in shown
-                     and (r[0] < cut_score or r[1].get("_notableOnly"))]
-                if nbs:
-                    out[_spec]["bands"][-1]["notableEffects"]=[{
-                      "id":r[1]["id"],"name":r[1]["name"],"q":r[1]["quality"],
-                      "ilvl":r[1]["ilvl"],"rlvl":r[1]["rlvl"],"kind":r[1]["kind"],
-                      "score":round(r[0],2),"stats":r[4],"effects":r[1].get("procs") or r[1].get("effects") or [],
-                      "suffix":r[2],"chance":r[3],"chanceAny":r[5],
-                      "suffixRange":(r[7] if len(r)>7 else None),"suffixId":(r[8] if len(r)>8 else None),
-                      "jackpot":round(r[6],2) if len(r)>6 else None,
-                      "src":srcs[str(r[1]["id"])]} for r in nbs]
-
             for faction,sl,lo,hi,key,rows in bands:
                 if early_band or spec=="levelling_1_9":
                     emit(faction,sl,lo,hi,rows); continue

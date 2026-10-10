@@ -23,6 +23,16 @@ SOURCES = Path(DATA) / "sources.json"
 CACHE_TIPS = Path(DATA) / "forever_wowhead" / "refresh_cache.json"
 CACHE_XML = Path(DATA) / "forever_wowhead" / "quest_req_cache.json"
 PINS = Path(DATA) / "client_item_overrides.json"
+# The reward step says Requires level 24. The chain cannot start until the
+# first quest, which says Requires level 30. Do not lower these back to 24.
+CHAIN_PICKUP = {
+    279839: 30,  # Spellguard Pauldrons — An Alarming Request
+    279840: 30,  # Renewing Footpads
+    279841: 30,  # Defender of Dalaran
+    279842: 30,  # Battle Spaulders — Blood in the Streets
+    279843: 30,  # Enchanted Sandals
+    279844: 30,  # Striking Staff
+}
 UA = "wow-classic-data-research/1.0 (+contact: local script)"
 WORKERS = 2
 JSON_BLOCK = re.compile(r"<json><!\[CDATA\[(.*?)\]\]></json>", re.S)
@@ -198,6 +208,7 @@ def main():
         # accepts, so a higher pickup level raises it.
         if stated > 1:
             level = max(stated, level)
+        level = max(level, CHAIN_PICKUP.get(int(iid), 0))
         old = it.get("rlvl") or 0
         if old == level:
             continue

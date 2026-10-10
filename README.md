@@ -18,11 +18,11 @@ Lists are the Forever scoring model for all nine classes, levels 1–60. Allianc
 
 **Play style** sits at the bottom of the log. Five cards, names under the pictures, three then two. **No Dungeons!** hides hunts that send you into a dungeon or raid, including a quest that enters one. A world drop stays even when its zone is a dungeon name. World bosses and crafts you can buy stay. **Dungeon Enjoyer** keeps only those dungeon and raid hunts. The two turn each other off. **Get it now!** hides a hunt until this character meets the reputation on that item, or can make a bind-on-pickup craft. A bind-on-equip craft stays unless the item itself requires the profession to wear. **Don't look back** hides a hunt once its required level would be a gray quest. **Buy it** keeps vendor pieces and anything that is not bind on pickup, unless a vendor sells that bind-on-pickup piece. Get it now, Don't look back, and Buy it can be on with either dungeon card.
 
-The source **Filter** is alphabetical. Profession, Boss drop, and Dungeon & Raid trash each open a flyout when checked. The trash boxes are separate from Boss drop. Select all / Deselect all covers the sources and all three flyouts. A filter or a play style fills a slot back up to three matching hunts, then keeps the notable when that notable still fits. The **Play style** button reads **Play style*** while any of the five is on.
+The source **Filter** is alphabetical. Profession, Boss drop, and Dungeon & Raid trash each open a flyout when checked. The trash boxes are separate from Boss drop. Select all / Deselect all covers the sources and all three flyouts. A filter or a play style fills a slot back up to three matching hunts. There is no notable shelf. The **Play style** button reads **Play style*** while any of the five is on.
 
 The parchment shows **Rank #N** in a black box above the item name. That number is the slot rank, so a filtered list still shows the real place. Hovering the box says best, 2nd, 3rd, or 4th, and why a later rank is on the list.
 
-The green upgrade arrow stays on the unfiltered best pieces when a filter or a play style hides them, and on every hunt still showing. The obtain toast follows the unfiltered top three, the notable, and any hunt you Track. A filter does not stop a tracked toast.
+The green upgrade arrow stays on the unfiltered best pieces when a filter or a play style hides them, and on every hunt still showing. The obtain toast follows the unfiltered top three and any hunt you Track. A filter does not stop a tracked toast.
 
 A crafted hunt lists the recipe materials, and the skill line just before Source. That clause is green when you meet the recipe and red when you are short or do not have the profession.
 
@@ -30,7 +30,7 @@ A crafted hunt lists the recipe materials, and the skill line just before Source
 
 Hover a piece of gear and the tooltip gains a line after the stats. The same trail is on each row of the (i) rank list. The hunt list itself does not show it.
 
-The line is **Rank #N for your level** (or **Notable for your level**) and a GearQuest index from **−100** to **+100**. **+100** is the best stored score in that slot at your level. **−100** is the worst. That index is how the tooltip draws the score. The hunt order still uses the stored scores.
+The line is **Rank #N for your level** and a GearQuest index from **−100** to **+100**. **+100** is the best stored score in that slot at your level. **−100** is the worst. That index is how the tooltip draws the score. The hunt order still uses the stored scores. There is no notable shelf. A piece only says Rank #N when it is on the list for your current level.
 
 When the slot has something equipped, a green up arrow and **+N** means this piece is better by that many index points. A red down arrow and **−N** means it is worse. An empty slot shows the index only. The same item shows no arrow. Rings and trinkets compare to the weaker piece, and only when both slots are filled.
 
@@ -40,9 +40,13 @@ If the piece is gear and it is not the ranked row, the tooltip says why: the ran
 
 **General → GearQuest score on tooltips** is on by default. Simulation mode shows **Turn off simulation mode to see your GearQuest Score for this item.** The Simulator button says **Turn off simulation**.
 
+When you are not simulating, the log header is the **GearQuest Index Score** bar. It averages the index of every gear slot, from 0 to 100, in four sections of 25: green, then blue, then purple, then orange. A slot below 0, including an empty slot at −100, counts as 0 in that average. The hover still lists the real number, and an empty slot says **(empty slot)** after it. The list is highest index first. White text above the bar reads **GearQuest Index Score - Collecting feedback on this**. **General → GearQuest score bar** is on by default. Off restores the viewing-upgrades line. The bar updates when you equip or remove a piece. Hovering it does not keep checking.
+
+On the active list, a slot whose rank #1 you already have reads **- Rank #1 BiS acquired**. Up to three rank #1 pieces you do not have, the ones that improve what you are wearing the most, read **- Recommended**. A later rank is never the recommendation.
+
 ## Where a piece is pinned
 
-A new item stores every real spot in the same pass it is added: the first quest in the chain, a dungeon or raid entrance, a named creature, every vendor, and a published camp in each zone a dropping creature lives in (up to three spawns per zone when they are far apart). The log offers the closest. An item already indexed gets new coordinates only when its places change. A stat or tooltip change leaves the stored spots. Do not invent a coordinate. The level-60 dungeon sets (**Feralheart**, **Beastmaster**, **Heroism**, **The Five Thunders**, **Darkmantle**, **Deathmist**, **Soulforge**, **Virtuous**, **Sorcerer's**, and the Forever copies) are quest rewards at 60. The pin is the start of the chain, **An Earnest Proposition**.
+A new item stores every real spot in the same pass it is added: the first quest in the chain, a dungeon or raid entrance, a named creature, every vendor, and a published camp in each zone a dropping creature lives in (up to three spawns per zone when they are far apart). The log offers the closest. Updating an item's quest, source, or faction indexes that coordinate in the same pass. A stat or tooltip change leaves the stored spots. Do not invent a coordinate. Heart of Disruption starts at level 30. Alliance pins Emissary Jacques in Hillsbrad Foothills (48.3, 60.1). Horde pins Magus Wordeen Voidglare in Tarren Mill (61.4, 20.8). The level-60 dungeon sets (**Feralheart**, **Beastmaster**, **Heroism**, **The Five Thunders**, **Darkmantle**, **Deathmist**, **Soulforge**, **Virtuous**, **Sorcerer's**, and the Forever copies) are quest rewards at 60. The pin is the start of the chain, **An Earnest Proposition**.
 
 A vendor with a required standing gets its own line just before Source. The standing is green when you have met it and red when you have not. **Requires Honored with Booty Bay. Your standing is Friendly.**
 
@@ -51,6 +55,8 @@ A vendor with a required standing gets its own line just before Source. The stan
 Each tracked hunt has **Enable Guide**. One hunt is guided at a time, stored on that character (`GearQuestForeverCharDB.guideEntryId`). A logout countdown clears it. `/reload` and the AddOn List Reload button keep it. Those buttons call a protected reload, so the addon does not replace `ReloadUI` or `C_UI.Reload`. Tracked hunts stay either way. **Hide guide arrow** on the Hunts page hides the arrow for the whole account (`settings.hideGuideArrow`).
 
 The arrow sits just above the tracker, bottom-left of the arrow on the top-left of the tracker, with a 4px gap. Dragging the arrow moves the tracker. The art is `GearQuest/Art/GQ-GuideArrow3D.png`, a 32-frame horizontal strip, 4096×128, each cell 128. It is drawn at 110×110. Frame 0 points the way you are facing, including west. The frame changes with `SetTexCoord`. The texture is never rotated. Inside 12 yards the line says **Here** and the arrow uses the frame that points back at you.
+
+The guide samples your position once every 5 seconds and turns the arrow from that sample. The closest camp updates on a zone change, when you track the hunt, and when you select it.
 
 On the same continent the line is yards, from the world-position delta. On another continent the arrow aims at the nearest dock this faction can board whose other end is the hunt's continent. The line names the dock: **Ship in Menethil Harbor**, **Ship in Auberdine**, **Zeppelin in Durotar**. The world-map waypoint stays on the hunt. Arrival on that continent aims at the pin again.
 

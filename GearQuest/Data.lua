@@ -7261,6 +7261,25 @@ local function WorldXY(world)
     return nil
 end
 
+function GQ.Data:MapVector(x, y)
+    if not CreateVector2D then
+        return nil
+    end
+    local vec = self._mapVector
+    if not vec then
+        vec = CreateVector2D(x or 0, y or 0)
+        self._mapVector = vec
+        return vec
+    end
+    if vec.SetXY then
+        vec:SetXY(x or 0, y or 0)
+    else
+        vec.x = x or 0
+        vec.y = y or 0
+    end
+    return vec
+end
+
 function GQ.Data:PlayerWorld()
     local now = GetTime and GetTime() or 0
     if self._playerWorldAt and (now - self._playerWorldAt) < 0.4 then
@@ -7282,7 +7301,8 @@ function GQ.Data:PlayerWorld()
     end
     local here = { mapId = mapId, x = px * 100, y = py * 100 }
     if C_Map.GetWorldPosFromMapPos then
-        local ok, continent, world = pcall(C_Map.GetWorldPosFromMapPos, mapId, CreateVector2D(px, py))
+        local vec = self:MapVector(px, py)
+        local ok, continent, world = vec and pcall(C_Map.GetWorldPosFromMapPos, mapId, vec)
         local wx, wy = ok and WorldXY(world) or nil
         if ok and continent and wx and wy then
             here.continent = continent
@@ -7305,7 +7325,8 @@ function GQ.Data:SpotWorld(spot)
     if cached then
         return cached
     end
-    local ok, continent, world = pcall(C_Map.GetWorldPosFromMapPos, mapId, CreateVector2D(spot.x / 100, spot.y / 100))
+    local vec = self:MapVector(spot.x / 100, spot.y / 100)
+    local ok, continent, world = vec and pcall(C_Map.GetWorldPosFromMapPos, mapId, vec)
     local wx, wy = ok and WorldXY(world) or nil
     if not (continent and wx and wy) then
         return nil
@@ -9438,44 +9459,8 @@ function GQ.Data:EnsureNotableBySlot(classFile)
 end
 
 function GQ.Data:GetNotableForSlot(slotName)
-    local classFile = GQ:GetEffectiveClass()
-    local src = NOTABLE_CLASS[classFile]
-    if not src then
-        return {}
-    end
-
-    local rows = self[src.rows]
-    local facts = self[src.facts]
-    if not rows or not facts then
-        return {}
-    end
-
-    slotName = self:NormalizeSlotName(slotName)
-    self:EnsureQueryCache()
-    local cachedNotables = self._queryCache.notables[slotName]
-    if cachedNotables then
-        return cachedNotables
-    end
-
-    self:EnsureNotableBySlot(classFile)
-    local slotRows = self.notableBySlot[slotName]
-    if not slotRows then
-        return {}
-    end
-
-    local results = {}
-    for i = 1, #slotRows do
-        local entry = self:BuildNotableEntry(slotRows[i], facts, classFile)
-        if entry and self:ShouldShowEntry(entry) and self:EntryMatchesPlayer(entry)
-            and self:EntryFitsPaperDollSlot(entry, slotName) then
-            table.insert(results, entry)
-        end
-    end
-
-    results = self:FilterToActiveBand(results)
-    results = self:DeduplicateEntriesByItem(results)
-    self._queryCache.notables[slotName] = results
-    return results
+    -- Notables are ranked with everything else. Nothing is pulled out as a fourth hunt.
+    return {}
 end
 
 function GQ.Data:GetActiveBandMinLevel()
@@ -9737,6 +9722,154 @@ end
 -- Tooltip display only. pipelineScore and curatedRank stay the hunt order.
 -- This maps the slot's raw scores onto -100..+100 so the best piece in the
 -- slot reads +100 and the worst reads -100.
+function GQ.Data:SlotScoreSpan(slotName, handKind)
+    local minScore, maxScore
+    local function push(score)
+        if type(score) ~= "number" then
+            return
+        end
+        if not minScore or score < minScore then
+            minScore = score
+        end
+        if not maxScore or score > maxScore then
+            maxScore = score
+        end
+    end
+    if GQ.Log and GQ.Log.GetSlotRankList and slotName then
+        for _, entry in ipairs(GQ.Log:GetSlotRankList(slotName, handKind) or {}) do
+            push(entry.pipelineScore)
+        end
+    end
+    local dataSlot = slotName == "WeaponPair" and "MainHand" or slotName
+    if dataSlot and self.GetNotableForSlot then
+        for _, notable in ipairs(self:GetNotableForSlot(dataSlot) or {}) do
+            if not handKind or not GQ.Log or not GQ.Log.EntryInWeaponHand
+                or GQ.Log:EntryInWeaponHand(notable, dataSlot, handKind) then
+                push(notable.pipelineScore)
+            end
+        end
+    end
+    return minScore, maxScore
+end
+
+function GQ.Data:WornSlotIndex(slotName, itemId, handKind)
+    if not itemId then
+        return 0
+    end
+    local score = self:EquippedPipelineScore(itemId, slotName)
+    if type(score) ~= "number" then
+        return 0
+    end
+    local minScore, maxScore = self:SlotScoreSpan(slotName, handKind)
+    if not minScore then
+        return 0
+    end
+    return self:GearScoreIndex(score, minScore, maxScore) or 0
+end
+
+-- One row per slot that goes into the bar. An empty slot counts as -100.
+-- A two-hand weapon does not also count an empty off hand.
+function GQ.Data:GearScoreWornRows()
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    if not classFile then
+        return {}
+    end
+    local slots = self:GetSlotsForClass(classFile) or {}
+    local mainLink = GetInventoryItemLink and GetInventoryItemLink("player", 16)
+    local mainId = mainLink and tonumber(string.match(mainLink, "item:(%d+)"))
+    local mainLoc
+    if mainId and GetItemInfo then
+        mainLoc = select(9, GetItemInfo(mainId))
+    end
+    local twoHandWorn = mainLoc == "INVTYPE_2HWEAPON"
+    local skipOff = twoHandWorn or self:UsesTwoHandOnlyWeapons()
+    local rows = {}
+
+    local function add(slotName, invSlot, handKind)
+        local link = GetInventoryItemLink and GetInventoryItemLink("player", invSlot)
+        local itemId = link and tonumber(string.match(link, "item:(%d+)"))
+        local name = link and string.match(link, "%[(.-)%]")
+        if name == "" then
+            name = nil
+        end
+        local label = slotName
+        if self.SlotHeaderLabel then
+            label = self:SlotHeaderLabel(slotName)
+        end
+        local index = -100
+        if itemId then
+            index = self:WornSlotIndex(slotName, itemId, handKind)
+        end
+        rows[#rows + 1] = {
+            slot = label,
+            name = name,
+            itemId = itemId,
+            empty = not itemId,
+            index = index,
+        }
+    end
+
+    for i = 1, #slots do
+        local slotName = slots[i]
+        if slotName == "SecondaryHand" and skipOff then
+            -- A two-hand weapon fills this slot. It is not a second piece of gear.
+        elseif slotName == "Finger" then
+            add("Finger", 11)
+            add("Finger", 12)
+        elseif slotName == "Trinket" then
+            add("Trinket", 13)
+            add("Trinket", 14)
+        elseif slotName == "MainHand" then
+            local handKind
+            if self:UsesTwoHandOnlyWeapons() or twoHandWorn then
+                handKind = "two"
+            elseif self:UsesHunterWeaponPairs() then
+                if twoHandWorn then
+                    handKind = "two"
+                else
+                    handKind = "main"
+                end
+            elseif self:UsesRogueWeaponHands() then
+                handKind = "main"
+            end
+            add("MainHand", 16, handKind)
+        else
+            local invSlot = self:GetInventorySlot(slotName)
+            if invSlot then
+                add(slotName, invSlot)
+            end
+        end
+    end
+
+    return rows
+end
+
+-- Average index of the gear this character is wearing, clamped to 0..100.
+-- A slot below 0 counts as 0. The tooltip still shows the real index.
+function GQ.Data:GearScoreBarAverage()
+    local rows = self:GearScoreWornRows()
+    local count = #rows
+    if count == 0 then
+        return 0
+    end
+    local sum = 0
+    for i = 1, count do
+        local index = rows[i].index or 0
+        if index < 0 then
+            index = 0
+        end
+        sum = sum + index
+    end
+    local avg = sum / count
+    if avg < 0 then
+        return 0
+    end
+    if avg > 100 then
+        return 100
+    end
+    return avg
+end
+
 function GQ.Data:GearScoreIndex(score, minScore, maxScore)
     if type(score) ~= "number" then
         return nil
@@ -10019,15 +10152,15 @@ function GQ.Data:GearScoreTooltipLine(entry)
         return cached.line, cached.note
     end
     local visibleRank = GQ.Log and GQ.Log.VisibleSlotRank and GQ.Log:VisibleSlotRank(entry)
+    local level = GQ.GetEffectiveLevel and GQ:GetEffectiveLevel() or 1
+    local inBand = level >= (entry.minLevel or 1) and level <= (entry.maxLevel or level)
     local rankText
-    if entry.notable then
-        rankText = "Notable for your level"
-    elseif visibleRank then
+    if visibleRank then
         rankText = string.format("Rank #%d for your level", visibleRank)
-    elseif entry.curatedRank then
+    elseif inBand and entry.curatedRank then
         rankText = string.format("Rank #%d for your level", entry.curatedRank)
     else
-        rankText = "For your level"
+        rankText = nil
     end
     local trail = ctx and self:GearScoreTrail(entry, ctx) or ""
     local note
@@ -10037,12 +10170,10 @@ function GQ.Data:GearScoreTooltipLine(entry)
         note = "|cffd9bf73Rank 1 when you wear multiple pieces of this set.|r"
     end
     local line
-    if trail == "" then
-        if not entry.curatedRank and not entry.notable then
-            line = nil
-        else
-            line = "|cffffd100" .. rankText .. "|r"
-        end
+    if not rankText then
+        line = nil
+    elseif trail == "" then
+        line = "|cffffd100" .. rankText .. "|r"
     else
         line = "|cffffd100" .. rankText .. "|r  " .. trail
     end
@@ -10173,6 +10304,14 @@ function GQ.Data:AddGearScoreToItemTooltip(tooltip)
         return
     end
     self:AppendGearScoreLine(tooltip, entry)
+    if not tooltip.gqScoreLineAdded then
+        local miss = self:GearScoreMissText(link)
+        if miss then
+            tooltip.gqScoreLineAdded = true
+            tooltip:AddLine(" ")
+            tooltip:AddLine(miss, 0.69, 0.69, 0.69)
+        end
+    end
     if shown and tooltip.Show then
         tooltip:Show()
     end

@@ -6,6 +6,10 @@ local ARROW_TEXTURE = "Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Art\\G
 local ARROW_FRAMES = 32
 local GOLD_R, GOLD_G, GOLD_B = 1, 0.82, 0
 local HERE_YARDS = 12
+-- Where you are, and which camp is closest. The arrow still turns every
+-- frame from the last sample. Asking the map more often than this is what
+-- made the guide's memory climb.
+local SAMPLE_SEC = 5
 
 local function Settings()
     GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
@@ -71,11 +75,33 @@ local function WorldXY(world)
     return nil
 end
 
-local function WorldOn(mapId, x, y)
-    if not (mapId and x and y and C_Map and C_Map.GetWorldPosFromMapPos and CreateVector2D) then
+-- One vector for every map query. A new one each frame is what made the
+-- guide's memory climb for as long as the arrow stayed on screen.
+local mapVector
+
+local function MapVector(x, y)
+    if not CreateVector2D then
         return nil
     end
-    local ok, continent, world = pcall(C_Map.GetWorldPosFromMapPos, mapId, CreateVector2D(x, y))
+    if not mapVector then
+        mapVector = CreateVector2D(x, y)
+        return mapVector
+    end
+    if mapVector.SetXY then
+        mapVector:SetXY(x, y)
+    else
+        mapVector.x = x
+        mapVector.y = y
+    end
+    return mapVector
+end
+
+local function WorldOn(mapId, x, y)
+    local vec = MapVector(x, y)
+    if not (mapId and vec and C_Map and C_Map.GetWorldPosFromMapPos) then
+        return nil
+    end
+    local ok, continent, world = pcall(C_Map.GetWorldPosFromMapPos, mapId, vec)
     if not ok or not continent or not world then
         return nil
     end
@@ -239,7 +265,11 @@ local function ProjectToMap(srcMap, x, y, destMap)
     if not (continent and wx and C_Map and C_Map.GetMapPosFromWorldPos and CreateVector2D) then
         return nil
     end
-    local ok, first, second, third = pcall(C_Map.GetMapPosFromWorldPos, continent, CreateVector2D(wx, wy), destMap)
+    local vec = MapVector(wx, wy)
+    if not vec then
+        return nil
+    end
+    local ok, first, second, third = pcall(C_Map.GetMapPosFromWorldPos, continent, vec, destMap)
     if not ok then
         return nil
     end
@@ -525,6 +555,25 @@ function GQ.Guide:Dismiss()
     end
 end
 
+local function HideGuide(frame)
+    if not frame then
+        return
+    end
+    local shown = frame.IsShown and frame:IsShown()
+    frame:Hide()
+    if not shown then
+        return
+    end
+    frame.aim = nil
+    frame.aimSpot = nil
+    frame.crossingCache = nil
+    frame.crossing = nil
+    frame.crossingTo = nil
+    if collectgarbage then
+        collectgarbage("collect")
+    end
+end
+
 function GQ.Guide:Apply()
     local frame = self.frame
     if not frame then
@@ -532,12 +581,12 @@ function GQ.Guide:Apply()
     end
     local id = CharSettings().guideEntryId
     if self:IsSuppressed() or not id then
-        frame:Hide()
+        HideGuide(frame)
         return
     end
     local entry = GQ.Data and GQ.Data.GetEntryById and GQ.Data:GetEntryById(id)
     if not entry then
-        frame:Hide()
+        HideGuide(frame)
         return
     end
     frame.entryId = id
@@ -550,17 +599,17 @@ local function UpdateGuide(frame)
     GQ.Guide:AnchorToTracker()
     local id = frame.entryId
     if not id or GQ.Guide:IsSuppressed() then
-        frame:Hide()
+        HideGuide(frame)
         return
     end
     local entry = GQ.Data and GQ.Data.GetEntryById and GQ.Data:GetEntryById(id)
     if not entry then
-        frame:Hide()
+        HideGuide(frame)
         return
     end
     local now = GetTime and GetTime() or 0
     if not frame.spotUntil or now >= frame.spotUntil then
-        frame.spotUntil = now + 0.3
+        frame.spotUntil = now + SAMPLE_SEC
         frame.spot = GQ.Data and GQ.Data.NearestCoordinateSpot and GQ.Data:NearestCoordinateSpot(entry.itemId) or nil
     end
     local spot = frame.spot
@@ -571,13 +620,13 @@ local function UpdateGuide(frame)
             facing = value
         end
     end
-    frame.crossing = nil
-    frame.crossingTo = nil
-    local text = spot and spot.map or "No pin"
-    local rotation = 0
-    local spotMap = spot and GQ.Data and GQ.Data.SpotMapId and GQ.Data:SpotMapId(spot)
-    local px, py = spotMap and PositionOn(spotMap)
-    if spot and px and py and spot.x and spot.y then
+    local sample = frame.aim
+    local refresh = not sample or sample.spot ~= spot or now >= (frame.aimUntil or 0)
+    if refresh then
+        sample = { spot = spot, text = spot and spot.map or "No pin", kind = "none" }
+        local spotMap = spot and GQ.Data and GQ.Data.SpotMapId and GQ.Data:SpotMapId(spot)
+        local px, py = spotMap and PositionOn(spotMap)
+        if spot and px and py and spot.x and spot.y then
         local sx, sy = spot.x / 100, spot.y / 100
         local pc, pwx, pwy = WorldOn(spotMap, px, py)
         local sc, swx, swy = WorldOn(spotMap, sx, sy)
@@ -585,17 +634,18 @@ local function UpdateGuide(frame)
             local dx = swx - pwx
             local dy = swy - pwy
             local dist = math.sqrt(dx * dx + dy * dy)
-            text = FormatYards(dist) or text
-            if dist < HERE_YARDS then
-                rotation = math.pi
-            else
-                rotation = AimWorld(spotMap, dx, dy, facing)
-            end
+            sample.text = FormatYards(dist) or sample.text
+            sample.mapId = spotMap
+            sample.dx = dx
+            sample.dy = dy
+            sample.kind = dist < HERE_YARDS and "here" or "world"
         else
             -- Map y grows south. Yards need a world position, so the line
             -- keeps the zone name until that conversion exists.
-            rotation = Aim(sx - px, py - sy, facing)
-            text = spot.map or text
+            sample.kind = "map"
+            sample.east = sx - px
+            sample.north = py - sy
+            sample.text = spot.map or sample.text
         end
     elseif spot and spotMap and spot.x and spot.y and C_Map and C_Map.GetBestMapForUnit then
         local playerMap = C_Map.GetBestMapForUnit("player")
@@ -621,12 +671,11 @@ local function UpdateGuide(frame)
             local dx = swx - pwx
             local dy = swy - pwy
             local dist = math.sqrt(dx * dx + dy * dy)
-            text = FormatYards(dist) or text
-            if dist < HERE_YARDS then
-                rotation = math.pi
-            else
-                rotation = AimWorld(spotMap, dx, dy, facing)
-            end
+            sample.text = FormatYards(dist) or sample.text
+            sample.mapId = spotMap
+            sample.dx = dx
+            sample.dy = dy
+            sample.kind = dist < HERE_YARDS and "here" or "world"
         else
             local dock, arrive
             if pc and sc and pc ~= sc then
@@ -656,14 +705,17 @@ local function UpdateGuide(frame)
                 local dx = dock.wx - pwx
                 local dy = dock.wy - pwy
                 local dist = math.sqrt(dx * dx + dy * dy)
-                frame.crossing = dock
-                frame.crossingTo = arrive
+                sample.dock = dock
+                sample.arrive = arrive
+                sample.mapId = dock.mapId
+                sample.dx = dx
+                sample.dy = dy
                 if dist < HERE_YARDS then
-                    rotation = math.pi
-                    text = "Here"
+                    sample.kind = "here"
+                    sample.text = "Here"
                 else
-                    rotation = AimWorld(dock.mapId, dx, dy, facing)
-                    text = dock.kind
+                    sample.kind = "world"
+                    sample.text = dock.kind
                 end
             else
                 local here = C_Map.GetBestMapForUnit("player")
@@ -678,11 +730,37 @@ local function UpdateGuide(frame)
                     ssx, ssy = ProjectToMap(spotMap, spot.x / 100, spot.y / 100, shared)
                 end
                 if ppx and ppy and ssx and ssy then
-                    rotation = Aim(ssx - ppx, ppy - ssy, facing)
-                    text = spot.map or text
+                    sample.kind = "map"
+                    sample.east = ssx - ppx
+                    sample.north = ppy - ssy
+                    sample.text = spot.map or sample.text
                 end
             end
         end
+    end
+        frame.aim = sample
+        frame.aimUntil = now + SAMPLE_SEC
+        if spot and GQ.Guide.ownsWaypoint then
+            local key = string.format("%s|%.1f|%.1f", spot.map or "", spot.x or 0, spot.y or 0)
+            if key ~= GQ.Guide._waypointKey then
+                local guided = GQ.Data:GetEntryById(id)
+                if guided then
+                    GQ.Guide:PlaceForeverPin(guided)
+                end
+                GQ.Guide._waypointKey = key
+            end
+        end
+    end
+    frame.crossing = sample.dock
+    frame.crossingTo = sample.arrive
+    local text = sample.text
+    local rotation = 0
+    if sample.kind == "here" then
+        rotation = math.pi
+    elseif sample.kind == "world" then
+        rotation = AimWorld(sample.mapId, sample.dx, sample.dy, facing)
+    elseif sample.kind == "map" then
+        rotation = Aim(sample.east, sample.north, facing)
     end
     if frame.distance and frame.distanceText ~= text then
         frame.distanceText = text
@@ -695,16 +773,6 @@ local function UpdateGuide(frame)
         local index = text == "Here" and (ARROW_FRAMES / 2) or ArrowIndex(rel)
         local left = index / ARROW_FRAMES
         frame.arrow:SetTexCoord(left, left + 1 / ARROW_FRAMES, 0, 1)
-    end
-    if spot and GQ.Guide.ownsWaypoint then
-        local key = string.format("%s|%.1f|%.1f", spot.map or "", spot.x or 0, spot.y or 0)
-        if key ~= GQ.Guide._waypointKey then
-            local guided = GQ.Data:GetEntryById(id)
-            if guided then
-                GQ.Guide:PlaceForeverPin(guided)
-            end
-            GQ.Guide._waypointKey = key
-        end
     end
 end
 

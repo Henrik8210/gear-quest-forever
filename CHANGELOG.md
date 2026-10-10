@@ -2,125 +2,69 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v0.5.1-beta
+## v0.5.2-beta
 
-The hunt list tells you when a slot's best piece is already yours, and which rank 1 is the biggest upgrade from what you are wearing. The guide follows the new ships and skyboats. Rank lists no longer skip numbers for a hunt the other faction cannot get.
+The log header shows your GearQuest Index Score while you are not simulating. Up to three rank #1 hunts are marked Recommended. Notables are gone, so a piece takes the rank its score earns. Heart of Disruption is the right faction, at level 30, with a pin on the quest that starts the chain.
 
-The window title reads **GearQuest Forever v0.5.1-beta**.
+The window title reads **GearQuest Forever v0.5.2-beta**.
 
-### What to hunt next
+### GearQuest Index Score
 
-When you already have the rank #1 piece for a slot, obtained or worn, that slot's title reads **- Rank #1 BiS acquired** in white, immediately after the (i). Enhancement at 25-27 does this on Hands for **Gloves of the Fang** and on Waist for **Belt of the Fang** once those pieces are yours.
+When you are not simulating, the line "Viewing upgrades for your current level, class and faction" is a bar. White text above it reads **GearQuest Index Score - Collecting feedback on this**.
 
-Among the rank #1 pieces you do not have yet, one of them is marked **- Recommended** in gold, immediately after the item name, with its own (i). It is the rank #1 whose GearQuest score is the biggest step up from what you are wearing. An empty slot counts as a fill. A piece that would not be an upgrade is not marked. A later rank is never the recommendation. A long item name shortens so **- Recommended** stays whole.
+The bar is the average GearQuest index of the gear you are wearing, from **0** to **100**. Each 25 points fills one section. While the first section fills, the bar is green. From there the whole fill becomes blue, then purple, then orange.
 
-The (i) hover has a yellow header, **GearQuest Recommends**, and then: "This is what GearQuest recommends for your next hunt. This would be the biggest upgrade compared to the current piece of gear you are wearing."
+Hovering the bar says the score out of 100, a middle dot, and a word. **Below average** (0–25) is green. **Fair** (26–50) is blue. **Great** (51–75) is purple. **Legend** (76–100) is orange. Under that, one line: "The average GearQuest index of the gear you are wearing. Negative numbers are counted as 0."
 
-Simulation hides both lines. Turning **GearQuest score on tooltips** off hides **- Recommended** and leaves **- Rank #1 BiS acquired**.
+The list under that line is every slot in the average, highest index first. An empty slot shows **Empty**, **−100**, and **(empty slot)**. A piece you are wearing still shows its real number when that number is negative. Those negatives, and an empty slot, count as 0 in the bar, so they do not pull the fill down. An empty off hand is left out when you are wearing a two-hand weapon. Enhancement does not count an off hand.
 
-### Rank lists no longer skip numbers
+**General → GearQuest score bar** is on by default, under **GearQuest score on tooltips**. Turn it off and the viewing-upgrades line comes back. The bar updates when you equip or remove a piece from the character panel. Hovering the bar does not keep checking.
 
-The (i) list and the **Rank #N** box count only the pieces this character can see. A hunt for the other faction is left out, and the numbers close up. The same is true the other way, for every class and every slot.
+### Three recommended hunts
 
-Horde Enhancement at 26-27 used to jump from **#10 Snake Eye Kaleidoscope** to **#14 Glowing Green Talisman**, because **Erudite's Amulet** and **Scholarly Pendant** (Friend of the Library, Stormwind) were still numbered on the Horde list. **Glowing Green Talisman** now follows straight on. The parchment rank matches that place. **Rank #1 BiS acquired** uses the best piece this character can actually get.
+Among the rank #1 pieces you do not already have, the three largest improvements over what you are wearing are marked **- Recommended** in gold, each with its own (i). The hover says: "One of the best upgrades for your level. GearQuest marks up to three rank #1 pieces, the ones that improve what you are wearing the most."
 
-### The guide follows the new ships
+An empty slot counts as a fill. A piece that would be a downgrade is not marked. A later rank is never the recommendation. If fewer than three rank #1 pieces would actually be an upgrade, only those are marked.
 
-A hunt on another continent still aims at the dock with the shortest walk to the boat and the shortest walk after you get off. The arrow says **Ship**, **Zeppelin**, or **Skycutter**. Hovering it names the dock and where to step off, for example **Ship in Auberdine to Southshore**. Inside 12 yards it says **Here**.
+A slot whose rank #1 you already have, obtained or worn, still reads **- Rank #1 BiS acquired** after that slot's (i). Simulation hides both lines. Turning **GearQuest score on tooltips** off hides **- Recommended** and leaves the acquired line.
 
-**Menethil Harbor**, **Southshore**, and **Auberdine** are one Alliance ship, both ways. Southshore is the stop in the middle. **Stormwind Harbor** and **Auberdine** are a separate Alliance ship, both ways. The southern pier from **Menethil Harbor** to **Theramore** is unchanged.
+### Notables are gone
 
-**Steamwheedle Port** in Tanaris and **Powderfuse Port** in the Riverglades are one ship, both ways, for both factions. **Ratchet** and **Booty Bay** are unchanged.
+There is no notable shelf. The hunt list still shows three pieces in a slot. A piece that used to sit beside the list as a notable now takes the rank its score earns, including rank 4 and later.
 
-Horde zeppelins at **Durotar**, **Tirisfal Glades**, and **Grom'gol** each go to the other two towers.
+A tooltip says **Rank #N for your level** only when that piece is on the list for the level you are at. **Twilight Maul** is a Horde Enhancement two-hand at level 23. At 27 it is not on that list, so the tooltip says it is not ranked at your level and names level 23.
 
-Alliance skycutters run from the eastern dock at **Valanaar** on Zephras Isle to the north side of **Dalaran** in Alterac Mountains, and back. Horde zeppelins run from the western dock at **Valanaar** to **Skywatcher Plateau** in Mulgore, and back.
+Warrior Protection still does not score spell power or healing. **Silvered Gauntlets** rank on the stamina, armor, and defense they have. They can be rank 1 when that score wins the slot.
 
-Crossing into Tirisfal no longer throws a Lua error. The route and the map pins also do less work each frame while a hunt is guided.
+### Heart of Disruption
 
-### Coldspire Staff
+Heart of Disruption is two City of Dalaran quests with the same name. The dungeon step says level 24. The quest that starts the chain requires **30**, and that is the level on the rewards.
 
-**Coldspire Staff** drops from **Rath'Mael** in the **Ruins of Lordaeron** and requires **19**. The tooltip is +13 Frost Resistance and +32 frost spell damage. The old line that added 26 damage and healing is gone. The drop chance reads 29.69%.
+Alliance starts at **An Alarming Request**. The pin is Emissary Jacques in Hillsbrad Foothills, **48.3, 60.1**. The choice is **Spellguard Pauldrons**, **Renewing Footpads**, or **Defender of Dalaran**.
 
-Frost, Alliance and Horde, stays rank 1 at level 19. Enhancement Alliance at 19-20 sees it at rank 23. Priest, druid, and warlock no longer rank it for that old healing and spell damage line.
+Horde starts at **Blood in the Streets**. The pin is Magus Wordeen Voidglare in Tarren Mill, **61.4, 20.8**. The choice is **Battle Spaulders**, **Enchanted Sandals**, or **Striking Staff**.
 
-### Smoother scores
+A Tauren does not see Defender of Dalaran. On a Horde Feral druid at 30–31, Striking Staff is a two-hand hunt behind **Heavehammer**.
 
-Hovering a piece of gear builds that slot's rank list once. Moving the mouse across the bag does not rebuild it, so the score line stays responsive. A piece with no random suffix, including **Sorcerer Collar**, no longer errors when that line is added.
+### Leather helms
 
-### Credits
+**Brawler's Leather Helm**, **Trapper's Leather Helm**, **Stormrider's Leather Helm**, **Wisdom's Leather Helm**, **Defender's Leather Helm**, and **Totemic Leather Helm** are boss drops, not recipes on Pawani or Karolek. The pin is the dungeon entrance.
 
-**Settings**, **Credits** lists **Click** with Eao, MainWon, and Stikmyre.
+All six drop in Blackfathom Deeps, Razorfen Kraul, and the Stockade. Scarlet Monastery drops Brawler's, Trapper's, and Defender's. Stormrider's, Wisdom's, and Totemic do not drop there.
+
+### The guide uses less memory
+
+The guide checks where you are once every 5 seconds and turns the arrow from that sample. Tracking a hunt on the world map does not keep asking for your position while you walk inside one zone. The closest camp updates when you change zone, when you track the hunt, and when you select it.
+
+### v0.5.1-beta
+
+The hunt list marks **- Rank #1 BiS acquired** when you already have that slot's best piece, and **- Recommended** on the biggest rank #1 upgrade from what you are wearing. Rank lists count only hunts this character can get. The window title reads **GearQuest Forever v0.5.1-beta**.
+
+Menethil Harbor, Southshore, and Auberdine are one Alliance ship. Stormwind Harbor and Auberdine are another. Steamwheedle Port and Powderfuse Port are one ship for both factions. Alliance skycutters run Valanaar to Dalaran. Horde zeppelins run Valanaar to Skywatcher Plateau. **Coldspire Staff** drops from Rath'Mael in the Ruins of Lordaeron and requires 19. Credits lists Click.
 
 ### v0.5.0-beta
 
-Hover any piece of gear and GearQuest tells you how it ranks for your level, how it compares with what you are wearing, and why a piece has no score. The dungeon upgrade sets are level 60 quests. Closing the world map with a gamepad no longer locks jump or talking to NPCs.
-
-The window title reads **GearQuest Forever v0.5.0-beta**.
-
-### GearQuest score
-
-Item tooltips gain a line after the stats. The same trail is on each row of the (i) rank list beside a slot header. The hunt list itself does not show the number.
-
-The line names the rank for your current level: **Rank #1 for your level**, or **Notable for your level**. Beside it is the GearQuest index, from **-100** to **+100**. **+100** is the best stored score in that slot at your level. **-100** is the worst. The number is only how the tooltip draws the score. The hunt order still uses the same scores as before.
-
-When that slot has something equipped, the same line compares this piece to it. A green up arrow and a green **+N** means this piece is better by that many index points. A red down arrow and a red **−N** means it is worse. An empty slot shows the index only. The same item, or a difference of zero, shows no arrow. Rings and trinkets compare to the weaker of the two pieces, and only when both slots are filled. An empty ring or trinket slot is a place to fill, not a piece to replace.
-
-A piece you are still wearing that has aged out of the current level band is still compared. **Slick Deviate Leggings**, last scored for Enhancement at 21-23, still compare when you are wearing them at 27.
-
-**Leggings of the Fang** stay rank 1 for Enhancement at 25-27 because **Embrace of the Viper** is scored as a set. The stored score on the legs can sit under **Triprunner Dungarees**, which then reads **+100**. When that happens the tooltip adds **Rank 1 when you wear multiple pieces of this set.**
-
-The arrows are the green and red pictures shipped with the addon.
-
-### Where the line shows
-
-The line is inside the item tooltip. A hunt hover, the character panel, a chat link, and a quest-log item all get it. On the character-panel upgrade hover it sits above **World drop** and **Left-click to see more details.** Bags, quivers, and ammo are skipped.
-
-A chat link uses the same rank as the hunt list. **Pathfinder Belt** is the unsuffixed item. Enhancement ranks **Pathfinder Belt of the Falcon**. **Kodohide Legguards** is rank 4 for Enhancement Horde at 25-27, on the list and on a chat link.
-
-### When there is no score
-
-If the piece is gear and it is not on the ranked list, the tooltip says why.
-
-**Only Pathfinder Belt of the Falcon is ranked for your level.** One ranked suffix.
-
-**Not this roll. Ranked for your level:** and then the names, when several suffixes are ranked.
-
-**Not ranked at your level. Ranked from 18 to 24.** Or **Ranked at level 20.**
-
-**Not ranked for Enhancement.** The name is the spec you are on.
-
-**Not ranked for your class.** **Not ranked for your faction.**
-
-**GearQuest has no score for this item.**
-
-### The setting, simulation, and Play style
-
-**General** has **GearQuest score on tooltips**, under **Remove background art**, checked by default. Uncheck it and the line leaves item tooltips and the (i) rank list. The hunt order does not change.
-
-Simulation mode does not show a score. The line says **Turn off simulation mode to see your GearQuest Score for this item.** The Simulator button that used to say Reset now says **Turn off simulation**.
-
-The **Play style** button reads **Play style*** while any play style is on: **No Dungeons!**, **Dungeon Enjoyer**, **Get it now!**, **Don't look back**, or **Buy it**. It matches **Filter***.
-
-### Required level and the level 60 dungeon sets
-
-Pieces that had no Requires Level were looked up as quest rewards. The stored level is the minimum level that can pick up that quest. Starter pieces with item level 15 or below, and no quest, can be worn at level 1.
-
-The dungeon upgrade sets are level 60 quests for every class. **Feralheart**, **Beastmaster**, **Heroism**, **The Five Thunders**, **Darkmantle**, **Deathmist**, **Soulforge**, **Virtuous**, and **Sorcerer's**, including the Forever copies of those pieces, require **60**. They are quest rewards, not world drops. Both factions see the Forever copies. Wrists come from **An Earnest Proposition**. Hands and waist come from **Just Compensation**. Feet, legs, and shoulders come from **Anthion's Parting Words**. Head and chest come from **Saving the Best for Last**. The chain starts with **An Earnest Proposition**, and that is where the map pin sits.
-
-**Truthseeker's Bow** requires **40**.
-
-### Where to find a piece
-
-A new item stores every published spot in the same pass it is added. That is the first quest in the chain, a dungeon or raid entrance, a named creature, every vendor who sells it, and a farm in each zone a dropping creature lives in, up to three spawns per zone when they are far apart. The log, the guide, and the map use the spot closest to you.
-
-An item already in the list gets new coordinates only when its places change: new droppers, new sellers, a source that was empty, or a pin that moved. A stat or tooltip change leaves the stored spots where they are.
-
-A world drop uses the sunset picture shipped with the addon.
-
-### Gamepad and the world map
-
-Opening the world map and closing it, with a gamepad, no longer blocks jump or talking to an NPC. Map pins are drawn by GearQuest on the map. They are not registered with the map's own pin list, so closing the map does not run addon code inside the gamepad focus clear.
+Hover any piece of gear and the tooltip says **Rank #N for your level** and a GearQuest index from −100 to +100, with a green or red arrow against what you are wearing. **General → GearQuest score on tooltips** is on by default. The dungeon upgrade sets require 60, and the pin is An Earnest Proposition. Closing the world map with a gamepad no longer locks jump or talking to NPCs. The window title reads **GearQuest Forever v0.5.0-beta**.
 
 ### v0.4.2-beta
 

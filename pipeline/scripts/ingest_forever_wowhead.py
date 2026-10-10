@@ -476,7 +476,10 @@ def apply_pinned_boss_sources(sources):
         src["sourceType"] = "boss_drop"
         src["npc"] = npc
         src["zone"] = row["zone"]
-        src["instructions"] = f"Drops from {npc}."
+        src["profession"] = None
+        if row.get("zones"):
+            src["zones"] = list(row["zones"])
+        src["instructions"] = row.get("instructions") or f"Drops from {npc}."
         src["obtainable"] = True
         src["excludedBecause"] = None
         n += 1

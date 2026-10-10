@@ -8,7 +8,7 @@ local ROW_HEIGHT = 16
 local TAB_HEIGHT = 24
 local TAB_BAR_PAD = 4
 local TAB_ROW_HEIGHT = TAB_HEIGHT + TAB_BAR_PAD
-local CONTEXT_BAND_HEIGHT = 20
+local CONTEXT_BAND_HEIGHT = 46
 local CONTEXT_BAND_TOP = -27
 local TAB_TOP_OFFSET = 56 + CONTEXT_BAND_HEIGHT
 local PORTRAIT_TEXTURE = "Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Art\\GearQuest-Portrait"
@@ -180,10 +180,6 @@ local function BuildListItemTags(entry, status, includeNewLabel, slotName)
 
     if entry and entry.setPiece then
         tags = tags .. " |cff88ccff(Set piece)|r"
-    end
-
-    if entry and GQ.Data:ShouldDisplayAsNotable(entry, slotName or (entry and entry.slot)) then
-        tags = tags .. " |cff88ccff(Notable)|r"
     end
 
     if includeNewLabel and entry and GQ.Data:IsEntryNewForPlayer(entry) then
@@ -4707,6 +4703,25 @@ function GQ.Log:EnsureTrackerEvents()
             return
         end
 
+        if event == "PLAYER_EQUIPMENT_CHANGED" then
+            if GQ.Data then
+                GQ.Data._gearScoreCache = nil
+            end
+            local function refreshWorn()
+                if log.UpdateGearScoreBar then
+                    log:UpdateGearScoreBar()
+                end
+            end
+            if C_Timer and C_Timer.After then
+                C_Timer.After(0.05, refreshWorn)
+            else
+                refreshWorn()
+            end
+            if log.frame and log.frame:IsShown() and log.ScheduleListRefresh then
+                log:ScheduleListRefresh()
+            end
+        end
+
         if event == "BAG_UPDATE" then
             if GQ.Data and GQ.Data.CacheContainerItemLinks then
                 GQ.Data:CacheContainerItemLinks()
@@ -5359,6 +5374,211 @@ function GQ.Log:UpdateContextStatus()
 
     self.frame.contextStatus:SetText(text)
     self:LayoutContextHeading()
+    self:UpdateGearScoreBar()
+end
+
+function GQ.Log:GearScoreBarShown()
+    if not self.frame or self:GetPageTab() ~= "log" then
+        return false
+    end
+    if GQ.IsPreviewEnabled and GQ:IsPreviewEnabled() then
+        return false
+    end
+    local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+    if settings and settings.showGearScoreBar == false then
+        return false
+    end
+    return true
+end
+
+function GQ.Log:GearScoreFillColor(score)
+    local quality = 2
+    if score > 75 then
+        quality = 5
+    elseif score > 50 then
+        quality = 4
+    elseif score > 25 then
+        quality = 3
+    end
+    local row = ITEM_QUALITY_COLORS and ITEM_QUALITY_COLORS[quality]
+    if row then
+        return row.r, row.g, row.b
+    end
+    if quality == 5 then
+        return 1, 0.5, 0
+    end
+    if quality == 4 then
+        return 0.64, 0.21, 0.93
+    end
+    if quality == 3 then
+        return 0, 0.44, 0.87
+    end
+    return 0.12, 1, 0
+end
+
+function GQ.Log:GearScoreBarWords(score)
+    local n = math.floor((score or 0) + 0.5)
+    if n > 100 then
+        n = 100
+    elseif n < 0 then
+        n = 0
+    end
+    local word = "Below average"
+    if n >= 76 then
+        word = "Legend"
+    elseif n >= 51 then
+        word = "Great"
+    elseif n >= 26 then
+        word = "Fair"
+    end
+    return n, word
+end
+
+function GQ.Log:EnsureGearScoreBar(frame)
+    if frame.gearScoreBar then
+        return frame.gearScoreBar
+    end
+    local shell = CreateFrame("Frame", nil, frame.contextStatusBar, "BackdropTemplate")
+    shell:SetHeight(16)
+    shell:SetPoint("BOTTOMLEFT", frame.contextStatusBar, "BOTTOMLEFT", 36, 2)
+    shell:SetPoint("BOTTOMRIGHT", frame.contextStatusBar, "BOTTOMRIGHT", -36, 2)
+    local title = shell:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    title:SetPoint("BOTTOM", shell, "TOP", 0, 5)
+    title:SetText("GearQuest Index Score - Collecting feedback on this")
+    title:SetTextColor(1, 1, 1)
+    shell.title = title
+    shell:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8X8",
+        edgeFile = METAL_EDGE,
+        tile = true,
+        tileSize = 16,
+        edgeSize = 10,
+        insets = { left = 3, right = 3, top = 3, bottom = 3 },
+    })
+    shell:SetBackdropColor(0.04, 0.03, 0.02, 0.95)
+    shell:SetBackdropBorderColor(GOLD[1], GOLD[2], GOLD[3], 1)
+    shell:EnableMouse(true)
+    shell:SetScript("OnEnter", function(self)
+        local shown, word = GQ.Log:GearScoreBarWords(self.score)
+        local r, g, b = GQ.Log:GearScoreFillColor(shown)
+        local hex = string.format("%02x%02x%02x", (r or 1) * 255, (g or 1) * 255, (b or 1) * 255)
+        GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+        GameTooltip:SetText("GearQuest Score", 1, 0.82, 0)
+        GameTooltip:AddLine(string.format("%d / 100 · |cff%s%s|r", shown, hex, word), 1, 1, 1)
+        GameTooltip:AddLine("The average GearQuest index of the gear you are wearing. Negative numbers are counted as 0.", 0.9, 0.9, 0.9, true)
+        local worn = self.rows
+        if worn and #worn > 0 then
+            GameTooltip:AddLine(" ")
+            for i = 1, #worn do
+                local row = worn[i]
+                local n = math.floor((row.index or 0) + 0.5)
+                local scoreText = string.format("|cffffffff%d|r", n)
+                if row.empty or not row.name then
+                    GameTooltip:AddLine(string.format("|cffffd100%s|r  |cff999999Empty|r  %s |cff999999(empty slot)|r", row.slot or "", scoreText))
+                else
+                    local qr, qg, qb = GetListItemQualityColor(row.itemId)
+                    local qhex = string.format("%02x%02x%02x", math.floor((qr or 1) * 255 + 0.5), math.floor((qg or 1) * 255 + 0.5), math.floor((qb or 1) * 255 + 0.5))
+                    GameTooltip:AddLine(string.format("|cffffd100%s|r  |cff%s%s|r  %s", row.slot or "", qhex, row.name, scoreText))
+                end
+            end
+        end
+        GameTooltip:Show()
+    end)
+    shell:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+
+    local status = CreateFrame("StatusBar", nil, shell)
+    status:SetPoint("TOPLEFT", shell, "TOPLEFT", 4, -4)
+    status:SetPoint("BOTTOMRIGHT", shell, "BOTTOMRIGHT", -4, 4)
+    status:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
+    status:SetMinMaxValues(0, 100)
+    status:SetValue(0)
+    shell.status = status
+
+    local divs = {}
+    for i = 1, 3 do
+        local div = status:CreateTexture(nil, "OVERLAY")
+        div:SetWidth(3)
+        div:SetColorTexture(GOLD[1], GOLD[2], GOLD[3], 1)
+        divs[i] = div
+    end
+    shell.divs = divs
+    status:SetScript("OnSizeChanged", function(self, width)
+        width = width or self:GetWidth() or 0
+        for i = 1, 3 do
+            local div = divs[i]
+            div:ClearAllPoints()
+            div:SetPoint("TOP", self, "TOPLEFT", width * i / 4, 0)
+            div:SetPoint("BOTTOM", self, "BOTTOMLEFT", width * i / 4, 0)
+        end
+    end)
+
+    shell:Hide()
+    frame.gearScoreBar = shell
+    return shell
+end
+
+function GQ.Log:UpdateGearScoreBar()
+    local frame = self.frame
+    if not frame or not frame.contextStatusBar then
+        return
+    end
+    local shell = self:EnsureGearScoreBar(frame)
+    if not self:GearScoreBarShown() then
+        shell:Hide()
+        if frame.contextStatus then
+            frame.contextStatus:Show()
+        end
+        return
+    end
+    local score = 0
+    local rows
+    if GQ.Data and GQ.Data.GearScoreWornRows then
+        rows = GQ.Data:GearScoreWornRows()
+        local sum, count = 0, #rows
+        for i = 1, count do
+            local index = rows[i].index or 0
+            if index < 0 then
+                index = 0
+            end
+            sum = sum + index
+        end
+        if count > 0 then
+            score = sum / count
+        end
+        if score < 0 then
+            score = 0
+        elseif score > 100 then
+            score = 100
+        end
+        for i = 1, count do
+            rows[i].order = i
+        end
+        table.sort(rows, function(a, b)
+            local ai = a.index or 0
+            local bi = b.index or 0
+            if ai ~= bi then
+                return ai > bi
+            end
+            return (a.order or 0) < (b.order or 0)
+        end)
+    elseif GQ.Data and GQ.Data.GearScoreBarAverage then
+        score = GQ.Data:GearScoreBarAverage() or 0
+    end
+    shell.rows = rows
+    shell.score = score
+    local r, g, b = self:GearScoreFillColor(score)
+    shell.status:SetStatusBarColor(r, g, b)
+    shell.status:SetValue(score)
+    shell:Show()
+    if frame.contextStatus then
+        frame.contextStatus:Hide()
+    end
+    local owner = GameTooltip.GetOwner and GameTooltip:GetOwner()
+    if owner == shell then
+        shell:GetScript("OnEnter")(shell)
+    end
 end
 
 function GQ.Log:LayoutContextHeading()
@@ -7973,6 +8193,60 @@ function GQ.Log:CreateGearScoreSetting(frame, detail, anchor)
     hint:SetText("Shows the rank, score, and comparison to your equipped gear on gear tooltips.")
     hint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
     frame.settingsScoreHint = hint
+
+    local barLabel = CreateFontStringWithFallback(detail, QUEST_DETAIL_TITLE_FONTS)
+    barLabel:SetJustifyH("LEFT")
+    barLabel:SetText("GearQuest score bar")
+    barLabel:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    frame.settingsScoreBarLabel = barLabel
+
+    local barHit = CreateFrame("Button", nil, detail)
+    barHit:SetPoint("TOPLEFT", hint, "BOTTOMLEFT", 0, -16)
+    barHit:SetSize(math.max(barLabel:GetStringWidth() or 0, 1) + 4, math.max(barLabel:GetStringHeight() or 0, 18))
+    barLabel:SetParent(barHit)
+    barLabel:ClearAllPoints()
+    barLabel:SetPoint("LEFT", barHit, "LEFT", 0, 0)
+    frame.settingsScoreBarLabelHit = barHit
+
+    local function ApplyBarCheck(checked)
+        GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+        GearQuestForeverDB.settings.showGearScoreBar = checked and true or false
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if log and log.UpdateContextStatus then
+            log:UpdateContextStatus()
+        end
+    end
+
+    local barCheck = CreateSettingsCheck(detail, "")
+    barCheck:SetPoint("RIGHT", barHit, "LEFT", -6, 0)
+    barCheck:SetChecked(true)
+    if barCheck.text then
+        barCheck.text:SetText("")
+        barCheck.text:Hide()
+    end
+    barCheck:SetScript("OnClick", function(self)
+        ApplyBarCheck(self:GetChecked())
+    end)
+    barHit:SetScript("OnClick", function()
+        local checked = not barCheck:GetChecked()
+        barCheck:SetChecked(checked)
+        ApplyBarCheck(checked)
+    end)
+    frame.settingsScoreBarCheck = barCheck
+
+    local barHint = CreateFontStringWithFallback(detail, {
+        "QuestFontNormalSmall",
+        "SystemFont_Small",
+        "SystemFont_Shadow_Small",
+        "QuestFont",
+    })
+    barHint:SetPoint("TOPLEFT", barHit, "BOTTOMLEFT", 0, -4)
+    barHint:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
+    barHint:SetJustifyH("LEFT")
+    barHint:SetWordWrap(true)
+    barHint:SetText("Shows the score bar in the log header. Off restores the viewing-upgrades line.")
+    barHint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
+    frame.settingsScoreBarHint = barHint
 end
 
 function GQ.Log:EnsureSettingsPage(frame)
@@ -8660,6 +8934,9 @@ function GQ.Log:SetSettingsSection(section)
         frame.settingsScoreLabelHit,
         frame.settingsScoreCheck,
         frame.settingsScoreHint,
+        frame.settingsScoreBarLabelHit,
+        frame.settingsScoreBarCheck,
+        frame.settingsScoreBarHint,
     }, section == "general")
     setShown({
         frame.settingsToastLabelHit,
@@ -8739,6 +9016,23 @@ function GQ.Log:RefreshSettings()
     if scoreCheck then
         local settings = GearQuestForeverDB and GearQuestForeverDB.settings
         scoreCheck:SetChecked(not settings or settings.showGearScore ~= false)
+    end
+    local barCheck = frame.settingsScoreBarCheck
+    if barCheck then
+        local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+        barCheck:SetChecked(not settings or settings.showGearScoreBar ~= false)
+    end
+    local barLabel = frame.settingsScoreBarLabel
+    local barHit = frame.settingsScoreBarLabelHit
+    if barLabel and barHit and barLabel.GetStringWidth then
+        local width = barLabel:GetStringWidth()
+        local height = barLabel.GetStringHeight and barLabel:GetStringHeight()
+        if width and width > 1 then
+            barHit:SetWidth(width + 4)
+        end
+        if height and height > 1 then
+            barHit:SetHeight(height)
+        end
     end
     local scoreLabel = frame.settingsScoreLabel
     local scoreHit = frame.settingsScoreLabelHit
@@ -9707,9 +10001,7 @@ end
 
 function GQ.Log:UpdateHuntAdvice(layoutRows, tab)
     self._rankOneOwned = {}
-    self._recommendHuntId = nil
-    self._recommendItemId = nil
-    self._recommendSuffix = nil
+    self._recommendKeys = nil
     if not layoutRows then
         return
     end
@@ -9718,8 +10010,7 @@ function GQ.Log:UpdateHuntAdvice(layoutRows, tab)
     end
     local wantRecommend = tab == "active"
         and GQ.Data and GQ.Data.GearScoreTooltipEnabled and GQ.Data:GearScoreTooltipEnabled()
-    local bestDelta = 0
-    local bestEntry
+    local picks = {}
     for i = 1, #layoutRows do
         local spec = layoutRows[i]
         if spec.type == "header" and spec.slotName then
@@ -9733,32 +10024,47 @@ function GQ.Log:UpdateHuntAdvice(layoutRows, tab)
                     if self:EntryShownOnActiveList(rankOne, dataSlot)
                         and (not spec.handKind or self:EntryInWeaponHand(rankOne, dataSlot, spec.handKind)) then
                         local delta = GQ.Data.GearScoreUpgradeDelta and GQ.Data:GearScoreUpgradeDelta(rankOne, spec.slotName, spec.handKind)
-                        if delta and delta > bestDelta then
-                            bestDelta = delta
-                            bestEntry = rankOne
+                        if delta and delta > 0 then
+                            picks[#picks + 1] = { entry = rankOne, delta = delta, order = #picks }
                         end
                     end
                 end
             end
         end
     end
-    if not bestEntry then
+    if #picks == 0 then
         return
     end
-    self._recommendHuntId = bestEntry.id
-    self._recommendItemId = bestEntry.itemId
-    self._recommendSuffix = bestEntry.suffix or ""
+    table.sort(picks, function(a, b)
+        if a.delta ~= b.delta then
+            return a.delta > b.delta
+        end
+        return a.order < b.order
+    end)
+    local keys = {}
+    local limit = #picks
+    if limit > 3 then
+        limit = 3
+    end
+    for i = 1, limit do
+        local entry = picks[i].entry
+        if entry.id then
+            keys[entry.id] = true
+        end
+        keys[tostring(entry.itemId or 0) .. "\0" .. (entry.suffix or "")] = true
+    end
+    self._recommendKeys = keys
 end
 
 function GQ.Log:EntryIsRecommended(entry)
-    if not entry or not self._recommendHuntId then
+    local keys = self._recommendKeys
+    if not entry or not keys then
         return false
     end
-    if entry.id == self._recommendHuntId then
+    if entry.id and keys[entry.id] then
         return true
     end
-    return entry.itemId == self._recommendItemId
-        and (entry.suffix or "") == (self._recommendSuffix or "")
+    return keys[tostring(entry.itemId or 0) .. "\0" .. (entry.suffix or "")] == true
 end
 
 function GQ.Log:EnsureAcquiredLabel(row)
@@ -9788,7 +10094,7 @@ function GQ.Log:EnsureRecommendWidgets(row)
         HideItemTooltip()
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
         GameTooltip:SetText("GearQuest Recommends", 1, 0.82, 0)
-        GameTooltip:AddLine("This is what GearQuest recommends for your next hunt. This would be the biggest upgrade compared to the current piece of gear you are wearing.", 1, 1, 1, true)
+        GameTooltip:AddLine("One of the best upgrades for your level. GearQuest marks up to three rank #1 pieces, the ones that improve what you are wearing the most.", 1, 1, 1, true)
         GameTooltip:Show()
     end)
     info:SetScript("OnLeave", function()
@@ -10603,29 +10909,6 @@ function GQ.Log:ShowSlotRankTooltip(row)
         end
     end
 
-    local dataSlot = slotName == "WeaponPair" and "MainHand" or slotName
-    if dataSlot and GQ.Data.GetNotableForSlot then
-        local addedNotable = false
-        for _, notable in ipairs(GQ.Data:GetNotableForSlot(dataSlot) or {}) do
-            if not handKind or self:EntryInWeaponHand(notable, dataSlot, handKind) then
-                local already = false
-                for i = 1, #entries do
-                    if entries[i].itemId == notable.itemId then
-                        already = true
-                        break
-                    end
-                end
-                if not already then
-                    local name = GQ.Data:GetEntryDisplayName(notable) or ("Item " .. tostring(notable.itemId))
-                    local r, g, b = GetListItemQualityColor(notable.itemId)
-                    local color = string.format("|cff%02x%02x%02x", math.floor(r * 255 + 0.5), math.floor(g * 255 + 0.5), math.floor(b * 255 + 0.5))
-                    add(string.format("|cffd9bf73Notable|r %s%s|r%s", color, name, scoreTrail(notable)), addedNotable and 0 or 8)
-                    addedNotable = true
-                end
-            end
-        end
-    end
-
     if GameTooltip then
         GameTooltip:Hide()
     end
@@ -10931,6 +11214,8 @@ function GQ.Log:RefreshNearestCoordinates()
     if not GQ.Data or not GQ.Data.NearestCoordinateSpot then
         return
     end
+    -- Called when you change zone. A tracked pin is placed once; asking the
+    -- map again every second was what climbed memory with the guide off.
     if GQ.Data then
         GQ.Data._playerWorldAt = nil
     end
@@ -10970,17 +11255,6 @@ function GQ.Log:EnsureCoordinateWatch()
     watch:RegisterEvent("ZONE_CHANGED_INDOORS")
     watch:RegisterEvent("ZONE_CHANGED_NEW_AREA")
     watch:SetScript("OnEvent", function()
-        local log = _G.GearQuest and _G.GearQuest.Log
-        if log and log.RefreshNearestCoordinates then
-            log:RefreshNearestCoordinates()
-        end
-    end)
-    watch:SetScript("OnUpdate", function(self, elapsed)
-        self.elapsed = (self.elapsed or 0) + (elapsed or 0)
-        if self.elapsed < 1 then
-            return
-        end
-        self.elapsed = 0
         local log = _G.GearQuest and _G.GearQuest.Log
         if log and log.RefreshNearestCoordinates then
             log:RefreshNearestCoordinates()

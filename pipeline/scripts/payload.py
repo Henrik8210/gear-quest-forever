@@ -316,30 +316,6 @@ for sp,blob in gen.items():
         if b.get("hi", 60) <= 9: continue
         primary=unique_picks([p for p in b["picks"] if not p.get("alt")], 3)
         band_picks=primary
-        shown_names={p.get("name") for p in band_picks}
-        cut=(band_picks[-1].get("score") or 0) if band_picks else 0
-        nbs=[nb for nb in (b.get("notableEffects") or [])
-             if nb.get("id") not in FOREVER_MISSING
-             and nb.get("name") not in shown_names
-             and (nb.get("score") is None or nb.get("score") < cut)]
-        forever_nb=None
-        if band_picks and cut:
-            shown_ids={p["id"] for p in band_picks}
-            for p in b["picks"]:
-                if p.get("alt") or p["id"] in FOREVER_MISSING:
-                    continue
-                if p["id"] in shown_ids or p.get("name") in shown_names:
-                    continue
-                sc=p.get("score") or 0
-                # Near-miss Forever item: notice-only, never equal/above BiS #3.
-                if p["id"]>=200000 and cut*0.98 <= sc < cut:
-                    forever_nb=p
-                    shown_names.add(p.get("name"))
-                    break
-        if forever_nb:
-            nbs=[forever_nb]+[nb for nb in nbs if nb.get("name")!=forever_nb.get("name")]
-        if nbs:
-            b["notableEffects"]=nbs[:2]
         seen_ids={p["id"] for p in band_picks}
         seen_names={p.get("name") for p in band_picks}
         for p in b["picks"]:
@@ -398,25 +374,6 @@ def stored_hand(slot, item_id):
         if sl == "OffHand" or inv == 22:
             return "off"
     return None
-
-notable=[]
-for sp,blob in gen.items():
-    for b in blob["bands"]:
-        for nb in (b.get("notableEffects") or []):
-            allused.add(nb["id"])
-            extra=""
-            if nb.get("suffix"):
-                extra=',suffix=%s'%lua(nb["suffix"])
-                if nb.get("chanceAny"):
-                    extra+=',suffixChance=%s'%nb.get("chanceAny")
-                if nb.get("suffixId"):    extra+=',suffixId=%d'%nb["suffixId"]
-                if nb.get("suffixRange"): extra+=',suffixRange=%s'%lua(nb["suffixRange"])
-            if not extra or "hand=" not in extra:
-                hand = stored_hand(b["slot"], nb["id"])
-                if hand:
-                    extra += ",hand=%s" % lua(hand)
-            notable.append('    {%d,%s,%d,%d,%s,%s%s},'%(
-                nb["id"], lua(b["slot"]), b["lo"], b["hi"], lua(SPEC.get(sp)), lua(b["faction"]), extra))
 
 facts=build_facts(allused)
 open(os.path.join(OUT,"Data.%s.generated.lua"%CLS.title()),"w").write(
@@ -477,12 +434,6 @@ GQ.Data."""+LC+"""Picks = {
 """+"\n".join(rows)+"""
 }
 
--- Items whose value is a proc the score cannot price -- Thunderfury prints 5 Agility
--- and 8 Stamina. Not part of the top 3; show them alongside it.
--- row = { itemId, slot, minLevel, maxLevel, spec, faction }
-GQ.Data."""+LC+"""Notable = {
-"""+"\n".join(notable)+"""
-}
 """)
 print("Data.%s.generated.lua %.2f MB, %d picks, %d interned items"%(CLS.title(),
     os.path.getsize(os.path.join(OUT,"Data.%s.generated.lua"%CLS.title()))/1e6,len(rows),len(facts)))

@@ -55,10 +55,20 @@ QUEST_START_DOOR = {
 }
 # Wowhead's series on the reward is one faction's chain. The other faction
 # starts the same rewards at these quests. Pin those starts too.
-# Turn-ins with no Wowhead quest. --repair-quests rebuilds quest_faction from
-# quest rewards only, so these sides are merged back in on every write.
+# Turn-ins with no Wowhead quest, and rewards whose shared quest name would
+# take the wrong Side. --repair-quests rebuilds quest_faction from quest
+# rewards, then these sides replace whatever that pass parsed.
 # Malignant Root: Rotheap Inards to Rethiel the Greenwarden, who is hostile to the Horde.
 HAND_FACTION = {
+    # Heart of Disruption is two quests with one name. Alliance 92458 chooses
+    # Spellguard Pauldrons, Renewing Footpads, or Defender of Dalaran. Horde
+    # 96984 chooses Battle Spaulders, Enchanted Sandals, or Striking Staff.
+    279839: "Alliance",
+    279840: "Alliance",
+    279841: "Alliance",
+    279842: "Horde",
+    279843: "Horde",
+    279844: "Horde",
     282283: "Alliance",
 }
 
@@ -311,6 +321,7 @@ MAP_IDS = {
     "Teldrassil": 1438, "Dun Morogh": 1426, "Elwynn Forest": 1429,
     "Redridge Mountains": 1433, "Tirisfal Glades": 1420, "Silverpine Forest": 1421,
     "Westfall": 1436, "Darkshore": 1439, "Loch Modan": 1432, "Duskwood": 1431,
+    "Hillsbrad Foothills": 1424, "Silverpine Forest": 1421,
 }
 
 
@@ -320,18 +331,16 @@ def quest_side(html: str) -> str | None:
     The end-NPC icons sit in the same infobox. Reading those marked every
     both-faction quest as Horde and then stamped the Alliance turn-in with
     that side. Friend of the Library starts in Stormwind and also turns in
-    to Owen Thadd in Undercity.
+    to Owen Thadd in Undercity. The Side word is often inside an
+    icon-alliance or icon-horde span, so a 40-character window misses it.
     """
     i = html.find("Side:")
     if i < 0:
         return None
-    match = re.search(r"Side:\s*([A-Za-z]+)", html[i : i + 40])
-    if not match:
-        return None
-    word = match.group(1).lower()
-    if word == "alliance":
+    window = html[i : i + 160]
+    if re.search(r"icon-alliance|Side:\s*Alliance\b", window):
         return "Alliance"
-    if word == "horde":
+    if re.search(r"icon-horde|Side:\s*Horde\b", window):
         return "Horde"
     return None
 
@@ -992,9 +1001,25 @@ def resolve_item(item_id: int, src: dict, cache: dict, xml_cache: dict) -> tuple
     described = described_key(zone)
 
     if kind in ("boss_drop", "raid_trash"):
-        if door:
-            spots = entrance_spots(door)
-            return {"note": NOTE_DOOR, "spots": spots, "more": len(spots) > 1}, None
+        door_names = []
+        for zone_name in src.get("zones") or []:
+            found = door_key(zone_name)
+            if found and found not in door_names:
+                door_names.append(found)
+        if not door_names and door:
+            door_names.append(door)
+        if door_names:
+            spots = []
+            seen_door = set()
+            for name in door_names:
+                for spot in entrance_spots(name):
+                    key = (spot.get("map"), spot.get("x"), spot.get("y"))
+                    if key in seen_door:
+                        continue
+                    seen_door.add(key)
+                    spots.append(spot)
+            if spots:
+                return {"note": NOTE_DOOR, "spots": spots, "more": len(spots) > 1}, None
         if described:
             return None, "entrance has no exact coordinate yet (" + DOORS["describedOnly"][described] + ")"
         if npc:
@@ -1227,7 +1252,7 @@ QUEST_FACTION_LUA = Path(ADDON_GEN) / "Data.QuestFaction.generated.lua"
 
 def write_quest_faction(sides: dict[int, str]) -> None:
     for iid, side in HAND_FACTION.items():
-        sides.setdefault(iid, side)
+        sides[iid] = side
     payload = {str(iid): side for iid, side in sorted(sides.items())}
     QUEST_FACTION_JSON.write_text(
         json.dumps(payload, indent=2) + "\n",

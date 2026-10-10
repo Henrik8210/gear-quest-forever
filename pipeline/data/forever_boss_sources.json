@@ -1,34 +1,231 @@
 [
-  {"id": 276631, "npc": "Baron Silverlaine", "zone": "Shadowfang Keep"},
-  {"id": 271201, "npc": "Witherfang", "zone": "Ruins of Lordaeron"},
-  {"id": 271202, "npc": "Witherfang", "zone": "Ruins of Lordaeron"},
-  {"id": 271203, "npc": "Witherfang", "zone": "Ruins of Lordaeron"},
-  {"id": 271204, "npc": "The Baron", "zone": "Ruins of Lordaeron"},
-  {"id": 271205, "npc": "The Baron", "zone": "Ruins of Lordaeron"},
-  {"id": 271206, "npc": "The Baron", "zone": "Ruins of Lordaeron"},
-  {"id": 271218, "npc": "Viktor the Vile", "zone": "Ruins of Lordaeron"},
-  {"id": 271212, "npc": "Viktor the Vile", "zone": "Ruins of Lordaeron"},
-  {"id": 271211, "npc": "Viktor the Vile", "zone": "Ruins of Lordaeron"},
-  {"id": 271216, "npc": "The Abandoned", "zone": "Ruins of Lordaeron"},
-  {"id": 271208, "npc": "The Abandoned", "zone": "Ruins of Lordaeron"},
-  {"id": 271207, "npc": "The Abandoned", "zone": "Ruins of Lordaeron"},
-  {"id": 271217, "npc": "Bjork", "zone": "Ruins of Lordaeron"},
-  {"id": 271209, "npc": "Bjork", "zone": "Ruins of Lordaeron"},
-  {"id": 271210, "npc": "Bjork", "zone": "Ruins of Lordaeron"},
-  {"id": 271213, "npc": "Rath'Mael", "zone": "Ruins of Lordaeron"},
-  {"id": 271215, "npc": "Rath'Mael", "zone": "Ruins of Lordaeron"},
-  {"id": 271214, "npc": "Rath'Mael", "zone": "Ruins of Lordaeron"},
-  {"id": 271097, "npc": "Faldrim Anvilmar", "zone": "Hall of Thanes"},
-  {"id": 270227, "npc": "Faldrim Anvilmar", "zone": "Hall of Thanes"},
-  {"id": 271096, "npc": "Faldrim Anvilmar", "zone": "Hall of Thanes"},
-  {"id": 270230, "npc": "Magmatus", "zone": "Hall of Thanes"},
-  {"id": 270231, "npc": "Magmatus", "zone": "Hall of Thanes"},
-  {"id": 271095, "npc": "Magmatus", "zone": "Hall of Thanes"},
-  {"id": 270228, "npc": "Plunder", "zone": "Hall of Thanes"},
-  {"id": 271098, "npc": "Plunder", "zone": "Hall of Thanes"},
-  {"id": 270229, "npc": "Plunder", "zone": "Hall of Thanes"},
-  {"id": 270256, "npc": "Durgen Dirgehammer", "zone": "Hall of Thanes"},
-  {"id": 270260, "npc": "Durgen Dirgehammer", "zone": "Hall of Thanes"},
-  {"id": 270261, "npc": "Durgen Dirgehammer", "zone": "Hall of Thanes"},
-  {"id": 273088, "npc": "Lady Anacondra", "zone": "Wailing Caverns"}
+  {
+    "id": 276631,
+    "npc": "Baron Silverlaine",
+    "zone": "Shadowfang Keep"
+  },
+  {
+    "id": 271201,
+    "npc": "Witherfang",
+    "zone": "Ruins of Lordaeron"
+  },
+  {
+    "id": 271202,
+    "npc": "Witherfang",
+    "zone": "Ruins of Lordaeron"
+  },
+  {
+    "id": 271203,
+    "npc": "Witherfang",
+    "zone": "Ruins of Lordaeron"
+  },
+  {
+    "id": 271204,
+    "npc": "The Baron",
+    "zone": "Ruins of Lordaeron"
+  },
+  {
+    "id": 271205,
+    "npc": "The Baron",
+    "zone": "Ruins of Lordaeron"
+  },
+  {
+    "id": 271206,
+    "npc": "The Baron",
+    "zone": "Ruins of Lordaeron"
+  },
+  {
+    "id": 271218,
+    "npc": "Viktor the Vile",
+    "zone": "Ruins of Lordaeron"
+  },
+  {
+    "id": 271212,
+    "npc": "Viktor the Vile",
+    "zone": "Ruins of Lordaeron"
+  },
+  {
+    "id": 271211,
+    "npc": "Viktor the Vile",
+    "zone": "Ruins of Lordaeron"
+  },
+  {
+    "id": 271216,
+    "npc": "The Abandoned",
+    "zone": "Ruins of Lordaeron"
+  },
+  {
+    "id": 271208,
+    "npc": "The Abandoned",
+    "zone": "Ruins of Lordaeron"
+  },
+  {
+    "id": 271207,
+    "npc": "The Abandoned",
+    "zone": "Ruins of Lordaeron"
+  },
+  {
+    "id": 271217,
+    "npc": "Bjork",
+    "zone": "Ruins of Lordaeron"
+  },
+  {
+    "id": 271209,
+    "npc": "Bjork",
+    "zone": "Ruins of Lordaeron"
+  },
+  {
+    "id": 271210,
+    "npc": "Bjork",
+    "zone": "Ruins of Lordaeron"
+  },
+  {
+    "id": 271213,
+    "npc": "Rath'Mael",
+    "zone": "Ruins of Lordaeron"
+  },
+  {
+    "id": 271215,
+    "npc": "Rath'Mael",
+    "zone": "Ruins of Lordaeron"
+  },
+  {
+    "id": 271214,
+    "npc": "Rath'Mael",
+    "zone": "Ruins of Lordaeron"
+  },
+  {
+    "id": 271097,
+    "npc": "Faldrim Anvilmar",
+    "zone": "Hall of Thanes"
+  },
+  {
+    "id": 270227,
+    "npc": "Faldrim Anvilmar",
+    "zone": "Hall of Thanes"
+  },
+  {
+    "id": 271096,
+    "npc": "Faldrim Anvilmar",
+    "zone": "Hall of Thanes"
+  },
+  {
+    "id": 270230,
+    "npc": "Magmatus",
+    "zone": "Hall of Thanes"
+  },
+  {
+    "id": 270231,
+    "npc": "Magmatus",
+    "zone": "Hall of Thanes"
+  },
+  {
+    "id": 271095,
+    "npc": "Magmatus",
+    "zone": "Hall of Thanes"
+  },
+  {
+    "id": 270228,
+    "npc": "Plunder",
+    "zone": "Hall of Thanes"
+  },
+  {
+    "id": 271098,
+    "npc": "Plunder",
+    "zone": "Hall of Thanes"
+  },
+  {
+    "id": 270229,
+    "npc": "Plunder",
+    "zone": "Hall of Thanes"
+  },
+  {
+    "id": 270256,
+    "npc": "Durgen Dirgehammer",
+    "zone": "Hall of Thanes"
+  },
+  {
+    "id": 270260,
+    "npc": "Durgen Dirgehammer",
+    "zone": "Hall of Thanes"
+  },
+  {
+    "id": 270261,
+    "npc": "Durgen Dirgehammer",
+    "zone": "Hall of Thanes"
+  },
+  {
+    "id": 273088,
+    "npc": "Lady Anacondra",
+    "zone": "Wailing Caverns"
+  },
+  {
+    "id": 252512,
+    "npc": "Gelihast",
+    "zone": "Blackfathom Deeps",
+    "zones": [
+      "Blackfathom Deeps",
+      "Razorfen Kraul",
+      "The Stockade",
+      "Scarlet Monastery"
+    ],
+    "instructions": "Drops from Gelihast, Lorgus Jett, and Aku'mai in Blackfathom Deeps, from Aggem Thorncurse, Death Speaker Jargba, Roogug, Overlord Ramtusk, Agathelos the Raging, and Charlga Razorflank in Razorfen Kraul, from Kam Deepfury and Dextren Ward in the Stockade, and from Azshir the Sleepless in Scarlet Monastery."
+  },
+  {
+    "id": 252513,
+    "npc": "Gelihast",
+    "zone": "Blackfathom Deeps",
+    "zones": [
+      "Blackfathom Deeps",
+      "Razorfen Kraul",
+      "The Stockade",
+      "Scarlet Monastery"
+    ],
+    "instructions": "Drops from Gelihast, Lorgus Jett, and Twilight Lord Kelris in Blackfathom Deeps, from Overlord Ramtusk and Agathelos the Raging in Razorfen Kraul, from Hamhock and Kam Deepfury in the Stockade, and from Interrogator Vishas and Bloodmage Thalnos in Scarlet Monastery."
+  },
+  {
+    "id": 252514,
+    "npc": "Gelihast",
+    "zone": "Blackfathom Deeps",
+    "zones": [
+      "Blackfathom Deeps",
+      "Razorfen Kraul",
+      "The Stockade"
+    ],
+    "instructions": "Drops from Gelihast and Aku'mai in Blackfathom Deeps, from Earthcaller Halmgar in Razorfen Kraul, and from Dextren Ward in the Stockade."
+  },
+  {
+    "id": 252515,
+    "npc": "Gelihast",
+    "zone": "Blackfathom Deeps",
+    "zones": [
+      "Blackfathom Deeps",
+      "Razorfen Kraul",
+      "The Stockade"
+    ],
+    "instructions": "Drops from Gelihast, Twilight Lord Kelris, and Aku'mai in Blackfathom Deeps, from Death Speaker Jargba, Overlord Ramtusk, and Charlga Razorflank in Razorfen Kraul, and from Kam Deepfury, Bazil Thredd, and Dextren Ward in the Stockade."
+  },
+  {
+    "id": 252455,
+    "npc": "Twilight Lord Kelris",
+    "zone": "Blackfathom Deeps",
+    "zones": [
+      "Blackfathom Deeps",
+      "Razorfen Kraul",
+      "The Stockade",
+      "Scarlet Monastery"
+    ],
+    "instructions": "Drops from Twilight Lord Kelris, Old Serra'kis, Aku'mai, and Lorgus Jett in Blackfathom Deeps, from Aggem Thorncurse, Earthcaller Halmgar, Agathelos the Raging, and Charlga Razorflank in Razorfen Kraul, from Kam Deepfury and Bazil Thredd in the Stockade, and from Interrogator Vishas and Bloodmage Thalnos in Scarlet Monastery."
+  },
+  {
+    "id": 252456,
+    "npc": "Gelihast",
+    "zone": "Blackfathom Deeps",
+    "zones": [
+      "Blackfathom Deeps",
+      "Razorfen Kraul",
+      "The Stockade"
+    ],
+    "instructions": "Drops from Gelihast, Twilight Lord Kelris, Old Serra'kis, and Aku'mai in Blackfathom Deeps, from Charlga Razorflank in Razorfen Kraul, and from Bazil Thredd and Dextren Ward in the Stockade."
+  }
 ]

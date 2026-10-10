@@ -134,6 +134,8 @@ OUTPUTS = {
 # Crafts that share a set prefix but are not sold as camp patterns.
 # Pawani's Trapper legs pattern is "Trapper's Leather Legguards", not Pants.
 # Armor / Helm / Pants on these six sets have no Pattern: item.
+# The six helms are boss drops (Blackfathom Deeps, Razorfen Kraul, the
+# Stockade, Scarlet Monastery), not trainer recipes. See forever_boss_sources.json.
 NOT_CAMP_RECIPES = {
     "brawler's leather armor", "brawler's leather helm", "brawler's leather pants",
     "defender's leather armor", "defender's leather helm", "defender's leather pants",
