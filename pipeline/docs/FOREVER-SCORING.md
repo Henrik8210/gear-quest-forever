@@ -57,6 +57,18 @@ numbers in `score.py` `weights_at_level()`, and
 you explicitly ask for a retune. A piece ranking first because of an
 existing weight is the model working.
 
+**Where to look up a weight change.** The community sheet is
+[GearQuest Forever - Class Stat Weights](https://docs.google.com/spreadsheets/d/1jMC89KgzHpPZHYgcjOq6ef7lENhh8OGgypG2rC2m0Ok/edit).
+One tab per class (Druid, Hunter, Mage, Paladin, Priest, Rogue, Shaman,
+Warlock, Warrior), themed with that class's log scene from
+`GearQuest/Art/GQ-LogScene-*.png`. The live grid is the raw `weights.json`
+row. Do not pre-multiply the leveling bonuses into it. Those cells are
+locked so only Henrik can edit them. Anyone with the link can add a row
+under **Suggest a change** (name, spec, stat, suggested weight, and why).
+Henrik's note column stays locked. A suggestion does not change the addon.
+When a suggestion is accepted, copy it into `weights.json` and re-score
+that class. Do not retune from the sheet unless asked.
+
 Priest, mage, and warlock ranged damage (`dpsWeightRanged`) is **7**, the
 same scale as a warrior's melee weapon. These classes cast, then wand. A
 higher-DPS wand is the ranged hunt. **White Obsidian Wand** (274425) is
@@ -1364,16 +1376,41 @@ above crit on all three.
 
 ### Holy paladin
 
-Holy levels in melee, then wears mail and, from 40, plate. Shown below 60:
-healing, spell power, and holy spell power **1.8**, intellect **1.2** (raw
-0.60), spirit **1.5** (raw 0.75; Reverence keeps spirit regen while casting),
-mana per 5 **2.2**, flat mana **0.08** (raw 0.04), crit **0.8**, armor
-**0.15** (raw 0.075). A line that says `+N Holy Spell Damage` is holy spell
-power only, and for this spec it is worth the same as generic spell power.
-Cloth is `armorClass` 0.62, leather 0.82, mail 0.96, plate 1.0. A cloth piece
-shows up only when its healing pays for the missing armor. Blacksmithing
-healing mail and plate (Acolyte's, Prefect's, and the later plate sets)
-outrank tailoring cloth of the same band.
+Holy levels in melee, then wears mail and, from 40, plate. The scored row
+in `weights.json` is what the tooltip and the hunt use. Below 60 the
+leveling multipliers still apply (stamina, health, and health per 5 ×3,
+armor ×2, intellect, spirit, mana per 5, and mana ×2). The tooltip prints
+two decimals, so a product of 0.008 shows as 0.01.
+
+| Stat | Raw weight | Shown below 60 |
+|---|---|---|
+| Healing | 1.3 | 1.3 |
+| Spell power | 1.35 | 1.35 |
+| Holy spell power | 1.8 | 1.8 |
+| Intellect | 0.85 | 1.7 |
+| Spirit | 0.3 | 0.6 |
+| Mana per 5 | 1.1 | 2.2 |
+| Mana | 0.04 | 0.08 |
+| Crit | 0.8 | 0.8 |
+| Stamina | 0.3 | 0.9 |
+| Armor | 0.004 | 0.01 on the tooltip (0.008 before rounding) |
+
+A note written in v0.3.6 said healing, spell power, and holy spell power
+were **1.8**, intellect **1.2** (raw 0.60), spirit **1.5** (raw 0.75), and
+armor **0.15** (raw 0.075). Those figures were never copied into the weight
+row. The row has been the table above since the first Classic re-score.
+Do not retune the row to match that note. `+N Holy Spell Damage` is
+`spHoly`, and for Holy it stays at **1.8**. Cloth is `armorClass` 0.62,
+leather 0.82, mail 0.96, plate 1.0. A cloth piece shows up only when its
+healing pays for the missing armor. Blacksmithing healing mail and plate
+(Acolyte's, Prefect's, and the later plate sets) outrank tailoring cloth
+of the same band.
+
+Protection paladin armor is **0.05**, shown as **0.1** below 60. Its
+`armorClass` is plate 1.0, mail 0.55, leather 0.35, cloth 0.18. The ×2
+line on the spec tooltip is the leveling armor stat. It is not an armor
+budget, and it is not why cloth loses. Generic spell power is **0.8**.
+`spHoly` is **0.05**. Do not copy Holy's equality rule onto Protection.
 
 ### Hunt instructions
 

@@ -154,7 +154,7 @@ Operational lessons from finishing the Classic random-enchant pass. Use this bef
 
 | Item | Notes |
 |------|--------|
-| **Stat weights** | Forever scale in `pipeline/data/weights.json`. Do not retune unless asked. Live rules: [FOREVER-SCORING.md](../pipeline/docs/FOREVER-SCORING.md). |
+| **Stat weights** | Forever scale in `pipeline/data/weights.json`. Do not retune unless asked. Look up proposals in the [class stat-weight sheet](https://docs.google.com/spreadsheets/d/1jMC89KgzHpPZHYgcjOq6ef7lENhh8OGgypG2rC2m0Ok/edit). Live rules: [FOREVER-SCORING.md](../pipeline/docs/FOREVER-SCORING.md). |
 | **Forever client** | Interface version, tooltips, new/retuned items — phase 4. |
 | **Push hygiene** | After regen, commit **generated Lua + pipeline inputs + scripts** together. |
 
@@ -189,7 +189,7 @@ Keep the pipeline **out of the CurseForge addon zip** (`.pkgmeta` already ignore
 
 ## Stat weights
 
-`pipeline/data/weights.json` is the Forever scale. Damage first, then survivability below 60, then endurance. Level 60 is the raw raid-scale weights. Priest, mage, and warlock `dpsWeightRanged` is **7**. Hunter ranged damage is real, and the ranged weapon is a bow, gun, or crossbow. Do not change a weight unless asked. The rules live in [FOREVER-SCORING.md](../pipeline/docs/FOREVER-SCORING.md).
+`pipeline/data/weights.json` is the Forever scale. Damage first, then survivability below 60, then endurance. Level 60 is the raw raid-scale weights. Priest, mage, and warlock `dpsWeightRanged` is **7**. Hunter ranged damage is real, and the ranged weapon is a bow, gun, or crossbow. Do not change a weight unless asked. Proposed changes are looked up in [GearQuest Forever - Class Stat Weights](https://docs.google.com/spreadsheets/d/1jMC89KgzHpPZHYgcjOq6ef7lENhh8OGgypG2rC2m0Ok/edit): the live grid is locked, and suggestions sit at the bottom of each class tab. A suggestion does not change the addon until it is copied into `weights.json`. The rules live in [FOREVER-SCORING.md](../pipeline/docs/FOREVER-SCORING.md).
 
 Re-score with `python pipeline/scripts/rescore_hunter_shaman.py` and the class name. Do not `reemit_all.py` from stale JSON.
 
