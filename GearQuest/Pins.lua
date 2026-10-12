@@ -295,8 +295,14 @@ local function CreateMapPin()
     return frame
 end
 
+local function MapIsOpen()
+    return WorldMapFrame and WorldMapFrame.IsShown and WorldMapFrame:IsShown()
+end
+
+-- GetCanvas creates or wakes the map canvas. Call it only while the map is
+-- open and the pins actually need to be drawn. A closed map does not need it.
 local function MapReady()
-    return WorldMapFrame and WorldMapFrame.GetCanvas and WorldMapFrame:GetCanvas()
+    return MapIsOpen() and WorldMapFrame.GetCanvas and WorldMapFrame:GetCanvas()
         and WorldMapFrame.GetMapID and MapCanvasPinMixin
 end
 
@@ -311,10 +317,10 @@ end
 
 -- Runs from our own OnUpdate, never from the map's show or hide.
 local function PlacePins()
-    if not MapReady() or not WorldMapFrame:IsShown() then
+    if not MapIsOpen() then
         return
     end
-    local mapId = WorldMapFrame:GetMapID()
+    local mapId = WorldMapFrame.GetMapID and WorldMapFrame:GetMapID()
     if not mapId then
         return
     end
@@ -322,6 +328,9 @@ local function PlacePins()
     -- Projecting every pin on every frame was a steady map-API cost.
     local guided = GuidedEntryId()
     if mapId == placedMap and pinGen == placedGen and guided == placedGuided then
+        return
+    end
+    if not MapReady() then
         return
     end
     placedMap, placedGen, placedGuided = mapId, pinGen, guided
@@ -348,12 +357,10 @@ local function PlacePins()
 end
 
 local function RefreshPins()
-    if not MapReady() then
+    if not MapIsOpen() then
         return
     end
-    if WorldMapFrame:IsShown() then
-        PlacePins()
-    end
+    PlacePins()
 end
 
 function GQ.Pins:Sync()
@@ -381,10 +388,19 @@ function GQ.Pins:Init()
     driver = CreateFrame("Frame")
     -- Place pins on our own tick once the map is already open. The map's
     -- show and hide must not call into this addon, or the gamepad cannot
-    -- clear its interact target when the map closes.
+    -- clear its interact target when the map closes. A closed map only
+    -- checks IsShown. GetCanvas runs on the open edge, then not again
+    -- until the map, the tracked hunts, or the guide pin changes.
+    local mapWasOpen = false
     driver:SetScript("OnUpdate", function()
-        if not MapReady() or not WorldMapFrame:IsShown() then
+        local open = MapIsOpen()
+        if not open then
+            mapWasOpen = false
             return
+        end
+        if not mapWasOpen then
+            mapWasOpen = true
+            placedMap = nil
         end
         PlacePins()
     end)

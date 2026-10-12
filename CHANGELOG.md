@@ -2,47 +2,49 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v0.5.3-beta
+## v0.5.4-beta
 
-The hunt list shows an icon and a rank on every row. Quest rewards say the level they can be picked up. Recommendations no longer treat an empty slot as an automatic upgrade. Hovering gear in your bags no longer stalls the game. Scores were rebuilt from the current Forever item pages.
+Weapons have their own filter, and the rank numbers stay the real ones. The list stops at 30. Chat can be silenced. Vendor lines name the seller your faction can actually buy from. The window title reads **GearQuest Forever v0.5.4-beta**.
 
-The window title reads **GearQuest Forever v0.5.3-beta**.
+### Weapons
 
-### Icons on the hunt list
+Every class has one **Weapons** header. The arrow on that title, before the (i), is the filter. **Two-hand** and **One-hand** are checkboxes, and both can be on. Under each style are the weapon types in your current level band: dagger, sword, mace, axe, fist, polearm, staff. Every type that style has starts checked. Unchecking a type hides every weapon of that type. **Leaden Mace of the Tiger** stays a mace when the tooltip glues the type onto the hand line. Shields, wands, thrown weapons, and relics keep their own slots.
 
-Each hunt row shows a small item icon immediately before the name, the same height as the text. The icon is a question mark until the client knows that item. Slot headers stay the plus and minus.
+The filter only hides pieces. If the best weapon is a two-hander, it stays **#1** when two-handers are hidden. A one-hander keeps its own number. **Recommended** is still that unfiltered rank 1, and it only shows when that piece is inside the filter. The (i) list is the same unfiltered order, up to 30 weapons, whatever the boxes are set to. The hunt rows are the filtered pieces, up to three names, with those same numbers. Narrowing to daggers still shows up to three daggers when three exist.
 
-### Rank numbers on every row
+**Hunters can dual wield.** One-hand opens the main hand and the off hand. **Shamans cannot.** Enhancement is two-hand only. Elemental starts with both styles on, because a staff and a one-hander are both worn, and the off hand stays a shield. Restoration and Enhancement Tank keep the shield. Rogues and Fury warriors can dual wield. Right-click on the paper doll follows the same filter.
 
-The column under the collapse button shows a faded grey **#N** on every hunt, including **#4** and later when an earlier piece was already obtained. The number is the same one the (i) tooltip uses. **Leafre's Ring** shows **#1** when that tooltip says it is first. A piece the other faction cannot get is left out, and the numbers close up.
+The source filter and a play style apply on top of that. A boss-drop sword stays hidden when Boss drop is off, even if swords are checked. Rank numbers do not change. The green arrow stays on the real best piece when a filter hides it, and on every hunt still showing.
 
-### Quest pickup level
+### Thirty weapons, and no dummy pieces
 
-A quest reward, including a seasonal quest, has a line just above Source: **This quest can be picked up at level N.** N is the level GearQuest uses for that hunt. **Windstorm Hammer** and **Dancing Flame** say 36. **Ragefire Wand**, **Icefury Wand**, and **Nether Force Wand** say 40. **Heart of Disruption** says 30. **Grave Shroud** says 16.
+The (i) list shows at most 30 weapons for your faction, spec, and level. Anything scored below that stays out of the addon. **Invisible Dagger** is gone. So is any piece named UNUSED, (DNT), or Placeholder.
 
-### Recommendations skip a naked slot
+A common vendor weapon can still sit high on that list. Off-hand damage is scored at half, and both hands share one list. On a level 22 Combat rogue, **Longsword** can outrank a blue off-hand. Horde buys it from **Kard Ragetotem** in Thunder Bluff. Alliance buys it from **Marda Weller** in Stormwind.
 
-**- Recommended** still marks up to three rank #1 hunts, the ones that improve what you are wearing the most. An empty slot is no longer treated as a jump from nothing to a perfect score. It is recommended only when that piece's raw score beats the best upgrade in a slot that already has gear.
+### Leather patterns at the camps
 
-On a level 11 Retribution paladin with empty shoulders and a weapon already equipped, **Talbar Mantle** is a few points. **Hammerbone** is the hunt, because it does more than double the weapon you are wearing. A later rank is never the recommendation. A downgrade is not marked. Simulation hides the marks. Turning **GearQuest score on tooltips** off hides **- Recommended** and leaves **- Rank #1 BiS acquired**.
+**Brawler's**, **Defender's**, **Totemic**, **Trapper's**, **Stormrider's**, and **Wisdom's Leather Armor**, and the six **Leather Pants** from those sets, are Merchant's Favor patterns. Horde buys them from **Pawani** at the Barrens camp. Alliance buys them from **Daniel Stitchsong** at the Redridge camp. The six leather helms stay boss drops.
 
-### Hovering bags stays smooth
+### The score bar stays put
 
-Hovering an item in your bags, on the character panel, or in chat scores that slot once and remembers it. Moving the mouse to another slot and back does not scan the first slot again. GearQuest does not ask the client to load every other piece in the slot. The obtain popup is unchanged. Looting a hunt on the list still shows **BiS upgrade obtained!**
+Changing the weapon filter does not move the GearQuest Index Score bar. The Weapons (i) list uses one scale for both hands. Each arrow compares that weapon to the hand you wear it in. An empty hand shows the index only.
 
-### Scores from the current Forever pages
+### Hide chat messages
 
-Every class was scored again from the live Forever tooltips.
+**General → Hide chat messages** is off until you check it. It stops every GearQuest line in chat, including login, obtain notices, and `/gq` replies. The log, tooltips, the obtain popup, and the score bar stay. The check stays checked after you reload. The General page scrolls when the options run past the pane.
 
-**Armor of the Fang** lost stamina and strength. The chest is now +3 Strength, +3 Intellect, and +10 Spirit. Beast Mastery and Marksmanship still hunt the legs, feet, belt, and gloves from about 18 to 24, not the chest. Survival and Feral keep that chest as the hunt only through level 21. Enhancement keeps the chest through 27. At 29 the other four Fang pieces leave as well.
+### Vendors on the right side
 
-**Blackened Defias** stats did not change. For Combat, Assassination, and Subtlety the legs are the hunt at 14–16 and the boots at 15–16. The belt moves into the top of the list from 17, and is rank 1 from 22, once Fang stops winning that slot.
+When both factions sell a piece, the hunt names one seller for each side. A piece only one faction sells stays off the other list. **Anachronos** pieces stay on both, because both factions turn quests in to him.
 
-**Chain of the Scarlet Crusade** is unchanged. Retribution still hunts the belt at 32–36. The chest stays in the top 3 at 34–39. The legs are rank 1 at 39.
+### Protection paladin
 
-**Rotmender's Garb** healing went from 10 to 11. Holy and Discipline priest still take the chest, sash, and gloves through 21, with the treads in the top 3 into the high 20s. Holy paladin **Rotmender's Treads** sit behind **Acolyte's Boots**, **Wisdom's Leather Boots**, and **Stormrider's Leather Boots**.
+Protection armor is **0.2** (shown **0.4** while leveling). Spell power is **0.9**. Mana per 5 is **0.2** (shown **0.4**). Ranged attack power is **0** on Holy, Protection, and Retribution, including levels 1–9. Every class was scored again. A piece Forever does not list is gone, and the ranks close up. Level 60 uses the same stamina and mana multipliers as the levels below it.
 
-**Medal of Courage** requires 35. **Zandalar Illusionist's Wraps**, **Zandalar Demoniac's Wraps**, **Zandalar Demoniac's Mantle**, **Zandalar Demoniac's Robe**, and **Zandalar Illusionist's Robe** require 58. The level 60 dungeon upgrade sets still require 60. **Fiery War Axe** stays hidden until 35. **Talbar Mantle** is a green: +2 Stamina, +4 Intellect, +1 mana per 5, requires 10.
+### v0.5.3-beta
+
+The hunt list shows an icon and a faded grey **#N** on every row, including **#4** and later. **Leafre's Ring** shows **#1** when that tooltip says it is first. A quest reward says **This quest can be picked up at level N.** **Windstorm Hammer** and **Dancing Flame** say 36. **Ragefire Wand**, **Icefury Wand**, and **Nether Force Wand** say 40. **Heart of Disruption** says 30. **- Recommended** skips an empty slot unless that piece's raw score beats the best upgrade in a slot that already has gear. On a level 11 Retribution paladin, **Hammerbone** is the hunt over **Talbar Mantle**. Hovering bags scores a slot once and does not load every other piece. **Armor of the Fang** is +3 Strength, +3 Intellect, and +10 Spirit. Beast Mastery and Marksmanship hunt the other Fang pieces from about 18 to 24. Survival and Feral keep the chest only through 21. Enhancement keeps it through 27. **Medal of Courage** requires 35. The five Zandalar wraps and robes require 58. The level 60 dungeon sets still require 60. The window title reads **GearQuest Forever v0.5.3-beta**.
 
 ### v0.5.2-beta
 

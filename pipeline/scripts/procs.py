@@ -182,6 +182,19 @@ def classify(text):
         out.append(("aoe_threat",{}))
     return out
 
+# "against Furbolg" is not a combat proc. A bonus sentence ("deals extra to
+# Plants") on a line that already hits nearby enemies still counts.
+_CREATURE = {
+    "furbolg", "furbolgs", "beast", "beasts", "demon", "demons", "undead",
+    "dragon", "dragons", "dragonkin", "elemental", "elementals", "giant",
+    "giants", "humanoid", "humanoids", "mechanical", "mechanicals", "plant",
+    "plants", "aberration", "aberrations",
+}
+
+def creature_limited(low):
+    m = re.search(r"against ([a-z]+)", low)
+    return bool(m and m.group(1) in _CREATURE)
+
 def value(procs, item, spec, weights, dpsWeight, level, onUseOnly=False):
     """-> (points, [explanation lines])
 
@@ -221,6 +234,9 @@ def value(procs, item, spec, weights, dpsWeight, level, onUseOnly=False):
                     f"({rate:.1f}/min) = {dps:.1f} dps -> {pts:.1f}"
                 )
             elif kind=="dmg" or kind=="dot":
+                if creature_limited(line.lower()):
+                    why.append("creature-specific damage -> 0")
+                    continue
                 # An on-use nuke fires once per cooldown, not PPM_DEFAULT times a
                 # minute. Electromagnetic Gigaflux Reactivator does 152-172 Nature
                 # damage on a 30-MINUTE cooldown; charging it at 2 procs/min priced

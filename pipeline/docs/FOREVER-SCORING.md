@@ -578,6 +578,8 @@ The bar does not tick while you hover it. Hover only draws the rows from the las
 
 Do not call `GearScoreContext` once per slot to draw the bar. The bar uses `GearScoreWornRows` and `WornSlotIndex`. The score cache keeps every slot scored for this level, spec, and gear, so a bag hover reuses a slot it already scanned. A scan must not call `GetItemInfo` for an item the client has not already cached.
 
+The weapon filter does not move the bar. The main-hand index uses the whole main-hand list, with no hand style applied. The Weapons (i) list uses one scale for both hands. Each weapon arrow compares to the hand that weapon is worn in. An empty hand shows the index only.
+
 `EquippedPipelineScore` uses the current band first. If the worn piece has
 aged out, it uses the nearest same-spec, same-faction band: the highest
 `maxLevel` at or below the player, otherwise the soonest band above.
@@ -643,9 +645,16 @@ promotion or the weights to make those two numbers match.
   background-art row (`settings.showGearScore`, on when nil).
   **Hide upgrade arrows** is under Hunts
   (`settings.hideUpgradeArrows`). It removes the green arrow from the quest
-  log, quest giver, loot, and vendors. **GearQuest Commands** lists each
+  log, quest giver, loot, and vendors. **Hide chat messages** is on General
+  (`settings.hideChat`, off when nil). It stops every GearQuest line in chat,
+  including login, obtain notices, errors, and `/gq` replies. The log,
+  tooltips, obtain popup, and score bar stay. The General page scrolls when
+  the options run past the pane. The chat box reads the saved check whenever
+  Settings is shown and writes it on the next frame. **GearQuest Commands** lists each
   slash command with a 1px shadow and the explanation in plain text under it.
-- The source **Filter** closes on a click outside the menu. The Profession
+- The source filter and a play style apply together with the Weapons filter. Hunt rows, the shield list, and the character-panel bar hide a weapon that fails any of them. Rank numbers and the (i) list stay the unfiltered order, at most 30 weapons in the current band. Changing the source filter or a play style drops the cached weapon hunt rows and does not drop the rank cache. The green arrow stays on the unfiltered best piece when the weapon filter hides it. The paper doll follows the weapon filter, including hunter, rogue, and enhancement. Toggling a weapon checkbox clears the paper-doll upgrade cache. Do not clear that cache on every refresh.
+
+The source **Filter** closes on a click outside the menu. The Profession
   flyout closes when the cursor leaves both the row and the flyout. Boss drop
   has the same flyout, but only for dungeons that have a boss-drop hunt in
   the current level window, including ranks below the top 3. Dungeon & Raid
@@ -1708,7 +1717,11 @@ What the lookup uses:
 - Vendor: every NPC who sells it, from the Forever sold-by list. Note
   `(vendor that sells this)`. The log, the guide, and the map pin use the
   vendor closest to the character, and a faction-only vendor stays on
-  that faction's list. A battleground quartermaster with no outdoor
+  that faction's list. When both factions sell the item, the hunt line
+  names one seller per side. `vendor_side.json` keeps an item off the
+  other list only when every Wowhead seller is that one faction. A
+  neutral seller stays on both. Anachronos stays on both, because both
+  factions turn quests in to him. A battleground quartermaster with no outdoor
   pin stays a gap.
 - World drop: a published camp in every zone a dropping creature lives
   in, from the Forever dropped-by list. Up to three spawns per zone, and
@@ -1730,6 +1743,10 @@ What the lookup uses:
   Razorfen Kraul, and the Stockade. Scarlet Monastery drops Brawler's,
   Trapper's, and Defender's only. Stormrider's, Wisdom's, and Totemic do
   not. The pin is each dungeon entrance that helm actually drops in.
+  The six Leather Armor chests and the six Leather Pants from those sets
+  are Merchant's Favor patterns. Pawani sells them at the Barrens camp and
+  Daniel Stitchsong sells them at the Redridge camp. Do not pin those on
+  Orgrimmar or Stormwind.
 - Profession bought at a Merchant's Favor camp: the vendor pin in the camps
   table above, for every leatherworking, blacksmithing, tailoring,
   enchanting, and engineering piece whose hunt sentence names that camp.

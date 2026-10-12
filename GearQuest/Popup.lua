@@ -527,7 +527,7 @@ function GQ.Popup:ShowForSlot(slotName, slotButton)
     if #upgrades == 0 then
         self:Hide()
         local hint = GQ:IsPreviewEnabled() and "" or " Try |cff00ff00/gq set|r to configure class, level, and faction."
-        print("|cff66ccffGearQuest|r: No upgrade hunts found for " .. slotLabel .. "." .. hint)
+        GQ:Chat("|cff66ccffGearQuest|r: No upgrade hunts found for " .. slotLabel .. "." .. hint)
         return
     end
 

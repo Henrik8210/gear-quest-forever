@@ -287,7 +287,7 @@ function GQ.Preview:PrintNowViewing()
         if GQ.Spec and GQ.Spec.IsActive and GQ.Spec:IsActive() then
             specSuffix = string.format(", %s", GQ.Spec:GetSelectedSpecLabel())
         end
-        print(string.format(
+        GQ:Chat(string.format(
             "|cff66ccffGearQuest|r: Now viewing upgrades as |cff00ff00your character|r — level %d %s (%s%s).",
             UnitLevel("player"),
             self:FormatClassName(classFile),
@@ -302,7 +302,7 @@ function GQ.Preview:PrintNowViewing()
     if GQ.Spec and GQ.Spec.IsActive and GQ.Spec:IsActive() then
         specSuffix = string.format(", %s", GQ.Spec:GetSelectedSpecLabel())
     end
-    print(string.format(
+    GQ:Chat(string.format(
         "|cff66ccffGearQuest|r: Now viewing upgrades as a |cff00ff00level %d %s|r (%s%s). Right-click a gear slot on your character panel, or |cff00ff00/gq|r.",
         preview.level,
         self:FormatClassName(preview.class),
@@ -312,22 +312,22 @@ function GQ.Preview:PrintNowViewing()
 end
 
 function GQ.Preview:PrintHelp()
-    print("|cff66ccffGearQuest|r commands:")
-    print("  |cff00ff00/gq set|r — show preview settings")
-    print("  |cff00ff00/gq class hunter|r — set preview class")
-    print("  |cff00ff00/gq level 37|r — set preview level")
-    print("  |cff00ff00/gq faction alliance|r — set preview faction")
-    print("  |cff00ff00/gq set on|r / |cff00ff00/gq set off|r — enable or disable preview")
-    print("  |cff00ff00/gq set me|r — copy your real character into preview")
-    print("  |cff00ff00/gq spec enhancement|r — set specialization (level 10+)")
-    print("  |cff00ff00/gq log|r — toggle GearQuest log window")
-    print("  |cff00ff00/gq wipe data|r — reset hunt progress (for testing obtain/toast)")
+    GQ:Chat("|cff66ccffGearQuest|r commands:")
+    GQ:Chat("  |cff00ff00/gq set|r — show preview settings")
+    GQ:Chat("  |cff00ff00/gq class hunter|r — set preview class")
+    GQ:Chat("  |cff00ff00/gq level 37|r — set preview level")
+    GQ:Chat("  |cff00ff00/gq faction alliance|r — set preview faction")
+    GQ:Chat("  |cff00ff00/gq set on|r / |cff00ff00/gq set off|r — enable or disable preview")
+    GQ:Chat("  |cff00ff00/gq set me|r — copy your real character into preview")
+    GQ:Chat("  |cff00ff00/gq spec enhancement|r — set specialization (level 10+)")
+    GQ:Chat("  |cff00ff00/gq log|r — toggle GearQuest log window")
+    GQ:Chat("  |cff00ff00/gq wipe data|r — reset hunt progress (for testing obtain/toast)")
 end
 
 function GQ.Preview:PrintStatus()
     local preview = self:GetSettings()
     if preview.enabled then
-        print(string.format(
+        GQ:Chat(string.format(
             "|cff66ccffGearQuest|r preview |cff00ff00on|r — level %d, %s, %s.",
             preview.level,
             preview.class,
@@ -335,7 +335,7 @@ function GQ.Preview:PrintStatus()
         ))
     else
         local _, classFile = UnitClass("player")
-        print(string.format(
+        GQ:Chat(string.format(
             "|cff66ccffGearQuest|r preview |cff888888off|r — using your character (lvl %d %s, %s).",
             UnitLevel("player"),
             classFile,
@@ -413,7 +413,7 @@ function GQ.Preview:HandleCommand(msg)
         if ok then
             self:PrintNowViewing()
         else
-            print("|cff66ccffGearQuest|r: " .. err)
+            GQ:Chat("|cff66ccffGearQuest|r: " .. err)
         end
         return
     end
@@ -426,7 +426,7 @@ function GQ.Preview:HandleCommand(msg)
                 GQ:RefreshUI()
             end
         else
-            print("|cff66ccffGearQuest|r: " .. err)
+            GQ:Chat("|cff66ccffGearQuest|r: " .. err)
         end
         return
     end
@@ -439,7 +439,7 @@ function GQ.Preview:HandleCommand(msg)
                 GQ:RefreshUI()
             end
         else
-            print("|cff66ccffGearQuest|r: " .. err)
+            GQ:Chat("|cff66ccffGearQuest|r: " .. err)
         end
         return
     end
@@ -452,12 +452,12 @@ function GQ.Preview:HandleCommand(msg)
         if GQ.Spec and GQ.Spec.SetSelectedSpec then
             local ok, err = GQ.Spec:SetSelectedSpec(value)
             if ok then
-                print(string.format(
+                GQ:Chat(string.format(
                     "|cff66ccffGearQuest|r: Now viewing |cff00ff00%s|r upgrades.",
                     GQ.Spec:GetSelectedSpecLabel()
                 ))
             else
-                print("|cff66ccffGearQuest|r: " .. (err or "Could not set specialization."))
+                GQ:Chat("|cff66ccffGearQuest|r: " .. (err or "Could not set specialization."))
             end
         end
         return
@@ -758,13 +758,13 @@ function GQ.Preview:EnsureDialog()
     dialog.submit:SetScript("OnClick", function()
         local classFile = dialog.selectedClass
         if not classFile then
-            print("|cff66ccffGearQuest|r: Choose a class.")
+            GQ:Chat("|cff66ccffGearQuest|r: Choose a class.")
             return
         end
 
         local levelText = SanitizeLevelInput(dialog.levelEdit)
         if levelText == "" then
-            print(string.format("|cff66ccffGearQuest|r: Enter a level between 1 and %d.", GQ.MAX_PLAYER_LEVEL or 60))
+            GQ:Chat(string.format("|cff66ccffGearQuest|r: Enter a level between 1 and %d.", GQ.MAX_PLAYER_LEVEL or 60))
             return
         end
 
@@ -772,7 +772,7 @@ function GQ.Preview:EnsureDialog()
         if ok then
             GQ.Preview:HideDialog()
         else
-            print("|cff66ccffGearQuest|r: " .. (err or "Could not simulate."))
+            GQ:Chat("|cff66ccffGearQuest|r: " .. (err or "Could not simulate."))
         end
     end)
 

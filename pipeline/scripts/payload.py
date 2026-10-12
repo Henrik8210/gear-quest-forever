@@ -272,7 +272,8 @@ def build_facts(used):
         if is_labeled_set_piece(iid):
             kv.append("setPiece=true")
         for k,val in (("zone",s.get("zone")),("npc",s.get("npc")),
-                      ("questName",s.get("questName")),("profession",s.get("profession"))):
+                      ("questName",s.get("questName")),("profession",s.get("profession")),
+                      ("pvpRank",s.get("pvpRank"))):
             if val: kv.append(f'{k}={lua(val)}')
         if s.get("seasonal"): kv.append("seasonal=true")
         if s.get("zoneOpen"): kv.append("zoneOpen=true")

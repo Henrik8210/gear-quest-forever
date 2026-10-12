@@ -1005,7 +1005,7 @@ function GQ.Indicator:RebuildCacheForSlot(slotName)
 
     -- Unfiltered best pieces keep the arrow when a filter or a play style
     -- hides them. The rows still on the hunt list keep one too.
-    for _, entry in ipairs(GQ.Data:GetTopUpgradesForSlot(slotName, maxUpgrades)) do
+    for _, entry in ipairs(GQ.Data:GetTopUpgradesForSlot(slotName, maxUpgrades, true)) do
         mark(entry)
     end
     if GQ.Log and GQ.Log.UsesWideHuntList and GQ.Log:UsesWideHuntList() and GQ.Log.GetActiveSlotListEntries then

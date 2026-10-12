@@ -2,11 +2,13 @@
 
 Paste into [GearQuest Forever](https://www.curseforge.com/wow/addons/gearquest-forever) (project **1698950**). This is **not** TBC Anniversary GearQuest.
 
+Drop each screenshot in the CurseForge editor where the italic line says so. The line under it is the caption. Keep the caption. Do not add a paragraph.
+
 ---
 
-## 1. Project summary (~250 characters)
+## 1. Project summary
 
-> Best-in-slot hunts for every class, spec, and level 1–60 on WoW Forever. Click a slot, see the top three upgrades and where they drop, track one, and get a toast when it's yours.
+> Best gear for your class, spec, and level on WoW Forever. The log lists the hunt, the map shows where, and a toast fires when it is yours.
 
 ---
 
@@ -20,81 +22,209 @@ Paste into [GearQuest Forever](https://www.curseforge.com/wow/addons/gearquest-f
 
 ### GearQuest Forever
 
-**GearQuest Forever answers one question at every level from 1 to 60: what is the best thing I could be wearing in this slot right now, and where do I get it?**
+GearQuest Forever tells you the best thing you could be wearing right now, and where it comes from. It is for WoW Forever, levels 1–60, every class and spec, Alliance and Horde.
 
-This is the Forever / Classic+ addon (client 1.60). It is a separate project from GearQuest for TBC Anniversary. Open the log, pick a slot, and you get the three best hunts for *your* class, *your* spec, *your* faction, and *your* level — with a plain-language source and a one-click track. When the item lands in your bags, GearQuest marks the hunt complete and toasts you.
-
-No spreadsheet. No alt-tab to a website that still thinks this is 2006 TBC.
+Left-click the minimap button for the log. Right-click a paper-doll slot for that slot. Right-click the minimap button for the simulator.
 
 ---
 
-### How we score (and why)
+### Your hunts
 
-Every hunt is scored with a per-spec Forever stat model. We do **not** rank by item level, and we do **not** average random-enchant greens into mush.
+*Screenshot 1 — the log, one slot open.*
 
-The philosophy while you are leveling (1–59) is three layers, in this order:
+Each row is a piece for that slot. The grey number is its rank. It matches the (i) list, including #4 and later once you already have an earlier piece.
 
-**1. Damage first.**
-The spec's real job still leads. A hunter hunts Agility. Arms hunts Strength. A mage hunts spell power. If the piece does not make you kill (or tank-threat) better, it is not BiS. Weapon rules stay here too: dual wield when it unlocks, shields for prot, totems/idols/librams in the relic slot, and procs that only count if you actually swing or shoot that slot.
-
-**2. Survivability second.**
-Leveling is not a raid parse. You pull extra mobs, you travel, you often have no healer. A naked +1 primary-stat upgrade that leaves you squishy loses to a piece with stamina, health, or armor. That is why at 22 **Brawler's / Trapper's Leather Tunic** (Agility *and* stam) beat **Panther Armor** (more Agility, no stam). Dying costs more time than a one-stat edge saves.
-
-**3. Endurance third.**
-Staying effective also means having and keeping mana. Intellect, spirit, and mana per 5 matter for paladin seals and heals, shaman shocks, hunter shots, and every caster's drink cycle. Endurance is real, but it is **less important than stamina**. A glass cannon that is OOM every two pulls is not a better hunt.
-
-At **level 60** those leveling boosts turn off. You get the raw raid-scale weights. Forever does not yet have pinned community 60 guides, so the model speaks at 60 too.
-
-**Random enchants: we rank the jackpot.**
-"Shoulders of Agility" can roll +6–7 Agi. If that +7 roll would be the best item in the slot, GearQuest lists it as BiS #1 and tells you the roll is slim (~9.5%). We do not hide a hunt because the suffix is rare. You came here to know what to look for on the auction house and on the corpse.
-
-**Three hunts, plus one notable.**
-Each slot shows up to three unique names. Beside them, one notable: a proc the math cannot fully price, or a tank-relevant extra (for example +3 Defense on a spell-power glove is a warrior-prot *notable*, not fake BiS). Warrior Protection does not score spell damage. Paladin Protection still does — holy threat is real.
-
-Item facts come from Wowhead Forever, not from a TBC dump. When the catalog grows, we scrape, ingest, and re-score.
+**- Recommended** marks up to three rank #1 upgrades, the ones that beat what you are wearing by the most. **- Rank #1 BiS acquired** means you already have the best piece in that slot.
 
 ---
 
-### What you get in game
+### Where it comes from
 
-- **Top 3 per slot** for all nine classes and every spec, levels 1–60, Alliance and Horde
-- **Rank #N** in a black box above the item name, still the real slot rank when a filter or a play style is on
-- **Play style** at the bottom of the log, five cards with a picture and the name underneath: **No Dungeons!**, **Dungeon Enjoyer**, **Get it now!**, **Don't look back**, and **Buy it**. The two dungeon cards turn each other off. The other three can be on with either.
-- **Filter** with a profession list, a boss-drop dungeon list, and a separate dungeon list for trash. A filtered slot still fills to three matching hunts, then the notable when it fits.
-- **Green upgrade arrows** on the real best pieces even when a filter or a play style hides them, and on every hunt still showing
-- **Track a hunt** and **toast on obtain**. The toast follows the unfiltered top three, the notable, and anything you Track. Rank and filters do not stop a tracked toast. The first time Track can be clicked it pulses gold, once per account.
-- **Guide** on a tracked hunt. An arrow above the tracker points the way you are facing. On another continent it points at the zeppelin or ship, then back at the hunt. Logging out clears the guide. `/reload` keeps it.
-- **The Log** — parchment detail with how to get the piece, the craft materials, the recipe skill in green or red, a vendor standing in green or red just before Source, zone, quest, NPC, and always a Source line
-- **World map pins** for every tracked hunt, each source with its own icon. Left-click guides. Right-click opens the hunt. The minimap does not draw hunt pins.
-- **Show on map** opens the quest start, the dungeon entrance, the vendor, the rare, or a farming spot on a real mob
-- **Simulator** — browse another class, spec, faction, or level (right-click the minimap button)
-- **Paper-doll** — right-click a character-panel slot
-- **Suffix names on the tooltip** so Forever's unsuffixed green tooltip still shows *of Agility* and the roll
-- **Faction-correct lists** — no Stormwind quest on a Horde character
+*Screenshot 2 — the parchment for one hunt.*
+
+Open a hunt for the source, the quest level, the craft, and the materials. **Track** pins it. **Show on map** opens the spot. **Remove** takes that hunt off the list until you restore it.
+
+A quest reward says the level it can be picked up. A craft says the skill in green when you can make it, and red when you cannot. A burnt mark means the item is new in Forever.
 
 ---
 
-### Getting started
+### On the map
 
-1. Install **GearQuest Forever** (folder `GearQuestForever`) and `/reload`.
-2. Left-click the minimap button for the Log, or right-click a paper-doll slot.
-3. Pick a hunt. Track it if you want it pinned.
-4. Loot it — the toast means you're done.
+*Screenshot 3 — the world map pin, and the guide arrow.*
 
-TBC Anniversary GearQuest can sit next to this one. They do not share saved variables or a CurseForge project.
+The pin is a real place: the quest that starts the chain, a dungeon entrance, a vendor, a named creature, or a camp. GearQuest does not invent one.
 
----
-
-### Compatibility
-
-- **World of Warcraft: Forever** (Interface 16001, max level 60)
-- No libraries, no bag automation — GearQuest never equips or moves items
+Track a hunt and an arrow can point the way. On another continent it points at the boat or zeppelin first.
 
 ---
 
-### Feedback
+### Play your way
 
-Wrong rank, missing Forever item, or "why is X above Y" — please include class, spec, level, faction, and slot. Those reports are how the weights stay honest.
+*Screenshot 4 — the five play-style cards.*
+
+**No Dungeons** hides dungeon and raid hunts, including a quest that steps inside one. A world drop stays.
+
+**Dungeon Enjoyer** keeps only those dungeon and raid hunts.
+
+**Get it now** waits until you have the reputation, or can make a bind-on-pickup craft.
+
+**Don't look back** hides a quest once it would be gray.
+
+**Buy it** keeps vendor pieces and gear that is not bind on pickup.
+
+The two dungeon cards turn each other off. The other three can be on with either. The button reads **Play style*** while one is on.
+
+---
+
+### Filter
+
+*Screenshot 5 — the filter menu, with a dungeon flyout open.*
+
+Hide a source, a profession, or one dungeon. Boss drop and Dungeon & Raid trash are separate lists. The rank number does not change because a filter is on.
+
+---
+
+### Is this an upgrade?
+
+*Screenshot 6 — an item tooltip with the GearQuest score.*
+
+Hover gear in your bags, on the character panel, in chat, or on a hunt. The line is a score for this level: best in the slot is +100, worst is −100. The arrow compares it to what you have equipped.
+
+*Screenshot 7 — the score bar in the log header.*
+
+The bar is your equipped gear, averaged. **General → GearQuest score on tooltips** and **GearQuest score bar** turn the two off separately.
+
+While the simulator is on, the tooltip tells you to turn it off before it will score your item.
+
+---
+
+### Why that piece won
+
+*Screenshot 8 — the spec weight tooltip.*
+
+Hover the spec name. Those are the weights for this spec. While you level, stamina and armor count for more than a naked +1 of your main stat, and mana counts for less than stamina. At 60 that leveling boost turns off.
+
+A random-enchant green is ranked on its best possible roll. The tooltip says how rare that roll is. A slim chance does not hide the hunt.
+
+You cannot edit the weights in the addon. Suggest a change here: [GearQuest Forever - Class Stat Weights](https://docs.google.com/spreadsheets/d/1jMC89KgzHpPZHYgcjOq6ef7lENhh8OGgypG2rC2m0Ok/edit). The live numbers stay locked. A suggestion does not change the addon by itself.
+
+---
+
+### Look ahead
+
+*Screenshot 9 — the simulator.*
+
+Right-click the minimap button, or open the Simulator tab. Pick another class, spec, faction, or level. **Turn off simulation** brings the list back to your character.
+
+---
+
+### When you ding
+
+*Screenshot 10 — Level up on demand, at the bottom of the log.*
+
+Check **Enable Level Up On Demand**. The list waits. Press **Level up!** when you are ready for it to rebuild.
+
+---
+
+### When it is yours
+
+*Screenshot 11 — the obtain toast.*
+
+Loot the hunt and GearQuest toasts you. The toast names that hunt. A different suffix on the same green is not that hunt.
+
+---
+
+## FAQ
+
+**The game freezes when I level up.**
+That rebuild is heavy. Use **Enable Level Up On Demand**, then press **Level up!** when you want the new list. Screenshot 10.
+
+**My FPS drops when I hover items in my bags.**
+Update to **v0.5.3-beta** or newer and `/reload`. The window title shows the version. That version stopped the bag hover from loading every other piece in the slot. If it still happens, comment the item name and the version in the title.
+
+**Why does Main Hand show a two-hander?**
+The headers are the weapons that spec uses. Enhancement is **Two-hand** only. A hunter gets **Two-hand**, then **Main hand** for weapons that can only go in the main hand, then **Off Hand** for weapons that can go in either hand. A rogue's **Main Hand** is weapons the tooltip calls Main Hand. There is no "swords only" box yet.
+
+*Screenshot 12 — a hunter's weapon headers, if you have the room.*
+
+**Why is this the best piece?**
+Hover the spec. Screenshot 8. The hunt follows those weights. While leveling, a piece with stamina beats a naked +1 of your main stat. At 60 it does not get that extra.
+
+**Can I change the stat weights?**
+Not in the addon. Suggest the spec, the stat, and the weight you want on the [stat weight sheet](https://docs.google.com/spreadsheets/d/1jMC89KgzHpPZHYgcjOq6ef7lENhh8OGgypG2rC2m0Ok/edit).
+
+**Holy paladin keeps suggesting cloth.**
+Holy levels in mail and plate. Cloth is scored lower on purpose, so a tailoring robe does not beat blacksmithing healing mail of the same band. Hover the spec to see it. If one piece is still wrong, name it, your level, and your faction.
+
+**Enhancement is using agility over strength.**
+That is the current weight. Agility is priced a little above strength. Suggest the change on the sheet if you want strength first.
+
+**Why does my warlock want healing gear?**
+A warlock does not hunt healing. A line that says both healing and damage is scored as damage. Intellect and spirit still show up because they keep you casting. If a pure healing piece is rank 1, name it.
+
+**I am Horde and I see an Alliance reward.**
+You only see rewards your faction can get. Defender of Dalaran is Alliance. A Tauren sees the Horde Heart of Disruption rewards, including Striking Staff. If the other faction's piece is still on your list, name it and your race.
+
+**The toast named a suffix I did not loot.**
+The hunt is the best suffix that green can roll. Shimmering Gloves of Arcane Wrath is not Shimmering Gloves of Healing. The tooltip says how rare the jackpot roll is.
+
+**How do I hide dungeons, or only chase what I can get today?**
+Play style. Screenshot 4. There is no "this zone only" filter. **Show on map** is per hunt.
+
+**How do I look at another level or another class?**
+Simulator. Screenshot 9. The item tooltip will not score your gear until you turn simulation off.
+
+**How do I hide the minimap button?**
+Open the log, the gear icon, **General**, **Hide minimap icon**. Drag the button around the minimap before you hide it.
+
+*Screenshot 13 — the General settings page.*
+
+**I already have the best piece.**
+The slot says **- Rank #1 BiS acquired**. Later ranks stay so you can see what is next. **Recommended** only marks a rank #1 you do not have yet.
+
+**It uses a lot of memory.**
+The list is every spec from 1 to 60. The hitch people feel is the rebuild when you ding, or an old bag-hover bug. Use Level up on demand, and be on v0.5.3-beta or newer.
+
+**GearQuest is not in my addon list.**
+The folder must be `Interface/AddOns/GearQuestForever`. This is not the TBC Anniversary GearQuest. The two can be installed together. `/reload`, or restart the client.
+
+**A gamepad popup locks the game when I close the map.**
+That was fixed. If it still happens, comment the version in the window title and what you clicked.
+
+**I do not want one specific hunt.**
+Open it and press **Remove**. Restore brings it back.
+
+---
+
+### Also
+
+The window title is the version to quote in a comment. Include class, spec, level, faction, and the item.
+
+Questions and weight ideas also go to the [Discord](https://discord.gg/jQ2GdDEeN).
+
+---
+
+## 4. Screenshots to take
+
+Take them on a character around level 20–30 so the log is full but not a raid list. Crop to the addon. Leave the window title in shot when the shot is about a version or a bug.
+
+| # | What to shoot | Why it is there |
+|---|---|---|
+| 1 | The log with one slot expanded. Show the item icon, the grey #N, one **- Recommended**, and one **- Rank #1 BiS acquired** if you have one. | The first thing people need to read. |
+| 2 | One parchment. A quest reward is best, so the pickup level and Source are both visible. Include Track, Show on map, and Remove. | Stops "where do I get this?" |
+| 3 | The world map with one pin, and a second crop of the guide arrow on the tracker. Two images under one caption is fine. | Stops "put it on the map." |
+| 4 | Play style open, all five cards, names under the pictures. | The filter people cannot find. |
+| 5 | The filter menu with the boss-drop or trash dungeon flyout open. | Shows that dungeons are a list, not one checkbox. |
+| 6 | A bag or character-panel tooltip with the GearQuest score and a green or red arrow. | "Is this an upgrade?" |
+| 7 | The log header score bar, not simulating. | Separate from the tooltip score. |
+| 8 | The spec weight tooltip. Holy paladin is the one people argue about. Enhancement is the other. | "Why did this win?" |
+| 9 | The simulator on another class or level, with **Turn off simulation** visible. | "How do I look ahead?" |
+| 10 | The bottom of the log: **Enable Level Up On Demand** and **Level up!** | The ding hitch. |
+| 11 | The obtain toast. | "You got it." |
+| 12 | Optional. A hunter log scrolled to Two-hand, Main hand, and Off Hand. | The weapon-slot question. |
+| 13 | Optional. General settings, with **Hide minimap icon** and the two score checkboxes. | "Where is the off switch?" |
+
+The gallery on the CurseForge page can be the same set, in this order. The description should use 1–11. 12 and 13 are for the FAQ if the page is not already long.
 
 ---
 
@@ -102,4 +232,7 @@ Wrong rank, missing Forever item, or "why is X above Y" — please include class
 
 - CurseForge project **1698950**. Never use TBC `1669225`.
 - File names are `vX.Y.Z-beta` on the beta channel.
-- Keep this file in sync when scoring philosophy changes.
+- Do not put the notable shelf back in this text. It is gone.
+- Do not promise an in-game weight editor or a "swords only" filter. Neither exists. The sheet is the suggestion box.
+- Enhancement agility above strength, and Holy cloth below mail and plate, are the current weights. Do not "correct" them in the FAQ.
+- Keep this file in sync when a player-facing behavior changes.

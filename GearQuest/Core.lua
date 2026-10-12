@@ -9,8 +9,17 @@ end
 GQ = GQ or {}
 _G.GearQuest = GQ
 
-GQ.VERSION = "0.5.3-beta"
+GQ.VERSION = "0.5.4-beta"
 GQ.ADDON_NAME = ADDON_NAME
+
+-- General -> Hide chat messages. Off until the player checks it.
+function GQ:Chat(...)
+    local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+    if settings and settings.hideChat then
+        return
+    end
+    _G.print(...)
+end
 -- WoW Forever: 1–60 Classic+ (no TBC level cap).
 GQ.MAX_PLAYER_LEVEL = 60
 
@@ -233,7 +242,7 @@ function GQ:PLAYER_LOGIN()
     local function run(label, fn)
         local ok, err = pcall(fn)
         if not ok then
-            print("|cffff0000GearQuest|r: " .. label .. " failed: " .. tostring(err))
+            GQ:Chat("|cffff0000GearQuest|r: " .. label .. " failed: " .. tostring(err))
         end
         return ok
     end
@@ -278,8 +287,8 @@ function GQ:PLAYER_LOGIN()
     run("Commands", function() self.Commands:Init() end)
 
     local previewNote = self.Preview:IsEnabled() and (" (" .. self:GetPreviewLabel() .. ")") or ""
-    print("|cff66ccffGearQuest|r v" .. self.VERSION .. " By Weber8210 loaded" .. previewNote .. ". Right-click a gear slot on your character panel, or |cff00ff00/gq|r.")
-    print("|cff66ccffGearQuest|r: Click the minimap icon to open GearQuest.")
+    GQ:Chat("|cff66ccffGearQuest|r v" .. self.VERSION .. " By Weber8210 loaded" .. previewNote .. ". Right-click a gear slot on your character panel, or |cff00ff00/gq|r.")
+    GQ:Chat("|cff66ccffGearQuest|r: Click the minimap icon to open GearQuest.")
     -- Login and /reload only print the welcome lines above. Milestone chat
     -- belongs to a real level-up, and a character already past that level
     -- is marked seen so a later check cannot repeat it.
@@ -550,7 +559,7 @@ function GQ:NotifyMilestoneOnce(key, message)
     end
 
     self:MarkMilestone(key)
-    print(message)
+    GQ:Chat(message)
 end
 
 -- A character who logs in already past a milestone has had their chance.

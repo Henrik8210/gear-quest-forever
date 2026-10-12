@@ -198,7 +198,7 @@ function GQ.Map:Show(entry)
     OpenToMap(mapId)
 
     if not spot then
-        print(PREFIX .. "No exact spot for this item.")
+        GQ:Chat(PREFIX .. "No exact spot for this item.")
         return
     end
 
@@ -208,5 +208,5 @@ function GQ.Map:Show(entry)
         C_Timer.After(0, GuardWaypointClipboard)
     end
     local where = string.format("%s %.1f, %.1f", spot.map or label, spot.x, spot.y)
-    print(PREFIX .. where .. (pinned and " — pin placed" or ""))
+    GQ:Chat(PREFIX .. where .. (pinned and " — pin placed" or ""))
 end

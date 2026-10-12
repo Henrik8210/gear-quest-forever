@@ -245,6 +245,8 @@ local function Expand(src, data, out)
                 classes      = classes,
                 specs        = spec and src.specs and src.specs[spec] or nil,
                 factions     = faction and FACTION[faction] or nil,
+                name         = f.name,
+                quality      = f.quality,
                 sourceType   = f.sourceType,
                 instructions = f.instructions,
                 setPiece     = f.setPiece,
@@ -308,7 +310,7 @@ function GQ.Data:EnsureClassLoaded(classFile)
             if not self._classLoadFailed[classFile] then
                 self._classLoadFailed[classFile] = true
                 local label = classFile:sub(1, 1) .. classFile:sub(2):lower()
-                print("|cffff0000GearQuest|r: could not load " .. label .. " hunt data (" .. tostring(reason) .. "). Enable |cff00ff00GearQuest Forever: " .. label .. "|r in the addon list, then /reload.")
+                GQ:Chat("|cffff0000GearQuest|r: could not load " .. label .. " hunt data (" .. tostring(reason) .. "). Enable |cff00ff00GearQuest Forever: " .. label .. "|r in the addon list, then /reload.")
             end
             return false
         end
@@ -331,7 +333,7 @@ function GQ.Data:EnsureClassLoaded(classFile)
         self._classLoadFailed = self._classLoadFailed or {}
         if not self._classLoadFailed[classFile] then
             self._classLoadFailed[classFile] = true
-            print("|cffff0000GearQuest|r: " .. classFile .. " hunt data loaded with no picks.")
+            GQ:Chat("|cffff0000GearQuest|r: " .. classFile .. " hunt data loaded with no picks.")
         end
         return false
     end

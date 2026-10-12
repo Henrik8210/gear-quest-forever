@@ -645,12 +645,15 @@ def places_differ(old, new):
 def should_update_places(old, new):
     """A named quest, vendor, dropper, or profession on the live listview.
 
-    An unnamed world drop must not wipe a boss, a rare, or a hand-set source.
+    The listview calls a rare and a dungeon trash mob a drop. That row must
+    not turn rare_npc, raid_trash, or boss_drop back into a world drop.
     """
     if not old or not new:
         return False
     new_type = new.get("sourceType")
     if new_type in (None, "", "unsourced"):
+        return False
+    if new_type == "world_drop" and old.get("sourceType") in ("rare_npc", "raid_trash", "boss_drop"):
         return False
     if new_type == "world_drop" and not new.get("npc"):
         if old.get("npc") or old.get("sourceType") not in (None, "", "unsourced", "world_drop"):

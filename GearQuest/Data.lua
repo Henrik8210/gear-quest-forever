@@ -5822,6 +5822,12 @@ function GQ.Data:GetItemFact(itemId)
         return nil
     end
 
+    local numeric = tonumber(itemId)
+    local keys = { itemId }
+    if numeric and numeric ~= itemId then
+        keys[2] = numeric
+    end
+
     local tables = {
         self.itemFacts,
         self.warriorItemFacts,
@@ -5925,7 +5931,13 @@ function GQ.Data:GetItemDisplayName(itemId)
 
     local prof = PROFESSION_ITEM_NAMES[itemId]
     if prof and not self:IsPlaceholderItemName(prof, itemId) then
-        return prof
+    local clientName
+    if GetItemInfo then
+        local ok, name = pcall(GetItemInfo, itemId)
+        if ok then
+            clientName = name
+        end
+    end
     end
 
     return nil
@@ -8214,6 +8226,10 @@ function GQ.Data:ItemInfoIsReady(itemIdOrLink)
     if not itemIdOrLink or not GetItemInfo then
         return false
     end
+        local ilvl = fact and fact.ilvl
+        if type(ilvl) == "number" and ilvl > 0 then
+            tooltip:AddLine("Item Level " .. tostring(ilvl), 1, 1, 1)
+        end
 
     local itemId = tonumber(itemIdOrLink)
     if not itemId and type(itemIdOrLink) == "string" then
@@ -9831,19 +9847,9 @@ function GQ.Data:GearScoreWornRows()
             add("Trinket", 13)
             add("Trinket", 14)
         elseif slotName == "MainHand" then
-            local handKind
-            if self:UsesTwoHandOnlyWeapons() or twoHandWorn then
-                handKind = "two"
-            elseif self:UsesHunterWeaponPairs() then
-                if twoHandWorn then
-                    handKind = "two"
-                else
-                    handKind = "main"
-                end
-            elseif self:UsesRogueWeaponHands() then
-                handKind = "main"
-            end
-            add("MainHand", 16, handKind)
+            -- The whole main-hand list, two-hand and one-hand together.
+            -- The weapon filter hides hunt rows. It does not change this index.
+            add("MainHand", 16)
         else
             local invSlot = self:GetInventorySlot(slotName)
             if invSlot then
@@ -9977,6 +9983,7 @@ function GQ.Data:GearScoreContext(slotName, handKind)
 
     local equippedIds = {}
     local worn = {}
+    local wornOff
     local empty = false
     local slots = dataSlot and self:GetInventorySlots(dataSlot) or {}
     for i = 1, #slots do
@@ -9989,6 +9996,21 @@ function GQ.Data:GearScoreContext(slotName, handKind)
             if score then
                 worn[#worn + 1] = score
                 push(score)
+            end
+        end
+    end
+
+    -- The merged weapon list compares each hand to the piece worn there.
+    if handKind == "both" then
+        for _, invSlot in ipairs(self:GetInventorySlots("SecondaryHand") or {}) do
+            local offId = self:EquippedItemId(invSlot)
+            if offId then
+                equippedIds[offId] = true
+                local offScore = self:EquippedPipelineScore(offId, "SecondaryHand")
+                if offScore then
+                    wornOff = offScore
+                    push(offScore)
+                end
             end
         end
     end
@@ -10026,11 +10048,22 @@ function GQ.Data:GearScoreContext(slotName, handKind)
     if baselineScore ~= nil then
         baseline = self:GearScoreIndex(baselineScore, minScore, maxScore)
     end
+    local handBaseline
+    if handKind == "both" then
+        handBaseline = {}
+        if baseline ~= nil then
+            handBaseline.MainHand = baseline
+        end
+        if wornOff ~= nil then
+            handBaseline.SecondaryHand = self:GearScoreIndex(wornOff, minScore, maxScore)
+        end
+    end
     local ctx = {
         minScore = minScore,
         maxScore = maxScore,
         baseline = baseline,
         baselineScore = baselineScore,
+        handBaseline = handBaseline,
         equippedIds = equippedIds,
         bestListScore = bestList,
         lines = {},
@@ -10135,9 +10168,20 @@ function GQ.Data:GearScoreTrail(entry, ctx)
     if not index then
         return ""
     end
+    local baseline = ctx.baseline
+    if ctx.handBaseline then
+        local slot = entry.slot
+        if self.NormalizeSlotName then
+            slot = self:NormalizeSlotName(slot) or slot
+        end
+        if slot == "OffHand" then
+            slot = "SecondaryHand"
+        end
+        baseline = ctx.handBaseline[slot]
+    end
     local delta = ""
     if not (entry.itemId and ctx.equippedIds and ctx.equippedIds[entry.itemId]) then
-        delta = self:GearScoreDeltaText(index, ctx.baseline)
+        delta = self:GearScoreDeltaText(index, baseline)
     end
     return string.format("|cffffffff%d|r%s", index, delta)
 end
@@ -10518,12 +10562,18 @@ function GQ.Data:GetRankableEntriesForSlot(slotName)
     return merged
 end
 
-function GQ.Data:GetTopUpgradesForSlot(slotName, maxResults)
+function GQ.Data:ClearTopUpgradeCache()
+    if self._queryCache and self._queryCache.topUpgrades then
+        self._queryCache.topUpgrades = {}
+    end
+end
+
+function GQ.Data:GetTopUpgradesForSlot(slotName, maxResults, ignoreWeaponFilter)
     slotName = self:NormalizeSlotName(slotName)
     maxResults = maxResults or self:GetMaxUpgradesForSlot(slotName)
     self:EnsureQueryCache()
 
-    local cacheKey = slotName .. ":" .. maxResults
+    local cacheKey = slotName .. ":" .. maxResults .. (ignoreWeaponFilter and ":open" or "")
     local cached = self._queryCache.topUpgrades[cacheKey]
     if cached then
         return cached
@@ -10533,7 +10583,7 @@ function GQ.Data:GetTopUpgradesForSlot(slotName, maxResults)
     local mains = {}
     local reserves = {}
     for _, entry in ipairs(self:GetCandidatesForSlot(slotName)) do
-        if not self:EntryFitsPaperDollSlot(entry, slotName) then
+        if not self:EntryFitsPaperDollSlot(entry, slotName, ignoreWeaponFilter) then
             -- Main-hand-only weapons stay in the log. The Main Hand slot is the
             -- two-hand list, and they cannot be equipped in the off hand.
         elseif GQ.Log and GQ.Log.IsHuntRemoved and GQ.Log:IsHuntRemoved(entry) then
@@ -10577,6 +10627,7 @@ local SHIELD_SPECS = {
 }
 
 local DUAL_WIELD_SPECS = {
+    HUNTER = { beast_mastery = true, marksmanship = true, survival = true },
     ROGUE = { combat = true, assassination = true, subtlety = true },
     WARRIOR = { fury = true },
 }
@@ -10604,6 +10655,12 @@ function GQ.Data:UsesTwoHandOnlyWeapons()
     local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
     local spec = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec()
     return classFile == "SHAMAN" and spec == "enhancement"
+end
+
+function GQ.Data:UsesBothWeaponStyles()
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    local spec = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec()
+    return classFile == "SHAMAN" and spec == "elemental"
 end
 
 function GQ.Data:EntryIsMainHandOnly(entry)
@@ -10657,34 +10714,56 @@ function GQ.Data:EntryIsOffHandOnly(entry)
     return false
 end
 
-function GQ.Data:EntryFitsPaperDollSlot(entry, slotName)
+function GQ.Data:EntryFitsPaperDollSlot(entry, slotName, ignoreWeaponFilter)
     slotName = self:NormalizeSlotName(slotName)
+    local function allow(ok)
+        if not ok then
+            return false
+        end
+        if ignoreWeaponFilter or not (GQ.Log and GQ.Log.WeaponPassesFilter) then
+            return true
+        end
+        return GQ.Log:WeaponPassesFilter(entry)
+    end
     if self:UsesTwoHandOnlyWeapons() then
         if slotName == "SecondaryHand" then
             return false
         end
         if slotName == "MainHand" then
-            return self:EntryIsTwoHand(entry)
+            return allow(self:EntryIsTwoHand(entry))
         end
     end
     if self:UsesHunterWeaponPairs() then
         if slotName == "MainHand" then
-            return self:EntryIsTwoHand(entry)
+            return allow(self:EntryIsTwoHand(entry))
         end
         if slotName == "SecondaryHand" then
             -- The off-hand character panel bar is one-handers only.
-            return self:EntryIsEitherHand(entry)
+            return allow(self:EntryIsEitherHand(entry))
         end
     end
     if self:UsesRogueWeaponHands() then
         if slotName == "MainHand" then
-            return self:EntryIsMainHandOnly(entry)
+            return allow(self:EntryIsMainHandOnly(entry))
         end
         if slotName == "SecondaryHand" then
-            return self:EntryIsEitherHand(entry) or self:EntryIsOffHandOnly(entry)
+            return allow(self:EntryIsEitherHand(entry) or self:EntryIsOffHandOnly(entry))
         end
     end
-    return true
+    if slotName ~= "MainHand" and slotName ~= "SecondaryHand" then
+        return true
+    end
+    if not self:EntryIsDamagingWeapon(entry) then
+        -- Shields and held items stay on the off-hand slot.
+        return slotName == "SecondaryHand"
+    end
+    -- The paper doll and the popup follow the weapon filter. Bag arrows pass
+    -- ignoreWeaponFilter so the unfiltered best still gets an arrow.
+    if not ignoreWeaponFilter and GQ.Log and GQ.Log.WeaponPassesFilter and not GQ.Log:WeaponPassesFilter(entry) then
+        return false
+    end
+    local style = self:EntryIsTwoHand(entry) and "two" or "one"
+    return self:WeaponFitsPaperSlot(entry, slotName, style)
 end
 
 function GQ.Data:EntryIsTwoHand(entry)
@@ -10739,6 +10818,12 @@ function GQ.Data:WeaponHeaderSuffix(slotName)
         end
         return nil
     end
+    if classFile == "HUNTER" then
+        if slotName == "MainHand" then
+            return "Two-hand or dual wield"
+        end
+        return nil
+    end
     local dual = DUAL_WIELD_SPECS[classFile]
     if dual and dual[spec] then
         if slotName == "MainHand" then
@@ -10750,12 +10835,6 @@ function GQ.Data:WeaponHeaderSuffix(slotName)
     if twoHand and twoHand[spec] then
         if slotName == "MainHand" then
             return "Two-hand"
-        end
-        return nil
-    end
-    if classFile == "HUNTER" then
-        if slotName == "MainHand" then
-            return "Two-hand or dual wield"
         end
         return nil
     end
@@ -10781,6 +10860,215 @@ function GQ.Data:WeaponHeaderSuffix(slotName)
         return "Two-hand or main hand"
     end
     return nil
+end
+
+-- Hunters, rogues, and fury warriors can put a damaging weapon in the off hand.
+-- Shamans cannot dual wield. A shield spec still uses the off-hand slot for a shield.
+function GQ.Data:CanDualWield()
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    local spec = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec()
+    if classFile == "SHAMAN" then
+        return false
+    end
+    if classFile == "HUNTER" or classFile == "ROGUE" then
+        return true
+    end
+    local dual = DUAL_WIELD_SPECS[classFile]
+    return dual and spec and dual[spec] and true or false
+end
+
+function GQ.Data:DefaultWeaponStyle()
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    local spec = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec()
+    if classFile == "HUNTER" then
+        return "two"
+    end
+    if classFile == "SHAMAN" and spec == "enhancement" then
+        return "two"
+    end
+    if classFile == "SHAMAN" then
+        return "one"
+    end
+    if classFile == "DRUID" and spec == "feral" then
+        return "two"
+    end
+    local two = TWO_HAND_SPECS[classFile]
+    if two and spec and two[spec] then
+        return "two"
+    end
+    return "one"
+end
+
+function GQ.Data:OffHandShowsShieldOrHeld()
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    local spec = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec()
+    local shield = classFile and SHIELD_SPECS[classFile]
+    if shield and spec and shield[spec] then
+        return true
+    end
+    if classFile == "MAGE" or classFile == "PRIEST" or classFile == "WARLOCK" then
+        return true
+    end
+    if classFile == "DRUID" and spec ~= "feral" then
+        return true
+    end
+    return false
+end
+
+local WEAPON_TYPE_LINES = {
+    ["Dagger"] = "Dagger",
+    ["Sword"] = "Sword",
+    ["Mace"] = "Mace",
+    ["Axe"] = "Axe",
+    ["Fist Weapon"] = "Fist",
+    ["Polearm"] = "Polearm",
+    ["Staff"] = "Staff",
+}
+
+-- Some Forever tips put the hand and the type on one line:
+-- "Binds when equippedOne-HandMace", "Main HandAxe", "Two-HandSword".
+local WEAPON_TYPE_MARKS = {
+    { "Fist Weapon", "Fist" },
+    { "Polearm", "Polearm" },
+    { "Dagger", "Dagger" },
+    { "Sword", "Sword" },
+    { "Mace", "Mace" },
+    { "Axe", "Axe" },
+    { "Staff", "Staff" },
+}
+
+local NOT_A_WEAPON_LINE = {
+    ["Shield"] = true,
+    ["Held In Off-hand"] = true,
+    ["Fishing Pole"] = true,
+    ["Libram"] = true,
+    ["Totem"] = true,
+    ["Idol"] = true,
+    ["Wand"] = true,
+    ["Bow"] = true,
+    ["Gun"] = true,
+    ["Crossbow"] = true,
+    ["Thrown"] = true,
+}
+
+function GQ.Data:WeaponTypeOf(entry)
+    if not entry or not entry.itemId then
+        return nil
+    end
+    self._weaponTypeById = self._weaponTypeById or {}
+    local cached = self._weaponTypeById[entry.itemId]
+    if cached ~= nil then
+        if cached == "" then
+            return nil
+        end
+        return cached
+    end
+    local found = ""
+    local audit = self.GetForeverAudit and self:GetForeverAudit(entry.itemId)
+    local tip = audit and audit.tip or ""
+    if tip ~= "" then
+        local head = tip
+        local damageAt = string.find(string.lower(tip), "damage", 1, true)
+        if damageAt and damageAt > 1 then
+            head = string.sub(tip, 1, damageAt - 1)
+        end
+        for line in string.gmatch(head, "[^\n]+") do
+            local mapped = WEAPON_TYPE_LINES[line]
+            if mapped then
+                found = mapped
+                break
+            end
+        end
+        if found == "" then
+            for i = 1, #WEAPON_TYPE_MARKS do
+                local mark = WEAPON_TYPE_MARKS[i]
+                if string.find(head, mark[1], 1, true) then
+                    found = mark[2]
+                    break
+                end
+            end
+        end
+    end
+    self._weaponTypeById[entry.itemId] = found
+    if found == "" then
+        return nil
+    end
+    return found
+end
+
+function GQ.Data:EntryIsDamagingWeapon(entry)
+    if not entry or not entry.itemId then
+        return false
+    end
+    self._damagingWeapon = self._damagingWeapon or {}
+    local cached = self._damagingWeapon[entry.itemId]
+    if cached ~= nil then
+        return cached
+    end
+    local slot = self:NormalizeSlotName(entry.slot)
+    local result = false
+    if slot == "MainHand" or slot == "SecondaryHand" then
+        local audit = self.GetForeverAudit and self:GetForeverAudit(entry.itemId)
+        local tip = audit and audit.tip or ""
+        local blocked = false
+        local hasDps = false
+        if tip ~= "" then
+            local lower = string.lower(tip)
+            hasDps = string.find(lower, "damage per second", 1, true) ~= nil
+            for line in string.gmatch(tip, "[^\n]+") do
+                if NOT_A_WEAPON_LINE[line] then
+                    blocked = true
+                    break
+                end
+            end
+        end
+        if not blocked then
+            local hand = entry.hand
+            if hand == "two" or hand == "main" or hand == "one" or hand == "off" then
+                result = tip == "" or hasDps
+            elseif slot == "MainHand" and (tip == "" or hasDps) then
+                result = true
+            end
+        end
+    end
+    self._damagingWeapon[entry.itemId] = result
+    return result
+end
+
+function GQ.Data:WeaponFitsStyle(entry, style)
+    if not entry then
+        return false
+    end
+    local two = self:EntryIsTwoHand(entry)
+    if style == "two" then
+        return two
+    end
+    return not two
+end
+
+function GQ.Data:WeaponFitsPaperSlot(entry, slotName, style)
+    if not self:WeaponFitsStyle(entry, style) then
+        return false
+    end
+    if style == "two" then
+        return slotName == "MainHand"
+    end
+    local offOnly = entry.hand == "off" or self:EntryIsOffHandOnly(entry)
+    local mainOnly = entry.hand == "main" or (entry.hand ~= "off" and entry.hand ~= "one" and self:EntryIsMainHandOnly(entry))
+    if entry.hand == "one" then
+        mainOnly = false
+        offOnly = false
+    end
+    if slotName == "MainHand" then
+        return not offOnly
+    end
+    if slotName == "SecondaryHand" then
+        if not self:CanDualWield() then
+            return false
+        end
+        return not mainOnly
+    end
+    return false
 end
 
 function GQ.Data:EntryOffWeaponRoute(entry, slotName)

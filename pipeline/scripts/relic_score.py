@@ -40,7 +40,7 @@ def relic_effect_text(it):
     return " ".join(parts)
 
 
-def score_relic(it, cls, spec, w):
+def score_relic(it, cls, spec, w, level=0):
     """Points in the same currency as stat weights (compare only within one slot)."""
     text = relic_effect_text(it)
     if not text:
@@ -57,16 +57,30 @@ def score_relic(it, cls, spec, w):
     m = re.search(r"increases the damage of (.+?) by up to (\d+)", low)
     if m:
         s += int(m.group(2)) * w.get("sp", 1.0)
+    # Totem of the Storm: "Increases damage done by Chain Lightning and
+    # Lightning Bolt by up to 33." Same number as the "damage of" line.
+    m = re.search(r"increases damage done by (.+?) by up to (\d+)", low)
+    if m:
+        s += int(m.group(2)) * w.get("sp", 1.0)
 
     m = re.search(r"allows (\d+)% of your mana regeneration to continue while casting", low)
     if m and (cls, spec) in _CASTER_SPECS:
         pct = int(m.group(1))
-        # Sustained casting mana — primary PvE value for elemental / other casters.
-        s += pct * (
+        # Sustained casting mana — primary PvE value while leveling.
+        # The 8/5/2 coefficients were tuned against the raw weight row, where
+        # 8% regen ties +33 spell power. weights_at_level already doubles
+        # int/spi/mp5 through 60, and that raw tie was already above Totem of
+        # Life (+80 healing). At 60 use a quarter of this term, which is half
+        # the raw-weight conversion, so Totem of the Storm and Totem of Life
+        # lead the slot and the leveling totem stays on the list.
+        term = pct * (
             w.get("mp5", 0.2) * 8.0
             + w.get("spi", 0.1) * 5.0
             + w.get("int", 0.3) * 2.0
         )
+        if level >= 60:
+            term *= 0.25
+        s += term
 
     m = re.search(r"reduces the cooldown of ([^.]+?) by (\d+)\s*sec", low)
     if m:

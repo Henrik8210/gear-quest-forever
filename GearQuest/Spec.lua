@@ -573,7 +573,7 @@ end
 function GQ.Spec:PrintSpecDebug()
     local classFile = NormalizeClassFile(GQ:GetEffectiveClass())
     if not classFile then
-        print("|cff66ccffGearQuest|r: Could not read your class.")
+        GQ:Chat("|cff66ccffGearQuest|r: Could not read your class.")
         return
     end
 
@@ -583,19 +583,19 @@ function GQ.Spec:PrintSpecDebug()
     local previewOn = GQ.IsPreviewEnabled and GQ:IsPreviewEnabled()
     local picked = GetSavedSpecPick(classFile)
 
-    print("|cff66ccffGearQuest|r spec debug (" .. classFile .. "):")
-    print("  simulation: " .. (previewOn and "on" or "off"))
-    print("  sim spec: " .. tostring(GetSimulatedSpec(classFile)))
-    print("  saved picker: " .. tostring(picked))
-    print("  talent-tree guess: " .. tostring(talents))
-    print("  using for hunts: " .. tostring(display))
+    GQ:Chat("|cff66ccffGearQuest|r spec debug (" .. classFile .. "):")
+    GQ:Chat("  simulation: " .. (previewOn and "on" or "off"))
+    GQ:Chat("  sim spec: " .. tostring(GetSimulatedSpec(classFile)))
+    GQ:Chat("  saved picker: " .. tostring(picked))
+    GQ:Chat("  talent-tree guess: " .. tostring(talents))
+    GQ:Chat("  using for hunts: " .. tostring(display))
     if picked and display == picked then
-        print("  source: saved spec picker")
+        GQ:Chat("  source: saved spec picker")
     elseif display == talents and talents then
-        print("  source: talent tree (most points)")
+        GQ:Chat("  source: talent tree (most points)")
     elseif previewOn and GetSimulatedSpec(classFile) then
-        print("  source: simulation picker")
+        GQ:Chat("  source: simulation picker")
     else
-        print("  class default (fallback): " .. tostring(default))
+        GQ:Chat("  class default (fallback): " .. tostring(default))
     end
 end

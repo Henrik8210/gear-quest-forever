@@ -133,16 +133,17 @@ OUTPUTS = {
 
 # Crafts that share a set prefix but are not sold as camp patterns.
 # Pawani's Trapper legs pattern is "Trapper's Leather Legguards", not Pants.
-# Armor / Helm / Pants on these six sets have no Pattern: item.
 # The six helms are boss drops (Blackfathom Deeps, Razorfen Kraul, the
-# Stockade, Scarlet Monastery), not trainer recipes. See forever_boss_sources.json.
+# Stockade, Scarlet Monastery), not camp patterns and not city trainers.
+# See forever_boss_sources.json. The Armor and Pants of these sets are
+# Merchant's Favor patterns from Pawani and Daniel Stitchsong.
 NOT_CAMP_RECIPES = {
-    "brawler's leather armor", "brawler's leather helm", "brawler's leather pants",
-    "defender's leather armor", "defender's leather helm", "defender's leather pants",
-    "totemic leather armor", "totemic leather helm", "totemic leather pants",
-    "trapper's leather armor", "trapper's leather helm", "trapper's leather pants",
-    "stormrider's leather armor", "stormrider's leather helm", "stormrider's leather pants",
-    "wisdom's leather armor", "wisdom's leather helm", "wisdom's leather pants",
+    "brawler's leather helm",
+    "defender's leather helm",
+    "totemic leather helm",
+    "trapper's leather helm",
+    "stormrider's leather helm",
+    "wisdom's leather helm",
 }
 
 # Whole sets. The pattern name and the item name do not always match.

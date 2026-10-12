@@ -1,10 +1,11 @@
 """Move dungeon and raid trash off the boss-drop source.
 
-Wowhead's boss flag is missing on real bosses (Edwin VanCleef has none), so a
-missing flag is not trash. A creature stays a boss when it is in
+Wowhead's boss flag is missing on real bosses (Edwin VanCleef, Targorr the
+Dread), so a missing flag is not trash. A creature stays a boss when it is in
 dungeon_entrances.json bossNpcs, or when Wowhead did set boss. A rare that is
-not on that list becomes Rare NPC. A normal mob, or a name in TRASH below,
-becomes raid_trash. The log calls that source Dungeon & Raid trash.
+not on that list becomes Rare NPC. A name in TRASH below becomes raid_trash.
+The log calls that source Dungeon & Raid trash. classification 0 (normal) is
+not enough: real bosses come back as normal when the flag is missing.
 """
 import json
 import os
@@ -73,6 +74,24 @@ TRASH = {
     "Twilight Acolyte",
     "Warpwood Guardian",
     "Wildspawn Satyr",
+    "Fallenroot Shadowstalker",
+    "Son of Arugal",
+    "Scarlet Sentry",
+    "Scarlet Soldier",
+    "Scarlet Augur",
+    "Caverndeep Burrower",
+    "Caverndeep Ambusher",
+    "Caverndeep Reaver",
+    "Dark Iron Agent",
+    "Razorfen Warrior",
+    "Razorfen Totemic",
+    "Vekniss Soldier",
+    "Ward Guardian",
+    "Withered Warrior",
+    "Dread Creeper",
+    "Living Monstrosity",
+    "Ragged Ghoul",
+    "Stone Watcher",
 }
 
 
@@ -86,8 +105,9 @@ def kind_for(npc: str, bosses: set[str], flags: dict) -> str | None:
         return None
     if row.get("classification") in (2, 4):
         return "rare_npc"
-    if row.get("classification") == 0:
-        return "raid_trash"
+    # classification 0 is "normal". Wowhead omits the boss flag on real bosses
+    # (Targorr the Dread, Edwin VanCleef), and those come back as normal too.
+    # Only the generic TRASH names above are trash. A unique name stays boss_drop.
     return None
 
 

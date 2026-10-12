@@ -237,6 +237,18 @@ def npc_ok(src, faction):
     side=NPC_FACTION.get(src.get("npc") or "")
     return side is None or side==faction
 
+# A vendor item belongs to one faction only when every Wowhead seller is that
+# faction. A neutral seller, or one seller on each side, stays on both lists.
+# Anachronos is left out of this file: both factions turn quests in to him.
+_VENDOR_SIDE_PATH = os.path.join(G, "vendor_side.json")
+VENDOR_SIDE = {}
+if os.path.exists(_VENDOR_SIDE_PATH):
+    VENDOR_SIDE = {int(k): v for k, v in json.load(open(_VENDOR_SIDE_PATH, encoding="utf-8")).items()}
+
+def vendor_side_ok(it, faction):
+    side = VENDOR_SIDE.get(it["id"])
+    return side is None or side == faction
+
 # Wowhead Side: Alliance / Side: Horde. Side: Both is absent, so both factions score it.
 # Written by index_coordinates.py --repair-quests.
 _QUEST_FACTION_PATH = os.path.join(G, "quest_faction.json")
@@ -399,6 +411,9 @@ def eff_req(it):
 PVP_PREFIX = json.load(open(G+"pvp_prefix_faction.json"))
 _PVP_ORDER = sorted(PVP_PREFIX, key=len, reverse=True)
 def pvp_side(name):
+    # Premier is the Forever name in front of the same rank title.
+    if name.startswith("Premier "):
+        name = name[8:]
     for p in _PVP_ORDER:
         if name.startswith(p): return PVP_PREFIX[p]
     return None
@@ -456,6 +471,7 @@ def eligible(it, cls, spec, level, faction, prof, wsubs):
     if side and side!=faction: return False
     if not rep_ok(it, faction): return False
     if not npc_ok(src, faction): return False
+    if not vendor_side_ok(it, faction): return False
     if it["cls"]==4:                                     # armour / shield / relic
         need=prof.get(it["kind"])
         if need is None or level<need: return False
@@ -530,12 +546,14 @@ def fmt_range(lo,hi):
 ROLL_POLICY="bestRoll"       # bestRoll | expectedValue | chanceFloor
 CHANCE_FLOOR=1.0             # used by chanceFloor policy (% for the whole suffix family)
 
-# Leveling is not raid min-max. Below 60:
+# Leveling is not raid min-max. Through 60, same as 1-59:
 #   survivability -- sta / health / hp5 x3, armor x2
 #   endurance     -- int / spi / mp5 / mana x2 (keep casting; less than stam)
 # A +1 primary-stat stick with no stam/mana cannot beat a real leveling chest.
-# Level 60 keeps the raid-scale weights (guides may pin later).
-LEVELING_SURVIVE_UNTIL = 60
+# Level 60 used to drop back to the raw raid weights. That let Frenzied
+# Striker (a hit stick) outrank Grand Marshal's Polearm. Hit, crit, parry,
+# dodge, and weapon damage stay on the raw weights at every level.
+LEVELING_SURVIVE_UNTIL = 61
 LEVELING_STA_MULT = 3.0
 LEVELING_HEALTH_MULT = 3.0
 LEVELING_HP5_MULT = 3.0
@@ -589,6 +607,61 @@ def forever_stats(st):
         out["sp_from_heal"] = max(out.get("sp_from_heal") or 0, heal / 3.0)
     return out
 
+# Forever tooltips say "by N%". A few items stored that percent on the old
+# rating scale (2% hit -> 20, 1% crit -> 14, 1% dodge -> 12, 1% parry -> 15)
+# and the other thousand did not. Frenzied Striker's stored 20 hit is that
+# conversion, and it outranked Grand Marshal's Polearm. At 60, drop a stored
+# hit/crit/dodge/parry when it is exactly that conversion. Do not invent the
+# rating on the items that never had it. A Chance on hit, a spell-specific
+# crit, and a line that reduces the chance to be dodged are not touched.
+_PCT_PER = {"hit": 10.0, "crit": 14.0, "dodge": 12.0, "parry": 15.0}
+
+def _percent_rating(line):
+    low = line.lower()
+    if not low.startswith("equip:"):
+        return None
+    if low.startswith("equip: improves your chance to get a critical strike"):
+        key = "crit"
+    elif low.startswith("equip: improves your chance to hit by"):
+        key = "hit"
+    elif low.startswith("equip: increases your chance to dodge an attack"):
+        key = "dodge"
+    elif low.startswith("equip: increases your chance to parry an attack"):
+        key = "parry"
+    else:
+        return None
+    m = re.search(r"by ([\d.]+)%", line)
+    if not m:
+        return None
+    return key, float(m.group(1)) * _PCT_PER[key]
+
+def _level60_stats(it, level):
+    """Stats the level-60 score uses. 1-59 keeps the stored row."""
+    base = forever_stats(it.get("stats") or {})
+    if level < 60:
+        return base
+    effects = it.get("effects") or []
+    equip = "\n".join(e for e in effects if e.lower().startswith("equip:")).lower()
+    for line in effects:
+        low = line.lower()
+        if not low.startswith("use:"):
+            continue
+        # Earthstrike stores the on-use 280 attack power as a passive stat
+        # and the proc model prices the use again. A Use amount with no Equip
+        # line is not a passive.
+        m = re.search(r"attack power by (\d+)", low)
+        if m and "attack power" not in equip:
+            if base.get("ap", 0) <= float(m.group(1)) + 0.01:
+                base["ap"] = 0
+    for line in effects:
+        got = _percent_rating(line)
+        if not got:
+            continue
+        key, pts = got
+        if abs(base.get(key, 0) - pts) < 0.6:
+            base[key] = 0
+    return base
+
 def best_variant(it, w, level, rscale):
     """-> (score, suffixName or None, chance or None, statsUsed)
 
@@ -598,7 +671,7 @@ def best_variant(it, w, level, rscale):
     wildly overvalued below 60. Keeping every weight level-invariant is both
     simpler and closer to the truth.
     """
-    base=forever_stats(it["stats"])
+    base=_level60_stats(it, level)
     def sc(st):
         t=0.0
         for k,v in forever_stats(st).items():
@@ -662,6 +735,28 @@ def best_variant(it, w, level, rscale):
 #   10020 Stormcloth Vest           -- inconclusive; only player speculation. Left in
 #                                       and surfaced in the review page instead.
 HAND_EXCLUDED={15141, 6730, 2867}
+# Forever lists these, but they are spells rather than gear you can hunt.
+# 280304 Invisible Dagger is spell 1308095, a hidden dummy aura.
+SPELL_NOT_GEAR={280304}
+
+def hidden_spell_item(it):
+    """A hidden spell or an unused placeholder. Not gear a player can hunt."""
+    if not it:
+        return False
+    if it.get("id") in SPELL_NOT_GEAR:
+        return True
+    name = it.get("name") or ""
+    if name.startswith("UNUSED") or name.startswith("[UNUSED]"):
+        return True
+    if "(DNT)" in name or "[DNT]" in name:
+        return True
+    if name in ("Placeholder", "Invisible Dagger"):
+        return True
+    return False
+
+# The Weapons list (main hand and off hand together) keeps this many names
+# per level band. Lower scores stay in items.json and can return if weights change.
+WEAPON_LIST_CAP=30
 
 def load_exclusions():
     try: ob=json.load(open("obtainability.json"))
@@ -915,7 +1010,7 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
     prof=ARMOR_PROF[cls]; wsubs=set(W[cls]["_weaponSubclasses"])
     notable={}; full60={}; source_alts={}
     armorClass=cfg.get("armorClass") or {}
-    pool=[it for it in items.values() if slot_for(it,cls) and it['id'] not in EXCLUDED]
+    pool=[it for it in items.values() if slot_for(it,cls) and it['id'] not in EXCLUDED and not hidden_spell_item(it)]
     pool=[it for it in pool if it["id"] in CLASSIC_IDS and it["id"] not in TBC_ONLY]
     per={}
     for faction in factions:
@@ -950,7 +1045,12 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     if mhKinds and it["kind"] not in mhKinds: continue
                     twoh = it["inv"]==17
                     if style=="twohand" and not twoh and level>=20: continue
-                    if style in ("onehand_shield","onehand_dual") and twoh: continue
+                    # Elemental wears a staff or a one-hander and a shield. The
+                    # shield style used to drop every two-hander, so a staff
+                    # never reached the hunt.
+                    if style in ("onehand_shield","onehand_dual") and twoh:
+                        if not (cls == "SHAMAN" and spec_key == "elemental"):
+                            continue
                 if sl=="SecondaryHand":
                     dw=dual_wield_level(cls,spec_key)
                     canDW = dw is not None and level>=dw
@@ -1076,7 +1176,7 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                 # value -- and scores are only ever compared inside one slot.
                 if it["cls"]==4 and it["kind"] in ("Totem","Idol","Libram"):
                     if not relic_ok(it,cls,spec_key): continue
-                    rs = RELIC.score_relic(it, cls, spec_key, wl)
+                    rs = RELIC.score_relic(it, cls, spec_key, wl, level)
                     if rs > 0:
                         s = rs
                     elif s <= 0:
@@ -1153,6 +1253,7 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     rows = ranked_all
                 split_hands = sl == "MainHand" and cls == "HUNTER"
                 enh_two_only = sl == "MainHand" and cls == "SHAMAN" and spec_key == "enhancement"
+                elem_both = sl == "MainHand" and cls == "SHAMAN" and spec_key == "elemental"
                 rogue_main_only = sl == "MainHand" and cls == "ROGUE"
                 if split_hands:
                     # Two-handers, then main-hand-only one-handers. An either-hand
@@ -1166,6 +1267,12 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     # Main Hand is the tooltip "Main Hand". Either-hand weapons
                     # (InventoryType 13) are off-hand picks.
                     rows = unique_name_rows([r for r in ranked_all if is_mainhand_only(r[1])], 8)
+                elif elem_both:
+                    # Keep staves beside one-handers. A pure top-8 was all
+                    # one-handers, so the two-hand filter had nothing to show.
+                    two = unique_name_rows([r for r in ranked_all if is_two_hand_item(r[1])], 4)
+                    one = unique_name_rows([r for r in ranked_all if not is_two_hand_item(r[1])], 4)
+                    rows = sorted(two + one, key=lambda r: (-r[0], r[1]["id"]))
                 else:
                     rows=unique_name_rows(rows, 8)
                 # Spell-power pieces stay in this list and take whatever rank
@@ -1473,10 +1580,78 @@ def collapse(per, factions, slots, levels):
                 prev=lv
     return bands
 
+
+def pick_is_ranked_weapon(slot, pick):
+    """A damaging weapon on the combined Weapons list. A shield has no hand."""
+    if slot not in ("MainHand", "SecondaryHand"):
+        return False
+    if hidden_spell_item(pick):
+        return False
+    if slot == "SecondaryHand" and not pick.get("hand"):
+        return False
+    if slot == "MainHand" and not pick.get("hand") and not pick.get("dps"):
+        return False
+    return True
+
+def cap_weapon_bands(bands, limit=WEAPON_LIST_CAP):
+    """Keep the highest-scored weapons for each faction and level band.
+
+    Main hand and off hand share one list, the same list the (i) tooltip
+    shows. Shields and held items stay. A weapon below the cap stays in
+    items.json so a later weight change can score it back in.
+    """
+    groups = {}
+    for band in bands:
+        if band.get("slot") not in ("MainHand", "SecondaryHand"):
+            continue
+        key = (band.get("faction"), band.get("lo"), band.get("hi"))
+        groups.setdefault(key, []).append(band)
+    for blist in groups.values():
+        ranked = []
+        for band in blist:
+            for index, pick in enumerate(band.get("picks") or []):
+                if not pick_is_ranked_weapon(band["slot"], pick):
+                    continue
+                ranked.append((
+                    -(pick.get("score") or 0),
+                    pick.get("curatedRank") or 99,
+                    pick.get("id") or 0,
+                    band,
+                    index,
+                    (pick.get("name") or "", pick.get("suffix") or ""),
+                ))
+        ranked.sort()
+        keep = set()
+        seen = set()
+        for _score, _rank, iid, band, index, name in ranked:
+            key = name if name[0] else ("id", iid)
+            if key in seen:
+                continue
+            if len(seen) >= limit:
+                continue
+            seen.add(key)
+            keep.add((id(band), index))
+        for band in blist:
+            kept = []
+            for index, pick in enumerate(band.get("picks") or []):
+                if hidden_spell_item(pick):
+                    continue
+                if pick_is_ranked_weapon(band["slot"], pick) and (id(band), index) not in keep:
+                    continue
+                kept.append(pick)
+            band["picks"] = kept
+    return [band for band in bands if band.get("picks")]
+
 if __name__=="__main__":
     cls=os.environ.get("GQ_CLASS","PALADIN")
+    only=os.environ.get("GQ_SPEC")
+    specs=[k for k in W[cls] if not k.startswith("_")]
+    if only:
+        if only not in specs:
+            raise SystemExit("unknown spec %s" % only)
+        specs=[only]
     out={}
-    for spec in [k for k in W[cls] if not k.startswith("_")]:
+    for spec in specs:
         # Stop at 69. Level 70 is deliberately NOT generated: at 70 the things that
         # decide BiS -- gem sockets, tier set bonuses, libram/relic effects, weapon
         # speed breakpoints, phase tier, PvE-vs-PvP intent -- are all invisible to a
@@ -1541,10 +1716,16 @@ if __name__=="__main__":
                 if lo<60: emit(faction,sl,lo,59,per.get((faction,59,sl)) or rows)
                 if ov: emit(faction,sl,60,60,ov[0],ov[1])
                 else:   emit(faction,sl,60,60,r60[:8])
+        out[spec]["bands"] = cap_weapon_bands(out[spec]["bands"])
         print(f"{spec:<16} slots={len(slots):<3} bands={len(out[spec]['bands'])}")
     if _displaced:
         print(f"level-60 guide override: {len(_displaced)} slot(s) where the model beat the guide by >{int(DISPLACE_MARGIN*100)}%")
         for d in _displaced[:14]:
             print(f"    {d[0]:<12}{d[2]:<9}{d[1]:<14}{d[3]} ({d[4]}) displaced {d[5]} ({d[6]})")
-    json.dump(out,open(os.path.join(OUT, os.environ.get("GQ_OUT","paladin.json")),"w"))
-    print("wrote "+os.path.join(OUT, os.environ.get("GQ_OUT","paladin.json")))
+    out_path=os.path.join(OUT, os.environ.get("GQ_OUT","paladin.json"))
+    if only and os.path.exists(out_path):
+        prev=json.load(open(out_path, encoding="utf-8"))
+        prev[only]=out[only]
+        out=prev
+    json.dump(out,open(out_path,"w"))
+    print("wrote "+out_path)
