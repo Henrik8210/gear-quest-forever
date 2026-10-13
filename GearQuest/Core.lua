@@ -9,7 +9,7 @@ end
 GQ = GQ or {}
 _G.GearQuest = GQ
 
-GQ.VERSION = "0.5.4-beta"
+GQ.VERSION = "0.5.5-beta"
 GQ.ADDON_NAME = ADDON_NAME
 
 -- General -> Hide chat messages. Off until the player checks it.
@@ -316,126 +316,44 @@ function GQ:SyncLevelOverride()
     end
 end
 
-function GQ:LevelUpCharDB()
-    self:BindSavedVariableGlobals()
-    if type(GearQuestForeverCharDB) ~= "table" then
-        return nil
+-- List builds ask for class, level, faction and spec several times per
+-- catalog entry, and every answer re-reads saved settings. Nothing changes
+-- them mid-build, so answer from one snapshot. Only list building runs inside.
+local function CloseContextSnapshot(self, ok, ...)
+    self._ctx = nil
+    if not ok then
+        error((...), 0)
     end
-    return GearQuestForeverCharDB
+    return ...
 end
 
-function GQ:IsLevelUpOnDemand()
-    local db = self:LevelUpCharDB()
-    return db and db.levelUpOnDemand and true or false
-end
-
-function GQ:GetLevelUpPin()
-    local db = self:LevelUpCharDB()
-    local pin = db and tonumber(db.levelUpPin)
-    if not pin then
-        pin = UnitLevel("player") or 1
-        if db then
-            db.levelUpPin = self:ClampPlayerLevel(pin)
-        end
+function GQ:WithContextSnapshot(fn, ...)
+    if self._ctx then
+        return fn(...)
     end
-    return self:ClampPlayerLevel(pin)
-end
-
-function GQ:RealPlayerLevel()
-    return self:ClampPlayerLevel(UnitLevel("player") or 1)
-end
-
-function GQ:SetLevelUpOnDemand(enabled)
-    self:BindSavedVariableGlobals()
-    if type(GearQuestForeverCharDB) ~= "table" then
-        GearQuestForeverCharDB = {}
-        _G.GearQuestForeverCharDB = GearQuestForeverCharDB
-    end
-    local db = GearQuestForeverCharDB
-    enabled = enabled and true or false
-    db.levelUpOnDemand = enabled
-    self._playerLevelOverride = nil
-    if enabled then
-        db.levelUpPin = self:RealPlayerLevel()
-    else
-        db.levelUpPin = nil
-        if self.Data and self.Data.InvalidateQueryCache then
-            self.Data:InvalidateQueryCache()
-        end
-        self:RefreshUI()
-    end
-    if self.Log and self.Log.UpdateLevelUpControls then
-        self.Log:UpdateLevelUpControls()
-    end
-end
-
-function GQ:CanLevelUpOnDemand()
-    if not self:IsLevelUpOnDemand() then
-        return false
-    end
-    return self:RealPlayerLevel() > self:GetLevelUpPin()
-end
-
--- Level-up also fires talent and quest-log events in the same burst.
--- Hold the gear-list rebuild until the player clicks Level up!.
--- Bag checks keep running so a drop from the pinned list can still toast.
-function GQ:NoteLevelUpHold()
-    self._levelUpHoldBurst = true
-    if C_Timer and C_Timer.After then
-        C_Timer.After(1, function()
-            self._levelUpHoldBurst = nil
-        end)
-    end
-end
-
-function GQ:LevelUpWorkHeld()
-    if not self:IsLevelUpOnDemand() then
-        return false
-    end
-    if self._levelUpHoldBurst then
-        return true
-    end
-    return self:CanLevelUpOnDemand()
-end
-
-function GQ:LevelUpNow()
-    if not self:CanLevelUpOnDemand() then
-        return
-    end
-    local db = self:LevelUpCharDB()
-    if not db then
-        return
-    end
-    local previous = self:GetLevelUpPin()
-    local actual = self:RealPlayerLevel()
-    db.levelUpPin = actual
-    self._playerLevelOverride = nil
-    if self:IsPreviewEnabled() then
-        if self.Log and self.Log.UpdateLevelUpControls then
-            self.Log:UpdateLevelUpControls()
-        end
-        return
-    end
-    if self.Data and self.Data.InvalidateQueryCache then
-        self.Data:InvalidateQueryCache()
-    end
-    self:CheckLevelMilestones(previous, actual)
-    if self.Log and self.Log.CheckAutoCompletion then
-        self.Log:CheckAutoCompletion()
-    end
-    self:RefreshUI()
+    self._ctx = {}
+    return CloseContextSnapshot(self, pcall(fn, ...))
 end
 
 function GQ:GetEffectiveLevel()
     if self._listProbeLevel then
         return self:ClampPlayerLevel(self._listProbeLevel)
     end
+    local ctx = self._ctx
+    local level = ctx and ctx.level
+    if level == nil then
+        level = self:ComputeEffectiveLevel()
+        if ctx then
+            ctx.level = level
+        end
+    end
+    return level
+end
+
+function GQ:ComputeEffectiveLevel()
     self:SyncLevelOverride()
     if self._playerLevelOverride and not self:IsPreviewEnabled() then
         return self:ClampPlayerLevel(self._playerLevelOverride)
-    end
-    if not self:IsPreviewEnabled() and self:IsLevelUpOnDemand() then
-        return self:GetLevelUpPin()
     end
     return self:ClampPlayerLevel(self.Preview:GetEffectiveLevel())
 end
@@ -469,11 +387,13 @@ function GQ:RefreshUI(opts)
                 if self.Log.frame:IsShown() then
                     pcall(function()
                         if self.Log.ScheduleListRefresh then
-                            self.Log:ScheduleListRefresh()
+                            self.Log:ScheduleListRefresh(opts.reason == "level")
                         else
                             self.Log:Refresh()
                         end
                     end)
+                elseif opts.reason == "level" then
+                    GQ._levelUpGap = nil
                 end
             end
 
@@ -499,7 +419,8 @@ function GQ:RefreshUI(opts)
         if self.Indicator then
             pcall(function()
                 if self.Indicator.RebuildCacheAsync then
-                    self.Indicator:RebuildCacheAsync(afterIndicatorCache)
+                    local perFrame = (opts.reason == "level") and 1 or nil
+                    self.Indicator:RebuildCacheAsync(afterIndicatorCache, perFrame)
                 else
                     self.Indicator:RebuildCache()
                     self.Indicator:RefreshAll()
@@ -523,7 +444,15 @@ function GQ:RefreshUI(opts)
     end
 
     if C_Timer and C_Timer.After then
-        C_Timer.After(0, runHeavy)
+        -- A cold cache builds every slot inside the first indicator pass.
+        -- Warm one slot per frame, then draw.
+        C_Timer.After(0, function()
+            if self.Data and self.Data.WarmQueryCacheAsync then
+                self.Data:WarmQueryCacheAsync(runHeavy)
+            else
+                runHeavy()
+            end
+        end)
     else
         runHeavy()
     end
@@ -597,20 +526,26 @@ function GQ:CheckLevelMilestones(previousLevel, newLevel)
 
     -- Finger milestones follow this character's hunts, not the Alliance paladin
     -- level-9 band. Horde shaman has no Finger rows until later; do not toast an empty slot.
-    local fingerHunts = GQ.Data and GQ.Data.GetTopUpgradesForSlot and GQ.Data:GetTopUpgradesForSlot("Finger", 3)
-    local fingerCount = fingerHunts and #fingerHunts or 0
     local fingerUnlock = 9
     if GQ.Data and GQ.Data.GetSlotUnlockLevel then
         fingerUnlock = GQ.Data:GetSlotUnlockLevel("Finger") or fingerUnlock
     end
-    if fingerCount > 0 and previousLevel < fingerUnlock and newLevel >= fingerUnlock then
+    local ringSlot2Level = GQ.Data and GQ.Data.RING_SLOT_2_MILESTONE_LEVEL
+    local crossesRing1 = previousLevel < fingerUnlock and newLevel >= fingerUnlock
+    local crossesRing2 = ringSlot2Level and previousLevel < ringSlot2Level and newLevel >= ringSlot2Level
+    -- The finger list is a catalog walk. Only a ring milestone needs it.
+    local fingerCount = 0
+    if (crossesRing1 or crossesRing2) and GQ.Data and GQ.Data.GetTopUpgradesForSlot then
+        local fingerHunts = GQ.Data:GetTopUpgradesForSlot("Finger", 3)
+        fingerCount = fingerHunts and #fingerHunts or 0
+    end
+    if fingerCount > 0 and crossesRing1 then
         self:NotifyMilestoneOnce(
             "ringSlot1",
             "|cff66ccffGearQuest|r: You've reached level " .. newLevel .. " — one of your ring slots is now eligible for an upgrade! Open |cff00ff00/gq log|r to browse finger upgrades."
         )
     end
-    local ringSlot2Level = GQ.Data and GQ.Data.RING_SLOT_2_MILESTONE_LEVEL
-    if fingerCount >= 2 and ringSlot2Level and previousLevel < ringSlot2Level and newLevel >= ringSlot2Level then
+    if fingerCount >= 2 and crossesRing2 then
         self:NotifyMilestoneOnce(
             "ringSlot2",
             "|cff66ccffGearQuest|r: You've reached level " .. newLevel .. " — your other ring slot is now eligible for an upgrade! Open |cff00ff00/gq log|r to browse finger upgrades."
@@ -634,36 +569,45 @@ end
 
 function GQ:PLAYER_LEVEL_UP(_, newLevel)
     local previousLevel = newLevel and (newLevel - 1) or nil
-    local hold = self:IsLevelUpOnDemand()
-    if newLevel and not self:IsPreviewEnabled() and not hold then
+    if newLevel and not self:IsPreviewEnabled() then
         self._playerLevelOverride = newLevel
     end
-    if not hold and self.Data and self.Data.InvalidateQueryCache then
+    if self.Data and self.Data.InvalidateQueryCache then
         self.Data:InvalidateQueryCache()
     end
-    -- Quest turn-in dings inside the gamepad focus change. Toasts and the
-    -- log refresh wait one frame so they are not on that call.
+    -- Quest turn-in dings inside the gamepad focus change. Each slot waits
+    -- a frame, then milestones, the obtain check, and the redraw each wait
+    -- a frame of their own.
+    GQ._levelUpGap = 1
+    local function later(fn)
+        if C_Timer and C_Timer.After then
+            C_Timer.After(0, fn)
+        else
+            fn()
+        end
+    end
     local function apply()
-        if not hold then
+        later(function()
             self:CheckLevelMilestones(previousLevel, newLevel)
-        end
-        if not hold and self.Log and self.Log.CheckAutoCompletion then
-            self.Log:CheckAutoCompletion()
-        end
-        if hold then
-            self:NoteLevelUpHold()
-            if self.Log and self.Log.UpdateLevelUpControls then
-                self.Log:UpdateLevelUpControls()
-            end
-            return
-        end
-        self:RefreshUI()
+            later(function()
+                if self.Log and self.Log.CheckAutoCompletion then
+                    self.Log:CheckAutoCompletion()
+                end
+                later(function()
+                    self:RefreshUI({ reason = "level" })
+                end)
+            end)
+        end)
     end
-    if C_Timer and C_Timer.After then
-        C_Timer.After(0, apply)
-    else
+    if not (C_Timer and C_Timer.After) then
         apply()
+        return
     end
+    if not (self.Data and self.Data.WarmQueryCacheAsync) then
+        C_Timer.After(0, apply)
+        return
+    end
+    self.Data:WarmQueryCacheAsync(apply, 1)
 end
 
 local eventFrame = CreateFrame("Frame")

@@ -398,6 +398,10 @@ function GQ.Spec:SetSelectedSpec(specId, classFile)
         GQ:RefreshUI({ reason = "spec" })
     end
 
+    if self._talentFrame then
+        self._talentFrame._lastSpec = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec() or matched.id
+    end
+
     return true
 end
 
@@ -503,7 +507,21 @@ function GQ.Spec:EnsureTalentRefresh()
         return
     end
     local frame = CreateFrame("Frame")
+    local function currentSpec()
+        return GQ.GetEffectiveSpec and GQ:GetEffectiveSpec() or nil
+    end
+    frame._lastSpec = currentSpec()
     local function applyTalentChange()
+        -- Every ding from 10 gives a talent point and fires this. With no spec
+        -- change, wiping the cache would throw away the level-up rebuild.
+        local spec = currentSpec()
+        if spec == frame._lastSpec then
+            if GQ.Log and GQ.Log.UpdateSpecButton then
+                GQ.Log:UpdateSpecButton()
+            end
+            return
+        end
+        frame._lastSpec = spec
         if GQ.Data and GQ.Data.InvalidateSpecCache then
             GQ.Data:InvalidateSpecCache()
         end
@@ -515,28 +533,8 @@ function GQ.Spec:EnsureTalentRefresh()
         end
     end
     local function onTalentChange()
-        -- A ding fires this even when no talent changed, and that reload is the hitch.
-        -- On-demand keeps the current list until Level up!. A real spec change while
-        -- caught up still reloads, one frame later so the ding can mark the hold first.
-        if GQ.IsLevelUpOnDemand and GQ:IsLevelUpOnDemand() then
-            if frame._talentDefer then
-                return
-            end
-            frame._talentDefer = true
-            local function finish()
-                frame._talentDefer = nil
-                if GQ.LevelUpWorkHeld and GQ:LevelUpWorkHeld() then
-                    return
-                end
-                applyTalentChange()
-            end
-            if C_Timer and C_Timer.After then
-                C_Timer.After(0, finish)
-            else
-                finish()
-            end
-            return
-        end
+        -- A ding fires this even when no talent changed. applyTalentChange
+        -- leaves the lists alone unless the spec actually changed.
         applyTalentChange()
     end
     GQ.RegisterEvent(frame, "PLAYER_TALENT_UPDATE")

@@ -331,6 +331,89 @@ function GQ.Equip:MeetsArmorPreference(itemId, slotName, classFile, playerLevel)
     return actual == preferred
 end
 
+-- What this class can equip, not what it prefers. A hunter wears leather
+-- until 40, then mail. Cloth stays wearable. Plate is warrior and paladin
+-- from 40. Unknown armor stays in; list building often has no client tooltip.
+function GQ.Equip:ClassCanWearArmorSubclass(subclass, classFile, playerLevel)
+    if not subclass or subclass == "" or subclass == "Miscellaneous" then
+        return true
+    end
+    classFile = classFile or (GQ.GetEffectiveClass and GQ:GetEffectiveClass())
+    playerLevel = playerLevel or (GQ.GetEffectiveLevel and GQ:GetEffectiveLevel()) or 1
+    if subclass == "Cloth" then
+        return true
+    end
+    if subclass == "Leather" then
+        return classFile ~= "MAGE" and classFile ~= "PRIEST" and classFile ~= "WARLOCK"
+    end
+    if subclass == "Mail" then
+        if classFile == "WARRIOR" or classFile == "PALADIN" then
+            return true
+        end
+        if classFile == "HUNTER" or classFile == "SHAMAN" then
+            return playerLevel >= 40
+        end
+        return false
+    end
+    if subclass == "Plate" then
+        return (classFile == "WARRIOR" or classFile == "PALADIN") and playerLevel >= 40
+    end
+    return true
+end
+
+function GQ.Equip:PeekItemArmorSubclass(itemId)
+    if not itemId or not GetItemInfo then
+        return nil
+    end
+    local _, _, _, _, _, class, subclass = GetItemInfo(itemId)
+    if class == "Armor" and subclass and subclass ~= "" then
+        return subclass
+    end
+    return nil
+end
+
+function GQ.Equip:EntryArmorSubclass(entry)
+    if not entry then
+        return nil
+    end
+    if type(entry.armorSubclass) == "string" and entry.armorSubclass ~= "" then
+        return entry.armorSubclass
+    end
+    local fromClient = self:PeekItemArmorSubclass(entry.itemId)
+    if fromClient then
+        return fromClient
+    end
+    local name = entry.name
+    if (not name or name == "") and GQ.Data and GQ.Data.GetItemDisplayName and entry.itemId then
+        name = GQ.Data:GetItemDisplayName(entry.itemId)
+    end
+    name = name or ""
+    if name:find("%f[%a]Mail%f[%A]") then
+        return "Mail"
+    end
+    if name:find("%f[%a]Plate%f[%A]") then
+        return "Plate"
+    end
+    -- Hand-placed lines read "Mail waist, 38 armor" or "Leather wrist, 15 armor".
+    local kind = (entry.instructions or ""):match("([A-Z][a-z]+) %a+, %d+ armor")
+    if kind == "Mail" or kind == "Plate" or kind == "Leather" or kind == "Cloth" then
+        return kind
+    end
+    return nil
+end
+
+function GQ.Equip:EntryArmorIsWearable(entry, slotName)
+    slotName = slotName or (entry and entry.slot)
+    if not self:SlotUsesArmorSubclass(slotName) then
+        return true
+    end
+    local subclass = self:EntryArmorSubclass(entry)
+    if not subclass then
+        return true
+    end
+    return self:ClassCanWearArmorSubclass(subclass)
+end
+
 function GQ.Equip:CanPlayerEquip(itemId, slotName)
     if not itemId then
         return false

@@ -913,7 +913,10 @@ def item_related(item_id: int, cache: dict) -> dict:
     for row in listview_rows(html, "sold-by"):
         npc_id = row.get("id")
         if isinstance(npc_id, int):
-            sell.append({"id": npc_id, "react": row.get("react")})
+            entry = {"id": npc_id, "react": row.get("react")}
+            if isinstance(row.get("name"), str) and row["name"].strip():
+                entry["name"] = row["name"].strip()
+            sell.append(entry)
     record = {"drop": drop, "sell": sell}
     cache["itemLists"][key] = record
     return record
@@ -959,6 +962,12 @@ def camps_from_npcs(npcs: list[dict], cache: dict, tag_faction: bool) -> list[di
                 row["mapId"] = spot["mapId"]
             elif spot["map"] in MAP_IDS:
                 row["mapId"] = MAP_IDS[spot["map"]]
+            # Vendor pins name the seller who stands there. World drops do not.
+            seller = rec.get("name") or npc.get("name")
+            if tag_faction and isinstance(seller, str) and seller.strip():
+                row["npc"] = seller.strip()
+                if not rec.get("name"):
+                    rec["name"] = row["npc"]
             if side:
                 row["faction"] = side
             elif tag_faction and spot.get("faction"):
@@ -1038,10 +1047,13 @@ def resolve_item(item_id: int, src: dict, cache: dict, xml_cache: dict) -> tuple
         spots = camps_from_npcs((item_related(item_id, cache).get("sell") or []), cache, True)
         if not spots:
             spots = spots_for_npc_name(npc, cache)
+            for spot in spots:
+                spot["npc"] = npc
             if not spots:
                 for named, fac in faction_names(src.get("instructions") or ""):
                     for spot in spots_for_npc_name(named, cache):
                         spot["faction"] = fac
+                        spot["npc"] = named
                         spots.append(spot)
         if spots:
             return {"note": NOTE_VENDOR, "spots": spots, "more": len(spots) > 1}, None
@@ -1185,6 +1197,9 @@ def lua_spot(spot: dict) -> str:
     ])
     if spot.get("faction"):
         parts.append(f'faction="{spot["faction"]}"')
+    if spot.get("npc"):
+        safe = str(spot["npc"]).replace("\\", "").replace('"', "")
+        parts.append(f'npc="{safe}"')
     return "{" + ",".join(parts) + "}"
 
 

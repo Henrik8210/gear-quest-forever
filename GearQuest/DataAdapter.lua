@@ -316,6 +316,8 @@ function GQ.Data:EnsureClassLoaded(classFile)
         end
     end
 
+    -- Class tips just landed in foreverAudit. Drop remembered show/hide answers.
+    self._showEntryMemo = nil
     self.entries = self.entries or {}
     local start = #self.entries
     local n = 0

@@ -2631,9 +2631,14 @@ function GQ.Log:BuyItEnabled()
     return ui and ui.playBuyIt and true or false
 end
 
+function GQ.Log:ManageableQuestsEnabled()
+    local ui = GearQuestForeverDB and GearQuestForeverDB.ui
+    return ui and ui.playManageableQuests and true or false
+end
+
 function GQ.Log:PlayStyleActive()
     return self:NoDungeonsEnabled() or self:DungeonEnjoyerEnabled() or self:GetItTodayEnabled()
-        or self:DontLookBackEnabled() or self:BuyItEnabled()
+        or self:DontLookBackEnabled() or self:BuyItEnabled() or self:ManageableQuestsEnabled()
 end
 
 function GQ.Log:UsesWideHuntList()
@@ -2730,6 +2735,43 @@ function GQ.Log:QuestGreenRange(level)
         return 11
     end
     return 12
+end
+
+-- Stored item level. Manageable Quests waits until the viewed level reaches
+-- this minus 4. That wait never goes past 60.
+function GQ.Log:QuestRewardItemLevel(entry)
+    if not entry or not entry.itemId or not (GQ.Data and GQ.Data.GetItemFact) then
+        return nil
+    end
+    local fact = GQ.Data:GetItemFact(entry.itemId)
+    local ilvl = fact and tonumber(fact.ilvl)
+    if not ilvl or ilvl < 1 then
+        return nil
+    end
+    return ilvl
+end
+
+function GQ.Log:QuestRewardTooHard(entry)
+    if not entry then
+        return false
+    end
+    local src = GQ.NormalizeSourceType and GQ:NormalizeSourceType(entry.sourceType or "") or (entry.sourceType or "")
+    if src ~= "quest_reward" and src ~= "seasonal_quest" then
+        return false
+    end
+    local ilvl = self:QuestRewardItemLevel(entry)
+    if not ilvl then
+        return false
+    end
+    local floor = ilvl - 4
+    if floor > 60 then
+        floor = 60
+    end
+    if floor < 1 then
+        return false
+    end
+    local level = GQ.GetEffectiveLevel and GQ:GetEffectiveLevel() or 1
+    return level < floor
 end
 
 function GQ.Log:HuntIsBehind(entry)
@@ -3072,6 +3114,9 @@ function GQ.Log:EntryMatchesPlayStyle(entry)
     if self:DontLookBackEnabled() and self:HuntIsBehind(entry) then
         return false
     end
+    if self:ManageableQuestsEnabled() and self:QuestRewardTooHard(entry) then
+        return false
+    end
     if self:BuyItEnabled() and not self:EntryCanBeBought(entry) then
         return false
     end
@@ -3298,6 +3343,7 @@ function GQ.Log:GetActiveListCacheContextKey()
         self:DungeonEnjoyerEnabled() and "enjoy" or "",
         self:GetItTodayEnabled() and "today" or "",
         self:DontLookBackEnabled() and "back" or "",
+        self:ManageableQuestsEnabled() and "manage" or "",
         self:BuyItEnabled() and "buy" or "",
     }, "|")
 end
@@ -3549,6 +3595,7 @@ function GQ.Log:GetFilteredTopForSlot(slotName)
                 and GQ.Data:ShouldShowEntry(entry)
                 and GQ.Data:EntryMatchesPlayer(entry)
                 and GQ.Data:EntryFitsPaperDollSlot(entry, slotName)
+                and (not equip or not equip.EntryArmorIsWearable or equip:EntryArmorIsWearable(entry, slotName))
                 and (not equip or not equip.EntryMatchesSpec or equip:EntryMatchesSpec(entry))
                 and (not equip or not equip.MeetsRequiredLevel or equip:MeetsRequiredLevel(entry.itemId, playerLevel))
             then
@@ -3626,6 +3673,32 @@ function GQ.Log:ShouldHideFromActiveList(entry, slotName, completedItemKeys)
     return false
 end
 
+-- The three hunt rows are the next ranked pieces this character does not
+-- already have. Owning rank 2 shows #1, #3, #4. A worn piece that is not on
+-- the rank list does not take one of those three places.
+function GQ.Log:RankedHuntEntries(slotName, applyFilters)
+    local results = {}
+    local seenName = {}
+    local list = self:GetSlotRankList(slotName)
+    for i = 1, list and #list or 0 do
+        if #results >= 3 then
+            break
+        end
+        local entry = list[i]
+        if entry and not self:ShouldHideFromActiveList(entry, slotName)
+            and (not applyFilters or (self:EntrySourceAllowed(entry) and self:EntryMatchesPlayStyle(entry))) then
+            local name = (GQ.Data.GetEntryDisplayName and GQ.Data:GetEntryDisplayName(entry)) or ""
+            if name == "" or not seenName[name] then
+                if name ~= "" then
+                    seenName[name] = true
+                end
+                results[#results + 1] = entry
+            end
+        end
+    end
+    return results
+end
+
 function GQ.Log:GetActiveSlotListEntries(slotName, plain)
     local results = {}
     local seenId = {}
@@ -3663,19 +3736,8 @@ function GQ.Log:GetActiveSlotListEntries(slotName, plain)
     end
 
     if not plain and self:UsesWideHuntList() then
-        for _, entry in ipairs(GQ.Data:GetTopUpgradesForSlot(slotName)) do
-            if self:EntrySourceAllowed(entry) and self:EntryMatchesPlayStyle(entry) then
-                addEntry(entry, false)
-            end
-        end
-
-        if #results < 3 then
-            for _, entry in ipairs(self:GetFilteredTopForSlot(slotName)) do
-                addEntry(entry, false)
-                if #results >= 3 then
-                    break
-                end
-            end
+        for _, entry in ipairs(self:RankedHuntEntries(slotName, true)) do
+            addEntry(entry, false)
         end
 
         for _, entry in ipairs(GQ.Data:GetNotableForSlot(slotName)) do
@@ -3700,7 +3762,7 @@ function GQ.Log:GetActiveSlotListEntries(slotName, plain)
         return results
     end
 
-    for _, entry in ipairs(GQ.Data:GetTopUpgradesForSlot(slotName)) do
+    for _, entry in ipairs(self:RankedHuntEntries(slotName, true)) do
         addEntry(entry, false)
     end
 
@@ -4170,10 +4232,10 @@ function GQ.Log:AnnounceObtained(entry)
     end
 end
 
-function GQ.Log:EntryOnCurrentGearQuestList(entry)
+function GQ.Log:EntryOnCurrentGearQuestList(entry, cacheOnly)
     -- The log's current list: top upgrades and the notable for this level.
     -- Not the whole candidate pool, and not an earlier band (a level 9 cloak
-    -- is not a level 20 hunt).
+    -- is not a level 20 hunt). cacheOnly never builds that list.
     if not entry or not entry.slot or not GQ.Data then
         return false
     end
@@ -4193,7 +4255,13 @@ function GQ.Log:EntryOnCurrentGearQuestList(entry)
         end
         return false
     end
-    if listHasMatch(GQ.Data:GetTopUpgradesForSlot(slotName)) then
+    local top
+    if cacheOnly and GQ.Data.PeekTopUpgradesForSlot then
+        top = GQ.Data:PeekTopUpgradesForSlot(slotName)
+    else
+        top = GQ.Data:GetTopUpgradesForSlot(slotName)
+    end
+    if listHasMatch(top) then
         return true
     end
     if listHasMatch(GQ.Data:GetNotableForSlot(slotName)) then
@@ -4219,22 +4287,24 @@ function GQ.Log:ShouldAutoCompleteOnObtain(entry, includeReached)
         return false
     end
 
-    local onList = self:EntryOnCurrentGearQuestList(entry)
-    if not onList and GetHuntStatus(entry.id) == "tracked" and GQ.Data:EntryMatchesPlayer(entry) then
-        onList = true
-    end
-    if onList then
+    -- Tracked hunts are already a match. Asking the slot list first builds
+    -- the catalog when the cache is cold.
+    if GetHuntStatus(entry.id) == "tracked" and GQ.Data:EntryMatchesPlayer(entry) then
         return true
     end
 
     -- Simulator jumps and /gq wipe data only. A live loot of an older piece
     -- (Calico Cloak at level 20) is not a current hunt and must not complete.
-    if not includeReached then
-        return false
+    -- Wait until the slot list exists so this pass does not scan the catalog.
+    if includeReached then
+        if GQ.Data.QueryCacheNeedsWarm and GQ.Data:QueryCacheNeedsWarm() then
+            return false
+        end
+        local playerLevel = GQ:GetEffectiveLevel()
+        return playerLevel >= (entry.minLevel or 1)
     end
 
-    local playerLevel = GQ:GetEffectiveLevel()
-    return playerLevel >= (entry.minLevel or 1)
+    return self:EntryOnCurrentGearQuestList(entry, true)
 end
 
 function GQ.Log:RememberObtainedEntry(entry, now)
@@ -4440,6 +4510,10 @@ function GQ.Log:WipeCharacterData()
 end
 
 function GQ.Log:CollectAutoCompletionCandidates()
+    return GQ:WithContextSnapshot(self.BuildCollectAutoCompletionCandidates, self)
+end
+
+function GQ.Log:BuildCollectAutoCompletionCandidates()
     local seen = {}
     local candidates = {}
 
@@ -4462,15 +4536,17 @@ function GQ.Log:CollectAutoCompletionCandidates()
     end
 
     -- The pinned list is already cached, so this compares bags to the list
-    -- on screen. Building the next level stays on the Level up! click.
-    local classFile = GQ:GetEffectiveClass()
-    if classFile and GQ.Data.GetSlotsForClass then
-        for _, slotName in ipairs(GQ.Data:GetSlotsForClass(classFile)) do
-            for _, entry in ipairs(GQ.Data:GetTopUpgradesForSlot(slotName)) do
-                add(entry)
-            end
-            for _, entry in ipairs(GQ.Data:GetNotableForSlot(slotName) or {}) do
-                add(entry)
+    -- on screen. Do not build that list here. GetSlotsForClass walks every
+    -- row for the class, and a loot event in a dungeon trips
+    -- "script ran too long". A cold cache is filled one slot per frame.
+    if GQ.Data.PeekTopUpgradesForSlot and GQ.Data.WarmSlotNames then
+        local slots = GQ.Data:WarmSlotNames()
+        for i = 1, #slots do
+            local cached = GQ.Data:PeekTopUpgradesForSlot(slots[i])
+            if cached then
+                for j = 1, #cached do
+                    add(cached[j])
+                end
             end
         end
     end
@@ -4554,8 +4630,9 @@ function GQ.Log:CheckAutoCompletion(includeReached)
             if entry and entry.id and not seen[entry.id] and owns(entry)
                 and self:ShouldAutoCompleteOnObtain(entry, includeReached) then
                 seen[entry.id] = true
-                local onList = self:EntryOnCurrentGearQuestList(entry)
-                    or (GetHuntStatus(entry.id) == "tracked" and GQ.Data:EntryMatchesPlayer(entry))
+                local tracked = GetHuntStatus(entry.id) == "tracked"
+                    and GQ.Data:EntryMatchesPlayer(entry)
+                local onList = tracked or self:EntryOnCurrentGearQuestList(entry, true)
                 local options = nil
                 if not onList then
                     options = { showToast = false, announce = false }
@@ -4586,9 +4663,174 @@ function GQ.Log:CheckAutoCompletion(includeReached)
             GQ:RefreshUI()
         end
     end
+
+    if GQ.Data and GQ.Data.QueryCacheNeedsWarm and GQ.Data:QueryCacheNeedsWarm()
+        and GQ.Data.WarmQueryCacheAsync then
+        local reached = includeReached
+        GQ.Data:WarmQueryCacheAsync(function()
+            if GQ.Log and GQ.Log.CheckAutoCompletion then
+                GQ.Log:CheckAutoCompletion(reached)
+            end
+        end)
+    end
 end
 
-function GQ.Log:ScheduleListRefresh()
+function GQ.Log:RankListCacheKey(slotName)
+    local handKind = nil
+    if slotName == "MainHand" and self.WeaponHeaderKind then
+        handKind = self:WeaponHeaderKind()
+    end
+    return tostring(slotName) .. ":" .. tostring(handKind), handKind
+end
+
+function GQ.Log:RankListsReady()
+    if not (GQ.Data and GQ.Data.GetSlotsForClass and GQ.Data.GetActiveBandCacheKey) then
+        return true
+    end
+    local band = GQ.Data:GetActiveBandCacheKey()
+    if self._slotRankBand ~= band or not self._slotRankCache then
+        return false
+    end
+    local slots = GQ.Data:GetSlotsForClass(GQ:GetEffectiveClass()) or {}
+    for i = 1, #slots do
+        local cacheKey = self:RankListCacheKey(slots[i])
+        if not self._slotRankCache[cacheKey] then
+            return false
+        end
+    end
+    return true
+end
+
+-- The hunt rows stay as they are until every slot for this level is built,
+-- then the list swaps once. A cached level still refreshes on this frame.
+function GQ.Log:ScheduleRankListWarm()
+    if self._rankWarmRunning then
+        self._rankWarmAgain = true
+        return
+    end
+    if not (C_Timer and C_Timer.After) or not self.frame then
+        self:Refresh()
+        return
+    end
+    self._rankWarmRunning = true
+    local band = GQ.Data:GetActiveBandCacheKey()
+    local slots = GQ.Data:GetSlotsForClass(GQ:GetEffectiveClass()) or {}
+    local index = 0
+    local phase = "ranks"
+    local function finish()
+        self._rankWarmRunning = false
+        local again = self._rankWarmAgain
+        self._rankWarmAgain = nil
+        local bandNow = GQ.Data.GetActiveBandCacheKey and GQ.Data:GetActiveBandCacheKey()
+        if not self.frame then
+            return
+        end
+        if again or bandNow ~= band then
+            self:Refresh()
+            return
+        end
+        self._refreshPainting = true
+        self:Refresh()
+    end
+    local function step()
+        if not self.frame then
+            self._rankWarmRunning = false
+            self._rankWarmAgain = nil
+            return
+        end
+        if phase == "ranks" then
+            index = index + 1
+            local slotName = slots[index]
+            if slotName then
+                local cacheKey, handKind = self:RankListCacheKey(slotName)
+                local cached = self._slotRankCache and self._slotRankBand == band and self._slotRankCache[cacheKey]
+                if not cached then
+                    self:GetSlotRankList(slotName, handKind)
+                    C_Timer.After(0, step)
+                    return
+                end
+                return step()
+            end
+            phase = "weapons"
+        end
+        if phase == "weapons" then
+            phase = "held"
+            local ctx = self.GetActiveListCacheContextKey and self:GetActiveListCacheContextKey() or ""
+            if not (self._weaponPool and self._weaponPoolBand == ctx) then
+                self:CollectWeaponPool()
+                C_Timer.After(0, step)
+                return
+            end
+        end
+        if phase == "held" then
+            phase = "done"
+            local ctx = self.GetActiveListCacheContextKey and self:GetActiveListCacheContextKey() or ""
+            if not (self._heldOffHand and self._heldOffBand == ctx) then
+                self:HeldOffHandEntries()
+                C_Timer.After(0, step)
+                return
+            end
+        end
+        C_Timer.After(0, finish)
+    end
+    C_Timer.After(0, step)
+end
+
+function GQ.Log:RefreshAfterRankWarm()
+    if not (self.frame and self.frame:IsShown()) or not (C_Timer and C_Timer.After) then
+        if self.frame and self.frame:IsShown() then
+            self:Refresh()
+        end
+        return
+    end
+
+    local slots = {}
+    if GQ.Data and GQ.Data.GetSlotsForClass then
+        slots = GQ.Data:GetSlotsForClass(GQ:GetEffectiveClass()) or {}
+    end
+    local index = 0
+    local gapLeft = 0
+    local function step()
+        if not (self.frame and self.frame:IsShown()) then
+            return
+        end
+        if gapLeft > 0 then
+            gapLeft = gapLeft - 1
+            C_Timer.After(0, step)
+            return
+        end
+        index = index + 1
+        local slotName = slots[index]
+        if not slotName then
+            C_Timer.After(0, function()
+                if self.frame and self.frame:IsShown() then
+                    self:Refresh()
+                end
+            end)
+            return
+        end
+        local handKind = nil
+        if slotName == "MainHand" and self.WeaponHeaderKind then
+            handKind = self:WeaponHeaderKind()
+        end
+        local cacheKey = tostring(slotName) .. ":" .. tostring(handKind)
+        local band = GQ.Data.GetActiveBandCacheKey and GQ.Data:GetActiveBandCacheKey()
+        local cached = self._slotRankCache and self._slotRankBand == band and self._slotRankCache[cacheKey]
+        if not cached then
+            self:GetSlotRankList(slotName, handKind)
+            gapLeft = 1
+            C_Timer.After(0, step)
+            return
+        end
+        step()
+    end
+    C_Timer.After(0, step)
+end
+
+function GQ.Log:ScheduleListRefresh(paced)
+    if paced then
+        self._listRefreshPaced = true
+    end
     if not C_Timer or not C_Timer.After then
         if self.frame and self.frame:IsShown() then
             self:Refresh()
@@ -4602,8 +4844,14 @@ function GQ.Log:ScheduleListRefresh()
     self._listRefreshScheduled = true
     C_Timer.After(0.15, function()
         self._listRefreshScheduled = false
+        local spread = self._listRefreshPaced
+        self._listRefreshPaced = nil
         if self.frame and self.frame:IsShown() then
-            self:Refresh()
+            if spread then
+                self:RefreshAfterRankWarm()
+            else
+                self:Refresh()
+            end
         end
     end)
 end
@@ -4679,10 +4927,19 @@ function GQ.Log:ScheduleAutoCompletionCheck(includeReached)
     self.completionPending = true
     if C_Timer and C_Timer.After then
         C_Timer.After(0.25, function()
-            local reached = GQ.Log.completionIncludeReached
-            GQ.Log.completionPending = false
-            GQ.Log.completionIncludeReached = nil
-            GQ.Log:CheckAutoCompletion(reached)
+            -- Bag and skill events land on the ding too. Wait for the sliced
+            -- cache build rather than walking every slot here in one frame.
+            local function run()
+                local reached = GQ.Log.completionIncludeReached
+                GQ.Log.completionPending = false
+                GQ.Log.completionIncludeReached = nil
+                GQ.Log:CheckAutoCompletion(reached)
+            end
+            if GQ.Data and GQ.Data.WarmQueryCacheAsync then
+                GQ.Data:WarmQueryCacheAsync(run)
+            else
+                run()
+            end
         end)
     else
         local reached = self.completionIncludeReached
@@ -5753,7 +6010,7 @@ function GQ.Log:EnsureGearScoreBar(frame)
         GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
         GameTooltip:SetText("GearQuest Score", 1, 0.82, 0)
         GameTooltip:AddLine(string.format("%d / 100 · |cff%s%s|r", shown, hex, word), 1, 1, 1)
-        GameTooltip:AddLine("The average GearQuest index of the gear you are wearing. Negative numbers are counted as 0.", 0.9, 0.9, 0.9, true)
+        GameTooltip:AddLine("The average GearQuest index of the gear you are wearing.", 0.9, 0.9, 0.9, true)
         local worn = self.rows
         if worn and #worn > 0 then
             GameTooltip:AddLine(" ")
@@ -5940,7 +6197,6 @@ function GQ.Log:UpdateFooterButtons()
     if self.frame.exitBtn then
         self.frame.exitBtn:Show()
     end
-    self:UpdateLevelUpControls()
 
     if self:GetPageTab() ~= "log" then
         if track then
@@ -6350,173 +6606,6 @@ function GQ.Log:EnsureOmitButtons(frame)
     end
 end
 
-function GQ.Log:EnsureLevelUpControls(frame)
-    if not frame or frame.levelUpCheck then
-        return
-    end
-
-    local hit = CreateFrame("Button", nil, frame)
-    hit:SetHeight(22)
-    local label = hit:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    label:SetPoint("LEFT", hit, "LEFT", 0, 0)
-    label:SetJustifyH("LEFT")
-    label:SetText("Enable Level Up On Demand")
-    label:SetTextColor(GOLD[1], GOLD[2], GOLD[3])
-    frame.levelUpHit = hit
-    frame.levelUpLabel = label
-
-    local check = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
-    check:SetSize(24, 24)
-    local templateText = check.Text
-    if not templateText and check.GetName and check:GetName() then
-        templateText = _G[check:GetName() .. "Text"]
-    end
-    if templateText then
-        templateText:SetText("")
-        templateText:Hide()
-    end
-    frame.levelUpCheck = check
-
-    local btn = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-    btn:SetSize(96, 22)
-    btn:SetText("Level up!")
-    btn:Hide()
-    frame.levelUpBtn = btn
-
-    local tipOff = "Once this is checked you no longer automatically load in new BiS lists when you level up. A Level up! button appears beside this box. Click it when you are ready to load the BiS list for the level you are now."
-    local tipOn = "Once this is unchecked you will automatically load in new BiS lists when you level up."
-    local function showTip(owner)
-        local heading, body
-        if GQ:IsLevelUpOnDemand() then
-            heading = "Switch to automatic level up!"
-            body = tipOn
-        else
-            heading = "Lag spikes on level up?"
-            body = tipOff
-        end
-        GameTooltip:SetOwner(owner, "ANCHOR_TOP")
-        GameTooltip:SetText(heading, 1, 0.82, 0, 1, true)
-        GameTooltip:AddLine(body, 1, 1, 1, true)
-        GameTooltip:Show()
-        local bodyLine = _G["GameTooltipTextLeft2"]
-        if bodyLine then
-            if bodyLine.SetFontObject and GameTooltipText then
-                bodyLine:SetFontObject(GameTooltipText)
-            end
-            bodyLine:SetTextColor(1, 1, 1)
-        end
-    end
-    local function toggle()
-        if not GQ.SetLevelUpOnDemand then
-            return
-        end
-        GQ:SetLevelUpOnDemand(not GQ:IsLevelUpOnDemand())
-    end
-    hit:SetScript("OnClick", toggle)
-    hit:SetScript("OnEnter", function(self)
-        showTip(self)
-    end)
-    hit:SetScript("OnLeave", function()
-        GameTooltip:Hide()
-    end)
-    check:SetScript("OnClick", function(self)
-        if GQ.SetLevelUpOnDemand then
-            GQ:SetLevelUpOnDemand(self:GetChecked())
-        end
-    end)
-    check:SetScript("OnEnter", function(self)
-        showTip(self)
-    end)
-    check:SetScript("OnLeave", function()
-        GameTooltip:Hide()
-    end)
-    local function showLevelTip(owner)
-        if not (GQ.CanLevelUpOnDemand and GQ:CanLevelUpOnDemand()) then
-            return
-        end
-        local fromLevel = GQ:GetLevelUpPin()
-        local toLevel = GQ:RealPlayerLevel()
-        GameTooltip:SetOwner(owner, "ANCHOR_TOP")
-        GameTooltip:SetText("Level up to " .. toLevel, 1, 0.82, 0, 1, true)
-        GameTooltip:AddLine("From level " .. fromLevel .. ".", 1, 1, 1, true)
-        GameTooltip:Show()
-        local bodyLine = _G["GameTooltipTextLeft2"]
-        if bodyLine then
-            if bodyLine.SetFontObject and GameTooltipText then
-                bodyLine:SetFontObject(GameTooltipText)
-            end
-            bodyLine:SetTextColor(1, 1, 1)
-        end
-    end
-    btn:SetScript("OnClick", function()
-        if GQ.LevelUpNow then
-            GQ:LevelUpNow()
-        end
-    end)
-    btn:SetScript("OnEnter", showLevelTip)
-    btn:SetScript("OnLeave", function()
-        GameTooltip:Hide()
-    end)
-
-    self:LayoutLevelUpControls(frame)
-    self:UpdateLevelUpControls()
-end
-
-function GQ.Log:LayoutLevelUpControls(frame)
-    frame = frame or self.frame
-    local hit = frame and frame.levelUpHit
-    local label = frame and frame.levelUpLabel
-    local check = frame and frame.levelUpCheck
-    local btn = frame and frame.levelUpBtn
-    if not hit or not label or not check then
-        return
-    end
-
-    local textWidth = label:GetStringWidth() or 180
-    if textWidth < 20 then
-        textWidth = 180
-    end
-    hit:SetWidth(textWidth + 2)
-    hit:ClearAllPoints()
-    hit:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", CONTENT_LEFT, FOOTER_BUTTON_Y)
-
-    check:ClearAllPoints()
-    check:SetPoint("LEFT", hit, "RIGHT", 2, 0)
-
-    if btn then
-        btn:ClearAllPoints()
-        btn:SetPoint("LEFT", check, "RIGHT", 2, 0)
-    end
-
-    local windowLevel = (frame.gqOuterBorder and frame.gqOuterBorder.GetFrameLevel and frame.gqOuterBorder:GetFrameLevel() or (frame:GetFrameLevel() or 1)) + 3
-    hit:SetFrameLevel(windowLevel)
-    check:SetFrameLevel(windowLevel)
-    if btn then
-        btn:SetFrameLevel(windowLevel)
-    end
-    self:EnsurePlayStyle(frame)
-end
-
-function GQ.Log:UpdateLevelUpControls()
-    local frame = self.frame
-    if not frame or not frame.levelUpCheck then
-        return
-    end
-    local enabled = GQ.IsLevelUpOnDemand and GQ:IsLevelUpOnDemand()
-    frame.levelUpCheck:SetChecked(enabled and true or false)
-    local btn = frame.levelUpBtn
-    if not btn then
-        return
-    end
-    if enabled then
-        btn:Show()
-        local ready = GQ.CanLevelUpOnDemand and GQ:CanLevelUpOnDemand()
-        btn:SetEnabled(ready and true or false)
-    else
-        btn:Hide()
-    end
-end
-
 function GQ.Log:EnsurePlayStyle(frame)
     frame = frame or self.frame
     if not frame or frame.playStyleBtn then
@@ -6669,7 +6758,7 @@ function GQ.Log:EnsurePlayStyle(frame)
     panel.dontLookBackCard = makeCard(
         "Don't look back",
         art .. "GQ-Play-DontLookBack.png",
-        panel.dungeonEnjoyerCard, -95, -36,
+        panel.dungeonEnjoyerCard, -190, -36,
         "Hides a hunt once its required level would be a gray quest for you. Green and yellow stay. A level 18 Darkshore hunt drops off in the high 20s, when the game itself would turn that quest gray.",
         function()
             local log = _G.GearQuest and _G.GearQuest.Log
@@ -6678,10 +6767,22 @@ function GQ.Log:EnsurePlayStyle(frame)
             end
         end
     )
+    panel.manageableCard = makeCard(
+        "Manageable Quests",
+        art .. "GQ-Play-Manageable.png",
+        panel.dungeonEnjoyerCard, 0, -36,
+        "Hides a quest reward until the level you are viewing is 4 under that item's level. An item of level 49 can show from 45. The wait stops at 60, so a raid reward with a higher item level still shows at 60. Other sources stay.",
+        function()
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if log then
+                log:SetManageableQuests(not log:ManageableQuestsEnabled())
+            end
+        end
+    )
     panel.buyItCard = makeCard(
         "Buy it",
         art .. "GQ-Play-BuyIt.png",
-        panel.dungeonEnjoyerCard, 95, -36,
+        panel.dungeonEnjoyerCard, 190, -36,
         "Keeps hunts you can buy. Vendor pieces stay. So does anything that binds when equipped, binds when used, or does not bind. Bind on pickup stays hidden, unless a vendor sells it. Get it now still waits on the standing.",
         function()
             local log = _G.GearQuest and _G.GearQuest.Log
@@ -6703,6 +6804,7 @@ function GQ.Log:EnsurePlayStyle(frame)
     self:SetSimulatorChoiceHighlight(panel.dungeonEnjoyerCard, false, 0.35)
     self:SetSimulatorChoiceHighlight(panel.getItTodayCard, false, 0.35)
     self:SetSimulatorChoiceHighlight(panel.dontLookBackCard, false, 0.35)
+    self:SetSimulatorChoiceHighlight(panel.manageableCard, false, 0.35)
     self:SetSimulatorChoiceHighlight(panel.buyItCard, false, 0.35)
     self:StartPlayStyleIntro(btn)
 end
@@ -6847,6 +6949,10 @@ function GQ.Log:SetBuyIt(enabled)
     self:SetPlayStyleFlag("playBuyIt", enabled)
 end
 
+function GQ.Log:SetManageableQuests(enabled)
+    self:SetPlayStyleFlag("playManageableQuests", enabled)
+end
+
 function GQ.Log:UpdatePlayStyleButton()
     local btn = self.frame and self.frame.playStyleBtn
     if not btn then
@@ -6876,6 +6982,10 @@ function GQ.Log:RefreshPlayStylePanel()
     local back = panel and panel.dontLookBackCard
     if back then
         self:SetSimulatorChoiceHighlight(back, self:DontLookBackEnabled(), 0.35)
+    end
+    local manage = panel and panel.manageableCard
+    if manage then
+        self:SetSimulatorChoiceHighlight(manage, self:ManageableQuestsEnabled(), 0.35)
     end
     local buy = panel and panel.buyItCard
     if buy then
@@ -6944,7 +7054,7 @@ function GQ.Log:LayoutFooterButtons(frame)
         frame.exitBtn:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -CONTENT_RIGHT_GUTTER, FOOTER_BUTTON_Y)
     end
 
-    self:LayoutLevelUpControls(frame)
+    self:EnsurePlayStyle(frame)
 end
 
 function GQ.Log:ApplyPageTab()
@@ -9275,7 +9385,7 @@ function GQ.Log:EnsureSettingsPage(frame)
     creditsBody:SetPoint("TOPLEFT", creditsTitle, "BOTTOMLEFT", 0, -6)
     creditsBody:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
     creditsBody:SetJustifyH("LEFT")
-    creditsBody:SetText("Eao\nMainWon\nStikmyre\nClick")
+    creditsBody:SetText("Eao\nMainWon\nStikmyre\nClick\nVaniron")
     creditsBody:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
     creditsBody:Hide()
     frame.settingsCreditsBody = creditsBody
@@ -10653,7 +10763,7 @@ function GQ.Log:Init()
     frame.exitBtn:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -CONTENT_RIGHT_GUTTER, 12)
     frame.exitBtn:SetText("Exit")
 
-    self:EnsureLevelUpControls(frame)
+    self:EnsurePlayStyle(frame)
 
     self:WireControls(frame)
     self:EnsureTrackerEvents()
@@ -11247,11 +11357,17 @@ function GQ.Log:BuildDetailLines(entry)
     end
 
     local intro
+    local vendorLine
     if entry and entry.sourceType == "profession" and GQ.Data and GQ.Data.GetProfessionInstructions then
         intro = GQ.Data:GetProfessionInstructions(entry) or ""
     else
-        intro = (GQ.Data and GQ.Data.GetEntryInstructions and GQ.Data:GetEntryInstructions(entry))
-            or (entry and entry.instructions)
+        vendorLine = GQ.Data and GQ.Data.VendorBoughtLine and GQ.Data:VendorBoughtLine(entry)
+        if vendorLine and vendorLine ~= "" then
+            intro = vendorLine
+        else
+            intro = (GQ.Data and GQ.Data.GetEntryInstructions and GQ.Data:GetEntryInstructions(entry))
+                or (entry and entry.instructions)
+        end
     end
     local lines = {}
     if intro and intro ~= "" then
@@ -11337,7 +11453,7 @@ function GQ.Log:BuildDetailLines(entry)
     if entry.questName and not alreadySays(entry.questName) then
         table.insert(lines, "Quest: " .. entry.questName)
     end
-    if entry.npc and not alreadySays(entry.npc) then
+    if entry.npc and not vendorLine and not alreadySays(entry.npc) then
         table.insert(lines, "NPC: " .. entry.npc)
     end
 
@@ -11650,6 +11766,7 @@ function GQ.Log:GetSlotRankList(slotName, handKind)
             if entry and entry.id and not seen[entry.id]
                 and GQ.Data:ShouldShowEntry(entry)
                 and GQ.Data:EntryMatchesPlayerBand(entry)
+                and (not equip or not equip.EntryArmorIsWearable or equip:EntryArmorIsWearable(entry, loadSlot))
                 and (not handKind or self:EntryInWeaponHand(entry, loadSlot, handKind)) then
                 local fact = GQ.Data:GetItemFact(entry.itemId)
                 local req = fact and fact.reqLevel
@@ -12176,7 +12293,11 @@ function GQ.Log:RefreshNearestCoordinates()
     local sig = table.concat(parts, ";")
     if sig ~= self._trackedSpotSig then
         self._trackedSpotSig = sig
-        GQ.Pins:Sync()
+        if GQ.Tracker.Refresh then
+            GQ.Tracker:Refresh()
+        else
+            GQ.Pins:Sync()
+        end
     end
 end
 
@@ -12367,6 +12488,10 @@ function GQ.Log:WeaponFilterRecord()
 end
 
 function GQ.Log:CollectWeaponPool()
+    return GQ:WithContextSnapshot(self.BuildCollectWeaponPool, self)
+end
+
+function GQ.Log:BuildCollectWeaponPool()
     local ctx = self.GetActiveListCacheContextKey and self:GetActiveListCacheContextKey() or ""
     if self._weaponPool and self._weaponPoolBand == ctx then
         return self._weaponPool
@@ -13017,6 +13142,16 @@ function GQ.Log:AppendListedEntries(layoutRows, entries, slotName)
 end
 
 function GQ.Log:Refresh()
+    local tab = self:GetListTab()
+    if self._refreshPainting then
+        self._refreshPainting = nil
+    elseif tab == "active" and not self:RankListsReady() and C_Timer and C_Timer.After and self.frame then
+        self:UpdateTabVisuals()
+        self:UpdateFooterButtons()
+        self:UpdateContextStatus()
+        self:ScheduleRankListWarm()
+        return
+    end
     self:HideSpecPicker()
     self:UpdateLogScene()
     self:EnsureActiveListCaches()

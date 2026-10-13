@@ -885,20 +885,59 @@ function GQ.Preview:ToggleDialog(anchor)
 end
 
 -- Backwards-compatible helpers used elsewhere in the addon.
+-- Inside GQ:WithContextSnapshot (a list build) each answer is read once.
 function GQ:IsPreviewEnabled()
-    return self.Preview:IsEnabled()
+    local ctx = self._ctx
+    local value = ctx and ctx.preview
+    if value == nil then
+        value = self.Preview:IsEnabled()
+        if ctx then
+            ctx.preview = value
+        end
+    end
+    return value
 end
 
 function GQ:GetEffectiveClass()
-    return self.Preview:GetEffectiveClass()
+    local ctx = self._ctx
+    local value = ctx and ctx.class
+    if value == nil then
+        value = self.Preview:GetEffectiveClass()
+        if ctx then
+            ctx.class = value
+        end
+    end
+    return value
 end
 
 function GQ:GetEffectiveFaction()
-    return self.Preview:GetEffectiveFaction()
+    local ctx = self._ctx
+    local value = ctx and ctx.faction
+    if value == nil then
+        value = self.Preview:GetEffectiveFaction()
+        if ctx then
+            ctx.faction = value
+        end
+    end
+    return value
 end
 
+-- No spec (below 10, or a class without specs) is common; remember that too.
+local NO_SPEC = {}
+
 function GQ:GetEffectiveSpec()
-    return self.Preview:GetEffectiveSpec()
+    local ctx = self._ctx
+    local value = ctx and ctx.spec
+    if value == NO_SPEC then
+        return nil
+    end
+    if value == nil then
+        value = self.Preview:GetEffectiveSpec()
+        if ctx then
+            ctx.spec = value == nil and NO_SPEC or value
+        end
+    end
+    return value
 end
 
 function GQ:GetPreviewLabel()

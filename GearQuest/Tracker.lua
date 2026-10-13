@@ -546,6 +546,11 @@ function GQ.Tracker:LayoutEntries(entries, descWordLimit)
         local instructions = entry.instructions
         if entry.sourceType == "profession" and GQ.Data and GQ.Data.GetProfessionInstructions then
             instructions = GQ.Data:GetProfessionInstructions(entry)
+        elseif GQ.Data and GQ.Data.VendorBoughtLine then
+            local vendorLine = GQ.Data:VendorBoughtLine(entry)
+            if vendorLine and vendorLine ~= "" then
+                instructions = vendorLine
+            end
         end
         if GQ.Data and GQ.Data.SanitizeText then
             instructions = GQ.Data:SanitizeText(instructions) or instructions

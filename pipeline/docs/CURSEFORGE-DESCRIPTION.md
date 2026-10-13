@@ -44,6 +44,8 @@ Each row is a piece for that slot. The grey number is its rank. It matches the (
 
 Open a hunt for the source, the quest level, the craft, and the materials. **Track** pins it. **Show on map** opens the spot. **Remove** takes that hunt off the list until you restore it.
 
+A vendor hunt names the person at the pin you are closest to. **Dirty Leather Bracers** in Mulgore is **Varia Hardhide**, not the Undercity cloth merchant. Walk to another town that sells it and the name follows. The tracker uses the same name.
+
 A quest reward says the level it can be picked up. A craft says the skill in green when you can make it, and red when you cannot. A burnt mark means the item is new in Forever.
 
 ---
@@ -60,7 +62,7 @@ Track a hunt and an arrow can point the way. On another continent it points at t
 
 ### Play your way
 
-*Screenshot 4 — the five play-style cards.*
+*Screenshot 4 — the six play-style cards.*
 
 **No Dungeons** hides dungeon and raid hunts, including a quest that steps inside one. A world drop stays.
 
@@ -70,9 +72,11 @@ Track a hunt and an arrow can point the way. On another continent it points at t
 
 **Don't look back** hides a quest once it would be gray.
 
+**Manageable Quests** hides a quest reward until you are 4 levels under its item level. That wait stops at 60.
+
 **Buy it** keeps vendor pieces and gear that is not bind on pickup.
 
-The two dungeon cards turn each other off. The other three can be on with either. The button reads **Play style*** while one is on.
+The two dungeon cards turn each other off. The other four can be on with either. The button reads **Play style*** while one is on.
 
 ---
 
@@ -88,7 +92,7 @@ Hide a source, a profession, or one dungeon. Boss drop and Dungeon & Raid trash 
 
 *Screenshot 6 — an item tooltip with the GearQuest score.*
 
-Hover gear in your bags, on the character panel, in chat, or on a hunt. The line is a score for this level: best in the slot is +100, worst is −100. The arrow compares it to what you have equipped.
+Hover gear in your bags, on the character panel, in chat, or on a hunt. The line is a score for this level: best in the slot is 100, worst is 0. The arrow compares it to what you have equipped.
 
 *Screenshot 7 — the score bar in the log header.*
 
@@ -102,7 +106,7 @@ While the simulator is on, the tooltip tells you to turn it off before it will s
 
 *Screenshot 8 — the spec weight tooltip.*
 
-Hover the spec name. Those are the weights for this spec. While you level, stamina and armor count for more than a naked +1 of your main stat, and mana counts for less than stamina. At 60 that leveling boost turns off.
+Hover the spec name. Those are the weights for this spec. While you level, stamina and armor count for more than a naked +1 of your main stat, and mana counts for less than stamina. Level 60 keeps those same multipliers. The tooltip index is still 0 to 100 for the slot, and the header bar is the average of what you have equipped. An empty slot counts as 0. Filtering weapons does not move the bar.
 
 A random-enchant green is ranked on its best possible roll. The tooltip says how rare that roll is. A slim chance does not hide the hunt.
 
@@ -120,15 +124,13 @@ Right-click the minimap button, or open the Simulator tab. Pick another class, s
 
 ### When you ding
 
-*Screenshot 10 — Level up on demand, at the bottom of the log.*
-
-Check **Enable Level Up On Demand**. The list waits. Press **Level up!** when you are ready for it to rebuild.
+The new list builds in the background, one slot at a time, with a spare frame between slots. The paper-doll arrows rebuild the same way, and the ones already on your character stay until the new set is ready. Changing zone, logging in, or opening a vendor does that arrow pass without clearing them first. Opening the log or a filter keeps the rows you are looking at until the ranks are ready, then swaps the list once.
 
 ---
 
 ### When it is yours
 
-*Screenshot 11 — the obtain toast.*
+*Screenshot 10 — the obtain toast.*
 
 Loot the hunt and GearQuest toasts you. The toast names that hunt. A different suffix on the same green is not that hunt.
 
@@ -137,7 +139,7 @@ Loot the hunt and GearQuest toasts you. The toast names that hunt. A different s
 ## FAQ
 
 **The game freezes when I level up.**
-That rebuild is heavy. Use **Enable Level Up On Demand**, then press **Level up!** when you want the new list. Screenshot 10.
+A ding builds the new list one slot at a time, with a spare frame between slots, then checks what you just outgrew, then redraws. The paper-doll arrows follow one slot per frame. If it still freezes, comment the version in the window title.
 
 **My FPS drops when I hover items in my bags.**
 Update to **v0.5.3-beta** or newer and `/reload`. The window title shows the version. That version stopped the bag hover from loading every other piece in the slot. If it still happens, comment the item name and the version in the title.
@@ -145,10 +147,10 @@ Update to **v0.5.3-beta** or newer and `/reload`. The window title shows the ver
 **Why does Main Hand show a two-hander?**
 The headers are the weapons that spec uses. Enhancement is **Two-hand** only. A hunter gets **Two-hand**, then **Main hand** for weapons that can only go in the main hand, then **Off Hand** for weapons that can go in either hand. A rogue's **Main Hand** is weapons the tooltip calls Main Hand. There is no "swords only" box yet.
 
-*Screenshot 12 — a hunter's weapon headers, if you have the room.*
+*Screenshot 11 — a hunter's weapon headers, if you have the room.*
 
 **Why is this the best piece?**
-Hover the spec. Screenshot 8. The hunt follows those weights. While leveling, a piece with stamina beats a naked +1 of your main stat. At 60 it does not get that extra.
+Hover the spec. Screenshot 8. The hunt follows those weights. While leveling, a piece with stamina beats a naked +1 of your main stat. Level 60 keeps that same stamina, armor, and mana weighting. The tooltip score is still 0 to 100 inside the slot.
 
 **Can I change the stat weights?**
 Not in the addon. Suggest the spec, the stat, and the weight you want on the [stat weight sheet](https://docs.google.com/spreadsheets/d/1jMC89KgzHpPZHYgcjOq6ef7lENhh8OGgypG2rC2m0Ok/edit).
@@ -177,13 +179,13 @@ Simulator. Screenshot 9. The item tooltip will not score your gear until you tur
 **How do I hide the minimap button?**
 Open the log, the gear icon, **General**, **Hide minimap icon**. Drag the button around the minimap before you hide it.
 
-*Screenshot 13 — the General settings page.*
+*Screenshot 12 — the General settings page.*
 
 **I already have the best piece.**
 The slot says **- Rank #1 BiS acquired**. Later ranks stay so you can see what is next. **Recommended** only marks a rank #1 you do not have yet.
 
 **It uses a lot of memory.**
-The list is every spec from 1 to 60. The hitch people feel is the rebuild when you ding, or an old bag-hover bug. Use Level up on demand, and be on v0.5.3-beta or newer.
+The list is every spec from 1 to 60. A ding, a zone change, and opening a cold log are spread across frames as of v0.5.5-beta. Bag hovers stopped loading every other piece in v0.5.3-beta. If a hitch is still sharp, comment the version in the window title and what you had just clicked.
 
 **GearQuest is not in my addon list.**
 The folder must be `Interface/AddOns/GearQuestForever`. This is not the TBC Anniversary GearQuest. The two can be installed together. `/reload`, or restart the client.
@@ -213,18 +215,17 @@ Take them on a character around level 20–30 so the log is full but not a raid 
 | 1 | The log with one slot expanded. Show the item icon, the grey #N, one **- Recommended**, and one **- Rank #1 BiS acquired** if you have one. | The first thing people need to read. |
 | 2 | One parchment. A quest reward is best, so the pickup level and Source are both visible. Include Track, Show on map, and Remove. | Stops "where do I get this?" |
 | 3 | The world map with one pin, and a second crop of the guide arrow on the tracker. Two images under one caption is fine. | Stops "put it on the map." |
-| 4 | Play style open, all five cards, names under the pictures. | The filter people cannot find. |
+| 4 | Play style open, all six cards, names under the pictures. | The filter people cannot find. |
 | 5 | The filter menu with the boss-drop or trash dungeon flyout open. | Shows that dungeons are a list, not one checkbox. |
 | 6 | A bag or character-panel tooltip with the GearQuest score and a green or red arrow. | "Is this an upgrade?" |
 | 7 | The log header score bar, not simulating. | Separate from the tooltip score. |
 | 8 | The spec weight tooltip. Holy paladin is the one people argue about. Enhancement is the other. | "Why did this win?" |
 | 9 | The simulator on another class or level, with **Turn off simulation** visible. | "How do I look ahead?" |
-| 10 | The bottom of the log: **Enable Level Up On Demand** and **Level up!** | The ding hitch. |
-| 11 | The obtain toast. | "You got it." |
-| 12 | Optional. A hunter log scrolled to Two-hand, Main hand, and Off Hand. | The weapon-slot question. |
-| 13 | Optional. General settings, with **Hide minimap icon** and the two score checkboxes. | "Where is the off switch?" |
+| 10 | The obtain toast. | "You got it." |
+| 11 | Optional. A hunter log scrolled to Two-hand, Main hand, and Off Hand. | The weapon-slot question. |
+| 12 | Optional. General settings, with **Hide minimap icon** and the two score checkboxes. | "Where is the off switch?" |
 
-The gallery on the CurseForge page can be the same set, in this order. The description should use 1–11. 12 and 13 are for the FAQ if the page is not already long.
+The gallery on the CurseForge page can be the same set, in this order. The description should use 1–10. 11 and 12 are for the FAQ if the page is not already long.
 
 ---
 

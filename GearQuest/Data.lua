@@ -5817,42 +5817,48 @@ function GQ.Data:GetEntriesByItemId(itemId)
     return self.byItemId and self.byItemId[itemId] or {}
 end
 
+-- Searched in this order. Names, not a table built per call: list building
+-- runs this for every catalog entry. A nil table is skipped so a loaded
+-- class whose facts sit after an unloaded one is still found.
+local ITEM_FACT_TABLES = {
+    "itemFacts",
+    "warriorItemFacts",
+    "hunterItemFacts",
+    "druidItemFacts",
+    "shamanItemFacts",
+    "rogueItemFacts",
+    "priestItemFacts",
+    "priestEarly1to9Facts",
+    "warlockItemFacts",
+    "warlockEarly1to9Facts",
+    "mageItemFacts",
+    "mageEarly1to9Facts",
+    "paladinHorde1to9Facts",
+    "warriorHorde1to9Facts",
+    "hunterEarly1to9Facts",
+    "druidEarly1to9Facts",
+    "shamanEarly1to9Facts",
+    "rogueEarly1to9Facts",
+}
+
 function GQ.Data:GetItemFact(itemId)
     if not itemId then
         return nil
     end
 
     local numeric = tonumber(itemId)
-    local keys = { itemId }
-    if numeric and numeric ~= itemId then
-        keys[2] = numeric
-    end
+    local alt = (numeric and numeric ~= itemId) and numeric or nil
 
-    local tables = {
-        self.itemFacts,
-        self.warriorItemFacts,
-        self.hunterItemFacts,
-        self.druidItemFacts,
-        self.shamanItemFacts,
-        self.rogueItemFacts,
-        self.priestItemFacts,
-        self.priestEarly1to9Facts,
-        self.warlockItemFacts,
-        self.warlockEarly1to9Facts,
-        self.mageItemFacts,
-        self.mageEarly1to9Facts,
-        self.paladinHorde1to9Facts,
-        self.warriorHorde1to9Facts,
-        self.hunterEarly1to9Facts,
-        self.druidEarly1to9Facts,
-        self.shamanEarly1to9Facts,
-        self.rogueEarly1to9Facts,
-    }
-
-    for i = 1, #tables do
-        local fact = tables[i] and tables[i][itemId]
-        if fact then
-            return fact
+    for i = 1, #ITEM_FACT_TABLES do
+        local facts = self[ITEM_FACT_TABLES[i]]
+        if facts then
+            local fact = facts[itemId]
+            if not fact and alt then
+                fact = facts[alt]
+            end
+            if fact then
+                return fact
+            end
         end
     end
 
@@ -7224,6 +7230,32 @@ function GQ.Data:GetEntryInstructions(entry)
     return text
 end
 
+-- The stored line names one seller. The pin is the closest seller, so the
+-- description names that person. A later sentence, such as the honor cost, stays.
+function GQ.Data:VendorBoughtLine(entry)
+    if not entry or entry.sourceType ~= "vendor" then
+        return nil
+    end
+    local spot = self.NearestCoordinateSpot and self:NearestCoordinateSpot(entry.itemId)
+    local npc = spot and spot.npc
+    if type(npc) ~= "string" or npc == "" then
+        return nil
+    end
+    local text = self:GetEntryInstructions(entry) or entry.instructions or ""
+    local rest = text:match("^Bought from .-%.%s*(.*)$")
+    if rest ~= nil then
+        if rest ~= "" then
+            return "Bought from " .. npc .. ". " .. rest
+        end
+        return "Bought from " .. npc .. "."
+    end
+    -- "Bought from " is 12 characters. A line with no period still names this seller.
+    if text == "" or text:sub(1, 12) == "Bought from " then
+        return "Bought from " .. npc .. "."
+    end
+    return nil
+end
+
 function GQ.Data:VisibleCoordinateSpots(itemId)
     local row = self.coordinates and itemId and self.coordinates[itemId]
     if not row or not row.spots or #row.spots == 0 then
@@ -7460,7 +7492,29 @@ function GQ.Data:CoordinateLine(itemId)
     return line, spots
 end
 
+-- The checks below read only the entry, static generated data, class and
+-- faction; never level. A ding rebuilds every slot, so remember the answer
+-- per entry. EnsureClassLoaded clears it when class tips arrive.
 function GQ.Data:ShouldShowEntry(entry)
+    if not entry then
+        return false
+    end
+    local classFile = GQ:GetEffectiveClass()
+    local faction = GQ:GetEffectiveFaction()
+    local memo = self._showEntryMemo
+    if not memo or memo.class ~= classFile or memo.faction ~= faction then
+        memo = { class = classFile, faction = faction, results = setmetatable({}, { __mode = "k" }) }
+        self._showEntryMemo = memo
+    end
+    local cached = memo.results[entry]
+    if cached == nil then
+        cached = self:ComputeShouldShowEntry(entry)
+        memo.results[entry] = cached
+    end
+    return cached
+end
+
+function GQ.Data:ComputeShouldShowEntry(entry)
     if not entry or self:IsNoveltyProcItem(entry) or self:IsExcludedItem(entry) then
         return false
     end
@@ -7535,20 +7589,34 @@ function GQ.Data:SetFamilyClass(name)
     if not name or name == "" then
         return nil
     end
+    local cache = self._setFamilyCache
+    if not cache then
+        cache = {}
+        self._setFamilyCache = cache
+    end
+    if cache[name] ~= nil then
+        return cache[name] or nil
+    end
     local lower = name:lower()
+    local found
     for i = 1, #self.CLASS_SET_PREFIX do
         local row = self.CLASS_SET_PREFIX[i]
         if lower:sub(1, #row[1]) == row[1] then
-            return row[2]
+            found = row[2]
+            break
         end
     end
-    for i = 1, #self.CLASS_SET_SUFFIX do
-        local row = self.CLASS_SET_SUFFIX[i]
-        if lower:sub(-#row[1]) == row[1] then
-            return row[2]
+    if not found then
+        for i = 1, #self.CLASS_SET_SUFFIX do
+            local row = self.CLASS_SET_SUFFIX[i]
+            if lower:sub(-#row[1]) == row[1] then
+                found = row[2]
+                break
+            end
         end
     end
-    return nil
+    cache[name] = found or false
+    return found
 end
 
 function GQ.Data:TipRequiredClasses(tip)
@@ -7582,18 +7650,36 @@ function GQ.Data:EntryMatchesPlayerClass(entry)
     if not classFile then
         return true
     end
+    -- The same item is one row per level band and suffix. The set class does
+    -- not change between those rows, so the string scan runs once per item.
+    local cache = self._classMatchCache
+    if not cache then
+        cache = {}
+        self._classMatchCache = cache
+    end
+    local itemCache = cache[entry.itemId]
+    if itemCache and itemCache[classFile] ~= nil then
+        return itemCache[classFile]
+    end
     local audit = self:GetForeverAudit(entry.itemId)
     local family = self:SetFamilyClass((audit and audit.name) or entry.name)
     local required = family and { family } or self:TipRequiredClasses(audit and audit.tip)
-    if not required then
-        return true
-    end
-    for i = 1, #required do
-        if required[i] == classFile then
-            return true
+    local ok = true
+    if required then
+        ok = false
+        for i = 1, #required do
+            if required[i] == classFile then
+                ok = true
+                break
+            end
         end
     end
-    return false
+    if not itemCache then
+        itemCache = {}
+        cache[entry.itemId] = itemCache
+    end
+    itemCache[classFile] = ok
+    return ok
 end
 
 function GQ.Data:GetTooltipScanner()
@@ -9534,16 +9620,32 @@ function GQ.Data:PreviousLevelShownKeys()
         return cache.previousListKeys
     end
 
-    local savedCache = cache
-    local savedBand = self._activeBandCache
+    -- Last level's lists are another full catalog walk. After a ding that is
+    -- a second hitch, so build one slot per frame and show no "new" labels
+    -- until it is done.
+    if cache.previousListBuilding then
+        return nil
+    end
+    cache.previousListBuilding = true
+
     local keys = {}
-    GQ._listProbeLevel = level - 1
-    self._queryCache = nil
-    self._activeBandCache = nil
-    local ok = pcall(function()
-        local slots = self:GetSlotsForClass(GQ:GetEffectiveClass())
-        for i = 1, #slots do
-            local slotName = slots[i]
+    local probe = { level = level - 1 }
+    local function withProbe(fn)
+        local savedCache = self._queryCache
+        local savedBand = self._activeBandCache
+        GQ._listProbeLevel = probe.level
+        self._queryCache = probe.cache
+        self._activeBandCache = probe.band
+        local ok, result = pcall(fn)
+        probe.cache = self._queryCache
+        probe.band = self._activeBandCache
+        GQ._listProbeLevel = nil
+        self._queryCache = savedCache
+        self._activeBandCache = savedBand
+        return ok, result
+    end
+    local function addSlot(slotName)
+        return withProbe(function()
             local top = self:GetTopUpgradesForSlot(slotName)
             for j = 1, #top do
                 local key = self:EntryListKey(top[j])
@@ -9558,16 +9660,50 @@ function GQ.Data:PreviousLevelShownKeys()
                     keys[key] = true
                 end
             end
-        end
-    end)
-    GQ._listProbeLevel = nil
-    self._queryCache = savedCache
-    self._activeBandCache = savedBand
-    if not ok then
-        keys = {}
+        end)
     end
-    savedCache.previousListKeys = keys
-    return keys
+    local _, slots = withProbe(function()
+        return self:WarmSlotNames()
+    end)
+    slots = type(slots) == "table" and slots or {}
+
+    if not (C_Timer and C_Timer.After) then
+        for i = 1, #slots do
+            addSlot(slots[i])
+        end
+        cache.previousListBuilding = nil
+        cache.previousListKeys = keys
+        return keys
+    end
+
+    local index = 0
+    local gapLeft = 0
+    local gap = GQ._levelUpGap or 0
+    GQ._levelUpGap = nil
+    local function step()
+        if self._queryCache ~= cache then
+            return
+        end
+        if gapLeft > 0 then
+            gapLeft = gapLeft - 1
+            C_Timer.After(0, step)
+            return
+        end
+        index = index + 1
+        if slots[index] then
+            addSlot(slots[index])
+            gapLeft = gap
+            C_Timer.After(0, step)
+            return
+        end
+        cache.previousListBuilding = nil
+        cache.previousListKeys = keys
+        if GQ.Log and GQ.Log.ScheduleListRefresh then
+            GQ.Log:ScheduleListRefresh()
+        end
+    end
+    C_Timer.After(0, step)
+    return nil
 end
 
 function GQ.Data:IsEntryNewForPlayer(entry)
@@ -9585,11 +9721,20 @@ function GQ.Data:IsEntryNewForPlayer(entry)
         return false
     end
 
-    return not self:PreviousLevelShownKeys()[key]
+    local previous = self:PreviousLevelShownKeys()
+    if not previous then
+        return false
+    end
+    return not previous[key]
 end
 
 -- Active-band candidates the player can equip now (required level uses GetEffectiveLevel).
+-- Runs inside one class/level/faction/spec snapshot (GQ:WithContextSnapshot).
 function GQ.Data:GetCandidatesForSlot(slotName)
+    return GQ:WithContextSnapshot(self.BuildCandidatesForSlot, self, slotName)
+end
+
+function GQ.Data:BuildCandidatesForSlot(slotName)
     slotName = self:NormalizeSlotName(slotName)
     self:EnsureQueryCache()
 
@@ -9606,9 +9751,19 @@ function GQ.Data:GetCandidatesForSlot(slotName)
         equip._suppressItemPrime = true
     end
 
+    -- Level is a number compare. The class-set name check is not, and most
+    -- rows are other bands. Skip those before ShouldShowEntry.
+    local playerLevel = GQ:GetEffectiveLevel() or 1
+    local grace = (equip and equip.LEVEL_GRACE) or 0
+
     for _, key in ipairs(self:GetCandidateSlotKeys(slotName)) do
         for _, entry in ipairs(self:GetClassSlotEntryList(key) or {}) do
-            if not seen[entry.id] and self:ShouldShowEntry(entry) and self:EntryMatchesPlayer(entry) then
+            if not seen[entry.id]
+                and playerLevel >= (entry.minLevel or 1)
+                and playerLevel <= (entry.maxLevel or playerLevel) + grace
+                and self:ShouldShowEntry(entry)
+                and self:EntryMatchesPlayer(entry)
+                and (not equip or not equip.EntryArmorIsWearable or equip:EntryArmorIsWearable(entry, slotName)) then
                 seen[entry.id] = true
                 table.insert(results, entry)
             end
@@ -9747,8 +9902,8 @@ function GQ.Data:LookupPipelineScore(itemId, slot, minLevel, faction, spec)
 end
 
 -- Tooltip display only. pipelineScore and curatedRank stay the hunt order.
--- This maps the slot's raw scores onto -100..+100 so the best piece in the
--- slot reads +100 and the worst reads -100.
+-- This maps the slot's raw scores onto 0..100 so the best piece in the
+-- slot reads 100 and the worst reads 0.
 function GQ.Data:SlotScoreSpan(slotName, handKind)
     local minScore, maxScore
     local function push(score)
@@ -9794,7 +9949,7 @@ function GQ.Data:WornSlotIndex(slotName, itemId, handKind)
     return self:GearScoreIndex(score, minScore, maxScore) or 0
 end
 
--- One row per slot that goes into the bar. An empty slot counts as -100.
+-- One row per slot that goes into the bar. An empty slot counts as 0.
 -- A two-hand weapon does not also count an empty off hand.
 function GQ.Data:GearScoreWornRows()
     local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
@@ -9823,7 +9978,7 @@ function GQ.Data:GearScoreWornRows()
         if self.SlotHeaderLabel then
             label = self:SlotHeaderLabel(slotName)
         end
-        local index = -100
+        local index = 0
         if itemId then
             index = self:WornSlotIndex(slotName, itemId, handKind)
         end
@@ -9862,7 +10017,6 @@ function GQ.Data:GearScoreWornRows()
 end
 
 -- Average index of the gear this character is wearing, clamped to 0..100.
--- A slot below 0 counts as 0. The tooltip still shows the real index.
 function GQ.Data:GearScoreBarAverage()
     local rows = self:GearScoreWornRows()
     local count = #rows
@@ -9894,11 +10048,11 @@ function GQ.Data:GearScoreIndex(score, minScore, maxScore)
     if type(minScore) ~= "number" or type(maxScore) ~= "number" or maxScore <= minScore then
         return 100
     end
-    local index = -100 + ((score - minScore) / (maxScore - minScore)) * 200
+    local index = ((score - minScore) / (maxScore - minScore)) * 100
     if index > 100 then
         index = 100
-    elseif index < -100 then
-        index = -100
+    elseif index < 0 then
+        index = 0
     end
     return math.floor(index + 0.5)
 end
@@ -10568,7 +10722,12 @@ function GQ.Data:ClearTopUpgradeCache()
     end
 end
 
+-- Runs inside one class/level/faction/spec snapshot (GQ:WithContextSnapshot).
 function GQ.Data:GetTopUpgradesForSlot(slotName, maxResults, ignoreWeaponFilter)
+    return GQ:WithContextSnapshot(self.BuildTopUpgradesForSlot, self, slotName, maxResults, ignoreWeaponFilter)
+end
+
+function GQ.Data:BuildTopUpgradesForSlot(slotName, maxResults, ignoreWeaponFilter)
     slotName = self:NormalizeSlotName(slotName)
     maxResults = maxResults or self:GetMaxUpgradesForSlot(slotName)
     self:EnsureQueryCache()
@@ -10607,6 +10766,144 @@ function GQ.Data:GetTopUpgradesForSlot(slotName, maxResults, ignoreWeaponFilter)
     end
     self._queryCache.topUpgrades[cacheKey] = results
     return results
+end
+
+-- Nil when this level, class, and spec have not built the slot yet.
+-- Does not build it. Auto-complete on a loot event must not.
+function GQ.Data:PeekTopUpgradesForSlot(slotName)
+    local cache = self._queryCache
+    if not cache or cache.key ~= self:GetQueryCacheKey() or not cache.topUpgrades then
+        return nil
+    end
+    slotName = self:NormalizeSlotName(slotName)
+    local maxResults = self:GetMaxUpgradesForSlot(slotName)
+    return cache.topUpgrades[slotName .. ":" .. maxResults]
+end
+
+function GQ.Data:WarmSlotNames()
+    local names = {}
+    local seen = {}
+    for _, slotName in ipairs(self.BASE_SLOTS) do
+        slotName = self:NormalizeSlotName(slotName)
+        if not seen[slotName] and self:IsSlotUnlocked(slotName) then
+            seen[slotName] = true
+            names[#names + 1] = slotName
+        end
+    end
+    local classFile = GQ:GetEffectiveClass()
+    if classFile and self.CLASS_RANGED[classFile] and not seen.Ranged then
+        names[#names + 1] = "Ranged"
+    end
+    return names
+end
+
+function GQ.Data:IsQueryCacheWarm()
+    local cache = self._queryCache
+    if not cache or cache.key ~= self:GetQueryCacheKey() then
+        return false
+    end
+    local failed = cache.warmFailed
+    for _, slotName in ipairs(self:WarmSlotNames()) do
+        if not (failed and failed[slotName]) then
+            local candidates = cache.candidates and cache.candidates[slotName]
+            if not candidates then
+                return false
+            end
+            local maxResults = self:GetMaxUpgradesForSlot(slotName)
+            if #candidates > 0 and not (cache.topUpgrades and cache.topUpgrades[slotName .. ":" .. maxResults]) then
+                return false
+            end
+        end
+    end
+    return true
+end
+
+function GQ.Data:QueryCacheNeedsWarm()
+    return not self:IsQueryCacheWarm()
+end
+
+local WARM_MAX_PASSES = 3
+
+-- One slot per frame. Building every slot on a ding, or inside a bag event
+-- after a dungeon kill, trips a hitch or "script ran too long".
+-- gapFrames is extra idle frames after each slot. A ding passes 1 so the
+-- level-up frame and the game's own level-up work are not on top of a scan.
+function GQ.Data:WarmQueryCacheAsync(onComplete, gapFrames)
+    if not (C_Timer and C_Timer.After) or self:IsQueryCacheWarm() then
+        if onComplete then
+            onComplete()
+        end
+        return
+    end
+
+    gapFrames = tonumber(gapFrames) or 0
+    if gapFrames < 0 then
+        gapFrames = 0
+    end
+
+    self._warmCallbacks = self._warmCallbacks or {}
+    if onComplete then
+        self._warmCallbacks[#self._warmCallbacks + 1] = onComplete
+    end
+    if self._warmRunning then
+        if gapFrames > (self._warmGap or 0) then
+            self._warmGap = gapFrames
+        end
+        return
+    end
+    self._warmRunning = true
+    self._warmGap = gapFrames
+
+    local slots = {}
+    local index = 0
+    local passes = 0
+    local gapLeft = 0
+    local function finish()
+        self._warmRunning = false
+        self._warmGap = nil
+        local callbacks = self._warmCallbacks or {}
+        self._warmCallbacks = nil
+        for i = 1, #callbacks do
+            local ok, err = pcall(callbacks[i])
+            if not ok and geterrorhandler then
+                geterrorhandler()(err)
+            end
+        end
+    end
+    local function step()
+        if gapLeft > 0 then
+            gapLeft = gapLeft - 1
+            C_Timer.After(0, step)
+            return
+        end
+        if index >= #slots then
+            -- A talent or preview change mid-warm swaps the cache key. Go
+            -- round again; slots already built come straight from the cache.
+            if self:IsQueryCacheWarm() or passes >= WARM_MAX_PASSES then
+                finish()
+                return
+            end
+            passes = passes + 1
+            slots = self:WarmSlotNames()
+            index = 0
+        end
+        index = index + 1
+        local slotName = slots[index]
+        if slotName then
+            local built = pcall(function()
+                if #self:GetCandidatesForSlot(slotName) > 0 then
+                    self:GetTopUpgradesForSlot(slotName)
+                end
+            end)
+            if not built and self._queryCache and self._queryCache.key == self:GetQueryCacheKey() then
+                self._queryCache.warmFailed = self._queryCache.warmFailed or {}
+                self._queryCache.warmFailed[slotName] = true
+            end
+            gapLeft = self._warmGap or 0
+        end
+        C_Timer.After(0, step)
+    end
+    C_Timer.After(0, step)
 end
 
 function GQ.Data:GetWeaponRouteForBand()

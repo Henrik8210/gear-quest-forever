@@ -618,8 +618,12 @@ function GQ.Compare:GetSortScore(entry, slotName, equippedIlvl, maxPreferredIlvl
         return 1000000 - entry.curatedRank
     end
 
-    if entry.generated and entry.curatedRank and not entry.notable then
-        return 500000 - entry.curatedRank
+    -- Same order as the (i) rank list: curated place, then pipeline score.
+    -- A hand-placed Forever piece is not marked generated. Scoring it as raw
+    -- item power dropped it out of the three hunt rows while the rank list
+    -- still counted it, so the rows read #1, #3, #4 or #1, #3, #2.
+    if type(entry.curatedRank) == "number" and entry.curatedRank > 0 and not entry.notable then
+        return 500000 - entry.curatedRank + (tonumber(entry.pipelineScore) or 0) * 0.0001
     end
 
     local itemIlvl = GetItemLevel(entry.itemId, entry)
@@ -657,7 +661,9 @@ function GQ.Compare:RankEntries(entries, slotName, maxResults)
     local scored = {}
 
     for _, entry in ipairs(entries) do
-        if not GQ.Equip or not GQ.Equip.MeetsRequiredLevel
+        if GQ.Equip and GQ.Equip.EntryArmorIsWearable and not GQ.Equip:EntryArmorIsWearable(entry, slotName) then
+            -- A hunter cannot wear mail until 40. Leave it out of the three rows.
+        elseif not GQ.Equip or not GQ.Equip.MeetsRequiredLevel
             or GQ.Equip:MeetsRequiredLevel(entry.itemId, playerLevel) then
             local sortScore = self:GetSortScore(entry, slotName, equippedIlvl, maxPreferredIlvl)
             local _, itemIlvl = self:ScoreEntry(entry, equippedIlvl, slotName, maxPreferredIlvl)

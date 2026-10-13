@@ -952,6 +952,9 @@ function GQ.Indicator:ScheduleRebuildCache()
 end
 
 function GQ.Indicator:RebuildCache()
+    self._rebuildGen = (self._rebuildGen or 0) + 1
+    self._rebuildItems = nil
+    self._rebuildNames = nil
     self.upgradeItems = {}
     self.upgradeItemNames = {}
     self.itemNameCache = self.itemNameCache or {}
@@ -971,11 +974,15 @@ function GQ.Indicator:RebuildCache()
 end
 
 function GQ.Indicator:RebuildCacheForSlot(slotName)
-    if not self.upgradeItems then
+    local items = self._rebuildItems or self.upgradeItems
+    local names = self._rebuildNames or self.upgradeItemNames
+    if not items then
         self.upgradeItems = {}
+        items = self.upgradeItems
     end
-    if not self.upgradeItemNames then
+    if not names then
         self.upgradeItemNames = {}
+        names = self.upgradeItemNames
     end
     self.itemNameCache = self.itemNameCache or {}
 
@@ -984,10 +991,10 @@ function GQ.Indicator:RebuildCacheForSlot(slotName)
     local function mark(entry)
         local hide = GQ.Log and GQ.Log.ShouldHideFromActiveList
             and GQ.Log:ShouldHideFromActiveList(entry, slotName)
-        if not entry or not entry.itemId or hide or self.upgradeItems[entry.itemId] then
+        if not entry or not entry.itemId or hide or items[entry.itemId] then
             return
         end
-        self.upgradeItems[entry.itemId] = true
+        items[entry.itemId] = true
         local itemName = (GQ.Data.GetItemDisplayName and GQ.Data:GetItemDisplayName(entry.itemId))
             or self.itemNameCache[entry.itemId]
         if itemName and GQ.Data.IsPlaceholderItemName and GQ.Data:IsPlaceholderItemName(itemName, entry.itemId) then
@@ -995,7 +1002,7 @@ function GQ.Indicator:RebuildCacheForSlot(slotName)
         end
         if itemName then
             self.itemNameCache[entry.itemId] = itemName
-            self.upgradeItemNames[itemName:lower()] = entry.itemId
+            names[itemName:lower()] = entry.itemId
         elseif GQ.Data and GQ.Data.RequestItemInfo then
             GQ.Data:RequestItemInfo(entry.itemId)
         else
@@ -1005,19 +1012,33 @@ function GQ.Indicator:RebuildCacheForSlot(slotName)
 
     -- Unfiltered best pieces keep the arrow when a filter or a play style
     -- hides them. The rows still on the hunt list keep one too.
-    for _, entry in ipairs(GQ.Data:GetTopUpgradesForSlot(slotName, maxUpgrades, true)) do
-        mark(entry)
-    end
-    if GQ.Log and GQ.Log.UsesWideHuntList and GQ.Log:UsesWideHuntList() and GQ.Log.GetActiveSlotListEntries then
-        for _, entry in ipairs(GQ.Log:GetActiveSlotListEntries(slotName)) do
+    -- Weapons stay on the weapon list. Armor and ranged fill from the rank
+    -- list, so owning one rank still leaves an arrow on the piece that replaced it.
+    local weaponSlot = slotName == "MainHand" or slotName == "SecondaryHand"
+    if weaponSlot or not (GQ.Log and GQ.Log.RankedHuntEntries) then
+        for _, entry in ipairs(GQ.Data:GetTopUpgradesForSlot(slotName, maxUpgrades, true)) do
             mark(entry)
+        end
+        if GQ.Log and GQ.Log.UsesWideHuntList and GQ.Log:UsesWideHuntList() and GQ.Log.GetActiveSlotListEntries then
+            for _, entry in ipairs(GQ.Log:GetActiveSlotListEntries(slotName)) do
+                mark(entry)
+            end
+        end
+    else
+        for _, entry in ipairs(GQ.Log:RankedHuntEntries(slotName, false)) do
+            mark(entry)
+        end
+        if GQ.Log.GetActiveSlotListEntries then
+            for _, entry in ipairs(GQ.Log:GetActiveSlotListEntries(slotName)) do
+                mark(entry)
+            end
         end
     end
 end
 
-local REBUILD_SLOTS_PER_FRAME = 5
+local REBUILD_SLOTS_PER_FRAME = 2
 
-function GQ.Indicator:RebuildCacheAsync(onComplete)
+function GQ.Indicator:RebuildCacheAsync(onComplete, slotsPerFrame)
     if not GQ.Data or not GQ.Data.GetSlotsForClass then
         if onComplete then
             onComplete()
@@ -1038,15 +1059,26 @@ function GQ.Indicator:RebuildCacheAsync(onComplete)
         self._rebuildCacheTimer = nil
     end
 
-    self.upgradeItems = {}
-    self.upgradeItemNames = {}
+    -- Build beside the arrows that are already showing, then swap. A zone
+    -- change or a vendor must not blank the arrows for the whole rebuild.
+    self._rebuildGen = (self._rebuildGen or 0) + 1
+    local gen = self._rebuildGen
+    self._rebuildItems = {}
+    self._rebuildNames = {}
     self.itemNameCache = self.itemNameCache or {}
 
     local slots = GQ.Data:GetSlotsForClass(classFile)
     local index = 1
+    local perFrame = tonumber(slotsPerFrame) or REBUILD_SLOTS_PER_FRAME
+    if perFrame < 1 then
+        perFrame = 1
+    end
 
     local function step()
-        local last = math.min(index + REBUILD_SLOTS_PER_FRAME - 1, #slots)
+        if gen ~= self._rebuildGen then
+            return
+        end
+        local last = math.min(index + perFrame - 1, #slots)
         for i = index, last do
             self:RebuildCacheForSlot(slots[i])
         end
@@ -1062,9 +1094,24 @@ function GQ.Indicator:RebuildCacheAsync(onComplete)
         end
 
         self._rebuildCacheTimer = nil
-        self:RefreshAll()
-        if onComplete then
-            onComplete()
+        local function done()
+            if gen ~= self._rebuildGen then
+                return
+            end
+            self.upgradeItems = self._rebuildItems or {}
+            self.upgradeItemNames = self._rebuildNames or {}
+            self._rebuildItems = nil
+            self._rebuildNames = nil
+            if onComplete then
+                onComplete()
+            end
+            self:RefreshAll()
+        end
+        -- A ding already spent this frame on the last slot. Paint next frame.
+        if perFrame < REBUILD_SLOTS_PER_FRAME and C_Timer and C_Timer.After then
+            C_Timer.After(0, done)
+        else
+            done()
         end
     end
 
@@ -1715,8 +1762,9 @@ function GQ.Indicator:Init()
     self.hooks = {}
     self.itemNameCache = {}
 
-    self:RebuildCache()
-    self:PrimeUpgradeItemInfo()
+    self:RebuildCacheAsync(function()
+        self:PrimeUpgradeItemInfo()
+    end)
 
     self:HookFunction("LootFrame_Update", function()
         self:UpdateLootFrame()
@@ -1809,7 +1857,7 @@ function GQ.Indicator:Init()
 
         if event == "MERCHANT_SHOW" then
             GQ.Indicator:EnsureMerchantHooks()
-            GQ.Indicator:RebuildCache()
+            GQ.Indicator:RebuildCacheAsync()
         end
 
         if event == "TRADE_SKILL_SHOW" or event == "TRADE_SKILL_UPDATE"
@@ -1833,9 +1881,10 @@ function GQ.Indicator:Init()
         end
 
         if event == "PLAYER_ENTERING_WORLD" then
-            GQ.Indicator:RebuildCache()
-            GQ.Indicator:PrimeDataItemInfo()
-            GQ.Indicator:PrimeUpgradeItemInfo()
+            GQ.Indicator:RebuildCacheAsync(function()
+                GQ.Indicator:PrimeDataItemInfo()
+                GQ.Indicator:PrimeUpgradeItemInfo()
+            end)
             return
         end
 

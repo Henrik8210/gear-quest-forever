@@ -2,45 +2,35 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v0.5.4-beta
+## v0.5.5-beta
 
-Weapons have their own filter, and the rank numbers stay the real ones. The list stops at 30. Chat can be silenced. Vendor lines name the seller your faction can actually buy from. The window title reads **GearQuest Forever v0.5.4-beta**.
+A vendor hunt names the person standing at the pin, not whichever seller was written down first. **Manageable Quests** waits on item level. Leveling up, changing zone, and opening a cold log are spread across frames so the hitch is smaller. The GearQuest index stays 0 to 100, including at level 60. The window title reads **GearQuest Forever v0.5.5-beta**.
 
-### Weapons
+### The vendor at the pin
 
-Every class has one **Weapons** header. The arrow on that title, before the (i), is the filter. **Two-hand** and **One-hand** are checkboxes, and both can be on. Under each style are the weapon types in your current level band: dagger, sword, mace, axe, fist, polearm, staff. Every type that style has starts checked. Unchecking a type hides every weapon of that type. **Leaden Mace of the Tiger** stays a mace when the tooltip glues the type onto the hand line. Shields, wands, thrown weapons, and relics keep their own slots.
+The description and the tracker use the seller at the closest coordinate. **Dirty Leather Bracers** in Mulgore says **Bought from Varia Hardhide.** The pin is Mulgore 43.8, 77.6. **Lauren Newcomb** is the name when the closest pin is hers in the Undercity. The same rule covers every vendor hunt: **Archibald Kava** in Tirisfal Glades, **Huklah** in Durotar, and the rest of that leather set. Walk to another town that sells the piece and both the parchment and the tracker update.
 
-The filter only hides pieces. If the best weapon is a two-hander, it stays **#1** when two-handers are hidden. A one-hander keeps its own number. **Recommended** is still that unfiltered rank 1, and it only shows when that piece is inside the filter. The (i) list is the same unfiltered order, up to 30 weapons, whatever the boxes are set to. The hunt rows are the filtered pieces, up to three names, with those same numbers. Narrowing to daggers still shows up to three daggers when three exist.
+A sentence after the name stays. **Samuel Hawke** still says the League of Arathor standing. **Sergeant Ba'sha** and **Officer Areyn** still say the rank and the honor cost. **Anachronos** stays on both factions. A piece only one faction sells stays off the other list.
 
-**Hunters can dual wield.** One-hand opens the main hand and the off hand. **Shamans cannot.** Enhancement is two-hand only. Elemental starts with both styles on, because a staff and a one-hander are both worn, and the off hand stays a shield. Restoration and Enhancement Tank keep the shield. Rogues and Fury warriors can dual wield. Right-click on the paper doll follows the same filter.
+### Manageable Quests
 
-The source filter and a play style apply on top of that. A boss-drop sword stays hidden when Boss drop is off, even if swords are checked. Rank numbers do not change. The green arrow stays on the real best piece when a filter hides it, and on every hunt still showing.
+**Play style** has a sixth card, **Manageable Quests**. It hides a quest reward, including a seasonal quest, until the level you are viewing is 4 under that item's level. **Clergy Ring** is item level 22, from The Tower of Althalaxx. At level 13 it stays hidden. It can show from 18. **Sprightring Helm** is item level 49, so a level 41 Enhancement shaman does not see it. It can show from 45. The wait stops at 60, so **Cloak of the Fallen God** (item level 88) still shows at 60. Boss drops, vendors, and crafts stay. Rank numbers and the (i) list do not change. The button reads **Play style*** while any card is on. **No Dungeons** and **Dungeon Enjoyer** still turn each other off. The other four can be on with either.
 
-### Thirty weapons, and no dummy pieces
+### A smaller hitch
 
-The (i) list shows at most 30 weapons for your faction, spec, and level. Anything scored below that stays out of the addon. **Invisible Dagger** is gone. So is any piece named UNUSED, (DNT), or Placeholder.
+Leveling up no longer builds the new list, the paper-doll arrows, and the obtain check on one frame. The list warms one slot at a time, with a spare frame between slots. Then GearQuest checks what you outgrew, then it redraws. The arrows on the character panel rebuild one slot per frame, and the arrows already there stay until the new set is ready.
 
-A common vendor weapon can still sit high on that list. Off-hand damage is scored at half, and both hands share one list. On a level 22 Combat rogue, **Longsword** can outrank a blue off-hand. Horde buys it from **Kard Ragetotem** in Thunder Bluff. Alliance buys it from **Marda Weller** in Stormwind.
+Changing zone, logging in, and opening a merchant rebuild those arrows the same way. They do not blink off first.
 
-### Leather patterns at the camps
+Opening the log, changing a filter, or returning to **Active**, when the ranks are not ready yet, keeps the rows you are looking at and swaps the whole list in once. **Completed** and **Removed** do not wait. A list that is already warm opens at once. Hovering a tooltip, and switching class in the Simulator, are unchanged.
 
-**Brawler's**, **Defender's**, **Totemic**, **Trapper's**, **Stormrider's**, and **Wisdom's Leather Armor**, and the six **Leather Pants** from those sets, are Merchant's Favor patterns. Horde buys them from **Pawani** at the Barrens camp. Alliance buys them from **Daniel Stitchsong** at the Redridge camp. The six leather helms stay boss drops.
+### The index at 60
 
-### The score bar stays put
+The tooltip score is still **0** to **100** inside the slot. **100** is the best stored score at your level. **0** is the worst. The header bar is the average of what you have equipped, and an empty slot counts as 0. Filtering weapons does not move that bar. Level 60 keeps the same stamina, armor, and mana weighting as the levels below it, so the index does not flip to a naked primary-stat ranking when you ding 60.
 
-Changing the weapon filter does not move the GearQuest Index Score bar. The Weapons (i) list uses one scale for both hands. Each arrow compares that weapon to the hand you wear it in. An empty hand shows the index only.
+### v0.5.4-beta
 
-### Hide chat messages
-
-**General → Hide chat messages** is off until you check it. It stops every GearQuest line in chat, including login, obtain notices, and `/gq` replies. The log, tooltips, the obtain popup, and the score bar stay. The check stays checked after you reload. The General page scrolls when the options run past the pane.
-
-### Vendors on the right side
-
-When both factions sell a piece, the hunt names one seller for each side. A piece only one faction sells stays off the other list. **Anachronos** pieces stay on both, because both factions turn quests in to him.
-
-### Protection paladin
-
-Protection armor is **0.2** (shown **0.4** while leveling). Spell power is **0.9**. Mana per 5 is **0.2** (shown **0.4**). Ranged attack power is **0** on Holy, Protection, and Retribution, including levels 1–9. Every class was scored again. A piece Forever does not list is gone, and the ranks close up. Level 60 uses the same stamina and mana multipliers as the levels below it.
+Weapons have one filter: two-hand and one-hand, then the types in the current band. Rank numbers stay the real ones, and the (i) list stops at 30. Hunters can dual wield. Shamans cannot. **Invisible Dagger** and placeholder items are gone. The six camp leather chests and pants are bought from Pawani and Daniel Stitchsong. The score bar does not move when you filter weapons. **General → Hide chat messages** silences chat and leaves the log. A vendor only one faction sells stays off the other list. Protection paladin armor, spell power, and mana per 5 were rescored, and level 60 kept the leveling stamina and mana multipliers. The window title reads **GearQuest Forever v0.5.4-beta**.
 
 ### v0.5.3-beta
 

@@ -521,8 +521,8 @@ fact, not a client item query. The first hover of a slot does the scan
 once. The line the player sees does not change. The obtain toast does not
 use this scan. It compares the item id in the bags to the hunt on the list.
 
-`GearScoreIndex` maps the slot's raw scores onto **−100..+100**. The best
-score in that comparison is **+100**. The worst is **−100**. One score in
+`GearScoreIndex` maps the slot's raw scores onto **0..100**. The best
+score in that comparison is **100**. The worst is **0**. One score in
 the slot is **100**. The displayed index is clamped and rounded. The scale
 is the live level's rank list (`GetSlotRankList`), the notables, and the
 equipped piece's raw score (so a worn piece that has aged out of the band
@@ -568,7 +568,7 @@ When you are not simulating, and the log page is open, the header is a four-sect
 
 The fill is the average GearQuest index of every gear slot, then clamped to **0–100**. `GearScoreWornRows` builds one row per slot. Head, neck, shoulder, chest, waist, legs, feet, wrist, hands, back, main hand, and ranged each count once. Finger counts both rings. Trinket counts both trinkets. An empty off hand is left out when the main hand is a two-hand weapon, and Enhancement (`UsesTwoHandOnlyWeapons`) never counts an off hand. Hunter two-hand uses the two-hand list. Hunter one-hand main uses the main-hand list. Rogue main hand uses the main-hand list.
 
-An empty slot is stored as **−100** and the tooltip writes **(empty slot)** after that score. A worn piece with no pipeline score is **0**. A worn piece that aged out of the band still has an index, from the nearest same-spec, same-faction band (`EquippedPipelineScore`). Before the average, every slot below 0 is counted as 0. The tooltip list still shows the real number, including **−100** and a negative worn piece such as Twilight Maul at **−8**. The line above the list is one sentence: "The average GearQuest index of the gear you are wearing. Negative numbers are counted as 0."
+An empty slot is **0** and the tooltip writes **(empty slot)** after that score. A worn piece with no pipeline score is **0**. A worn piece that aged out of the band still has an index, from the nearest same-spec, same-faction band (`EquippedPipelineScore`). The tooltip list shows that same 0–100 number. The line above the list is one sentence: "The average GearQuest index of the gear you are wearing."
 
 Each 25 points is one section. The fill color uses the raw average, before it is rounded for the word: above 75 legendary orange, above 50 epic purple, above 25 rare blue, otherwise uncommon green. The hover word uses the rounded integer: **Below average** (0–25, green), **Fair** (26–50, blue), **Great** (51–75, purple), **Legend** (76–100, orange). The number stays white. The header is yellow **GearQuest Score**, then `N / 100 · WORD`.
 
@@ -579,6 +579,8 @@ The bar does not tick while you hover it. Hover only draws the rows from the las
 Do not call `GearScoreContext` once per slot to draw the bar. The bar uses `GearScoreWornRows` and `WornSlotIndex`. The score cache keeps every slot scored for this level, spec, and gear, so a bag hover reuses a slot it already scanned. A scan must not call `GetItemInfo` for an item the client has not already cached.
 
 The weapon filter does not move the bar. The main-hand index uses the whole main-hand list, with no hand style applied. The Weapons (i) list uses one scale for both hands. Each weapon arrow compares to the hand that weapon is worn in. An empty hand shows the index only.
+
+Level 60 uses the same survivability and endurance multipliers as levels 1–59. Stamina, health, and health per 5 stay ×3. Armor stays ×2. Intellect, spirit, mana per 5, and mana stay ×2. The index does not flip to a naked primary-stat ranking at 60.
 
 `EquippedPipelineScore` uses the current band first. If the worn piece has
 aged out, it uses the nearest same-spec, same-faction band: the highest
@@ -615,6 +617,12 @@ individual piece. Enhancement Horde legs at 25–27: **Leggings of the Fang**
 (10410) rank 1, score 20.87, index 94; **Triprunner Dungarees** (9624)
 rank 2, score 21.56, index 100. Fang stays rank 1. Do not change the set
 promotion or the weights to make those two numbers match.
+
+## Staying smooth
+
+A ding does not build the new list, the paper-doll arrows, and the obtain check on one frame. `PLAYER_LEVEL_UP` warms the query cache one slot per frame, then an idle frame (`WarmQueryCacheAsync` with gap 1). Milestones, the obtain check, and the redraw each wait a frame after that. Paper-doll arrows on a ding are one slot per frame. The previous-level "new" probe idles between slots. The arrows you already have stay up until the new set is ready.
+
+Changing zone, logging in, and opening a merchant rebuild those arrows in the background the same way. Opening the log, changing a filter, or returning to Active, when the rank lists are not ready, keeps the rows on screen and swaps the whole list once they are built. Completed and Removed do not wait. A list that is already warm opens at once. Hovering an item tooltip, and switching class in the Simulator, stay on the frame they already used. Do not slice those.
 
 ## Log window
 
@@ -670,10 +678,10 @@ The source **Filter** closes on a click outside the menu. The Profession
   Checking Profession, Boss drop, or Dungeon & Raid trash opens that flyout
   on the click. You do not have to leave the row and come back.
 - **Play style** is the button at the bottom of the log
-  (`GearQuestForeverDB.ui`). While any of the five is on, the button reads
-  **Play style***. Five cards, three on the first row and two on
+  (`GearQuestForeverDB.ui`). While any of the six is on, the button reads
+  **Play style***. Six cards, three on the first row and three on
   the second. The name sits under the picture. **Get it now!** can be on
-  with either dungeon card, and with **Don't look back** and **Buy it**.
+  with either dungeon card, and with **Don't look back**, **Manageable Quests**, and **Buy it**.
   **No Dungeons!** and **Dungeon Enjoyer** turn each other off. A play
   style hides hunts across several sources. The filter still only chooses a source. Any of them widens the slot list the
   same way a filter does, so a later rank can show, and the rank box says why.
@@ -714,6 +722,14 @@ The source **Filter** closes on a click outside the menu. The Profession
     the classic steps around the known samples (5 at level 9, 10 at 50,
     12 at 60). A level 18 hunt is still shown at 25 and drops at 26 on
     that scale. A missing `minLevel` stays.
+  - **Manageable Quests** (`playManageableQuests`) hides a quest reward,
+    including a seasonal quest, until the viewed level reaches 4 under
+    that item's level (`ilvl` on the fact). Sprightring Helm is 49, so it
+    stays hidden until 45. Clergy Ring is 22, so a level 13 list hides it
+    and it can show from 18. The floor is `min(ilvl - 4, 60)`, so Cloak of
+    the Fallen God (item level 88) still shows at 60. A missing item level
+    stays. The hunt still leaves when its band ends. Boss drops, vendors,
+    and crafts stay.
   - **Buy it** (`playBuyIt`) keeps a vendor or auction hunt, and any item
     that is not bind on pickup or quest-bound (bind when equipped, bind
     when used, or no bind). Bind on pickup stays hidden unless a vendor
@@ -1715,10 +1731,17 @@ What the lookup uses:
   doors have a description and no numbers.
   Leave them unpinned until someone measures the door.
 - Vendor: every NPC who sells it, from the Forever sold-by list. Note
-  `(vendor that sells this)`. The log, the guide, and the map pin use the
-  vendor closest to the character, and a faction-only vendor stays on
-  that faction's list. When both factions sell the item, the hunt line
-  names one seller per side. `vendor_side.json` keeps an item off the
+  `(vendor that sells this)`. Each spot stores that seller's name (`npc`).
+  The log, the guide, and the map pin use the vendor closest to the
+  character. The description and the tracker say **Bought from** that
+  person, not the one name stored on the hunt. Dirty Leather Bracers in
+  Mulgore is Varia Hardhide at 43.8, 77.6. Lauren Newcomb is the name when
+  the closest pin is hers in Undercity. A sentence after the first period,
+  such as a reputation or honor cost, stays. Changing zone updates the
+  parchment and the tracker. A faction-only vendor stays on
+  that faction's list. When both factions sell the item, the stored hunt
+  line can still name one seller per side. The line the player reads is
+  the seller at the pin. `vendor_side.json` keeps an item off the
   other list only when every Wowhead seller is that one faction. A
   neutral seller stays on both. Anachronos stays on both, because both
   factions turn quests in to him. A battleground quartermaster with no outdoor
