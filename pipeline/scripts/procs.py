@@ -56,9 +56,9 @@ AOE_TARGETS      = 4.0    # typical adds hit by a chaining proc while levelling 
 HP_PER_STA       = 10.0
 # how much a mitigation proc is worth to each spec. A tank prices it fully; a
 # leveller soloing prices it partly; nobody prices it at zero.
-MIT_RELEVANCE    = {"protection":1.00,"retribution":0.35,"holy":0.35,"levelling_1_9":0.40}
+MIT_RELEVANCE    = {"protection":1.00,"retribution":0.35,"holy":0.35,"shockadin":0.35,"levelling_1_9":0.40}
 # threat-only value (AoE threat, taunt-adjacent) matters to a tank and nobody else
-THREAT_RELEVANCE = {"protection":1.00,"retribution":0.10,"holy":0.05,"levelling_1_9":0.15}
+THREAT_RELEVANCE = {"protection":1.00,"retribution":0.10,"holy":0.05,"shockadin":0.10,"levelling_1_9":0.15}
 
 def player_hp(level):
     """Rough unbuffed plate-wearer health. Used only to price mitigation procs."""

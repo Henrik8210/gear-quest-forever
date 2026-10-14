@@ -2,31 +2,50 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v0.5.5-beta
+## v0.5.6-beta
 
-A vendor hunt names the person standing at the pin, not whichever seller was written down first. **Manageable Quests** waits on item level. Leveling up, changing zone, and opening a cold log are spread across frames so the hitch is smaller. The GearQuest index stays 0 to 100, including at level 60. The window title reads **GearQuest Forever v0.5.5-beta**.
+Paladins have a fourth spec, **Shockadin**. Holy, Shockadin, Elemental, and Restoration hunt a two-hander and a one-hander together. Rogues can hunt one-hand axes. Ten new Forever pieces are on the lists, and the Desolace centaur weapons now require 35. The window title reads **GearQuest Forever v0.5.6-beta**.
 
-### The vendor at the pin
+### Shockadin
 
-The description and the tracker use the seller at the closest coordinate. **Dirty Leather Bracers** in Mulgore says **Bought from Varia Hardhide.** The pin is Mulgore 43.8, 77.6. **Lauren Newcomb** is the name when the closest pin is hers in the Undercity. The same rule covers every vendor hunt: **Archibald Kava** in Tirisfal Glades, **Huklah** in Durotar, and the rest of that leather set. Walk to another town that sells the piece and both the parchment and the tracker update.
+The paladin spec menu has **Shockadin** beside Holy, Protection, and Retribution. It is not a talent tree. A new paladin still starts on Retribution. `/gq spec shockadin` and `/gq spec shock` both select it.
 
-A sentence after the name stays. **Samuel Hawke** still says the League of Arathor standing. **Sergeant Ba'sha** and **Officer Areyn** still say the rank and the honor cost. **Anachronos** stays on both factions. A piece only one faction sells stays off the other list.
+Shockadin swings and hunts spell damage. Hover the spec name. Spell power is **1**, holy spell power **0.85**, intellect **0.8**, and crit **0.55**. Healing is **0**, so a healing robe is not the hunt. Strength is **0.2** and weapon damage is **0.4**, so the swing still counts and a spell-power weapon stays ahead. Stamina shows as **0.45**. Armor shows as **0.01**. Cloth sits under mail and plate, the same curve as Holy.
 
-### Manageable Quests
+Weapons starts with two-hand and one-hand both checked. Two-hand swords, maces, axes, and polearms sit beside the one-hander. The off-hand slot stays the shield. Paladins do not dual wield.
 
-**Play style** has a sixth card, **Manageable Quests**. It hides a quest reward, including a seasonal quest, until the level you are viewing is 4 under that item's level. **Clergy Ring** is item level 22, from The Tower of Althalaxx. At level 13 it stays hidden. It can show from 18. **Sprightring Helm** is item level 49, so a level 41 Enhancement shaman does not see it. It can show from 45. The wait stops at 60, so **Cloak of the Fallen God** (item level 88) still shows at 60. Boss drops, vendors, and crafts stay. Rank numbers and the (i) list do not change. The button reads **Play style*** while any card is on. **No Dungeons** and **Dungeon Enjoyer** still turn each other off. The other four can be on with either.
+The community weight sheet has a Shockadin column on the Paladin tab. A suggestion there does not change the hunts until it is accepted.
 
-### A smaller hitch
+### Two-handers for Holy, Elemental, and Restoration
 
-Leveling up no longer builds the new list, the paper-doll arrows, and the obtain check on one frame. The list warms one slot at a time, with a spare frame between slots. Then GearQuest checks what you outgrew, then it redraws. The arrows on the character panel rebuild one slot per frame, and the arrows already there stay until the new set is ready.
+Holy opens with two-hand and one-hand both on. A two-hand sword, mace, axe, or polearm is on the list beside the one-hander. The shield stays on the off-hand slot.
 
-Changing zone, logging in, and opening a merchant rebuild those arrows the same way. They do not blink off first.
+Elemental and Restoration do the same. Staves are on the list, including **Odo's Ley Staff**. For Restoration it is rank 2 from 21 through 23, behind **Staff of the Friar**, and it stays through 29. Enhancement is still two-hand only. Shamans still cannot dual wield. The shield stays on the off-hand slot for Elemental, Restoration, and Enhancement Tank.
 
-Opening the log, changing a filter, or returning to **Active**, when the ranks are not ready yet, keeps the rows you are looking at and swaps the whole list in once. **Completed** and **Removed** do not wait. A list that is already warm opens at once. Hovering a tooltip, and switching class in the Simulator, are unchanged.
+### Rogue axes
 
-### The index at 60
+Rogues can hunt one-hand axes. Assassination and Subtlety stay dagger-locked in the main hand. Combat uses the axe. **Axe of the Deep Woods** is rank 1 for Horde Combat from 52 through 59. It is a main-hand axe, so it stays off the off-hand list.
 
-The tooltip score is still **0** to **100** inside the slot. **100** is the best stored score at your level. **0** is the worst. The header bar is the average of what you have equipped, and an empty slot counts as 0. Filtering weapons does not move that bar. Level 60 keeps the same stamina, armor, and mana weighting as the levels below it, so the index does not flip to a naked primary-stat ranking when you ding 60.
+### Blade of Silverlaine and Coldflame Saber
+
+The hover matches the Forever page. One Equip line states the spell bonus. **Coldflame Saber** is 17–32 damage, 12.25 DPS, +7 intellect, and +32 damage and healing. It requires 21 and is mage only. Melee attacks deal 98 additional Fire damage against Frozen targets. **Blade of Silverlaine** is 17–33 damage, 10.87 DPS, +6 shadow resistance, and +28 damage and healing. It requires 21. Baron Silverlaine drops it.
+
+### New Forever gear
+
+The 14 October Forever list added ten pieces. Wowhead does not name a drop, a quest, a vendor, or a recipe, so the hunt says the source is not listed yet and there is no map pin.
+
+**Firebird Leggings** require 43. They are rank 1 legs from 43 through 50 for Fire and Battle Mage (Fire), both factions, and rank 3 legs from 43 through 49 for Destruction. **Stone Keeper Spire** requires 44. It is rank 1 in the main hand at 44 for Holy and Discipline, both factions, and rank 1 for Bear from 44 through 54. **Moonchaser's Headdress** requires 41 and is rank 2 or 3 for Balance around 41–44. **Abomination Chain** requires 37 and is rank 3 for Bear necks at 37–44.
+
+**Well-Worn Pitchfork** requires 33. **Surveyor's Gloves** require 39. **Cliffbreaker's Pauldrons** require 47. **Feardred's Gauntlets** require 49. **Crown of Maldazzar** requires 53. **High Priestess's Kilt** requires 54. They are on the rank list below the top three.
+
+### Desolace centaur weapons
+
+The Magram weapon set requires **35**. Damage and stats are lower than the old row. **Centaur Spear**, **Wanderer's Broadsword**, and **Desert Crawler's Claw** come from Test Your Theory. **Blade of the Magram Clan**, **Staff of Revelations**, and **Desperate Barrier** come from Proof of Concept. **Scavenged Magram Armament**, **Abandoned Ferocity**, **Bludgeon of Betrayed Virtues**, **Greatstaff of the Necrokhans**, **Soulsplatter Mace**, and **Thrice-Damned Effigy** come from Khan Jehn. Centaur Spear is 26.61 DPS with +9 strength and +11 stamina. Staff of Revelations is +8 intellect, +11 spirit, and +30 healing and spell damage. The quest names and pins are unchanged.
+
+### v0.5.5-beta
+
+A vendor hunt names the person standing at the pin. **Dirty Leather Bracers** in Mulgore says **Bought from Varia Hardhide.** **Manageable Quests** hides a quest reward until the level you are viewing is 4 under that item's level. **Clergy Ring** can show from 18. The wait stops at 60. Leveling up, changing zone, and opening a cold log are spread across frames. The GearQuest index stays 0 to 100 at level 60. The window title reads **GearQuest Forever v0.5.5-beta**.
+
 
 ### v0.5.4-beta
 

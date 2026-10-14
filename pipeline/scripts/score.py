@@ -500,7 +500,9 @@ RELIC_ABILITIES={
    "protection":["Holy Shield","Devotion Aura","block","Consecration","Judgement","Judgment",
                  "Seal of Fury","Holy Strike"],
    "retribution":["Seal","Judgement","Judgment","Holy Strike","Exorcism","Holy Wrath",
-                  "Consecration"]},
+                  "Consecration"],
+   "shockadin":["Holy Shock","Exorcism","Holy Wrath","Consecration","Seal",
+                "Judgement","Judgment","Holy Strike"]},
  "DRUID":{
    "restoration":["Rejuvenation","Healing Touch","Lifebloom","Regrowth","Tree of Life"],
    "feral":["Claw","Rake","Shred","Rip","Mangle","combo point","finishing move"],
@@ -1045,11 +1047,17 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     if mhKinds and it["kind"] not in mhKinds: continue
                     twoh = it["inv"]==17
                     if style=="twohand" and not twoh and level>=20: continue
-                    # Elemental wears a staff or a one-hander and a shield. The
-                    # shield style used to drop every two-hander, so a staff
-                    # never reached the hunt.
+                    # Elemental and restoration wear a staff or a one-hander
+                    # and a shield. Holy and Shockadin wear a two-hander or a
+                    # one-hander and a shield. The shield style used to drop
+                    # every two-hander, so those weapons never reached the hunt.
+                    # Protection stays one-hand and shield.
                     if style in ("onehand_shield","onehand_dual") and twoh:
-                        if not (cls == "SHAMAN" and spec_key == "elemental"):
+                        keep_two = (
+                            (cls == "SHAMAN" and spec_key in ("elemental", "restoration"))
+                            or (cls == "PALADIN" and spec_key in ("holy", "shockadin"))
+                        )
+                        if not keep_two:
                             continue
                 if sl=="SecondaryHand":
                     dw=dual_wield_level(cls,spec_key)
@@ -1253,7 +1261,10 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     rows = ranked_all
                 split_hands = sl == "MainHand" and cls == "HUNTER"
                 enh_two_only = sl == "MainHand" and cls == "SHAMAN" and spec_key == "enhancement"
-                elem_both = sl == "MainHand" and cls == "SHAMAN" and spec_key == "elemental"
+                elem_both = sl == "MainHand" and (
+                    (cls == "SHAMAN" and spec_key in ("elemental", "restoration"))
+                    or (cls == "PALADIN" and spec_key in ("holy", "shockadin"))
+                )
                 rogue_main_only = sl == "MainHand" and cls == "ROGUE"
                 if split_hands:
                     # Two-handers, then main-hand-only one-handers. An either-hand
@@ -1268,9 +1279,18 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     # (InventoryType 13) are off-hand picks.
                     rows = unique_name_rows([r for r in ranked_all if is_mainhand_only(r[1])], 8)
                 elif elem_both:
-                    # Keep staves beside one-handers. A pure top-8 was all
-                    # one-handers, so the two-hand filter had nothing to show.
-                    two = unique_name_rows([r for r in ranked_all if is_two_hand_item(r[1])], 4)
+                    # Keep two-handers beside one-handers. A pure top-8 was
+                    # all one-handers, so the two-hand filter had nothing to
+                    # show. Shamans reserve staves inside that two-hand slice
+                    # so a mace does not crowd out Odo's Ley Staff.
+                    if cls == "SHAMAN":
+                        staves = unique_name_rows(
+                            [r for r in ranked_all if r[1].get("kind") == "Staff"], 2)
+                        other_two = unique_name_rows(
+                            [r for r in ranked_all if is_two_hand_item(r[1]) and r[1].get("kind") != "Staff"], 2)
+                        two = staves + other_two
+                    else:
+                        two = unique_name_rows([r for r in ranked_all if is_two_hand_item(r[1])], 4)
                     one = unique_name_rows([r for r in ranked_all if not is_two_hand_item(r[1])], 4)
                     rows = sorted(two + one, key=lambda r: (-r[0], r[1]["id"]))
                 else:
@@ -1621,16 +1641,59 @@ def cap_weapon_bands(bands, limit=WEAPON_LIST_CAP):
                     (pick.get("name") or "", pick.get("suffix") or ""),
                 ))
         ranked.sort()
-        keep = set()
-        seen = set()
-        for _score, _rank, iid, band, index, name in ranked:
-            key = name if name[0] else ("id", iid)
-            if key in seen:
-                continue
-            if len(seen) >= limit:
-                continue
+
+        def _name_key(item):
+            _score, _rank, iid, _band, _index, name = item
+            return name if name[0] else ("id", iid)
+
+        def _pick(item):
+            _score, _rank, _iid, band, index, _name = item
+            return (band.get("picks") or [])[index]
+
+        def _is_two(item):
+            return _pick(item).get("hand") == "two"
+
+        def _is_staff(item):
+            return _pick(item).get("kind") == "Staff"
+
+        def _take(item, seen, keep):
+            key = _name_key(item)
+            if key in seen or len(seen) >= limit:
+                return False
+            _score, _rank, _iid, band, index, _name = item
             seen.add(key)
             keep.add((id(band), index))
+            return True
+
+        keep = set()
+        seen = set()
+        # A shield spec that can also swing a two-hander needs those weapons
+        # inside the 30. Filling by score alone left the two-hand filter empty.
+        # Staves are reserved first so a higher-scoring two-hand mace does not
+        # push Odo's Ley Staff off the shaman list.
+        if any(_is_staff(item) for item in ranked):
+            reserved = 0
+            for item in ranked:
+                if not _is_staff(item):
+                    continue
+                if _take(item, seen, keep):
+                    reserved += 1
+                if reserved >= 2:
+                    break
+        both_styles = any(_is_two(item) for item in ranked) and any(not _is_two(item) for item in ranked)
+        if both_styles:
+            reserved = sum(1 for item in ranked if _is_two(item) and _name_key(item) in seen)
+            for item in ranked:
+                if reserved >= 4:
+                    break
+                if not _is_two(item):
+                    continue
+                if _take(item, seen, keep):
+                    reserved += 1
+        for item in ranked:
+            if len(seen) >= limit:
+                break
+            _take(item, seen, keep)
         for band in blist:
             kept = []
             for index, pick in enumerate(band.get("picks") or []):

@@ -152,13 +152,21 @@ def copy_class_lua(src: Path, dest: Path) -> None:
     dest.write_bytes(raw)
 
 
+def addon_version() -> str:
+    toc = Path(__file__).resolve().parents[1] / "GearQuest" / "GearQuestForever.toc"
+    for line in toc.read_text(encoding="utf-8").splitlines():
+        if line.startswith("## Version:"):
+            return line.split(":", 1)[1].strip()
+    raise SystemExit("GearQuestForever.toc has no ## Version")
+
+
 def write_toc(folder: Path, title: str, files: list[str]) -> None:
     lines = [
         "## Interface: 16001",
         f"## Title: GearQuest Forever: {title}",
         "## Notes: Hunt lists for this class. GearQuest Forever loads this when you play or simulate it.",
         "## Author: Henrik8210",
-        "## Version: 0.3.6-beta",
+        f"## Version: {addon_version()}",
         "## LoadOnDemand: 1",
         "## Dependencies: GearQuestForever",
         "## RequiredDeps: GearQuestForever",

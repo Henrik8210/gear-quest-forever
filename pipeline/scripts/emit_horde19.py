@@ -92,7 +92,7 @@ GQ.Data = GQ.Data or {}
 -- faction-exclusive zones are gated by name -- a vendor standing in Darnassus is
 -- not race-restricted, the city is.
 --
--- Spec column: 1-9 is scored per spec so ret/prot/holy (or arms/fury) do not
+-- Spec column: 1-9 is scored per spec so ret/prot/holy/shockadin (or arms/fury) do not
 -- share one hybrid list.
 --
 -- row = { itemId, slot, minLevel, maxLevel, rank, spec, faction, score }

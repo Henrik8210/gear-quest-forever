@@ -17,28 +17,29 @@ order of importance. Do not invert them.
    weapon style, and “does this proc even fire in this slot” stay in the
    damage layer.
 
-2. **Survivability second (below 60).** A naked +1 primary-stat upgrade that
+2. **Survivability second (through 60).** A naked +1 primary-stat upgrade that
    leaves you squishy loses to a piece with stamina, health, hp5, or armor.
    `weights_at_level()` multiplies sta / health / hp5 ×3 and armor ×2 when
-   `level < 60`. Example: at 22, **Brawler’s / Trapper’s Leather Tunic**
+   `level < 61` (`LEVELING_SURVIVE_UNTIL`). Example: at 22, **Brawler’s / Trapper’s Leather Tunic**
    (8 Agi + stam / str / int) beat **Panther Armor** (9 Agi, no stam).
    Leveling is travel, extra pulls, and no healer. Dying costs more time than
    a one-stat edge saves.
 
-3. **Endurance third (below 60).** Staying effective also means having and
+3. **Endurance third (through 60).** Staying effective also means having and
    keeping mana. Int / spirit / mp5 / mana ×2 — real, but **less than stam**.
    Paladin seals and heals, shaman shocks, hunter shots, and caster drinks
    all run out. A glass cannon that is OOM every two pulls is not a better
    hunt.
 
-Level **60** uses the raw raid-scale weights (`GQ_NO_GUIDES=1` until Forever
-guides exist). Do not apply the leveling multipliers at 60.
+Level **60** uses those same survivability and endurance multipliers. Hit,
+crit, and weapon damage stay on the raw weights. `GQ_NO_GUIDES=1` until
+Forever guides exist.
 
 The same multipliers live in the addon as `GQ.ScoringLeveling` in
 `GearQuest/_generated/ScoringWeights.generated.lua` (from
 `pipeline/data/weights.json` via `scripts/generate-stat-weights-lua.mjs`).
 Hovering the spec name or icon in the log shows the **effective** weights
-for the current level: below 60 the tooltip already includes ×3 / ×2.
+for the current level: through 60 the tooltip already includes ×3 / ×2.
 If you change `LEVELING_*` in `score.py`, change `GQ.ScoringLeveling` to
 match and regenerate that file. `GQ.StatWeights` is still the Compare.lua
 reorder table; the tooltip does not read it.
@@ -285,20 +286,26 @@ skeleton with that school in front.
 
 - Damage is frost / fire / arcane spell power, plus a small weapon DPS weight
   (`0.35`, so a swing is real and still loses to spell power).
-- **Coldflame Saber** (276631) is mage-only. The hover is the Wowhead tip:
-  17–32 damage, 12.2 DPS, +7 Intellect, requires level 21, Classes: Mage, and
-  `Equip: Increases damage and healing done by magical spells and effects by
-  up to 32.` That sentence is stored as heal 32 and damageDone 32, never as
-  two green `+32 Spell Power` / `+32 Healing Done` lines. 98 Fire on melee
-  against Frozen targets. Pinned in `client_item_overrides.json`. The 22 Sep
-  nether tip (25–48 damage, 18.25 DPS, no spell bonus) was the stale one; the
-  current page matches the client. Do not sync an older cached tip back over it.
+- **Coldflame Saber** (276631) is mage-only. The hover is the 14 Oct 2026
+  dataEnv 16 page: 17–32 damage, 12.25 DPS, +7 Intellect, Durability 90,
+  Classes: Mage, requires level 21, and `Equip: Increases damage and healing
+  done by magical spells and effects by up to 32.` That sentence is stored as
+  heal 32 and damageDone 32, never as two green `+32 Spell Power` /
+  `+32 Healing Done` lines. The page says `Equip: Melee attacks deal 98
+  additional Fire damage against Frozen targets.` Pinned in
+  `client_item_overrides.json`. The 22 Sep nether tip (25–48 damage, 18.25
+  DPS, no spell bonus) was the stale one. Do not sync an older cached tip
+  back over it.
 - The 98 Fire line is every swing while Frozen, priced at 25% of swings for
   frost battle mage and 15% for fire and arcane (`FROZEN_MELEE_UPTIME`).
   Retune if a melee hit breaks the freeze.
-- **Blade of Silverlaine** (273637) is the sword Imbue Blade consumes. Client:
-  17–33 damage, 10.9 DPS, +6 Shadow Resistance, +28 spell power and healing.
-  It is not mage-locked.
+- **Blade of Silverlaine** (273637) is the sword Imbue Blade consumes. The
+  hover is the 14 Oct 2026 dataEnv 16 page: 17–33 damage, 10.87 DPS, +6
+  Shadow Resistance, Durability 80, requires level 21, and `Equip: Increases
+  damage and healing done by magical spells and effects by up to 28.` That
+  sentence is stored as spell power 28 and healing 28. Do not print two green
+  `+28 Spell Power` and `+28 Healing Done` lines. It is not mage-locked.
+  Dropped by Baron Silverlaine.
 - The log shows the imbued saber. Intellect, spell power, and healing stay
   the normal colors. Only the effect the scroll adds is grey (98 Fire vs
   Frozen). Do not print that effect a second time. Under it:
@@ -385,7 +392,7 @@ the client tip.
 | Item | Wowhead nether | Forever client (22 Sep 2026) |
 |------|----------------|------------------------------|
 | Coldflame Saber (276631) | 25–48 damage, 18.25 DPS, +7 Int, no spell power, rlvl stored as 24 | 17–32 damage, 12.2 DPS, +7 Int, +32 spell power and healing, 98 Fire vs Frozen, requires 21, Classes: Mage. **30 Sep 2026:** Wowhead now serves the same numbers and prints `Equip: Increases damage and healing done by magical spells and effects by up to 32.` The hover uses that sentence. The hand-written `+32 Spell Power` / `+32 Healing Done` lines were wrong and are gone. |
-| Blade of Silverlaine (273637) | 26–50 damage, 16.52 DPS, +6 Shadow Resistance, no spell power | 17–33 damage, 10.9 DPS, +6 Shadow Resistance, +28 spell power and healing, requires 21 |
+| Blade of Silverlaine (273637) | 26–50 damage, 16.52 DPS, +6 Shadow Resistance, no spell power | 17–33 damage, 10.87 DPS, +6 Shadow Resistance, Equip spell bonus 28, requires 21. **14 Oct 2026:** the hover is that Equip line. The hand-written `+28 Spell Power` / `+28 Healing Done` lines were wrong and are gone. |
 
 Coldflame is mage-only. After the client stats, it is the mage main hand from
 21 until the level-60 raid staves, and it leaves rogue, warrior, and paladin
@@ -1014,6 +1021,20 @@ Hunt-id probe (`pipeline/scripts/probe_forever_hunt_tooltips.py`) labels 200 vs 
 - **Wolfsbane (267369).** Horde Retribution main hand rank 1 from level **20 through 26** (score 124 vs Hammerbone 103 at 20). Pin in `client_item_overrides.json`: `rlvl` 20, `tipClasses` Paladin, Holystorm proc text. Source is Diplomatic Incident, Danitha Morr, Bandarion Keep, Tirisfal Glades (`sources.json` `gateLevel` 20). Tirisfal is a Horde zone, so Alliance never sees it. Warrior was re-scored after the class lock so Arms/Fury/Protection no longer list it. Paladin files: `Data.Paladin.generated.lua` and `Data.Paladin.Horde.1to9.generated.lua`.
 - **Memory.** Do not list class hunt files in `GearQuestForever.toc`, and do not put those class addons in `## OptionalDeps` (that loads every class before `Core.lua` sets `_G.GearQuest`, so each file errors and the hunt list stays empty). Each class is a load-on-demand addon `GearQuestForever_<CLASS>` (`scripts/stage-class-addons.py` copies the lua and writes `AuditTips.lua`). Login loads the player's class only. `Preview:SetClass` expands the simulated class. Your class and the class on screen keep their expanded rows. Switching to another sim class drops the previous one's expanded rows (`ReleaseIdleHuntClasses`). The addon stays in the memory list until `/reload` (WoW cannot unload it); pick arrays stay so switching back does not rerun the file. The main `foreverAudit` keeps `status` / `name` / `quality` for every item. The long Wowhead `tip` for a class item ships in that class's `AuditTips.lua` and is applied when the class loads, so hunt tooltips stay the Forever text. Curated Data.lua items that are not in a class file keep their tip on the main audit.
 
+**14 Oct 2026 index: 3,796** (10 Oct was 3,785). The listview armor column is base armor. Stored armor is base plus the green bonus, so a lower listview number is not a tooltip change. Live dataEnv 16 still matched Violet Sash, Gravewalker Boots, Desperate Barrier (1257), Feralheart Embrace, and Summit Guardian Polearm. Those rows were left as they were.
+
+Eleven ids were new to the index. Jewelcrafting Chisel (271965) and the paladin monster shield (286140) stay skipped. Blackthorne Maul (273830) is a quest objective, not a reward, and stays out. The other ten were inserted from the dataEnv 16 tooltip. Wowhead names no drop, quest, vendor, or recipe for them, so the source is unsourced and the hunt says the source is not listed yet. No coordinate was invented. `build_forever_new.py` stamped the uncached ids. New in Forever is 2,785.
+
+The ten, and where they lead:
+
+- **Firebird Leggings** (286569), cloth legs, requires 43. +14 intellect, +17 fire spell power. Rank 1 legs from 43 through 50 for Fire and Battle Mage (Fire), both factions. Rank 3 legs from 43 through 49 for Destruction.
+- **Stone Keeper Spire** (274432), staff, requires 44. 31.72 DPS, +19 stamina, +105 healing, +35 spell damage. Rank 1 main hand at 44 for Holy and Discipline, both factions. Rank 1 for Bear from 44 through 54, rank 2 at 55–59.
+- **Moonchaser's Headdress** (283545), leather head, requires 41. Rank 2–3 for Balance around 41–44.
+- **Abomination Chain** (274385), neck, requires 37. Rank 3 for Bear necks at 37–44.
+- **Well-Worn Pitchfork** (281661) requires 33. **Surveyor's Gloves** (281896) requires 39. **Cliffbreaker's Pauldrons** (284064) requires 47. **Feardred's Gauntlets** (284285) requires 49. **Crown of Maldazzar** (284065) requires 53. **High Priestess's Kilt** (286640) requires 54. They are on the rank list below the hunt's top three.
+
+The Desolace centaur weapons (271794–271805) were refreshed from the same tooltip. Required level is 35. Item level is 38 or 42, and damage and stats are lower than the previous row. **Centaur Spear** is 26.61 DPS, +9 strength, +11 stamina, from Test Your Theory. **Staff of Revelations** is +8 intellect, +11 spirit, +30 healing and spell damage, from Proof of Concept. **Desperate Barrier** stays 1257 armor. **Thrice-Damned Effigy** is the held item from Khan Jehn. Their quest names and pins were already stored.
+
 **28 Sep 2026 index: 3,693** (26 Sep was 3,678). Fifteen new listview ids. Ingest added the seven that had a nether tooltip: Needletooth's Needletooth (282703), Bloodstained Pants (282713), Denmother's Hide (283253), Arcane Charged Robes (284697), Still Water Band (284699), Wyvern Heart Band (285190), Winds of Tanaris (286556). Eight still 404 and are not in the pool: Wail of Death (281600), Fishscale Hauberk (281891), Unmovable Sabatons (284154), Eternally Frozen Band (284253), Budding Leaf Belt (284382), Faerie Dragon's Skin (284383), Ursol'lok's Paws (284573), Snapped Branch Wand (284574). All nine classes were re-scored. **Wyvern Heart Band** is rank 1 finger from 29 through 37 for Arms, Fury, Retribution, Combat, Subtlety, Survival, and Feral, and through 47 for Assassination. The other six did not take a top-3 slot.
 
 A full ingest rewrites sources.json for every id >= 200000. That cleared 162 zones, including Wolfsbane (Tirisfal / Diplomatic Incident became Old Fire-Eye) and dropped Kaleidoscope's hand-patched resist 5. After ingest, restore every source key that already existed and only add new ids. Keep Kaleidoscope resist 5. Client pins stay skipped. Do not rescore from the wiped sources.
@@ -1265,7 +1286,8 @@ One-Hand and Off Hand. An either-hand weapon does not sit under Main Hand.
 | Rogue (combat, assassination, subtlety) | Main Hand (tooltip Main Hand) | One-Hand and Off Hand |
 | Warrior Fury | Dual wield | Off Hand |
 | Paladin Retribution, Warrior Arms | Two-hand | Off Hand |
-| Paladin Protection and Holy, Warrior Protection, Shaman Elemental, Restoration, Enhancement Tank | Main Hand | Shield |
+| Paladin Protection, Warrior Protection, Shaman Enhancement Tank | Main Hand | Shield |
+| Paladin Holy and Shockadin, Shaman Elemental and Restoration | Two-hand and one-hand, both start on | Shield |
 
 Hunter ranged weapons are **Bow, Gun, and Crossbow** only. The slot title
 is **Ranged**, the same word a warrior sees, because the list is not only
@@ -1295,6 +1317,21 @@ Mastery Horde is **Concealed Hand Crossbow** (273829), **Dun Garok Rifle**
 
 Forever Enhancement has no dual wield. Do not label it Dual-wield.
 Rogues cannot wear two-hand. Hunters: the bow is its own slot.
+
+Holy and Shockadin keep two-hand swords, maces, axes, and polearms beside
+the shield. Elemental and Restoration keep staves and the other two-handers
+a shaman can equip. **Odo's Ley Staff** (6318) is Restoration rank 2 at
+21–23, behind Staff of the Friar, and it stays on that list through 29.
+The two-hand slice reserves staves so a mace does not crowd the staff out.
+Enhancement stays two-hand only. Shamans cannot dual wield.
+
+Rogues include one-hand axes. Assassination and Subtlety stay dagger-locked
+in the main hand (`mainHandKinds` is Dagger: Backstab, Ambush, and Mutilate).
+Combat uses the axe. **Axe of the Deep Woods** (811) is a main-hand axe and
+rank 1 for Horde Combat at 52–59. The first view follows the spec: two-hand
+for a hunter, a feral druid, an arms warrior, a retribution paladin, or
+enhancement; one-hand for a rogue, a fury warrior, or a shield spec. Holy,
+Shockadin, Elemental, and Restoration start with both styles on.
 
 **Source filter.** `EntrySourceAllowed` used to return `not hidden[src]`.
 A source type with no checkbox is never in `hidden`, so it showed on every
@@ -1372,8 +1409,9 @@ Steady Shot, shaman no dual wield. Level 60 is scored from the model
 Forever ones.
 
 `check_roles.py` enforces the role split: casters carry no str/ap/rap;
-physical specs carry no sp/heal except Ret, Enhance, Enhancement Tank, and
-Paladin Protection. Warrior Protection is physical (no SP/heal).
+physical specs carry no sp/heal except Ret, Enhance, Enhancement Tank,
+Paladin Protection, and Shockadin. Warrior Protection is physical (no SP/heal).
+Shockadin is spell Retribution: spell power and holy spell power, healing 0.
 
 ### Wand damage
 
@@ -1402,12 +1440,12 @@ above crit on all three.
 ### Holy paladin
 
 Holy levels in melee, then wears mail and, from 40, plate. The scored row
-in `weights.json` is what the tooltip and the hunt use. Below 60 the
+in `weights.json` is what the tooltip and the hunt use. Through 60 the
 leveling multipliers still apply (stamina, health, and health per 5 ×3,
 armor ×2, intellect, spirit, mana per 5, and mana ×2). The tooltip prints
 two decimals, so a product of 0.008 shows as 0.01.
 
-| Stat | Raw weight | Shown below 60 |
+| Stat | Raw weight | Shown through 60 |
 |---|---|---|
 | Healing | 1.3 | 1.3 |
 | Spell power | 1.35 | 1.35 |
@@ -1431,11 +1469,56 @@ healing pays for the missing armor. Blacksmithing healing mail and plate
 (Acolyte's, Prefect's, and the later plate sets) outrank tailoring cloth
 of the same band.
 
-Protection paladin armor is **0.05**, shown as **0.1** below 60. Its
+Protection paladin armor is **0.2**, shown as **0.4** through 60. Its
 `armorClass` is plate 1.0, mail 0.55, leather 0.35, cloth 0.18. The ×2
 line on the spec tooltip is the leveling armor stat. It is not an armor
-budget, and it is not why cloth loses. Generic spell power is **0.8**.
-`spHoly` is **0.05**. Do not copy Holy's equality rule onto Protection.
+budget, and it is not why cloth loses. Generic spell power is **0.9**.
+`spHoly` is **0.05**. Mana per 5 is **0.2** (shown **0.4**). Ranged attack
+power is **0** on every paladin spec, including levels 1–9. Do not copy
+Holy's equality rule onto Protection.
+
+### Shockadin
+
+Shockadin is a fourth paladin spec in the log menu. It is not a talent tab.
+`SPEC_BY_TAB` stays holy, protection, retribution, and the default spec stays
+retribution. The label is **Shockadin**. Aliases are `shockadin` and `shock`.
+It is spell Retribution: you swing, and the spell is what you are hunting.
+It is not a healer. `HEALER_SPECS` does not include it.
+
+The order is spell power, then holy spell power, then intellect, then crit.
+The raw row keeps that order after the endurance multiplier:
+
+| Stat | Raw weight | Shown through 60 |
+|---|---|---|
+| Spell power | 1.0 | 1.0 |
+| Holy spell power | 0.85 | 0.85 |
+| Intellect | 0.4 | 0.8 |
+| Crit | 0.55 | 0.55 |
+| Hit | 0.4 | 0.4 |
+| Haste | 0.3 | 0.3 |
+| Strength | 0.2 | 0.2 |
+| Stamina | 0.15 | 0.45 |
+| Attack power | 0.1 | 0.1 |
+| Spirit | 0.1 | 0.2 |
+| Mana per 5 | 0.2 | 0.4 |
+| Mana | 0.03 | 0.06 |
+| Armor | 0.004 | 0.01 |
+| Healing | 0 | 0 |
+
+Weapon `dpsWeight` is **0.4**, so a swing still counts and a spell-power
+weapon stays ahead. Healing and `sp_from_heal` stay **0**. The damage half
+of an Equip line still folds into spell power. Do not copy Holy's
+`spHoly` equals healing rule onto this row. Holy `spHoly` stays **1.8**.
+`armorClass` matches Holy: plate 1.0, mail 0.96, leather 0.82, cloth 0.62.
+Do not flatten the cloth penalty.
+
+`weaponStyle` is `onehand_shield`. Both weapon styles start checked, the
+same as Holy, Elemental, and Restoration. Two-hand swords, maces, axes, and
+polearms stay beside the shield. Paladins do not dual wield. The off-hand
+slot stays the shield. Relics that count are Holy Shock, Exorcism, Holy
+Wrath, Consecration, Seal, Judgement, and Holy Strike. Shockadin is not in
+`ROTMENDER_SPECS`. The Paladin sheet column is the raw row. A suggestion
+there does not change the addon until it is copied into `weights.json`.
 
 ### Hunt instructions
 

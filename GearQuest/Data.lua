@@ -10918,7 +10918,7 @@ function GQ.Data:GetWeaponRouteForBand()
 end
 
 local SHIELD_SPECS = {
-    PALADIN = { protection = true, holy = true },
+    PALADIN = { protection = true, holy = true, shockadin = true },
     WARRIOR = { protection = true },
     SHAMAN = { elemental = true, restoration = true, enhancement_tank = true },
 }
@@ -10957,7 +10957,14 @@ end
 function GQ.Data:UsesBothWeaponStyles()
     local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
     local spec = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec()
-    return classFile == "SHAMAN" and spec == "elemental"
+    -- A staff or other two-hander and a one-hander are both worn.
+    if classFile == "SHAMAN" and (spec == "elemental" or spec == "restoration") then
+        return true
+    end
+    if classFile == "PALADIN" and (spec == "holy" or spec == "shockadin") then
+        return true
+    end
+    return false
 end
 
 function GQ.Data:EntryIsMainHandOnly(entry)

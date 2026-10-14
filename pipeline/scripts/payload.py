@@ -415,7 +415,7 @@ GQ.Data = GQ.Data or {}
 -- instruction text per row would multiply the file size by roughly 6x.
 --
 -- <class>Picks row = { itemId, slot, minLevel, maxLevel, rank, spec, faction, score }
---   spec     is always one of "retribution" / "protection" / "holy"
+--   spec     is always one of "retribution" / "protection" / "holy" / "shockadin"
 --   faction  is "Alliance" or "Horde"
 --   optional: suffix, suffixChance, suffixRange  (random-enchantment items --
 --             `score` is the JACKPOT roll (top of the suffix range). suffixChance

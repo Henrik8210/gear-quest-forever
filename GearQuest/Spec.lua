@@ -28,6 +28,7 @@ GQ.Spec.CLASS_SPECS = {
         { id = "retribution", label = "Retribution", icon = "Interface\\Icons\\Spell_Holy_AuraOfLight", default = true },
         { id = "holy", label = "Holy", icon = "Interface\\Icons\\Spell_Holy_HolyBolt" },
         { id = "protection", label = "Protection", icon = "Interface\\Icons\\Spell_Holy_DevotionAura" },
+        { id = "shockadin", label = "Shockadin", icon = "Interface\\Icons\\Spell_Holy_HolySmite" },
     },
     HUNTER = {
         { id = "beast_mastery", label = "Beast Mastery", icon = "Interface\\Icons\\Ability_Hunter_BeastTaming", default = true },
@@ -78,6 +79,8 @@ local SPEC_ALIASES = {
     holy = "holy",
     prot = "protection",
     protection = "protection",
+    shockadin = "shockadin",
+    shock = "shockadin",
     -- Warrior
     arms = "arms",
     fury = "fury",

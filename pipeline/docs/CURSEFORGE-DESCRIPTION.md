@@ -145,7 +145,7 @@ A ding builds the new list one slot at a time, with a spare frame between slots,
 Update to **v0.5.3-beta** or newer and `/reload`. The window title shows the version. That version stopped the bag hover from loading every other piece in the slot. If it still happens, comment the item name and the version in the title.
 
 **Why does Main Hand show a two-hander?**
-The headers are the weapons that spec uses. Enhancement is **Two-hand** only. A hunter gets **Two-hand**, then **Main hand** for weapons that can only go in the main hand, then **Off Hand** for weapons that can go in either hand. A rogue's **Main Hand** is weapons the tooltip calls Main Hand. There is no "swords only" box yet.
+Weapons is one header. The arrow before the (i) is the filter. Two-hand and one-hand can both be on, and under each are the weapon types in this level band. Enhancement is two-hand only. Holy, Shockadin, Elemental, and Restoration start with both on, so a staff or another two-hander sits beside the one-hander. The shield stays its own slot. Hunters can dual wield. Shamans cannot. Rogues hunt one-hand axes. Assassination and Subtlety stay on daggers in the main hand. Combat uses the axe. Rank numbers stay the real ones when a type is hidden.
 
 *Screenshot 11 — a hunter's weapon headers, if you have the room.*
 
@@ -158,6 +158,9 @@ Not in the addon. Suggest the spec, the stat, and the weight you want on the [st
 **Holy paladin keeps suggesting cloth.**
 Holy levels in mail and plate. Cloth is scored lower on purpose, so a tailoring robe does not beat blacksmithing healing mail of the same band. Hover the spec to see it. If one piece is still wrong, name it, your level, and your faction.
 
+**What is Shockadin?**
+A fourth paladin spec in the spec menu, added in v0.5.6-beta. It is not a talent tree. You still start on Retribution. Shockadin hunts spell damage, then holy spell damage, then intellect, then crit. Healing is not scored. Both weapon styles start on, and the off hand stays a shield. Hover the spec to see the weights.
+
 **Enhancement is using agility over strength.**
 That is the current weight. Agility is priced a little above strength. Suggest the change on the sheet if you want strength first.
 
@@ -166,6 +169,9 @@ A warlock does not hunt healing. A line that says both healing and damage is sco
 
 **I am Horde and I see an Alliance reward.**
 You only see rewards your faction can get. Defender of Dalaran is Alliance. A Tauren sees the Horde Heart of Disruption rewards, including Striking Staff. If the other faction's piece is still on your list, name it and your race.
+
+**The tooltip says Not ranked for your faction.**
+That line is for a piece the faction you are viewing cannot get. If the Simulator is on Alliance, a Horde-only quest reward says that while you preview Alliance. The log header names the faction on screen. Turn simulation off to score the character you are playing.
 
 **The toast named a suffix I did not loot.**
 The hunt is the best suffix that green can roll. Shimmering Gloves of Arcane Wrath is not Shimmering Gloves of Healing. The tooltip says how rare the jackpot roll is.
@@ -234,6 +240,7 @@ The gallery on the CurseForge page can be the same set, in this order. The descr
 - CurseForge project **1698950**. Never use TBC `1669225`.
 - File names are `vX.Y.Z-beta` on the beta channel.
 - Do not put the notable shelf back in this text. It is gone.
-- Do not promise an in-game weight editor or a "swords only" filter. Neither exists. The sheet is the suggestion box.
+- Do not promise an in-game weight editor. The sheet is the suggestion box. Weapons already filters by two-hand, one-hand, and weapon type.
+- Shockadin is the fourth paladin spec. Do not retune Holy, Protection, or Retribution to match it.
 - Enhancement agility above strength, and Holy cloth below mail and plate, are the current weights. Do not "correct" them in the FAQ.
 - Keep this file in sync when a player-facing behavior changes.

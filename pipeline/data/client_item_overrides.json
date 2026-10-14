@@ -1,6 +1,6 @@
 {
   "273637": {
-    "source": "Forever client tooltip, confirmed 2026-09-22. Wowhead nether tip overstates white damage and omits spell power.",
+    "source": "Forever dataEnv 16 page, 14 Oct 2026. Stats stay pinned: 17-33 damage, 10.9 DPS, +6 Shadow Resistance, Equip spell bonus 28, requires level 21. The hover is that Equip line, not two green +Spell Power and +Healing Done lines.",
     "rlvl": 21,
     "dps": 10.9,
     "speed": 2.3,
@@ -14,10 +14,10 @@
     "tipClasses": [],
     "procs": [],
     "effects": [],
-    "tip": "Item Level 26\nBinds when picked up\nMain Hand Sword\n17 - 33 Damage Speed 2.30\n(10.9 damage per second)\n+6 Shadow Resistance\n+28 Spell Power\n+28 Healing Done\nRequires Level 21\nSell Price: 37 72"
+    "tip": "Item Level 26\nBinds when picked up\nMain Hand\nSword\n17 - 33 Damage\nSpeed 2.30\n(10.87 damage per second)\n+6 Shadow Resistance\nDurability 80 / 80\nRequires Level 21\nEquip: Increases damage and healing done by magical spells and effects by up to 28.\nSell Price: 37 72\nDropped by: Baron Silverlaine\nDrop Chance: 1.50%"
   },
   "276631": {
-    "source": "Forever client tooltip, confirmed 2026-09-22. Wowhead nether tip overstates white damage, drops +32 spell power, and the stored rlvl was 24. Client requires level 21. Classes: Mage.",
+    "source": "Forever dataEnv 16 page, 14 Oct 2026. Stats stay pinned: 17-32 damage, 12.2 DPS, +7 Intellect, Equip spell bonus 32, requires level 21, Classes: Mage. The hover says 98 additional Fire damage against Frozen targets.",
     "rlvl": 21,
     "dps": 12.2,
     "speed": 2.0,
@@ -28,7 +28,9 @@
       "sp": 32,
       "heal": 32
     },
-    "tipClasses": ["Mage"],
+    "tipClasses": [
+      "Mage"
+    ],
     "procs": [
       "Equip: Melee attacks deal 98 Fire additional damage against Frozen targets."
     ],
@@ -37,18 +39,38 @@
     ],
     "imbueScroll": "Imbue Blade",
     "imbueBase": "Blade of Silverlaine",
-    "tip": "Item Level 29\nBinds when picked up\nMain Hand Sword\n17 - 32 Damage Speed 2.00\n(12.2 damage per second)\n+7 Intellect\nClasses: Mage\nRequires Level 21\nEquip: Increases damage and healing done by magical spells and effects by up to 32.\nEquip: Melee attacks deal 98 Fire additional damage against Frozen targets.\nSell Price: 47 16"
+    "tip": "Item Level 29\nBinds when picked up\nMain Hand\nSword\n17 - 32 Damage\nSpeed 2.00\n(12.25 damage per second)\n+7 Intellect\nDurability 90 / 90\nClasses: Mage\nRequires Level 21\nEquip: Increases damage and healing done by magical spells and effects by up to 32.\nEquip: Melee attacks deal 98 additional Fire damage against Frozen targets.\nSell Price: 47 16"
   },
-  "252445": {"source": "Forever client, 2026-09-23. Camp leather pants require level 25. Wowhead nether tip says 20.", "rlvl": 25},
-  "252446": {"source": "Forever client, 2026-09-23. Camp leather pants require level 25. Wowhead nether tip says 20.", "rlvl": 25},
-  "252500": {"source": "Forever client, 2026-09-23. Camp leather pants require level 25. Wowhead nether tip says 20.", "rlvl": 25},
-  "252501": {"source": "Forever client, 2026-09-23. Camp leather pants require level 25. Wowhead nether tip says 20.", "rlvl": 25},
-  "252502": {"source": "Forever client, 2026-09-23. Camp leather pants require level 25. Wowhead nether tip says 20.", "rlvl": 25},
-  "252503": {"source": "Forever client, 2026-09-23. Camp leather pants require level 25. Wowhead nether tip says 20.", "rlvl": 25},
+  "252445": {
+    "source": "Forever client, 2026-09-23. Camp leather pants require level 25. Wowhead nether tip says 20.",
+    "rlvl": 25
+  },
+  "252446": {
+    "source": "Forever client, 2026-09-23. Camp leather pants require level 25. Wowhead nether tip says 20.",
+    "rlvl": 25
+  },
+  "252500": {
+    "source": "Forever client, 2026-09-23. Camp leather pants require level 25. Wowhead nether tip says 20.",
+    "rlvl": 25
+  },
+  "252501": {
+    "source": "Forever client, 2026-09-23. Camp leather pants require level 25. Wowhead nether tip says 20.",
+    "rlvl": 25
+  },
+  "252502": {
+    "source": "Forever client, 2026-09-23. Camp leather pants require level 25. Wowhead nether tip says 20.",
+    "rlvl": 25
+  },
+  "252503": {
+    "source": "Forever client, 2026-09-23. Camp leather pants require level 25. Wowhead nether tip says 20.",
+    "rlvl": 25
+  },
   "267369": {
     "source": "Forever, 28 Sep 2026. Wolfsbane is the Horde paladin reward from the Diplomatic Incident chain (Danitha Morr, Bandarion Keep, Tirisfal). The quest is available at 18 and can be completed at 20. Wowhead stores no Requires Level and the pipeline had inferred 26 from item level 31. Tooltip: Classes: Paladin. Two-hand sword, 25.59 dps, +9 stamina, +10 intellect.",
     "rlvl": 20,
-    "tipClasses": ["Paladin"],
+    "tipClasses": [
+      "Paladin"
+    ],
     "procs": [
       "Chance on hit: Sear the target with a vortex of blazing wind, dealing 39 to 59 Holystorm damage. Deals 3 times as much damage to Wolves and Worgen."
     ],
