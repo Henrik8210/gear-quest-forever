@@ -1008,6 +1008,10 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
     # damage mattered as much as its axe's. A ranged weapon is a stat stick for every
     # class but the hunter, so a class that really fights with it must say so.
     dpsWRanged=cfg.get("dpsWeightRanged", 0.0)
+    # Points per swing per second. Seal specs want a faster weapon because
+    # the seal lands on each hit. DPS already pays for damage per second, so
+    # this is only the extra swings. Zero for every spec that does not set it.
+    speedW=cfg.get("speedWeight", 0.0)
     mhKinds=set(cfg["mainHandKinds"]) if cfg.get("mainHandKinds") else None
     prof=ARMOR_PROF[cls]; wsubs=set(W[cls]["_weaponSubclasses"])
     notable={}; full60={}; source_alts={}
@@ -1124,6 +1128,9 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     # error inflated every off-hand-only weapon for fury warriors.
                     if sl=="SecondaryHand": dw*=0.5
                     if dw: s+= it["dps"]*dw
+                    spd = it.get("speed") or 0
+                    if speedW and sl not in ("Ranged", "SecondaryHand") and spd > 0:
+                        s += speedW * spd
                 # Proc value, in the same points currency. See procs.py for the
                 # channels (damage -> dps -> dpsWeight, stat buff -> stat x uptime,
                 # mitigation -> effective hp -> stamina weight) and for every

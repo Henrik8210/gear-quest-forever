@@ -5,8 +5,8 @@ GQ.Minimap = GQ.Minimap or {}
 local MINIMAP_TEXTURE = "Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Art\\GearQuest-Icon"
 local MINIMAP_ICON_SIZE = 20
 local BUTTON_SIZE = 31
--- Sit on the circular rim. Hardcoded 80px sat outside Forever's minimap border.
-local MINIMAP_BORDER_INSET = 2
+-- Center sits on the rim, the same offset Questie uses (half the minimap, plus 5).
+local MINIMAP_BORDER_OUTSET = 5
 
 local function GetRadius()
     if not Minimap then
@@ -14,7 +14,7 @@ local function GetRadius()
     end
     local w = Minimap:GetWidth() or 140
     local h = Minimap:GetHeight() or w
-    return (math.min(w, h) / 2) - MINIMAP_BORDER_INSET
+    return (math.min(w, h) / 2) + MINIMAP_BORDER_OUTSET
 end
 
 local function ApplyMinimapIcon(icon)

@@ -384,6 +384,10 @@ function GQ.Equip:EntryArmorSubclass(entry)
         return fromClient
     end
     local name = entry.name
+    if (not name or name == "") and entry.itemId and GQ.Data and GQ.Data.GetItemFact then
+        local fact = GQ.Data:GetItemFact(entry.itemId)
+        name = fact and fact.name
+    end
     if (not name or name == "") and GQ.Data and GQ.Data.GetItemDisplayName and entry.itemId then
         name = GQ.Data:GetItemDisplayName(entry.itemId)
     end

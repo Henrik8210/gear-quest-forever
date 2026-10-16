@@ -247,8 +247,6 @@ local function Expand(src, data, out)
                 classes      = classes,
                 specs        = spec and src.specs and src.specs[spec] or nil,
                 factions     = faction and FACTION[faction] or nil,
-                name         = f.name,
-                quality      = f.quality,
                 sourceType   = f.sourceType,
                 instructions = f.instructions,
                 setPiece     = f.setPiece,
@@ -342,6 +340,9 @@ function GQ.Data:EnsureClassLoaded(classFile)
         return false
     end
 
+    self._entryGeneration = (self._entryGeneration or 0) + 1
+    self._classEntrySpan = self._classEntrySpan or {}
+    self._classEntrySpan[classFile] = { start + 1, #self.entries }
     self:BuildSuffixLookup(classFile)
     for i = start + 1, #self.entries do
         self:EnrichEntrySuffix(self.entries[i])
@@ -370,6 +371,9 @@ function GQ.Data:ReleaseExpandedClass(classFile)
     end
     self.entries = kept
     self._expandedClasses[classFile] = nil
+    -- Dropping rows shifts every later index. A lookup walk must start over.
+    self._entryGeneration = (self._entryGeneration or 0) + 1
+    self._classEntrySpan = nil
     return true
 end
 

@@ -6029,6 +6029,78 @@ function GQ.Data:SanitizeText(text)
     text = text:gsub("\146", "'")
     text = text:gsub("\151", "-")
     text = text:gsub("\150", "-")
+    -- Wowhead quest text keeps HTML entities. &nbsp; is a space, and
+    -- &lt;name&gt; is the character. Decode those before the parchment draws.
+    local named = {
+        nbsp = " ", ensp = " ", emsp = " ",
+        amp = "&", lt = "<", gt = ">",
+        quot = '"', apos = "'",
+    }
+    local function decodeChar(n)
+        if n == 160 or n == 32 then
+            return " "
+        end
+        if n >= 32 and n < 127 then
+            return string.char(n)
+        end
+        return " "
+    end
+    for _ = 1, 2 do
+        local decoded = text:gsub("&(%a+);", function(name)
+            return named[name:lower()]
+        end)
+        decoded = decoded:gsub("&#(%d+);", function(num)
+            return decodeChar(tonumber(num) or -1)
+        end)
+        decoded = decoded:gsub("&#[xX](%x+);", function(hex)
+            return decodeChar(tonumber(hex, 16) or -1)
+        end)
+        if decoded == text then
+            break
+        end
+        text = decoded
+    end
+    local function playerBit(token)
+        token = token:lower()
+        if token == "name" then
+            local name = UnitName and UnitName("player")
+            if type(name) == "string" and name ~= "" and not (issecretvalue and issecretvalue(name)) then
+                return name
+            end
+            return "you"
+        end
+        if token == "class" then
+            local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+            local localized = classFile and LOCALIZED_CLASS_NAMES_MALE and LOCALIZED_CLASS_NAMES_MALE[classFile]
+            if type(localized) == "string" and localized ~= "" then
+                return localized
+            end
+            local unitClass = UnitClass and UnitClass("player")
+            if type(unitClass) == "string" and unitClass ~= "" then
+                return unitClass
+            end
+            return "adventurer"
+        end
+        if token == "race" then
+            local race = UnitRace and UnitRace("player")
+            if type(race) == "string" and race ~= "" then
+                return race
+            end
+            return "adventurer"
+        end
+    end
+    text = text:gsub("<(%a+)>", playerBit)
+    -- <sir/madam> and the same shape. 2 is male, 3 is female.
+    text = text:gsub("<([^<>]-)/([^<>]-)>", function(left, right)
+        local sex = UnitSex and UnitSex("player")
+        if sex == 3 then
+            return right
+        end
+        return left
+    end)
+    -- <Lieutenant Haggerdin salutes.> is an action, not a tag.
+    text = text:gsub("<([^<>]+)>", " %1 ")
+    text = text:gsub("([!?])(%u)", "%1 %2")
     -- FFFD/em-dash pairs became quote-space-quote after a bad decode.
     text = text:gsub("' '", " - ")
     text = text:gsub('" "', " - ")
@@ -7256,6 +7328,99 @@ function GQ.Data:VendorBoughtLine(entry)
     return nil
 end
 
+function GQ.Data:HuntIconCount(count, texture)
+    return tostring(count) .. "|T" .. texture .. ":0:0:2:0|t"
+end
+
+-- The number sits beside the same coin used in the money frame. Zero
+-- denominations are left out, the same way the game writes a price.
+function GQ.Data:CoinIcons(copper)
+    copper = math.floor(tonumber(copper) or 0)
+    if copper <= 0 then
+        return nil
+    end
+    if GetCoinTextureString then
+        local text = GetCoinTextureString(copper)
+        if type(text) == "string" and text ~= "" then
+            return (text:gsub("^%s+", ""):gsub("%s+$", ""))
+        end
+    end
+    local gold = math.floor(copper / 10000)
+    local silver = math.floor((copper % 10000) / 100)
+    local rest = copper % 100
+    local parts = {}
+    if gold > 0 then
+        parts[#parts + 1] = self:HuntIconCount(gold, "Interface\\MoneyFrame\\UI-GoldIcon")
+    end
+    if silver > 0 then
+        parts[#parts + 1] = self:HuntIconCount(silver, "Interface\\MoneyFrame\\UI-SilverIcon")
+    end
+    if rest > 0 or #parts == 0 then
+        parts[#parts + 1] = self:HuntIconCount(rest, "Interface\\MoneyFrame\\UI-CopperIcon")
+    end
+    return table.concat(parts, " ")
+end
+
+function GQ.Data:StripGenericVendorCost(text)
+    if type(text) ~= "string" or text == "" then
+        return text
+    end
+    local cleaned = text
+    cleaned = cleaned:gsub("%s*Costs Honor Points and tokens %(Marks of Honor%)%.?", "")
+    cleaned = cleaned:gsub("%s*%-?%s*[Cc]osts tokens or reputation%.?", "")
+    cleaned = cleaned:gsub("%s%s+", " ")
+    cleaned = cleaned:gsub("%s+%.", ".")
+    cleaned = cleaned:gsub("^%s+", ""):gsub("%s+$", "")
+    if cleaned == "" then
+        return nil
+    end
+    return cleaned
+end
+
+-- copper is the in-game money price. honor is honor points. tokens are
+-- {count, icon} pairs, icon without the Interface\\Icons\\ prefix.
+function GQ.Data:VendorCostLine(entry)
+    local row = self.vendorCost and entry and entry.itemId and self.vendorCost[entry.itemId]
+    if type(row) ~= "table" then
+        return nil
+    end
+    local parts = {}
+    local coins = self:CoinIcons(row.copper)
+    if coins then
+        parts[#parts + 1] = coins
+    end
+    local honor = tonumber(row.honor)
+    if honor and honor > 0 then
+        local faction = GQ.GetEffectiveFaction and GQ:GetEffectiveFaction()
+        local texture = faction == "Horde"
+            and "Interface\\PVPFrame\\PVP-Currency-Horde"
+            or "Interface\\PVPFrame\\PVP-Currency-Alliance"
+        parts[#parts + 1] = self:HuntIconCount(math.floor(honor), texture)
+    end
+    if type(row.tokens) == "table" then
+        for i = 1, #row.tokens do
+            local token = row.tokens[i]
+            local count = token and tonumber(token[1])
+            local icon = token and token[2]
+            if count and count > 0 and type(icon) == "string" and icon ~= "" then
+                parts[#parts + 1] = self:HuntIconCount(math.floor(count), "Interface\\Icons\\" .. icon)
+            end
+        end
+    end
+    if #parts == 0 then
+        return nil
+    end
+    return "Costs " .. table.concat(parts, " ") .. "."
+end
+
+function GQ.Data:QuestChainLines(entry)
+    local steps = self.questChain and entry and entry.itemId and self.questChain[entry.itemId]
+    if type(steps) ~= "number" or steps < 2 then
+        return nil, nil
+    end
+    return "Part of a quest chain.", string.format("%d quests until you get this.", math.floor(steps))
+end
+
 function GQ.Data:VisibleCoordinateSpots(itemId)
     local row = self.coordinates and itemId and self.coordinates[itemId]
     if not row or not row.spots or #row.spots == 0 then
@@ -7662,7 +7827,12 @@ function GQ.Data:EntryMatchesPlayerClass(entry)
         return itemCache[classFile]
     end
     local audit = self:GetForeverAudit(entry.itemId)
-    local family = self:SetFamilyClass((audit and audit.name) or entry.name)
+    local named = audit and audit.name
+    if named == nil and entry.itemId then
+        local fact = self:GetItemFact(entry.itemId)
+        named = (fact and fact.name) or entry.name
+    end
+    local family = self:SetFamilyClass(named)
     local required = family and { family } or self:TipRequiredClasses(audit and audit.tip)
     local ok = true
     if required then

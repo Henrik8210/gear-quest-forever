@@ -151,6 +151,7 @@
    "primary": "sta",
    "weaponStyle": "onehand_shield",
    "dpsWeight": 0.5,
+   "speedWeight": -2,
    "weights": {
     "sta": 1.0,
     "str": 0.3,
@@ -263,6 +264,7 @@
    "primary": "sp",
    "weaponStyle": "onehand_shield",
    "dpsWeight": 0.4,
+   "speedWeight": -2,
    "weights": {
     "sp": 1.0,
     "spHoly": 0.85,
@@ -2017,7 +2019,7 @@
    },
    "weights": {
     "str": 0.0,
-    "agi": 0.0,
+    "agi": 0.008,
     "ap": 0.0,
     "rap": 0.0,
     "feralAp": 0.0,
@@ -2069,7 +2071,7 @@
    },
    "weights": {
     "str": 0.0,
-    "agi": 0.0,
+    "agi": 0.008,
     "ap": 0.0,
     "rap": 0.0,
     "feralAp": 0.0,
@@ -2121,7 +2123,7 @@
    },
    "weights": {
     "str": 0.0,
-    "agi": 0.0,
+    "agi": 0.008,
     "ap": 0.0,
     "rap": 0.0,
     "feralAp": 0.0,
@@ -2173,7 +2175,7 @@
    },
    "weights": {
     "str": 0.0,
-    "agi": 0.0,
+    "agi": 0.008,
     "ap": 0.0,
     "rap": 0.0,
     "feralAp": 0.0,
@@ -2225,7 +2227,7 @@
    },
    "weights": {
     "str": 0.0,
-    "agi": 0.0,
+    "agi": 0.008,
     "ap": 0.0,
     "rap": 0.0,
     "feralAp": 0.0,
@@ -2277,7 +2279,7 @@
    },
    "weights": {
     "str": 0.0,
-    "agi": 0.0,
+    "agi": 0.008,
     "ap": 0.0,
     "rap": 0.0,
     "feralAp": 0.0,
@@ -2329,7 +2331,7 @@
    },
    "weights": {
     "str": 0.0,
-    "agi": 0.0,
+    "agi": 0.012,
     "ap": 0.0,
     "rap": 0.0,
     "feralAp": 0.0,

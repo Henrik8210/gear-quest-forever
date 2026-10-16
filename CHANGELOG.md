@@ -2,45 +2,53 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v0.5.6-beta
+## v0.5.7-beta
 
-Paladins have a fourth spec, **Shockadin**. Holy, Shockadin, Elemental, and Restoration hunt a two-hander and a one-hander together. Rogues can hunt one-hand axes. Ten new Forever pieces are on the lists, and the Desolace centaur weapons now require 35. The window title reads **GearQuest Forever v0.5.6-beta**.
+The log has a **Lookup** tab. Quest text reads as a person wrote it. A piece you already have leaves the hunt list on that character only. Protection and Shockadin prefer a faster weapon. **Manageable Dungeons** replaces Don't look back. Hovers match the current Wowhead Forever page. The window title reads **GearQuest Forever v0.5.7-beta**.
 
-### Shockadin
+### Lookup
 
-The paladin spec menu has **Shockadin** beside Holy, Protection, and Retribution. It is not a talent tree. A new paladin still starts on Retribution. `/gq spec shockadin` and `/gq spec shock` both select it.
+A handle on the left of the log says **Lookup**. It searches the database for the class you are viewing. Open the Simulator to switch that class. Type part of a name and press Search.
 
-Shockadin swings and hunts spell damage. Hover the spec name. Spell power is **1**, holy spell power **0.85**, intellect **0.8**, and crit **0.55**. Healing is **0**, so a healing robe is not the hunt. Strength is **0.2** and weapon damage is **0.4**, so the swing still counts and a spell-power weapon stays ahead. Stamina shows as **0.45**. Armor shows as **0.01**. Cloth sits under mail and plate, the same curve as Holy.
+While the list is building, the portrait turns grey and spins, and the line says **Searching for matching items**.
 
-Weapons starts with two-hand and one-hand both checked. Two-hand swords, maces, axes, and polearms sit beside the one-hander. The off-hand slot stays the shield. Paladins do not dual wield.
+Click a result and the parchment is that item. The row's rank line says the spec, the rank, the levels, and the faction. **Thunderbrew's Boot Flask** is Alliance, from Sweet Amber in Westfall, and it requires 40. The parchment says **Part of a quest chain.** and **5 quests until you get this.** A quest that is not part of a chain does not get those lines.
 
-The community weight sheet has a Shockadin column on the Paladin tab. A suggestion there does not change the hunts until it is accepted.
+Leaving Lookup puts the parchment back on the hunt you had open. It does not change your hunts or the Simulator.
 
-### Two-handers for Holy, Elemental, and Restoration
+### Quest text
 
-Holy opens with two-hand and one-hand both on. A two-hand sword, mace, axe, or polearm is on the list beside the one-hander. The shield stays on the off-hand slot.
+**Wildhunter Cloak**, the reward from The Hunt Completed, used to print the code from the quest page. It now uses your character's name, a real space, and a space after **commended!** The same cleanup is on every description, the lore, and the tracker. A class token uses your class. A race token uses your race. Sir or madam follows your character.
 
-Elemental and Restoration do the same. Staves are on the list, including **Odo's Ley Staff**. For Restoration it is rank 2 from 21 through 23, behind **Staff of the Friar**, and it stays through 29. Enhancement is still two-hand only. Shamans still cannot dual wield. The shield stays on the off-hand slot for Elemental, Restoration, and Enhancement Tank.
+### This character only
 
-### Rogue axes
+If you already have a hunt, it leaves **Active** on that character and sits on **Completed**. Another character still sees it. **Hammerbone** on a druid does not hide **Hammerbone** on a level 16 paladin. The weapon (i) list was already that character's ranks. The hunt rows follow the same rule.
 
-Rogues can hunt one-hand axes. Assassination and Subtlety stay dagger-locked in the main hand. Combat uses the axe. **Axe of the Deep Woods** is rank 1 for Horde Combat from 52 through 59. It is a main-hand axe, so it stays off the off-hand list.
+### Protection and Shockadin
 
-### Blade of Silverlaine and Coldflame Saber
+Hover Protection or Shockadin. The spec tooltip has **Weapon speed** at **-2**. A faster weapon loses less when the other stats are close, because the seal lands on each hit. A 2 second weapon loses 4 points and a 3 second weapon loses 6, on top of the weapon damage. Holy and Retribution do not use that row. Protection and Shockadin were scored again. Holy and Retribution were not.
 
-The hover matches the Forever page. One Equip line states the spell bonus. **Coldflame Saber** is 17–32 damage, 12.25 DPS, +7 intellect, and +32 damage and healing. It requires 21 and is mage only. Melee attacks deal 98 additional Fire damage against Frozen targets. **Blade of Silverlaine** is 17–33 damage, 10.87 DPS, +6 shadow resistance, and +28 damage and healing. It requires 21. Baron Silverlaine drops it.
+### Play style
 
-### New Forever gear
+**Don't look back** is gone. **Manageable Dungeons** is the card in its place. It hides a boss drop, and dungeon and raid trash, until the level you are viewing is 4 under that item's level. An item of level 49 can show from 45. The wait stops at 60. Quests, vendors, crafts, and world drops stay. If Don't look back was on, it is off. Turn Manageable Dungeons on yourself.
 
-The 14 October Forever list added ten pieces. Wowhead does not name a drop, a quest, a vendor, or a recipe, so the hunt says the source is not listed yet and there is no map pin.
+**Get it now** still waits on reputation, and on a bind-on-pickup craft until you can make it. A bind-on-equip craft stays, because you can buy it. **Darksoul Breastplate** stays. **Flying Tiger Goggles** still wait, because the goggles themselves require Engineering to wear.
 
-**Firebird Leggings** require 43. They are rank 1 legs from 43 through 50 for Fire and Battle Mage (Fire), both factions, and rank 3 legs from 43 through 49 for Destruction. **Stone Keeper Spire** requires 44. It is rank 1 in the main hand at 44 for Holy and Discipline, both factions, and rank 1 for Bear from 44 through 54. **Moonchaser's Headdress** requires 41 and is rank 2 or 3 for Balance around 41–44. **Abomination Chain** requires 37 and is rank 3 for Bear necks at 37–44.
+### Vendor prices
 
-**Well-Worn Pitchfork** requires 33. **Surveyor's Gloves** require 39. **Cliffbreaker's Pauldrons** require 47. **Feardred's Gauntlets** require 49. **Crown of Maldazzar** requires 53. **High Priestess's Kilt** requires 54. They are on the rank list below the top three.
+A vendor hunt states the price with the same coin icons the game uses. **Sergeant's Cape**, from Officer Areyn in Stormwind, shows that price beside the coins. Honor uses your faction's honor icon. A badge uses that badge's icon. The old sentence about Honor Points and tokens is left off once the price line is there. The rank requirement stays.
 
-### Desolace centaur weapons
+### Tooltips
 
-The Magram weapon set requires **35**. Damage and stats are lower than the old row. **Centaur Spear**, **Wanderer's Broadsword**, and **Desert Crawler's Claw** come from Test Your Theory. **Blade of the Magram Clan**, **Staff of Revelations**, and **Desperate Barrier** come from Proof of Concept. **Scavenged Magram Armament**, **Abandoned Ferocity**, **Bludgeon of Betrayed Virtues**, **Greatstaff of the Necrokhans**, **Soulsplatter Mace**, and **Thrice-Damned Effigy** come from Khan Jehn. Centaur Spear is 26.61 DPS with +9 strength and +11 stamina. Staff of Revelations is +8 intellect, +11 spirit, and +30 healing and spell damage. The quest names and pins are unchanged.
+222 stored rare tooltips were checked against Wowhead Forever and updated where the page had changed. 220 of them stayed rare. The text changed. **Rot-Covered Harpoon** and **Scoutmaster's Eyepatch** are uncommon. **Whirlwind Axe**, **Triprunner Dungarees**, **Gravestone Scepter**, **Crescent Staff**, and **Vanquisher's Sword** stay rare, because Wowhead Forever still lists them as rare. **Gravestone Scepter** no longer has the extra shadow resistance the old tooltip carried.
+
+### The minimap button
+
+The minimap button sits on the rim of the minimap.
+
+### v0.5.6-beta
+
+Paladins have a fourth spec, **Shockadin**. Holy, Shockadin, Elemental, and Restoration hunt a two-hander and a one-hander together. Rogues can hunt one-hand axes. **Axe of the Deep Woods** is the Horde Combat main hand from 52 through 59. **Coldflame Saber** and **Blade of Silverlaine** match the Forever page. Ten new Forever pieces are on the lists, including **Firebird Leggings** at 43 and **Stone Keeper Spire** at 44. The Desolace centaur weapons require 35. The window title reads **GearQuest Forever v0.5.6-beta**.
 
 ### v0.5.5-beta
 

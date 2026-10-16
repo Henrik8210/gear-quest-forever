@@ -295,6 +295,7 @@ for (const classFile of Object.keys(pipelineWeights).sort()) {
     scoring += `            label = ${luaString(spec.label || specId)},\n`;
     if (spec.dpsWeight) scoring += `            dpsWeight = ${luaNumber(spec.dpsWeight)},\n`;
     if (spec.dpsWeightRanged) scoring += `            dpsWeightRanged = ${luaNumber(spec.dpsWeightRanged)},\n`;
+    if (spec.speedWeight) scoring += `            speedWeight = ${luaNumber(spec.speedWeight)},\n`;
     scoring += `            weights = ${luaTable(stats, 3)},\n`;
     scoring += `        },\n`;
   }

@@ -770,6 +770,19 @@ function GQ.Compare:GetEffectiveScoringRows(classFile, specId, playerLevel)
         return a.label < b.label
     end)
 
+    -- Negative points per second of weapon speed. Slower weapons lose more.
+    -- Kept under melee weapon damage so the penalty stays with the weapon rows.
+    if (specRow.speedWeight or 0) ~= 0 then
+        local at = #rows + 1
+        for i = 1, #rows do
+            if rows[i].label == "Melee weapon damage" then
+                at = i + 1
+                break
+            end
+        end
+        table.insert(rows, at, { label = "Weapon speed", value = specRow.speedWeight })
+    end
+
     return rows, specRow.label, useLeveling
 end
 
@@ -806,6 +819,22 @@ function GQ.Compare:ShowScoringWeightTooltip(owner)
         GameTooltip:AddLine("Level 60 uses these weights with no leveling bonus.", 0.75, 0.75, 0.75, true)
     end
     GameTooltip:AddLine("1.00 is one point of this spec's main stat.", 0.75, 0.75, 0.75, true)
+    for i = 1, #rows do
+        if rows[i].label == "Weapon speed" and rows[i].value < 0 then
+            local cost = -rows[i].value
+            GameTooltip:AddLine(
+                "Each second of weapon speed costs "
+                    .. FormatScoringWeight(cost)
+                    .. " points. A weapon that swings every 2 seconds loses "
+                    .. FormatScoringWeight(cost * 2)
+                    .. " points. A weapon that swings every 3 seconds loses "
+                    .. FormatScoringWeight(cost * 3)
+                    .. ".",
+                0.75, 0.75, 0.75, true
+            )
+            break
+        end
+    end
     GameTooltip:AddLine(" ")
 
     for i = 1, #rows do

@@ -567,7 +567,15 @@ The active hunt list points at the next hunt with the raw pipeline score, not th
 
 Each hunt row shows a small item icon immediately before the name, the same height as the row font. A question mark stands in until the client has the icon. Slot headers stay the plus and minus. In the collapse-icon column, every hunt row shows `#N` in faded grey. N is that piece's place on the (i) rank tooltip (`GetSlotRankList`), including `#4` and later when an earlier piece was already obtained. Stored `curatedRank` is not that number: it still counts pieces this faction cannot see. **Leafre's Ring** can be stored rank 2 and still be `#1` on the list. A faction hole closes up, so the list number matches the tooltip.
 
-A quest reward, including a seasonal quest, states `This quest can be picked up at level N.` on the line just before Source. N is the stored required level, the same gate the hunt list uses. Skip the line when that level is missing.
+A quest reward, including a seasonal quest, states `This quest can be picked up at level N.` on the line just before Source. N is the stored required level, the same gate the hunt list uses. Skip the line when that level is missing. A reward from a chain of at least two quests adds two lines above that: `Part of a quest chain.` and `N quests until you get this.` The count line has a blank row above it and a blank row below it. N is the reward quest's place in the series, counting the quest that gives the item. A single quest does not get those lines.
+
+A vendor hunt states the price on its own line, `Costs` followed by the same icons the game uses, with the number beside each icon. Gold, silver, and copper use the money-frame coins. Honor uses the faction honor icon. A badge uses that badge's item icon. The old sentence `Costs Honor Points and tokens (Marks of Honor).` is left off once that line is present. The rank requirement stays on the line just before Source.
+
+`SanitizeText` decodes Wowhead quest entities before the parchment, the lore, and the tracker draw. `&nbsp;` is a space. `&lt;name&gt;` is `UnitName("player")`, or "you". `&lt;class&gt;` and `&lt;race&gt;` use this character. `&lt;sir/madam&gt;` follows `UnitSex`. A remaining `&lt;...&gt;` emote is the sentence inside it. `commended!Please` gains a space. **Wildhunter Cloak** (16658), The Hunt Completed, is the check.
+
+**Lookup** is the log handle. It searches the loaded class database, 2000 rows a frame, and does not change the hunt selection or the Simulator. The detail parchment is the same hunt detail. A chain of at least two steps uses `GQ.Data.questChain`. **Thunderbrew's Boot Flask** (744) is 5.
+
+The minimap button center is half the minimap plus 5 (`MINIMAP_BORDER_OUTSET` in `Minimap.lua`).
 
 ## GearQuest Index Score bar
 
@@ -688,7 +696,7 @@ The source **Filter** closes on a click outside the menu. The Profession
   (`GearQuestForeverDB.ui`). While any of the six is on, the button reads
   **Play style***. Six cards, three on the first row and three on
   the second. The name sits under the picture. **Get it now!** can be on
-  with either dungeon card, and with **Don't look back**, **Manageable Quests**, and **Buy it**.
+  with either dungeon card, and with **Manageable Dungeons**, **Manageable Quests**, and **Buy it**.
   **No Dungeons!** and **Dungeon Enjoyer** turn each other off. A play
   style hides hunts across several sources. The filter still only chooses a source. Any of them widens the slot list the
   same way a filter does, so a later rank can show, and the rank box says why.
@@ -722,13 +730,13 @@ The source **Filter** closes on a click outside the menu. The Profession
     standing or the skill shows the hunt without turning the style off.
     If the reputation scan fails, reputation hunts stay. A bind type that
     is still unknown does not hide the craft.
-  - **Don't look back** (`playDontLookBack`) hides a hunt whose `minLevel`
-    would be a gray quest at the effective level. Green and yellow stay:
-    hidden when `playerLevel - minLevel` is greater than the green range.
-    The live character uses `GetQuestGreenRange()`. A simulated level uses
-    the classic steps around the known samples (5 at level 9, 10 at 50,
-    12 at 60). A level 18 hunt is still shown at 25 and drops at 26 on
-    that scale. A missing `minLevel` stays.
+  - **Manageable Dungeons** (`playManageableDungeons`) hides a boss drop,
+    and dungeon and raid trash, until the viewed level reaches 4 under
+    that item's level (`ilvl` on the fact). The same floor as Manageable
+    Quests: an item of level 49 can show from 45, and the floor is
+    `min(ilvl - 4, 60)`, so a raid drop with a higher item level still
+    shows at 60. A missing item level stays. Quests, vendors, crafts, and
+    world drops stay. Replaces **Don't look back**.
   - **Manageable Quests** (`playManageableQuests`) hides a quest reward,
     including a seasonal quest, until the viewed level reaches 4 under
     that item's level (`ilvl` on the fact). Sprightring Helm is 49, so it
@@ -993,7 +1001,9 @@ Hunt-id probe (`pipeline/scripts/probe_forever_hunt_tooltips.py`) labels 200 vs 
 
 **Worn gear beside the hunt tooltip.** After the hunt tooltip, `ShowEquippedCompare` fills `ShoppingTooltip1` / `2` from `GetInventorySlots`. Finger 11+12, Trinket 13+14, other slots one. Gold line `Currently equipped`. Empty slot shows nothing.
 
-**Obtain toast is once per item.** `AnnounceObtained` runs only from `MarkEntryObtained`, and only when that item id was not already in `obtainedItems` and was not in `ownedAtLogin`. The first time it is in bags or equipped. Unequip and re-equip must not toast. `ToastReequippedUpgrades` is gone; do not toast from `PLAYER_EQUIPMENT_CHANGED`.
+**Obtain toast is once per item.** `AnnounceObtained` runs only from `MarkEntryObtained`, and only when that item id was not already in this character's `obtainedItems` and was not in `ownedAtLogin`. The first time it is in bags or equipped. Unequip and re-equip must not toast. `ToastReequippedUpgrades` is gone; do not toast from `PLAYER_EQUIPMENT_CHANGED`.
+
+**Obtained is this character.** `GearQuestForeverCharDB.obtainedItems` is the record. Do not read or write `GearQuestForeverDB.obtainedItems` for a new obtain. Another character's copy stays on that character. **Hammerbone** on a druid stays on the paladin's Active list. Bags and gear on the character you are logged into still hide it here. The (i) list never used the account map.
 
 **Spec switch does not scan gear.** `SetSelectedSpec` refreshes the UI and does not call `CheckAutoCompletion`. Completion is by item id (`obtainedItems`). A hunt already completed on this character is completed on the new spec immediately (`IsEntryObtained` checks the item id) and does not toast. A piece you are wearing that was never recorded stays on Active until the next bag update, equip change, or login scan. That scan marks it completed. No toast if `ownedAtLogin` or `obtainedItems` already has the id. A random-enchant hunt still needs the matching suffix.
 
@@ -1011,7 +1021,7 @@ Hunt-id probe (`pipeline/scripts/probe_forever_hunt_tooltips.py`) labels 200 vs 
 - **Log header.** `GearQuestWindowTitle` in `Log.lua` is `GearQuest Forever v` plus `GQ.VERSION`. Every release bump of `GQ.VERSION` (and the TOC `## Version:`) updates the band. Do not hardcode a second version string in the title. See `RELEASE.md`.
 - **Source filter must not duplicate Completed onto Active.** The same item can exist under several generated hunt ids (level band vs the wide filter pool). `IsItemIdObtained` is true if any hunt id for that item is in `obtained` or a completed hunt, or `obtainedItems`. `ShouldHideFromActiveList` also hides an item whose list key is already on **Completed** for that slot. With a filter on, Active starts from the normal top upgrades / notables / tracked hunts (source-gated), then backfills from `GetFilteredTopForSlot` only while the slot has fewer than 3 rows. Example: level 20 Beast Mastery, World drop unchecked, **Snake Eye Kaleidoscope** stays on Completed only.
 - **Filter toggles stay cheap.** Do not bag-scan or walk every sibling hunt id per row in the wide pool. `EnsureActiveListCaches` builds completed keys, obtained item ids, and a bag/equip id set once per class/level/spec/faction. `GetFilteredTopForSlot` uses `EntryHiddenFromActiveFast` and caches per slot until `InvalidateSourceFilterCache`. Checkbox clicks call `ScheduleListRefresh` (debounced), not a synchronous `Refresh` plus a full indicator rebuild in the same frame. `InvalidateQueryCache` also drops the filtered-top cache.
-- **`/gq wipe data` then sim up.** Wipe clears character progress, `GearQuestForeverDB.obtainedItems`, and `completedItemBackup`, and sets `completedWipeAt`. Account `obtainedItems` with a timestamp at or before that wipe must not count (`AccountObtainedItemCounts`). Otherwise auto-complete skips pieces the player still wears, and Completed stays empty for them. A jump from 10 to 20 does not pass through earlier bands, so wipe and `Preview:SetLevel` call `ScheduleAutoCompletionCheck(true)`. That path records owned hunts with `minLevel <=` effective level (class/spec/faction via `EntryMatchesTrackedHunt`) and **does not toast**. It looks up `GetEntriesByItemId` for items already in bags. It must not walk `GetClassSlotEntryList`.
+- **`/gq wipe data` then sim up.** Wipe clears this character's progress. Obtained items are `GearQuestForeverCharDB.obtainedItems`. Do not read `GearQuestForeverDB.obtainedItems` when hiding an Active hunt, and do not write a new obtain into that account map or `completedItemBackup`. Another character's copy stays on that character. A jump from 10 to 20 does not pass through earlier bands, so wipe and `Preview:SetLevel` call `ScheduleAutoCompletionCheck(true)`. That path records owned hunts with `minLevel <=` effective level (class/spec/faction via `EntryMatchesTrackedHunt`) and **does not toast**. It looks up `GetEntriesByItemId` for items already in bags. It must not walk `GetClassSlotEntryList`.
 - **Toasts are the current list only.** Bag, equip, loot, and a normal level-up call `CheckAutoCompletion()` with no reached-band scan. Complete and toast only top upgrades, the notable, and a tracked hunt that still `EntryMatchesPlayer`. A filter or a play style does not change that list. A rank 6 that is only showing because of a filter does not toast. Tracking it does. Hovering **Track** says so. A level 20 Enhancement shaman looting **Calico Cloak** (level 9 back) must not toast or complete it. Do not treat `GetCandidatesForSlot` as the list. The full catalog walk on `BAG_UPDATE` was the dungeon `Log.lua` "script ran too long" error.
 
 **28 Sep 2026 (v0.2.17-beta).**
@@ -1475,7 +1485,13 @@ line on the spec tooltip is the leveling armor stat. It is not an armor
 budget, and it is not why cloth loses. Generic spell power is **0.9**.
 `spHoly` is **0.05**. Mana per 5 is **0.2** (shown **0.4**). Ranged attack
 power is **0** on every paladin spec, including levels 1–9. Do not copy
-Holy's equality rule onto Protection.
+Holy's equality rule onto Protection. `speedWeight` is **-2**: points per
+second of weapon speed. A 2 second weapon loses 4 points and a 3 second
+weapon loses 6, on top of melee weapon damage **0.5**. The seal lands on
+each hit, so the faster weapon loses less when the stats are close. The
+spec tooltip labels the row **Weapon speed** and prints **-2**. The grey
+line says the same 2 second and 3 second examples. Holy and Retribution
+do not use it.
 
 ### Shockadin
 
@@ -1506,7 +1522,8 @@ The raw row keeps that order after the endurance multiplier:
 | Healing | 0 | 0 |
 
 Weapon `dpsWeight` is **0.4**, so a swing still counts and a spell-power
-weapon stays ahead. Healing and `sp_from_heal` stay **0**. The damage half
+weapon stays ahead. `speedWeight` is **-2**, the same weapon-speed penalty as
+Protection. A faster weapon loses less when the spell power is close. Healing and `sp_from_heal` stay **0**. The damage half
 of an Equip line still folds into spell power. Do not copy Holy's
 `spHoly` equals healing rule onto this row. Holy `spHoly` stays **1.8**.
 `armorClass` matches Holy: plate 1.0, mail 0.96, leather 0.82, cloth 0.62.

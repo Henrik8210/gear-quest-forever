@@ -36,6 +36,18 @@ Each row is a piece for that slot. The grey number is its rank. It matches the (
 
 **- Recommended** marks up to three rank #1 upgrades, the ones that beat what you are wearing by the most. **- Rank #1 BiS acquired** means you already have the best piece in that slot.
 
+A piece you already have leaves the list on that character only. Another character still sees it.
+
+---
+
+### Look something up
+
+*Screenshot — the Lookup tab, with a search result open.*
+
+**Lookup** searches the database for the class you are viewing. Use the Simulator to switch class. A chain reward says how many quests are left. **Thunderbrew's Boot Flask** is Sweet Amber in Westfall, requires 40, and says **5 quests until you get this.**
+
+Quest text uses your character's name. **Wildhunter Cloak** reads as the quest, not the code from the page.
+
 ---
 
 ### Where it comes from
@@ -70,7 +82,7 @@ Track a hunt and an arrow can point the way. On another continent it points at t
 
 **Get it now** waits until you have the reputation, or can make a bind-on-pickup craft.
 
-**Don't look back** hides a quest once it would be gray.
+**Manageable Dungeons** hides a boss drop, and dungeon and raid trash, until you are 4 levels under that item's level. That wait stops at 60.
 
 **Manageable Quests** hides a quest reward until you are 4 levels under its item level. That wait stops at 60.
 
@@ -159,7 +171,13 @@ Not in the addon. Suggest the spec, the stat, and the weight you want on the [st
 Holy levels in mail and plate. Cloth is scored lower on purpose, so a tailoring robe does not beat blacksmithing healing mail of the same band. Hover the spec to see it. If one piece is still wrong, name it, your level, and your faction.
 
 **What is Shockadin?**
-A fourth paladin spec in the spec menu, added in v0.5.6-beta. It is not a talent tree. You still start on Retribution. Shockadin hunts spell damage, then holy spell damage, then intellect, then crit. Healing is not scored. Both weapon styles start on, and the off hand stays a shield. Hover the spec to see the weights.
+A fourth paladin spec in the spec menu, added in v0.5.6-beta. It is not a talent tree. You still start on Retribution. Shockadin hunts spell damage, then holy spell damage, then intellect, then crit. Healing is not scored. Both weapon styles start on, and the off hand stays a shield. Hover the spec to see the weights. Protection and Shockadin also show Weapon speed at -2. Holy and Retribution do not.
+
+**I already have this on another character.**
+The hunt stays on this character until this character obtains it. Hammerbone on a druid does not hide it on a paladin. Completed is that character's list.
+
+**The description shows odd codes.**
+Update to v0.5.7-beta and /reload. Quest text uses your name. Wildhunter Cloak is the one to check.
 
 **Enhancement is using agility over strength.**
 That is the current weight. Agility is priced a little above strength. Suggest the change on the sheet if you want strength first.

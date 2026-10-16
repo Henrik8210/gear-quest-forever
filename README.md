@@ -14,9 +14,9 @@ Forever is a new 1–60 Classic+ client (original continents, before Molten Core
 
 Install folder is `_classic_beta_` (Forever beta). `scripts/sync-addon.ps1` looks for that first, then a few other likely names, or set `$env:GEARQUEST_WOW_CLIENT`.
 
-Lists are the Forever scoring model for all nine classes, levels 1–60. Alliance paladin and warrior levels 1–9 stay curated. Scoring rules: [pipeline/docs/FOREVER-SCORING.md](pipeline/docs/FOREVER-SCORING.md). Paladin has a fourth spec, Shockadin, for spell damage in melee. It is in the spec menu, not a talent tab. Holy, Shockadin, Elemental, and Restoration start with two-hand and one-hand both on. Rogues hunt one-hand axes. Assassination and Subtlety stay dagger-locked in the main hand.
+Lists are the Forever scoring model for all nine classes, levels 1–60. Alliance paladin and warrior levels 1–9 stay curated. Scoring rules: [pipeline/docs/FOREVER-SCORING.md](pipeline/docs/FOREVER-SCORING.md). Paladin has a fourth spec, Shockadin, for spell damage in melee. It is in the spec menu, not a talent tab. Holy, Shockadin, Elemental, and Restoration start with two-hand and one-hand both on. Rogues hunt one-hand axes. Assassination and Subtlety stay dagger-locked in the main hand. Protection and Shockadin score weapon speed at -2, so a faster weapon loses less when the other stats are close. Holy and Retribution do not.
 
-**Play style** sits at the bottom of the log. Six cards, names under the pictures, three then three. **No Dungeons!** hides hunts that send you into a dungeon or raid, including a quest that enters one. A world drop stays even when its zone is a dungeon name. World bosses and crafts you can buy stay. **Dungeon Enjoyer** keeps only those dungeon and raid hunts. The two turn each other off. **Get it now!** hides a hunt until this character meets the reputation on that item, or can make a bind-on-pickup craft. A bind-on-equip craft stays unless the item itself requires the profession to wear. **Don't look back** hides a hunt once its required level would be a gray quest. **Manageable Quests** hides a quest reward, including a seasonal quest, until the level you are viewing is 4 under that item's level. The wait stops at 60. **Buy it** keeps vendor pieces and anything that is not bind on pickup, unless a vendor sells that bind-on-pickup piece. Get it now, Don't look back, Manageable Quests, and Buy it can be on with either dungeon card.
+**Play style** sits at the bottom of the log. Six cards, names under the pictures, three then three. **No Dungeons!** hides hunts that send you into a dungeon or raid, including a quest that enters one. A world drop stays even when its zone is a dungeon name. World bosses and crafts you can buy stay. **Dungeon Enjoyer** keeps only those dungeon and raid hunts. The two turn each other off. **Get it now!** hides a hunt until this character meets the reputation on that item, or can make a bind-on-pickup craft. A bind-on-equip craft stays unless the item itself requires the profession to wear. **Manageable Dungeons** hides a boss drop, and dungeon and raid trash, until the level you are viewing is 4 under that item's level. The wait stops at 60. **Manageable Quests** hides a quest reward, including a seasonal quest, until the level you are viewing is 4 under that item's level. The wait stops at 60. **Buy it** keeps vendor pieces and anything that is not bind on pickup, unless a vendor sells that bind-on-pickup piece. Get it now, Manageable Dungeons, Manageable Quests, and Buy it can be on with either dungeon card.
 
 The source **Filter** is alphabetical. Profession, Boss drop, and Dungeon & Raid trash each open a flyout when checked. The trash boxes are separate from Boss drop. Select all / Deselect all covers the sources and all three flyouts. A filter or a play style fills a slot back up to three matching hunts. There is no notable shelf. The **Play style** button reads **Play style*** while any of the six is on.
 
@@ -25,6 +25,14 @@ The parchment shows **Rank #N** in a black box above the item name. That number 
 The green upgrade arrow stays on the unfiltered best pieces when a filter or a play style hides them, and on every hunt still showing. The obtain toast follows the unfiltered top three and any hunt you Track. A filter does not stop a tracked toast.
 
 A crafted hunt lists the recipe materials, and the skill line just before Source. That clause is green when you meet the recipe and red when you are short or do not have the profession.
+
+A piece you already have leaves **Active** on that character and sits on **Completed**. Another character still sees it. **Hammerbone** on a druid does not hide **Hammerbone** on a paladin.
+
+**Lookup** is the handle under the log tabs. It searches the database for the class you are viewing. The Simulator switches that class. A chain reward says **Part of a quest chain.** and how many quests are left. **Thunderbrew's Boot Flask** is Sweet Amber in Westfall, requires 40, and says **5 quests until you get this.**
+
+Quest text on the parchment, the lore, and the tracker uses your character's name. **Wildhunter Cloak** no longer prints the code from the quest page. A vendor price uses the same coin icons as the game. **Sergeant's Cape** shows that price beside the coins.
+
+The minimap button sits on the rim of the minimap.
 
 ## GearQuest score
 
