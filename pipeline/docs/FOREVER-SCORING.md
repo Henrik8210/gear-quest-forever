@@ -70,6 +70,39 @@ Henrik's note column stays locked. A suggestion does not change the addon.
 When a suggestion is accepted, copy it into `weights.json` and re-score
 that class. Do not retune from the sheet unless asked.
 
+**Custom spec.** The spec menu has a divider, then any custom specs for this
+class, then **+ custom stat weights**. The window sits on the log. The name
+is at most 20 characters. The player picks which premade spec it is based on,
+and the right side lists that spec's weights. The grey number in an empty box,
+and the number beside it, is the weight that spec uses through level 60,
+including the leveling multipliers. A typed number replaces it, including 0,
+with no extra multiplier. A typed Spell power weight scores the Spell Power
+stat only. The line "Increases damage and healing done" stays on Healing.
+An empty Spell power box still counts that line's damage half as spell power,
+which is how the premade list scores it.
+**Save and score items!** reorders that spec's existing hunts for every level
+band and saves the weights on the account (`GearQuestForeverDB.customSpecs`).
+Which spec is selected stays on the character. Right-click a custom spec to
+edit it. Delete removes it. The item pool, weapon style, and pins stay the
+base spec's. A custom list cannot surface a piece that never ranked for that
+class. Stats, weapon damage, armor class, the best suffix, Embrace of
+the Viper, and Rotmender's Raiment are scored again. A proc such as
+Thunderfury is not re-priced, so it ranks on the printed stats. The stat rows
+live in `Data.ItemStats.generated.lua`, written by
+`pipeline/scripts/emit_item_stats.py`. The label **Healing as spell power**
+is `sp_from_heal`.
+
+While that score runs, a portrait spins on the GearQuest window only. The
+shade covers the log, not the whole screen. It stays up through the
+slot-by-slot list build and comes down when the hunt list is painted and
+can scroll.
+
+Simulating another class and choosing a custom spec for that class scores
+after that class's hunts are indexed. **Turn off simulation** scores the
+character's saved spec when that spec is custom. After a reload on a
+simulated premade spec, a left click on a custom spec selects it. The
+header and the spec button use the custom name.
+
 Priest, mage, and warlock ranged damage (`dpsWeightRanged`) is **7**, the
 same scale as a warrior's melee weapon. These classes cast, then wand. A
 higher-DPS wand is the ranged hunt. **White Obsidian Wand** (274425) is
@@ -502,11 +535,21 @@ paragraph.
   this hunt. `ownedAtLogin` stores the lowercased full name when the link
   contains ` of `, otherwise the item id.
 - Keep the Equip sentence `Increases damage and healing done by magical
-  spells and effects by up to N`. That sentence **is** the spell power on a
-  weapon. Do not strip it (`STALE_EQUIP` is gone). A green `+N Spell Power`
-  line is generic spell power only. A party line (`of all party members`)
-  is not personal spell power. Set bonuses start with `(N) Set`, not
-  `Equip:`, and stay on the set block.
+  spells and effects by up to N`. Store it as healing N and damage done N.
+  Do not store that sentence as generic spell power. Premade scoring folds
+  damage done into spell power, and a healer also scores the healing half.
+  A typed Spell power weight on a custom spec does not. An empty Spell
+  power box still folds the damage half, matching the premade list. A green
+  `+N Spell Power` line is generic spell power only. Greater Magic Wand
+  (11288) is the `+2 Spell Power` line and is not a hunt row. A party line
+  (`of all party members`) is not personal spell power. Set bonuses start
+  with `(N) Set`, not `Equip:`, and stay on the set block.
+  **Stormrider's Leather Pants** (252502) says up to 10 and is stored as
+  healing 10 and damage done 10. Elemental Horde, legs, 25–28, stays rank
+  3 at 18.22. Restoration Shaman and Restoration Druid list it at 25–28,
+  legs, rank 13, score 24.42. Holy Paladin lists it at 25–27, legs, rank
+  14, score 35.55. **Totemic Leather Pants** (252446) is the same sentence
+  at 7. Blade of Silverlaine and Coldflame Saber stay pinned.
 
 ## GearQuest score (tooltip display)
 
@@ -697,10 +740,10 @@ The source **Filter** closes on a click outside the menu. The Profession
   Checking Profession, Boss drop, or Dungeon & Raid trash opens that flyout
   on the click. You do not have to leave the row and come back.
 - **Play style** is the button at the bottom of the log
-  (`GearQuestForeverDB.ui`). While any of the six is on, the button reads
-  **Play style***. Six cards, three on the first row and three on
-  the second. The name sits under the picture. **Get it now!** can be on
-  with either dungeon card, and with **Manageable Dungeons**, **Manageable Quests**, and **Buy it**.
+  (`GearQuestForeverDB.ui`). While any of the seven is on, the button reads
+  **Play style***. Seven cards, names under the pictures, three then three,
+  then **Focus Zone** under **Manageable Dungeons**. **Get it now!** can be on
+  with either dungeon card, and with **Manageable Dungeons**, **Manageable Quests**, **Buy it**, and **Focus Zone**.
   **No Dungeons!** and **Dungeon Enjoyer** turn each other off. A play
   style hides hunts across several sources. The filter still only chooses a source. Any of them widens the slot list the
   same way a filter does, so a later rank can show, and the rank box says why.
@@ -754,6 +797,13 @@ The source **Filter** closes on a click outside the menu. The Profession
     when used, or no bind). Bind on pickup stays hidden unless a vendor
     sells it. An unknown bind stays. **Get it now!** still hides a vendor
     piece until the stored standing is met.
+  - **Focus Zone** (`playFocusZone`) keeps a hunt only when the zone the
+    character is standing in is that hunt's zone or one of its spots.
+    Quests, vendors, crafts, world drops, and dungeon drops all follow.
+    A hunt with no place stays hidden. Changing zone keeps the current
+    rows and builds the new zone one slot per frame, with an idle frame
+    between slots, then swaps the list once. The art is
+    `GearQuest/Art/GQ-Play-FocusZone.png`.
 - **Rank on the parchment.** Above the item title, a black box reads
   `Rank #N` from that piece's place on the rank list this character can
   see. A hunt the other faction cannot get is left out and the numbers

@@ -6901,6 +6901,44 @@ function GQ.Data:LineIsImbued(text, info)
     return false
 end
 
+function GQ.Data:TooltipAlreadySays(tooltip, text)
+    if not tooltip or not text or text == "" or not tooltip.NumLines or not tooltip.GetName then
+        return false
+    end
+    local name = tooltip:GetName()
+    if not name then
+        return false
+    end
+    local function norm(value)
+        value = tostring(value or "")
+        value = value:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", "")
+        value = value:gsub("%s+", " ")
+        if strtrim then
+            value = strtrim(value)
+        end
+        return value:lower()
+    end
+    local needle = norm(text)
+    if needle == "" then
+        return false
+    end
+    local body = needle:match("^[^:]+:%s*(.+)$")
+    if not body or #body < 12 then
+        body = nil
+    end
+    for i = 1, tooltip:NumLines() do
+        local fs = _G[name .. "TextLeft" .. i]
+        local line = fs and fs.GetText and fs:GetText()
+        if line and line ~= "" then
+            local hay = norm(line)
+            if hay == needle or (hay ~= "" and hay:find(needle, 1, true)) or (body and hay:find(body, 1, true)) then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 function GQ.Data:AppendImbueOrProc(tooltip, entry)
     if not tooltip or not entry then
         return
@@ -6908,13 +6946,13 @@ function GQ.Data:AppendImbueOrProc(tooltip, entry)
     local info = self:ImbueInfo(entry.itemId)
     if info then
         local line = self:ImbueCombineLine(info)
-        if line then
+        if line and not self:TooltipAlreadySays(tooltip, line) then
             tooltip:AddLine(" ")
             tooltip:AddLine(line, 0, 1, 0, true)
         end
         return
     end
-    if entry.proc and entry.proc ~= "" then
+    if entry.proc and entry.proc ~= "" and not self:TooltipAlreadySays(tooltip, entry.proc) then
         tooltip:AddLine(" ")
         tooltip:AddLine(entry.proc, 1, 1, 1, true)
     end
@@ -7314,16 +7352,17 @@ function GQ.Data:VendorBoughtLine(entry)
         return nil
     end
     local text = self:GetEntryInstructions(entry) or entry.instructions or ""
+    local note = " (be aware that some vendors sell items at random)"
     local rest = text:match("^Bought from .-%.%s*(.*)$")
     if rest ~= nil then
         if rest ~= "" then
-            return "Bought from " .. npc .. ". " .. rest
+            return "Bought from " .. npc .. "." .. note .. " " .. rest
         end
-        return "Bought from " .. npc .. "."
+        return "Bought from " .. npc .. "." .. note
     end
     -- "Bought from " is 12 characters. A line with no period still names this seller.
     if text == "" or text:sub(1, 12) == "Bought from " then
-        return "Bought from " .. npc .. "."
+        return "Bought from " .. npc .. "." .. note
     end
     return nil
 end
@@ -11131,6 +11170,14 @@ local TWO_HAND_SPECS = {
 -- slot. A main-hand weapon (tooltip "Main Hand") is one-handed but cannot go
 -- in the off hand, so it stays in the log and on neither paper-doll slot.
 -- Enhancement: two-handers only.
+function GQ.Data:RuleSpec()
+    local spec = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec()
+    if GQ.Spec and GQ.Spec.GetRuleSpec then
+        return GQ.Spec:GetRuleSpec(spec)
+    end
+    return spec
+end
+
 function GQ.Data:UsesHunterWeaponPairs()
     local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
     return classFile == "HUNTER"
@@ -11307,7 +11354,7 @@ end
 
 function GQ.Data:WeaponHeaderSuffix(slotName)
     local classFile = GQ:GetEffectiveClass()
-    local spec = GQ:GetEffectiveSpec()
+    local spec = self:RuleSpec()
     local shield = SHIELD_SPECS[classFile]
     if shield and shield[spec] then
         if slotName == "SecondaryHand" then
@@ -11363,7 +11410,7 @@ end
 -- Shamans cannot dual wield. A shield spec still uses the off-hand slot for a shield.
 function GQ.Data:CanDualWield()
     local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
-    local spec = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec()
+    local spec = self:RuleSpec()
     if classFile == "SHAMAN" then
         return false
     end
@@ -11376,7 +11423,7 @@ end
 
 function GQ.Data:DefaultWeaponStyle()
     local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
-    local spec = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec()
+    local spec = self:RuleSpec()
     if classFile == "HUNTER" then
         return "two"
     end
@@ -11532,9 +11579,48 @@ function GQ.Data:EntryIsDamagingWeapon(entry)
     return result
 end
 
+-- Filter hands. For a spec that can dual wield, Main Hand is main-hand-only.
+-- Either-hand weapons (the tooltip line "One-Hand") live under Off Hand,
+-- with off-hand-only weapons, so turning Off Hand off leaves the main-hand
+-- list. A spec that cannot dual wield has no Off Hand section, so Main Hand
+-- keeps those one-handers.
+function GQ.Data:WeaponFitsFilterHand(entry, hand)
+    if hand ~= "two" and hand ~= "main" and hand ~= "off" then
+        return false
+    end
+    if not entry or not self:EntryIsDamagingWeapon(entry) then
+        return false
+    end
+    if hand == "two" then
+        return self:EntryIsTwoHand(entry)
+    end
+    if self:EntryIsTwoHand(entry) or self:UsesTwoHandOnlyWeapons() then
+        return false
+    end
+    local offOnly = entry.hand == "off" or self:EntryIsOffHandOnly(entry)
+    local mainOnly = entry.hand == "main" or (entry.hand ~= "off" and entry.hand ~= "one" and self:EntryIsMainHandOnly(entry))
+    if entry.hand == "one" then
+        mainOnly = false
+        offOnly = false
+    end
+    if hand == "off" then
+        if not self:CanDualWield() then
+            return false
+        end
+        return not mainOnly
+    end
+    if self:CanDualWield() then
+        return mainOnly
+    end
+    return not offOnly
+end
+
 function GQ.Data:WeaponFitsStyle(entry, style)
     if not entry then
         return false
+    end
+    if style == "main" or style == "off" then
+        return self:WeaponFitsFilterHand(entry, style)
     end
     local two = self:EntryIsTwoHand(entry)
     if style == "two" then

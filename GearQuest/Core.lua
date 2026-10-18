@@ -9,7 +9,7 @@ end
 GQ = GQ or {}
 _G.GearQuest = GQ
 
-GQ.VERSION = "0.5.8-beta"
+GQ.VERSION = "0.6.0-beta"
 GQ.ADDON_NAME = ADDON_NAME
 
 -- General -> Hide chat messages. Off until the player checks it.
@@ -261,6 +261,13 @@ function GQ:PLAYER_LOGIN()
             self.Data:EnsureActiveHuntClasses()
         end
         self.Data:BuildIndex()
+        if self.Custom and self.Custom.EnsureBuilt and self.GetEffectiveClass and self.GetEffectiveSpec then
+            local classFile = self:GetEffectiveClass()
+            local specId = self:GetEffectiveSpec()
+            if classFile and specId and self.Custom:Get(classFile, specId) then
+                self.Custom:EnsureBuilt(classFile, specId)
+            end
+        end
         self.Data:CacheContainerItemLinks()
     end)
 

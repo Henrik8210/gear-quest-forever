@@ -163,15 +163,27 @@ def parse_tooltip(t):
     for m in re.finditer(r'<span class="q2">Equip:(.*?)</span>', t, re.S):
         raw = m.group(1)
         if "<!--rtg" in raw:
-            # rtg41 already counted the number as healing. The sentence is
-            # healing and spell damage. A split line (rtg41 and rtg42) already
-            # has both. A party aura is not personal spell power.
+            # rtg41 already counted the number as healing. rtg45 counted it
+            # as spell power. The sentence is both. A split line (rtg41 and
+            # rtg42) already has both. A party aura is not personal spell power.
             text = plain(raw)
             if ("damage and healing" in text and "party" not in text
-                    and "<!--rtg41-->" in raw and "<!--rtg42-->" not in raw):
-                mm = re.search(r"<!--rtg41-->(\d+)", raw)
-                if mm:
-                    add("damageDone", int(mm.group(1)))
+                    and "<!--rtg42-->" not in raw):
+                if "<!--rtg41-->" in raw:
+                    mm = re.search(r"<!--rtg41-->(\d+)", raw)
+                    if mm:
+                        add("damageDone", int(mm.group(1)))
+                elif "<!--rtg45-->" in raw:
+                    mm = re.search(r"<!--rtg45-->(\d+)", raw)
+                    if mm:
+                        amt = int(mm.group(1))
+                        left = o["stats"].get("sp", 0) - amt
+                        if left > 0:
+                            o["stats"]["sp"] = left
+                        else:
+                            o["stats"].pop("sp", None)
+                        add("heal", amt)
+                        add("damageDone", amt)
             continue
         line = plain(raw).strip()
         for rx, key in PATS:

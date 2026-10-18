@@ -78,7 +78,7 @@ Track a hunt and an arrow can point the way. On another continent it points at t
 
 ### Play your way
 
-*Screenshot 4 — the six play-style cards.*
+*Screenshot 4 — the seven play-style cards.*
 
 **No Dungeons** hides dungeon and raid hunts, including a quest that steps inside one. A world drop stays.
 
@@ -92,7 +92,9 @@ Track a hunt and an arrow can point the way. On another continent it points at t
 
 **Buy it** keeps vendor pieces and gear that is not bind on pickup.
 
-The two dungeon cards turn each other off. The other four can be on with either. The button reads **Play style*** while one is on.
+**Focus Zone** keeps a hunt only when the zone you are standing in is that hunt's zone or one of its spots. Quests, vendors, crafts, world drops, and dungeon drops all follow. A hunt with no place stays hidden. Walk into another zone and the list changes. The card sits under Manageable Dungeons.
+
+The two dungeon cards turn each other off. The other five can be on with either. The button reads **Play style*** while one is on.
 
 ---
 
@@ -126,7 +128,11 @@ Hover the spec name. Those are the weights for this spec. While you level, stami
 
 A random-enchant green is ranked on its best possible roll. The tooltip says how rare that roll is. A slim chance does not hide the hunt.
 
-You cannot edit the weights in the addon. Suggest a change here: [GearQuest Forever - Class Stat Weights](https://docs.google.com/spreadsheets/d/1jMC89KgzHpPZHYgcjOq6ef7lENhh8OGgypG2rC2m0Ok/edit). The live numbers stay locked. A suggestion does not change the addon by itself.
+The premade weights stay locked. Suggest a change for those here: [GearQuest Forever - Class Stat Weights](https://docs.google.com/spreadsheets/d/1jMC89KgzHpPZHYgcjOq6ef7lENhh8OGgypG2rC2m0Ok/edit). A suggestion does not change the addon by itself.
+
+You can make your own. The spec menu ends with **+ custom stat weights**. Name it, pick the premade spec it starts from, and type over any weight. An empty box keeps that spec's weight, including the extra stamina, armor, and mana while you level. A number you type replaces it, including 0. **Save and score items!** reorders that spec's hunts. The portrait spins on the GearQuest window until the list can scroll. Right-click a custom spec to edit it. The weights are saved on the account. A custom list only reorders pieces that spec already hunts.
+
+A Spell power number you type scores Spell Power. The line **Increases damage and healing done by magical spells and effects by up to N** stays on Healing. Leave Spell power empty and that line's damage half still counts as spell power, the same as the premade list. **Stormrider's Leather Pants** says up to 10. Elemental still has it at 25–28, legs, rank 3. Restoration lists it there at rank 13. Holy lists it at 25–27, legs, rank 14.
 
 ---
 
@@ -199,7 +205,7 @@ That line is for a piece the faction you are viewing cannot get. If the Simulato
 The hunt is the best suffix that green can roll. Shimmering Gloves of Arcane Wrath is not Shimmering Gloves of Healing. The tooltip says how rare the jackpot roll is.
 
 **How do I hide dungeons, or only chase what I can get today?**
-Play style. Screenshot 4. There is no "this zone only" filter. **Show on map** is per hunt.
+Play style. Screenshot 4. **Focus Zone** keeps hunts in the zone you are standing in. **Show on map** is still per hunt.
 
 **How do I look at another level or another class?**
 Simulator. Screenshot 9. The item tooltip will not score your gear until you turn simulation off.
@@ -211,13 +217,13 @@ Open the log, the gear icon, **General**, **Hide minimap icon**. Drag the button
 **General → Window size.** 100% is the normal window. 150% is half again as tall and wide. Each step is one percent. Let go of the slider and the log, the filter, and the spec menu grow together. The tracker, the guide arrow, and item tooltips stay the normal size.
 
 **The vendor says I have not met the faction.**
-Update to **v0.5.8-beta** and `/reload`. Neutral still counts. **Ratchet Wristwraps** says **Your standing is Neutral** in red until you are Friendly. **You have not met this faction yet** is only when that faction is missing from this character's reputation list.
+Update to **v0.6.0-beta** and `/reload`. Neutral still counts. **Ratchet Wristwraps** says **Your standing is Neutral** in red until you are Friendly. **You have not met this faction yet** is only when that faction is missing from this character's reputation list.
 
 **The hunt tooltip has no auction price.**
 Enable Auctionator and `/reload`. The hunt hover adds Auctionator's price lines under the Forever tooltip. The GearQuest score stays underneath. If Auctionator is off, those lines are left out.
 
 **A starter rare still drops a white.**
-Update to **v0.5.8-beta**. **Ice-covered Bracers**, **Royal Frostmane Girdle**, **Wendigo Fur Cloak**, **Wispy Cloak**, **Ghostly Bracers**, **Lithe Boots**, **Fingerless Gloves**, and **Ratty Old Belt** are green. **Wispy Cloak** requires level 5. **Ratty Old Belt** drops from Narg the Taskmaster.
+Update to **v0.6.0-beta**. **Ice-covered Bracers**, **Royal Frostmane Girdle**, **Wendigo Fur Cloak**, **Wispy Cloak**, **Ghostly Bracers**, **Lithe Boots**, **Fingerless Gloves**, and **Ratty Old Belt** are green. **Wispy Cloak** requires level 5. **Ratty Old Belt** drops from Narg the Taskmaster.
 
 *Screenshot 12 — the General settings page.*
 
@@ -255,7 +261,7 @@ Take them on a character around level 20–30 so the log is full but not a raid 
 | 1 | The log with one slot expanded. Show the item icon, the grey #N, one **- Recommended**, and one **- Rank #1 BiS acquired** if you have one. | The first thing people need to read. |
 | 2 | One parchment. A quest reward is best, so the pickup level and Source are both visible. Include Track, Show on map, and Remove. | Stops "where do I get this?" |
 | 3 | The world map with one pin, and a second crop of the guide arrow on the tracker. Two images under one caption is fine. | Stops "put it on the map." |
-| 4 | Play style open, all six cards, names under the pictures. | The filter people cannot find. |
+| 4 | Play style open, all seven cards, names under the pictures, Focus Zone under Manageable Dungeons. | The filter people cannot find. |
 | 5 | The filter menu with the boss-drop or trash dungeon flyout open. | Shows that dungeons are a list, not one checkbox. |
 | 6 | A bag or character-panel tooltip with the GearQuest score and a green or red arrow. | "Is this an upgrade?" |
 | 7 | The log header score bar, not simulating. | Separate from the tooltip score. |
@@ -274,7 +280,7 @@ The gallery on the CurseForge page can be the same set, in this order. The descr
 - CurseForge project **1698950**. Never use TBC `1669225`.
 - File names are `vX.Y.Z-beta` on the beta channel.
 - Do not put the notable shelf back in this text. It is gone.
-- Do not promise an in-game weight editor. The sheet is the suggestion box. Weapons already filters by two-hand, one-hand, and weapon type.
+- Premade weights change only from the sheet. A player edits weights by adding **+ custom stat weights** in the spec menu. That list reorders the base spec's hunts. It does not add pieces that spec never ranked. Weapons already filters by two-hand, one-hand, and weapon type.
 - Shockadin is the fourth paladin spec. Do not retune Holy, Protection, or Retribution to match it.
 - Enhancement agility above strength, and Holy cloth below mail and plate, are the current weights. Do not "correct" them in the FAQ.
 - Keep this file in sync when a player-facing behavior changes.

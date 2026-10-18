@@ -2,33 +2,47 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v0.5.8-beta
+## v0.6.0-beta
 
-The log can be resized. A reputation vendor says the standing you have. A hunt hover can show an Auctionator price. Eight starter whites are green. The window title reads **GearQuest Forever v0.5.8-beta**.
+You can make your own spec weights. **Focus Zone** keeps hunts in the zone you are standing in. The scoring spinner stays on the GearQuest window until the list can scroll. **Stormrider's Leather Pants** scores the damage-and-healing line as healing and damage. The window title reads **GearQuest Forever v0.6.0-beta**.
 
-### Window size
+### Custom stat weights
 
-**General → Window size** is a slider. **100%** is the window you have now. **150%** is half again as tall and wide. Each step is one percent. The number updates while you drag, and the window changes when you let go, so it does not jump under the cursor. A click on the track, or the mouse wheel, applies that step right away.
+The spec menu ends with **+ custom stat weights**. The window opens on the log. Name it, up to 20 characters, and pick the premade spec it starts from. The right side lists that spec's weights. The grey number in an empty box is the weight that spec uses while you level, including the extra stamina, armor, and mana through 60. Type a number to replace it, including 0. A number you type is not multiplied again.
 
-The hunt list, the parchment, the buttons, Play style, the filter and its flyouts, the weapon filter, and the spec menu all follow that size. So does the rank list from the (i) button. The tracker, the guide arrow, the toast, the map pins, the minimap button, and item tooltips stay the normal size. If you had already checked Larger window, the slider starts at 150%.
+**Save and score items!** rebuilds that spec's hunt list. A portrait spins on the GearQuest window, not over the rest of the screen, and it keeps spinning until the list is on screen and you can scroll it. You can still move, talk, and use the rest of the game.
 
-### Vendor standing
+The weights are saved on the account. The spec you selected stays on this character. Right-click a custom spec to edit it. Delete removes it. The header and the spec button use the name you gave it.
 
-A vendor that requires reputation says what you need and what this character has. **Ratchet Wristwraps**, bought from Winklespark, reads **Requires Friendly with Ratchet. Your standing is Neutral.** The standing clause is red while you are short and green once you have reached it. Neutral counts. **You have not met this faction yet** stays red, and it only appears when this character's reputation list has no row for that faction. Another character's reputation is not used.
+The list reorders pieces that spec already hunts. It does not pull in gear that never ranked for that class. Weapon style and map pins stay the base spec's. A hunter custom spec can still dual wield. A shaman custom spec cannot. Assassination and Subtlety stay dagger-locked in the main hand when that is the base spec. Embrace of the Viper still counts on a custom Beast Mastery, Marksmanship, Survival, Enhancement, or Feral list. Rotmender's Raiment still counts on a custom Holy, Discipline, or Restoration list. A proc such as Thunderfury stays on the printed stats.
 
-### Auction House prices
+**Spell power** you type scores Spell Power. The Equip line **Increases damage and healing done by magical spells and effects by up to N** stays on Healing. Leave Spell power empty and that line's damage half still counts as spell power, the same as the premade list. **Healing as spell power** is the box for a heal-only line.
 
-If Auctionator is enabled, a hunt hover adds its price lines under the Forever tooltip. The Forever stats stay. The GearQuest score stays underneath those lines. If Auctionator is off, nothing is added, so there is no empty price line.
+Simulating a mage, or any class you are not playing, and choosing a custom spec for that class builds the list. **Turn off simulation** builds your own custom spec when that is the spec this character had selected. After a reload, while the simulated class is on a premade spec, left-clicking a custom spec opens its hunts. The other premade specs in that menu still switch.
 
-### Starter greens
+### Focus Zone
 
-Wowhead Forever turned eight common starter drops into uncommon pieces. All nine classes were scored again.
+Play style is seven cards. The names sit under the pictures, three then three, and **Focus Zone** sits under **Manageable Dungeons**. The button reads **Play style*** while any card is on.
 
-**Ice-covered Bracers**, from Hammerspine in Dun Morogh, are +1 Agility and 27 armor, and require 7. **Royal Frostmane Girdle**, from Great Father Arctikus, is +2 Intellect and 73 armor, and requires 8. **Wendigo Fur Cloak**, from Edan the Howler, is +1 Strength and requires 6. For an arms or fury warrior it is the best cloak at level 6. **Wispy Cloak**, from Lost Soul in Tirisfal Glades, is item level 10, requires 5, and has +1 Spirit. It no longer shows at level 3. **Ghostly Bracers**, from Tormented Spirit, are +1 Intellect and require 5. **Lithe Boots**, from Morgaine the Sly in Elwynn Forest, are +2 Stamina and 42 armor, and require 7. **Fingerless Gloves**, from Thuros Lightfingers, are +2 Agility and require 8. **Ratty Old Belt**, from Narg the Taskmaster, is +2 Strength and 35 armor, and requires 7. It is on the leather belt list. It had been left out because the word Old in the name was treated as an unused item.
+**Focus Zone** keeps a hunt only when the zone you are standing in is that hunt's zone or one of its spots. Quests, vendors, crafts, world drops, and dungeon drops all follow. A drop with a camp in this zone stays, even when it also drops somewhere else. A hunt with no place stays hidden. Walk into another zone and the rows you are looking at stay up while the new zone is built, one slot at a time, then the list swaps.
 
-### The community
+It can be on with **No Dungeons!** or **Dungeon Enjoyer**, and with **Get it now!**, **Manageable Dungeons**, **Manageable Quests**, and **Buy it**. The two dungeon cards still turn each other off.
 
-**The GearQuest Community** lists Thrayne.
+### Damage and healing
+
+The Equip line **Increases damage and healing done by magical spells and effects by up to N** is healing and damage. It is not a green **+N Spell Power** line. A Spell Power weight on a custom spec does not score it. A healer scores the healing half. A damage spec scores the damage half as spell power.
+
+**Stormrider's Leather Pants** says up to 10. It requires 25. Leatherworking. The recipe is bought from Pawani at the Barrens camp, or from Daniel Stitchsong at the Redridge camp. Elemental Horde, level 25–28, legs, stays rank 3, score 18.22. Restoration Shaman and Restoration Druid list it at 25–28, legs, rank 13, score 24.42. Holy Paladin lists it at 25–27, legs, rank 14, score 35.55.
+
+**Totemic Leather Pants** is the same sentence at 7. Elemental and Enhancement already listed it, and those ranks stay. The same storage fix is on a set of old PvP pieces that are not on a hunt list. **Blade of Silverlaine** and **Coldflame Saber** stay as they were.
+
+### Vendors
+
+A vendor description names the seller at the closest pin, then adds **(be aware that some vendors sell items at random)**. A reputation or honor sentence after that stays. **Dirty Leather Bracers** in Mulgore still says **Bought from Varia Hardhide.**
+
+### v0.5.8-beta
+
+**General → Window size** runs from 100% to 150%. A reputation vendor says the standing this character has. **Ratchet Wristwraps** says **Your standing is Neutral.** Auctionator prices sit under a hunt hover when that addon is on. Eight starter drops are green, including **Wispy Cloak** at 5 and **Ratty Old Belt** from Narg the Taskmaster. **The GearQuest Community** lists Thrayne. The window title reads **GearQuest Forever v0.5.8-beta**.
 
 ### v0.5.7-beta
 

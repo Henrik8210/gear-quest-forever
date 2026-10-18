@@ -121,6 +121,15 @@ function GQ.Preview:SetEnabled(enabled)
     if not enabled and GQ.Log and GQ.Log.InvalidateActiveListCaches then
         GQ.Log:InvalidateActiveListCaches()
     end
+    -- The character's own spec was not scored while a simulated class was
+    -- on screen. A custom spec on this character has to be scored now.
+    if not enabled and GQ.Custom and GQ.Custom.EnsureBuilt and GQ.GetEffectiveClass and GQ.GetEffectiveSpec then
+        local classFile = GQ:GetEffectiveClass()
+        local specId = GQ:GetEffectiveSpec()
+        if classFile and specId then
+            GQ.Custom:EnsureBuilt(classFile, specId)
+        end
+    end
 end
 
 function GQ.Preview:SetClass(classFile)
@@ -138,6 +147,12 @@ function GQ.Preview:SetClass(classFile)
             GQ.Data:BuildIndex()
             if collectgarbage then
                 collectgarbage("collect")
+            end
+        end
+        if GQ.Custom and GQ.Custom.EnsureBuilt and GQ.GetEffectiveSpec then
+            local specId = GQ:GetEffectiveSpec()
+            if specId then
+                GQ.Custom:EnsureBuilt(normalized, specId)
             end
         end
     end

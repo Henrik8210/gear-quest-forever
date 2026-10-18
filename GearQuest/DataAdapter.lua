@@ -353,6 +353,9 @@ function GQ.Data:EnsureClassLoaded(classFile)
     self._loadedClasses[classFile] = true
     self._expandedClasses[classFile] = true
     self._generatedCount = (self._generatedCount or 0) + n
+    if GQ.Custom and GQ.Custom.OnClassExpanded then
+        GQ.Custom:OnClassExpanded(classFile)
+    end
     return true
 end
 
@@ -371,6 +374,9 @@ function GQ.Data:ReleaseExpandedClass(classFile)
     end
     self.entries = kept
     self._expandedClasses[classFile] = nil
+    if GQ.Custom and GQ.Custom.OnClassReleased then
+        GQ.Custom:OnClassReleased(classFile)
+    end
     -- Dropping rows shifts every later index. A lookup walk must start over.
     self._entryGeneration = (self._entryGeneration or 0) + 1
     self._classEntrySpan = nil

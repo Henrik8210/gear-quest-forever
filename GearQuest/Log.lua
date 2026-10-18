@@ -223,7 +223,7 @@ local function SetListRowItemText(row, leftInset, name, entry, status, showNewLa
     row.text:SetTextColor(1, 1, 1)
 end
 
-local SPEC_PICKER_WIDTH = 188
+local SPEC_PICKER_WIDTH = 228
 local SPEC_PICKER_ROW_HEIGHT = 20
 local SPEC_PICKER_PAD = 4
 local SPEC_ICON_SIZE = 22
@@ -2664,9 +2664,176 @@ function GQ.Log:ManageableQuestsEnabled()
     return ui and ui.playManageableQuests and true or false
 end
 
+function GQ.Log:FocusZoneEnabled()
+    local ui = GearQuestForeverDB and GearQuestForeverDB.ui
+    return ui and ui.playFocusZone and true or false
+end
+
 function GQ.Log:PlayStyleActive()
     return self:NoDungeonsEnabled() or self:DungeonEnjoyerEnabled() or self:GetItTodayEnabled()
         or self:ManageableDungeonsEnabled() or self:BuyItEnabled() or self:ManageableQuestsEnabled()
+        or self:FocusZoneEnabled()
+end
+
+function GQ.Log:PlayerZoneName()
+    local zone = ""
+    if GetRealZoneText then
+        zone = GetRealZoneText() or ""
+    end
+    if zone == "" and GetZoneText then
+        zone = GetZoneText() or ""
+    end
+    return zone
+end
+
+function GQ.Log:ZoneNamesMatch(a, b)
+    if not a or not b or a == "" or b == "" then
+        return false
+    end
+    if a == b then
+        return true
+    end
+    return string.lower(a) == string.lower(b)
+end
+
+-- A hunt can be finished here when its zone, or any spot this faction can
+-- use, is the zone the character is standing in. No place means it stays out.
+function GQ.Log:EntryInPlayerZone(entry)
+    if not entry then
+        return false
+    end
+    local zone = self:PlayerZoneName()
+    if zone == "" then
+        zone = self._focusZoneSeen or ""
+    end
+    if zone == "" then
+        return true
+    end
+    local itemId = entry.itemId
+    local cache = self._focusZoneMatch
+    if itemId and cache and self._focusZoneCacheName == zone then
+        local hit = cache[itemId]
+        if hit ~= nil then
+            return hit
+        end
+    end
+    local function remember(ok)
+        if itemId and self._focusZoneMatch and self._focusZoneCacheName == zone then
+            self._focusZoneMatch[itemId] = ok and true or false
+        end
+        return ok
+    end
+    if self:ZoneNamesMatch(entry.zone, zone) then
+        return remember(true)
+    end
+    local spots = GQ.Data and GQ.Data.VisibleCoordinateSpots and itemId and GQ.Data:VisibleCoordinateSpots(itemId)
+    if spots then
+        for i = 1, #spots do
+            if self:ZoneNamesMatch(spots[i].map, zone) then
+                return remember(true)
+            end
+        end
+    end
+    return remember(false)
+end
+
+-- The rows on screen stay until each slot has been checked, one slot per
+-- frame with an idle frame between slots. The list swaps once at the end.
+function GQ.Log:ScheduleFocusZoneRefresh()
+    if not self:FocusZoneEnabled() then
+        return
+    end
+    if not (self.frame and self.frame:IsShown()) then
+        return
+    end
+    if self._focusZoneWarm then
+        self._focusZoneWarmAgain = true
+        return
+    end
+    if not (C_Timer and C_Timer.After) then
+        self:Refresh()
+        return
+    end
+    self._focusZoneWarm = true
+    local zone = self:PlayerZoneName()
+    if zone == "" then
+        zone = self._focusZoneSeen or ""
+    end
+    self._focusZoneSeen = zone
+    self._focusZoneCacheName = zone
+    self._focusZoneMatch = {}
+    local slots = (GQ.Data and GQ.Data.GetSlotsForClass and GQ.Data:GetSlotsForClass(GQ:GetEffectiveClass())) or {}
+    local index = 0
+    local phase = "slots"
+    local gapLeft = 0
+    local function finish()
+        self._focusZoneWarm = false
+        if not (self.frame and self.frame:IsShown() and self:FocusZoneEnabled()) then
+            return
+        end
+        local nowZone = self:PlayerZoneName()
+        if self._focusZoneWarmAgain or (nowZone ~= "" and nowZone ~= zone) then
+            self._focusZoneWarmAgain = nil
+            self:ScheduleFocusZoneRefresh()
+            return
+        end
+        self:Refresh()
+    end
+    local function step()
+        if not (self.frame and self:FocusZoneEnabled()) then
+            self._focusZoneWarm = false
+            self._focusZoneWarmAgain = nil
+            return
+        end
+        local nowZone = self:PlayerZoneName()
+        if nowZone ~= "" and nowZone ~= zone then
+            self._focusZoneWarm = false
+            self:ScheduleFocusZoneRefresh()
+            return
+        end
+        if gapLeft > 0 then
+            gapLeft = gapLeft - 1
+            C_Timer.After(0, step)
+            return
+        end
+        if phase == "slots" then
+            index = index + 1
+            local slotName = slots[index]
+            if slotName then
+                local handKind = nil
+                if slotName == "MainHand" and self.WeaponHeaderKind then
+                    handKind = self:WeaponHeaderKind()
+                end
+                local list = self:GetSlotRankList(slotName, handKind)
+                if list then
+                    for i = 1, #list do
+                        self:EntryInPlayerZone(list[i])
+                    end
+                end
+                gapLeft = 1
+                C_Timer.After(0, step)
+                return
+            end
+            phase = "weapons"
+            gapLeft = 1
+            C_Timer.After(0, step)
+            return
+        end
+        if phase == "weapons" then
+            phase = "done"
+            local pool = self:CollectWeaponPool()
+            if pool then
+                for i = 1, #pool do
+                    self:EntryInPlayerZone(pool[i])
+                end
+            end
+            gapLeft = 1
+            C_Timer.After(0, step)
+            return
+        end
+        C_Timer.After(0, finish)
+    end
+    C_Timer.After(0, step)
 end
 
 function GQ.Log:UsesWideHuntList()
@@ -3278,6 +3445,9 @@ function GQ.Log:EntryMatchesPlayStyle(entry)
     if self:BuyItEnabled() and not self:EntryCanBeBought(entry) then
         return false
     end
+    if self:FocusZoneEnabled() and not self:EntryInPlayerZone(entry) then
+        return false
+    end
     return true
 end
 
@@ -3503,6 +3673,7 @@ function GQ.Log:GetActiveListCacheContextKey()
         self:ManageableDungeonsEnabled() and "mdung" or "",
         self:ManageableQuestsEnabled() and "manage" or "",
         self:BuyItEnabled() and "buy" or "",
+        self:FocusZoneEnabled() and ("zone:" .. self:PlayerZoneName()) or "",
     }, "|")
 end
 
@@ -3666,7 +3837,7 @@ function GQ.Log:GetFilteredTopForSlot(slotName)
     -- A filter can use an earlier level band, so a slot still shows the best
     -- allowed piece the character can equip when this level's band has none.
     slotName = GQ.Data:NormalizeSlotName(slotName)
-    if slotName == "MainHand" or (slotName == "SecondaryHand" and GQ.Data:CanDualWield() and self:WeaponStyleEnabled("one")) then
+    if slotName == "MainHand" or (slotName == "SecondaryHand" and GQ.Data:CanDualWield() and self:WeaponStyleEnabled("off")) then
         local list = self:FilteredWeaponEntries()
         local out = {}
         local claimed = {}
@@ -5480,13 +5651,24 @@ function GQ.Log:RefreshSpecPickerRows()
     local classFile = GQ:GetEffectiveClass()
     local options = GQ.Spec:GetOptions(classFile) or {}
     local current = GQ.Spec:GetDisplaySpec(classFile)
-    local rowCount = #options
+    local lines = {}
+    for i = 1, #options do
+        lines[#lines + 1] = { kind = "spec", opt = options[i] }
+    end
+    lines[#lines + 1] = { kind = "divider" }
+    local customs = (GQ.Custom and GQ.Custom.List and GQ.Custom:List(classFile)) or {}
+    for i = 1, #customs do
+        lines[#lines + 1] = { kind = "custom", record = customs[i] }
+    end
+    lines[#lines + 1] = { kind = "add" }
 
     for i, row in ipairs(picker.rows) do
         row:Hide()
     end
 
-    for i, opt in ipairs(options) do
+    local y = SPEC_PICKER_PAD
+    for i = 1, #lines do
+        local line = lines[i]
         local row = picker.rows[i]
         if not row then
             row = CreateFrame("Button", nil, picker)
@@ -5503,64 +5685,149 @@ function GQ.Log:RefreshSpecPickerRows()
             row.highlight:SetColorTexture(0.28, 0.22, 0.08, 0.55)
             row.highlight:Hide()
             row:SetScript("OnEnter", function(self)
-                if self.highlight then
+                if self.highlight and self:IsEnabled() then
                     self.highlight:Show()
+                end
+                if self.tip then
+                    GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+                    GameTooltip:SetText(self.tip, 1, 0.82, 0)
+                    GameTooltip:Show()
                 end
             end)
             row:SetScript("OnLeave", function(self)
                 if self.highlight then
                     self.highlight:Hide()
                 end
+                GameTooltip:Hide()
             end)
+            row.rule = row:CreateTexture(nil, "ARTWORK")
+            row.rule:SetColorTexture(0.78, 0.7, 0.48, 0.95)
+            row.rule:SetHeight(1)
+            row.rule:SetPoint("LEFT", row, "LEFT", 6, 0)
+            row.rule:SetPoint("RIGHT", row, "RIGHT", -6, 0)
+            row.rule:Hide()
+            row.remove = CreateFrame("Button", nil, row)
+            row.remove:SetSize(16, 16)
+            row.remove:SetPoint("RIGHT", row, "RIGHT", -1, 0)
+            row.remove.label = row.remove:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+            row.remove.label:SetPoint("CENTER", row.remove, "CENTER", 0, 0)
+            row.remove.label:SetText("|cffff6666X|r")
+            row.remove:SetScript("OnClick", function(self)
+                local parent = self:GetParent()
+                if parent.customId and GQ.Custom and GQ.Custom.DeleteSpec then
+                    GQ.Custom:DeleteSpec(parent.classFile, parent.customId)
+                end
+            end)
+            row.remove:SetScript("OnEnter", function(self)
+                GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+                GameTooltip:SetText("Delete this custom spec", 1, 0.82, 0)
+                GameTooltip:Show()
+            end)
+            row.remove:SetScript("OnLeave", function()
+                GameTooltip:Hide()
+            end)
+            row.remove:Hide()
             picker.rows[i] = row
         end
 
+        local height = line.kind == "divider" and 10 or SPEC_PICKER_ROW_HEIGHT
+        row:SetHeight(height)
         row:ClearAllPoints()
-        row:SetPoint("TOPLEFT", picker, "TOPLEFT", SPEC_PICKER_PAD, -(SPEC_PICKER_PAD + ((i - 1) * SPEC_PICKER_ROW_HEIGHT)))
+        row:SetPoint("TOPLEFT", picker, "TOPLEFT", SPEC_PICKER_PAD, -y)
         row:Show()
-
-        local specId = opt.id
-        local specLabel = opt.label
-        row.specId = specId
-        local selectable = GQ.Spec:IsSpecSelectable(specId, classFile)
-        row.icon:SetTexture(GQ.Spec:GetSpecIcon(specId, classFile))
-        if selectable then
-            row.icon:SetVertexColor(1, 1, 1)
-        else
-            row.icon:SetVertexColor(0.45, 0.45, 0.45)
+        row.tip = nil
+        row.specId = nil
+        row.customId = nil
+        row.classFile = classFile
+        row.icon:Show()
+        if row.rule then
+            row.rule:Hide()
         end
+        if row.remove then
+            row.remove:Hide()
+        end
+        row.label:ClearAllPoints()
+        row.label:SetPoint("LEFT", row.icon, "RIGHT", 6, 0)
+        row.label:SetText("")
+        y = y + height
 
-        local selected = (current == specId)
-        if not selectable then
+        if line.kind == "divider" then
             row:Disable()
-            row.label:SetText("|cff888888" .. specLabel .. " (coming later)|r")
-            row:SetScript("OnClick", nil)
-        else
-            row:Enable()
-            if selected then
-                row.label:SetText("|cffFFD200> |r" .. specLabel)
-            else
-                row.label:SetText(specLabel)
+            row.icon:Hide()
+            if row.rule then
+                row.rule:Show()
             end
-
-            row:SetScript("OnClick", function(self)
-                local picked = self.specId
-                local ok, err = GQ.Spec:SetSelectedSpec(picked, classFile)
-                if not ok then
-                    GQ:Chat("|cff66ccffGearQuest|r: " .. (err or "Could not change specialization."))
-                    return
+            row:SetScript("OnClick", nil)
+        elseif line.kind == "add" then
+            row:Enable()
+            row.icon:Hide()
+            row.label:ClearAllPoints()
+            row.label:SetPoint("LEFT", row, "LEFT", 4, 0)
+            row.label:SetText("|cffFFD200+ custom stat weights|r")
+            row:SetScript("OnClick", function()
+                if GQ.Custom and GQ.Custom.ShowEditor then
+                    GQ.Custom:ShowEditor(classFile)
                 end
-                GQ:Chat(string.format(
-                    "|cff66ccffGearQuest|r: Now viewing |cff00ff00%s|r upgrades.",
-                    GQ.Spec:GetSpecLabel(picked, classFile) or specLabel
-                ))
-                GQ.Log:HideSpecPicker()
-                GQ.Log:UpdateSpecButton()
             end)
+        else
+            local specId, specLabel, icon
+            if line.kind == "custom" then
+                specId = line.record.id
+                specLabel = line.record.name
+                icon = GQ.Spec:GetSpecIcon(line.record.base, classFile)
+                row.customId = specId
+                row.tip = "Right-click to edit these weights."
+                if row.remove then
+                    row.remove:Show()
+                    row.label:SetPoint("RIGHT", row.remove, "LEFT", -2, 0)
+                end
+            else
+                specId = line.opt.id
+                specLabel = line.opt.label
+                icon = GQ.Spec:GetSpecIcon(specId, classFile)
+            end
+            row.specId = specId
+            local selectable = GQ.Spec:IsSpecSelectable(specId, classFile)
+            row.icon:SetTexture(icon)
+            if selectable then
+                row.icon:SetVertexColor(1, 1, 1)
+            else
+                row.icon:SetVertexColor(0.45, 0.45, 0.45)
+            end
+            if not selectable then
+                row:Disable()
+                row.label:SetText("|cff888888" .. specLabel .. " (coming later)|r")
+                row:SetScript("OnClick", nil)
+            else
+                row:Enable()
+                if current == specId then
+                    row.label:SetText("|cffFFD200> |r" .. specLabel)
+                else
+                    row.label:SetText(specLabel)
+                end
+                row:SetScript("OnClick", function(self, button)
+                    if button == "RightButton" and self.customId and GQ.Custom and GQ.Custom.ShowEditor then
+                        GQ.Custom:ShowEditor(classFile, self.customId)
+                        return
+                    end
+                    local picked = self.specId
+                    local ok, err = GQ.Spec:SetSelectedSpec(picked, classFile)
+                    if not ok then
+                        GQ:Chat("|cff66ccffGearQuest|r: " .. (err or "Could not change specialization."))
+                        return
+                    end
+                    GQ:Chat(string.format(
+                        "|cff66ccffGearQuest|r: Now viewing |cff00ff00%s|r upgrades.",
+                        GQ.Spec:GetSpecLabel(picked, classFile) or specLabel
+                    ))
+                    GQ.Log:HideSpecPicker()
+                    GQ.Log:UpdateSpecButton()
+                end)
+            end
         end
     end
 
-    picker:SetHeight((SPEC_PICKER_PAD * 2) + (rowCount * SPEC_PICKER_ROW_HEIGHT))
+    picker:SetHeight(y + SPEC_PICKER_PAD)
 end
 
 function GQ.Log:ToggleSpecPicker(anchorBtn)
@@ -6263,18 +6530,34 @@ function GQ.Log:LayoutContextHeading()
     if not fs then
         return
     end
+    local simulated = GQ.IsPreviewEnabled and GQ:IsPreviewEnabled() and self:GetPageTab() ~= "settings"
     fs:ClearAllPoints()
     fs:SetJustifyH("CENTER")
     fs:SetJustifyV("MIDDLE")
     if self:GetPageTab() == "settings" then
         local mid = (CONTEXT_BAND_TOP - TAB_TOP_OFFSET) / 2
         fs:SetPoint("CENTER", frame, "TOP", 0, mid)
+    elseif simulated then
+        local bar = frame.contextStatusBar
+        fs:SetPoint("TOPLEFT", bar, "TOPLEFT", 0, -1)
+        fs:SetPoint("TOPRIGHT", bar, "TOPRIGHT", 0, -1)
+        fs:SetHeight(18)
     else
         local bar = frame.contextStatusBar
         fs:SetPoint("LEFT", bar, "LEFT", 0, 0)
         fs:SetPoint("RIGHT", bar, "RIGHT", 0, 0)
         fs:SetPoint("TOP", bar, "TOP", 0, 0)
         fs:SetPoint("BOTTOM", bar, "BOTTOM", 0, 0)
+    end
+    local offBtn = frame.simHeaderOffBtn
+    if offBtn then
+        if simulated then
+            offBtn:ClearAllPoints()
+            offBtn:SetPoint("TOP", fs, "BOTTOM", 0, -1)
+            offBtn:Show()
+        else
+            offBtn:Hide()
+        end
     end
 end
 
@@ -6311,6 +6594,19 @@ function GQ.Log:EnsureContextStatus(frame)
     frame.contextStatus:SetPoint("TOP", frame.contextStatusBar, "TOP", 0, 0)
     frame.contextStatus:SetPoint("BOTTOM", frame.contextStatusBar, "BOTTOM", 0, 0)
     frame.contextStatus:Show()
+    if not frame.simHeaderOffBtn then
+        local offBtn = CreateFrame("Button", "GearQuestSimHeaderOffButton", frame.contextStatusBar, "UIPanelButtonTemplate")
+        offBtn:SetSize(168, 22)
+        offBtn:SetText("Turn off simulation")
+        offBtn:SetScript("OnClick", function()
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if log and GQ.IsPreviewEnabled and GQ:IsPreviewEnabled() then
+                log:ResetSimulator()
+            end
+        end)
+        offBtn:Hide()
+        frame.simHeaderOffBtn = offBtn
+    end
     self:UpdateContextStatus()
 end
 
@@ -6797,10 +7093,14 @@ function GQ.Log:EnsurePlayStyle(frame)
     self:UpdatePlayStyleButton()
 
     local panel = CreateFrame("Frame", "GearQuestPlayStylePanel", frame, "BackdropTemplate")
-    panel:SetFrameStrata("DIALOG")
-    panel:SetFrameLevel(200)
+    -- The log title is drawn on the portrait frame above a DIALOG child.
+    panel:SetFrameStrata("FULLSCREEN_DIALOG")
+    panel:SetFrameLevel(300)
     panel:EnableMouse(true)
-    panel:SetSize(640, 418)
+    panel:SetSize(640, 560)
+    if panel.SetClampedToScreen then
+        panel:SetClampedToScreen(true)
+    end
     panel:SetPoint("CENTER", frame, "CENTER", 0, 20)
     panel:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8X8",
@@ -6959,6 +7259,18 @@ function GQ.Log:EnsurePlayStyle(frame)
             end
         end
     )
+    panel.focusZoneCard = makeCard(
+        "Focus Zone",
+        art .. "GQ-Play-FocusZone.png",
+        panel.manageableDungeonsCard, 0, -36,
+        "Shows only hunts with a spot in the zone you are standing in. Quests, vendors, crafts, world drops, and dungeon drops all follow that zone. A drop with a camp here stays, even when it also drops somewhere else. A hunt with no place stays hidden. Walk into another zone and the list changes.",
+        function()
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if log then
+                log:SetFocusZone(not log:FocusZoneEnabled())
+            end
+        end
+    )
 
     local closeBtn = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
     closeBtn:SetSize(100, 22)
@@ -6974,6 +7286,7 @@ function GQ.Log:EnsurePlayStyle(frame)
     self:SetSimulatorChoiceHighlight(panel.manageableDungeonsCard, false, 0.35)
     self:SetSimulatorChoiceHighlight(panel.manageableCard, false, 0.35)
     self:SetSimulatorChoiceHighlight(panel.buyItCard, false, 0.35)
+    self:SetSimulatorChoiceHighlight(panel.focusZoneCard, false, 0.35)
     self:StartPlayStyleIntro(btn)
 end
 
@@ -7121,6 +7434,29 @@ function GQ.Log:SetManageableQuests(enabled)
     self:SetPlayStyleFlag("playManageableQuests", enabled)
 end
 
+function GQ.Log:SetFocusZone(enabled)
+    self._focusZoneSeen = self:PlayerZoneName()
+    self._focusZoneMatch = nil
+    self._focusZoneCacheName = nil
+    GearQuestForeverDB.ui = GearQuestForeverDB.ui or {}
+    if enabled then
+        GearQuestForeverDB.ui.playFocusZone = true
+    else
+        GearQuestForeverDB.ui.playFocusZone = nil
+    end
+    self:RefreshPlayStylePanel()
+    self:InvalidateSourceFilterCache()
+    if GQ.Indicator and GQ.Indicator.ScheduleRebuildCache then
+        GQ.Indicator:ScheduleRebuildCache()
+    end
+    if enabled then
+        self:ScheduleFocusZoneRefresh()
+    end
+    if not enabled or not (self.frame and self.frame:IsShown()) then
+        self:ScheduleListRefresh()
+    end
+end
+
 function GQ.Log:UpdatePlayStyleButton()
     local btn = self.frame and self.frame.playStyleBtn
     if not btn then
@@ -7159,6 +7495,10 @@ function GQ.Log:RefreshPlayStylePanel()
     if buy then
         self:SetSimulatorChoiceHighlight(buy, self:BuyItEnabled(), 0.35)
     end
+    local focus = panel and panel.focusZoneCard
+    if focus then
+        self:SetSimulatorChoiceHighlight(focus, self:FocusZoneEnabled(), 0.35)
+    end
     self:UpdatePlayStyleButton()
 end
 
@@ -7172,6 +7512,8 @@ function GQ.Log:TogglePlayStylePanel()
         return
     end
     self:RefreshPlayStylePanel()
+    panel:SetFrameStrata("FULLSCREEN_DIALOG")
+    panel:SetFrameLevel(300)
     panel:Show()
 end
 
@@ -11512,7 +11854,11 @@ function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry, label, hand
         row.text:ClearAllPoints()
         row.text:SetPoint("LEFT", row.icon, "RIGHT", 4, 0)
         row.text:SetPoint("RIGHT", row, "RIGHT", -24, 0)
-        row.text:SetText(label or GQ.Data:SlotHeaderLabel(slotName))
+        local header = label or GQ.Data:SlotHeaderLabel(slotName)
+        if label == "Weapons" and self:WeaponFilterNarrowed() then
+            header = "Weapons*"
+        end
+        row.text:SetText(header)
         row.text:SetTextColor(1, 0.82, 0)
         if row.info then
             local titleWidth = row.text:GetStringWidth() or 0
@@ -12700,6 +13046,12 @@ function GQ.Log:EnsureCoordinateWatch()
         if log and log.RefreshNearestCoordinates then
             log:RefreshNearestCoordinates()
         end
+        if log and log.FocusZoneEnabled and log:FocusZoneEnabled() then
+            local zone = log:PlayerZoneName()
+            if zone ~= "" and zone ~= log._focusZoneSeen then
+                log:ScheduleFocusZoneRefresh()
+            end
+        end
     end)
     self._coordWatch = watch
 end
@@ -12981,7 +13333,8 @@ end
 
 function GQ.Log:PreferredWeaponStyle(pool, hasTwo, hasOne)
     local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
-    local spec = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec()
+    local spec = GQ.Data and GQ.Data.RuleSpec and GQ.Data:RuleSpec()
+        or (GQ.GetEffectiveSpec and GQ:GetEffectiveSpec())
     if classFile == "MAGE" or classFile == "PRIEST" or classFile == "WARLOCK" or (classFile == "DRUID" and spec ~= "feral") then
         return self:BestOpenWeaponStyle(pool, hasTwo, hasOne)
     end
@@ -13033,8 +13386,24 @@ function GQ.Log:IsWeaponHandKind(handKind)
     return handKind == "two" or handKind == "one" or handKind == "both"
 end
 
+function GQ.Log:IsWeaponFilterStyle(style)
+    return style == "two" or style == "main" or style == "off"
+end
+
+-- A saved "one" checkbox is both hands for a dual-wield spec, and Main Hand
+-- only when the off hand is a shield or held item.
+function GQ.Log:LegacyOneHandEnables(style)
+    if style == "main" then
+        return true
+    end
+    if style == "off" then
+        return GQ.Data:CanDualWield() and true or false
+    end
+    return false
+end
+
 function GQ.Log:WeaponStyleEnabled(style)
-    if style ~= "two" and style ~= "one" then
+    if not self:IsWeaponFilterStyle(style) then
         return false
     end
     local available = self:WeaponStylesAvailable()
@@ -13052,30 +13421,33 @@ function GQ.Log:WeaponStyleEnabled(style)
         return style == "two"
     end
     local rec = self:WeaponFilterRecord()
-    if rec and rec.styles and rec.styles[style] ~= nil then
-        return rec.styles[style] and true or false
+    if rec and rec.styles then
+        if rec.styles[style] ~= nil then
+            return rec.styles[style] and true or false
+        end
+        if rec.styles.one ~= nil and rec.styles.main == nil and rec.styles.off == nil and style ~= "two" then
+            return rec.styles.one and self:LegacyOneHandEnables(style)
+        end
     end
     if GQ.Data.UsesBothWeaponStyles and GQ.Data:UsesBothWeaponStyles() then
         return true
     end
-    if rec and (rec.style == "two" or rec.style == "one") then
-        local savedExists = false
-        for i = 1, #available do
-            if available[i] == rec.style then
-                savedExists = true
-                break
-            end
-        end
-        if savedExists then
-            return rec.style == style
-        end
+    local saved = rec and rec.style
+    if saved == "one" and style ~= "two" then
+        return self:LegacyOneHandEnables(style)
     end
-    return style == self:WeaponStyle()
+    if saved == "two" then
+        return style == "two"
+    end
+    if self:WeaponStyle() == "one" then
+        return style ~= "two" and self:LegacyOneHandEnables(style)
+    end
+    return style == "two"
 end
 
 function GQ.Log:WeaponHeaderKind()
     local two = self:WeaponStyleEnabled("two")
-    local one = self:WeaponStyleEnabled("one")
+    local one = self:WeaponStyleEnabled("main") or self:WeaponStyleEnabled("off")
     if two and one then
         return "both"
     end
@@ -13087,20 +13459,40 @@ end
 
 function GQ.Log:WeaponTypeChecked(style, typeId)
     local rec = self:WeaponFilterRecord()
-    local by = rec and rec.typesByStyle and rec.typesByStyle[style]
+    local byStyle = rec and rec.typesByStyle
+    local by = byStyle and byStyle[style]
     if by and by[typeId] ~= nil then
         return by[typeId] and true or false
+    end
+    -- Types saved under the old combined One-hand box apply to a hand that
+    -- has not been changed yet.
+    if not by and (style == "main" or style == "off") and byStyle and byStyle.one and byStyle.one[typeId] ~= nil then
+        return byStyle.one[typeId] and true or false
     end
     if rec and rec.types and rec.types[typeId] ~= nil then
         local legacy = rec.style
         if legacy ~= "two" and legacy ~= "one" then
             legacy = self:WeaponStyle()
         end
-        if legacy == style then
+        if legacy == style or (legacy == "one" and (style == "main" or style == "off")) then
             return rec.types[typeId] and true or false
         end
     end
     return true
+end
+
+function GQ.Log:WeaponFilterNarrowed()
+    local available = self:WeaponStylesAvailable()
+    for i = 1, #available do
+        local style = available[i]
+        if not self:WeaponStyleEnabled(style) then
+            return true
+        end
+        if self:WeaponTypeFilterNarrowed(style) then
+            return true
+        end
+    end
+    return false
 end
 
 function GQ.Log:WeaponTypeFilterNarrowed(style)
@@ -13113,11 +13505,13 @@ function GQ.Log:WeaponTypeFilterNarrowed(style)
     return false
 end
 
-function GQ.Log:WeaponTypeAllowed(entry)
+function GQ.Log:WeaponTypeAllowed(entry, style)
     if not entry then
         return false
     end
-    local style = GQ.Data:EntryIsTwoHand(entry) and "two" or "one"
+    if not style then
+        style = GQ.Data:EntryIsTwoHand(entry) and "two" or "main"
+    end
     local kind = GQ.Data:WeaponTypeOf(entry)
     if not kind then
         -- An unread type is not a selected type. It stays out once any box is off.
@@ -13130,11 +13524,23 @@ function GQ.Log:WeaponPassesFilter(entry)
     if not entry or not GQ.Data:EntryIsDamagingWeapon(entry) then
         return false
     end
-    local style = GQ.Data:EntryIsTwoHand(entry) and "two" or "one"
-    if not self:WeaponStyleEnabled(style) then
-        return false
+    if GQ.Data:EntryIsTwoHand(entry) then
+        if not self:WeaponStyleEnabled("two") then
+            return false
+        end
+        return self:WeaponTypeAllowed(entry, "two")
     end
-    return self:WeaponTypeAllowed(entry)
+    -- Main Hand and Off Hand do not overlap for a dual-wield spec.
+    -- Main-hand-only weapons leave when Main Hand is off. One-handers
+    -- that can sit in the off hand leave when Off Hand is off.
+    local hands = { "main", "off" }
+    for i = 1, #hands do
+        local hand = hands[i]
+        if GQ.Data:WeaponFitsFilterHand(entry, hand) and self:WeaponStyleEnabled(hand) and self:WeaponTypeAllowed(entry, hand) then
+            return true
+        end
+    end
+    return false
 end
 
 function GQ.Log:WeaponTypesForStyle(style)
@@ -13164,23 +13570,28 @@ function GQ.Log:WeaponStylesAvailable()
         return self._weaponStyles
     end
     local pool = self:CollectWeaponPool()
-    local hasTwo, hasOne = false, false
+    local hasTwo, hasMain, hasOff = false, false, false
     for i = 1, #pool do
-        if GQ.Data:WeaponFitsStyle(pool[i], "two") then
+        local entry = pool[i]
+        if GQ.Data:WeaponFitsFilterHand(entry, "two") then
             hasTwo = true
-        else
-            hasOne = true
         end
-    end
-    if GQ.Data:UsesTwoHandOnlyWeapons() then
-        hasOne = false
+        if GQ.Data:WeaponFitsFilterHand(entry, "main") then
+            hasMain = true
+        end
+        if GQ.Data:WeaponFitsFilterHand(entry, "off") then
+            hasOff = true
+        end
     end
     local out = {}
     if hasTwo then
         out[#out + 1] = "two"
     end
-    if hasOne then
-        out[#out + 1] = "one"
+    if hasMain then
+        out[#out + 1] = "main"
+    end
+    if hasOff then
+        out[#out + 1] = "off"
     end
     self._weaponStylesBand = ctx
     self._weaponStyles = out
@@ -13329,12 +13740,13 @@ end
 
 function GQ.Log:ToggleWeaponStyle(style)
     local rec = self:WeaponFilterRecord()
-    if not rec or (style ~= "two" and style ~= "one") then
+    if not rec or not self:IsWeaponFilterStyle(style) then
         return
     end
     local now = {
         two = self:WeaponStyleEnabled("two"),
-        one = self:WeaponStyleEnabled("one"),
+        main = self:WeaponStyleEnabled("main"),
+        off = self:WeaponStyleEnabled("off"),
     }
     now[style] = not now[style]
     rec.styles = now
@@ -13352,7 +13764,7 @@ end
 
 function GQ.Log:ToggleWeaponType(typeId, style)
     local rec = self:WeaponFilterRecord()
-    if not rec or (style ~= "two" and style ~= "one") then
+    if not rec or not self:IsWeaponFilterStyle(style) then
         return
     end
     rec.typesByStyle = rec.typesByStyle or {}
@@ -13471,7 +13883,15 @@ function GQ.Log:FillWeaponMenu()
         local name
         local checked
         if line.kind == "style" then
-            name = (line.id == "two") and "Two-hand" or "One-hand"
+            if line.id == "two" then
+                name = "Two-hand"
+            elseif line.id == "main" then
+                name = "Main Hand"
+            elseif line.id == "off" then
+                name = "Off Hand"
+            else
+                name = line.id
+            end
             checked = self:WeaponStyleEnabled(line.id)
             check.label:SetTextColor(1, 0.82, 0)
         else
@@ -13530,6 +13950,9 @@ end
 function GQ.Log:Refresh()
     if self:GetPageTab() == "lookup" then
         self:RefreshLookup()
+        if GQ.Custom and GQ.Custom.NoteListPainted then
+            GQ.Custom:NoteListPainted()
+        end
         return
     end
     local tab = self:GetListTab()
@@ -13700,6 +14123,9 @@ function GQ.Log:Refresh()
     LayoutDetailScroll(self.frame)
     self:ApplyPageTab()
     self:ClampListRowMouse()
+    if GQ.Custom and GQ.Custom.NoteListPainted then
+        GQ.Custom:NoteListPainted()
+    end
     if C_Timer and C_Timer.After then
         C_Timer.After(0, function()
             if GQ.Log and GQ.Log.ClampListRowMouse then
@@ -13840,6 +14266,16 @@ function GQ.Log:Show()
     LayoutDetailScroll(self.frame)
     BringLogWindowToFront(self.frame)
     self.frame:Show()
+    if GQ.Custom and GQ.Custom.EnsureBuilt and GQ.GetEffectiveClass and GQ.GetEffectiveSpec then
+        local classFile = GQ:GetEffectiveClass()
+        local specId = GQ:GetEffectiveSpec()
+        if classFile and specId and GQ.Custom:Get(classFile, specId) then
+            GQ.Custom:EnsureBuilt(classFile, specId)
+        end
+    end
+    if GQ.Custom and GQ.Custom.ShowWorking and (GQ.Custom._job or GQ.Custom._awaitList) then
+        GQ.Custom:ShowWorking()
+    end
     self:LayoutSideTabs(self.frame)
     self:EnsureCoordinateWatch()
 

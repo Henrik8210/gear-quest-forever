@@ -722,18 +722,59 @@ local function FormatScoringWeight(value)
     return text
 end
 
+local function ScoringRowsFromWeights(weights, dpsWeight, dpsRanged, speedWeight)
+    local rows = {}
+    for key, value in pairs(weights or {}) do
+        if value > 0 then
+            local label = (GQ.ScoringWeightLabels and GQ.ScoringWeightLabels[key]) or key
+            rows[#rows + 1] = { label = label, value = value }
+        end
+    end
+    if (dpsWeight or 0) > 0 then
+        rows[#rows + 1] = { label = "Melee weapon damage", value = dpsWeight }
+    end
+    if (dpsRanged or 0) > 0 then
+        rows[#rows + 1] = { label = "Ranged weapon damage", value = dpsRanged }
+    end
+    table.sort(rows, function(a, b)
+        if a.value ~= b.value then
+            return a.value > b.value
+        end
+        return a.label < b.label
+    end)
+    if (speedWeight or 0) ~= 0 then
+        local at = #rows + 1
+        for i = 1, #rows do
+            if rows[i].label == "Melee weapon damage" then
+                at = i + 1
+                break
+            end
+        end
+        table.insert(rows, at, { label = "Weapon speed", value = speedWeight })
+    end
+    return rows
+end
+
 function GQ.Compare:GetEffectiveScoringRows(classFile, specId, playerLevel)
+    playerLevel = playerLevel or 1
+    local custom = GQ.Custom and classFile and specId and GQ.Custom.Get and GQ.Custom:Get(classFile, specId)
+    if custom then
+        local weights, dpsWeight, dpsRanged, speedWeight = GQ.Custom:Weights(classFile, custom, playerLevel)
+        local leveling = GQ.ScoringLeveling
+        local useLeveling = leveling and playerLevel <= (leveling.untilLevel or 60)
+        local rows = ScoringRowsFromWeights(weights, dpsWeight, dpsRanged, speedWeight)
+        return rows, custom.name, useLeveling, true
+    end
+
     local classTable = GQ.ScoringWeights and GQ.ScoringWeights[classFile]
     local specRow = classTable and specId and classTable[specId]
     if not specRow or not specRow.weights then
         return nil
     end
 
-    playerLevel = playerLevel or 1
     local leveling = GQ.ScoringLeveling
     local useLeveling = leveling and playerLevel < (leveling.untilLevel or 60)
-    local rows = {}
-
+    local weights = {}
     for key, raw in pairs(specRow.weights) do
         local mult = 1
         if useLeveling and leveling[key] then
@@ -750,40 +791,11 @@ function GQ.Compare:GetEffectiveScoringRows(classFile, specId, playerLevel)
             local armorW = (specRow.weights.armor or 0) * armorMult
             value = value + 2 * armorW + (specRow.weights.dodge or 0) / 20 + (specRow.weights.crit or 0) / 20
         end
-        if value > 0 then
-            local label = (GQ.ScoringWeightLabels and GQ.ScoringWeightLabels[key]) or key
-            rows[#rows + 1] = { label = label, value = value }
-        end
+        weights[key] = value
     end
 
-    if (specRow.dpsWeight or 0) > 0 then
-        rows[#rows + 1] = { label = "Melee weapon damage", value = specRow.dpsWeight }
-    end
-    if (specRow.dpsWeightRanged or 0) > 0 then
-        rows[#rows + 1] = { label = "Ranged weapon damage", value = specRow.dpsWeightRanged }
-    end
-
-    table.sort(rows, function(a, b)
-        if a.value ~= b.value then
-            return a.value > b.value
-        end
-        return a.label < b.label
-    end)
-
-    -- Negative points per second of weapon speed. Slower weapons lose more.
-    -- Kept under melee weapon damage so the penalty stays with the weapon rows.
-    if (specRow.speedWeight or 0) ~= 0 then
-        local at = #rows + 1
-        for i = 1, #rows do
-            if rows[i].label == "Melee weapon damage" then
-                at = i + 1
-                break
-            end
-        end
-        table.insert(rows, at, { label = "Weapon speed", value = specRow.speedWeight })
-    end
-
-    return rows, specRow.label, useLeveling
+    local rows = ScoringRowsFromWeights(weights, specRow.dpsWeight, specRow.dpsWeightRanged, specRow.speedWeight)
+    return rows, specRow.label, useLeveling, false
 end
 
 function GQ.Compare:ShowScoringWeightTooltip(owner)
@@ -794,7 +806,7 @@ function GQ.Compare:ShowScoringWeightTooltip(owner)
     local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
     local specId = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec()
     local playerLevel = GQ.GetEffectiveLevel and GQ:GetEffectiveLevel() or 1
-    local rows, specLabel, useLeveling = self:GetEffectiveScoringRows(classFile, specId, playerLevel)
+    local rows, specLabel = self:GetEffectiveScoringRows(classFile, specId, playerLevel)
 
     GameTooltip:SetOwner(owner, "ANCHOR_RIGHT")
     local title = specLabel
@@ -810,31 +822,6 @@ function GQ.Compare:ShowScoringWeightTooltip(owner)
     end
 
     GameTooltip:AddLine("How GearQuest ranks gear for this spec.", 1, 1, 1, true)
-    if useLeveling then
-        GameTooltip:AddLine(
-            "Levels 1–59. Stamina, health, and health per 5 count ×3. Armor counts ×2. Intellect, spirit, mana, and mana per 5 count ×2. The numbers below already include that.",
-            0.75, 0.75, 0.75, true
-        )
-    else
-        GameTooltip:AddLine("Level 60 uses these weights with no leveling bonus.", 0.75, 0.75, 0.75, true)
-    end
-    GameTooltip:AddLine("1.00 is one point of this spec's main stat.", 0.75, 0.75, 0.75, true)
-    for i = 1, #rows do
-        if rows[i].label == "Weapon speed" and rows[i].value < 0 then
-            local cost = -rows[i].value
-            GameTooltip:AddLine(
-                "Each second of weapon speed costs "
-                    .. FormatScoringWeight(cost)
-                    .. " points. A weapon that swings every 2 seconds loses "
-                    .. FormatScoringWeight(cost * 2)
-                    .. " points. A weapon that swings every 3 seconds loses "
-                    .. FormatScoringWeight(cost * 3)
-                    .. ".",
-                0.75, 0.75, 0.75, true
-            )
-            break
-        end
-    end
     GameTooltip:AddLine(" ")
 
     for i = 1, #rows do

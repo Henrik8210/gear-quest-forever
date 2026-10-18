@@ -226,6 +226,7 @@ const SCORING_LABELS = {
   rap: "Ranged attack power",
   feralAp: "Feral attack power",
   heal: "Healing",
+  sp_from_heal: "Healing as spell power",
   sp: "Spell power",
   spHoly: "Holy spell power",
   spFire: "Fire spell power",

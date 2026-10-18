@@ -190,6 +190,20 @@ function GQ.Spec:GetSpecOption(specId, classFile)
             return opt
         end
     end
+    if GQ.Custom and GQ.Custom.Option then
+        return GQ.Custom:Option(classFile, specId)
+    end
+end
+
+function GQ.Spec:GetRuleSpec(specId, classFile)
+    specId = specId or (GQ.GetEffectiveSpec and GQ:GetEffectiveSpec())
+    if GQ.Custom and GQ.Custom.BaseOf then
+        local base = GQ.Custom:BaseOf(specId, classFile)
+        if base then
+            return base
+        end
+    end
+    return specId
 end
 
 function GQ.Spec:IsSpecSelectable(specId, classFile)
@@ -209,6 +223,8 @@ function GQ.Spec:GetSpecLabel(specId, classFile)
             return opt.label
         end
     end
+    local custom = GQ.Custom and GQ.Custom.Option and GQ.Custom:Option(classFile, specId)
+    return custom and custom.label
 end
 
 function GQ.Spec:GetSpecIcon(specId, classFile)
@@ -339,6 +355,13 @@ function GQ.Spec:ResolveSpecInput(specId, classFile)
         end
     end
 
+    if GQ.Custom and GQ.Custom.FindByName then
+        local customId = GQ.Custom:FindByName(classFile, specId)
+        if customId then
+            return customId
+        end
+    end
+
     local compact = specId:gsub("[%s_%-]", "")
     for _, opt in ipairs(options) do
         local optCompact = opt.id:gsub("_", "")
@@ -370,6 +393,10 @@ function GQ.Spec:SetSelectedSpec(specId, classFile)
         end
     end
 
+    if not matched and GQ.Custom and GQ.Custom.Option then
+        matched = GQ.Custom:Option(classFile, specId)
+    end
+
     if not matched then
         local names = {}
         for _, opt in ipairs(options) do
@@ -382,6 +409,10 @@ function GQ.Spec:SetSelectedSpec(specId, classFile)
 
     if not self:IsSpecSelectable(matched.id, classFile) then
         return false, matched.label .. " is coming later."
+    end
+
+    if matched.custom and GQ.Custom and GQ.Custom.EnsureBuilt then
+        GQ.Custom:EnsureBuilt(classFile, matched.id)
     end
 
     if GQ.IsPreviewEnabled and GQ:IsPreviewEnabled() then

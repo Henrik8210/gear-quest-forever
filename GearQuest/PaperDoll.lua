@@ -21,12 +21,12 @@ function GQ.PaperDoll:Init()
                 local gq = _G.GearQuest
                 if mouseButton == "RightButton" and CharacterFrame and CharacterFrame:IsShown() then
                     if slotName == "SecondaryHand" and gq and gq.Data and gq.Log then
-                        local oneOn = gq.Log.WeaponStyleEnabled and gq.Log:WeaponStyleEnabled("one")
+                        local offOn = gq.Log.WeaponStyleEnabled and gq.Log:WeaponStyleEnabled("off")
                         local shield = gq.Data.OffHandShowsShieldOrHeld and gq.Data:OffHandShowsShieldOrHeld()
                         local dual = gq.Data.CanDualWield and gq.Data:CanDualWield()
-                        -- A damaging off hand opens when One-hand is on and the spec
+                        -- A damaging off hand opens when Off Hand is on and the spec
                         -- can dual wield. Shamans cannot. Shields still open here.
-                        if not shield and not (dual and oneOn) then
+                        if not shield and not (dual and offOn) then
                             return
                         end
                     end
