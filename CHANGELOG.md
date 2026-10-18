@@ -2,49 +2,37 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v0.5.7-beta
+## v0.5.8-beta
 
-The log has a **Lookup** tab. Quest text reads as a person wrote it. A piece you already have leaves the hunt list on that character only. Protection and Shockadin prefer a faster weapon. **Manageable Dungeons** replaces Don't look back. Hovers match the current Wowhead Forever page. The window title reads **GearQuest Forever v0.5.7-beta**.
+The log can be resized. A reputation vendor says the standing you have. A hunt hover can show an Auctionator price. Eight starter whites are green. The window title reads **GearQuest Forever v0.5.8-beta**.
 
-### Lookup
+### Window size
 
-A handle on the left of the log says **Lookup**. It searches the database for the class you are viewing. Open the Simulator to switch that class. Type part of a name and press Search.
+**General → Window size** is a slider. **100%** is the window you have now. **150%** is half again as tall and wide. Each step is one percent. The number updates while you drag, and the window changes when you let go, so it does not jump under the cursor. A click on the track, or the mouse wheel, applies that step right away.
 
-While the list is building, the portrait turns grey and spins, and the line says **Searching for matching items**.
+The hunt list, the parchment, the buttons, Play style, the filter and its flyouts, the weapon filter, and the spec menu all follow that size. So does the rank list from the (i) button. The tracker, the guide arrow, the toast, the map pins, the minimap button, and item tooltips stay the normal size. If you had already checked Larger window, the slider starts at 150%.
 
-Click a result and the parchment is that item. The row's rank line says the spec, the rank, the levels, and the faction. **Thunderbrew's Boot Flask** is Alliance, from Sweet Amber in Westfall, and it requires 40. The parchment says **Part of a quest chain.** and **5 quests until you get this.** A quest that is not part of a chain does not get those lines.
+### Vendor standing
 
-Leaving Lookup puts the parchment back on the hunt you had open. It does not change your hunts or the Simulator.
+A vendor that requires reputation says what you need and what this character has. **Ratchet Wristwraps**, bought from Winklespark, reads **Requires Friendly with Ratchet. Your standing is Neutral.** The standing clause is red while you are short and green once you have reached it. Neutral counts. **You have not met this faction yet** stays red, and it only appears when this character's reputation list has no row for that faction. Another character's reputation is not used.
 
-### Quest text
+### Auction House prices
 
-**Wildhunter Cloak**, the reward from The Hunt Completed, used to print the code from the quest page. It now uses your character's name, a real space, and a space after **commended!** The same cleanup is on every description, the lore, and the tracker. A class token uses your class. A race token uses your race. Sir or madam follows your character.
+If Auctionator is enabled, a hunt hover adds its price lines under the Forever tooltip. The Forever stats stay. The GearQuest score stays underneath those lines. If Auctionator is off, nothing is added, so there is no empty price line.
 
-### This character only
+### Starter greens
 
-If you already have a hunt, it leaves **Active** on that character and sits on **Completed**. Another character still sees it. **Hammerbone** on a druid does not hide **Hammerbone** on a level 16 paladin. The weapon (i) list was already that character's ranks. The hunt rows follow the same rule.
+Wowhead Forever turned eight common starter drops into uncommon pieces. All nine classes were scored again.
 
-### Protection and Shockadin
+**Ice-covered Bracers**, from Hammerspine in Dun Morogh, are +1 Agility and 27 armor, and require 7. **Royal Frostmane Girdle**, from Great Father Arctikus, is +2 Intellect and 73 armor, and requires 8. **Wendigo Fur Cloak**, from Edan the Howler, is +1 Strength and requires 6. For an arms or fury warrior it is the best cloak at level 6. **Wispy Cloak**, from Lost Soul in Tirisfal Glades, is item level 10, requires 5, and has +1 Spirit. It no longer shows at level 3. **Ghostly Bracers**, from Tormented Spirit, are +1 Intellect and require 5. **Lithe Boots**, from Morgaine the Sly in Elwynn Forest, are +2 Stamina and 42 armor, and require 7. **Fingerless Gloves**, from Thuros Lightfingers, are +2 Agility and require 8. **Ratty Old Belt**, from Narg the Taskmaster, is +2 Strength and 35 armor, and requires 7. It is on the leather belt list. It had been left out because the word Old in the name was treated as an unused item.
 
-Hover Protection or Shockadin. The spec tooltip has **Weapon speed** at **-2**. A faster weapon loses less when the other stats are close, because the seal lands on each hit. A 2 second weapon loses 4 points and a 3 second weapon loses 6, on top of the weapon damage. Holy and Retribution do not use that row. Protection and Shockadin were scored again. Holy and Retribution were not.
+### The community
 
-### Play style
+**The GearQuest Community** lists Thrayne.
 
-**Don't look back** is gone. **Manageable Dungeons** is the card in its place. It hides a boss drop, and dungeon and raid trash, until the level you are viewing is 4 under that item's level. An item of level 49 can show from 45. The wait stops at 60. Quests, vendors, crafts, and world drops stay. If Don't look back was on, it is off. Turn Manageable Dungeons on yourself.
+### v0.5.7-beta
 
-**Get it now** still waits on reputation, and on a bind-on-pickup craft until you can make it. A bind-on-equip craft stays, because you can buy it. **Darksoul Breastplate** stays. **Flying Tiger Goggles** still wait, because the goggles themselves require Engineering to wear.
-
-### Vendor prices
-
-A vendor hunt states the price with the same coin icons the game uses. **Sergeant's Cape**, from Officer Areyn in Stormwind, shows that price beside the coins. Honor uses your faction's honor icon. A badge uses that badge's icon. The old sentence about Honor Points and tokens is left off once the price line is there. The rank requirement stays.
-
-### Tooltips
-
-222 stored rare tooltips were checked against Wowhead Forever and updated where the page had changed. 220 of them stayed rare. The text changed. **Rot-Covered Harpoon** and **Scoutmaster's Eyepatch** are uncommon. **Whirlwind Axe**, **Triprunner Dungarees**, **Gravestone Scepter**, **Crescent Staff**, and **Vanquisher's Sword** stay rare, because Wowhead Forever still lists them as rare. **Gravestone Scepter** no longer has the extra shadow resistance the old tooltip carried.
-
-### The minimap button
-
-The minimap button sits on the rim of the minimap.
+The log has a **Lookup** tab. Quest text uses your character's name. **Wildhunter Cloak** no longer prints the code from the quest page. A piece you already have leaves the hunt list on that character only. **Hammerbone** on a druid does not hide it on a paladin. Protection and Shockadin score weapon speed at -2. **Manageable Dungeons** replaces Don't look back. A bind-on-equip craft stays under **Get it now**. Vendor prices use coin icons. 222 rare tooltips were checked against Wowhead Forever. **Rot-Covered Harpoon** and **Scoutmaster's Eyepatch** are uncommon. The minimap button sits on the rim. The window title reads **GearQuest Forever v0.5.7-beta**.
 
 ### v0.5.6-beta
 

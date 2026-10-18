@@ -34,6 +34,14 @@ Quest text on the parchment, the lore, and the tracker uses your character's nam
 
 The minimap button sits on the rim of the minimap.
 
+**General → Window size** runs from 100% to 150%, one percent at a time. 100% is the normal log. 150% is half again as tall and wide. The window changes when you let go of the slider. The hunt list, the parchment, the filter, Play style, and the spec menu follow that size. The tracker, the guide arrow, the toast, the map pins, and item tooltips stay the normal size.
+
+A vendor line names the standing this character has. **Ratchet Wristwraps** says **Requires Friendly with Ratchet. Your standing is Neutral.** That standing clause is red while you are short and green once you have reached it. **You have not met this faction yet** appears only when this character's reputation list has no row for that faction. Neutral still counts.
+
+If Auctionator is enabled, a hunt hover adds Auctionator's price lines under the Forever tooltip. The GearQuest score stays underneath. Nothing is added when Auctionator is off.
+
+Eight starter drops that used to be white are green, and all nine classes were scored again. **Wispy Cloak** requires level 5. **Wendigo Fur Cloak** is +1 Strength. **Ratty Old Belt** drops from Narg the Taskmaster. **The GearQuest Community** lists Thrayne.
+
 ## GearQuest score
 
 Hover a piece of gear and the tooltip gains a line after the stats. The same trail is on each row of the (i) rank list. The hunt list itself does not show it.
@@ -58,7 +66,7 @@ A new item stores every real spot in the same pass it is added: the first quest 
 
 A vendor hunt names the seller at the closest pin. **Dirty Leather Bracers** in Mulgore says **Bought from Varia Hardhide.** Lauren Newcomb is the name when the closest pin is hers in Undercity. The tracker uses that same line, and both update when you change zone. A reputation or honor sentence after the name stays.
 
-A vendor with a required standing gets its own line just before Source. The standing is green when you have met it and red when you have not. **Requires Honored with Booty Bay. Your standing is Friendly.**
+A vendor with a required standing gets its own line just before Source. The standing clause is green when this character has reached it and red when they are short. **Requires Friendly with Ratchet. Your standing is Neutral.** **You have not met this faction yet** is only for a faction missing from this character's reputation list.
 
 Leveling up, changing zone, logging in, and opening a merchant spread the paper-doll arrows and the hunt list across frames. The arrows you already have stay until the new set is ready. Opening the log or a filter keeps the current rows until the rank lists are built, then swaps them in once. Hovering a tooltip and switching class in the Simulator are unchanged.
 

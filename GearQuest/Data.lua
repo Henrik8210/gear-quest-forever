@@ -8482,10 +8482,6 @@ function GQ.Data:ItemInfoIsReady(itemIdOrLink)
     if not itemIdOrLink or not GetItemInfo then
         return false
     end
-        local ilvl = fact and fact.ilvl
-        if type(ilvl) == "number" and ilvl > 0 then
-            tooltip:AddLine("Item Level " .. tostring(ilvl), 1, 1, 1)
-        end
 
     local itemId = tonumber(itemIdOrLink)
     if not itemId and type(itemIdOrLink) == "string" then
@@ -8568,6 +8564,7 @@ function GQ.Data:RefreshPendingTooltip(tooltip, entry, forceFallback)
     if entry.itemId then
         self:ApplyImbueTooltipLines(tooltip, entry.itemId)
     end
+    self:AppendAuctionatorTooltip(tooltip, entry)
     self:AppendGearScoreLine(tooltip, entry)
     if tooltip.Show then
         tooltip:Show()
@@ -8904,6 +8901,31 @@ function GQ.Data:PopulateEntryItemTooltip(tooltip, entry)
     return true
 end
 
+function GQ.Data:AuctionatorTooltipEnabled()
+    local auctionator = Auctionator
+    if not auctionator or not auctionator.Tooltip or not auctionator.Tooltip.ShowTipWithPricing then
+        return false
+    end
+    if C_AddOns and C_AddOns.IsAddOnLoaded then
+        return C_AddOns.IsAddOnLoaded("Auctionator") and true or false
+    end
+    if IsAddOnLoaded then
+        return IsAddOnLoaded("Auctionator") and true or false
+    end
+    return false
+end
+
+function GQ.Data:AppendAuctionatorTooltip(tooltip, entry)
+    if not tooltip or not entry or not entry.itemId or not self:AuctionatorTooltipEnabled() then
+        return
+    end
+    local link = self:GetEntryItemHyperlink(entry)
+    if not link then
+        return
+    end
+    pcall(Auctionator.Tooltip.ShowTipWithPricing, tooltip, link, 1)
+end
+
 function GQ.Data:ShowEntryItemTooltip(tooltip, owner, entry, anchor, ...)
     if not tooltip or not entry or not entry.itemId then
         return
@@ -8914,6 +8936,7 @@ function GQ.Data:ShowEntryItemTooltip(tooltip, owner, entry, anchor, ...)
     tooltip:SetOwner(owner, anchor or "ANCHOR_RIGHT", ...)
     self:PopulateEntryItemTooltip(tooltip, entry)
     self:ApplyImbueTooltipLines(tooltip, entry.itemId)
+    self:AppendAuctionatorTooltip(tooltip, entry)
     self:AppendGearScoreLine(tooltip, entry)
     tooltip:Show()
     self:SolidItemTooltip(tooltip)

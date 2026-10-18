@@ -60,6 +60,10 @@ A vendor hunt names the person at the pin you are closest to. **Dirty Leather Br
 
 A quest reward says the level it can be picked up. A craft says the skill in green when you can make it, and red when you cannot. A burnt mark means the item is new in Forever.
 
+A reputation vendor also says the standing this character has. **Ratchet Wristwraps** reads **Requires Friendly with Ratchet. Your standing is Neutral.** That clause is red while you are short and green once you have reached it. **You have not met this faction yet** appears only when your reputation list has no row for that faction.
+
+If Auctionator is enabled, the hunt hover adds its price lines under the Forever tooltip. The GearQuest score stays underneath. Nothing is added when Auctionator is off.
+
 ---
 
 ### On the map
@@ -202,6 +206,18 @@ Simulator. Screenshot 9. The item tooltip will not score your gear until you tur
 
 **How do I hide the minimap button?**
 Open the log, the gear icon, **General**, **Hide minimap icon**. Drag the button around the minimap before you hide it.
+
+**The log is too small.**
+**General → Window size.** 100% is the normal window. 150% is half again as tall and wide. Each step is one percent. Let go of the slider and the log, the filter, and the spec menu grow together. The tracker, the guide arrow, and item tooltips stay the normal size.
+
+**The vendor says I have not met the faction.**
+Update to **v0.5.8-beta** and `/reload`. Neutral still counts. **Ratchet Wristwraps** says **Your standing is Neutral** in red until you are Friendly. **You have not met this faction yet** is only when that faction is missing from this character's reputation list.
+
+**The hunt tooltip has no auction price.**
+Enable Auctionator and `/reload`. The hunt hover adds Auctionator's price lines under the Forever tooltip. The GearQuest score stays underneath. If Auctionator is off, those lines are left out.
+
+**A starter rare still drops a white.**
+Update to **v0.5.8-beta**. **Ice-covered Bracers**, **Royal Frostmane Girdle**, **Wendigo Fur Cloak**, **Wispy Cloak**, **Ghostly Bracers**, **Lithe Boots**, **Fingerless Gloves**, and **Ratty Old Belt** are green. **Wispy Cloak** requires level 5. **Ratty Old Belt** drops from Narg the Taskmaster.
 
 *Screenshot 12 — the General settings page.*
 

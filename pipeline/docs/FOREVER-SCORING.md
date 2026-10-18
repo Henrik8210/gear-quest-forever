@@ -577,6 +577,10 @@ A vendor hunt states the price on its own line, `Costs` followed by the same ico
 
 The minimap button center is half the minimap plus 5 (`MINIMAP_BORDER_OUTSET` in `Minimap.lua`).
 
+**General → Window size** (`settings.windowScalePercent`, 100 when nil) is a slider from 100 to 150. Each step is one percent. 100 is the normal log. 150 is half again as tall and wide. The percent uses the same color as the **Window size** label. Dragging updates the percent and leaves the window alone until the mouse button is released, so the frame does not jump under the cursor. A click on the track, or the mouse wheel, applies that step immediately. An old `largeWindow` check still means 150 until the slider is moved. Hunt rows, icons, parchment, buttons, Play style, the filter and its flyouts, the weapon filter, and the spec picker are children of the log and grow with it. Do not set their scale again. The (i) rank list is parented to UIParent, so `ApplyWindowScale` sets that panel to the same scale. The filter click-catcher stays full screen. The tracker, the guide arrow, the toast, the map pins, and item tooltips stay at the normal size.
+
+A hunt hover asks Auctionator for its price lines only when that addon is loaded (`Auctionator.Tooltip.ShowTipWithPricing`). The Forever tip stays. Auctionator appends its own vendor, auction, and disenchant lines. The GearQuest score stays under those. If Auctionator is not enabled, nothing is added.
+
 ## GearQuest Index Score bar
 
 When you are not simulating, and the log page is open, the header is a four-section bar instead of "Viewing upgrades for your current level, class and faction". **General → GearQuest score bar** (`settings.showGearScoreBar`) is on unless that setting is false. Off hides the bar and shows that sentence. Simulation and Settings keep their own header sentences. White text above the bar reads **GearQuest Index Score - Collecting feedback on this**.
@@ -1247,13 +1251,19 @@ off those vendors.
 **Vendor reputation is a line of its own, just before Source.** A Forever tip
 `Requires Booty Bay - Honored` is `reqRep`. The parchment reads
 `Requires Honored with Booty Bay. Your standing is Friendly.` The standing
-is green (`|cff0c4a1c`) when this character has met it and red
-(`|cff6e1212`) when they are short or have not met the faction. The
+clause is green (`|cff0c4a1c`) when this character has reached it and red
+(`|cff6e1212`) when they are short. Neutral still counts: a Ratchet vendor
+that wants Friendly says `Your standing is Neutral` in red. `You have not
+met this faction yet` is red, and only when this character's reputation
+list has no row for that name. The list is `C_Reputation` on this
+character. It is not saved and it is not read from another character. The
 instructions can still say `Bought from Gezzy Gunkgear. Requires Booty Bay - Honored.`
 Souvenier Sea Shell **274749** is that neck. Darkspear Raiders is Horde, so
 those pieces are not on the Alliance list. League of Arathor is Alliance.
 The Defilers are Horde. Goblin towns (Booty Bay, Ratchet, Gadgetzan,
 Everlook) stay on both lists, with the standing written out.
+
+**Starter whites Forever turned green** (dataEnv 16). Ice-covered Bracers (763) is +1 Agility and 27 armor. Royal Frostmane Girdle (2546) is +2 Intellect and 73 armor. Wendigo Fur Cloak (3008) is +1 Strength. Wispy Cloak (3322) is item level 10, requires 5, +1 Spirit, and 10 armor. Ghostly Bracers (3323) is +1 Intellect. Lithe Boots (6201) is +2 Stamina and 42 armor. Fingerless Gloves (6202) is +2 Agility. Ratty Old Belt (6147) is +2 Strength and 35 armor, from Narg the Taskmaster in Elwynn Forest. It had been marked unobtainable because the word Old matched an unused-name rule. That flag is cleared. All nine classes were re-scored from these stats. Wispy Cloak is not on a list before level 5. Wendigo Fur Cloak is rank 1 back at 6 for arms and fury.
 
 **Blank item kind.** Subclass −2 ring, −3 neck, −4 trinket, −5 held, −6
 cloak must be `kind` `Misc` (`ARMOR_SUB`). `kind` `?` makes `eligible()`

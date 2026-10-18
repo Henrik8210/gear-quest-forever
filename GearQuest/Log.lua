@@ -2835,10 +2835,29 @@ function GQ.Log:RepStandingName(standingId)
     return names[standingId]
 end
 
+function GQ.Log:FactionStandingId(standings, faction)
+    if not standings or type(faction) ~= "string" or faction == "" then
+        return nil
+    end
+    local have = standings[faction] or standings[string.lower(faction)]
+    if have then
+        return have
+    end
+    local key = string.lower(faction)
+    key = string.gsub(key, "^%s+", "")
+    key = string.gsub(key, "%s+$", "")
+    key = string.gsub(key, "^the ", "")
+    return standings[key]
+end
+
 function GQ.Log:ReputationRequirementLine(faction, standing)
     local need = self:RepRank(standing)
     local standings = self:PlayerFactionStandings()
-    local have = faction and standings and (standings[faction] or standings[string.lower(faction)])
+    -- A failed read is not the same as a faction this character has never seen.
+    if not standings then
+        return string.format("\nRequires %s with %s.", standing, faction)
+    end
+    local have = self:FactionStandingId(standings, faction)
     if not have then
         return string.format(
             "\nRequires %s with %s. |cff6e1212You have not met this faction yet.|r",
@@ -2849,12 +2868,98 @@ function GQ.Log:ReputationRequirementLine(faction, standing)
     local haveName = self:RepStandingName(have) or "Unknown"
     local met = need and have >= need
     local color = met and "|cff0c4a1c" or "|cff6e1212"
-    return string.format("\nRequires %s with %s. Your standing is %s%s|r.", standing, faction, color, haveName)
+    return string.format(
+        "\nRequires %s with %s. %sYour standing is %s.|r",
+        standing,
+        faction,
+        color,
+        haveName
+    )
 end
 
 function GQ.Log:ReadFactionStandings()
+    -- This character's reputation panel only. Nothing here is saved or shared.
+    local ranks = {}
+    local function note(name, standingId, isHeader, hasRep)
+        if issecretvalue and (issecretvalue(name) or issecretvalue(standingId) or issecretvalue(isHeader)) then
+            return
+        end
+        if type(name) ~= "string" or name == "" then
+            return
+        end
+        standingId = tonumber(standingId)
+        if not standingId or standingId < 1 then
+            return
+        end
+        if isHeader and not hasRep then
+            return
+        end
+        ranks[name] = standingId
+        local key = string.lower(name)
+        key = string.gsub(key, "^%s+", "")
+        key = string.gsub(key, "%s+$", "")
+        ranks[key] = standingId
+        local bare = string.gsub(key, "^the ", "")
+        ranks[bare] = standingId
+    end
+
+    local cRep = C_Reputation
+    if cRep and cRep.GetNumFactions and cRep.GetFactionDataByIndex then
+        local opened = {}
+        local guard = 0
+        while guard < 40 do
+            guard = guard + 1
+            local expanded = false
+            local okCount, count = pcall(cRep.GetNumFactions)
+            if not okCount or type(count) ~= "number" then
+                break
+            end
+            for i = 1, count do
+                local okRow, data = pcall(cRep.GetFactionDataByIndex, i)
+                if okRow and type(data) == "table" and data.isHeader and data.isCollapsed and cRep.ExpandFactionHeader then
+                    pcall(cRep.ExpandFactionHeader, i)
+                    if type(data.name) == "string" then
+                        opened[#opened + 1] = data.name
+                    end
+                    expanded = true
+                    break
+                end
+            end
+            if not expanded then
+                break
+            end
+        end
+        local okCount, count = pcall(cRep.GetNumFactions)
+        if okCount and type(count) == "number" then
+            for i = 1, count do
+                local okRow, data = pcall(cRep.GetFactionDataByIndex, i)
+                if okRow and type(data) == "table" then
+                    note(data.name, data.reaction, data.isHeader, data.isHeaderWithRep)
+                end
+            end
+        end
+        if cRep.CollapseFactionHeader then
+            for n = #opened, 1, -1 do
+                local want = opened[n]
+                local okBack, total = pcall(cRep.GetNumFactions)
+                if okBack and type(total) == "number" then
+                    for i = total, 1, -1 do
+                        local okRow, data = pcall(cRep.GetFactionDataByIndex, i)
+                        if okRow and type(data) == "table" and data.isHeader and not data.isCollapsed and data.name == want then
+                            pcall(cRep.CollapseFactionHeader, i)
+                            break
+                        end
+                    end
+                end
+            end
+        end
+        if next(ranks) then
+            return ranks
+        end
+    end
+
     if not GetNumFactions or not GetFactionInfo then
-        return {}
+        return nil
     end
     local opened = {}
     local guard = 0
@@ -2877,13 +2982,9 @@ function GQ.Log:ReadFactionStandings()
             break
         end
     end
-    local ranks = {}
     for i = 1, GetNumFactions() do
-        local name, _, standingId, _, _, _, _, _, isHeader = GetFactionInfo(i)
-        if name and not isHeader and standingId then
-            ranks[name] = standingId
-            ranks[string.lower(name)] = standingId
-        end
+        local name, _, standingId, _, _, _, _, _, isHeader, _, hasRep = GetFactionInfo(i)
+        note(name, standingId, isHeader, hasRep)
     end
     if CollapseFactionHeader then
         for n = #opened, 1, -1 do
@@ -2896,6 +2997,9 @@ function GQ.Log:ReadFactionStandings()
                 end
             end
         end
+    end
+    if not next(ranks) then
+        return nil
     end
     return ranks
 end
@@ -2979,13 +3083,11 @@ function GQ.Log:PlayerFactionStandings()
         local ok, ranks = pcall(function()
             return self:ReadFactionStandings()
         end)
-        if ok and ranks then
+        if ok and type(ranks) == "table" then
             self._playerRep = ranks
-        else
-            self._playerRep = false
         end
     end
-    if self._playerRep == false then
+    if type(self._playerRep) ~= "table" then
         return nil
     end
     return self._playerRep
@@ -3103,7 +3205,7 @@ function GQ.Log:EntryBlockedToday(entry)
                 local row = reps[i]
                 local faction = row[1] or row.faction
                 local need = self:RepRank(row[2] or row.standing)
-                local have = faction and (standings[faction] or standings[string.lower(faction)])
+                local have = self:FactionStandingId(standings, faction)
                 if need and (not have or have < need) then
                     return true
                 end
@@ -9257,6 +9359,129 @@ function GQ.Log:EnsureSettingsPage(frame)
     hint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
     frame.settingsHint = hint
 
+    local largeLabel = CreateFontStringWithFallback(detail, QUEST_DETAIL_TITLE_FONTS)
+    largeLabel:SetJustifyH("LEFT")
+    largeLabel:SetText("Window size")
+    largeLabel:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    frame.settingsLargeLabel = largeLabel
+
+    local largeHit = CreateFrame("Button", nil, detail)
+    largeHit:SetPoint("TOPLEFT", hint, "BOTTOMLEFT", 0, -16)
+    largeHit:SetSize(math.max(largeLabel:GetStringWidth() or 0, 1) + 4, math.max(largeLabel:GetStringHeight() or 0, 18))
+    largeLabel:SetParent(largeHit)
+    largeLabel:ClearAllPoints()
+    largeLabel:SetPoint("LEFT", largeHit, "LEFT", 0, 0)
+    frame.settingsLargeLabelHit = largeHit
+
+    local largeValue = CreateFontStringWithFallback(detail, QUEST_DETAIL_TITLE_FONTS)
+    largeValue:SetPoint("LEFT", largeHit, "RIGHT", 8, 0)
+    largeValue:SetJustifyH("LEFT")
+    largeValue:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    frame.settingsLargeValue = largeValue
+
+    local function WindowPercent()
+        local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+        local percent = settings and tonumber(settings.windowScalePercent)
+        if not percent and settings and settings.largeWindow then
+            percent = 150
+        end
+        percent = math.floor((tonumber(percent) or 100) + 0.5)
+        if percent < 100 then
+            percent = 100
+        elseif percent > 150 then
+            percent = 150
+        end
+        return percent
+    end
+
+    local slider
+    local createdOk, created = pcall(CreateFrame, "Slider", "GearQuestWindowScaleSlider", detail, "OptionsSliderTemplate")
+    if createdOk and created then
+        slider = created
+    else
+        slider = CreateFrame("Slider", "GearQuestWindowScaleSlider", detail)
+        slider:SetOrientation("HORIZONTAL")
+        local thumb = slider:CreateTexture(nil, "ARTWORK")
+        thumb:SetTexture("Interface\\Buttons\\UI-SliderBar-Button-Horizontal")
+        thumb:SetSize(32, 32)
+        slider:SetThumbTexture(thumb)
+    end
+    slider:SetPoint("TOPLEFT", largeHit, "BOTTOMLEFT", 0, -6)
+    slider:SetWidth(220)
+    slider:SetHeight(17)
+    slider:SetMinMaxValues(100, 150)
+    slider:SetValueStep(1)
+    if slider.SetObeyStepOnDrag then
+        slider:SetObeyStepOnDrag(true)
+    end
+    local sliderName = slider:GetName()
+    local lowText = slider.Low or (sliderName and _G[sliderName .. "Low"])
+    local highText = slider.High or (sliderName and _G[sliderName .. "High"])
+    local titleText = slider.Text or (sliderName and _G[sliderName .. "Text"])
+    if lowText then
+        lowText:SetText("100%")
+    end
+    if highText then
+        highText:SetText("150%")
+    end
+    if titleText then
+        titleText:SetText("")
+        titleText:Hide()
+    end
+    local function ApplyWindowPercent(percent)
+        percent = math.floor((tonumber(percent) or 100) + 0.5)
+        if percent < 100 then
+            percent = 100
+        elseif percent > 150 then
+            percent = 150
+        end
+        GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+        GearQuestForeverDB.settings.windowScalePercent = percent
+        GearQuestForeverDB.settings.largeWindow = nil
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if log and log.ApplyWindowScale then
+            log:ApplyWindowScale()
+        end
+    end
+
+    slider:SetScript("OnValueChanged", function(self, value)
+        local percent = math.floor((tonumber(value) or 100) + 0.5)
+        if percent < 100 then
+            percent = 100
+        elseif percent > 150 then
+            percent = 150
+        end
+        largeValue:SetText(tostring(percent) .. "%")
+        if self._gqQuiet then
+            return
+        end
+        -- Resizing while the thumb is held moves the slider under the cursor.
+        if IsMouseButtonDown and IsMouseButtonDown("LeftButton") then
+            return
+        end
+        ApplyWindowPercent(percent)
+    end)
+    slider:SetScript("OnMouseUp", function(self)
+        if self._gqQuiet then
+            return
+        end
+        ApplyWindowPercent(self:GetValue())
+    end)
+    slider._gqQuiet = true
+    slider:SetValue(WindowPercent())
+    slider._gqQuiet = nil
+    largeValue:SetText(tostring(WindowPercent()) .. "%")
+    frame.settingsLargeSlider = slider
+
+    local largeHint = CreateFontStringWithFallback(detail, SETTINGS_NOTE_FONTS)
+    largeHint:SetPoint("TOPLEFT", slider, "BOTTOMLEFT", 0, -16)
+    largeHint:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
+    largeHint:SetJustifyH("LEFT")
+    largeHint:SetWordWrap(true)
+    largeHint:SetText("100% is the normal window. 150% is half again as tall and wide. Each step is one percent. The filter and the spec menu follow this size.")
+    largeHint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
+    frame.settingsLargeHint = largeHint
+
     local artLabel = CreateFontStringWithFallback(detail, QUEST_DETAIL_TITLE_FONTS)
     artLabel:SetJustifyH("LEFT")
     artLabel:SetText("Remove background art")
@@ -9264,7 +9489,7 @@ function GQ.Log:EnsureSettingsPage(frame)
     frame.settingsArtLabel = artLabel
 
     local artHit = CreateFrame("Button", nil, detail)
-    artHit:SetPoint("TOPLEFT", hint, "BOTTOMLEFT", 0, -16)
+    artHit:SetPoint("TOPLEFT", frame.settingsLargeHint, "BOTTOMLEFT", 0, -16)
     artHit:SetSize(math.max(artLabel:GetStringWidth() or 0, 1) + 4, math.max(artLabel:GetStringHeight() or 0, 18))
     artLabel:SetParent(artHit)
     artLabel:ClearAllPoints()
@@ -9476,7 +9701,7 @@ function GQ.Log:EnsureSettingsPage(frame)
     creditsBody:SetPoint("TOPLEFT", creditsTitle, "BOTTOMLEFT", 0, -6)
     creditsBody:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
     creditsBody:SetJustifyH("LEFT")
-    creditsBody:SetText("Eao\nMainWon\nStikmyre\nClick\nVaniron")
+    creditsBody:SetText("Eao\nMainWon\nStikmyre\nClick\nVaniron\nThrayne")
     creditsBody:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
     creditsBody:Hide()
     frame.settingsCreditsBody = creditsBody
@@ -9639,6 +9864,7 @@ function GQ.Log:MountSettingsGeneral(frame, detail)
 
     local widgets = {
         frame.settingsMinimapLabelHit, frame.settingsMinimapCheck, frame.settingsHint,
+        frame.settingsLargeLabelHit, frame.settingsLargeValue, frame.settingsLargeSlider, frame.settingsLargeHint,
         frame.settingsArtLabelHit, frame.settingsArtCheck, frame.settingsArtHint,
         frame.settingsScoreLabelHit, frame.settingsScoreCheck, frame.settingsScoreHint,
         frame.settingsScoreBarLabelHit, frame.settingsScoreBarCheck, frame.settingsScoreBarHint,
@@ -9654,7 +9880,7 @@ function GQ.Log:MountSettingsGeneral(frame, detail)
         frame.settingsMinimapLabelHit:SetPoint("TOPLEFT", child, "TOPLEFT", 32, -4)
     end
     local hints = {
-        frame.settingsHint, frame.settingsArtHint, frame.settingsScoreHint,
+        frame.settingsHint, frame.settingsLargeHint, frame.settingsArtHint, frame.settingsScoreHint,
         frame.settingsScoreBarHint, frame.settingsChatHint,
     }
     for i = 1, #hints do
@@ -9871,6 +10097,10 @@ function GQ.Log:SetSettingsSection(section)
         frame.settingsMinimapLabelHit,
         frame.settingsMinimapCheck,
         frame.settingsHint,
+        frame.settingsLargeLabelHit,
+        frame.settingsLargeValue,
+        frame.settingsLargeSlider,
+        frame.settingsLargeHint,
         frame.settingsArtLabelHit,
         frame.settingsArtCheck,
         frame.settingsArtHint,
@@ -9942,6 +10172,26 @@ function GQ.Log:RefreshSettings()
     end
     local hidden = GQ.Minimap and GQ.Minimap.IsHidden and GQ.Minimap:IsHidden()
     check:SetChecked(hidden and true or false)
+    local largeSlider = frame.settingsLargeSlider
+    if largeSlider and largeSlider.SetValue then
+        local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+        local percent = settings and tonumber(settings.windowScalePercent)
+        if not percent and settings and settings.largeWindow then
+            percent = 150
+        end
+        percent = math.floor((tonumber(percent) or 100) + 0.5)
+        if percent < 100 then
+            percent = 100
+        elseif percent > 150 then
+            percent = 150
+        end
+        largeSlider._gqQuiet = true
+        largeSlider:SetValue(percent)
+        largeSlider._gqQuiet = nil
+        if frame.settingsLargeValue then
+            frame.settingsLargeValue:SetText(tostring(percent) .. "%")
+        end
+    end
     local label = frame.settingsMinimapLabel
     local hit = frame.settingsMinimapLabelHit
     if label and hit and label.GetStringWidth then
@@ -10627,6 +10877,11 @@ function GQ.Log:Init()
 
     frame:SetSize(FRAME_WIDTH, FRAME_HEIGHT)
     frame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+    if frame.SetClampedToScreen then
+        frame:SetClampedToScreen(true)
+    end
+    self.frame = frame
+    self:ApplyWindowScale()
     frame:SetMovable(true)
     frame:EnableMouse(true)
     frame:RegisterForDrag("LeftButton")
@@ -12018,6 +12273,7 @@ function GQ.Log:EnsureSlotRankPanel()
 
     panel:Hide()
     self.slotRankPanel = panel
+    panel:SetScale(self:WindowScale())
     return panel
 end
 
@@ -13540,11 +13796,44 @@ function GQ.Log:ReleaseMouseForGameUI()
     self:RefreshProfessionBranch()
 end
 
+function GQ.Log:WindowScale()
+    local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+    local percent = settings and tonumber(settings.windowScalePercent)
+    if not percent and settings and settings.largeWindow then
+        percent = 150
+    end
+    percent = math.floor((tonumber(percent) or 100) + 0.5)
+    if percent < 100 then
+        percent = 100
+    elseif percent > 150 then
+        percent = 150
+    end
+    return percent / 100
+end
+
+function GQ.Log:ApplyWindowScale()
+    local scale = self:WindowScale()
+    local frame = self.frame
+    if frame and frame.SetScale then
+        frame:SetScale(scale)
+        if frame.SetClampedToScreen then
+            frame:SetClampedToScreen(true)
+        end
+    end
+    -- Filter, its flyouts, the weapon filter, the spec picker, and Play style
+    -- are children of the log, so they use this scale. The (i) list is not.
+    local rank = self.slotRankPanel
+    if rank and rank.SetScale then
+        rank:SetScale(scale)
+    end
+end
+
 function GQ.Log:Show()
     if not self.frame then
         return
     end
 
+    self:ApplyWindowScale()
     ApplyModernChrome(self.frame)
     ApplyParchmentBackground(self.frame.detailBg)
     self:LayoutMainWindow(self.frame)
