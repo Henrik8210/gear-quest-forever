@@ -710,6 +710,7 @@ GQ.Data.vendorCost[277078] = { copper = 656 }
 GQ.Data.vendorCost[277079] = { copper = 380 }
 GQ.Data.vendorCost[277081] = { copper = 506 }
 GQ.Data.vendorCost[277091] = { copper = 659 }
+GQ.Data.vendorCost[287063] = { copper = 3612, sellers = { ["Frederick Stover"] = 3612, ["Kuna Thunderhorn"] = 3802, ["Landria"] = 3802, ["Railee Thriceforged"] = 3612, ["Rallic Finn"] = 3802 } }
 
 GQ.Data.questChain = {}
 GQ.Data.questChain[80] = { {5261, "Eagan Peltskinner"}, {33, "Wolves Across the Border"} }
@@ -843,6 +844,8 @@ GQ.Data.questChain[12296] = { {12, "The People's Militia"}, {13, "The People's M
 GQ.Data.questChain[15397] = { {4811, "The Red Crystal"}, {4812, "As Water Cascades"}, {4813, "The Fragments Within"} }
 GQ.Data.questChain[15456] = { {660, "Hints of a New Plague?"}, {661, "Hints of a New Plague?"} }
 GQ.Data.questChain[15461] = { {4881, "Assassination Plot"}, {4966, "Protect Kanati Greycloud"} }
+GQ.Data.questChain[15462] = { {4881, "Assassination Plot"}, {4966, "Protect Kanati Greycloud"} }
+GQ.Data.questChain[15463] = { {4881, "Assassination Plot"}, {4966, "Protect Kanati Greycloud"} }
 GQ.Data.questChain[15787] = { {5083, "Winterfall Firewater"}, {5084, "Falling to Corruption"}, {5085, "Mystery Goo"}, {5086, "Toxic Horrors"}, {5087, "Winterfall Runners"}, {5121, "High Chief Winterfall"} }
 GQ.Data.questChain[15789] = { {974, "Finding the Source"}, {980, "The New Springs"}, {4842, "Strange Sources"} }
 GQ.Data.questChain[15796] = { {4882, "Guarding Secrets"}, {4883, "Guarding Secrets"} }
@@ -925,3 +928,5 @@ GQ.Data.questChain[279896] = { {96391, "Underground Map"}, {96393, "Old Ironforg
 GQ.Data.questChain[280696] = { {94789, "Call of Air"}, {96264, "Elemental Aid"}, {79358, "Storm, Earth, and Fire"}, {96135, "Heed My Call"}, {96016, "The Tempest's Weapons"} }
 GQ.Data.questChain[281274] = { {97281, "A Simmering Storm"}, {97282, "Stormy Potential"} }
 GQ.Data.questChain[281296] = { {279, "Claws from the Deep"}, {281, "Reclaiming Goods"}, {284, "The Search Continues"}, {285, "Search More Hovels"}, {286, "Return the Statuette"}, {98189, "Return the Statuette"}, {98190, "A Friend of the Family"}, {98191, "A Friend of the Family"} }
+GQ.Data.questChain[287059] = { {239, "Westbrook Garrison Needs Help!"}, {11, "Riverpaw Gnoll Bounty"} }
+GQ.Data.questChain[287067] = { {473, "Report to Captain Stoutfist"}, {464, "War Banners"}, {465, "Nek'rosh's Gambit"}, {474, "Defeat Nek'rosh"} }

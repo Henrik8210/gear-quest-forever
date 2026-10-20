@@ -2243,6 +2243,7 @@ GQ.Log.DUNGEON_FILTERS = {
     "Blackrock Depths",
     "Blackrock Spire",
     "Blackwing Lair",
+    "City of Dalaran",
     "Dire Maul",
     "Excavation Site",
     "Gnomeregan",
@@ -3740,6 +3741,12 @@ function GQ.Log:InvalidateSourceFilterCache()
     self._weaponStyleNow = nil
     self._weaponMenuStyles = nil
     self._weaponMenuStylesBand = nil
+    -- Shields and held items keep their own hunt rows. That list is filtered
+    -- when it is built, then saved for the level and spec. The source filter
+    -- is not part of that key, so a Boss drop list was still the old world
+    -- drops until the level changed. Drop it with the other filtered rows.
+    self._heldOffHand = nil
+    self._heldOffBand = nil
 end
 
 function GQ.Log:EnsureActiveListCaches()
@@ -4534,6 +4541,27 @@ function GQ.Log:IsItemIdObtained(itemId)
     end
 
     return false
+end
+
+function GQ.Log:ObtainToastTitle(entry)
+    local rank = self.HuntDisplayRank and self:HuntDisplayRank(entry)
+    local upgrade = false
+    if entry and GQ.Data and GQ.Data.GearScoreUpgradeDelta and self.RankListContext then
+        local slotName, handKind = self:RankListContext(entry)
+        local deltaHand = handKind == "both" and nil or handKind
+        local delta = GQ.Data:GearScoreUpgradeDelta(entry, slotName, deltaHand)
+        upgrade = type(delta) == "number" and delta > 0
+    end
+    if rank then
+        if upgrade then
+            return string.format("|cffffd200Rank #%d upgrade obtained!|r", rank)
+        end
+        return string.format("|cffffd200Rank #%d obtained|r", rank)
+    end
+    if upgrade then
+        return "|cffffd200Upgrade obtained!|r"
+    end
+    return "|cffffd200Hunt obtained|r"
 end
 
 function GQ.Log:AnnounceObtained(entry)
@@ -6406,7 +6434,6 @@ function GQ.Log:EnsureGearScoreBar(frame)
     shell:SetPoint("BOTTOMRIGHT", frame.contextStatusBar, "BOTTOMRIGHT", -36, 2)
     local title = shell:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     title:SetPoint("BOTTOM", shell, "TOP", 0, 5)
-    title:SetText("GearQuest Index Score - Collecting feedback on this")
     title:SetTextColor(1, 1, 1)
     shell.title = title
     shell:SetBackdrop({
@@ -6530,7 +6557,17 @@ function GQ.Log:UpdateGearScoreBar()
     end
     shell.rows = rows
     shell.score = score
-    local r, g, b = self:GearScoreFillColor(score)
+    local n, word = self:GearScoreBarWords(score)
+    local r, g, b = self:GearScoreFillColor(n)
+    local hex = string.format(
+        "%02x%02x%02x",
+        math.floor((r or 1) * 255 + 0.5),
+        math.floor((g or 1) * 255 + 0.5),
+        math.floor((b or 1) * 255 + 0.5)
+    )
+    if shell.title then
+        shell.title:SetText(string.format("Your GearQuest Index Score is |cff%s%d %s|r", hex, n, word))
+    end
     shell.status:SetStatusBarColor(r, g, b)
     shell.status:SetValue(score)
     shell:Show()
@@ -8347,21 +8384,54 @@ function GQ.Log:SyncSourceSelectButton(menu)
     btn:SetText(allOn and "Deselect all" or "Select all")
 end
 
-function GQ.Log:SyncProfessionRowLabel(check)
-    if not check or not check.label then
+function GQ.Log:FilterBranchAnchor(check)
+    if check and check.branchArrow and check.branchArrow:IsShown() then
+        return check.branchArrow
+    end
+    if check and check.label then
+        return check.label
+    end
+    return check
+end
+
+function GQ.Log:SyncFilterBranchMark(check, name)
+    if not check or not check.label or not name then
         return
     end
-    local text = check:GetChecked() and "Profession >" or "Profession"
-    check.label:SetText(text)
+    check.label:SetText(name)
+    if not check.branchArrow then
+        local arrow = check:CreateTexture(nil, "OVERLAY")
+        arrow:SetTexture("Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Up")
+        arrow:SetSize(12, 15)
+        arrow:SetBlendMode("ADD")
+        -- The gold chevron sits in the middle of that button. Crop to it and
+        -- turn the downward tip to the right. Black around the chevron adds nothing.
+        local left, right = 8 / 32, 23 / 32
+        local top, bottom = 10 / 32, 22 / 32
+        arrow:SetTexCoord(right, top, left, top, right, bottom, left, bottom)
+        arrow:SetPoint("LEFT", check.label, "RIGHT", 2, 0)
+        check.branchArrow = arrow
+    end
+    if check:GetChecked() then
+        check.branchArrow:Show()
+    else
+        check.branchArrow:Hide()
+    end
     local iconPad = check.sourceIcon and ((check.sourceIcon:GetWidth() or 18) + 4) or 0
-    check:SetHitRectInsets(0, -((check.label:GetStringWidth() or 90) + iconPad + 8), -2, -2)
+    local arrowPad = check.branchArrow:IsShown() and 16 or 0
+    local textW = check.label:GetStringWidth() or 90
+    check:SetHitRectInsets(0, -(textW + iconPad + arrowPad + 8), -2, -2)
     local menu = self.frame and self.frame.sourceFilterMenu
     if menu then
-        local needed = 40 + iconPad + (check.label:GetStringWidth() or 90)
+        local needed = 40 + iconPad + textW + arrowPad
         if needed > (menu:GetWidth() or 0) then
             menu:SetWidth(needed)
         end
     end
+end
+
+function GQ.Log:SyncProfessionRowLabel(check)
+    self:SyncFilterBranchMark(check, "Profession")
 end
 
 function GQ.Log:PopulateProfessionBranch(menu)
@@ -8447,7 +8517,7 @@ function GQ.Log:ShowProfessionBranch(check)
     end
     self._profRowHot = true
     branch:ClearAllPoints()
-    branch:SetPoint("TOPLEFT", check.label or check, "TOPRIGHT", 0, 6)
+    branch:SetPoint("TOPLEFT", self:FilterBranchAnchor(check), "TOPRIGHT", 2, 6)
     self:PopulateProfessionBranch(menu)
     branch:Show()
 end
@@ -8490,20 +8560,7 @@ function GQ.Log:RefreshProfessionBranch()
 end
 
 function GQ.Log:SyncVendorRowLabel(check)
-    if not check or not check.label then
-        return
-    end
-    local text = check:GetChecked() and "Vendor >" or "Vendor"
-    check.label:SetText(text)
-    local iconPad = check.sourceIcon and ((check.sourceIcon:GetWidth() or 18) + 4) or 0
-    check:SetHitRectInsets(0, -((check.label:GetStringWidth() or 90) + iconPad + 8), -2, -2)
-    local menu = self.frame and self.frame.sourceFilterMenu
-    if menu then
-        local needed = 40 + iconPad + (check.label:GetStringWidth() or 90)
-        if needed > (menu:GetWidth() or 0) then
-            menu:SetWidth(needed)
-        end
-    end
+    self:SyncFilterBranchMark(check, "Vendor")
 end
 
 function GQ.Log:CreateVendorFilterBranch(menu)
@@ -8630,7 +8687,7 @@ function GQ.Log:ShowVendorBranch(check)
     end
     self._vendorRowHot = true
     branch:ClearAllPoints()
-    branch:SetPoint("TOPLEFT", check.label or check, "TOPRIGHT", 0, 6)
+    branch:SetPoint("TOPLEFT", self:FilterBranchAnchor(check), "TOPRIGHT", 2, 6)
     self:PopulateVendorBranch(menu)
     branch:Show()
 end
@@ -8659,20 +8716,7 @@ function GQ.Log:ScheduleHideVendorBranch()
 end
 
 function GQ.Log:SyncBossDropRowLabel(check)
-    if not check or not check.label then
-        return
-    end
-    local text = check:GetChecked() and "Boss drop >" or "Boss drop"
-    check.label:SetText(text)
-    local iconPad = check.sourceIcon and ((check.sourceIcon:GetWidth() or 18) + 4) or 0
-    check:SetHitRectInsets(0, -((check.label:GetStringWidth() or 90) + iconPad + 8), -2, -2)
-    local menu = self.frame and self.frame.sourceFilterMenu
-    if menu then
-        local needed = 40 + iconPad + (check.label:GetStringWidth() or 90)
-        if needed > (menu:GetWidth() or 0) then
-            menu:SetWidth(needed)
-        end
-    end
+    self:SyncFilterBranchMark(check, "Boss drop")
 end
 
 function GQ.Log:CreateDungeonFilterBranch(menu)
@@ -8815,7 +8859,7 @@ function GQ.Log:ShowDungeonBranch(check)
     end
     self._dungeonRowHot = true
     branch:ClearAllPoints()
-    branch:SetPoint("TOPLEFT", check.label or check, "TOPRIGHT", 0, 6)
+    branch:SetPoint("TOPLEFT", self:FilterBranchAnchor(check), "TOPRIGHT", 2, 6)
     self:PopulateDungeonBranch(menu)
     branch:Show()
 end
@@ -8844,20 +8888,7 @@ function GQ.Log:ScheduleHideDungeonBranch()
 end
 
 function GQ.Log:SyncTrashRowLabel(check)
-    if not check or not check.label then
-        return
-    end
-    local text = check:GetChecked() and "Dungeon & Raid trash >" or "Dungeon & Raid trash"
-    check.label:SetText(text)
-    local iconPad = check.sourceIcon and ((check.sourceIcon:GetWidth() or 18) + 4) or 0
-    check:SetHitRectInsets(0, -((check.label:GetStringWidth() or 90) + iconPad + 8), -2, -2)
-    local menu = self.frame and self.frame.sourceFilterMenu
-    if menu then
-        local needed = 40 + iconPad + (check.label:GetStringWidth() or 90)
-        if needed > (menu:GetWidth() or 0) then
-            menu:SetWidth(needed)
-        end
-    end
+    self:SyncFilterBranchMark(check, "Dungeon & Raid trash")
 end
 
 function GQ.Log:CreateTrashFilterBranch(menu)
@@ -9000,7 +9031,7 @@ function GQ.Log:ShowTrashBranch(check)
     end
     self._trashRowHot = true
     branch:ClearAllPoints()
-    branch:SetPoint("TOPLEFT", check.label or check, "TOPRIGHT", 0, 6)
+    branch:SetPoint("TOPLEFT", self:FilterBranchAnchor(check), "TOPRIGHT", 2, 6)
     self:PopulateTrashBranch(menu)
     branch:Show()
 end
@@ -9939,7 +9970,7 @@ function GQ.Log:EnsureSettingsPage(frame)
     toastHint:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
     toastHint:SetJustifyH("LEFT")
     toastHint:SetWordWrap(true)
-    toastHint:SetText("Stops the popup when you obtain a BiS item from the hunt list.")
+    toastHint:SetText("Stops the popup when you obtain a piece from the hunt list.")
     toastHint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
     toastHint:Hide()
     frame.settingsToastHint = toastHint
@@ -14364,14 +14395,10 @@ function GQ.Log:Refresh()
                 local handKind = self:WeaponHeaderKind()
                 local weapons = self:FilteredWeaponEntries()
                 table.insert(layoutRows, { type = "header", slotName = "MainHand", label = "Weapons", handKind = handKind })
-                if not self:IsSlotCollapsed("MainHand", weapons) then
-                    if #weapons == 0 then
-                        table.insert(layoutRows, { type = "empty", slotName = "MainHand" })
-                    else
-                        for _, entry in ipairs(weapons) do
-                            local rowType = GQ.Data:ShouldDisplayAsNotable(entry, "MainHand") and "notable" or "item"
-                            table.insert(layoutRows, { type = rowType, slotName = "MainHand", entry = entry, handKind = handKind })
-                        end
+                if #weapons > 0 and not self:IsSlotCollapsed("MainHand", weapons) then
+                    for _, entry in ipairs(weapons) do
+                        local rowType = GQ.Data:ShouldDisplayAsNotable(entry, "MainHand") and "notable" or "item"
+                        table.insert(layoutRows, { type = rowType, slotName = "MainHand", entry = entry, handKind = handKind })
                     end
                 end
             elseif slotName == "SecondaryHand" then
@@ -14379,12 +14406,8 @@ function GQ.Log:Refresh()
                     local held = self:HeldOffHandEntries()
                     if #held > 0 or GQ.Data:OffHandShowsShieldOrHeld() then
                         table.insert(layoutRows, { type = "header", slotName = "SecondaryHand" })
-                        if not self:IsSlotCollapsed("SecondaryHand", held) then
-                            if #held == 0 then
-                                table.insert(layoutRows, { type = "empty", slotName = "SecondaryHand" })
-                            else
-                                self:AppendListedEntries(layoutRows, held, "SecondaryHand")
-                            end
+                        if #held > 0 and not self:IsSlotCollapsed("SecondaryHand", held) then
+                            self:AppendListedEntries(layoutRows, held, "SecondaryHand")
                         end
                     end
                 end
@@ -14392,14 +14415,10 @@ function GQ.Log:Refresh()
                 local upgrades = self:GetActiveSlotListEntries(slotName)
                 table.insert(layoutRows, { type = "header", slotName = slotName })
 
-                if not self:IsSlotCollapsed(slotName, upgrades) then
-                    if #upgrades == 0 then
-                        table.insert(layoutRows, { type = "empty", slotName = slotName })
-                    else
-                        for _, entry in ipairs(upgrades) do
-                            local rowType = GQ.Data:ShouldDisplayAsNotable(entry, slotName) and "notable" or "item"
-                            table.insert(layoutRows, { type = rowType, slotName = slotName, entry = entry })
-                        end
+                if #upgrades > 0 and not self:IsSlotCollapsed(slotName, upgrades) then
+                    for _, entry in ipairs(upgrades) do
+                        local rowType = GQ.Data:ShouldDisplayAsNotable(entry, slotName) and "notable" or "item"
+                        table.insert(layoutRows, { type = rowType, slotName = slotName, entry = entry })
                     end
                 end
             end
@@ -14506,6 +14525,10 @@ function GQ.Log:Refresh()
         elseif tab == "removed" and not self:IsHuntRemoved(entry) then
             clearSelection = true
         elseif tab == "active" and (status == "completed" or self:IsHuntRemoved(entry)) then
+            clearSelection = true
+        elseif tab == "active" and not self:EntrySourceAllowed(entry) then
+            clearSelection = true
+        elseif tab == "active" and not self:EntryMatchesPlayStyle(entry) then
             clearSelection = true
         end
 

@@ -19,10 +19,10 @@ Publishing uses **GitHub Actions**, not the CurseForge webhook. Keep any CurseFo
 
 Only when explicitly publishing:
 
-1. Bump `## Version:` in `GearQuest/GearQuestForever.toc` and `GearQuest/Core.lua` (`GQ.VERSION`) to **`X.Y.Z-beta`** (e.g. `0.2.1-beta`). The log window header is **`GearQuest Forever v`** plus `GQ.VERSION` (`GearQuest/Log.lua`, `GearQuestWindowTitle`). It must stay that string — do not hardcode a different version in the header. Bumping `GQ.VERSION` is what updates the band on every release.
-2. Add a `## vX.Y.Z-beta` section to `CHANGELOG.md`. That whole section is the CurseForge changelog (until the next `## ` heading). Write it for players: a short lead, then a subsection per change, with the classes, specs, levels, and what they will see. A one-line summary is not enough.
+1. Bump `## Version:` in `GearQuest/GearQuestForever.toc` and `GearQuest/Core.lua` (`GQ.VERSION`) to **`X.Y.Z`** (the current release is `1.0.0`). A beta tag is `X.Y.Z-beta` only when that upload should stay on the beta channel. The log window header is **`GearQuest Forever v`** plus `GQ.VERSION` (`GearQuest/Log.lua`, `GearQuestWindowTitle`). It must stay that string — do not hardcode a different version in the header. Bumping `GQ.VERSION` is what updates the band on every release.
+2. Add a `## vX.Y.Z` section at the top of `CHANGELOG.md` and demote the previous `## ` heading to `###`. `scripts/upload-curseforge-forever.py` sends markdown from that first `## ` line through the end of the file. Older versions stay as `###` so there is only one level-2 heading. Write the new section for players: a short lead, then a subsection per change, with the classes, specs, levels, and what they will see. A one-line summary is not enough.
 3. Commit and push to `main`.
-4. Tag and push: `git tag vX.Y.Z-beta` then `git push origin vX.Y.Z-beta`. CurseForge **Files** shows **`vX.Y.Z-beta`** (keep the `v`). Uploads stay on the **beta** channel until `CF_RELEASE_TYPE` is changed to `release`.
+4. Tag and push: `git tag vX.Y.Z` then `git push origin vX.Y.Z`. CurseForge **Files** shows that tag (keep the `v`). A tag that does not end in `-beta` uploads on the **release** channel. A tag that ends in `-beta` uploads on the **beta** channel. `.github/workflows/release.yml` sets `CF_RELEASE_TYPE` from the tag name.
 5. Verify **GitHub Actions → Release** succeeds.
 6. Check CurseForge → **Files** — new file appears as Processing, then Approved.
 
@@ -35,6 +35,6 @@ Only when explicitly publishing:
 
 ## Next upload
 
-Version string is **`X.Y.Z-beta`**. CurseForge file name is **`vX.Y.Z-beta`**.
+`v1.0.0` is the first file on the CurseForge **release** channel. The next version is the next `X.Y.Z` on that channel unless a beta was asked for.
 
-After `v0.2.9-beta`, bump the patch (e.g. `0.2.10-beta`) rather than deleting the tag.
+After a tag exists, bump the version rather than deleting the tag.

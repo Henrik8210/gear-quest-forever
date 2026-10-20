@@ -309,10 +309,25 @@
         "x": 47.8,
         "y": 56.3
       }
+    ],
+    "City of Dalaran": [
+      {
+        "map": "Alterac Mountains",
+        "mapId": 1416,
+        "x": 14.2,
+        "y": 61.1,
+        "faction": "Alliance"
+      },
+      {
+        "map": "Alterac Mountains",
+        "mapId": 1416,
+        "x": 8.8,
+        "y": 59.6,
+        "faction": "Horde"
+      }
     ]
   },
   "describedOnly": {
-    "City of Dalaran": "Alterac Mountains boundary",
     "The Drowned City": "Gillijim's Isle coast",
     "Krol'dok Stronghold": "Riverglades",
     "Alcaz Prison": "far northeast of the Dustwallow Marsh coast, on Alcaz Island",
@@ -397,6 +412,14 @@
     "Mr. Smite": "The Deadmines",
     "Rhahk'Zor": "The Deadmines",
     "Sneed's Shredder": "The Deadmines",
-    "Skum": "Wailing Caverns"
+    "Skum": "Wailing Caverns",
+    "Atrexis the Grave Knight": "City of Dalaran",
+    "Arcane Anomaly": "City of Dalaran",
+    "Arcanic Enigma": "City of Dalaran",
+    "Unstable Sentinel": "City of Dalaran",
+    "Mana Devourer": "City of Dalaran",
+    "Fel Ancient": "City of Dalaran",
+    "Shade of the Archmage": "City of Dalaran",
+    "Lyn the Ignored": "City of Dalaran"
   }
 }

@@ -278,7 +278,7 @@ The gallery on the CurseForge page can be the same set, in this order. The descr
 ## Notes for the author (not the listing)
 
 - CurseForge project **1698950**. Never use TBC `1669225`.
-- File names are `vX.Y.Z-beta` on the beta channel.
+- `v1.0.0` is the first file on the release channel. Later files are `vX.Y.Z` on that channel. A tag ending in `-beta` stays on the beta channel.
 - Do not put the notable shelf back in this text. It is gone.
 - Premade weights change only from the sheet. A player edits weights by adding **+ custom stat weights** in the spec menu. That list reorders the base spec's hunts. It does not add pieces that spec never ranked. Weapons already filters by two-hand, one-hand, and weapon type.
 - Shockadin is the fourth paladin spec. Do not retune Holy, Protection, or Retribution to match it.

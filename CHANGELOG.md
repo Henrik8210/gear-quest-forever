@@ -2,7 +2,39 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v0.6.1-beta
+## v1.0.0
+
+This is the first release of GearQuest Forever. The beta is over. The window title reads **GearQuest Forever v1.0.0**. World of Warcraft: Forever launches on November 4th, and GearQuest Forever will keep being improved after that launch.
+
+### Your score
+
+The line above the score bar reads **Your GearQuest Index Score is N Rank**. The number and the rank word use that rank's color: green for Below average, blue for Fair, purple for Great, and orange for Legend. Looting a hunt names the rank. It says **upgrade** only when that piece is better than what you are wearing. An empty slot on the Active list is just the header. It no longer adds "No upgrades for your level yet."
+
+### The source filter
+
+**Off Hand — Shield**, and an off-hand orb or tome, now follow the source filter. A Boss drop list no longer keeps world drops such as **Scaled Shield of Healing**, **Pathfinder Guard of Healing**, and **Robust Buckler of Healing**. Weapons and the armor slots already did this. Rank numbers stay the real ones. The (i) list still shows every source. If the parchment was open on a hunt the filter just hid, it closes.
+
+### City of Dalaran
+
+Boss drops, dungeon trash, and quests that send you into City of Dalaran say the dungeon has an attunement.
+
+Alliance pick up **An Alarming Request** from Emissary Jacques at the Southshore Town Hall in Hillsbrad Foothills. The pin is in front of the city, Alterac Mountains 14.2, 61.1. Image of Archmage Modera teleports you in. The dungeon pipe is inside the city, in the sewers at Cantrips & Crows.
+
+Horde start with **Key to the City** from Magus Wordeen Voidglare in Tarren Mill. **Heart of Disruption** awards the Dalaran Sewer Key. The pin is the outside sewer, Alterac Mountains 8.8, 59.6. One person in the group needs the key. Defeating Shade of the Archmage and finishing **Shrewd Negotiations** makes the city guards neutral. Most citizens still will not offer their services.
+
+City of Dalaran is on the Boss drop flyout and the Dungeon & Raid trash flyout. **Atrexis the Grave Knight**, **Arcane Anomaly**, **Arcanic Enigma**, **Unstable Sentinel**, **Mana Devourer**, **Fel Ancient**, **Shade of the Archmage**, and **Lyn the Ignored** are boss drops. **Seeking Remnant**, **Fragmented Sentry**, **Fallen Mage**, and **Dark Caster** are dungeon trash. **Roused Nature Footwraps** drops from Seeking Remnant. Those hunts are no longer world drops in the outdoor Alterac camps.
+
+### Ruins of Lordaeron
+
+**Ragged Ghoul**, **Flesh Golem**, **Stone Watcher**, **Shrieking Banshee**, and **Skeletal Soldier** are dungeon trash in the Ruins of Lordaeron. The pin is the entrance in Undercity, 71.6, 11.4. **Rotmender's Garb** still says it drops in that dungeon.
+
+### New hunts
+
+The Forever item list was scraped again. A new hunt uses the same description as the hunts of that source that were already on the list, and it has a pin when a real spot exists.
+
+**Serrated Knife** is bought from Rallic Finn and Kuna Thunderhorn, with a pin and a price for each seller. **Westbrook Garrison Needs Help!** leads to the Riverpaw gnoll bounty. **Report to Captain Stoutfist** leads through War Banners and Nek'rosh's Gambit to Defeat Nek'rosh. **Cheese Knife**, **Darnassian Knife**, **Beastculler's Knife**, and **Wizlo's Tuning Wrench** are single quest rewards, pinned where that quest starts. A piece Wowhead still does not source stays **Unsourced**, with no invented pin and no map spot.
+
+### v0.6.1-beta
 
 Paladin and warrior levels 1–9 are scored the same way as every other class, for both factions. Turning the guide off frees the memory it used. **Recommended** follows the filters you have on. A level 60 weight hover matches the hunt. The window title reads **GearQuest Forever v0.6.1-beta**.
 

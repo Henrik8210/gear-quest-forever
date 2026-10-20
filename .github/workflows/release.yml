@@ -37,10 +37,17 @@ jobs:
           )
           unzip -l ".release/GearQuestForever-${GITHUB_REF_NAME}.zip" | head -n 20
 
+      - name: Choose CurseForge release channel
+        run: |
+          if [[ "${GITHUB_REF_NAME}" == *-beta ]]; then
+            echo "CF_RELEASE_TYPE=beta" >> "$GITHUB_ENV"
+          else
+            echo "CF_RELEASE_TYPE=release" >> "$GITHUB_ENV"
+          fi
+
       - name: Upload zip to CurseForge (WoW Forever 1.60.1)
         env:
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
           CF_PROJECT_ID: "1698950"
           CF_GAME_VERSION: "1.60.1"
-          CF_RELEASE_TYPE: "beta"
         run: python3 scripts/upload-curseforge-forever.py

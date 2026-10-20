@@ -84,6 +84,15 @@ EXTRA_CHAIN_ROOTS = {
 REPLACE_CHAIN_ROOTS = {
     79442: (1531, 1532),
 }
+# The quest page has no start pin. The note that begins the chain drops from
+# this patrol. Three published camps, far apart, so the log can pick the nearest.
+ITEM_START_PINS = {
+    4881: (
+        {"map": "Thousand Needles", "mapId": 1441, "x": 18.4, "y": 22.2, "faction": "Horde", "npc": "Galak Messenger"},
+        {"map": "Thousand Needles", "mapId": 1441, "x": 28.2, "y": 33.4, "faction": "Horde", "npc": "Galak Messenger"},
+        {"map": "Thousand Needles", "mapId": 1441, "x": 39.6, "y": 32.2, "faction": "Horde", "npc": "Galak Messenger"},
+    ),
+}
 NOTE_VENDOR = "vendor that sells this"
 NOTE_FARM = "a farming spot"
 NOTE_RARE = "where this rare spawns"
@@ -598,6 +607,8 @@ def copy_spots(spots: list[dict], faction: str | None = None) -> list[dict]:
         fac = spot.get("faction") or faction
         if fac:
             row["faction"] = fac
+        if spot.get("npc"):
+            row["npc"] = spot["npc"]
         out.append(row)
     return out
 
@@ -712,6 +723,12 @@ def beginning_spots(quest_id: int, cache: dict, faction: str | None) -> list[dic
         rec = object_record(object_id, cache)
         for spot in rec.get("spots") or []:
             _add_spot(spots, seen, _stamp_spot(spot, fac))
+    if spots:
+        return spots
+    pinned = ITEM_START_PINS.get(int(quest_id))
+    if pinned:
+        for spot in pinned:
+            _add_spot(spots, seen, dict(spot))
     if spots:
         return spots
     door = QUEST_START_DOOR.get(int(quest_id))

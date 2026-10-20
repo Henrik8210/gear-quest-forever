@@ -66,7 +66,7 @@ local function EnsureFrame()
     frame.title:SetPoint("TOPLEFT", frame.icon, "TOPRIGHT", 10, -2)
     frame.title:SetPoint("RIGHT", frame, "RIGHT", -22, 0)
     frame.title:SetJustifyH("LEFT")
-    frame.title:SetText("|cffffd200BiS upgrade obtained!|r")
+    frame.title:SetText("|cffffd200Hunt obtained|r")
 
     frame.subtitle = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     frame.subtitle:SetPoint("TOPLEFT", frame.title, "BOTTOMLEFT", 0, -2)
@@ -184,6 +184,8 @@ function GQ.Toast:ApplyEntryVisuals(entry)
     end
 
     local itemName = GQ.Data:GetEntryDisplayName(entry) or ("Item " .. entry.itemId)
+    local title = GQ.Log and GQ.Log.ObtainToastTitle and GQ.Log:ObtainToastTitle(entry)
+    frame.title:SetText(title or "|cffffd200Hunt obtained|r")
     frame.subtitle:SetText(itemName)
 
     if GQ.Data and GQ.Data.RequestItemInfo then

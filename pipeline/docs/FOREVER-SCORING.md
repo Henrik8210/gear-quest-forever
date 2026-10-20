@@ -409,6 +409,8 @@ indexed, that is every published camp the pattern under **Map tracking**
 keeps, not one pin taken from the page. `NearestCoordinateSpot` then offers
 the closest of those spots to wherever the player is standing.
 
+A new hunt also matches the description the other hunts of that source already use. A quest reward from a chain lists every Wowhead series step from the first quest through the quest that rewards the item, then `This quest can be picked up at level N.` A single quest has that pickup line and no step list. A vendor names the seller on the pin, the coin price, and any reputation or honor sentence after the first period. A boss drop and dungeon trash pin the entrance, and a dungeon with an attunement gets the access line. A world drop names the creature and the camp. An empty source stays Unsourced. Do not invent a pin, a price, or a chain step.
+
 `sync_forever_item_stats.py` dry-run first. `--apply` only when the parse of
 known items is sane (Imperial Plate Helm **18/17** Str/Sta, not 38 from the
 set bonus; Lionheart **+20 Hit**; Jouster's Crest **1101** armor).
@@ -722,7 +724,7 @@ Changing zone, logging in, and opening a merchant rebuild those arrows in the ba
   the options run past the pane. The chat box reads the saved check whenever
   Settings is shown and writes it on the next frame. **GearQuest Commands** lists each
   slash command with a 1px shadow and the explanation in plain text under it.
-- The source filter and a play style apply together with the Weapons filter. Hunt rows, the shield list, and the character-panel bar hide a weapon that fails any of them. The Weapons menu and the hunter Ranged menu list a hand or a type only when something of that kind still passes those two. A box the player turned off stays off when it comes back. Rank numbers and the (i) list stay the unfiltered order, at most 30 weapons in the current band. Changing the source filter or a play style drops the cached weapon hunt rows and does not drop the rank cache. The green arrow stays on the unfiltered best piece when the weapon filter hides it. The paper doll follows the weapon filter, including hunter, rogue, and enhancement. Toggling a weapon checkbox clears the paper-doll upgrade cache. Do not clear that cache on every refresh.
+- The source filter and a play style apply together with the Weapons filter. Hunt rows, the shield list, and the character-panel bar hide a weapon that fails any of them. The Weapons menu and the hunter Ranged menu list a hand or a type only when something of that kind still passes those two. A box the player turned off stays off when it comes back. Rank numbers and the (i) list stay the unfiltered order, at most 30 weapons in the current band. Changing the source filter or a play style drops the cached weapon hunt rows and does not drop the rank cache. The Off Hand shield and held-item list is cached apart from those weapon rows (`_heldOffHand`). Drop that cache in the same pass, or a Boss drop filter keeps the world-drop shields from the previous filter. If the parchment is open on a hunt the filter or a play style just hid, close it. The green arrow stays on the unfiltered best piece when the weapon filter hides it. The paper doll follows the weapon filter, including hunter, rogue, and enhancement. Toggling a weapon checkbox clears the paper-doll upgrade cache. Do not clear that cache on every refresh.
 
 The source **Filter** closes on a click outside the menu. The Profession
   flyout closes when the cursor leaves both the row and the flyout. Boss drop
@@ -1129,7 +1131,7 @@ A full ingest rewrites sources.json for every id >= 200000. That cleared 162 zon
 
 `refresh_forever_tips.py` is the refresh. It reads the live Forever tooltip `https://nether.wowhead.com/tooltip/item/{id}?dataEnv=16` (the item-page database) and writes quality, required level, and stats to `items.json`. The older `nether.wowhead.com/forever/tooltip/item/` feed can lag that page: Talbar Mantle (10657) is uncommon/green on the page and on dataEnv 16, and was still rare/blue on the old feed. Do not reuse `refresh_cache.json` from that feed. The live cache is `refresh_cache_env16.json`. One request at a time, `GQ_TIP_DELAY` default 1.5 seconds. A full ingest is not a refresh: ingest inserts new ids and must not rewrite existing stat rows from `tooltips.json` (that reverted Erudite). It does fill an empty source, and when the listview names a different quest, vendor, dropper, or profession it updates that place and indexes coordinates for those ids. Client pins and Greater Magic Wand **11288** stay skipped. A stated Requires Level above 1 replaces the stored level. A tooltip with no Requires Level line does not. The hunt list hides a piece until the stored required level (Fiery War Axe is 35, so level 30 must not list it). On 7 Oct the previous feed updated **1186** items, then all nine classes were re-scored with `rescore_hunter_shaman.py`. Holy paladin and Beast Mastery / Marksmanship weights in this file are the weights that score used. Do not rescore from a stale row.
 
-**Heart of Disruption** is two City of Dalaran quests that share the name. Alliance quest 92458 chooses Spellguard Pauldrons (279839), Renewing Footpads (279840), or Defender of Dalaran (279841). Horde quest 96984 chooses Battle Spaulders (279842), Enchanted Sandals (279843), or Striking Staff (279844). A Tauren does not see Defender of Dalaran. Those six ids are exclusive in `quest_faction.json`. The dungeon step says Requires level 24. The chain starts earlier, and that first quest says Requires level 30, so the hunts are level 30. Alliance begins at An Alarming Request (92432), Emissary Jacques in Hillsbrad Foothills (48.3, 60.1). Horde begins at Blood in the Streets (92434), Magus Wordeen Voidglare in Tarren Mill (61.4, 20.8). The pin is that start, not Image of Archmage Modera.
+**Heart of Disruption** is two City of Dalaran quests that share the name. Alliance quest 92458 chooses Spellguard Pauldrons (279839), Renewing Footpads (279840), or Defender of Dalaran (279841). Horde quest 96984 chooses Battle Spaulders (279842), Enchanted Sandals (279843), or Striking Staff (279844). A Tauren does not see Defender of Dalaran. Those six ids are exclusive in `quest_faction.json`. The dungeon step says Requires level 24. The chain starts earlier, and that first quest says Requires level 30, so the hunts are level 30. Alliance begins at An Alarming Request (92432), Emissary Jacques in Hillsbrad Foothills (48.3, 60.1). Horde begins at Blood in the Streets (92434), Magus Wordeen Voidglare in Tarren Mill (61.4, 20.8). The pin is that start, not Image of Archmage Modera. The dungeon itself has two doors, both in Alterac Mountains (map 1416). Alliance is in front of the city at 14.2, 61.1. Horde is the outside sewer at 8.8, 59.6. Boss drops and dungeon trash in City of Dalaran use those doors. The parchment access line is faction-specific. Alliance starts at An Alarming Request, and Image of Archmage Modera teleports the group in. The dungeon pipe is inside the city, in the sewers at Cantrips & Crows. Horde starts with Key to the City from Magus Wordeen Voidglare, and Heart of Disruption awards the Dalaran Sewer Key. One person in the group needs the key. Defeating Shade of the Archmage and finishing Shrewd Negotiations makes the city guards neutral. Most citizens still will not offer their services. Do not pin Alliance in Silverpine Forest. Modera's quest coordinate is not the door.
 
 **Malignant Root (282283)** is a finger. Alliance Arms and Fury, rank 1 at level **27** only. Source is the rare **Nightveiled Rotheap** in the Wetlands (pins 21.2, 43.2 / 21.9, 43.3 / 23.0, 43.6). Rotheap Inards are party loot at 100%. Turn them in to Rethiel the Greenwarden. The Greenwarden is hostile to Horde, so `questRaces` 77 and `GQ.Data.questFaction[282283] = "Alliance"`. Do not pin the turn-in. The classic nether tooltip 404s, so the reward carries the New in Forever stamp.
 
@@ -1739,13 +1741,14 @@ Notes by source:
 Classic dungeon doors are the pre-Cataclysm Questie entrance table (Forever
 still uses classic geography). Forever doors with exact numbers: Hall of
 Thanes 43.6, 51.7 in Ironforge, Ruins of Lordaeron 71.6, 11.4 in
-Undercity, and Excavation Site 47.8, 56.3 in the Wetlands (Wowhead Forever
-dungeon guide, zone 11 pin "Entrance to Excavation Site"). These six have a
-description only, so nothing is pinned there: City of Dalaran (Alterac
-Mountains boundary), The Drowned City (Gillijim's Isle), Krol'dok Stronghold
-(Riverglades), Alcaz Prison (Alcaz Island), Blackmaw Hold (northern
-Azshara), Shaper's Terrace (northern Un'Goro). Table:
-`pipeline/data/dungeon_entrances.json`.
+Undercity, Excavation Site 47.8, 56.3 in the Wetlands (Wowhead Forever
+dungeon guide, zone 11 pin "Entrance to Excavation Site"), and City of
+Dalaran in Alterac Mountains (map 1416): Alliance 14.2, 61.1 in front of
+the city, Horde 8.8, 59.6 at the outside sewer. These five have a
+description only, so nothing is pinned there: The Drowned City (Gillijim's
+Isle), Krol'dok Stronghold (Riverglades), Alcaz Prison (Alcaz Island),
+Blackmaw Hold (northern Azshara), Shaper's Terrace (northern Un'Goro).
+Table: `pipeline/data/dungeon_entrances.json`.
 
 ### What could not be indexed (2 Oct 2026)
 

@@ -3027,33 +3027,76 @@ function GQ.Data:AccessLine(entry)
         return nil
     end
     local src = entry.sourceType
-    if src ~= "boss_drop" and src ~= "raid_trash" and src ~= "world_drop" and src ~= "rare_npc" then
+    local dropLike = src == "boss_drop" or src == "raid_trash" or src == "world_drop" or src == "rare_npc"
+    local questLike = src == "quest_reward"
+    if not dropLike and not questLike then
         return nil
     end
-    local function zoneHit(name)
-        if name == "Onyxia's Lair" then
-            return true
-        end
-        return false
-    end
-    if zoneHit(entry.zone) then
+    local function onyxiaLine()
         local faction = GQ.GetEffectiveFaction and GQ:GetEffectiveFaction()
         if faction == "Horde" then
             return "Onyxia's Lair requires the Drakefire Amulet. That chain ends with Blood of the Black Dragon Champion."
         end
         return "Onyxia's Lair requires the Drakefire Amulet. That chain ends with Drakefire Amulet."
     end
-    local row = self.coordinates and entry.itemId and self.coordinates[entry.itemId]
-    if row and row.spots then
-        for i = 1, #row.spots do
-            if zoneHit(row.spots[i] and row.spots[i].map) then
-                local faction = GQ.GetEffectiveFaction and GQ:GetEffectiveFaction()
-                if faction == "Horde" then
-                    return "Onyxia's Lair requires the Drakefire Amulet. That chain ends with Blood of the Black Dragon Champion."
+    local function dalaranLine()
+        local faction = GQ.GetEffectiveFaction and GQ:GetEffectiveFaction()
+        if faction == "Horde" then
+            return "City of Dalaran has an attunement. Start with Key to the City from Magus Wordeen Voidglare in Tarren Mill. Heart of Disruption awards the Dalaran Sewer Key for the entrance on the northwest side of the city. One person in the group needs it. Defeating Shade of the Archmage and finishing Shrewd Negotiations makes the city guards neutral. Most citizens still will not offer their services."
+        end
+        return "City of Dalaran has an attunement. Pick up An Alarming Request from Emissary Jacques at the Southshore Town Hall in Hillsbrad Foothills. The Alliance entrance is in front of the city in Alterac Mountains. Image of Archmage Modera teleports you in, and the dungeon pipe is inside at Cantrips & Crows. The outside sewer on the northwest shore is the Horde entrance."
+    end
+    local function accessFor(name)
+        if name == "Onyxia's Lair" then
+            return onyxiaLine()
+        end
+        if name == "City of Dalaran" then
+            return dalaranLine()
+        end
+        return nil
+    end
+    local function textHas(text, needle)
+        return type(text) == "string" and text:find(needle, 1, true) ~= nil
+    end
+    local function entersDalaran()
+        if entry.zone == "City of Dalaran" then
+            return true
+        end
+        if entry.questName == "Heart of Disruption" or textHas(entry.questName, "City of Dalaran") then
+            return true
+        end
+        if textHas(entry.instructions, "City of Dalaran") or textHas(entry.instructions, "Heart of Disruption") then
+            return true
+        end
+        local steps = self.QuestChainSteps and self:QuestChainSteps(entry)
+        if steps then
+            for i = 1, #steps do
+                local step = steps[i]
+                local name = type(step) == "table" and step[2]
+                if name == "Heart of Disruption" or textHas(name, "City of Dalaran") then
+                    return true
                 end
-                return "Onyxia's Lair requires the Drakefire Amulet. That chain ends with Drakefire Amulet."
             end
         end
+        return false
+    end
+    if dropLike then
+        local line = accessFor(entry.zone)
+        if line then
+            return line
+        end
+        local row = self.coordinates and entry.itemId and self.coordinates[entry.itemId]
+        if row and row.spots then
+            for i = 1, #row.spots do
+                line = accessFor(row.spots[i] and row.spots[i].map)
+                if line then
+                    return line
+                end
+            end
+        end
+    end
+    if entersDalaran() then
+        return dalaranLine()
     end
     return nil
 end
@@ -6403,7 +6446,6 @@ function GQ.Data:AddGearScoreToItemTooltip(tooltip)
         return
     end
     local _, link = tooltip:GetItem()
-    local shown = tooltip.IsShown and tooltip:IsShown()
     tooltip.gqScoreBusy = true
     local entry = self:EntryForItemLink(link)
     if not entry then
@@ -6415,9 +6457,6 @@ function GQ.Data:AddGearScoreToItemTooltip(tooltip)
         tooltip.gqScoreLineAdded = true
         tooltip:AddLine(" ")
         tooltip:AddLine(miss, 0.69, 0.69, 0.69)
-        if shown and tooltip.Show then
-            tooltip:Show()
-        end
         tooltip.gqScoreBusy = nil
         return
     end
@@ -6429,9 +6468,6 @@ function GQ.Data:AddGearScoreToItemTooltip(tooltip)
             tooltip:AddLine(" ")
             tooltip:AddLine(miss, 0.69, 0.69, 0.69)
         end
-    end
-    if shown and tooltip.Show then
-        tooltip:Show()
     end
     tooltip.gqScoreBusy = nil
 end
@@ -6563,14 +6599,41 @@ function GQ.Data:GearScoreMissText(link)
 end
 
 function GQ.Data:HookItemScoreTooltips()
+    local function hookClear(tip)
+        if not tip or tip.gqScoreClearHooked or not tip.HookScript then
+            return
+        end
+        tip.gqScoreClearHooked = true
+        tip:HookScript("OnTooltipCleared", function(self)
+            self.gqScoreLineAdded = nil
+        end)
+    end
+
+    local hasProcessor = TooltipDataProcessor and TooltipDataProcessor.AddTooltipPostCall
+        and Enum and Enum.TooltipDataType and Enum.TooltipDataType.Item
+
+    -- OnTooltipSetItem runs inside the bag button. That taints the button, and
+    -- a right-click sell at a vendor is then blocked. The tooltip processor
+    -- adds the score line without that. Showing the tooltip from the hook
+    -- redraws it during the click and swallows the sell.
+    if hasProcessor then
+        hookClear(GameTooltip)
+        hookClear(ItemRefTooltip)
+        if not self._scoreTooltipProcessor then
+            self._scoreTooltipProcessor = true
+            TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(tooltip)
+                GQ.Data:AddGearScoreToItemTooltip(tooltip)
+            end)
+        end
+        return
+    end
+
     local function hook(tip)
         if not tip or tip.gqScoreHooked or not tip.HookScript then
             return
         end
         tip.gqScoreHooked = true
-        tip:HookScript("OnTooltipCleared", function(self)
-            self.gqScoreLineAdded = nil
-        end)
+        hookClear(tip)
         pcall(tip.HookScript, tip, "OnTooltipSetItem", function(self)
             GQ.Data:AddGearScoreToItemTooltip(self)
         end)
@@ -6585,16 +6648,6 @@ function GQ.Data:HookItemScoreTooltips()
         end)
         self._scoreTooltipWatcher = watcher
     end
-    if self._scoreTooltipProcessor or not TooltipDataProcessor or not TooltipDataProcessor.AddTooltipPostCall then
-        return
-    end
-    if not Enum or not Enum.TooltipDataType or not Enum.TooltipDataType.Item then
-        return
-    end
-    self._scoreTooltipProcessor = true
-    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(tooltip)
-        GQ.Data:AddGearScoreToItemTooltip(tooltip)
-    end)
 end
 
 GQ.Data:HookItemScoreTooltips()
