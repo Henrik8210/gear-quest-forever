@@ -30,11 +30,11 @@ const SOURCES = [
   },
   {
     class: "PALADIN",
-    picks: "paladinHorde1to9",
-    facts: "paladinHorde1to9Facts",
+    picks: "paladinEarly1to9",
+    facts: "paladinEarly1to9Facts",
     hasSpec: true,
-    faction: "Horde",
-    file: "_generated/Data.Paladin.Horde.1to9.generated.lua",
+    factionInRow: true,
+    file: "_generated/Data.Paladin.Early.1to9.generated.lua",
   },
   {
     class: "WARRIOR",
@@ -45,11 +45,11 @@ const SOURCES = [
   },
   {
     class: "WARRIOR",
-    picks: "warriorHorde1to9",
-    facts: "warriorHorde1to9Facts",
+    picks: "warriorEarly1to9",
+    facts: "warriorEarly1to9Facts",
     hasSpec: true,
-    faction: "Horde",
-    file: "_generated/Data.Warrior.Horde.1to9.generated.lua",
+    factionInRow: true,
+    file: "_generated/Data.Warrior.Early.1to9.generated.lua",
   },
   {
     class: "HUNTER",

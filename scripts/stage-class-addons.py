@@ -20,11 +20,11 @@ AUDIT_NAME = "Data.ForeverAudit.generated.lua"
 CLASSES = {
     "PALADIN": (
         "Paladin",
-        ["Data.Paladin.generated.lua", "Data.Paladin.Horde.1to9.generated.lua"],
+        ["Data.Paladin.generated.lua", "Data.Paladin.Early.1to9.generated.lua"],
     ),
     "WARRIOR": (
         "Warrior",
-        ["Data.Warrior.generated.lua", "Data.Warrior.Horde.1to9.generated.lua"],
+        ["Data.Warrior.generated.lua", "Data.Warrior.Early.1to9.generated.lua"],
     ),
     "HUNTER": (
         "Hunter",

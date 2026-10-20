@@ -9,7 +9,7 @@ end
 GQ = GQ or {}
 _G.GearQuest = GQ
 
-GQ.VERSION = "0.6.0-beta"
+GQ.VERSION = "0.6.1-beta"
 GQ.ADDON_NAME = ADDON_NAME
 
 -- General -> Hide chat messages. Off until the player checks it.
@@ -172,12 +172,10 @@ local SOURCE_LABELS = {
     boss_drop = "Boss drop",
     raid_trash = "Dungeon & Raid trash",
     quest_reward = "Quest reward",
-    seasonal_quest = "Seasonal quest",
     vendor = "Vendor",
     profession = "Profession",
     auction_house = "Auction House",
     object_drop = "Container",
-    special = "Special",
 }
 
 local SOURCE_COLORS = {
@@ -187,7 +185,6 @@ local SOURCE_COLORS = {
     boss_drop = "|cffff4444",
     raid_trash = "|cffcc9966",
     quest_reward = "|cff00ff00",
-    seasonal_quest = "|cffff8800",
     vendor = "|cffffcc00",
     profession = "|cffcc66ff",
     auction_house = "|cffffa500",
@@ -199,8 +196,6 @@ local SOURCE_ALIAS = {
     skinning = "profession",
     -- Looted from a container. The checkbox id is object_drop.
     container = "object_drop",
-    mail = "special",
-    pickpocket = "special",
 }
 
 function GQ:NormalizeSourceType(sourceType)
@@ -218,18 +213,30 @@ function GQ:GetSourceTag(sourceType)
     return color .. (SOURCE_LABELS[sourceType] or sourceType) .. "|r"
 end
 
+-- InputDeviceInterfaceStyle is 0 for mouse. The gamepad UI is 1, or a value
+-- whose name contains "gamepad". Anything else still draws the map pins.
+function GQ:UsesGamepad()
+    local get = C_CVar and C_CVar.GetCVar or GetCVar
+    if not get then
+        return false
+    end
+    local ok, style = pcall(get, "InputDeviceInterfaceStyle")
+    if not ok or style == nil then
+        return false
+    end
+    style = tostring(style):lower()
+    if style == "1" or style == "gamepad" then
+        return true
+    end
+    return style:find("gamepad", 1, true) ~= nil
+end
+
 -- Gamepad UI: Blizzard shows the "following UI restrictions" dialog when any
 -- addon is still on the stack, then the dialog itself changes gamepad focus
 -- and the same protected call fires again until the client stops responding.
 -- The warning is the hang. Mouse mode still shows it.
 function GQ:SilenceGamepadActionPopup()
-    local get = C_CVar and C_CVar.GetCVar or GetCVar
-    if not get or not UIParent or not UIParent.UnregisterEvent then
-        return
-    end
-    local ok, style = pcall(get, "InputDeviceInterfaceStyle")
-    style = ok and tostring(style):lower() or ""
-    if style ~= "1" and style ~= "gamepad" then
+    if not self:UsesGamepad() or not UIParent or not UIParent.UnregisterEvent then
         return
     end
     pcall(UIParent.UnregisterEvent, UIParent, "ADDON_ACTION_FORBIDDEN")

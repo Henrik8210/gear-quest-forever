@@ -4,12 +4,9 @@ local _, GQ = ...
 -- Indicator.lua, Log.lua and Tracker.lua already iterate. Nothing in those files
 -- needs to change: generated rows arrive in exactly the shape curated ones use.
 --
--- Per class, the data does not overlap the hand-curated entries in Data.lua:
---   1-9            curated in Data.lua for the classes ALLIANCE_MAIL / MAIL_MELEE
---                  covers (warrior, paladin), so those ship a Horde-only file;
---                  a class in neither table (hunter) ships BOTH factions, and its
---                  rows carry their own faction field.
---   10-60          <class>Picks            (expanded here)
+-- Per class, levels 1-9 and 10-60 both come from the scorer.
+--   1-9            <class>Early1to9, both factions, one row per spec
+--   10-60          <class>Picks
 --   70             not used (Forever cap is 60; TBC L70 curated was stripped)
 
 local FACTION = { Alliance = { Alliance = true }, Horde = { Horde = true } }
@@ -24,8 +21,8 @@ local SOURCES = {
               protection  = { protection  = true },
               holy        = { holy        = true },
               shockadin   = { shockadin   = true } } },
-  { class = "PALADIN", picks = "paladinHorde1to9", facts = "paladinHorde1to9Facts",
-    hasSpec = true, faction = "Horde",
+  { class = "PALADIN", picks = "paladinEarly1to9", facts = "paladinEarly1to9Facts",
+    hasSpec = true,
     specs = { retribution = { retribution = true },
               protection  = { protection  = true },
               holy        = { holy        = true },
@@ -36,8 +33,8 @@ local SOURCES = {
     specs = { arms       = { arms       = true },
               fury       = { fury       = true },
               protection = { protection = true } } },
-  { class = "WARRIOR", picks = "warriorHorde1to9", facts = "warriorHorde1to9Facts",
-    hasSpec = true, faction = "Horde",
+  { class = "WARRIOR", picks = "warriorEarly1to9", facts = "warriorEarly1to9Facts",
+    hasSpec = true,
     specs = { arms       = { arms       = true },
               fury       = { fury       = true },
               protection = { protection = true } } },

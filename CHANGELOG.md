@@ -2,43 +2,49 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v0.6.0-beta
+## v0.6.1-beta
 
-You can make your own spec weights. **Focus Zone** keeps hunts in the zone you are standing in. The scoring spinner stays on the GearQuest window until the list can scroll. **Stormrider's Leather Pants** scores the damage-and-healing line as healing and damage. The window title reads **GearQuest Forever v0.6.0-beta**.
+Paladin and warrior levels 1–9 are scored the same way as every other class, for both factions. Turning the guide off frees the memory it used. **Recommended** follows the filters you have on. A level 60 weight hover matches the hunt. The window title reads **GearQuest Forever v0.6.1-beta**.
 
-### Custom stat weights
+### Paladin and warrior, levels 1–9
 
-The spec menu ends with **+ custom stat weights**. The window opens on the log. Name it, up to 20 characters, and pick the premade spec it starts from. The right side lists that spec's weights. The grey number in an empty box is the weight that spec uses while you level, including the extra stamina, armor, and mana through 60. Type a number to replace it, including 0. A number you type is not multiplied again.
+Alliance paladin and warrior no longer share one hand-written mail list. Holy, Protection, Retribution, and Shockadin each have their own scored hunts from 1 through 9, and Horde has the same four. Warrior Arms, Fury, and Protection do the same on both factions. The old Alliance list ran past level 9 and could fill a third slot into the teens. Those rows are gone.
 
-**Save and score items!** rebuilds that spec's hunt list. A portrait spins on the GearQuest window, not over the rest of the screen, and it keeps spinning until the list is on screen and you can scroll it. You can still move, talk, and use the rest of the game.
+Retribution Alliance, main hand: **Northshire Hammer** is rank 1 from 1 through 5, from Rare Books in Elwynn Forest. **Empyrean Greatsword** is rank 1 at 7 and 8. **Ironforge Greathammer** is rank 1 at 9, from Old Ironforge Incursion. Holy Alliance at 8–9 hunts **Thornroot Club**, from Ursal the Mauler in Teldrassil. Back at 1–2 is **Linen Cloak** (Tailoring 1), then **Frayed Cloak** and **Patchwork Cloak**.
 
-The weights are saved on the account. The spec you selected stays on this character. Right-click a custom spec to edit it. Delete removes it. The header and the spec button use the name you gave it.
+Horde Arms, main hand: **Rusty Cutlass** is rank 1 from 1 through 4. **Goblin Smasher** is rank 1 at 5, from Supervisor Fizsprocket in Mulgore. **Riptear's Cleaver** is rank 1 at 6, from Rear Guard Patrol in Tirisfal Glades. Horde Arms back at 1–2 is also **Linen Cloak**.
 
-The list reorders pieces that spec already hunts. It does not pull in gear that never ranked for that class. Weapon style and map pins stay the base spec's. A hunter custom spec can still dual wield. A shaman custom spec cannot. Assassination and Subtlety stay dagger-locked in the main hand when that is the base spec. Embrace of the Viper still counts on a custom Beast Mastery, Marksmanship, Survival, Enhancement, or Feral list. Rotmender's Raiment still counts on a custom Holy, Discipline, or Restoration list. A proc such as Thunderfury stays on the printed stats.
+### The guide
 
-**Spell power** you type scores Spell Power. The Equip line **Increases damage and healing done by magical spells and effects by up to N** stays on Healing. Leave Spell power empty and that line's damage half still counts as spell power, the same as the premade list. **Healing as spell power** is the box for a heal-only line.
+Clearing **Enable Guide** stops the arrow. It no longer reads your position after that. The memory it used while it was pointing is collected on that close, so the addon memory number can fall. Turning the arrow back on still follows the hunt you had selected, unless you dismissed it.
 
-Simulating a mage, or any class you are not playing, and choosing a custom spec for that class builds the list. **Turn off simulation** builds your own custom spec when that is the spec this character had selected. After a reload, while the simulated class is on a premade spec, left-clicking a custom spec opens its hunts. The other premade specs in that menu still switch.
+### Recommended
 
-### Focus Zone
+**Recommended** only marks a rank 1 hunt that is still on the list you are looking at. A weapon filter, the hunter Bow, Gun, and Crossbow filter, a source filter, or a play style that hides that row also hides the mark. **Rank #1 BiS acquired** still shows when you already have that piece, even if a filter hides the row. Simulation still hides both.
 
-Play style is seven cards. The names sit under the pictures, three then three, and **Focus Zone** sits under **Manageable Dungeons**. The button reads **Play style*** while any card is on.
+### Level 60 weights
 
-**Focus Zone** keeps a hunt only when the zone you are standing in is that hunt's zone or one of its spots. Quests, vendors, crafts, world drops, and dungeon drops all follow. A drop with a camp in this zone stays, even when it also drops somewhere else. A hunt with no place stays hidden. Walk into another zone and the rows you are looking at stay up while the new zone is built, one slot at a time, then the list swaps.
+Hovering a premade spec at level 60 shows the same stamina, armor, and mana multipliers the hunt list uses. Custom specs already did. The weights themselves did not change.
 
-It can be on with **No Dungeons!** or **Dungeon Enjoyer**, and with **Get it now!**, **Manageable Dungeons**, **Manageable Quests**, and **Buy it**. The two dungeon cards still turn each other off.
+### Who can get it
 
-### Damage and healing
+**Dun Garok Rifle**, **Humbert's Helm**, **Humbert's Chestpiece**, and **Circlet of the Order** are Horde only. Tamra Stormpike is friendly to the Alliance, so an Alliance character does not hunt them. **Solid Gold Band** and **Larcenist's Belt** stay off the Alliance list. Opportunistic Education is a Horde quest. **Friend of the Library** is 10 books and **Greater Friend of the Library** is 20. Both factions turn the books in: Garion Wendell in Stormwind, Owen Thadd in Undercity.
 
-The Equip line **Increases damage and healing done by magical spells and effects by up to N** is healing and damage. It is not a green **+N Spell Power** line. A Spell Power weight on a custom spec does not score it. A healer scores the healing half. A damage spec scores the damage half as spell power.
+### Legendaries and Silithus
 
-**Stormrider's Leather Pants** says up to 10. It requires 25. Leatherworking. The recipe is bought from Pawani at the Barrens camp, or from Daniel Stitchsong at the Redridge camp. Elemental Horde, level 25–28, legs, stays rank 3, score 18.22. Restoration Shaman and Restoration Druid list it at 25–28, legs, rank 13, score 24.42. Holy Paladin lists it at 25–27, legs, rank 14, score 35.55.
+**Ashbringer** is a quest reward at 60. The parchment does not invent a quest name. **Sulfuras, Hand of Ragnaros** drops from Ragnaros in Molten Core, and the description says you also need the Sulfuron Hammer. **Nature's Whisper** is the reward from A Terrible Purpose. It requires 54. The chain is The Twilight Mystery, The Deserter, The Twilight Lexicon, then A Terrible Purpose, and the pin is Silithus. **Crown of the Fire Festival** is not a hunt.
 
-**Totemic Leather Pants** is the same sentence at 7. Elemental and Enhancement already listed it, and those ranks stay. The same storage fix is on a set of old PvP pieces that are not on a hunt list. **Blade of Silverlaine** and **Coldflame Saber** stay as they were.
+### Weapons and ranged
 
-### Vendors
+A priest, a mage, a warlock, and a balance or restoration druid start with two-hand and main hand both on, so the one-hander stays beside the staff. The weapon filter is remembered for that class and spec. A filter you set while simulating stays on that simulated spec only. Hunters have Bow, Gun, and Crossbow on the Ranged header. Rank numbers stay the real ones.
 
-A vendor description names the seller at the closest pin, then adds **(be aware that some vendors sell items at random)**. A reputation or honor sentence after that stays. **Dirty Leather Bracers** in Mulgore still says **Bought from Varia Hardhide.**
+### Quest text, prices, and the map
+
+A quest reward says **This quest can be picked up at level N.** The line is green when you are at that level and red when you are not. A chain lists each step through the quest that gives the item. A finished step ends with **completed** in green. A vendor price uses the coin, honor, and mark icons Wowhead lists. A drop in Onyxia's Lair says the lair requires the Drakefire Amulet. The six leather helms are crafted. The description says the Leatherworking pattern drops from those bosses. Seasonal quest and Special are gone from the filter and from the map pins. With a gamepad, the map does not get GearQuest pin frames. Show on map and the guide still set the waypoint.
+
+### v0.6.0-beta
+
+You can make your own spec weights from **+ custom stat weights**. **Save and score items!** rebuilds that list, and the spinner stays on the GearQuest window. **Focus Zone** keeps hunts in the zone you are standing in. **Stormrider's Leather Pants** scores the damage-and-healing line as healing and damage. The window title reads **GearQuest Forever v0.6.0-beta**.
 
 ### v0.5.8-beta
 

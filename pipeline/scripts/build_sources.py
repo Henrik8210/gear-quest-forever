@@ -300,6 +300,38 @@ for k,rec in out.items():
     elif rec["sourceType"]=="unknown": why="no obtain path found in the world database"
     rec["obtainable"]= why is None
     rec["excludedBecause"]=why
+
+# These stay off the removed Special and Seasonal quest sources.
+FIXED_SOURCE = {
+    13262: {
+        "sourceType": "quest_reward",
+        "instructions": "Quest reward.",
+        "seasonal": False,
+    },
+    17182: {
+        "sourceType": "boss_drop",
+        "instructions": "Drops from Ragnaros. You also need to have obtained the Sulfuron Hammer.",
+        "npc": "Ragnaros",
+        "zone": "Molten Core",
+        "seasonal": False,
+    },
+    20645: {
+        "sourceType": "quest_reward",
+        "instructions": "Reward from the quest 'A Terrible Purpose'. The reward is mailed to you after you finish the quest.",
+        "questName": "A Terrible Purpose",
+        "zone": "Silithus",
+        "seasonal": False,
+    },
+    23323: {
+        "obtainable": False,
+        "excludedBecause": "removed from the hunt list",
+        "seasonal": False,
+    },
+}
+for iid, fix in FIXED_SOURCE.items():
+    rec = out.get(str(iid))
+    if rec:
+        rec.update(fix)
 json.dump(out,open("/home/claude/gq/sources.json","w"))
 print("obtainable:",sum(1 for v in out.values() if v["obtainable"]),"/ excluded:",sum(1 for v in out.values() if not v["obtainable"]))
 print("source resolution:",dict(collections.Counter(v["sourceType"] for v in out.values())))

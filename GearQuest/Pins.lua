@@ -15,8 +15,6 @@ local PIN_ICONS = {
         path = "Interface\\TargetingFrame\\UI-TargetingFrame-Rare",
         coord = { 0, 0.22, 0, 0.62 },
     },
-    seasonal_quest = { path = "Interface\\Icons\\INV_Holiday_Christmas_Present_01" },
-    special = { path = "Interface\\TargetingFrame\\UI-RaidTargetingIcon_1" },
     unsourced = { path = "Interface\\RaidFrame\\ReadyCheck-NotReady" },
     vendor = { path = "Interface\\Cursor\\Buy" },
     -- Far Sight is not in this client, so the sunset ships with the addon.
@@ -272,8 +270,8 @@ end
 
 local function CreateMapPin()
     local canvas = WorldMapFrame:GetCanvas()
-    -- A Frame, not a Button. A Button on the map canvas is a gamepad focus
-    -- target, and hiding it with the map calls SetPreferredGamepadInteractTarget.
+    -- Mouse mode only. GamepadMap() never reaches here. A Button would be a
+    -- gamepad focus target, so this stays a Frame placed by the map pin mixin.
     local frame = CreateFrame("Frame", nil, canvas)
     frame:SetSize(WORLD_PIN_SIZE, WORLD_PIN_SIZE)
     frame.icon = frame:CreateTexture(nil, "OVERLAY")
@@ -301,7 +299,14 @@ end
 
 -- GetCanvas creates or wakes the map canvas. Call it only while the map is
 -- open and the pins actually need to be drawn. A closed map does not need it.
+local function GamepadMap()
+    return GQ.UsesGamepad and GQ:UsesGamepad()
+end
+
 local function MapReady()
+    if GamepadMap() then
+        return false
+    end
     return MapIsOpen() and WorldMapFrame.GetCanvas and WorldMapFrame:GetCanvas()
         and WorldMapFrame.GetMapID and MapCanvasPinMixin
 end
@@ -366,6 +371,15 @@ end
 function GQ.Pins:Sync()
     if not driver then
         self:Init()
+    end
+    -- The gamepad map close clears focus with a protected call. A frame on
+    -- the canvas is hidden with the map and taints that call. The guide and
+    -- Show on map still set the Blizzard user waypoint.
+    if GamepadMap() then
+        pins = {}
+        pinGen = pinGen + 1
+        placedMap = nil
+        return
     end
     pins = {}
     pinGen = pinGen + 1

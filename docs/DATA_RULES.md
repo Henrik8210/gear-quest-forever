@@ -10,25 +10,25 @@ GearQuest uses **two different pipelines**. Do not apply one pipeline’s rules 
 
 | Source | Levels | Classes | How it gets in | Authoritative doc |
 |--------|--------|---------|----------------|-------------------|
-| **Curated** (`Data.lua`) | 1–9 Alliance bands, seasonal/event items, hand-picked Paladin quest chains | Early Alliance mail melee; not full-class 1–60 yet | Manual curation | This file (§ Curation workflow) |
-| **Generated** (`_generated/*.lua` → `DataAdapter.lua`) | **1–9 generated** (except Alliance paladin/warrior curated) **and 10–60** | **Nine classes** | Forever `score.py` (`pipeline/`); damage then survivability then endurance | [`pipeline/docs/FOREVER-SCORING.md`](../pipeline/docs/FOREVER-SCORING.md) |
+| **Curated** (`Data.lua`) | Forever pins only (`foreverDelta`) | Shaman, hunter, druid, priest, mage, warlock, rogue | Manual pins that compete with the scored bands | This file (§ Curation workflow) |
+| **Generated** (`_generated/*.lua` → `DataAdapter.lua`) | **1–9 and 10–60**, both factions, per spec | **Nine classes**, including paladin and warrior 1–9 | Forever `score.py` (`pipeline/`); damage then survivability then endurance | [`pipeline/docs/FOREVER-SCORING.md`](../pipeline/docs/FOREVER-SCORING.md) |
 
 **Forever max level is 60** (`GQ.MAX_PLAYER_LEVEL` in `Core.lua`). TBC **level 70** curated data was removed; do not re-import Phase 3 AtlasLoot into this repo. Generated bands are capped at **60**. Migration phases: [FOREVER-DATA-MIGRATION.md](./FOREVER-DATA-MIGRATION.md).
 
-**Paladin 10–60** comes from the generated pipeline (`paladinPicks` + `paladinHorde1to9`). All nine classes merge into `GQ.Data.entries` at load time via `DataAdapter.lua`. Sanity check:
+**Paladin and warrior 1–9** come from the same scorer as every other class (`paladinEarly1to9`, `warriorEarly1to9`), both factions, per spec. Do not put a hand-written Alliance mail list back into `Data.lua`, and do not emit a Horde-only `Horde.1to9` file. **10–60** is `paladinPicks` and `warriorPicks`. All nine classes merge into `GQ.Data.entries` at load time via `DataAdapter.lua`. Sanity check:
 
 ```powershell
 node scripts/verify-generated-bis.mjs
 ```
 
-Always use `node scripts/verify-generated-bis.mjs` for the live entry count, not a stale figure. All nine classes are Forever `score.py` regens with the Wowhead Forever pool (id ≥ 200000) merged in. Levels 1–9 are scored **per spec** (Alliance paladin/warrior 1–9 stay curated). Horde Forever deltas in `Data.lua` use `foreverDelta = true` so they compete across generated per-level bands; Compare still shows the top 3.
+Always use `node scripts/verify-generated-bis.mjs` for the live entry count, not a stale figure. All nine classes are Forever `score.py` regens with the Wowhead Forever pool (id ≥ 200000) merged in. Levels 1–9 are scored **per spec** for every class, both factions. Paladin and warrior are not a hand list. Horde Forever deltas in `Data.lua` use `foreverDelta = true` so they compete across generated per-level bands; Compare still shows the top 3.
 
 ### Ranking philosophy by source
 
 | Source | What “top 3” means |
 |--------|---------------------|
-| **Curated (early bands)** | Human judgment: realistic upgrades for that level band, correct armor tier, obtainability considered when hand-picking. |
-| **Generated (all classes 1–60)** | **Combat value** in this order: **damage** (spec primary) first, then **survivability** below 60 (sta / health / hp5 ×3, armor ×2), then **endurance** (int / spirit / mp5 / mana ×2, less than stam). Random-enchant greens rank on the **jackpot** (top of the suffix range) — a 9.5% +7 Agi roll that would be #1 must appear as BiS #1. Warrior Protection does not score spell power; defense on a caster piece is a notable, not rank 1. Shaman **Enhancement Tank** is a hybrid (1h + shield, like paladin Protection). Max **3 unique names + 1 notable** per slot. Level 60 uses raw raid-scale weights (`GQ_NO_GUIDES=1`). Item facts for scoring come from Forever hunt tips (`sync_forever_item_stats.py`), not stale Classic `items.json`. |
+| **Forever pins** (`Data.lua`) | A few Forever pieces that compete with the scored bands. Not a 1–9 catalog. Do not hand-write a paladin or warrior leveling list. |
+| **Generated (all classes 1–60)** | **Combat value** in this order: **damage** (spec primary) first, then **survivability** below 60 (sta / health / hp5 ×3, armor ×2), then **endurance** (int / spirit / mp5 / mana ×2, less than stam). Random-enchant greens rank on the **jackpot** (top of the suffix range) — a 9.5% +7 Agi roll that would be #1 must appear as BiS #1. Warrior Protection does not score spell power; defense on a caster piece is a notable, not rank 1. Shaman **Enhancement Tank** is a hybrid (1h + shield, like paladin Protection). Max **3 unique names** per slot. There is no notable shelf. Level 60 uses the same stamina, armor, and mana multipliers as 1–59 (`GQ_NO_GUIDES=1` only skips guide pins). Item facts for scoring come from Forever hunt tips (`sync_forever_item_stats.py`), not stale Classic `items.json`. |
 
 At **runtime**, a generated hunt with `curatedRank` keeps that pipeline order. `Compare.lua` `GetSortScore` sorts those rows as `500000 - curatedRank` for every class. Guide rows (`origin="guide"`) and level-60 hand-curated rows use `1000000 - curatedRank`. Item level versus what you have equipped is the fallback when a row has no `curatedRank`. The ≥8 ilvl lower-tier armor penalty is that fallback only. Generated picks were chosen by the Forever weights in [`FOREVER-SCORING.md`](../pipeline/docs/FOREVER-SCORING.md).
 
@@ -702,8 +702,7 @@ Re-run after any `instructions` / `npc` / token-boss edits. Wowhead tooltip API 
 
 | Band | Status |
 |------|--------|
-| **Level 1–9 Alliance** | Curated Warrior & Paladin; early generated bands for Hunter, Druid, Shaman, Rogue (`*Early1to9`) |
-| **Level 1–9 Horde** | Generated Horde bands: Paladin (`paladinHorde1to9`), Warrior (`warriorHorde1to9`); early 1–9 for Hunter/Druid/Shaman/Rogue |
+| **Level 1–9, both factions** | Scored for all nine classes (`*Early1to9`), per spec. Paladin and warrior included. No hand-written Alliance list. |
 | **Level 10–60 all nine classes** | Generated (`*Picks`) on the Forever model. Faction-gated. Bands stop at 60. |
 | **Level 60 cap** | Addon and preview simulate **1–60** only |
 | **Total** | **67,320** entries (287 curated + 67,033 generated) — `node scripts/verify-generated-bis.mjs` |

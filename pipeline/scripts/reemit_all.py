@@ -11,8 +11,8 @@ ROOT = Path(__file__).resolve().parent
 PY = sys.executable
 
 CLASSES = [
-    ("PALADIN", "paladin.json", "horde"),
-    ("WARRIOR", "warrior.json", "horde"),
+    ("PALADIN", "paladin.json", "early"),
+    ("WARRIOR", "warrior.json", "early"),
     ("HUNTER", "hunter.json", "early"),
     ("DRUID", "druid.json", "early"),
     ("SHAMAN", "shaman.json", "early"),

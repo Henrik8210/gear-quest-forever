@@ -559,6 +559,10 @@ local function HideGuide(frame)
     if not frame then
         return
     end
+    -- A hidden frame still runs OnUpdate. A leftover id keeps sampling the map.
+    frame.entryId = nil
+    frame.spot = nil
+    frame.spotUntil = nil
     local shown = frame.IsShown and frame:IsShown()
     frame:Hide()
     if not shown then
@@ -569,6 +573,8 @@ local function HideGuide(frame)
     frame.crossingCache = nil
     frame.crossing = nil
     frame.crossingTo = nil
+    -- Once, on the close. The map objects from this session are already
+    -- unhooked. This is what lets that memory fall instead of sitting there.
     if collectgarbage then
         collectgarbage("collect")
     end
@@ -596,12 +602,15 @@ function GQ.Guide:Apply()
 end
 
 local function UpdateGuide(frame)
-    GQ.Guide:AnchorToTracker()
+    local saved = GQ.Guide:GuidedId()
     local id = frame.entryId
-    if not id or GQ.Guide:IsSuppressed() then
-        HideGuide(frame)
+    if not saved or id ~= saved or GQ.Guide:IsSuppressed() then
+        if id or (frame.IsShown and frame:IsShown()) then
+            HideGuide(frame)
+        end
         return
     end
+    GQ.Guide:AnchorToTracker()
     local entry = GQ.Data and GQ.Data.GetEntryById and GQ.Data:GetEntryById(id)
     if not entry then
         HideGuide(frame)

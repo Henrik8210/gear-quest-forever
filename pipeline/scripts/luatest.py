@@ -19,8 +19,8 @@ def run(fn):
     chunk=L.eval("function(s,n) return assert(load(s, n)) end")(src, "@"+fn)
     chunk("GearQuest", L.globals().GQ)
     print(f"  loaded {fn}  ({os.path.getsize(G+fn)/1e6:.2f} MB)")
-for f in ("Data.Paladin.generated.lua","Data.Paladin.Horde.1to9.generated.lua",
-          "Data.Warrior.generated.lua","Data.Warrior.Horde.1to9.generated.lua",
+for f in ("Data.Paladin.generated.lua","Data.Paladin.Early.1to9.generated.lua",
+          "Data.Warrior.generated.lua","Data.Warrior.Early.1to9.generated.lua",
           "Data.Hunter.generated.lua","Data.Hunter.Early.1to9.generated.lua",
           "Data.Druid.generated.lua","Data.Druid.Early.1to9.generated.lua",
           "Data.Shaman.generated.lua","Data.Shaman.Early.1to9.generated.lua",

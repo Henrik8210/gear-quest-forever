@@ -60,8 +60,6 @@ facts=[]
 for iid in sorted(used):
     s=srcs[str(iid)]; it=items[str(iid)]
     st = s["sourceType"]
-    if st == "quest_reward" and s.get("seasonal"):
-        st = "seasonal_quest"
     kv=[f'sourceType={lua(st)}',f'instructions={lua(s["instructions"])}']
     for k,val in (("zone",s.get("zone")),("npc",s.get("npc")),
                   ("questName",s.get("questName")),("profession",s.get("profession"))):

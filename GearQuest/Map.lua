@@ -115,34 +115,17 @@ local function SkipWaypointClipboard()
 end
 
 local function GuardWaypointClipboard()
+    -- The gamepad UI closes the map through a protected focus clear. Do not
+    -- touch WorldMapFrame.pinPools or a live pin: writing an addon function
+    -- onto one taints that hide. Mouse mode only skips the clipboard copy.
+    if GQ.UsesGamepad and GQ:UsesGamepad() then
+        return
+    end
     if type(WaypointLocationPinMixin) == "table"
         and type(WaypointLocationPinMixin.CopySlashCommandToClipboard) == "function"
         and WaypointLocationPinMixin.CopySlashCommandToClipboard ~= SkipWaypointClipboard
     then
         WaypointLocationPinMixin.CopySlashCommandToClipboard = SkipWaypointClipboard
-    end
-
-    local pools = WorldMapFrame and WorldMapFrame.pinPools
-    local pool = pools and pools["WaypointLocationPinTemplate"]
-    if not pool then
-        return
-    end
-    local function patch(pin)
-        if type(pin) == "table" or (pin and pin.CopySlashCommandToClipboard) then
-            if pin.CopySlashCommandToClipboard ~= SkipWaypointClipboard then
-                pin.CopySlashCommandToClipboard = SkipWaypointClipboard
-            end
-        end
-    end
-    if pool.EnumerateActive then
-        for pin in pool:EnumerateActive() do
-            patch(pin)
-        end
-    end
-    if pool.EnumerateInactive then
-        for pin in pool:EnumerateInactive() do
-            patch(pin)
-        end
     end
 end
 

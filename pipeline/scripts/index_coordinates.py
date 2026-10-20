@@ -69,6 +69,9 @@ HAND_FACTION = {
     279842: "Horde",
     279843: "Horde",
     279844: "Horde",
+    # Opportunistic Education is Side: Horde. City of Dalaran, Rexxie Copperclutch.
+    279845: "Horde",
+    279846: "Horde",
     282283: "Alliance",
 }
 

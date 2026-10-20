@@ -249,6 +249,19 @@ def vendor_side_ok(it, faction):
     side = VENDOR_SIDE.get(it["id"])
     return side is None or side == faction
 
+# Wowhead react is [Alliance, Horde]. 1 is friendly, -1 is hostile. A dropper
+# who is friendly to one faction and hostile to the other can only be looted
+# by the side that can attack them. Dun Garok Rifle is the same keep: Tamra
+# Stormpike is friendly to the Alliance, so the rifle is Horde only.
+_DROP_FACTION_PATH = os.path.join(G, "drop_faction.json")
+DROP_FACTION = {}
+if os.path.exists(_DROP_FACTION_PATH):
+    DROP_FACTION = {int(k): v for k, v in json.load(open(_DROP_FACTION_PATH, encoding="utf-8")).items()}
+
+def drop_side_ok(it, faction):
+    side = DROP_FACTION.get(it["id"])
+    return side is None or side == faction
+
 # Wowhead Side: Alliance / Side: Horde. Side: Both is absent, so both factions score it.
 # Written by index_coordinates.py --repair-quests.
 _QUEST_FACTION_PATH = os.path.join(G, "quest_faction.json")
@@ -464,6 +477,7 @@ def eligible(it, cls, spec, level, faction, prof, wsubs):
             and not zone_ok(src.get("zone"), faction)):
         return False
     if not quest_side_ok(it, faction): return False
+    if not drop_side_ok(it, faction): return False
     iid = it["id"]
     if iid in RUNE_BROKER_ALLIANCE and faction != "Alliance": return False
     if iid in RUNE_BROKER_HORDE and faction != "Horde": return False
@@ -1117,16 +1131,8 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                 # dpsWeight, so classes that do not care are unaffected.
                 if it["cls"]==2:
                     dw = dpsWRanged if sl=="Ranged" else dpsW
-                    # Dual Wield halves off-hand weapon damage, and that applies to
-                    # ANY weapon swinging in the off hand -- not only the one-handers
-                    # duplicated there from the main-hand pool. InventoryType 22
-                    # weapons (off-hand ONLY) reach this slot through slot_for, so
-                    # they were being paid full weapon dps for a swing that lands at
-                    # half. Shekketh Talons -- 47.9 dps, no stats at all -- scored
-                    # 718 and displaced The Hungering Cold (73.0 dps, 14 stamina,
-                    # 14 expertise) in every rogue spec's off hand, and the same
-                    # error inflated every off-hand-only weapon for fury warriors.
-                    if sl=="SecondaryHand": dw*=0.5
+                    # The tooltip damage is the weapon's damage in either hand.
+                    # An off-hand copy and an off-hand-only weapon both keep it.
                     if dw: s+= it["dps"]*dw
                     spd = it.get("speed") or 0
                     if speedW and sl not in ("Ranged", "SecondaryHand") and spd > 0:
@@ -1156,10 +1162,9 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                 pr=it.get("procs")
                 if pr:
                     procDw = dpsWRanged if sl=="Ranged" else dpsW
-                    # NOT halved for the off hand. Dual Wield halves the weapon's
-                    # own swing damage, but a proc that deals 100 damage deals 100
-                    # damage whichever hand triggered it, and how often it triggers
-                    # is already carried by the item's speed inside procs.py.
+                    # A proc that deals 100 damage deals 100 damage whichever hand
+                    # triggered it, and how often it triggers is already carried
+                    # by the item's speed inside procs.py.
                     #
                     # Generalised: if the spec's dps weight for THIS slot is zero,
                     # the character does not attack with the item at all, so nothing
@@ -1212,9 +1217,8 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                 # list is inv-13 swords and axes (The Hungering Cold, The Castigator,
                 # Iblis, Maladath). Give the off hand its own copy of every one-hander.
                 #
-                # Off-hand weapon damage is halved by Dual Wield, so only the weapon's
-                # dps contribution is scaled by 0.5 -- its stats and its procs are
-                # worth the same in either hand. Dual wield itself is a level-20 skill.
+                # The off-hand copy keeps that same score. Dual wield itself is a
+                # level-20 skill.
                 # Previously gated on style=="onehand_dual", which meant a hunter --
                 # style twohand_or_onehand, because its guide offers both -- never got a
                 # single one-hander in the off hand. The right condition is simply
@@ -1229,10 +1233,7 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                 if (it["inv"]==13 and it.get("slot") != "MainHand" and it["cls"]==2
                         and _dw is not None and level>=_dw
                         and style in ("onehand_dual","twohand_or_onehand")):
-                    # s was built with the MAIN-hand weight; rebuild the dps part
-                    # at the off-hand rate so both routes into SecondaryHand agree.
-                    s2=s - (it["dps"]*dpsW if dpsW else 0.0)*0.5
-                    if s2>0: buckets["SecondaryHand"].append((s2,it,suf,ch,st,chAny,s2+_roll_gain,srange,sid))
+                    if s>0: buckets["SecondaryHand"].append((s,it,suf,ch,st,chAny,s+_roll_gain,srange,sid))
             for sl,rows in buckets.items():
                 rows.sort(key=lambda r:(-r[0], r[1]["id"]))
                 if sl == "Ranged":
@@ -1262,8 +1263,9 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     ranked_all = [r for r in ranked_all if is_either_hand(r[1])]
                     rows = ranked_all
                 if cls == "ROGUE" and sl == "SecondaryHand":
-                    # Off hand is One-Hand or Off Hand. A tooltip "Main Hand" weapon
-                    # stays on the Main Hand list.
+                    # Off hand is One-Hand or Off Hand, at the same weapon damage.
+                    # A tooltip "Main Hand" stays on the main hand. A caster
+                    # dagger ranks on that damage against the One-Hand daggers.
                     ranked_all = [r for r in ranked_all if is_either_hand(r[1]) or is_offhand_only(r[1])]
                     rows = ranked_all
                 split_hands = sl == "MainHand" and cls == "HUNTER"
@@ -1272,7 +1274,6 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     (cls == "SHAMAN" and spec_key in ("elemental", "restoration"))
                     or (cls == "PALADIN" and spec_key in ("holy", "shockadin"))
                 )
-                rogue_main_only = sl == "MainHand" and cls == "ROGUE"
                 if split_hands:
                     # Two-handers, then main-hand-only one-handers. An either-hand
                     # weapon (InventoryType 13) is an off-hand pick, not this list.
@@ -1281,10 +1282,6 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     rows = two + main_only
                 elif enh_two_only:
                     rows = unique_name_rows([r for r in ranked_all if is_two_hand_item(r[1])], 8)
-                elif rogue_main_only:
-                    # Main Hand is the tooltip "Main Hand". Either-hand weapons
-                    # (InventoryType 13) are off-hand picks.
-                    rows = unique_name_rows([r for r in ranked_all if is_mainhand_only(r[1])], 8)
                 elif elem_both:
                     # Keep two-handers beside one-handers. A pure top-8 was
                     # all one-handers, so the two-hand filter had nothing to
@@ -1322,8 +1319,6 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     if cls == "HUNTER" and sl == "MainHand" and not is_two_hand_item(it) and not is_mainhand_only(it):
                         continue
                     if cls == "HUNTER" and sl == "SecondaryHand" and not is_either_hand(it):
-                        continue
-                    if cls == "ROGUE" and sl == "MainHand" and not is_mainhand_only(it):
                         continue
                     if cls == "ROGUE" and sl == "SecondaryHand" and not (is_either_hand(it) or is_offhand_only(it)):
                         continue
@@ -1647,7 +1642,8 @@ def cap_weapon_bands(bands, limit=WEAPON_LIST_CAP):
                     index,
                     (pick.get("name") or "", pick.get("suffix") or ""),
                 ))
-        ranked.sort()
+        # Score, rank, and id can match on the two hands. The band is a dict.
+        ranked.sort(key=lambda item: (item[0], item[1], item[2], item[5], id(item[3]), item[4]))
 
         def _name_key(item):
             _score, _rank, iid, _band, _index, name = item
@@ -1665,9 +1661,14 @@ def cap_weapon_bands(bands, limit=WEAPON_LIST_CAP):
 
         def _take(item, seen, keep):
             key = _name_key(item)
-            if key in seen or len(seen) >= limit:
-                return False
             _score, _rank, _iid, band, index, _name = item
+            if key in seen:
+                # The other hand already has this weapon. The hunt shows it
+                # once. The slot keeps its own copy.
+                keep.add((id(band), index))
+                return False
+            if len(seen) >= limit:
+                return False
             seen.add(key)
             keep.add((id(band), index))
             return True

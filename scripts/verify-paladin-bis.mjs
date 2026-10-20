@@ -28,21 +28,20 @@ const mainLua = fs.readFileSync(
   path.join(root, "_generated", "Data.Paladin.generated.lua"),
   "utf8",
 );
-const hordeLua = fs.readFileSync(
-  path.join(root, "_generated", "Data.Paladin.Horde.1to9.generated.lua"),
+const earlyLua = fs.readFileSync(
+  path.join(root, "_generated", "Data.Paladin.Early.1to9.generated.lua"),
   "utf8",
 );
 
 const curated = (dataLua.match(/^\s+id = /gm) || []).length;
 const mainPicks = countTableRows(mainLua, "paladinPicks");
-const hordePicks = countTableRows(mainLua.replace(/paladinPicks[\s\S]*/, ""), "paladinHorde1to9");
-const hordePicksReal = countTableRows(hordeLua, "paladinHorde1to9");
+const earlyPicks = countTableRows(earlyLua, "paladinEarly1to9");
 
 console.log("=== Counts ===");
 console.log("Curated:", curated);
 console.log("paladinPicks:", mainPicks);
-console.log("paladinHorde1to9:", hordePicksReal);
-console.log("Expected total:", curated + mainPicks + hordePicksReal);
+console.log("paladinEarly1to9:", earlyPicks);
+console.log("Expected total:", curated + mainPicks + earlyPicks);
 
 const picksBody = mainLua.match(/GQ\.Data\.paladinPicks = \{([\s\S]*?)\n\}/)?.[1] ?? "";
 let maxLevel = 0;

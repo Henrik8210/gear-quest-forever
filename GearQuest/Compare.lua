@@ -567,7 +567,7 @@ function GQ.Compare:ScoreEntry(entry, equippedIlvl, slotName, maxPreferredIlvl)
 
     -- Simple relevance: prefer higher item level upgrades; slight bonus for quest/boss sources.
     local sourceBonus = 0
-    if entry.sourceType == "quest_reward" or entry.sourceType == "seasonal_quest" then
+    if entry.sourceType == "quest_reward" then
         sourceBonus = 2
     elseif entry.sourceType == "boss_drop" or entry.sourceType == "raid_trash" then
         sourceBonus = 1
@@ -773,7 +773,7 @@ function GQ.Compare:GetEffectiveScoringRows(classFile, specId, playerLevel)
     end
 
     local leveling = GQ.ScoringLeveling
-    local useLeveling = leveling and playerLevel < (leveling.untilLevel or 60)
+    local useLeveling = leveling and playerLevel <= (leveling.untilLevel or 60)
     local weights = {}
     for key, raw in pairs(specRow.weights) do
         local mult = 1

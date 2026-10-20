@@ -301,7 +301,7 @@ Ret and Enhance stay hybrids.
 
 **Wolfsbane (267369)** is the Horde paladin two-hander from the Diplomatic Incident chain (Danitha Morr, Bandarion Keep, Tirisfal). The quest can be finished at level 20. Wowhead has no Requires Level; the stored level 26 was inferred from item level 31. `client_item_overrides.json` pins required level 20 and Classes: Paladin, so Alliance and other classes do not get it. 25.59 weapon damage is why it is rank 1 for Horde Retribution at 20.
 
-**Enhancement intellect is 0.6 raw.** Mental Dexterity grants 1 attack power per intellect, and the scorer does not convert intellect into attack power on its own. Below 60 the endurance rule doubles intellect, so the lists use **1.2**, just above agility at 1.0. Level 60 keeps 0.6. Spell power stays 0.35 for Mental Quickness and Maelstrom. Enhancement Tank is unchanged and still stamina-first.
+**Enhancement intellect is 0.6 raw.** Mental Dexterity grants 1 attack power per intellect, and the scorer does not convert intellect into attack power on its own. Through 60 the endurance rule doubles intellect, so the lists use **1.2**, just above agility at 1.0. Level 60 keeps that ×2. Do not drop it back to 0.6 at 60. Spell power stays 0.35 for Mental Quickness and Maelstrom. Enhancement Tank is unchanged and still stamina-first.
 
 **Shaman Enhancement Tank is a hybrid**, like paladin Protection: 1h + shield,
 stamina / armor / defense first, then Rockbiter melee threat, then Earth Shock /
@@ -309,7 +309,7 @@ Lightning Shield spell threat. Not dual-wield (Forever has no shaman DW).
 `enhancement_tank` in `weights.json`. No combat log sim — EP only. Do not
 retune tankier vs threatier unless asked.
 
-Armor weight is **0.20** (0.40 below 60). A mail shaman has no plate multiplier, so the armor on the piece is a large part of staying alive while questing. One agility is also **2 armor**, **1% dodge per 20**, and **1% crit per 20**. That is added on top of the listed agility weight, using the same armor weight as armor on the item. Below 60, +6 stamina and +4 agility beats +7 stamina. A much larger stamina gap still wins, which is the early-leveling rule. At 60 the stamina tripling drops off, so agility's armor and dodge are a larger share.
+Armor weight is **0.20** (0.40 below 60). A mail shaman has no plate multiplier, so the armor on the piece is a large part of staying alive while questing. One agility is also **2 armor**, **1% dodge per 20**, and **1% crit per 20**. That is added on top of the listed agility weight, using the same armor weight as armor on the item. Through 60, +6 stamina and +4 agility beats +7 stamina. A much larger stamina gap still wins, which is the early-leveling rule. Level 60 keeps the ×3 on stamina. The tripling does not drop off at 60.
 
 **Mage Battle Mage is a caster who swings.** Three specs, same pillars as every
 other class: damage, then survivability, then endurance. Stamina is only a
@@ -606,17 +606,17 @@ same item, or a delta of 0, shows no arrow. Rings and trinkets compare to
 the weaker equipped piece only when **both** slots are filled. A free slot
 is a fill, not a replacement.
 
-The active hunt list points at the next hunt with the raw pipeline score, not the tooltip index. A slot whose rank #1 the character already has, obtained or worn, shows **- Rank #1 BiS acquired** just after the header (i). Among the rank #1 pieces they do not have, the three largest raw gains are marked **- Recommended** right after the item name, each with its own (i). A filled slot's gain is the rank #1 score minus the worn piece's score. An empty slot's gain is the rank #1 score itself. It is not an index jump from nothing to +100. That piece is recommended only when its score is larger than the best raw upgrade in a slot that already has gear. Talbar Mantle at 11 is a few points. Hammerbone, against the weapon already worn, is the hunt. A long item name truncates so that label stays whole. The hover says: "One of the best upgrades for your level. GearQuest marks up to three rank #1 pieces, the ones that improve what you are wearing the most." A downgrade is not marked. A later rank is never the recommendation. Fewer than three are marked when fewer rank #1 pieces would be an upgrade. Simulation hides both lines. Turning the score off hides the recommendation and leaves the acquired line.
+The active hunt list points at the next hunt with the raw pipeline score, not the tooltip index. A slot whose rank #1 the character already has, obtained or worn, shows **- Rank #1 BiS acquired** just after the header (i). Among the rank #1 pieces they do not have, the three largest raw gains are marked **- Recommended** right after the item name, each with its own (i). A filled slot's gain is the rank #1 score minus the worn piece's score. An empty slot's gain is the rank #1 score itself. It is not an index jump from nothing to +100. That piece is recommended only when its score is larger than the best raw upgrade in a slot that already has gear. Talbar Mantle at 11 is a few points. Hammerbone, against the weapon already worn, is the hunt. A long item name truncates so that label stays whole. The hover says: "One of the best upgrades for your level. GearQuest marks up to three rank #1 pieces, the ones that improve what you are wearing the most." A downgrade is not marked. A later rank is never the recommendation. Fewer than three are marked when fewer rank #1 pieces would be an upgrade. Simulation hides both lines. Turning the score off hides the recommendation and leaves the acquired line. The recommendation only shows when that rank 1 is still on the active list: the weapon filter, the hunter ranged filter, the source filter, and the play style. **Rank #1 BiS acquired** still shows when you own that piece even if one of those hides the row.
 
 Each hunt row shows a small item icon immediately before the name, the same height as the row font. A question mark stands in until the client has the icon. Slot headers stay the plus and minus. In the collapse-icon column, every hunt row shows `#N` in faded grey. N is that piece's place on the (i) rank tooltip (`GetSlotRankList`), including `#4` and later when an earlier piece was already obtained. Stored `curatedRank` is not that number: it still counts pieces this faction cannot see. **Leafre's Ring** can be stored rank 2 and still be `#1` on the list. A faction hole closes up, so the list number matches the tooltip.
 
-A quest reward, including a seasonal quest, states `This quest can be picked up at level N.` on the line just before Source. N is the stored required level, the same gate the hunt list uses. Skip the line when that level is missing. A reward from a chain of at least two quests adds two lines above that: `Part of a quest chain.` and `N quests until you get this.` The count line has a blank row above it and a blank row below it. N is the reward quest's place in the series, counting the quest that gives the item. A single quest does not get those lines.
+A quest reward states `This quest can be picked up at level N.` on the line just before Source. N is the stored required level, the same gate the hunt list uses. Skip the line when that level is missing. The line is green when this character (the simulated level, when simulation is on) is at that level or above, and red when they are below. A reward from a chain of at least two quests lists the Wowhead series from the first quest through the quest that gives the item, and no later quest. Each step the character has not completed stays in the parchment color and ends with `- not completed yet`. A completed step ends with `- completed` in green. A single quest does not get that list.
 
-A vendor hunt states the price on its own line, `Costs` followed by the same icons the game uses, with the number beside each icon. Gold, silver, and copper use the money-frame coins. Honor uses the faction honor icon. A badge uses that badge's item icon. The old sentence `Costs Honor Points and tokens (Marks of Honor).` is left off once that line is present. The rank requirement stays on the line just before Source.
+A vendor hunt states the price on its own line, `Costs` followed by the same icons the game uses, with the number beside each icon. The number is the price of the seller named on the line when Wowhead's sellers disagree. Gold, silver, and copper use the money-frame coins. Honor uses the faction honor icon when Wowhead lists honor. A mark or other token uses that token's item icon, with the count, when Wowhead lists it. The old sentence `Costs Honor Points and tokens (Marks of Honor).` is left off once that line is present. A rank-named purchase states the required rank on the line just before Source (`Requires Sergeant (Rank 3).`). A reputation requirement is printed for every source that stores one, not only vendors, and the character's standing is green or red the same way. A boss, trash, world, or rare drop in Onyxia's Lair says the lair requires the Drakefire Amulet.
 
 `SanitizeText` decodes Wowhead quest entities before the parchment, the lore, and the tracker draw. `&nbsp;` is a space. `&lt;name&gt;` is `UnitName("player")`, or "you". `&lt;class&gt;` and `&lt;race&gt;` use this character. `&lt;sir/madam&gt;` follows `UnitSex`. A remaining `&lt;...&gt;` emote is the sentence inside it. `commended!Please` gains a space. **Wildhunter Cloak** (16658), The Hunt Completed, is the check.
 
-**Lookup** is the log handle. It searches the loaded class database, 2000 rows a frame, and does not change the hunt selection or the Simulator. The detail parchment is the same hunt detail. A chain of at least two steps uses `GQ.Data.questChain`. **Thunderbrew's Boot Flask** (744) is 5.
+**Lookup** is the log handle. It searches the loaded class database, 2000 rows a frame, and does not change the hunt selection or the Simulator. The detail parchment is the same hunt detail. A chain of at least two steps is the list in `GQ.Data.questChain`, from the first series quest through the reward. **Thunderbrew's Boot Flask** (744) is 5 steps.
 
 The minimap button center is half the minimap plus 5 (`MINIMAP_BORDER_OUTSET` in `Minimap.lua`).
 
@@ -722,7 +722,7 @@ Changing zone, logging in, and opening a merchant rebuild those arrows in the ba
   the options run past the pane. The chat box reads the saved check whenever
   Settings is shown and writes it on the next frame. **GearQuest Commands** lists each
   slash command with a 1px shadow and the explanation in plain text under it.
-- The source filter and a play style apply together with the Weapons filter. Hunt rows, the shield list, and the character-panel bar hide a weapon that fails any of them. Rank numbers and the (i) list stay the unfiltered order, at most 30 weapons in the current band. Changing the source filter or a play style drops the cached weapon hunt rows and does not drop the rank cache. The green arrow stays on the unfiltered best piece when the weapon filter hides it. The paper doll follows the weapon filter, including hunter, rogue, and enhancement. Toggling a weapon checkbox clears the paper-doll upgrade cache. Do not clear that cache on every refresh.
+- The source filter and a play style apply together with the Weapons filter. Hunt rows, the shield list, and the character-panel bar hide a weapon that fails any of them. The Weapons menu and the hunter Ranged menu list a hand or a type only when something of that kind still passes those two. A box the player turned off stays off when it comes back. Rank numbers and the (i) list stay the unfiltered order, at most 30 weapons in the current band. Changing the source filter or a play style drops the cached weapon hunt rows and does not drop the rank cache. The green arrow stays on the unfiltered best piece when the weapon filter hides it. The paper doll follows the weapon filter, including hunter, rogue, and enhancement. Toggling a weapon checkbox clears the paper-doll upgrade cache. Do not clear that cache on every refresh.
 
 The source **Filter** closes on a click outside the menu. The Profession
   flyout closes when the cursor leaves both the row and the flyout. Boss drop
@@ -784,8 +784,8 @@ The source **Filter** closes on a click outside the menu. The Profession
     `min(ilvl - 4, 60)`, so a raid drop with a higher item level still
     shows at 60. A missing item level stays. Quests, vendors, crafts, and
     world drops stay. Replaces **Don't look back**.
-  - **Manageable Quests** (`playManageableQuests`) hides a quest reward,
-    including a seasonal quest, until the viewed level reaches 4 under
+  - **Manageable Quests** (`playManageableQuests`) hides a quest reward
+    until the viewed level reaches 4 under
     that item's level (`ilvl` on the fact). Sprightring Helm is 49, so it
     stays hidden until 45. Clergy Ring is 22, so a level 13 list hides it
     and it can show from 18. The floor is `min(ilvl - 4, 60)`, so Cloak of
@@ -976,9 +976,31 @@ re-score the class, then copy Lua back.
    invent 1 when both are empty. Dress Shoes (6836) has no recipe, so the
    parchment line stays off.
 
-Python 3.12 is installed on the authoring PC. A one-off curated row in
-`GearQuest/Data.lua` is only for levels 1–9 Alliance bands (see
-`docs/DATA_RULES.md`).
+Python 3.12 is installed on the authoring PC.
+
+## Levels 1–9
+
+Every class is scored for levels 1–9, both factions, one list per spec. Paladin and warrior used to be the exception. Alliance had one shared hand-written mail list in `Data.lua`, and Horde had `Data.Paladin.Horde.1to9.generated.lua` and `Data.Warrior.Horde.1to9.generated.lua`. Those files and that list are gone. Do not put them back.
+
+The emitter is `emit_early.py` with `GQ_FACTIONS=Alliance,Horde`. `reemit_all.py` and `rescore_hunter_shaman.py` use kind `early` for all nine classes. Do not run `emit_horde19.py` for paladin or warrior. The tables are `paladinEarly1to9` / `paladinEarly1to9Facts` and `warriorEarly1to9` / `warriorEarly1to9Facts`. `GetItemFact` reads those fact tables. A nil `paladinHorde1to9Facts` is not a source.
+
+`Data.lua` is not a leveling catalog. The rows left there are Forever pins (`foreverDelta`) for shaman, hunter, druid, priest, mage, warlock, and rogue. Paladin and warrior do not have those pins. Do not add a hand-written 1–9 band for any class.
+
+Retribution Alliance main hand: **Northshire Hammer** (248005) is rank 1 from 1 through 5, **Empyrean Greatsword** (263407) at 7 and 8, **Ironforge Greathammer** (279895) at 9. Holy Alliance at 8–9 is **Thornroot Club** (5587). Horde Arms main hand: **Rusty Cutlass** (270001) from 1 through 4, **Goblin Smasher** (4964) at 5, **Riptear's Cleaver** (286742) at 6. Back at 1–2 is **Linen Cloak** (2570) for Retribution Alliance and for Arms Horde.
+
+## Guide memory
+
+`HideGuide` always clears `frame.entryId`. A hidden frame still runs OnUpdate, and a leftover id kept sampling the map after Enable Guide was cleared. `collectgarbage("collect")` runs once, only when the frame was shown, after the aim and crossing tables are cleared. It does not run while the guide stays off. Do not add a background position poll. That is what used to climb memory, and it is why a proximity alert stays off.
+
+## v0.6.1 facts
+
+Premade spec hover uses `playerLevel <= untilLevel`, the same test custom specs already used. Level 60 shows the ×3 / ×2 weights. Do not retune so the hover matches an old raw row.
+
+`drop_faction.json` keeps a drop on the side that can attack the dropper when every Wowhead reaction is friendly to one faction and hostile to the other. Dun Garok Rifle (282710), Humbert's Helm, Humbert's Chestpiece, and Circlet of the Order are Horde only. Opportunistic Education is Horde, so Solid Gold Band (279845) and Larcenist's Belt (279846) stay off the Alliance list. Friend of the Library is 10 books and Greater Friend of the Library is 20. Both factions turn them in: Garion Wendell in Stormwind, Owen Thadd in Undercity.
+
+Ashbringer (13262) is a quest reward. Do not invent a quest name for it. Sulfuras (17182) is a boss drop from Ragnaros, and the description says you also need the Sulfuron Hammer. Nature's Whisper (20645) is A Terrible Purpose, required level 54, pinned in Silithus. Crown of the Fire Festival (23323) is not a hunt.
+
+Lookup searches the loaded class, both factions. The index is released when you leave the Lookup tab. Closing the log while that tab is still selected keeps it.
 
 ## Three picks per slot
 
@@ -1061,7 +1083,7 @@ Hunt-id probe (`pipeline/scripts/probe_forever_hunt_tooltips.py`) labels 200 vs 
 
 **Spec switch does not scan gear.** `SetSelectedSpec` refreshes the UI and does not call `CheckAutoCompletion`. Completion is by item id (`obtainedItems`). A hunt already completed on this character is completed on the new spec immediately (`IsEntryObtained` checks the item id) and does not toast. A piece you are wearing that was never recorded stays on Active until the next bag update, equip change, or login scan. That scan marks it completed. No toast if `ownedAtLogin` or `obtainedItems` already has the id. A random-enchant hunt still needs the matching suffix.
 
-**Finger gap (Horde, levels 9–14):** curated level-9 rings are Alliance paladin/warrior only. Generated shaman Finger starts at 10 with **The 1 Ring (8350)**, which 404s on Forever and is pruned. Jewelcrafting is not in the Forever client. Woven Copper Ring and the rest of that catalog are not hunts. Horde enhancement rings that exist are Bounty Hunter's Ring (5351, Barrens) and Ring of Scorn (3235, Silverpine) around 15. Do not toast “ring slot eligible” unless `SlotHasHunts("Finger")`.
+**Finger gap (shaman, levels 9–14):** the old Alliance-only curated paladin and warrior rings are gone. Those classes' 1–9 rings come from the scorer for both factions. Generated shaman Finger starts at 10 with **The 1 Ring (8350)**, which 404s on Forever and is pruned. Jewelcrafting is not in the Forever client. Woven Copper Ring and the rest of that catalog are not hunts. Horde enhancement rings that exist are Bounty Hunter's Ring (5351, Barrens) and Ring of Scorn (3235, Silverpine) around 15. Do not toast “ring slot eligible” unless `SlotHasHunts("Finger")`.
 
 **28 Sep 2026 (v0.2.15-beta).**
 
@@ -1080,9 +1102,9 @@ Hunt-id probe (`pipeline/scripts/probe_forever_hunt_tooltips.py`) labels 200 vs 
 
 **28 Sep 2026 (v0.2.17-beta).**
 
-- **Spec weight tooltip.** Hover the spec name or icon. `GQ.Compare:ShowScoringWeightTooltip` reads `GQ.ScoringWeights` (pipeline `weights.json`) and applies `GQ.ScoringLeveling` when level &lt; 60. Do not show `GQ.StatWeights` (Compare.lua reorder table). Weapon `dpsWeight` / `dpsWeightRanged` are extra rows. Regenerate with `node scripts/generate-stat-weights-lua.mjs` after a weight edit. `sources.json` must stay ASCII JSON (`ensure_ascii=True`); `score.py` opens it with the Windows default encoding and rejects raw UTF-8.
-- **Enhancement intellect.** `weights.json` Enhancement `int` is **0.6**. `weights_at_level` doubles intellect below 60, so those bands score it at **1.2**, above agility **1.0**. Level 60 stays 0.6. The scorer does not turn intellect into attack power; Mental Dexterity lives only in this weight. Enhancement Tank `int` stays 0.4. Shaman was re-scored and `Data.Shaman.generated.lua` plus the early 1–9 file were copied. Do not `reemit_all.py` for this.
-- **Wolfsbane (267369).** Horde Retribution main hand rank 1 from level **20 through 26** (score 124 vs Hammerbone 103 at 20). Pin in `client_item_overrides.json`: `rlvl` 20, `tipClasses` Paladin, Holystorm proc text. Source is Diplomatic Incident, Danitha Morr, Bandarion Keep, Tirisfal Glades (`sources.json` `gateLevel` 20). Tirisfal is a Horde zone, so Alliance never sees it. Warrior was re-scored after the class lock so Arms/Fury/Protection no longer list it. Paladin files: `Data.Paladin.generated.lua` and `Data.Paladin.Horde.1to9.generated.lua`.
+- **Spec weight tooltip.** Hover the spec name or icon. `GQ.Compare:ShowScoringWeightTooltip` reads `GQ.ScoringWeights` (pipeline `weights.json`) and applies `GQ.ScoringLeveling` when the level is 60 or below (`playerLevel <= untilLevel` for premade and custom). Level 60 shows the multiplied weights. Do not treat 60 as the raw row. Do not show `GQ.StatWeights` (Compare.lua reorder table). Weapon `dpsWeight` / `dpsWeightRanged` are extra rows. Regenerate with `node scripts/generate-stat-weights-lua.mjs` after a weight edit. `sources.json` must stay ASCII JSON (`ensure_ascii=True`); `score.py` opens it with the Windows default encoding and rejects raw UTF-8.
+- **Enhancement intellect.** `weights.json` Enhancement `int` is **0.6**. `weights_at_level` doubles intellect below 60, so those bands score it at **1.2**, above agility **1.0**. Level 60 keeps the same ×2, so those bands still score it at 1.2. The scorer does not turn intellect into attack power; Mental Dexterity lives only in this weight. Enhancement Tank `int` stays 0.4. Shaman was re-scored and `Data.Shaman.generated.lua` plus the early 1–9 file were copied. Do not `reemit_all.py` for this.
+- **Wolfsbane (267369).** Horde Retribution main hand rank 1 from level **20 through 26** (score 124 vs Hammerbone 103 at 20). Pin in `client_item_overrides.json`: `rlvl` 20, `tipClasses` Paladin, Holystorm proc text. Source is Diplomatic Incident, Danitha Morr, Bandarion Keep, Tirisfal Glades (`sources.json` `gateLevel` 20). Tirisfal is a Horde zone, so Alliance never sees it. Warrior was re-scored after the class lock so Arms/Fury/Protection no longer list it. The paladin hunt file is `Data.Paladin.generated.lua`. Levels 1–9 are `Data.Paladin.Early.1to9.generated.lua` and do not include Wolfsbane.
 - **Memory.** Do not list class hunt files in `GearQuestForever.toc`, and do not put those class addons in `## OptionalDeps` (that loads every class before `Core.lua` sets `_G.GearQuest`, so each file errors and the hunt list stays empty). Each class is a load-on-demand addon `GearQuestForever_<CLASS>` (`scripts/stage-class-addons.py` copies the lua and writes `AuditTips.lua`). Login loads the player's class only. `Preview:SetClass` expands the simulated class. Your class and the class on screen keep their expanded rows. Switching to another sim class drops the previous one's expanded rows (`ReleaseIdleHuntClasses`). The addon stays in the memory list until `/reload` (WoW cannot unload it); pick arrays stay so switching back does not rerun the file. The main `foreverAudit` keeps `status` / `name` / `quality` for every item. The long Wowhead `tip` for a class item ships in that class's `AuditTips.lua` and is applied when the class loads, so hunt tooltips stay the Forever text. Curated Data.lua items that are not in a class file keep their tip on the main audit.
 
 **14 Oct 2026 index: 3,796** (10 Oct was 3,785). The listview armor column is base armor. Stored armor is base plus the green bonus, so a lower listview number is not a tooltip change. Live dataEnv 16 still matched Violet Sash, Gravewalker Boots, Desperate Barrier (1257), Feralheart Embrace, and Summit Guardian Polearm. Those rows were left as they were.
@@ -1344,20 +1366,25 @@ character panel bar shows either-hand weapons only (InventoryType 13,
 One-Hand), because a main-hand weapon cannot be equipped there. The Off
 Hand paper-doll slot is that either-hand list. Enhancement shows the **Two-hand** block only. No one-hand list
 and no off-hand list. Forever Enhancement does not dual wield.
-Rogue **Main Hand** is tooltip Main Hand only. Rogue **Off Hand** is
-One-Hand and Off Hand. An either-hand weapon does not sit under Main Hand.
+Rogue **Main Hand** is the tooltip line Main Hand. Rogue **Off Hand** is
+One-Hand and Off Hand, the same split as every other dual-wield spec. For
+every class, the printed weapon damage is the damage in either hand. A
+caster dagger that only says Main Hand stays on the main-hand list and
+ranks on its weapon damage.
 
 | Who | Main Hand header | Off Hand header |
 |---|---|---|
-| Mage, priest, warlock | Staff or main hand | Off Hand |
+| Mage, priest, warlock, balance and restoration druid | Two-hand and Main Hand, both start on, so a one-hander in the top three stays beside the staff. The hunt is still three names | Off Hand |
 | Druid, paladin/warrior levelling when a route exists | Two-hand or main hand | Off Hand |
 | Enhancement | Two-hand | (no off-hand list) |
 | Hunter | Two-hand, then a Main hand list of main-hand-only weapons | Off Hand is either-hand only, and that is the character panel bar. The ranged slot title is **Ranged** |
-| Rogue (combat, assassination, subtlety) | Main Hand (tooltip Main Hand) | One-Hand and Off Hand |
+| Rogue (combat, assassination, subtlety) | Tooltip Main Hand | One-Hand and Off Hand |
 | Warrior Fury | Dual wield | Off Hand |
 | Paladin Retribution, Warrior Arms | Two-hand | Off Hand |
 | Paladin Protection, Warrior Protection, Shaman Enhancement Tank | Main Hand | Shield |
 | Paladin Holy and Shockadin, Shaman Elemental and Restoration | Two-hand and one-hand, both start on | Shield |
+
+The weapon filter is saved for the class and spec on screen. A filter set while simulating is saved only for that simulated spec. It does not apply to another spec you simulate, and it does not apply after simulation is turned off. The character's own filter is unchanged.
 
 Hunter ranged weapons are **Bow, Gun, and Crossbow** only. The slot title
 is **Ranged**, the same word a warrior sees, because the list is not only
@@ -1366,6 +1393,17 @@ bows. A thrown weapon does not fire Auto Shot, so `HUNTER`
 Quilrager Throwing Axe, Vicious Throwing Stars, and Assassin's Throwing Axe
 are not hunter hunts. Rogue and warrior still list thrown weapons. Do not
 put Thrown back on the hunter list.
+
+The arrow on the hunter **Ranged** header, before the (i), is the filter.
+Bow, Gun, and Crossbow are checkboxes, and a type is listed only when the
+current band still has one after the source filter and the play style. Each
+starts checked. A type with nothing left is not listed, and it comes back
+with the same check when those filters allow it again. The header reads **Ranged*** while
+any of those is off. Unchecking a type hides that type from the hunt rows
+and from the character-panel list. Rank numbers and the (i) list stay the
+unfiltered order. A piece whose type cannot be read stays out once any box
+is off. The choice is remembered per hunter spec. Other classes do not get
+this filter.
 
 Ranged DPS, damage, and speed are the Forever tooltip, not a stale stored
 number. Beast Mastery and Marksmanship melee `dpsWeight` is **0.05** (they also
@@ -1408,8 +1446,8 @@ A source type with no checkbox is never in `hidden`, so it showed on every
 filtered list. The 1 Ring (8350), Steelscale Crushfish (6360), and Broken
 Wine Bottle (6651) are `sourceType` `fishing` ("Fished up.") and leaked
 onto a Boss drop only list. `GQ:NormalizeSourceType` maps `fishing` and
-`skinning` to `profession`, `container` to `object_drop` (the Container
-checkbox), and `mail` and `pickpocket` to `special`. While a filter is
+`skinning` to `profession`, and `container` to `object_drop` (the Container
+checkbox). There is no Special source and no Seasonal quest source. While a filter is
 active, a type that is still not a checkbox id is hidden. `unknown` stays
 on the unfiltered list. `GetSourceLabel` prints Profession, not the raw
 string `fishing`. `build_sources.py` stores new fishing and skinning rows
@@ -1724,8 +1762,7 @@ had in place. That index is not loaded at runtime.
 | Vendor | 768 | 661 | 257 unnamed; the rest have no outdoor pin |
 | World drop | 1,521 | 1,757 | No named creature, and Questie has no classic-map spawn either |
 | Object | 15 | 9 | Container was not a named object |
-| Container / fishing / mail | 4 | 10 | The container, pool, or mailbox is still unnamed |
-| Special | 1 | 1 | Sulfuras uses the Molten Core door; Ashbringer names no quest |
+| Container / fishing | 4 | 10 | The container or pool is still unnamed |
 
 Do not invent a city pin for a battleground vendor, and do not invent
 numbers for the six Forever doors above.
@@ -1748,14 +1785,11 @@ does not clear the icon's anchors, so a filter icon keeps its own point.
 | Profession | `Interface\QuestFrame\UI-QuestLog-BookIcon` |
 | Quest reward | `Interface\GossipFrame\AvailableQuestIcon` |
 | Rare NPC | atlas `nameplates-icon-elite-silver`, else a crop of `UI-TargetingFrame-Rare` |
-| Seasonal quest | `Interface\Icons\INV_Holiday_Christmas_Present_01` |
-| Special | `Interface\TargetingFrame\UI-RaidTargetingIcon_1` (gold star) |
 | Unsourced | `Interface\RaidFrame\ReadyCheck-NotReady` |
 | Vendor | `Interface\Cursor\Buy` (the buy-cursor sack) |
 | World drop | `GearQuest/Art/GQ-WorldDrop.png` (sunset over dark hills). `Interface\Icons\Spell_Nature_FarSight` is not in this client, so that path draws nothing. |
 
-Fishing and skinning use the profession book. Mail and pickpocket use the
-star. A container source uses the chest. `Interface\GossipFrame\VendorIcon`
+Fishing and skinning use the profession book. A container source uses the chest. `Interface\GossipFrame\VendorIcon`
 is not on this client. The world-drop icon is not the micro-button globe:
 that texture is a tall button, and a crop of it draws as a dash or as
 nothing. It is also not `Spell_Nature_FarSight`: that file is not in this
@@ -1920,12 +1954,15 @@ What the lookup uses:
   same missing-dropper case uses one shared catalog spot. Do not invent a
   coordinate.
 - Profession taught by a trainer: the trainer pin. Note
-  `(the trainer that teaches this)`. The six leather helms with no pattern
+  `(the trainer that teaches this)`. The six leather helms
   (Brawler's, Trapper's, Stormrider's, Wisdom's, Defender's, Totemic) are
-  boss drops, not Karolek or Pawani. All six drop in Blackfathom Deeps,
-  Razorfen Kraul, and the Stockade. Scarlet Monastery drops Brawler's,
-  Trapper's, and Defender's only. Stormrider's, Wisdom's, and Totemic do
-  not. The pin is each dungeon entrance that helm actually drops in.
+  boss drops of the Leatherworking pattern, not the helm, and not Karolek
+  or Pawani. The description says the pattern drops from those bosses and
+  shows the Leatherworking skill line. The helm is crafted. All six
+  patterns drop in Blackfathom Deeps, Razorfen Kraul, and the Stockade.
+  Scarlet Monastery drops Brawler's, Trapper's, and Defender's only.
+  Stormrider's, Wisdom's, and Totemic do not. The pin is each dungeon
+  entrance that pattern drops in.
   The six Leather Armor chests and the six Leather Pants from those sets
   are Merchant's Favor patterns. Pawani sells them at the Barrens camp and
   Daniel Stitchsong sells them at the Redridge camp. Do not pin those on
@@ -1950,13 +1987,16 @@ center are not coordinates.
 or a dungeon door. It does not run on the scrape. Unnamed world drops that
 Questie also cannot place stay in `coordinate_gaps.json`.
 
-Show on map opens that zone and sets the user waypoint. Tracked hunts draw
-their own frames on the map canvas. They are not registered with the map's
-pin pool, and they do not write `WorldMapFrame.pinPools`. Do not
-`AddDataProvider`, and do not hook `WorldMapFrame` OnShow. The map's hide
-must not run addon code: a data provider, or `Hide()` on a pin while the
-map hides, calls `SetPreferredGamepadInteractTarget` and taints gamepad
-focus, so jump and talking to an NPC stop working after the map closes.
+Show on map opens that zone and sets the user waypoint. With the mouse UI,
+tracked hunts draw their frames on the map canvas through the pin mixin, so
+the pin stays on the spot when the map zooms. They do not use
+`AddDataProvider`, and they do not write `WorldMapFrame.pinPools`. Do not
+hook `WorldMapFrame` OnShow. The map's hide must not run addon code: a data
+provider, or `Hide()` on a pin while the map hides, calls
+`SetPreferredGamepadInteractTarget` and taints gamepad focus, so jump and
+talking to an NPC stop working after the map closes. While the gamepad UI
+is on (`InputDeviceInterfaceStyle` is `1` or contains `gamepad`), the canvas
+gets no frames. Show on map and the guide still set the Blizzard user waypoint.
 Pins are placed from the addon's own update only while the map is shown.
 The world-drop icon is the addon picture `GQ-WorldDrop.png`. The icon keeps
 its size when the map zooms. The same pin is translated onto a continent

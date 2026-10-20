@@ -1,5 +1,7 @@
-"""Standalone emitter: Horde-only levels 1-9. Henrik keeps his hand-made Alliance
-1-9 data, so this file must contain nothing else -- no Alliance rows, no level 10+."""
+"""Standalone emitter: levels 1-9 for the factions in GQ_FACTIONS.
+
+Alliance,Horde writes Data.<Class>.Early.1to9.generated.lua. Nothing at level 10 or above.
+"""
 import json, os
 from gq_paths import G, OUT
 CLS=os.environ.get("GQ_CLASS","PALADIN"); LC=CLS.lower()
@@ -19,10 +21,7 @@ def lua(v):
     s=s.replace("\\","\\\\").replace('"','\\"').replace("\n"," ")
     return '"'+s+'"'
 
-# Which factions this class needs a 1-9 file for. Paladin and warrior are Horde-only
-# because Henrik's curated Data.lua covers Alliance for both by hand (ALLIANCE_MAIL /
-# MAIL_MELEE). Hunter is in neither table, so it has no curated early data at all and
-# needs BOTH factions.
+# Factions for this 1-9 file. reemit_all passes Alliance,Horde for every class.
 FACTIONS=[f.strip() for f in os.environ.get("GQ_FACTIONS","Horde").split(",")]
 used=set()
 rows=[]
@@ -67,8 +66,6 @@ facts=[]
 for iid in sorted(used):
     s=srcs[str(iid)]; it=items[str(iid)]
     st = s["sourceType"]
-    if st == "quest_reward" and s.get("seasonal"):
-        st = "seasonal_quest"
     kv=[f'sourceType={lua(st)}',f'instructions={lua(s["instructions"])}']
     for k,val in (("zone",s.get("zone")),("npc",s.get("npc")),
                   ("questName",s.get("questName")),("profession",s.get("profession"))):
@@ -105,9 +102,8 @@ if not GQ then
 end
 GQ.Data = GQ.Data or {}
 
--- GENERATED -- """+CLS.title()+""", """+(", ".join(FACTIONS).upper())+""", levels 1-9. Nothing else is in this file:
--- no Alliance rows and no level 10 or above, so it can sit next to the
--- hand-made Alliance 1-9 data without either overwriting the other.
+-- GENERATED -- """+CLS.title()+""", """+(", ".join(FACTIONS).upper())+""", levels 1-9.
+-- Levels 10 and above stay in the class hunt file. Each row carries its faction.
 --
 -- The race filter is the class's own playable races for that faction, not the whole
 -- faction: a Horde warrior can be Orc, Undead, Tauren or Troll but never a Blood Elf,

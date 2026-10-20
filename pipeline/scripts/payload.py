@@ -265,8 +265,6 @@ def build_facts(used):
     for iid in sorted(used):
         s=srcs[str(iid)]; it=items[str(iid)]
         st = s["sourceType"]
-        if st == "quest_reward" and s.get("seasonal"):
-            st = "seasonal_quest"
         instructions = set_piece_instructions(iid, s)
         kv=[f'sourceType={lua(st)}',f'instructions={lua(instructions)}']
         if is_labeled_set_piece(iid):
@@ -397,10 +395,9 @@ GQ.Data = GQ.Data or {}
 -- item-level band, so a looted Shimmering Sash of Healing can read +11 and still be
 -- the right item.
 --
--- LEVELS 1-9 ARE NOT IN THIS FILE AT ALL, so the three sources never overlap:
---   Alliance 1-9  -> Henrik's hand-made entries in Data.lua
---   Horde 1-9     -> Data."""+CLS.title()+""".Horde.1to9.generated.lua
---   levels 10-60  -> this file
+-- LEVELS 1-9 ARE NOT IN THIS FILE AT ALL:
+--   levels 1-9   -> Data."""+CLS.title()+""".Early.1to9.generated.lua (both factions, per spec)
+--   levels 10-60 -> this file
 --   level 70      -> Henrik's curated AtlasLoot Phase 3 entries in Data.lua
 --
 -- At exactly level 60 the picks come from Wowhead's Classic BiS guides for all

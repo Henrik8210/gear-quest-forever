@@ -53,8 +53,8 @@ NOTE_RE = re.compile(
 )
 
 EARLY_FILES = {
-    "PALADIN": "Data.Paladin.Horde.1to9.generated.lua",
-    "WARRIOR": "Data.Warrior.Horde.1to9.generated.lua",
+    "PALADIN": "Data.Paladin.Early.1to9.generated.lua",
+    "WARRIOR": "Data.Warrior.Early.1to9.generated.lua",
     "HUNTER": "Data.Hunter.Early.1to9.generated.lua",
     "DRUID": "Data.Druid.Early.1to9.generated.lua",
     "SHAMAN": "Data.Shaman.Early.1to9.generated.lua",
