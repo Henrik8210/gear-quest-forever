@@ -58,7 +58,9 @@ Open a hunt for the source, the quest level, the craft, and the materials. **Tra
 
 A vendor hunt names the person at the pin you are closest to. **Dirty Leather Bracers** in Mulgore is **Varia Hardhide**, not the Undercity cloth merchant. Walk to another town that sells it and the name follows. The tracker uses the same name.
 
-A quest reward says the level it can be picked up, and the level GearQuest recommends you pick it up. The recommendation is four under the item level, and it is never lower than the level the quest actually starts. **Replica Crescent Necklace** recommends 25. A craft says the skill in green when you can make it, and red when you cannot. A burnt mark means the item is new in Forever.
+The reward name uses the item's rarity color. A rare such as **Feline Mantle** or **Garb of Florid Feathers** is blue. The strip behind the name is dark enough to read it.
+
+A quest reward says the level it can be picked up, and the level GearQuest recommends you pick it up. The recommendation is four under the item level, and it is never lower than the level the quest actually starts. **Replica Crescent Necklace** recommends 25. A boss drop or dungeon trash hunt says **Recommended dungeon entry at level N.** N is four under the item level, and it stops at 60. **Garb of Florid Feathers** is item level 31, so that line says 27. The line is green once the level you are viewing has reached it, and red before that. A craft says the skill in green when you can make it, and red when you cannot. A burnt mark means the item is new in Forever.
 
 A reputation vendor also says the standing this character has. **Ratchet Wristwraps** reads **Requires Friendly with Ratchet. Your standing is Neutral.** That clause is red while you are short and green once you have reached it. **You have not met this faction yet** appears only when your reputation list has no row for that faction.
 
@@ -72,7 +74,7 @@ If Auctionator is enabled, the hunt hover adds its price lines under the Forever
 
 The pin is a real place: the quest that starts the chain, a dungeon entrance, a vendor, a named creature, or a camp. GearQuest does not invent one.
 
-Track a hunt and an arrow can point the way. On another continent it points at the boat or zeppelin first.
+Track a hunt and an arrow can point the way. On another continent it points at the boat or zeppelin first. A client in another language still finds that dock. The words on the arrow stay **Ship**, **Zeppelin**, and **Skycutter**.
 
 ---
 
@@ -102,7 +104,7 @@ The two dungeon cards turn each other off. The other five can be on with either.
 
 *Screenshot 5 — the filter menu, with a dungeon flyout open.*
 
-Hide a source, a profession, or one dungeon. Boss drop and Dungeon & Raid trash are separate lists. The rank number does not change because a filter is on.
+Hide a source, a profession, or one dungeon. Boss drop and Dungeon & Raid trash are separate lists. Each flyout has **Select all** and **Deselect all** for the boxes on that list. The button on the main filter still changes every source at once. The rank number does not change because a filter is on.
 
 ---
 

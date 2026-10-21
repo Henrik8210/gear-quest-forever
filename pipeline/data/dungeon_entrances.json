@@ -368,7 +368,7 @@
     "Ironaya": "Uldaman",
     "Geomancer Flintdagger": "Uldaman",
     "Tuten'kash": "Razorfen Downs",
-    "Fel Steed": "Scarlet Monastery",
+    "Fel Steed": "Shadowfang Keep",
     "Gorosh the Dervish": "Blackrock Depths",
     "Ok'thor the Breaker": "Blackrock Depths",
     "Anub'shiah": "Blackrock Depths",
@@ -420,6 +420,10 @@
     "Mana Devourer": "City of Dalaran",
     "Fel Ancient": "City of Dalaran",
     "Shade of the Archmage": "City of Dalaran",
-    "Lyn the Ignored": "City of Dalaran"
+    "Lyn the Ignored": "City of Dalaran",
+    "Gelihast": "Blackfathom Deeps",
+    "Lorgus Jett": "Blackfathom Deeps",
+    "Saltspine": "Excavation Site",
+    "Shadetooth": "Excavation Site"
   }
 }

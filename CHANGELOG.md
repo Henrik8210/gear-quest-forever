@@ -2,47 +2,65 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.0.2
+## v1.0.3
 
-The window title reads **GearQuest Forever v1.0.2**. The log can be driven with a controller. **The GearQuest Community** lists Alteredigor.
+The window title reads **GearQuest Forever v1.0.3**. The reward name uses the item's rarity color. A flyout can select or clear every box on that list. A boss drop says when to enter the dungeon. The guide still finds the ship when the client is not English. Every class was scored again, so the new Forever pieces and the corrected dungeon drops are on the lists.
 
-### The highlight
+### The reward
 
-While the log is open in gamepad UI, a gold chevron sits to the left of the focused control. It is a smaller arrow inside a larger one, and it eases toward that control. A blue highlight marks the control. The window gets a soft gold glow that follows the portrait ring and the window edges. Clicking a hunt moves the arrow onto that row. Opening the log shows these marks, including when you open it with `/gq`. They hide while another window has the pad, and they stop when the log closes. Mouse mode does not turn them on.
+The name under REWARD uses the item's rarity color. **Feline Mantle** and **Garb of Florid Feathers** are rare, so that name is blue. An uncommon name is green, and an epic name is purple. The strip behind the name is darker than the parchment, so the blue reads.
 
-### Moving through the list
+### When to enter
 
-On the hunt list, down moves to the next hunt and up moves to the previous one. The list stops at the ends. Up from the top hunt reaches Active, Completed, and Removed. Left and right move among those three tabs. Down from a tab returns to the first hunt. The arrows and the left stick skip the filter buttons while you are on the hunts.
+A boss drop and a dungeon or raid trash hunt say **Recommended dungeon entry at level N.** N is four under the item level, and it stops at 60. The line is green once the level you are viewing has reached it, and red before that. **Garb of Florid Feathers** is item level 31, so the line says 27. A quest reward still says **Recommended to pick this quest up at level M.**
 
-On Settings, Lookup, and the Simulator, up and down walk the next control in that column and stop at the ends. Left and right move only when a control is actually that way. Moving onto a checkbox, including **Hide minimap icon**, does not change it. One press does one thing. A direction does not also confirm a hunt or close the window.
+### Select all on a flyout
 
-### A, B, and Y
+Boss drop, Dungeon & Raid trash, Profession, and Vendor each have **Select all** and **Deselect all**. That button changes only the boxes on that flyout. The button on the main filter still changes every source, and every flyout, at once.
 
-The bottom face button confirms. On a hunt it moves the arrow to Track. The d-pad and the left stick then move among Track, Show on map, and Remove, and back to the hunts. The right stick scrolls the parchment.
+### The guide in another language
 
-The right face button closes an open menu, then leaves the filter controls, then closes the log.
+On another continent the arrow still aims at the ship, zeppelin, or skycutter when the client is not English. The dock is found from the map, so a translated zone name does not skip the boat. The words on the arrow stay **Ship**, **Zeppelin**, and **Skycutter**.
 
-The top face button moves the arrow onto the source filter, Play style, and the weapon arrows, including the arrow on a Weapons or Ranged header. It does not apply a filter. A on one of those controls opens it. A second press of the top face button returns to the hunts.
+### Excavation Site
 
-### The side pages
+**Shadetooth** and **Saltspine** are bosses in Excavation Site. The pin is the entrance in the Wetlands, 47.8, 56.3.
 
-The left bumper goes to the previous page, up the side tabs: Settings, Simulator, Lookup, Log. The right bumper goes to the next page, down that rail. From Log the left bumper wraps to Settings, and from Settings the right bumper wraps to Log. The bumpers do not change Active, Completed, or Removed. LB sits above the side handles and RB below them.
+**Garb of Florid Feathers** drops from Shadetooth. It is chest rank 1 at 26 through 28 for Beast Mastery and Marksmanship, both factions, and for Horde Enhancement. Alliance Enhancement hunts it at 28.
 
-### The hint bar
+**Raptorclaw Greaves** drop from Shadetooth. They are feet rank 1 at 26 for Protection, Arms, and Fury, and for Retribution from 26 through 34 on Alliance and through 35 on Horde.
 
-A dark bar under the window reads A Select, Y Filters, Navigate, and B Close. Navigate is the d-pad. An open filter, Play style, weapon, or spec menu gets a smaller bar that reads A Select, Navigate, and B Close.
+**Raptor's Gaze** drops from Shadetooth. It is the off hand rank 1 from 26 through 31 for every mage spec, every warlock spec, Balance, and Shadow. Holy paladin hunts it at 26.
 
-### Typing
+**Glinteye Slippers** drop from Saltspine. They are feet rank 1 at 26 for Holy and Shadow, and from 26 through 29 for Affliction, Demonology, and Destruction.
 
-The level box and the search box open the on-screen keyboard when the highlight lands on them. While that box has focus, the pad belongs to the keyboard. B leaves the box.
+**Saltscale Girdle** drops from Saltspine. It is waist rank 1 at 26 and 27 for Retribution.
 
-### Which window has the pad
+**Supple Bellyskin Leggings** drop from Saltspine. Bear hunts them as legs rank 2 from 26 through 31. Enhancement Tank hunts them at 26 and 27.
 
-Opening a Blizzard window while GearQuest has the pad gives that window the pad. The character panel, bags, the map, the spellbook, and the game menu all do this, and the gold arrow and the blue highlight hide. A click anywhere on GearQuest takes the pad back. Closing Play Style, the source filter, or the weapon menu clears the highlight, so the blue square does not stay on the hunt list.
+### Dungeon sources
 
-### The map
+Other dungeon hunts that were filed as a world drop now say which boss or which dungeon they come from. The pin is that entrance.
 
-The world map still gets no GearQuest pin frames while the gamepad UI is on. Show on map and the guide still set the waypoint. Closing the map does not lock jump or talking to an NPC.
+**Eerie Stable Lantern** drops from Fel Steed in Shadowfang Keep. The pin is Silverpine Forest 44.8, 67.8. Bear hunts it as the off hand at 19.
+
+**Pendulum of Doom** drops from trash in Uldaman, and it is combined from **Axe of Lingering Dread** and **Axe of Inevitable Ruin**. The pins are the Uldaman doors in the Badlands, 44.4, 12.2 and 65.2, 43.5. It is main hand rank 1 from 39 through 44 for Survival, Retribution, Enhancement, and Arms, both factions.
+
+**Annealed Blade** drops from trash in Uldaman, at those same doors. Horde Survival hunts it in the off hand at 35 and 36. Horde Assassination, Combat, and Subtlety see it at 35. Horde Fury sees it at 35 and 36. Horde Protection sees it from 35 through 37.
+
+### New Forever pieces
+
+**Axe of Inevitable Ruin** is new in Forever. Wowhead does not list a drop yet, so the hunt stays Unsourced. It requires 37. It is main hand rank 1 at 37 and 38 for Survival, Enhancement, and Arms, both factions, and for Horde Retribution at 37. Alliance Retribution lists it at 37 as rank 2.
+
+**Cloudkeeper Legplates** are epic plate legs. They drop from Colossus of Zora, Colossus of Regal, and Colossus of Ashi in Silithus. The pin is the camp closest to you. They require 57. They are legs rank 1 from 57 through 59 for Retribution, Arms, and Fury, both factions. Protection paladin lists them at 57.
+
+**Changuk Smasher** is a rare one-hand mace from Omgorn the Lost in Tanaris. It requires 47. Enhancement Tank hunts it at 47, and Alliance Protection lists it there too.
+
+**Rog'mar Trainee Shoulderpads** are new in Forever. Wowhead does not list a drop yet, so the hunt stays Unsourced. They require 36. Beast Mastery and Marksmanship hunt them as shoulder rank 3 at 36, both factions.
+
+### v1.0.2
+
+The window title reads **GearQuest Forever v1.0.2**. While the log is open in gamepad UI, a gold chevron eases toward the focused control, a blue highlight marks it, and the window gets a soft gold glow. The d-pad and the left stick move through the hunts, the tabs, and Track, Show on map, and Remove. Y opens the filters without applying one. The bumpers change pages. A dark bar under the window names the buttons. The level box and the search box open the on-screen keyboard. Opening a Blizzard window gives that window the pad. **The GearQuest Community** lists Alteredigor.
 
 ### v1.0.1
 

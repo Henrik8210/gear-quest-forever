@@ -722,7 +722,7 @@ local function CreateRewardItemButton(parent, name)
     button.nameBg:SetPoint("RIGHT", button, "RIGHT", 0, 0)
     button.nameBg:SetPoint("TOP", iconFrame, "TOP", 0, 0)
     button.nameBg:SetPoint("BOTTOM", iconFrame, "BOTTOM", 0, 0)
-    button.nameBg:SetColorTexture(0, 0, 0, 0.55)
+    button.nameBg:SetColorTexture(0, 0, 0, 0.68)
 
     button.name = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     button.name:SetPoint("LEFT", button.nameBg, "LEFT", 8, 0)
@@ -2947,6 +2947,22 @@ function GQ.Log:QuestRewardRecommendedLevel(entry)
         end
     end
     return floor
+end
+
+-- Same wait as Manageable Dungeons: 4 under the item level, never past 60.
+-- Green once the viewed level has reached it, red before that.
+function GQ.Log:AppendDungeonEntryLine(lines, entry)
+    local recommended = self:QuestRewardRecommendedLevel(entry)
+    if type(recommended) ~= "number" or recommended < 1 then
+        return
+    end
+    local level = GQ.GetEffectiveLevel and GQ:GetEffectiveLevel() or 1
+    local color = level >= recommended and "|cff0c4a1c" or "|cff6e1212"
+    table.insert(lines, string.format(
+        "\n%sRecommended dungeon entry at level %d.|r",
+        color,
+        math.floor(recommended)
+    ))
 end
 
 function GQ.Log:ItemLevelTooSoon(entry)
@@ -5401,6 +5417,12 @@ function GQ.Log:UpdateDetailReward(entryOrItemId)
     local itemName = (entry and GQ.Data:GetEntryDisplayName(entry))
         or (GQ.Data and GQ.Data.GetItemDisplayName and GQ.Data:GetItemDisplayName(itemId))
         or ("Item " .. itemId)
+    local nameR, nameG, nameB = 1, 1, 1
+    local quality = GQ.Data and GQ.Data.GetItemQualityForDisplay and GQ.Data:GetItemQualityForDisplay(itemId)
+    if quality then
+        nameR, nameG, nameB = GetListItemQualityColor(itemId)
+    end
+    icon.name:SetTextColor(nameR, nameG, nameB)
     TruncateFontStringToWidth(icon.name, itemName, REWARD_NAME_MAX_WIDTH)
     icon:SetWidth(REWARD_ICON_SIZE + REWARD_NAME_MIN_WIDTH)
     if icon.foreverMark then
@@ -8462,25 +8484,113 @@ function GQ.Log:SyncProfessionRowLabel(check)
     self:SyncFilterBranchMark(check, "Profession")
 end
 
+function GQ.Log:EnsureBranchSelectButton(branch)
+    if not branch then
+        return nil
+    end
+    if branch.selectBtn then
+        return branch.selectBtn
+    end
+    local btn = CreateFrame("Button", nil, branch, "UIPanelButtonTemplate")
+    btn:SetHeight(22)
+    btn:SetPoint("TOPLEFT", branch, "TOPLEFT", 8, -6)
+    btn:SetPoint("TOPRIGHT", branch, "TOPRIGHT", -8, -6)
+    btn:SetScript("OnEnter", function()
+        HideItemTooltip()
+    end)
+    btn:SetScript("OnClick", function()
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if log then
+            log:ToggleBranchSelectAll(branch)
+        end
+    end)
+    branch.selectBtn = btn
+    return btn
+end
+
+function GQ.Log:AnchorBranchCheck(branch, row, index)
+    row:ClearAllPoints()
+    if index == 1 and branch.selectBtn then
+        row:SetPoint("TOPLEFT", branch.selectBtn, "BOTTOMLEFT", 0, -2)
+    elseif index == 1 then
+        row:SetPoint("TOPLEFT", branch, "TOPLEFT", 8, -6)
+    else
+        row:SetPoint("TOPLEFT", branch.rows[index - 1], "BOTTOMLEFT", 0, 2)
+    end
+end
+
+function GQ.Log:SyncBranchSelectLabel(branch, hidden, keys)
+    local btn = self:EnsureBranchSelectButton(branch)
+    if not btn then
+        return
+    end
+    if not keys or #keys == 0 then
+        btn:Hide()
+        return
+    end
+    btn:Show()
+    hidden = hidden or {}
+    local allOn = true
+    for i = 1, #keys do
+        if hidden[keys[i]] then
+            allOn = false
+            break
+        end
+    end
+    btn:SetText(allOn and "Deselect all" or "Select all")
+end
+
+function GQ.Log:ToggleBranchSelectAll(branch)
+    local keys = branch and branch._selectKeys
+    local bucketName = branch and branch._selectBucket
+    local refill = branch and branch._selectRefill
+    if not keys or not bucketName or not refill then
+        return
+    end
+    local draft = self._filterDraft or self:CopyFilterDraft()
+    draft[bucketName] = draft[bucketName] or {}
+    local bucket = draft[bucketName]
+    local allOn = true
+    for i = 1, #keys do
+        if bucket[keys[i]] then
+            allOn = false
+            break
+        end
+    end
+    for i = 1, #keys do
+        if allOn then
+            bucket[keys[i]] = true
+        else
+            bucket[keys[i]] = nil
+        end
+    end
+    local menu = self.frame and self.frame.sourceFilterMenu
+    refill(self, menu)
+    self:SyncSourceSelectButton(menu)
+end
+
+function GQ.Log:RememberBranchSelection(branch, bucketName, refill, keys, hidden)
+    branch._selectBucket = bucketName
+    branch._selectRefill = refill
+    branch._selectKeys = keys
+    self:SyncBranchSelectLabel(branch, hidden, keys)
+end
+
 function GQ.Log:PopulateProfessionBranch(menu)
     local branch = menu and menu.profBranch
     if not branch then
         return
     end
+    self:EnsureBranchSelectButton(branch)
     local names = self:GetBisProfessionNames()
     local draft = self._filterDraft or self:CopyFilterDraft()
     local hidden = draft.professions
-    local width = 148
+    local width = 168
     for i, name in ipairs(names) do
         local row = branch.rows[i]
         if not row then
             row = CreateFrame("CheckButton", nil, branch, "UICheckButtonTemplate")
             row:SetSize(22, 22)
-            if i == 1 then
-                row:SetPoint("TOPLEFT", branch, "TOPLEFT", 8, -6)
-            else
-                row:SetPoint("TOPLEFT", branch.rows[i - 1], "BOTTOMLEFT", 0, 2)
-            end
             local label = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
             ApplyFilterButtonFont(label)
             label:SetPoint("LEFT", row, "RIGHT", 2, 0)
@@ -8506,9 +8616,11 @@ function GQ.Log:PopulateProfessionBranch(menu)
                 end
                 local menu = log.frame and log.frame.sourceFilterMenu
                 log:SyncSourceSelectButton(menu)
+                log:SyncBranchSelectLabel(branch, pending.professions, branch._selectKeys)
             end)
             branch.rows[i] = row
         end
+        self:AnchorBranchCheck(branch, row, i)
         row.professionName = name
         row.label:SetText(name)
         row:SetChecked(not hidden[name])
@@ -8524,10 +8636,19 @@ function GQ.Log:PopulateProfessionBranch(menu)
     end
     if #names == 0 then
         branch.empty:Show()
+        branch._selectKeys = nil
+        if branch.selectBtn then
+            branch.selectBtn:Hide()
+        end
         branch:SetSize(168, 32)
     else
         branch.empty:Hide()
-        branch:SetSize(width, 12 + (#names * 20))
+        local keys = {}
+        for i = 1, #names do
+            keys[i] = names[i]
+        end
+        self:RememberBranchSelection(branch, "professions", self.PopulateProfessionBranch, keys, hidden)
+        branch:SetSize(width, 40 + (#names * 20))
     end
 end
 
@@ -8640,22 +8761,18 @@ function GQ.Log:PopulateVendorBranch(menu)
     if not branch then
         return
     end
+    self:EnsureBranchSelectButton(branch)
     local kinds = self.VENDOR_KINDS or {}
     local draft = self._filterDraft or self:CopyFilterDraft()
     draft.vendors = draft.vendors or {}
     local hidden = draft.vendors
-    local width = 148
+    local width = 168
     for i = 1, #kinds do
         local kind = kinds[i]
         local row = branch.rows[i]
         if not row then
             row = CreateFrame("CheckButton", nil, branch, "UICheckButtonTemplate")
             row:SetSize(22, 22)
-            if i == 1 then
-                row:SetPoint("TOPLEFT", branch, "TOPLEFT", 8, -6)
-            else
-                row:SetPoint("TOPLEFT", branch.rows[i - 1], "BOTTOMLEFT", 0, 2)
-            end
             local label = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
             ApplyFilterButtonFont(label)
             label:SetPoint("LEFT", row, "RIGHT", 2, 0)
@@ -8682,9 +8799,11 @@ function GQ.Log:PopulateVendorBranch(menu)
                 end
                 local filterMenu = log.frame and log.frame.sourceFilterMenu
                 log:SyncSourceSelectButton(filterMenu)
+                log:SyncBranchSelectLabel(branch, pending.vendors, branch._selectKeys)
             end)
             branch.rows[i] = row
         end
+        self:AnchorBranchCheck(branch, row, i)
         row.vendorKind = kind.id
         row.label:SetText(kind.label)
         row:SetChecked(not hidden[kind.id])
@@ -8698,7 +8817,12 @@ function GQ.Log:PopulateVendorBranch(menu)
     for i = #kinds + 1, #branch.rows do
         branch.rows[i]:Hide()
     end
-    branch:SetSize(width, 12 + (#kinds * 20))
+    local keys = {}
+    for i = 1, #kinds do
+        keys[i] = kinds[i].id
+    end
+    self:RememberBranchSelection(branch, "vendors", self.PopulateVendorBranch, keys, hidden)
+    branch:SetSize(width, 40 + (#kinds * 20))
 end
 
 function GQ.Log:ShowVendorBranch(check)
@@ -8801,6 +8925,7 @@ function GQ.Log:PopulateDungeonBranch(menu)
     if not branch then
         return
     end
+    self:EnsureBranchSelectButton(branch)
     local names = self:ReachableBossDungeons()
     local draft = self._filterDraft or self:CopyFilterDraft()
     local hidden = draft.dungeons or {}
@@ -8810,11 +8935,6 @@ function GQ.Log:PopulateDungeonBranch(menu)
         if not row then
             row = CreateFrame("CheckButton", nil, branch, "UICheckButtonTemplate")
             row:SetSize(22, 22)
-            if i == 1 then
-                row:SetPoint("TOPLEFT", branch, "TOPLEFT", 8, -6)
-            else
-                row:SetPoint("TOPLEFT", branch.rows[i - 1], "BOTTOMLEFT", 0, 2)
-            end
             local label = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
             ApplyFilterButtonFont(label)
             label:SetPoint("LEFT", row, "RIGHT", 2, 0)
@@ -8840,9 +8960,11 @@ function GQ.Log:PopulateDungeonBranch(menu)
                     pending.dungeons[self.dungeonName] = true
                 end
                 log:SyncSourceSelectButton(menu)
+                log:SyncBranchSelectLabel(branch, pending.dungeons, branch._selectKeys)
             end)
             branch.rows[i] = row
         end
+        self:AnchorBranchCheck(branch, row, i)
         row.dungeonName = name
         row.label:SetText(name)
         row:SetChecked(not hidden[name])
@@ -8860,6 +8982,10 @@ function GQ.Log:PopulateDungeonBranch(menu)
         if branch.empty then
             branch.empty:Show()
         end
+        branch._selectKeys = nil
+        if branch.selectBtn then
+            branch.selectBtn:Hide()
+        end
         branch:SetSize(236, 32)
         return
     end
@@ -8870,7 +8996,12 @@ function GQ.Log:PopulateDungeonBranch(menu)
         width = 200
     end
     width = width + 36
-    branch:SetSize(width, 12 + (#names * 20))
+    local keys = {}
+    for i = 1, #names do
+        keys[i] = names[i]
+    end
+    self:RememberBranchSelection(branch, "dungeons", self.PopulateDungeonBranch, keys, hidden)
+    branch:SetSize(width, 40 + (#names * 20))
 end
 
 function GQ.Log:ShowDungeonBranch(check)
@@ -8973,6 +9104,7 @@ function GQ.Log:PopulateTrashBranch(menu)
     if not branch then
         return
     end
+    self:EnsureBranchSelectButton(branch)
     local names = self:ReachableTrashDungeons()
     local draft = self._filterDraft or self:CopyFilterDraft()
     local hidden = draft.trashDungeons or {}
@@ -8982,11 +9114,6 @@ function GQ.Log:PopulateTrashBranch(menu)
         if not row then
             row = CreateFrame("CheckButton", nil, branch, "UICheckButtonTemplate")
             row:SetSize(22, 22)
-            if i == 1 then
-                row:SetPoint("TOPLEFT", branch, "TOPLEFT", 8, -6)
-            else
-                row:SetPoint("TOPLEFT", branch.rows[i - 1], "BOTTOMLEFT", 0, 2)
-            end
             local label = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
             ApplyFilterButtonFont(label)
             label:SetPoint("LEFT", row, "RIGHT", 2, 0)
@@ -9012,9 +9139,11 @@ function GQ.Log:PopulateTrashBranch(menu)
                     pending.trashDungeons[self.dungeonName] = true
                 end
                 log:SyncSourceSelectButton(menu)
+                log:SyncBranchSelectLabel(branch, pending.trashDungeons, branch._selectKeys)
             end)
             branch.rows[i] = row
         end
+        self:AnchorBranchCheck(branch, row, i)
         row.dungeonName = name
         row.label:SetText(name)
         row:SetChecked(not hidden[name])
@@ -9032,6 +9161,10 @@ function GQ.Log:PopulateTrashBranch(menu)
         if branch.empty then
             branch.empty:Show()
         end
+        branch._selectKeys = nil
+        if branch.selectBtn then
+            branch.selectBtn:Hide()
+        end
         branch:SetSize(236, 32)
         return
     end
@@ -9042,7 +9175,12 @@ function GQ.Log:PopulateTrashBranch(menu)
         width = 200
     end
     width = width + 36
-    branch:SetSize(width, 12 + (#names * 20))
+    local keys = {}
+    for i = 1, #names do
+        keys[i] = names[i]
+    end
+    self:RememberBranchSelection(branch, "trashDungeons", self.PopulateTrashBranch, keys, hidden)
+    branch:SetSize(width, 40 + (#names * 20))
 end
 
 function GQ.Log:ShowTrashBranch(check)
@@ -12452,6 +12590,10 @@ function GQ.Log:BuildDetailLines(entry)
                 math.floor(recommended)
             ))
         end
+    end
+
+    if (src == "boss_drop" or src == "raid_trash") and self.AppendDungeonEntryLine then
+        self:AppendDungeonEntryLine(lines, entry)
     end
 
     if src == "vendor" and GQ.Data and GQ.Data.VendorCostLine then

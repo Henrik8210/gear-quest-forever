@@ -286,29 +286,31 @@ local function ProjectToMap(srcMap, x, y, destMap)
     return mx, my
 end
 
--- Published docks that cross continents. The arrow aims at the dock where
--- this character boards. The ride it picks is the one with the shortest
--- walk to that dock plus the shortest walk after the last landing.
--- Menethil, Southshore, and Auberdine are one ship, both ways. Southshore
--- is the stop in the middle. Stormwind Harbor and Auberdine are a separate ship.
+-- Published docks that cross continents. mapId is the client's map number,
+-- the same one the hunt pins use, so a German client finds the dock without
+-- the English zone name. The arrow aims at the dock where this character
+-- boards. The ride it picks is the one with the shortest walk to that dock
+-- plus the shortest walk after the last landing. Menethil, Southshore, and
+-- Auberdine are one ship, both ways. Southshore is the stop in the middle.
+-- Stormwind Harbor and Auberdine are a separate ship.
 local CROSSINGS = {
-    { id = "durotar", zone = "Durotar", place = "Durotar", x = 50.8, y = 13.6, faction = "Horde", kind = "Zeppelin", to = { "tirisfal", "gromgol" } },
-    { id = "tirisfal", zone = "Tirisfal Glades", place = "Tirisfal Glades", x = 61.0, y = 59.0, faction = "Horde", kind = "Zeppelin", to = { "durotar", "gromgol" } },
-    { id = "gromgol", zone = "Stranglethorn Vale", place = "Grom'gol", x = 31.5, y = 29.6, faction = "Horde", kind = "Zeppelin", to = { "durotar", "tirisfal" } },
-    { id = "ratchet", zone = "The Barrens", place = "Ratchet", x = 63.6, y = 38.7, kind = "Ship", to = { "booty" } },
-    { id = "booty", zone = "Stranglethorn Vale", place = "Booty Bay", x = 26.0, y = 73.2, kind = "Ship", to = { "ratchet" } },
-    { id = "auberdine", zone = "Darkshore", place = "Auberdine", x = 32.7, y = 43.7, faction = "Alliance", kind = "Ship", to = { "southshore", "stormwind" } },
-    { id = "menethilNorth", zone = "Wetlands", place = "Menethil Harbor", x = 4.7, y = 57.0, faction = "Alliance", kind = "Ship", to = { "southshore" } },
-    { id = "southshore", zone = "Hillsbrad Foothills", place = "Southshore", x = 50.6, y = 61.0, faction = "Alliance", kind = "Ship", to = { "auberdine", "menethilNorth" } },
-    { id = "stormwind", zone = "Stormwind City", place = "Stormwind Harbor", x = 22.6, y = 56.1, faction = "Alliance", kind = "Ship", to = { "auberdine" } },
-    { id = "menethilSouth", zone = "Wetlands", place = "Menethil Harbor", x = 5.0, y = 63.0, faction = "Alliance", kind = "Ship", to = { "theramore" } },
-    { id = "theramore", zone = "Dustwallow Marsh", place = "Theramore", x = 71.0, y = 56.0, faction = "Alliance", kind = "Ship", to = { "menethilSouth" } },
-    { id = "steamwheedle", zone = "Tanaris", place = "Steamwheedle Port", x = 66.6, y = 22.0, kind = "Ship", to = { "powderfuse" } },
-    { id = "powderfuse", zone = "Riverglades", place = "Powderfuse Port", x = 78.1, y = 51.9, kind = "Ship", to = { "steamwheedle" } },
-    { id = "valanaarEast", zone = "Zephras Isle", place = "Valanaar", x = 65.9, y = 83.5, faction = "Alliance", kind = "Skycutter", to = { "dalaran" } },
-    { id = "dalaran", zone = "Alterac Mountains", place = "Dalaran", x = 12.5, y = 51.8, faction = "Alliance", kind = "Skycutter", to = { "valanaarEast" } },
-    { id = "valanaarWest", zone = "Zephras Isle", place = "Valanaar", x = 57.9, y = 80.9, faction = "Horde", kind = "Zeppelin", to = { "skywatcher" } },
-    { id = "skywatcher", zone = "Mulgore", place = "Skywatcher Plateau", x = 34.3, y = 25.8, faction = "Horde", kind = "Zeppelin", to = { "valanaarWest" } },
+    { id = "durotar", zone = "Durotar", mapId = 1411, place = "Durotar", x = 50.8, y = 13.6, faction = "Horde", kind = "Zeppelin", to = { "tirisfal", "gromgol" } },
+    { id = "tirisfal", zone = "Tirisfal Glades", mapId = 1420, place = "Tirisfal Glades", x = 61.0, y = 59.0, faction = "Horde", kind = "Zeppelin", to = { "durotar", "gromgol" } },
+    { id = "gromgol", zone = "Stranglethorn Vale", mapId = 1434, place = "Grom'gol", x = 31.5, y = 29.6, faction = "Horde", kind = "Zeppelin", to = { "durotar", "tirisfal" } },
+    { id = "ratchet", zone = "The Barrens", mapId = 1413, place = "Ratchet", x = 63.6, y = 38.7, kind = "Ship", to = { "booty" } },
+    { id = "booty", zone = "Stranglethorn Vale", mapId = 1434, place = "Booty Bay", x = 26.0, y = 73.2, kind = "Ship", to = { "ratchet" } },
+    { id = "auberdine", zone = "Darkshore", mapId = 1439, place = "Auberdine", x = 32.7, y = 43.7, faction = "Alliance", kind = "Ship", to = { "southshore", "stormwind" } },
+    { id = "menethilNorth", zone = "Wetlands", mapId = 1437, place = "Menethil Harbor", x = 4.7, y = 57.0, faction = "Alliance", kind = "Ship", to = { "southshore" } },
+    { id = "southshore", zone = "Hillsbrad Foothills", mapId = 1424, place = "Southshore", x = 50.6, y = 61.0, faction = "Alliance", kind = "Ship", to = { "auberdine", "menethilNorth" } },
+    { id = "stormwind", zone = "Stormwind City", mapId = 1453, place = "Stormwind Harbor", x = 22.6, y = 56.1, faction = "Alliance", kind = "Ship", to = { "auberdine" } },
+    { id = "menethilSouth", zone = "Wetlands", mapId = 1437, place = "Menethil Harbor", x = 5.0, y = 63.0, faction = "Alliance", kind = "Ship", to = { "theramore" } },
+    { id = "theramore", zone = "Dustwallow Marsh", mapId = 1445, place = "Theramore", x = 71.0, y = 56.0, faction = "Alliance", kind = "Ship", to = { "menethilSouth" } },
+    { id = "steamwheedle", zone = "Tanaris", mapId = 1446, place = "Steamwheedle Port", x = 66.6, y = 22.0, kind = "Ship", to = { "powderfuse" } },
+    { id = "powderfuse", zone = "Riverglades", mapId = 2548, place = "Powderfuse Port", x = 78.1, y = 51.9, kind = "Ship", to = { "steamwheedle" } },
+    { id = "valanaarEast", zone = "Zephras Isle", mapId = 2521, place = "Valanaar", x = 65.9, y = 83.5, faction = "Alliance", kind = "Skycutter", to = { "dalaran" } },
+    { id = "dalaran", zone = "Alterac Mountains", mapId = 1416, place = "Dalaran", x = 12.5, y = 51.8, faction = "Alliance", kind = "Skycutter", to = { "valanaarEast" } },
+    { id = "valanaarWest", zone = "Zephras Isle", mapId = 2521, place = "Valanaar", x = 57.9, y = 80.9, faction = "Horde", kind = "Zeppelin", to = { "skywatcher" } },
+    { id = "skywatcher", zone = "Mulgore", mapId = 1412, place = "Skywatcher Plateau", x = 34.3, y = 25.8, faction = "Horde", kind = "Zeppelin", to = { "valanaarWest" } },
 }
 
 local function DockLabel(dock)
@@ -327,7 +329,12 @@ local function DockWorld(place)
     if place.continent then
         return place.continent, place.wx, place.wy, place.mapId
     end
-    local mapId = GQ.Map and GQ.Map.ZoneMap and GQ.Map:ZoneMap(place.zone)
+    -- The stored map number is the same on every client language. The
+    -- English zone name is only a fallback for a dock that has no number.
+    local mapId = place.mapId
+    if not mapId and GQ.Map and GQ.Map.ZoneMap then
+        mapId = GQ.Map:ZoneMap(place.zone)
+    end
     if not mapId then
         return nil
     end
