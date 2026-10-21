@@ -10168,7 +10168,7 @@ function GQ.Log:EnsureSettingsPage(frame)
     creditsBody:SetPoint("TOPLEFT", creditsTitle, "BOTTOMLEFT", 0, -6)
     creditsBody:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
     creditsBody:SetJustifyH("LEFT")
-    creditsBody:SetText("Eao\nMainWon\nStikmyre\nClick\nVaniron\nThrayne")
+    creditsBody:SetText("Eao\nMainWon\nStikmyre\nClick\nVaniron\nThrayne\nAlteredigor")
     creditsBody:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
     creditsBody:Hide()
     frame.settingsCreditsBody = creditsBody
@@ -12044,11 +12044,14 @@ function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry, label, hand
             end
         end
         row.highlight:Hide()
-        row:SetScript("OnClick", function()
+        row:SetScript("OnClick", function(self)
             HideItemTooltip()
             local log = _G.GearQuest and _G.GearQuest.Log
             if log then
                 log:ToggleSlotCollapsed(slotName)
+                if log.GamepadFollowClick then
+                    log:GamepadFollowClick(self)
+                end
             end
         end)
     elseif rowType == "empty" then
@@ -12119,8 +12122,12 @@ function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry, label, hand
         end
 
         UpdateListRowHighlight(row)
-        row:SetScript("OnClick", function()
+        row:SetScript("OnClick", function(self)
             OnListRowItemClick(entry)
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if log and log.GamepadFollowClick then
+                log:GamepadFollowClick(self)
+            end
         end)
     else
         local name = tostring(GQ.Data:GetEntryDisplayName(entry) or ("Item " .. tostring(entry.itemId)))
@@ -12169,8 +12176,12 @@ function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry, label, hand
         end
 
         UpdateListRowHighlight(row)
-        row:SetScript("OnClick", function()
+        row:SetScript("OnClick", function(self)
             OnListRowItemClick(entry)
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if log and log.GamepadFollowClick then
+                log:GamepadFollowClick(self)
+            end
         end)
     end
 end

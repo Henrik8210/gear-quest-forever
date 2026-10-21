@@ -2068,15 +2068,32 @@ provider, or `Hide()` on a pin while the map hides, calls
 talking to an NPC stop working after the map closes. While the gamepad UI
 is on (`InputDeviceInterfaceStyle` is `1` or contains `gamepad`), the canvas
 gets no frames. Show on map and the guide still set the Blizzard user waypoint.
-The log itself takes the pad while it is open. The arrows and the left
-stick move a gold highlight. The bottom face button activates it. The
-right face button closes a filter, the spec menu, or the weapon menu, and
-closes the log when nothing else is open. The bumpers move between Log,
-Lookup, Simulator, and Settings. Holding a direction keeps moving. A
-slider steps left and right. The simulator level box steps by one, from 1
-to 60. Confirm is a left click, so a spec row selects that spec. The
-highlight ticks only while the log is open. Mouse mode never starts it.
-Closing the log stops it. Do not parent pin frames to the map in this mode.
+The log itself takes the pad while it is open and GearQuest is the window
+being used. On the hunt list the arrows and the left stick move a gold
+chevron and a blue highlight through the hunts and skip the filters. The
+chevron sits to the left of the focused control, a smaller arrow inside a larger
+one, and it eases toward that control. A click on a hunt moves it onto that
+row. A soft gold glow follows the portrait ring and the window edges while GearQuest is the focused window. A square
+control gets the blue button highlight. A wide row gets a blue wash, and a
+hunt icon gets the blue box. LB sits above the side handles and RB below
+them. A dark bar under the window reads A Select, Y Filters, Navigate, and B Close.
+An open filter, play style, weapon, or spec menu gets a smaller bar under it
+that reads A Select, Navigate, and B Close. The arrow, the gold border, the bumper marks, and both bars
+hide while another window has the pad. Opening a Blizzard window while GearQuest has the pad gives that window the pad. A click anywhere on GearQuest takes the pad back. That check only reads
+FrameControlsManager.currentFrame. Do not call its methods. Down on the hunt list moves to the next hunt. Up from the top hunt reaches Active, Completed, and Removed. Left and right move among those tabs, and down from a tab returns to the first hunt. On Settings, Lookup, and the Simulator, up and down walk the next control in that column and stop at the ends. Left and right move only when a control sits that way. One press is one action. A direction does not also confirm or close. Closing Play Style, the source filter, or the weapon menu clears the highlight, so a card that just closed does not leave the blue square on the list. The top face button (Y / Triangle) moves the arrow onto the source filter, Play style, and the weapon arrows, and does not change the list. A second Y returns to the hunts. A on a filter control opens it. The bottom face
+button (A / Cross) confirms. Moving onto a checkbox or a button does not
+change it. A on a hunt moves the arrow to Track. The d-pad and the left stick
+then move among Track, Show on map, and Remove, and back to the hunts. The
+right stick scrolls the parchment. The bumpers do not change those tabs.
+The left bumper goes to the previous page and the right
+bumper to the next, wrapping across Log, Lookup, Simulator, and Settings.
+The level box and the search box open the on-screen keyboard when the
+highlight lands on them. While that box has focus, the pad belongs to the
+keyboard, and B leaves the box. A slider still steps left and right. The right face
+button closes a menu, then the filters, then the log. Button names come from the mapped pad state, lined up so the bottom face button is confirm and the right face button is back. The raw state only fills a bumper the mapped state left out. The left bumper is the previous page. Do not treat Ctrl as the left bumper, and do not relabel a direction as Jump. Do not call FrameControlsManager methods. Do not walk UIParent children. Do not call SetUIFocusState. Mouse mode never starts the driver, and the click that takes the pad back does nothing until the log is open in gamepad UI. The highlight ticks only while the log is
+open. Mouse mode never starts it. Closing the log stops it. The gamepad
+cursor is held off while the log is open so a direction does not click the
+control under it, and it is restored when the log closes. Do not parent pin frames to the map in this mode.
 Pins are placed from the addon's own update only while the map is shown.
 The world-drop icon is the addon picture `GQ-WorldDrop.png`. The icon keeps
 its size when the map zooms. The same pin is translated onto a continent

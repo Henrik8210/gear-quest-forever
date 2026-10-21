@@ -2,121 +2,59 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.0.1
+## v1.0.2
 
-The window title reads **GearQuest Forever v1.0.1**. A gear tooltip can name the enchant worth putting on that piece. The log can be driven with a gamepad. A quest reward says when to pick the quest up, not only when it first becomes available. Assassination, Combat, and Subtlety all hunt every one-hand type a rogue can wear, in both hands.
+The window title reads **GearQuest Forever v1.0.2**. The log can be driven with a controller. **The GearQuest Community** lists Alteredigor.
 
-### Recommended enchantment
+### The highlight
 
-**Hunts → Recommended gear enchantment** is off until you turn it on. The hint under the box reads **Enable the recommended enchantment line on gear tooltips**.
+While the log is open in gamepad UI, a gold chevron sits to the left of the focused control. It is a smaller arrow inside a larger one, and it eases toward that control. A blue highlight marks the control. The window gets a soft gold glow that follows the portrait ring and the window edges. Clicking a hunt moves the arrow onto that row. Opening the log shows these marks, including when you open it with `/gq`. They hide while another window has the pad, and they stop when the log closes. Mouse mode does not turn them on.
 
-On a gear tooltip, one line sits just above the rank line. Only the words **Recommended enchantment** are yellow. The rest is white: the formula name, then what it does. It uses the class and spec on screen. Simulating a hunter still shows the scope on a bow, a gun, or a crossbow. The GearQuest score line still says **Turn off simulation mode to see your GearQuest Score for this item.** The enchant line does not wait for that.
+### Moving through the list
 
-You do not need Enchanting, Leatherworking, or Engineering. You take a piece to an enchanter, or you apply a kit or a scope yourself. A formula is skipped only when the spell says this character cannot wear it. Wowhead Forever does not list a tailoring embroidery, or a ring enchant that only an enchanter can wear, so rings and trinkets have no line. A necklace formula is for everyone. **Requires Enchanting** on the pattern is the recipe, not a lock on who can wear the necklace.
+On the hunt list, down moves to the next hunt and up moves to the previous one. The list stops at the ends. Up from the top hunt reaches Active, Completed, and Removed. Left and right move among those three tabs. Down from a tab returns to the first hunt. The arrows and the left stick skip the filter buttons while you are on the hunts.
 
-How high a formula is in reach depends on your level. Under 10, skill 75. Under 20, skill 150. Under 35, skill 225. From 35 on, skill 300. A kit or a scope also keeps its own required level.
+On Settings, Lookup, and the Simulator, up and down walk the next control in that column and stop at the ends. Left and right move only when a control is actually that way. Moving onto a checkbox, including **Hide minimap icon**, does not change it. One press does one thing. A direction does not also confirm a hunt or close the window.
 
-Armor on an enchant counts for a tank only: a Protection warrior, a Protection paladin, a Bear druid, and an Enhancement Tank shaman. Every other spec ignores that armor. The hunt list is unchanged. An Enhancement shaman at 27 is not sent to **Thick Armor Kit** just because it has the most armor.
+### A, B, and Y
 
-Kits go on the chest, hands, feet, and legs. **Light Armor Kit** is +1 Stamina and +8 Armor. **Medium Armor Kit** is +2 Stamina and +16 Armor, from level 5. **Forceful Medium Armor Kit** is +4 Attack Power and +16 Armor, and **Mystic Medium Armor Kit** is +2 Spell Power and +16 Armor, both from level 15. **Heavy Armor Kit** is +3 Stamina and +24 Armor, requires level 20, and goes on items level 15 and above. **Forceful Heavy Armor Kit** is +6 Attack Power, and **Mystic Heavy Armor Kit** is +4 Spell Power, both with +24 Armor, from level 30, on items level 15 and above. **Thick Armor Kit** is +4 Stamina and +32 Armor at 30, on items level 25 and above. **Forceful Thick Armor Kit** is +8 Attack Power, and **Mystic Thick Armor Kit** is +5 Spell Power, both with +32 Armor, from level 40. **Rugged Armor Kit** is +5 Stamina and +40 Armor at 40, on items level 35 and above. **Forceful Rugged Armor Kit** is +10 Attack Power, and **Mystic Rugged Armor Kit** is +6 Spell Power, both with +40 Armor, from level 50. **Core Armor Kit** is +3 Defense at 50. **Wild Leather Armor Kit** is +10 Stamina and +4 Defense at 60.
+The bottom face button confirms. On a hunt it moves the arrow to Track. The d-pad and the left stick then move among Track, Show on map, and Remove, and back to the hunts. The right stick scrolls the parchment.
 
-**Enchant Cloak - Defense** is +30 Armor. **Enchant Cloak - Greater Defense** is +60 Armor. **Enchant Cloak - Superior Defense** is +70 Armor. A tank uses that armor. Anyone else still prefers agility on a cloak.
+The right face button closes an open menu, then leaves the filter controls, then closes the log.
 
-A scope is only for a bow, a gun, or a crossbow. A wand and a thrown weapon do not get one. Rogues and warriors still hunt thrown weapons, and those tooltips stay bare. **Crude Scope** is +1 ranged damage at level 5. **Standard Scope** is +2 at 10. **Accurate Scope** is +3 at 20. **Deadly Scope** is +5 at 30. **Sniper Scope** is +7 at 40. A simulated hunter sees the one this level can reach.
+The top face button moves the arrow onto the source filter, Play style, and the weapon arrows, including the arrow on a Weapons or Ranged header. It does not apply a filter. A on one of those controls opens it. A second press of the top face button returns to the hunts.
 
-Weapon procs are chosen by what they do. **Enchant Weapon - Insight** is the healer pick in the middle formulas: a chance on spell cast to double spirit for 10 seconds. **Enchant Weapon - Revelation** is the caster proc. **Enchant Weapon - Crusader** and **Enchant Weapon - Grand Crusader** are the melee picks. A flat stat enchant can still win at 60 when the weights say so.
+### The side pages
 
-Wrists, chest, hands, feet, cloak, neck, shield, and weapons each have their own formulas. Legs use an armor kit. Shirts, bags, rings, and trinkets have no line.
+The left bumper goes to the previous page, up the side tabs: Settings, Simulator, Lookup, Log. The right bumper goes to the next page, down that rail. From Log the left bumper wraps to Settings, and from Settings the right bumper wraps to Log. The bumpers do not change Active, Completed, or Removed. LB sits above the side handles and RB below them.
 
-### Gamepad
+### The hint bar
 
-While the GearQuest log is open and the game is using the gamepad UI, the pad drives the window. The arrows and the left stick move a gold highlight. The bottom face button activates whatever is highlighted: a hunt, a checkbox, a tab, or a spec. The right face button closes a filter, the play-style panel, the spec menu, or the weapon menu, and closes the log when nothing else is open. The bumpers move between **Log**, **Lookup**, **Simulator**, and **Settings**. Holding a direction keeps moving. A slider steps left and right. The level box in the simulator steps by one level, from 1 to 60. Choosing a spec is a left click, so the pad selects that spec.
+A dark bar under the window reads A Select, Y Filters, Navigate, and B Close. Navigate is the d-pad. An open filter, Play style, weapon, or spec menu gets a smaller bar that reads A Select, Navigate, and B Close.
 
-Mouse mode does not turn this on. The highlight stops when the log closes. The world map still does not get GearQuest pin frames while the gamepad UI is on. **Show on map** and the guide still set the waypoint. Closing the map does not lock jump or talking to an NPC.
+### Typing
 
-### Quest rewards
+The level box and the search box open the on-screen keyboard when the highlight lands on them. While that box has focus, the pad belongs to the keyboard. B leaves the box.
 
-A quest reward already said **This quest can be picked up at level N.** That line is the earliest the quest can be taken. It is green when you are at that level and red when you are not.
+### Which window has the pad
 
-The next line is **Recommended to pick this quest up at level M.** M is four under the item level, the same wait as **Manageable Quests**, and it stops at 60. When the quest cannot be picked up until a higher level, M is that pickup level, so the recommendation is never lower than the level the quest actually starts. **Replica Crescent Necklace** recommends 25, because that quest cannot be picked up until 25. The line uses the same green and red. It is on every class, both factions, including while you are simulating. The pickup line stays the earliest you can take the quest.
+Opening a Blizzard window while GearQuest has the pad gives that window the pad. The character panel, bags, the map, the spellbook, and the game menu all do this, and the gold arrow and the blue highlight hide. A click anywhere on GearQuest takes the pad back. Closing Play Style, the source filter, or the weapon menu clears the highlight, so the blue square does not stay on the hunt list.
 
-### Rogue weapons
+### The map
 
-Assassination, Combat, and Subtlety all hunt the one-hand types a rogue can equip: daggers, swords, maces, axes, and fists. Subtlety is not a dagger list. Assassination is not a dagger list. Combat still scores the axe highly. **Axe of the Deep Woods** stays a main-hand axe on the Combat list.
+The world map still gets no GearQuest pin frames while the gamepad UI is on. Show on map and the guide still set the waypoint. Closing the map does not lock jump or talking to an NPC.
 
-**Main Hand** and **Off Hand** each list those types for the level you are viewing. A one-hand weapon belongs to both hands, so you can turn swords off in the off hand and leave them on in the main hand. A one-hand weapon stays on the hunt while either hand still allows that type. A main-hand-only weapon stays under Main Hand. An off-hand-only weapon stays under Off Hand. Rank numbers stay the real ones. The (i) list is that same order. Both factions, from level 1 through 60, including levels 1–9.
+### v1.0.1
+
+The window title reads **GearQuest Forever v1.0.1**. **Hunts → Recommended gear enchantment** is off until you turn it on. The tooltip then says **Recommended enchantment** in yellow, then the formula and the effect in white, just above the rank line. A quest reward says **Recommended to pick this quest up at level M.** A rogue hunts every one-hand type in both hands. The log could already be opened with a controller.
 
 ### v1.0.0
 
-This is the first release of GearQuest Forever. The beta is over. The window title reads **GearQuest Forever v1.0.0**. World of Warcraft: Forever launches on November 4th, and GearQuest Forever will keep being improved after that launch.
-
-### Your score
-
-The line above the score bar reads **Your GearQuest Index Score is N Rank**. The number and the rank word use that rank's color: green for Below average, blue for Fair, purple for Great, and orange for Legend. Looting a hunt names the rank. It says **upgrade** only when that piece is better than what you are wearing. An empty slot on the Active list is just the header. It no longer adds "No upgrades for your level yet."
-
-### The source filter
-
-**Off Hand — Shield**, and an off-hand orb or tome, now follow the source filter. A Boss drop list no longer keeps world drops such as **Scaled Shield of Healing**, **Pathfinder Guard of Healing**, and **Robust Buckler of Healing**. Weapons and the armor slots already did this. Rank numbers stay the real ones. The (i) list still shows every source. If the parchment was open on a hunt the filter just hid, it closes.
-
-### City of Dalaran
-
-Boss drops, dungeon trash, and quests that send you into City of Dalaran say the dungeon has an attunement.
-
-Alliance pick up **An Alarming Request** from Emissary Jacques at the Southshore Town Hall in Hillsbrad Foothills. The pin is in front of the city, Alterac Mountains 14.2, 61.1. Image of Archmage Modera teleports you in. The dungeon pipe is inside the city, in the sewers at Cantrips & Crows.
-
-Horde start with **Key to the City** from Magus Wordeen Voidglare in Tarren Mill. **Heart of Disruption** awards the Dalaran Sewer Key. The pin is the outside sewer, Alterac Mountains 8.8, 59.6. One person in the group needs the key. Defeating Shade of the Archmage and finishing **Shrewd Negotiations** makes the city guards neutral. Most citizens still will not offer their services.
-
-City of Dalaran is on the Boss drop flyout and the Dungeon & Raid trash flyout. **Atrexis the Grave Knight**, **Arcane Anomaly**, **Arcanic Enigma**, **Unstable Sentinel**, **Mana Devourer**, **Fel Ancient**, **Shade of the Archmage**, and **Lyn the Ignored** are boss drops. **Seeking Remnant**, **Fragmented Sentry**, **Fallen Mage**, and **Dark Caster** are dungeon trash. **Roused Nature Footwraps** drops from Seeking Remnant. Those hunts are no longer world drops in the outdoor Alterac camps.
-
-### Ruins of Lordaeron
-
-**Ragged Ghoul**, **Flesh Golem**, **Stone Watcher**, **Shrieking Banshee**, and **Skeletal Soldier** are dungeon trash in the Ruins of Lordaeron. The pin is the entrance in Undercity, 71.6, 11.4. **Rotmender's Garb** still says it drops in that dungeon.
-
-### New hunts
-
-The Forever item list was scraped again. A new hunt uses the same description as the hunts of that source that were already on the list, and it has a pin when a real spot exists.
-
-**Serrated Knife** is bought from Rallic Finn and Kuna Thunderhorn, with a pin and a price for each seller. **Westbrook Garrison Needs Help!** leads to the Riverpaw gnoll bounty. **Report to Captain Stoutfist** leads through War Banners and Nek'rosh's Gambit to Defeat Nek'rosh. **Cheese Knife**, **Darnassian Knife**, **Beastculler's Knife**, and **Wizlo's Tuning Wrench** are single quest rewards, pinned where that quest starts. A piece Wowhead still does not source stays **Unsourced**, with no invented pin and no map spot.
+This is the first release. The window title reads **GearQuest Forever v1.0.0**. The score bar says **Your GearQuest Index Score is N Rank**. Off-hand shields follow the source filter. City of Dalaran and the Ruins of Lordaeron name the attunement and the entrance. New Forever hunts include **Serrated Knife**.
 
 ### v0.6.1-beta
 
-Paladin and warrior levels 1–9 are scored the same way as every other class, for both factions. Turning the guide off frees the memory it used. **Recommended** follows the filters you have on. A level 60 weight hover matches the hunt. The window title reads **GearQuest Forever v0.6.1-beta**.
-
-### Paladin and warrior, levels 1–9
-
-Alliance paladin and warrior no longer share one hand-written mail list. Holy, Protection, Retribution, and Shockadin each have their own scored hunts from 1 through 9, and Horde has the same four. Warrior Arms, Fury, and Protection do the same on both factions. The old Alliance list ran past level 9 and could fill a third slot into the teens. Those rows are gone.
-
-Retribution Alliance, main hand: **Northshire Hammer** is rank 1 from 1 through 5, from Rare Books in Elwynn Forest. **Empyrean Greatsword** is rank 1 at 7 and 8. **Ironforge Greathammer** is rank 1 at 9, from Old Ironforge Incursion. Holy Alliance at 8–9 hunts **Thornroot Club**, from Ursal the Mauler in Teldrassil. Back at 1–2 is **Linen Cloak** (Tailoring 1), then **Frayed Cloak** and **Patchwork Cloak**.
-
-Horde Arms, main hand: **Rusty Cutlass** is rank 1 from 1 through 4. **Goblin Smasher** is rank 1 at 5, from Supervisor Fizsprocket in Mulgore. **Riptear's Cleaver** is rank 1 at 6, from Rear Guard Patrol in Tirisfal Glades. Horde Arms back at 1–2 is also **Linen Cloak**.
-
-### The guide
-
-Clearing **Enable Guide** stops the arrow. It no longer reads your position after that. The memory it used while it was pointing is collected on that close, so the addon memory number can fall. Turning the arrow back on still follows the hunt you had selected, unless you dismissed it.
-
-### Recommended
-
-**Recommended** only marks a rank 1 hunt that is still on the list you are looking at. A weapon filter, the hunter Bow, Gun, and Crossbow filter, a source filter, or a play style that hides that row also hides the mark. **Rank #1 BiS acquired** still shows when you already have that piece, even if a filter hides the row. Simulation still hides both.
-
-### Level 60 weights
-
-Hovering a premade spec at level 60 shows the same stamina, armor, and mana multipliers the hunt list uses. Custom specs already did. The weights themselves did not change.
-
-### Who can get it
-
-**Dun Garok Rifle**, **Humbert's Helm**, **Humbert's Chestpiece**, and **Circlet of the Order** are Horde only. Tamra Stormpike is friendly to the Alliance, so an Alliance character does not hunt them. **Solid Gold Band** and **Larcenist's Belt** stay off the Alliance list. Opportunistic Education is a Horde quest. **Friend of the Library** is 10 books and **Greater Friend of the Library** is 20. Both factions turn the books in: Garion Wendell in Stormwind, Owen Thadd in Undercity.
-
-### Legendaries and Silithus
-
-**Ashbringer** is a quest reward at 60. The parchment does not invent a quest name. **Sulfuras, Hand of Ragnaros** drops from Ragnaros in Molten Core, and the description says you also need the Sulfuron Hammer. **Nature's Whisper** is the reward from A Terrible Purpose. It requires 54. The chain is The Twilight Mystery, The Deserter, The Twilight Lexicon, then A Terrible Purpose, and the pin is Silithus. **Crown of the Fire Festival** is not a hunt.
-
-### Weapons and ranged
-
-A priest, a mage, a warlock, and a balance or restoration druid start with two-hand and main hand both on, so the one-hander stays beside the staff. The weapon filter is remembered for that class and spec. A filter you set while simulating stays on that simulated spec only. Hunters have Bow, Gun, and Crossbow on the Ranged header. Rank numbers stay the real ones.
-
-### Quest text, prices, and the map
-
-A quest reward says **This quest can be picked up at level N.** The line is green when you are at that level and red when you are not. A chain lists each step through the quest that gives the item. A finished step ends with **completed** in green. A vendor price uses the coin, honor, and mark icons Wowhead lists. A drop in Onyxia's Lair says the lair requires the Drakefire Amulet. The six leather helms are crafted. The description says the Leatherworking pattern drops from those bosses. Seasonal quest and Special are gone from the filter and from the map pins. With a gamepad, the map does not get GearQuest pin frames. Show on map and the guide still set the waypoint.
+The window title reads **GearQuest Forever v0.6.1-beta**. Paladin and warrior levels 1–9 are scored per spec for both factions. Alliance Retribution hunts **Northshire Hammer**, **Empyrean Greatsword**, and **Ironforge Greathammer**. Horde Arms hunts **Rusty Cutlass**, **Goblin Smasher**, and **Riptear's Cleaver**. Turning the guide off frees the memory it used. **Recommended** follows the filters. **Dun Garok Rifle** and the Stormpike pieces are Horde only. **Friend of the Library** is both factions. **Ashbringer**, **Sulfuras**, and **Nature's Whisper** are on the lists. A priest, a mage, a warlock, and a balance or restoration druid start with two-hand and main hand both on. Hunters have Bow, Gun, and Crossbow on the Ranged header.
 
 ### v0.6.0-beta
 
