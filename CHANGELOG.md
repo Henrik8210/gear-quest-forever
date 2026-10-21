@@ -2,7 +2,51 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.0.0
+## v1.0.1
+
+The window title reads **GearQuest Forever v1.0.1**. A gear tooltip can name the enchant worth putting on that piece. The log can be driven with a gamepad. A quest reward says when to pick the quest up, not only when it first becomes available. Assassination, Combat, and Subtlety all hunt every one-hand type a rogue can wear, in both hands.
+
+### Recommended enchantment
+
+**Hunts → Recommended gear enchantment** is off until you turn it on. The hint under the box reads **Enable the recommended enchantment line on gear tooltips**.
+
+On a gear tooltip, one line sits just above the rank line. Only the words **Recommended enchantment** are yellow. The rest is white: the formula name, then what it does. It uses the class and spec on screen. Simulating a hunter still shows the scope on a bow, a gun, or a crossbow. The GearQuest score line still says **Turn off simulation mode to see your GearQuest Score for this item.** The enchant line does not wait for that.
+
+You do not need Enchanting, Leatherworking, or Engineering. You take a piece to an enchanter, or you apply a kit or a scope yourself. A formula is skipped only when the spell says this character cannot wear it. Wowhead Forever does not list a tailoring embroidery, or a ring enchant that only an enchanter can wear, so rings and trinkets have no line. A necklace formula is for everyone. **Requires Enchanting** on the pattern is the recipe, not a lock on who can wear the necklace.
+
+How high a formula is in reach depends on your level. Under 10, skill 75. Under 20, skill 150. Under 35, skill 225. From 35 on, skill 300. A kit or a scope also keeps its own required level.
+
+Armor on an enchant counts for a tank only: a Protection warrior, a Protection paladin, a Bear druid, and an Enhancement Tank shaman. Every other spec ignores that armor. The hunt list is unchanged. An Enhancement shaman at 27 is not sent to **Thick Armor Kit** just because it has the most armor.
+
+Kits go on the chest, hands, feet, and legs. **Light Armor Kit** is +1 Stamina and +8 Armor. **Medium Armor Kit** is +2 Stamina and +16 Armor, from level 5. **Forceful Medium Armor Kit** is +4 Attack Power and +16 Armor, and **Mystic Medium Armor Kit** is +2 Spell Power and +16 Armor, both from level 15. **Heavy Armor Kit** is +3 Stamina and +24 Armor, requires level 20, and goes on items level 15 and above. **Forceful Heavy Armor Kit** is +6 Attack Power, and **Mystic Heavy Armor Kit** is +4 Spell Power, both with +24 Armor, from level 30, on items level 15 and above. **Thick Armor Kit** is +4 Stamina and +32 Armor at 30, on items level 25 and above. **Forceful Thick Armor Kit** is +8 Attack Power, and **Mystic Thick Armor Kit** is +5 Spell Power, both with +32 Armor, from level 40. **Rugged Armor Kit** is +5 Stamina and +40 Armor at 40, on items level 35 and above. **Forceful Rugged Armor Kit** is +10 Attack Power, and **Mystic Rugged Armor Kit** is +6 Spell Power, both with +40 Armor, from level 50. **Core Armor Kit** is +3 Defense at 50. **Wild Leather Armor Kit** is +10 Stamina and +4 Defense at 60.
+
+**Enchant Cloak - Defense** is +30 Armor. **Enchant Cloak - Greater Defense** is +60 Armor. **Enchant Cloak - Superior Defense** is +70 Armor. A tank uses that armor. Anyone else still prefers agility on a cloak.
+
+A scope is only for a bow, a gun, or a crossbow. A wand and a thrown weapon do not get one. Rogues and warriors still hunt thrown weapons, and those tooltips stay bare. **Crude Scope** is +1 ranged damage at level 5. **Standard Scope** is +2 at 10. **Accurate Scope** is +3 at 20. **Deadly Scope** is +5 at 30. **Sniper Scope** is +7 at 40. A simulated hunter sees the one this level can reach.
+
+Weapon procs are chosen by what they do. **Enchant Weapon - Insight** is the healer pick in the middle formulas: a chance on spell cast to double spirit for 10 seconds. **Enchant Weapon - Revelation** is the caster proc. **Enchant Weapon - Crusader** and **Enchant Weapon - Grand Crusader** are the melee picks. A flat stat enchant can still win at 60 when the weights say so.
+
+Wrists, chest, hands, feet, cloak, neck, shield, and weapons each have their own formulas. Legs use an armor kit. Shirts, bags, rings, and trinkets have no line.
+
+### Gamepad
+
+While the GearQuest log is open and the game is using the gamepad UI, the pad drives the window. The arrows and the left stick move a gold highlight. The bottom face button activates whatever is highlighted: a hunt, a checkbox, a tab, or a spec. The right face button closes a filter, the play-style panel, the spec menu, or the weapon menu, and closes the log when nothing else is open. The bumpers move between **Log**, **Lookup**, **Simulator**, and **Settings**. Holding a direction keeps moving. A slider steps left and right. The level box in the simulator steps by one level, from 1 to 60. Choosing a spec is a left click, so the pad selects that spec.
+
+Mouse mode does not turn this on. The highlight stops when the log closes. The world map still does not get GearQuest pin frames while the gamepad UI is on. **Show on map** and the guide still set the waypoint. Closing the map does not lock jump or talking to an NPC.
+
+### Quest rewards
+
+A quest reward already said **This quest can be picked up at level N.** That line is the earliest the quest can be taken. It is green when you are at that level and red when you are not.
+
+The next line is **Recommended to pick this quest up at level M.** M is four under the item level, the same wait as **Manageable Quests**, and it stops at 60. When the quest cannot be picked up until a higher level, M is that pickup level, so the recommendation is never lower than the level the quest actually starts. **Replica Crescent Necklace** recommends 25, because that quest cannot be picked up until 25. The line uses the same green and red. It is on every class, both factions, including while you are simulating. The pickup line stays the earliest you can take the quest.
+
+### Rogue weapons
+
+Assassination, Combat, and Subtlety all hunt the one-hand types a rogue can equip: daggers, swords, maces, axes, and fists. Subtlety is not a dagger list. Assassination is not a dagger list. Combat still scores the axe highly. **Axe of the Deep Woods** stays a main-hand axe on the Combat list.
+
+**Main Hand** and **Off Hand** each list those types for the level you are viewing. A one-hand weapon belongs to both hands, so you can turn swords off in the off hand and leave them on in the main hand. A one-hand weapon stays on the hunt while either hand still allows that type. A main-hand-only weapon stays under Main Hand. An off-hand-only weapon stays under Off Hand. Rank numbers stay the real ones. The (i) list is that same order. Both factions, from level 1 through 60, including levels 1–9.
+
+### v1.0.0
 
 This is the first release of GearQuest Forever. The beta is over. The window title reads **GearQuest Forever v1.0.0**. World of Warcraft: Forever launches on November 4th, and GearQuest Forever will keep being improved after that launch.
 

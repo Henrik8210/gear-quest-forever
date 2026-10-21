@@ -58,7 +58,7 @@ Open a hunt for the source, the quest level, the craft, and the materials. **Tra
 
 A vendor hunt names the person at the pin you are closest to. **Dirty Leather Bracers** in Mulgore is **Varia Hardhide**, not the Undercity cloth merchant. Walk to another town that sells it and the name follows. The tracker uses the same name.
 
-A quest reward says the level it can be picked up. A craft says the skill in green when you can make it, and red when you cannot. A burnt mark means the item is new in Forever.
+A quest reward says the level it can be picked up, and the level GearQuest recommends you pick it up. The recommendation is four under the item level, and it is never lower than the level the quest actually starts. **Replica Crescent Necklace** recommends 25. A craft says the skill in green when you can make it, and red when you cannot. A burnt mark means the item is new in Forever.
 
 A reputation vendor also says the standing this character has. **Ratchet Wristwraps** reads **Requires Friendly with Ratchet. Your standing is Neutral.** That clause is red while you are short and green once you have reached it. **You have not met this faction yet** appears only when your reputation list has no row for that faction.
 
@@ -167,7 +167,7 @@ A ding builds the new list one slot at a time, with a spare frame between slots,
 Update to **v0.5.3-beta** or newer and `/reload`. The window title shows the version. That version stopped the bag hover from loading every other piece in the slot. If it still happens, comment the item name and the version in the title.
 
 **Why does Main Hand show a two-hander?**
-Weapons is one header. The arrow before the (i) is the filter. Two-hand and one-hand can both be on, and under each are the weapon types in this level band. Enhancement is two-hand only. Holy, Shockadin, Elemental, and Restoration start with both on, so a staff or another two-hander sits beside the one-hander. The shield stays its own slot. Hunters can dual wield. Shamans cannot. Rogues hunt one-hand axes. Assassination and Subtlety stay on daggers in the main hand. Combat uses the axe. Rank numbers stay the real ones when a type is hidden.
+Weapons is one header. The arrow before the (i) is the filter. Two-hand and one-hand can both be on, and under each are the weapon types in this level band. Enhancement is two-hand only. Holy, Shockadin, Elemental, and Restoration start with both on, so a staff or another two-hander sits beside the one-hander. The shield stays its own slot. Hunters can dual wield. Shamans cannot. Rogues hunt one-hand axes, swords, maces, fists, and daggers on every spec. Assassination and Subtlety are not dagger lists. Main Hand and Off Hand each list the types in this level band. A one-hand weapon stays while either hand still allows that type. Combat still scores the axe highly. Rank numbers stay the real ones when a type is hidden.
 
 *Screenshot 11 — a hunter's weapon headers, if you have the room.*
 
@@ -237,7 +237,10 @@ The list is every spec from 1 to 60. A ding, a zone change, and opening a cold l
 The folder must be `Interface/AddOns/GearQuestForever`. This is not the TBC Anniversary GearQuest. The two can be installed together. `/reload`, or restart the client.
 
 **A gamepad popup locks the game when I close the map.**
-That was fixed. If it still happens, comment the version in the window title and what you clicked.
+That was fixed. If it still happens, comment the version in the window title and what you clicked. While the log is open in gamepad UI, the pad drives it: the arrows and the left stick move a highlight, the bottom face button activates it, the right face button closes, and the bumpers change page. Mouse mode does not turn that on. The map still has no GearQuest pin frames while the gamepad UI is on.
+
+**Where is the enchant?**
+**Hunts → Recommended gear enchantment** is off until you turn it on. The tooltip then says **Recommended enchantment** in yellow, then the formula and the effect in white, just above the rank line. It works while you are simulating. You do not need to be an enchanter, a leatherworker, or an engineer. A scope is for a bow, a gun, or a crossbow. A wand does not get one. Armor on that line counts for a tank only.
 
 **I do not want one specific hunt.**
 Open it and press **Remove**. Restore brings it back.

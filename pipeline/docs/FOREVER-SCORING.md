@@ -409,7 +409,7 @@ indexed, that is every published camp the pattern under **Map tracking**
 keeps, not one pin taken from the page. `NearestCoordinateSpot` then offers
 the closest of those spots to wherever the player is standing.
 
-A new hunt also matches the description the other hunts of that source already use. A quest reward from a chain lists every Wowhead series step from the first quest through the quest that rewards the item, then `This quest can be picked up at level N.` A single quest has that pickup line and no step list. A vendor names the seller on the pin, the coin price, and any reputation or honor sentence after the first period. A boss drop and dungeon trash pin the entrance, and a dungeon with an attunement gets the access line. A world drop names the creature and the camp. An empty source stays Unsourced. Do not invent a pin, a price, or a chain step.
+A new hunt also matches the description the other hunts of that source already use. A quest reward from a chain lists every Wowhead series step from the first quest through the quest that rewards the item, then `This quest can be picked up at level N.` The next line is `Recommended to pick this quest up at level M.` M is the item level minus 4, the same wait as Manageable Quests, and it stops at 60. When that quest cannot be picked up until a higher level, M is that pickup level. A missing item level skips that line. A single quest has the pickup line and no step list. A vendor names the seller on the pin, the coin price, and any reputation or honor sentence after the first period. A boss drop and dungeon trash pin the entrance, and a dungeon with an attunement gets the access line. A world drop names the creature and the camp. An empty source stays Unsourced. Do not invent a pin, a price, or a chain step.
 
 `sync_forever_item_stats.py` dry-run first. `--apply` only when the parse of
 known items is sane (Imperial Plate Helm **18/17** Str/Sta, not 38 from the
@@ -599,6 +599,66 @@ Bags, quivers, and ammo are skipped. **General → GearQuest score on
 tooltips** is on unless `settings.showGearScore` is false. Off hides the
 line on item tooltips and the (i) list. The hunt order does not change.
 
+**Hunts → Recommended gear enchantment** (`settings.showGearEnchant`) is
+off until the player turns it on. The checkbox reads **Recommended gear
+enchantment**. The hint is **Enable the recommended enchantment line on
+gear tooltips**. The gear tooltip then adds one line immediately above the
+rank line, including while the score line is off and while simulation is
+on. Simulation still replaces the rank line with **Turn off simulation
+mode to see your GearQuest Score for this item.** The enchant line uses
+the class and spec on screen. Only the words **Recommended enchantment**
+are yellow. The rest is white: the formula name, then the effect. A score
+of zero draws nothing.
+
+The formula is the best one this level can reach for the spec on screen.
+Enchanting formulas, armor kits, and scopes are for every character. You
+take a piece to an enchanter. Anyone can apply a bought armor kit or a
+scope. The level decides how high a formula is in reach: under 10 the cap
+is 75, under 20 it is 150, under 35 it is 225, and after that it is 300.
+A formula stored above 300 counts as 300. A kit or a scope also keeps its
+own required level, and a kit keeps the minimum item level on its Use
+line. An unknown item level leaves those kits off. Wowhead Forever does
+not list a tailoring embroidery, an enchanter-only ring enchant, or any
+other worn effect that says only one profession can wear it. A formula's
+**Requires Enchanting** line is the recipe, not a wearer lock. Necklace
+formulas are for everyone. Until a spell says only one profession can
+wear it, nothing is hidden for lack of a profession.
+
+Armor on an enchant counts for a tank only: warrior Protection, paladin
+Protection, druid Bear, and shaman Enhancement Tank. Every other spec
+scores the enchant's other stats and ignores its armor. Hunt scores are
+unchanged. Flat stats use the same weights as the hunt, including the
+leveling multipliers through 60. A weapon proc is a judgment of what the
+effect does. Insight is the healer proc. Revelation is the caster proc.
+Recovery, Fiery Weapon, Crusader, Grand Crusader, and Lifestealing are
+the melee and tank procs. A flat stat can still win at 60 when the
+weights say so.
+
+Wrists, chest, hands, feet, cloak, neck, shield, and weapons have
+formulas. Legs take an armor kit. The chest, hands, feet, and legs share
+the kits. **Light Armor Kit** is +1 Stamina and +8 Armor. **Medium** is
++2 Stamina and +16 Armor. **Heavy** is +3 Stamina and +24 Armor, requires
+20, and goes on items level 15 and above. **Thick** is +4 Stamina and +32
+Armor at 30, items 25+. **Rugged** is +5 Stamina and +40 Armor at 40,
+items 35+. The Forceful kits add attack power and the Mystic kits add
+spell power, on the same armor. **Mystic Rugged Armor Kit** is +6 Spell
+Power and +40 Armor, requires 50, and the pattern requires Leatherworking
+235. The pattern page's Use sentence that says 75 and 0 is a broken
+description. Spell 1254770 says Spell Power +6 and Armor +40.
+**Enchant Cloak - Defense** is +30 Armor (spell 13635). **Greater
+Defense** is +60 (13746). **Superior Defense** is +70 (20015). A non-tank
+still prefers agility on a cloak.
+
+A scope is only a bow, a gun, or a crossbow. The client names those
+**Bows**, **Guns**, and **Crossbows**. **Crude Scope** is +1 ranged
+damage at level 5, **Standard** +2 at 10, **Accurate** +3 at 20,
+**Deadly** +5 at 30, and **Sniper** +7 at 40. A wand, a thrown weapon, a
+fishing pole, a ring, and a trinket have no line. The enchant line uses
+`GetItemInfoInstant` and does not call `GetItemInfo` on an id the client
+has not already cached. A hover down the hunt list must not request every
+piece. Rebuilding a tooltip clears the enchant flag with the rank flag,
+or the line disappears on the refresh.
+
 Comparison is `index(hovered) − index(equipped)`, rounded. A positive delta
 is the green `GQ-ArrowUp.png` and a green **+N**. A negative delta is the
 red `GQ-ArrowDown.png` and a red **−N**. The Forever font has no arrows
@@ -612,7 +672,7 @@ The active hunt list points at the next hunt with the raw pipeline score, not th
 
 Each hunt row shows a small item icon immediately before the name, the same height as the row font. A question mark stands in until the client has the icon. Slot headers stay the plus and minus. In the collapse-icon column, every hunt row shows `#N` in faded grey. N is that piece's place on the (i) rank tooltip (`GetSlotRankList`), including `#4` and later when an earlier piece was already obtained. Stored `curatedRank` is not that number: it still counts pieces this faction cannot see. **Leafre's Ring** can be stored rank 2 and still be `#1` on the list. A faction hole closes up, so the list number matches the tooltip.
 
-A quest reward states `This quest can be picked up at level N.` on the line just before Source. N is the stored required level, the same gate the hunt list uses. Skip the line when that level is missing. The line is green when this character (the simulated level, when simulation is on) is at that level or above, and red when they are below. A reward from a chain of at least two quests lists the Wowhead series from the first quest through the quest that gives the item, and no later quest. Each step the character has not completed stays in the parchment color and ends with `- not completed yet`. A completed step ends with `- completed` in green. A single quest does not get that list.
+A quest reward states `This quest can be picked up at level N.` on the line just before Source. N is the stored required level, the same gate the hunt list uses. Skip the line when that level is missing. The line is green when this character (the simulated level, when simulation is on) is at that level or above, and red when they are below. The following line is `Recommended to pick this quest up at level M.` M is the item level minus 4, the same wait as Manageable Quests, never past 60, and at least 1. When that quest cannot be picked up until a higher level, M is that pickup level. A missing item level skips it. That line uses the same green and red. **Replica Crescent Necklace** (281290) recommends 25, because the quest cannot be picked up until 25, which is above the item level minus 4. The pickup line stays the earliest the quest can be taken. A reward from a chain of at least two quests lists the Wowhead series from the first quest through the quest that gives the item, and no later quest. Each step the character has not completed stays in the parchment color and ends with `- not completed yet`. A completed step ends with `- completed` in green. A single quest does not get that list.
 
 A vendor hunt states the price on its own line, `Costs` followed by the same icons the game uses, with the number beside each icon. The number is the price of the seller named on the line when Wowhead's sellers disagree. Gold, silver, and copper use the money-frame coins. Honor uses the faction honor icon when Wowhead lists honor. A mark or other token uses that token's item icon, with the count, when Wowhead lists it. The old sentence `Costs Honor Points and tokens (Marks of Honor).` is left off once that line is present. A rank-named purchase states the required rank on the line just before Source (`Requires Sergeant (Rank 3).`). A reputation requirement is printed for every source that stores one, not only vendors, and the character's standing is green or red the same way. A boss, trash, world, or rare drop in Onyxia's Lair says the lair requires the Drakefire Amulet.
 
@@ -788,7 +848,9 @@ The source **Filter** closes on a click outside the menu. The Profession
     world drops stay. Replaces **Don't look back**.
   - **Manageable Quests** (`playManageableQuests`) hides a quest reward
     until the viewed level reaches 4 under
-    that item's level (`ilvl` on the fact). Sprightring Helm is 49, so it
+    that item's level (`ilvl` on the fact). When the quest cannot be
+    picked up until a higher level, the wait uses that pickup level.
+    Sprightring Helm is 49, so it
     stays hidden until 45. Clergy Ring is 22, so a level 13 list hides it
     and it can show from 18. The floor is `min(ilvl - 4, 60)`, so Cloak of
     the Fallen God (item level 88) still shows at 60. A missing item level
@@ -1368,11 +1430,16 @@ character panel bar shows either-hand weapons only (InventoryType 13,
 One-Hand), because a main-hand weapon cannot be equipped there. The Off
 Hand paper-doll slot is that either-hand list. Enhancement shows the **Two-hand** block only. No one-hand list
 and no off-hand list. Forever Enhancement does not dual wield.
-Rogue **Main Hand** is the tooltip line Main Hand. Rogue **Off Hand** is
-One-Hand and Off Hand, the same split as every other dual-wield spec. For
-every class, the printed weapon damage is the damage in either hand. A
-caster dagger that only says Main Hand stays on the main-hand list and
-ranks on its weapon damage.
+Rogue **Main Hand** and **Off Hand** each list the one-hand types in the
+current band. Assassination, Combat, and Subtlety are not dagger-locked.
+Each lists the daggers, swords, maces, axes, and fists a rogue can equip.
+Combat still scores the axe highly. A One-Hand weapon belongs to both
+hands, so a type can be off under one hand and on under the other.
+Main-hand-only stays under Main Hand. Off-hand-only stays under Off Hand.
+The hunt keeps a One-Hand weapon while either hand still allows that type. For every class, the
+printed weapon damage is the damage in either hand. A caster dagger that
+only says Main Hand stays on the main-hand list and ranks on its weapon
+damage.
 
 | Who | Main Hand header | Off Hand header |
 |---|---|---|
@@ -1380,7 +1447,7 @@ ranks on its weapon damage.
 | Druid, paladin/warrior levelling when a route exists | Two-hand or main hand | Off Hand |
 | Enhancement | Two-hand | (no off-hand list) |
 | Hunter | Two-hand, then a Main hand list of main-hand-only weapons | Off Hand is either-hand only, and that is the character panel bar. The ranged slot title is **Ranged** |
-| Rogue (combat, assassination, subtlety) | Tooltip Main Hand | One-Hand and Off Hand |
+| Rogue (combat, assassination, subtlety) | One-Hand and Main Hand, types under that hand | One-Hand and Off Hand, types under that hand |
 | Warrior Fury | Dual wield | Off Hand |
 | Paladin Retribution, Warrior Arms | Two-hand | Off Hand |
 | Paladin Protection, Warrior Protection, Shaman Enhancement Tank | Main Hand | Shield |
@@ -1435,10 +1502,11 @@ a shaman can equip. **Odo's Ley Staff** (6318) is Restoration rank 2 at
 The two-hand slice reserves staves so a mace does not crowd the staff out.
 Enhancement stays two-hand only. Shamans cannot dual wield.
 
-Rogues include one-hand axes. Assassination and Subtlety stay dagger-locked
-in the main hand (`mainHandKinds` is Dagger: Backstab, Ambush, and Mutilate).
-Combat uses the axe. **Axe of the Deep Woods** (811) is a main-hand axe and
-rank 1 for Horde Combat at 52–59. The first view follows the spec: two-hand
+Rogues include one-hand axes, swords, maces, fists, and daggers on every
+spec. Assassination and Subtlety are not dagger-locked. The Weapons menu is
+where a player turns a type off for one hand. Combat still scores the axe
+highly. **Axe of the Deep Woods** (811) is a main-hand axe and rank 1 for
+Horde Combat at 52–59. The first view follows the spec: two-hand
 for a hunter, a feral druid, an arms warrior, a retribution paladin, or
 enhancement; one-hand for a rogue, a fury warrior, or a shield spec. Holy,
 Shockadin, Elemental, and Restoration start with both styles on.
@@ -2000,6 +2068,15 @@ provider, or `Hide()` on a pin while the map hides, calls
 talking to an NPC stop working after the map closes. While the gamepad UI
 is on (`InputDeviceInterfaceStyle` is `1` or contains `gamepad`), the canvas
 gets no frames. Show on map and the guide still set the Blizzard user waypoint.
+The log itself takes the pad while it is open. The arrows and the left
+stick move a gold highlight. The bottom face button activates it. The
+right face button closes a filter, the spec menu, or the weapon menu, and
+closes the log when nothing else is open. The bumpers move between Log,
+Lookup, Simulator, and Settings. Holding a direction keeps moving. A
+slider steps left and right. The simulator level box steps by one, from 1
+to 60. Confirm is a left click, so a spec row selects that spec. The
+highlight ticks only while the log is open. Mouse mode never starts it.
+Closing the log stops it. Do not parent pin frames to the map in this mode.
 Pins are placed from the addon's own update only while the map is shown.
 The world-drop icon is the addon picture `GQ-WorldDrop.png`. The icon keeps
 its size when the map zooms. The same pin is translated onto a continent

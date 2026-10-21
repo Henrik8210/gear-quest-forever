@@ -4310,6 +4310,7 @@ function GQ.Data:RefreshPendingTooltip(tooltip, entry, forceFallback)
     tooltip.gqItemInfoRefreshing = true
     tooltip.gqSkipScoreHook = true
     tooltip.gqScoreLineAdded = nil
+    tooltip.gqEnchantAdded = nil
     if forceFallback then
         if not self:ShowForeverItemTooltip(tooltip, entry) then
             self:ShowFactFallbackTooltip(tooltip, entry)
@@ -4690,6 +4691,7 @@ function GQ.Data:ShowEntryItemTooltip(tooltip, owner, entry, anchor, ...)
 
     tooltip.gqSkipScoreHook = true
     tooltip.gqScoreLineAdded = nil
+    tooltip.gqEnchantAdded = nil
     tooltip:SetOwner(owner, anchor or "ANCHOR_RIGHT", ...)
     self:PopulateEntryItemTooltip(tooltip, entry)
     self:ApplyImbueTooltipLines(tooltip, entry.itemId)
@@ -6353,21 +6355,29 @@ function GQ.Data:GearScoreTooltipEnabled()
 end
 
 function GQ.Data:AppendGearScoreLine(tooltip, entry)
-    if not self:GearScoreTooltipEnabled() then
-        return
-    end
     if not tooltip or not tooltip.AddLine or not entry or tooltip.gqScoreLineAdded then
         return
     end
-    local line, note = self:GearScoreTooltipLine(entry)
-    if not line then
+    local showScore = self:GearScoreTooltipEnabled()
+    local line, note
+    if showScore then
+        line, note = self:GearScoreTooltipLine(entry)
+    end
+    local enchant = GQ.Enchant and GQ.Enchant.Text and not tooltip.gqEnchantAdded and GQ.Enchant:Text(nil, entry)
+    if not line and not enchant then
         return
     end
     tooltip.gqScoreLineAdded = true
     tooltip:AddLine(" ")
-    tooltip:AddLine(line, 1, 1, 1)
-    if note then
-        tooltip:AddLine(note, 1, 1, 1)
+    if enchant then
+        tooltip.gqEnchantAdded = true
+        tooltip:AddLine(enchant, 1, 1, 1)
+    end
+    if line then
+        tooltip:AddLine(line, 1, 1, 1)
+        if note then
+            tooltip:AddLine(note, 1, 1, 1)
+        end
     end
 end
 
@@ -6435,9 +6445,6 @@ function GQ.Data:AddGearScoreToItemTooltip(tooltip)
     if not tooltip or tooltip.gqSkipScoreHook or tooltip.gqScoreLineAdded or tooltip.gqScoreBusy then
         return
     end
-    if not self:GearScoreTooltipEnabled() then
-        return
-    end
     local name = tooltip.GetName and tooltip:GetName()
     if name and string.find(name, "ShoppingTooltip", 1, true) then
         return
@@ -6446,27 +6453,54 @@ function GQ.Data:AddGearScoreToItemTooltip(tooltip)
         return
     end
     local _, link = tooltip:GetItem()
+    local scoreOn = self:GearScoreTooltipEnabled()
+    if not scoreOn then
+        if GQ.Enchant and GQ.Enchant.Text and not tooltip.gqEnchantAdded then
+            local enchant = GQ.Enchant:Text(link, nil)
+            if enchant then
+                tooltip.gqScoreLineAdded = true
+                tooltip.gqEnchantAdded = true
+                tooltip:AddLine(" ")
+                tooltip:AddLine(enchant, 1, 1, 1)
+            end
+        end
+        return
+    end
     tooltip.gqScoreBusy = true
     local entry = self:EntryForItemLink(link)
     if not entry then
         local miss = self:GearScoreMissText(link)
-        if not miss then
+        local enchant = GQ.Enchant and GQ.Enchant.Text and not tooltip.gqEnchantAdded and GQ.Enchant:Text(link, nil)
+        if not miss and not enchant then
             tooltip.gqScoreBusy = nil
             return
         end
         tooltip.gqScoreLineAdded = true
         tooltip:AddLine(" ")
-        tooltip:AddLine(miss, 0.69, 0.69, 0.69)
+        if enchant then
+            tooltip.gqEnchantAdded = true
+            tooltip:AddLine(enchant, 1, 1, 1)
+        end
+        if miss then
+            tooltip:AddLine(miss, 0.69, 0.69, 0.69)
+        end
         tooltip.gqScoreBusy = nil
         return
     end
     self:AppendGearScoreLine(tooltip, entry)
     if not tooltip.gqScoreLineAdded then
         local miss = self:GearScoreMissText(link)
-        if miss then
+        local enchant = GQ.Enchant and GQ.Enchant.Text and not tooltip.gqEnchantAdded and GQ.Enchant:Text(link, entry)
+        if miss or enchant then
             tooltip.gqScoreLineAdded = true
             tooltip:AddLine(" ")
-            tooltip:AddLine(miss, 0.69, 0.69, 0.69)
+            if enchant then
+                tooltip.gqEnchantAdded = true
+                tooltip:AddLine(enchant, 1, 1, 1)
+            end
+            if miss then
+                tooltip:AddLine(miss, 0.69, 0.69, 0.69)
+            end
         end
     end
     tooltip.gqScoreBusy = nil
@@ -6606,6 +6640,7 @@ function GQ.Data:HookItemScoreTooltips()
         tip.gqScoreClearHooked = true
         tip:HookScript("OnTooltipCleared", function(self)
             self.gqScoreLineAdded = nil
+            self.gqEnchantAdded = nil
         end)
     end
 
@@ -6999,10 +7034,19 @@ function GQ.Data:EntryFitsPaperDollSlot(entry, slotName, ignoreWeaponFilter)
         if not ok then
             return false
         end
-        if ignoreWeaponFilter or not (GQ.Log and GQ.Log.WeaponPassesFilter) then
+        if ignoreWeaponFilter or not (GQ.Log and GQ.Log.WeaponStyleEnabled and GQ.Log.WeaponTypeAllowed) then
             return true
         end
-        return GQ.Log:WeaponPassesFilter(entry)
+        local hand = "main"
+        if self:EntryIsTwoHand(entry) then
+            hand = "two"
+        elseif slotName == "SecondaryHand" then
+            hand = "off"
+        end
+        if not GQ.Log:WeaponStyleEnabled(hand) or not GQ.Log:WeaponTypeAllowed(entry, hand) then
+            return false
+        end
+        return true
     end
     if self:UsesTwoHandOnlyWeapons() then
         if slotName == "SecondaryHand" then
@@ -7023,7 +7067,9 @@ function GQ.Data:EntryFitsPaperDollSlot(entry, slotName, ignoreWeaponFilter)
     end
     if self:UsesRogueWeaponHands() then
         if slotName == "MainHand" then
-            return allow(self:EntryIsMainHandOnly(entry))
+            -- A One-Hand weapon can be worn in the main hand. Main-hand-only
+            -- stays here. Off-hand-only stays on the off-hand slot.
+            return allow(self:EntryIsMainHandOnly(entry) or self:EntryIsEitherHand(entry))
         end
         if slotName == "SecondaryHand" then
             return allow(self:EntryIsEitherHand(entry) or self:EntryIsOffHandOnly(entry))
@@ -7045,8 +7091,11 @@ function GQ.Data:EntryFitsPaperDollSlot(entry, slotName, ignoreWeaponFilter)
     end
     -- The paper doll and the popup follow the weapon filter. Bag arrows pass
     -- ignoreWeaponFilter so the unfiltered best still gets an arrow.
-    if not ignoreWeaponFilter and GQ.Log and GQ.Log.WeaponPassesFilter and not GQ.Log:WeaponPassesFilter(entry) then
-        return false
+    if not ignoreWeaponFilter and GQ.Log and GQ.Log.WeaponStyleEnabled and GQ.Log.WeaponTypeAllowed then
+        local hand = self:EntryIsTwoHand(entry) and "two" or (slotName == "SecondaryHand" and "off" or "main")
+        if not GQ.Log:WeaponStyleEnabled(hand) or not GQ.Log:WeaponTypeAllowed(entry, hand) then
+            return false
+        end
     end
     local style = self:EntryIsTwoHand(entry) and "two" or "one"
     return self:WeaponFitsPaperSlot(entry, slotName, style)
@@ -7377,11 +7426,41 @@ function GQ.Data:EntryIsDamagingWeapon(entry)
     return result
 end
 
--- Filter hands. For every spec that can dual wield, Main Hand is the tooltip
--- line "Main Hand". One-Hand weapons can sit in either slot, so they live
--- under Off Hand with off-hand-only weapons. Turning Off Hand off leaves
--- only the main-hand-only weapons. A spec that cannot dual wield has no Off
--- Hand section, so Main Hand keeps the one-handers.
+-- Hands a weapon can be worn in. For a dual-wield spec, a One-Hand weapon
+-- belongs to both Main Hand and Off Hand, so each hand can turn that type
+-- off on its own. Main-hand-only stays out of Off Hand. Off-hand-only stays
+-- out of Main Hand. A spec that cannot dual wield has no Off Hand, and Main
+-- Hand keeps the one-handers.
+function GQ.Data:WeaponCanEquipHand(entry, hand)
+    if hand ~= "two" and hand ~= "main" and hand ~= "off" then
+        return false
+    end
+    if not entry or not self:EntryIsDamagingWeapon(entry) then
+        return false
+    end
+    if hand == "two" then
+        return self:EntryIsTwoHand(entry)
+    end
+    if self:EntryIsTwoHand(entry) or self:UsesTwoHandOnlyWeapons() then
+        return false
+    end
+    local offOnly = entry.hand == "off" or self:EntryIsOffHandOnly(entry)
+    local mainOnly = entry.hand == "main" or (entry.hand ~= "off" and entry.hand ~= "one" and self:EntryIsMainHandOnly(entry))
+    if entry.hand == "one" then
+        mainOnly = false
+        offOnly = false
+    end
+    if hand == "off" then
+        if not self:CanDualWield() then
+            return false
+        end
+        return not mainOnly
+    end
+    return not offOnly
+end
+
+-- Tooltip split kept for style checks. The menu and the hunt use
+-- WeaponCanEquipHand, so a One-Hand weapon is listed under both hands.
 function GQ.Data:WeaponFitsFilterHand(entry, hand)
     if hand ~= "two" and hand ~= "main" and hand ~= "off" then
         return false
@@ -7441,9 +7520,6 @@ function GQ.Data:WeaponFitsPaperSlot(entry, slotName, style)
         offOnly = false
     end
     if slotName == "MainHand" then
-        if self:CanDualWield() then
-            return mainOnly
-        end
         return not offOnly
     end
     if slotName == "SecondaryHand" then

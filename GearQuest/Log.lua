@@ -590,6 +590,7 @@ local function ShowItemTooltipForRow(row)
 
     GameTooltip.gqSkipScoreHook = true
     GameTooltip.gqScoreLineAdded = nil
+    GameTooltip.gqEnchantAdded = nil
     GameTooltip:SetOwner(row, "ANCHOR_RIGHT")
     GQ.Data:PopulateEntryItemTooltip(GameTooltip, row.entry)
 
@@ -2919,16 +2920,38 @@ function GQ.Log:QuestRewardItemLevel(entry)
     return ilvl
 end
 
-function GQ.Log:ItemLevelTooSoon(entry)
+-- Same wait as Manageable Quests: 4 under the item level, and never past 60.
+-- A quest that cannot be picked up until later uses that pickup level, so
+-- the recommendation is never lower than the level the quest actually starts.
+function GQ.Log:QuestRewardRecommendedLevel(entry)
     local ilvl = self:QuestRewardItemLevel(entry)
     if not ilvl then
-        return false
+        return nil
     end
     local floor = ilvl - 4
     if floor > 60 then
         floor = 60
     end
     if floor < 1 then
+        floor = 1
+    end
+    local src = entry and (GQ.NormalizeSourceType and GQ:NormalizeSourceType(entry.sourceType or "") or entry.sourceType or "")
+    if src == "quest_reward" and entry.itemId and GQ.Data and GQ.Data.GetItemFact then
+        local fact = GQ.Data:GetItemFact(entry.itemId)
+        local pickup = fact and tonumber(fact.reqLevel)
+        if pickup and pickup > floor then
+            floor = pickup
+        end
+        if floor > 60 then
+            floor = 60
+        end
+    end
+    return floor
+end
+
+function GQ.Log:ItemLevelTooSoon(entry)
+    local floor = self:QuestRewardRecommendedLevel(entry)
+    if not floor then
         return false
     end
     local level = GQ.GetEffectiveLevel and GQ:GetEffectiveLevel() or 1
@@ -3260,10 +3283,15 @@ function GQ.Log:PlayerFactionStandings()
 end
 
 function GQ.Log:PlayerProfessionRanks()
-    if not self._playerProf then
-        self._playerProf = self:ReadProfessionRanks()
+    local cached = self._playerProf
+    if type(cached) == "table" and next(cached) then
+        return cached
     end
-    return self._playerProf
+    local ranks = self:ReadProfessionRanks()
+    if type(ranks) == "table" and next(ranks) then
+        self._playerProf = ranks
+    end
+    return ranks or {}
 end
 
 function GQ.Log:SameRankMap(previous, current)
@@ -10075,6 +10103,53 @@ function GQ.Log:EnsureSettingsPage(frame)
     guideHint:Hide()
     frame.settingsGuideHint = guideHint
 
+    local enchantLabel = CreateFontStringWithFallback(detail, QUEST_DETAIL_TITLE_FONTS)
+    enchantLabel:SetJustifyH("LEFT")
+    enchantLabel:SetText("Recommended gear enchantment")
+    enchantLabel:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    frame.settingsEnchantLabel = enchantLabel
+
+    local enchantHit = CreateFrame("Button", nil, detail)
+    enchantHit:SetPoint("TOPLEFT", guideHint, "BOTTOMLEFT", 0, -16)
+    enchantHit:SetSize(math.max(enchantLabel:GetStringWidth() or 0, 1) + 4, math.max(enchantLabel:GetStringHeight() or 0, 18))
+    enchantLabel:SetParent(enchantHit)
+    enchantLabel:ClearAllPoints()
+    enchantLabel:SetPoint("LEFT", enchantHit, "LEFT", 0, 0)
+    enchantHit:Hide()
+    frame.settingsEnchantLabelHit = enchantHit
+
+    local function ApplyEnchantCheck(checked)
+        GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+        GearQuestForeverDB.settings.showGearEnchant = checked and true or false
+    end
+
+    local enchantCheck = CreateSettingsCheck(detail, "")
+    enchantCheck:SetPoint("RIGHT", enchantHit, "LEFT", -6, 0)
+    if enchantCheck.text then
+        enchantCheck.text:SetText("")
+        enchantCheck.text:Hide()
+    end
+    enchantCheck:SetScript("OnClick", function(self)
+        ApplyEnchantCheck(self:GetChecked())
+    end)
+    enchantHit:SetScript("OnClick", function()
+        local checked = not enchantCheck:GetChecked()
+        enchantCheck:SetChecked(checked)
+        ApplyEnchantCheck(checked)
+    end)
+    enchantCheck:Hide()
+    frame.settingsEnchantCheck = enchantCheck
+
+    local enchantHint = CreateFontStringWithFallback(detail, SETTINGS_NOTE_FONTS)
+    enchantHint:SetPoint("TOPLEFT", enchantHit, "BOTTOMLEFT", 0, -4)
+    enchantHint:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
+    enchantHint:SetJustifyH("LEFT")
+    enchantHint:SetWordWrap(true)
+    enchantHint:SetText("Enable the recommended enchantment line on gear tooltips")
+    enchantHint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
+    enchantHint:Hide()
+    frame.settingsEnchantHint = enchantHint
+
     local creditsTitle = CreateFontStringWithFallback(detail, QUEST_DETAIL_TITLE_FONTS)
     creditsTitle:SetPoint("TOPLEFT", pageTitle, "BOTTOMLEFT", 0, -12)
     creditsTitle:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
@@ -10516,6 +10591,9 @@ function GQ.Log:SetSettingsSection(section)
         frame.settingsGuideLabelHit,
         frame.settingsGuideCheck,
         frame.settingsGuideHint,
+        frame.settingsEnchantLabelHit,
+        frame.settingsEnchantCheck,
+        frame.settingsEnchantHint,
     }, section == "hunts")
     local showCredits = section == "credits"
     setShown({
@@ -10717,6 +10795,24 @@ function GQ.Log:RefreshSettings()
         end
         if height and height > 1 then
             toastHit:SetHeight(height)
+        end
+    end
+
+    local enchantCheck = frame.settingsEnchantCheck
+    if enchantCheck then
+        local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+        enchantCheck:SetChecked(settings and settings.showGearEnchant and true or false)
+    end
+    local enchantLabel = frame.settingsEnchantLabel
+    local enchantHit = frame.settingsEnchantLabelHit
+    if enchantLabel and enchantHit and enchantLabel.GetStringWidth then
+        local width = enchantLabel:GetStringWidth()
+        local height = enchantLabel.GetStringHeight and enchantLabel:GetStringHeight()
+        if width and width > 1 then
+            enchantHit:SetWidth(width + 4)
+        end
+        if height and height > 1 then
+            enchantHit:SetHeight(height)
         end
     end
 end
@@ -12335,6 +12431,16 @@ function GQ.Log:BuildDetailLines(entry)
                 math.floor(pickup)
             ))
         end
+        local recommended = self.QuestRewardRecommendedLevel and self:QuestRewardRecommendedLevel(entry)
+        if type(recommended) == "number" and recommended >= 1 then
+            local level = GQ.GetEffectiveLevel and GQ:GetEffectiveLevel() or 1
+            local color = level >= recommended and "|cff0c4a1c" or "|cff6e1212"
+            table.insert(lines, string.format(
+                "\n%sRecommended to pick this quest up at level %d.|r",
+                color,
+                math.floor(recommended)
+            ))
+        end
     end
 
     if src == "vendor" and GQ.Data and GQ.Data.VendorCostLine then
@@ -13679,13 +13785,13 @@ function GQ.Log:WeaponPassesFilter(entry)
         end
         return self:WeaponTypeAllowed(entry, "two")
     end
-    -- Main Hand and Off Hand do not overlap. A tooltip "Main Hand" leaves
-    -- when Main Hand is off. A One-Hand weapon, and an Off Hand weapon,
-    -- leave when Off Hand is off.
+    -- A One-Hand weapon stays while either hand still allows that type.
+    -- Main-hand-only leaves when Main Hand is off. Off-hand-only leaves
+    -- when Off Hand is off.
     local hands = { "main", "off" }
     for i = 1, #hands do
         local hand = hands[i]
-        if GQ.Data:WeaponFitsFilterHand(entry, hand) and self:WeaponStyleEnabled(hand) and self:WeaponTypeAllowed(entry, hand) then
+        if GQ.Data:WeaponCanEquipHand(entry, hand) and self:WeaponStyleEnabled(hand) and self:WeaponTypeAllowed(entry, hand) then
             return true
         end
     end
@@ -13713,7 +13819,7 @@ function GQ.Log:WeaponTypesForStyle(style)
     local seen = {}
     local pool = self:CollectWeaponPool()
     for i = 1, #pool do
-        if self:WeaponMenuEntryVisible(pool[i]) and GQ.Data:WeaponFitsStyle(pool[i], style) then
+        if self:WeaponMenuEntryVisible(pool[i]) and GQ.Data:WeaponCanEquipHand(pool[i], style) then
             local kind = GQ.Data:WeaponTypeOf(pool[i])
             if kind then
                 seen[kind] = true
@@ -13738,13 +13844,13 @@ function GQ.Log:WeaponStylesAvailable()
     local hasTwo, hasMain, hasOff = false, false, false
     for i = 1, #pool do
         local entry = pool[i]
-        if GQ.Data:WeaponFitsFilterHand(entry, "two") then
+        if GQ.Data:WeaponCanEquipHand(entry, "two") then
             hasTwo = true
         end
-        if GQ.Data:WeaponFitsFilterHand(entry, "main") then
+        if GQ.Data:WeaponCanEquipHand(entry, "main") then
             hasMain = true
         end
-        if GQ.Data:WeaponFitsFilterHand(entry, "off") then
+        if GQ.Data:WeaponCanEquipHand(entry, "off") then
             hasOff = true
         end
     end
@@ -13776,13 +13882,13 @@ function GQ.Log:WeaponStylesForMenu()
     for i = 1, #pool do
         local entry = pool[i]
         if self:WeaponMenuEntryVisible(entry) then
-            if GQ.Data:WeaponFitsFilterHand(entry, "two") then
+            if GQ.Data:WeaponCanEquipHand(entry, "two") then
                 hasTwo = true
             end
-            if GQ.Data:WeaponFitsFilterHand(entry, "main") then
+            if GQ.Data:WeaponCanEquipHand(entry, "main") then
                 hasMain = true
             end
-            if GQ.Data:WeaponFitsFilterHand(entry, "off") then
+            if GQ.Data:WeaponCanEquipHand(entry, "off") then
                 hasOff = true
             end
         end
@@ -14655,6 +14761,9 @@ function GQ.Log:Show()
     end
 
     self:ScheduleAutoCompletionCheck()
+    if self.GamepadAcquire then
+        self:GamepadAcquire()
+    end
 end
 
 function GQ.Log:LookupClassName()
@@ -15526,6 +15635,9 @@ function GQ.Log:PlaceDetailPanel(frame)
 end
 
 function GQ.Log:Hide()
+    if self.GamepadRelease then
+        self:GamepadRelease()
+    end
     self:HideSpecPicker()
     if self:GetPageTab() == "lookup" then
         self:ReleaseLookupIndex()

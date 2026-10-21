@@ -1058,10 +1058,10 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                 if not eligible(it,cls,spec_key and spec_key or "",level,faction,prof,wsubs): continue
                 sl=slot_for(it,cls)
                 if sl=="MainHand":
-                    # A spec whose core abilities REQUIRE a weapon type. Backstab,
-                    # Ambush and Mutilate are dagger-only, so an assassination or
-                    # subtlety rogue holding a sword loses its whole rotation -- a
-                    # hard mechanical gate, like plate proficiency, not a preference.
+                    # Optional. A spec sets mainHandKinds only when a weapon type
+                    # cannot be equipped. Rogue specs do not: classic Subtlety and
+                    # Assassination are not a dagger lock, and the Weapons menu
+                    # is where the player turns a type off.
                     if mhKinds and it["kind"] not in mhKinds: continue
                     twoh = it["inv"]==17
                     if style=="twohand" and not twoh and level>=20: continue
