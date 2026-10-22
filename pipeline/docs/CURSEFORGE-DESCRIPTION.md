@@ -38,6 +38,20 @@ Each row is a piece for that slot. The grey number is its rank. It matches the (
 
 A piece you already have leaves the list on that character only. Another character still sees it.
 
+**Hunts per gear slot** is the slider at the lower left of the log. It runs from 3 to 10. 3 is the default. The number shows while you drag, and the list updates when you let go. The choice is saved on the account, including while you are simulating. That number is how many hunts a slot still shows after the filter and the play style. Rank numbers stay the real ones. The character panel, the obtain toast, and **Recommended** stay on rank 1, 2, and 3. A green arrow is on a hunt that beats what you are wearing, including a later rank the slider put on the list.
+
+---
+
+### The GearQuest Knight
+
+*Screenshot — the parchment bubble above the portrait, page 1, the Yes button.*
+
+The portrait in the corner introduces the log the first time you open GearQuest on an account. Leave the window up for 5 seconds. He fades in, and he speaks. The title on the bubble is **The GearQuest Knight**. Logging in does not start him. Closing the window during the wait does not count. Once he has appeared, a reload does not play it again. Click the portrait any time to hear him from the first page.
+
+Page 1 has a **Yes!** button and no arrows. From page 2 the arrows and the counter run **2/12** through **12/12**. **X** dismisses him. The speaker mutes the voice. **−** and **+** are the three volumes, and 2 is the default. A gold glow marks what that page is about: the hunt list, the (i) and the slider, Filter and Play style, the parchment, Track and the map, the score bar and the spec picker, Lookup, the Simulator, and Settings. The last page glows the whole window.
+
+With a gamepad, the bubble takes the pad. A selects **Yes!**, the arrows, the volume, mute, and **X**. The bumpers change his page. B closes the bubble first.
+
 ---
 
 ### Look something up

@@ -994,6 +994,9 @@ function GQ.Indicator:RebuildCacheForSlot(slotName)
         if not entry or not entry.itemId or hide or items[entry.itemId] then
             return
         end
+        if GQ.Log and GQ.Log.EntryIsListedUpgrade and not GQ.Log:EntryIsListedUpgrade(entry, slotName) then
+            return
+        end
         items[entry.itemId] = true
         local itemName = (GQ.Data.GetItemDisplayName and GQ.Data:GetItemDisplayName(entry.itemId))
             or self.itemNameCache[entry.itemId]
@@ -1010,8 +1013,10 @@ function GQ.Indicator:RebuildCacheForSlot(slotName)
         end
     end
 
-    -- Unfiltered best pieces keep the arrow when a filter or a play style
-    -- hides them. The rows still on the hunt list keep one too.
+    -- Unfiltered rank 1–3 keep the arrow when a filter or a play style
+    -- hides them, and only when the piece is an upgrade. The rows still on
+    -- the hunt list keep one too, including a later rank the slider showed,
+    -- again only when it beats what is worn.
     -- Weapons stay on the weapon list. Armor and ranged fill from the rank
     -- list, so owning one rank still leaves an arrow on the piece that replaced it.
     local weaponSlot = slotName == "MainHand" or slotName == "SecondaryHand"

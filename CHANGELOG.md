@@ -2,61 +2,59 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.0.3
+## v1.0.4
 
-The window title reads **GearQuest Forever v1.0.3**. The reward name uses the item's rarity color. A flyout can select or clear every box on that list. A boss drop says when to enter the dungeon. The guide still finds the ship when the client is not English. Every class was scored again, so the new Forever pieces and the corrected dungeon drops are on the lists.
+The window title reads **GearQuest Forever v1.0.4**. The log can show more than three hunts in a slot. The first time you open GearQuest on an account, The GearQuest Knight introduces the window, out loud, and a gold glow marks what he is talking about.
 
-### The reward
+### Hunts per gear slot
 
-The name under REWARD uses the item's rarity color. **Feline Mantle** and **Garb of Florid Feathers** are rare, so that name is blue. An uncommon name is green, and an epic name is purple. The strip behind the name is darker than the parchment, so the blue reads.
+A slider at the lower left of the log reads **Hunts per gear slot**. It runs from 3 to 10. 3 is the default. The number shows while you drag, and the list updates when you let go. The choice is saved on the account, including while you are simulating.
 
-### When to enter
+That number is how many hunts a slot still shows after the source filter and the play style, skipping pieces you already have or removed. Rank numbers stay the real ones. A slot that is showing its fourth piece still says **#4**. Weapons stay one header. Narrowing Weapons to daggers still shows up to that many daggers, each with its own rank.
 
-A boss drop and a dungeon or raid trash hunt say **Recommended dungeon entry at level N.** N is four under the item level, and it stops at 60. The line is green once the level you are viewing has reached it, and red before that. **Garb of Florid Feathers** is item level 31, so the line says 27. A quest reward still says **Recommended to pick this quest up at level M.**
+The character panel, the obtain toast, and **Recommended** stay on rank 1, 2, and 3. A green arrow is on a hunt that beats what you are wearing, including a later rank the slider put on the list. An empty slot counts. While you are simulating there is nothing worn to compare, so the listed hunts keep the arrow.
 
-### Select all on a flyout
+### The GearQuest Knight
 
-Boss drop, Dungeon & Raid trash, Profession, and Vendor each have **Select all** and **Deselect all**. That button changes only the boxes on that flyout. The button on the main filter still changes every source, and every flyout, at once.
+The portrait in the corner of the log is the guide. Logging in does not open him. The first time you open GearQuest on an account, leave the window up for 5 seconds. The parchment fades in above the portrait, the tail sits just above him, and he speaks. The title on the bubble is **The GearQuest Knight**.
 
-### The guide in another language
+Closing the window during those 5 seconds does not count. The next time you open GearQuest, he waits again. Once the bubble has appeared, a reload or a later login does not play it. Click the portrait to start from the first page again. Click it while he is already talking to hear the current page again.
 
-On another continent the arrow still aims at the ship, zeppelin, or skycutter when the client is not English. The dock is found from the map, so a translated zone name does not skip the boat. The words on the arrow stay **Ship**, **Zeppelin**, and **Skycutter**.
+Page 1 asks if you are ready. It has a **Yes!** button and no arrows. **Yes!** goes to page 2. From page 2 the back and forward arrows and the counter are there: **2/12** through **12/12**. **X** dismisses him.
 
-### Excavation Site
+Voice is on. The speaker at the lower right mutes him. **−**, the number, and **+** sit just to the left of that speaker. There are three volumes. 2 is the default. Changing the volume plays the current page again. Mute stops the voice.
 
-**Shadetooth** and **Saltspine** are bosses in Excavation Site. The pin is the entrance in the Wetlands, 47.8, 56.3.
+A gold glow marks what the page is about, and only while you are on that tab.
 
-**Garb of Florid Feathers** drops from Shadetooth. It is chest rank 1 at 26 through 28 for Beast Mastery and Marksmanship, both factions, and for Horde Enhancement. Alliance Enhancement hunts it at 28.
+Page 1 glows the GearQuest Log handle, then waits for **Yes!**.
 
-**Raptorclaw Greaves** drop from Shadetooth. They are feet rank 1 at 26 for Protection, Arms, and Fury, and for Retribution from 26 through 34 on Alliance and through 35 on Horde.
+Page 2 glows Active, Completed, Removed, and the hunt list. He explains the top 3 and the right-click list on the character panel.
 
-**Raptor's Gaze** drops from Shadetooth. It is the off hand rank 1 from 26 through 31 for every mage spec, every warlock spec, Balance, and Shadow. Holy paladin hunts it at 26.
+Page 3 glows the (i) beside a slot title and the **Hunts per gear slot** slider.
 
-**Glinteye Slippers** drop from Saltspine. They are feet rank 1 at 26 for Holy and Shadow, and from 26 through 29 for Affliction, Demonology, and Destruction.
+Page 4 glows Filter and Play style, including Zone Focus and No Dungeons.
 
-**Saltscale Girdle** drops from Saltspine. It is waist rank 1 at 26 and 27 for Retribution.
+Page 5 glows the parchment: the rank, where to get the piece, and the reward. Obtaining a top piece still fires the toast.
 
-**Supple Bellyskin Leggings** drop from Saltspine. Bear hunts them as legs rank 2 from 26 through 31. Enhancement Tank hunts them at 26 and 27.
+Page 6 glows Track, Show on map, Remove, and the Removed tab. Remove is on the parchment when a hunt on Active is selected.
 
-### Dungeon sources
+Page 7 glows the GearQuest Index Score bar and the spec picker. The score bar is hidden while you are simulating, so that glow waits until simulation is off.
 
-Other dungeon hunts that were filed as a world drop now say which boss or which dungeon they come from. The pin is that entrance.
+Page 8 stays on the spec picker. Hover the spec name for its weights. A custom spec is still made from **+ custom stat weights**.
 
-**Eerie Stable Lantern** drops from Fel Steed in Shadowfang Keep. The pin is Silverpine Forest 44.8, 67.8. Bear hunts it as the off hand at 19.
+Page 9 opens Lookup and glows that handle and the search box.
 
-**Pendulum of Doom** drops from trash in Uldaman, and it is combined from **Axe of Lingering Dread** and **Axe of Inevitable Ruin**. The pins are the Uldaman doors in the Badlands, 44.4, 12.2 and 65.2, 43.5. It is main hand rank 1 from 39 through 44 for Survival, Retribution, Enhancement, and Arms, both factions.
+Page 10 opens the Simulator and glows the Simulator handle, the warrior button, Alliance, Arms, the level box, and Simulate.
 
-**Annealed Blade** drops from trash in Uldaman, at those same doors. Horde Survival hunts it in the off hand at 35 and 36. Horde Assassination, Combat, and Subtlety see it at 35. Horde Fury sees it at 35 and 36. Horde Protection sees it from 35 through 37.
+Page 11 opens Settings and glows that handle, **Hide minimap icon** on General, and **Recommended gear enchantment** on Hunts. The enchant glow shows once Hunts is the section on screen.
 
-### New Forever pieces
+Page 12 glows the whole window. The line is **Let's start Gear Questing... Forever!**
 
-**Axe of Inevitable Ruin** is new in Forever. Wowhead does not list a drop yet, so the hunt stays Unsourced. It requires 37. It is main hand rank 1 at 37 and 38 for Survival, Enhancement, and Arms, both factions, and for Horde Retribution at 37. Alliance Retribution lists it at 37 as rank 2.
+With the gamepad UI on, the bubble takes the pad. The chevron starts on **Yes!**, then on the forward arrow from page 2. A selects the focused button: Yes, the arrows, the volume buttons, mute, and X. The bumpers move one page and stop at the ends. B closes the bubble, and a second B closes the log. Y does nothing while he is talking. On the hunt list, up from Active reaches the portrait, and A there starts him again. Mouse mode is unchanged. The hunts slider stays a mouse control. On Settings, the right stick scrolls General the first time you open that page.
 
-**Cloudkeeper Legplates** are epic plate legs. They drop from Colossus of Zora, Colossus of Regal, and Colossus of Ashi in Silithus. The pin is the camp closest to you. They require 57. They are legs rank 1 from 57 through 59 for Retribution, Arms, and Fury, both factions. Protection paladin lists them at 57.
+### v1.0.3
 
-**Changuk Smasher** is a rare one-hand mace from Omgorn the Lost in Tanaris. It requires 47. Enhancement Tank hunts it at 47, and Alliance Protection lists it there too.
-
-**Rog'mar Trainee Shoulderpads** are new in Forever. Wowhead does not list a drop yet, so the hunt stays Unsourced. They require 36. Beast Mastery and Marksmanship hunt them as shoulder rank 3 at 36, both factions.
+The window title reads **GearQuest Forever v1.0.3**. The reward name uses the item's rarity color. A flyout can select or clear every box on that list. A boss drop says **Recommended dungeon entry at level N.** The guide still finds the ship when the client is not English. **Garb of Florid Feathers**, **Raptorclaw Greaves**, **Raptor's Gaze**, **Glinteye Slippers**, **Saltscale Girdle**, and **Supple Bellyskin Leggings** drop in Excavation Site. **Pendulum of Doom** and **Annealed Blade** come from Uldaman. **Axe of Inevitable Ruin**, **Cloudkeeper Legplates**, **Changuk Smasher**, and **Rog'mar Trainee Shoulderpads** are on the lists.
 
 ### v1.0.2
 

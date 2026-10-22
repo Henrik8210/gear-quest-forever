@@ -1564,6 +1564,14 @@ local function WireLogWindowMouseWheel(frame)
         if page == "lookup" then
             if self.detailBg and self.detailBg.IsMouseOver and self.detailBg:IsMouseOver() then
                 ScrollFrameOnMouseWheel(self.detailScroll, delta)
+            elseif self.lookupInset and self.lookupInset.IsMouseOver and self.lookupInset:IsMouseOver() then
+                ScrollFrameOnMouseWheel(self.lookupScroll, delta)
+            end
+            return
+        end
+        if page == "simulator" then
+            if self.simDetail and self.simDetail.IsMouseOver and self.simDetail:IsMouseOver() then
+                ScrollFrameOnMouseWheel(self.simScroll, delta)
             end
             return
         end
@@ -4054,15 +4062,67 @@ function GQ.Log:ShouldHideFromActiveList(entry, slotName, completedItemKeys)
     return false
 end
 
--- The three hunt rows are the next ranked pieces this character does not
--- already have. Owning rank 2 shows #1, #3, #4. A worn piece that is not on
--- the rank list does not take one of those three places.
-function GQ.Log:RankedHuntEntries(slotName, applyFilters)
+function GQ.Log:HuntsPerSlot()
+    local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+    local count = settings and tonumber(settings.huntsPerSlot) or 3
+    count = math.floor(count + 0.5)
+    if count < 3 then
+        count = 3
+    elseif count > 10 then
+        count = 10
+    end
+    return count
+end
+
+function GQ.Log:SetHuntsPerSlot(count)
+    count = math.floor((tonumber(count) or 3) + 0.5)
+    if count < 3 then
+        count = 3
+    elseif count > 10 then
+        count = 10
+    end
+    GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+    if GearQuestForeverDB.settings.huntsPerSlot == count then
+        return
+    end
+    GearQuestForeverDB.settings.huntsPerSlot = count
+    self._weaponFiltered = nil
+    self._heldOffHand = nil
+    self._heldOffBand = nil
+    self:ScheduleListRefresh()
+    if GQ.Indicator and GQ.Indicator.ScheduleRebuildCache then
+        GQ.Indicator:ScheduleRebuildCache()
+    end
+end
+
+-- A listed piece gets the green arrow only when it beats what is worn.
+-- An empty slot counts. Simulation has no worn comparison, so the listed
+-- hunts keep the arrow there.
+function GQ.Log:EntryIsListedUpgrade(entry, slotName)
+    if GQ.IsPreviewEnabled and GQ:IsPreviewEnabled() then
+        return true
+    end
+    if not entry or not GQ.Data or not GQ.Data.GearScoreUpgradeDelta then
+        return true
+    end
+    local delta = GQ.Data:GearScoreUpgradeDelta(entry, slotName)
+    if type(delta) ~= "number" then
+        return true
+    end
+    return delta > 0
+end
+
+-- The hunt rows are the next ranked pieces this character does not already
+-- have. Owning rank 2 at a count of 3 shows #1, #3, #4. A worn piece that
+-- is not on the rank list does not take one of those places. The count is
+-- Hunts per gear slot. Rank numbers stay the real ones.
+function GQ.Log:RankedHuntEntries(slotName, applyFilters, limit)
     local results = {}
     local seenName = {}
     local list = self:GetSlotRankList(slotName)
+    limit = limit or self:HuntsPerSlot()
     for i = 1, list and #list or 0 do
-        if #results >= 3 then
+        if #results >= limit then
             break
         end
         local entry = list[i]
@@ -7173,6 +7233,130 @@ function GQ.Log:EnsureOmitButtons(frame)
     end
 end
 
+function GQ.Log:EnsureHuntsPerSlot(frame)
+    frame = frame or self.frame
+    if not frame or frame.huntsPerSlot then
+        return
+    end
+
+    local host = CreateFrame("Frame", nil, frame, BackdropFrameTemplate())
+    host:SetHeight(22)
+    host:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", CONTENT_LEFT, FOOTER_BUTTON_Y)
+    local windowLevel = (frame.gqOuterBorder and frame.gqOuterBorder.GetFrameLevel and frame.gqOuterBorder:GetFrameLevel() or (frame:GetFrameLevel() or 1)) + 3
+    host:SetFrameLevel(windowLevel)
+    if host.SetBackdrop then
+        host:SetBackdrop({
+            bgFile = "Interface\\Buttons\\WHITE8X8",
+            tile = true,
+            tileSize = 8,
+        })
+        -- Same fill as the side handle bars.
+        host:SetBackdropColor(PANEL_BG[1], PANEL_BG[2], PANEL_BG[3], PANEL_BG[4] or 1)
+    else
+        local fill = host:CreateTexture(nil, "BACKGROUND")
+        fill:SetAllPoints()
+        fill:SetColorTexture(PANEL_BG[1], PANEL_BG[2], PANEL_BG[3], PANEL_BG[4] or 1)
+    end
+
+    local label = host:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    label:SetPoint("LEFT", host, "LEFT", 8, 0)
+    label:SetJustifyH("LEFT")
+    label:SetText("Hunts per gear slot")
+    label:SetTextColor(1, 0.82, 0)
+
+    local slider
+    local createdOk, created = pcall(CreateFrame, "Slider", "GearQuestHuntsPerSlotSlider", host, "OptionsSliderTemplate")
+    if createdOk and created then
+        slider = created
+    else
+        slider = CreateFrame("Slider", "GearQuestHuntsPerSlotSlider", host)
+        slider:SetOrientation("HORIZONTAL")
+        local thumb = slider:CreateTexture(nil, "ARTWORK")
+        thumb:SetTexture("Interface\\Buttons\\UI-SliderBar-Button-Horizontal")
+        thumb:SetSize(32, 32)
+        slider:SetThumbTexture(thumb)
+    end
+    slider:SetPoint("LEFT", label, "RIGHT", 10, 0)
+    slider:SetSize(108, 17)
+    slider:SetMinMaxValues(3, 10)
+    slider:SetValueStep(1)
+    if slider.SetObeyStepOnDrag then
+        slider:SetObeyStepOnDrag(true)
+    end
+    local sliderName = slider:GetName()
+    local lowText = slider.Low or (sliderName and _G[sliderName .. "Low"])
+    local highText = slider.High or (sliderName and _G[sliderName .. "High"])
+    local titleText = slider.Text or (sliderName and _G[sliderName .. "Text"])
+    if lowText then
+        lowText:SetText("")
+    end
+    if highText then
+        highText:SetText("")
+    end
+    if titleText then
+        titleText:SetText("")
+        titleText:Hide()
+    end
+
+    local valueText = host:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    valueText:SetPoint("LEFT", slider, "RIGHT", 8, 0)
+    valueText:SetJustifyH("LEFT")
+    valueText:SetTextColor(1, 0.82, 0)
+
+    local function ShowCount(raw)
+        local count = math.floor((tonumber(raw) or 3) + 0.5)
+        if count < 3 then
+            count = 3
+        elseif count > 10 then
+            count = 10
+        end
+        valueText:SetText(tostring(count))
+        return count
+    end
+
+    slider:SetScript("OnValueChanged", function(self, raw)
+        ShowCount(raw)
+        if self._gqQuiet then
+            return
+        end
+        if IsMouseButtonDown and IsMouseButtonDown("LeftButton") then
+            return
+        end
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if log then
+            log:SetHuntsPerSlot(raw)
+        end
+    end)
+    slider:SetScript("OnMouseUp", function(self)
+        if self._gqQuiet then
+            return
+        end
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if log then
+            log:SetHuntsPerSlot(self:GetValue())
+        end
+    end)
+    slider:HookScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_TOP")
+        GameTooltip:SetText("Hunts per gear slot")
+        GameTooltip:AddLine("The list updates when you let go. Rank 1, 2, and 3 stay the best in slot.", 1, 1, 1, true)
+        GameTooltip:Show()
+    end)
+    slider:HookScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+
+    slider._gqQuiet = true
+    slider:SetValue(self:HuntsPerSlot())
+    slider._gqQuiet = nil
+    ShowCount(self:HuntsPerSlot())
+
+    local labelWidth = label:GetStringWidth() or 130
+    host:SetWidth(8 + labelWidth + 10 + 108 + 8 + 24 + 8)
+    frame.huntsPerSlot = host
+    frame.huntsPerSlotSlider = slider
+end
+
 function GQ.Log:EnsurePlayStyle(frame)
     frame = frame or self.frame
     if GearQuestForeverDB and GearQuestForeverDB.ui then
@@ -7671,6 +7855,7 @@ function GQ.Log:LayoutFooterButtons(frame)
     end
 
     self:EnsurePlayStyle(frame)
+    self:EnsureHuntsPerSlot(frame)
 end
 
 function GQ.Log:ApplyPageTab()
@@ -7742,13 +7927,20 @@ function GQ.Log:ApplyPageTab()
     end
 
     if self.frame.playStyleBtn then
-        if page == "lookup" then
+        if page == "log" then
+            self.frame.playStyleBtn:Show()
+        else
             self.frame.playStyleBtn:Hide()
             if self.frame.playStylePanel then
                 self.frame.playStylePanel:Hide()
             end
+        end
+    end
+    if self.frame.huntsPerSlot then
+        if page == "log" then
+            self.frame.huntsPerSlot:Show()
         else
-            self.frame.playStyleBtn:Show()
+            self.frame.huntsPerSlot:Hide()
         end
     end
 
@@ -9323,36 +9515,43 @@ function GQ.Log:EnsureSimulatorPage(frame)
     ApplyMetalEdge(simDetail, 12)
     frame.simDetail = simDetail
 
-    local title = CreateFontStringWithFallback(simDetail, QUEST_DETAIL_TITLE_FONTS)
-    title:SetPoint("TOPLEFT", simDetail, "TOPLEFT", 16, -16)
-    title:SetPoint("RIGHT", simDetail, "RIGHT", -16, 0)
+    local simScroll = CreatePanelScrollFrame("GearQuestSimScroll", simDetail)
+    local simChild = CreateFrame("Frame", "GearQuestSimScrollChild", simScroll)
+    simChild:SetSize(300, 420)
+    simScroll:SetScrollChild(simChild)
+    frame.simScroll = simScroll
+    frame.simScrollChild = simChild
+
+    local title = CreateFontStringWithFallback(simChild, QUEST_DETAIL_TITLE_FONTS)
+    title:SetPoint("TOPLEFT", simChild, "TOPLEFT", 8, -8)
+    title:SetPoint("RIGHT", simChild, "RIGHT", -8, 0)
     title:SetJustifyH("LEFT")
     title:SetText("SIMULATOR")
     title:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
     frame.simTitle = title
 
-    local body = CreateFontStringWithFallback(simDetail, QUEST_DETAIL_BODY_FONTS)
+    local body = CreateFontStringWithFallback(simChild, QUEST_DETAIL_BODY_FONTS)
     body:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -10)
-    body:SetPoint("RIGHT", simDetail, "RIGHT", -16, 0)
+    body:SetPoint("RIGHT", simChild, "RIGHT", -8, 0)
     body:SetJustifyH("LEFT")
     body:SetWordWrap(true)
     body:SetText("Pick a class on the left, then set faction, specialization, and level. Simulate to browse that character's upgrades in the log.")
     body:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
     frame.simBody = body
 
-    local factionHeader = CreateFontStringWithFallback(simDetail, QUEST_DETAIL_HEADER_FONTS)
+    local factionHeader = CreateFontStringWithFallback(simChild, QUEST_DETAIL_HEADER_FONTS)
     factionHeader:SetPoint("TOPLEFT", body, "BOTTOMLEFT", 0, -16)
     factionHeader:SetText("FACTION")
     factionHeader:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
     frame.simFactionHeader = factionHeader
 
-    local allianceBtn = CreateFrame("Button", "GearQuestSimFactionAlliance", simDetail, "UIPanelButtonTemplate")
+    local allianceBtn = CreateFrame("Button", "GearQuestSimFactionAlliance", simChild, "UIPanelButtonTemplate")
     allianceBtn:SetSize(96, 22)
     allianceBtn:SetPoint("TOPLEFT", factionHeader, "BOTTOMLEFT", 0, -6)
     allianceBtn:SetText("Alliance")
     frame.simAllianceBtn = allianceBtn
 
-    local hordeBtn = CreateFrame("Button", "GearQuestSimFactionHorde", simDetail, "UIPanelButtonTemplate")
+    local hordeBtn = CreateFrame("Button", "GearQuestSimFactionHorde", simChild, "UIPanelButtonTemplate")
     hordeBtn:SetSize(96, 22)
     hordeBtn:SetPoint("LEFT", allianceBtn, "RIGHT", 6, 0)
     hordeBtn:SetText("Horde")
@@ -9373,26 +9572,41 @@ function GQ.Log:EnsureSimulatorPage(frame)
         end
     end)
 
-    local specHeader = CreateFontStringWithFallback(simDetail, QUEST_DETAIL_HEADER_FONTS)
+    local specHeader = CreateFontStringWithFallback(simChild, QUEST_DETAIL_HEADER_FONTS)
     specHeader:SetPoint("TOPLEFT", allianceBtn, "BOTTOMLEFT", 0, -16)
     specHeader:SetText("SPECIALIZATION")
     specHeader:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
     frame.simSpecHeader = specHeader
 
     frame.simSpecButtons = {}
-    for i = 1, 4 do
-        local specBtn = CreateFrame("Button", "GearQuestSimSpec" .. i, simDetail, "UIPanelButtonTemplate")
+    -- Mage has six specs. The rest have four or fewer. Layout wraps them.
+    for i = 1, 6 do
+        local specBtn = CreateFrame("Button", "GearQuestSimSpec" .. i, simChild, "UIPanelButtonTemplate")
         specBtn:SetSize(150, 22)
-        if i == 1 then
-            specBtn:SetPoint("TOPLEFT", specHeader, "BOTTOMLEFT", 0, -6)
-        elseif i == 2 then
-            specBtn:SetPoint("LEFT", frame.simSpecButtons[1], "RIGHT", 6, 0)
-        elseif i == 3 then
-            specBtn:SetPoint("TOPLEFT", frame.simSpecButtons[1], "BOTTOMLEFT", 0, -4)
-        else
-            specBtn:SetPoint("LEFT", frame.simSpecButtons[3], "RIGHT", 6, 0)
-        end
+        specBtn:SetPoint("TOPLEFT", specHeader, "BOTTOMLEFT", 0, -6)
         specBtn:Hide()
+        specBtn:SetScript("OnEnter", function(self)
+            local label = self.specLabel
+            if not label or label == "" or not GameTooltip then
+                return
+            end
+            local shown = self:GetText() or ""
+            local text = self.GetFontString and self:GetFontString()
+            if text and text.GetText then
+                shown = text:GetText() or shown
+            end
+            if shown == label then
+                return
+            end
+            GameTooltip:SetOwner(self, "ANCHOR_TOP")
+            GameTooltip:SetText(label, 1, 1, 1)
+            GameTooltip:Show()
+        end)
+        specBtn:SetScript("OnLeave", function()
+            if GameTooltip then
+                GameTooltip:Hide()
+            end
+        end)
         specBtn:SetScript("OnClick", function(self)
             local log = _G.GearQuest and _G.GearQuest.Log
             if not log then
@@ -9407,13 +9621,13 @@ function GQ.Log:EnsureSimulatorPage(frame)
         frame.simSpecButtons[i] = specBtn
     end
 
-    local levelHeader = CreateFontStringWithFallback(simDetail, QUEST_DETAIL_HEADER_FONTS)
+    local levelHeader = CreateFontStringWithFallback(simChild, QUEST_DETAIL_HEADER_FONTS)
     levelHeader:SetPoint("TOPLEFT", specHeader, "BOTTOMLEFT", 0, -72)
     levelHeader:SetText("LEVEL")
     levelHeader:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
     frame.simLevelHeader = levelHeader
 
-    local levelEdit = CreateFrame("EditBox", "GearQuestSimLevelEdit", simDetail, "InputBoxTemplate")
+    local levelEdit = CreateFrame("EditBox", "GearQuestSimLevelEdit", simChild, "InputBoxTemplate")
     levelEdit:SetSize(64, 20)
     levelEdit:SetPoint("LEFT", levelHeader, "RIGHT", 12, 0)
     levelEdit:SetAutoFocus(false)
@@ -9445,9 +9659,9 @@ function GQ.Log:EnsureSimulatorPage(frame)
         end
     end
 
-    local status = CreateFontStringWithFallback(simDetail, QUEST_DETAIL_BODY_FONTS)
+    local status = CreateFontStringWithFallback(simChild, QUEST_DETAIL_BODY_FONTS)
     status:SetPoint("TOPLEFT", levelHeader, "BOTTOMLEFT", 0, -18)
-    status:SetPoint("RIGHT", simDetail, "RIGHT", -16, 0)
+    status:SetPoint("RIGHT", simChild, "RIGHT", -8, 0)
     status:SetJustifyH("LEFT")
     status:SetWordWrap(true)
     status:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
@@ -9501,6 +9715,137 @@ function GQ.Log:EnsureSimulatorPage(frame)
     return simPage
 end
 
+function GQ.Log:LayoutSimulatorSpecs(frame)
+    local header = frame and frame.simSpecHeader
+    local levelHeader = frame and frame.simLevelHeader
+    local child = frame and frame.simScrollChild
+    if not header or not levelHeader or not child then
+        return
+    end
+
+    local inner = child:GetWidth() or 0
+    if inner < 80 then
+        inner = RIGHT_COLUMN_WIDTH - 56
+    end
+    inner = inner - 16
+    if inner < 80 then
+        inner = 80
+    end
+
+    local shown = {}
+    local buttons = frame.simSpecButtons or {}
+    for i = 1, #buttons do
+        if buttons[i]:IsShown() then
+            shown[#shown + 1] = buttons[i]
+        end
+    end
+
+    local gap = 6
+    local half = math.floor((inner - gap) / 2)
+    local columns = 2
+    if half < 110 then
+        columns = 1
+    else
+        for i = 1, #shown do
+            local fs = shown[i]:GetFontString()
+            local label = shown[i].specLabel or ""
+            if fs and label ~= "" then
+                fs:SetText(label)
+                if (fs:GetStringWidth() or 0) > (half - 16) then
+                    columns = 1
+                    break
+                end
+            end
+        end
+    end
+
+    local btnW = columns == 2 and half or inner
+    for i = 1, #shown do
+        local btn = shown[i]
+        btn:ClearAllPoints()
+        btn:SetSize(btnW, 22)
+        local col = (i - 1) % columns
+        local row = math.floor((i - 1) / columns)
+        btn:SetPoint("TOPLEFT", header, "BOTTOMLEFT", col * (btnW + gap), -6 - (row * 26))
+        local fs = btn:GetFontString()
+        if fs then
+            TruncateFontStringToWidth(fs, btn.specLabel or btn:GetText() or "", btnW - 16)
+        end
+    end
+
+    local rows = 0
+    if #shown > 0 then
+        rows = math.floor((#shown - 1) / columns) + 1
+    end
+    local drop = 16
+    if rows > 0 then
+        drop = 6 + (rows * 26) + 12
+    end
+    levelHeader:ClearAllPoints()
+    if header:IsShown() then
+        levelHeader:SetPoint("TOPLEFT", header, "BOTTOMLEFT", 0, -drop)
+    elseif frame.simAllianceBtn then
+        levelHeader:SetPoint("TOPLEFT", frame.simAllianceBtn, "BOTTOMLEFT", 0, -16)
+    end
+end
+
+function GQ.Log:LayoutSimulatorContent(frame)
+    local scroll = frame and frame.simScroll
+    local child = frame and frame.simScrollChild
+    local detail = frame and frame.simDetail
+    if not scroll or not child or not detail then
+        return
+    end
+
+    -- Simulate and Turn off simulation stay pinned under the scrolling text.
+    LayoutColumnScroll(scroll, detail, 46)
+    local width = scroll:GetWidth()
+    if not width or width < 40 then
+        width = RIGHT_COLUMN_WIDTH - 56
+    end
+    child:SetWidth(math.max(width, 40))
+    self:LayoutSimulatorSpecs(frame)
+
+    local top = child:GetTop()
+    local status = frame.simStatus
+    local bottom = status and status.GetBottom and status:GetBottom()
+    if not top or not bottom or top <= bottom then
+        local pageShown = frame.simPage and frame.simPage.IsShown and frame.simPage:IsShown()
+        if pageShown and not frame._simScrollWait and C_Timer and C_Timer.After then
+            frame._simScrollWait = true
+            C_Timer.After(0, function()
+                frame._simScrollWait = nil
+                local log = _G.GearQuest and _G.GearQuest.Log
+                if log and log.frame and log.LayoutSimulatorContent then
+                    log:LayoutSimulatorContent(log.frame)
+                end
+            end)
+        end
+        return
+    end
+
+    local kept = 0
+    if scroll.GetVerticalScroll then
+        kept = scroll:GetVerticalScroll() or 0
+    end
+    child:SetHeight((top - bottom) + 14)
+    UpdateScrollChildRect(scroll)
+    local range = 0
+    if scroll.GetVerticalScrollRange then
+        range = scroll:GetVerticalScrollRange() or 0
+    end
+    if kept > range then
+        kept = range
+    end
+    if kept < 0 then
+        kept = 0
+    end
+    if scroll.SetVerticalScroll then
+        scroll:SetVerticalScroll(kept)
+    end
+    ApplyScrollBarVisibility(scroll)
+end
+
 function GQ.Log:LayoutSimulatorPage(frame)
     if not frame.simPage or not frame.simClassInset or not frame.simDetail then
         return
@@ -9542,6 +9887,7 @@ function GQ.Log:LayoutSimulatorPage(frame)
     frame.simDetail:SetPoint("TOPLEFT", frame.simPage, "TOPLEFT", LEFT_COLUMN_WIDTH + COLUMN_GAP, LOG_SECTION_TOP)
     frame.simDetail:SetPoint("BOTTOMRIGHT", frame.simPage, "BOTTOMRIGHT", 0, FOOTER_OFFSET)
     ApplyMetalEdge(frame.simDetail, 16)
+    self:LayoutSimulatorContent(frame)
 end
 
 local function CreateSettingsCheck(parent, label, frameName)
@@ -11169,11 +11515,13 @@ function GQ.Log:RefreshSimulator()
         local opt = specOptions[i]
         if opt then
             specBtn:Show()
+            specBtn.specLabel = opt.label
             specBtn:SetText(opt.label)
             specBtn.specId = opt.id
             self:SetSimulatorChoiceHighlight(specBtn, self.simSpec == opt.id)
         else
             specBtn:Hide()
+            specBtn.specLabel = nil
             specBtn.specId = nil
         end
     end
@@ -11201,6 +11549,7 @@ function GQ.Log:RefreshSimulator()
     end
 
     self:UpdateSimulatorResetButton()
+    self:LayoutSimulatorContent(self.frame)
 end
 
 function GQ.Log:UpdateSimulatorResetButton()
@@ -11740,7 +12089,7 @@ function GQ.Log:Init()
 
     frame.exitBtn = CreateFrame("Button", "GearQuestLogExitButton", frame, "UIPanelButtonTemplate")
     frame.exitBtn:SetSize(106, 22)
-    frame.exitBtn:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -CONTENT_RIGHT_GUTTER, 12)
+    frame.exitBtn:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -CONTENT_RIGHT_GUTTER, FOOTER_BUTTON_Y)
     frame.exitBtn:SetText("Exit")
 
     self:EnsurePlayStyle(frame)
@@ -14124,8 +14473,9 @@ function GQ.Log:FilteredWeaponEntries()
     local pool = self:CollectWeaponPool()
     local picked = {}
     local seenName = {}
+    local limit = self:HuntsPerSlot()
     for i = 1, #pool do
-        if #picked >= 3 then
+        if #picked >= limit then
             break
         end
         local entry = pool[i]
@@ -14183,8 +14533,9 @@ function GQ.Log:HeldOffHandEntries()
     end)
     local picked = {}
     local seenName = {}
+    local limit = self:HuntsPerSlot()
     for i = 1, #pool do
-        if #picked >= 3 then
+        if #picked >= limit then
             break
         end
         local entry = pool[i]
@@ -14893,6 +15244,10 @@ function GQ.Log:Show()
     LayoutDetailScroll(self.frame)
     BringLogWindowToFront(self.frame)
     self.frame:Show()
+    if self:GetPageTab() == "simulator" then
+        self:SeedSimulatorFromCharacter()
+        self:RefreshSimulator()
+    end
     if GQ.Custom and GQ.Custom.EnsureBuilt and GQ.GetEffectiveClass and GQ.GetEffectiveSpec then
         local classFile = GQ:GetEffectiveClass()
         local specId = GQ:GetEffectiveSpec()
@@ -14916,6 +15271,9 @@ function GQ.Log:Show()
     self:ScheduleAutoCompletionCheck()
     if self.GamepadAcquire then
         self:GamepadAcquire()
+    end
+    if GQ.PortraitGuide and GQ.PortraitGuide.OnLogShown then
+        GQ.PortraitGuide:OnLogShown(self.frame)
     end
 end
 
@@ -15342,18 +15700,27 @@ function GQ.Log:EnsureLookupWidgets(frame)
     end)
     frame.lookupSearch = search
 
-    local empty = inset:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    local resultsScroll = CreatePanelScrollFrame("GearQuestLookupResultsScroll", inset)
+    local resultsChild = CreateFrame("Frame", "GearQuestLookupResultsChild", resultsScroll)
+    resultsChild:SetSize(200, 200)
+    resultsScroll:SetScrollChild(resultsChild)
+    frame.lookupScroll = resultsScroll
+    frame.lookupScrollChild = resultsChild
+    WireMouseWheel(resultsScroll, resultsScroll)
+    WireMouseWheel(resultsChild, resultsScroll)
+
+    local empty = resultsScroll:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     empty:SetJustifyH("LEFT")
     empty:SetJustifyV("TOP")
     empty:SetWordWrap(true)
     empty:SetTextColor(0.7, 0.7, 0.7)
-    empty:SetText("No matches for your input. Try switch to another class and try again, or change your input")
+    empty:SetText("No matches. Try another class in the Simulator, or change what you typed.")
     empty:Hide()
     frame.lookupEmpty = empty
 
     frame.lookupRows = {}
     for i = 1, 10 do
-        local row = CreateFrame("Button", nil, inset)
+        local row = CreateFrame("Button", nil, resultsChild)
         row:SetHeight(18)
         row:RegisterForClicks("LeftButtonUp")
         row.highlight = row:CreateTexture(nil, "BACKGROUND")
@@ -15419,7 +15786,7 @@ function GQ.Log:EnsureLookupWidgets(frame)
         frame.lookupRows[i] = row
     end
 
-    local wait = CreateFrame("Frame", nil, inset)
+    local wait = CreateFrame("Frame", nil, resultsScroll)
     wait:SetSize(240, 108)
     wait:Hide()
     local icon = wait:CreateTexture(nil, "ARTWORK")
@@ -15482,20 +15849,66 @@ function GQ.Log:LayoutLookupPage(frame)
     frame.lookupSearch:SetSize(74, 22)
 
     local rowTop = pad + introH + 8 + promptH + 8 + 22 + 6
-    frame.lookupEmpty:ClearAllPoints()
-    frame.lookupEmpty:SetPoint("TOPLEFT", inset, "TOPLEFT", pad, -rowTop)
-    frame.lookupEmpty:SetWidth(width)
-    for i = 1, 10 do
-        local row = frame.lookupRows[i]
-        row:ClearAllPoints()
-        row:SetPoint("TOPLEFT", inset, "TOPLEFT", 6, -(rowTop + (i - 1) * 20))
-        row:SetPoint("RIGHT", inset, "RIGHT", -8, 0)
-        row:SetHeight(18)
+    local scroll = frame.lookupScroll
+    local child = frame.lookupScrollChild
+    if scroll and child then
+        scroll:ClearAllPoints()
+        scroll:SetPoint("TOPLEFT", inset, "TOPLEFT", 4, -rowTop)
+        scroll:SetPoint("BOTTOMRIGHT", inset, "BOTTOMRIGHT", -(4 + SCROLLBAR_WIDTH), 8)
+        local scrollWidth = scroll:GetWidth()
+        if not scrollWidth or scrollWidth < 40 then
+            scrollWidth = width
+        end
+        child:SetWidth(math.max(scrollWidth, 40))
+        for i = 1, 10 do
+            local row = frame.lookupRows[i]
+            row:ClearAllPoints()
+            row:SetPoint("TOPLEFT", child, "TOPLEFT", 2, -((i - 1) * 20))
+            row:SetPoint("RIGHT", child, "RIGHT", -4, 0)
+            row:SetHeight(18)
+        end
+        if frame.lookupEmpty then
+            frame.lookupEmpty:SetParent(child)
+            frame.lookupEmpty:ClearAllPoints()
+            frame.lookupEmpty:SetPoint("TOPLEFT", child, "TOPLEFT", 8, -4)
+            frame.lookupEmpty:SetPoint("RIGHT", child, "RIGHT", -8, 0)
+        end
+        if frame.lookupWait then
+            frame.lookupWait:ClearAllPoints()
+            frame.lookupWait:SetPoint("TOP", scroll, "TOP", 0, -8)
+            if frame.lookupWait.SetFrameLevel and scroll.GetFrameLevel then
+                frame.lookupWait:SetFrameLevel(scroll:GetFrameLevel() + 8)
+            end
+        end
+        local bar = scroll.GetName and _G[scroll:GetName() .. "ScrollBar"]
+        if bar and bar.SetFrameLevel and scroll.GetFrameLevel then
+            bar:SetFrameLevel(scroll:GetFrameLevel() + 5)
+        end
+        self:LayoutLookupResults(frame)
     end
-    if frame.lookupWait then
-        frame.lookupWait:ClearAllPoints()
-        frame.lookupWait:SetPoint("TOP", inset, "TOP", 0, -(rowTop + 16))
+end
+
+function GQ.Log:LayoutLookupResults(frame)
+    local scroll = frame and frame.lookupScroll
+    local child = frame and frame.lookupScrollChild
+    if not scroll or not child then
+        return
     end
+    local count = self._lookupResults and #self._lookupResults or 0
+    if count < 1 then
+        count = 1
+    end
+    local height = (count * 20) + 4
+    local empty = frame.lookupEmpty
+    if empty and empty:IsShown() then
+        local textH = empty:GetStringHeight() or 0
+        if textH + 8 > height then
+            height = textH + 8
+        end
+    end
+    child:SetHeight(height)
+    UpdateScrollChildRect(scroll)
+    ApplyScrollBarVisibility(scroll)
 end
 
 function GQ.Log:HideLookupSearchWait()
@@ -15597,6 +16010,7 @@ function GQ.Log:PaintLookupRows()
             row:Hide()
         end
     end
+    self:LayoutLookupResults(frame)
 end
 
 function GQ.Log:ApplyLookupHits(classFile, query)

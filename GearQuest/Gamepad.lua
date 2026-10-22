@@ -334,7 +334,55 @@ local function PadAction(name)
     return nil
 end
 
+function GQ.Log:GamepadGuideBubble()
+    if not GQ.UsesGamepad or not GQ:UsesGamepad() then
+        return nil
+    end
+    local guide = GQ.PortraitGuide
+    local bubble = guide and guide.bubble
+    if bubble and bubble.IsShown and bubble:IsShown() then
+        return bubble
+    end
+    return nil
+end
+
+function GQ.Log:GamepadIsGuidePortrait(widget)
+    local hit = GQ.PortraitGuide and GQ.PortraitGuide.hit
+    return hit and widget == hit or false
+end
+
+function GQ.Log:GamepadSyncGuide()
+    if not self._padOn or not GQ.UsesGamepad or not GQ:UsesGamepad() then
+        return
+    end
+    local list = self:GamepadCandidates()
+    local focus = self._padFocus
+    if focus and self:GamepadContains(list, focus) and self:GamepadFocusVisible(focus) then
+        return
+    end
+    local bubble = self:GamepadGuideBubble()
+    local initial
+    if bubble and Usable(bubble.yes) then
+        initial = bubble.yes
+    elseif bubble and Usable(bubble.forward) then
+        initial = bubble.forward
+    elseif bubble and Usable(bubble.back) then
+        initial = bubble.back
+    else
+        initial = self:GamepadPickInitial(list)
+    end
+    self:GamepadSetFocus(initial)
+end
+
 function GQ.Log:GamepadOverlay()
+    local bubble = self:GamepadGuideBubble()
+    if bubble then
+        local probe = {}
+        Walk(bubble, probe, self.frame)
+        if #probe > 0 then
+            return bubble
+        end
+    end
     local frame = self.frame
     local panels = {
         frame and frame.sourceFilterMenu,
@@ -384,6 +432,7 @@ function GQ.Log:GamepadIsListTarget(widget)
     end
     return widget == frame.tabActive or widget == frame.tabCompleted or widget == frame.tabRemoved
         or widget == frame.trackBtn or widget == frame.mapBtn or widget == frame.removeBtn
+        or self:GamepadIsGuidePortrait(widget)
 end
 
 function GQ.Log:GamepadIsRow(widget)
@@ -655,6 +704,13 @@ function GQ.Log:GamepadSetFocus(widget)
 end
 
 function GQ.Log:GamepadPickInitial(list)
+    local bubble = self:GamepadGuideBubble()
+    if bubble and self:GamepadOverlay() == bubble and Usable(bubble.yes) then
+        return bubble.yes
+    end
+    if bubble and self:GamepadOverlay() == bubble and Usable(bubble.forward) then
+        return bubble.forward
+    end
     local best, bestY, bestX
     local rowBest, rowY, rowX
     local preferRow = not self._padFilterMode and not self:GamepadOverlay()
@@ -694,7 +750,9 @@ function GQ.Log:GamepadPick(origin, direction, list)
         if widget ~= origin then
             local x, y = widget:GetCenter()
             if x then
-                if self:GamepadIsRow(origin) and self:GamepadIsListTab(widget) then
+                if self:GamepadIsGuidePortrait(widget) and origin ~= (self.frame and self.frame.tabActive) then
+                    x = nil
+                elseif self:GamepadIsRow(origin) and self:GamepadIsListTab(widget) then
                     x = nil
                 end
             end
@@ -749,7 +807,21 @@ function GQ.Log:GamepadNudgeSlider(slider, direction)
 end
 
 function GQ.Log:GamepadScrollDetail(direction)
-    local scroll = self.frame and self.frame.detailScroll
+    local frame = self.frame
+    local scroll = frame and frame.detailScroll
+    local page = self.GetPageTab and self:GetPageTab()
+    if page == "simulator" then
+        scroll = frame and frame.simScroll
+    elseif page == "settings" then
+        scroll = frame and frame.settingsGeneralScroll
+        if self.settingsSection == "commands" then
+            scroll = frame and frame.settingsCommandsScroll
+        elseif self.settingsSection and self.settingsSection ~= "general" then
+            scroll = nil
+        end
+    elseif page == "lookup" and frame and frame.lookupInset and frame.lookupInset.IsMouseOver and frame.lookupInset:IsMouseOver() then
+        scroll = frame.lookupScroll
+    end
     if not scroll or not scroll.IsShown or not scroll:IsShown() then
         return false
     end
@@ -834,6 +906,13 @@ function GQ.Log:GamepadListStep(direction, focus, list)
     if page ~= "log" or self._padFilterMode or self:GamepadOverlay() then
         return nil, false
     end
+    local portrait = GQ.PortraitGuide and GQ.PortraitGuide.hit
+    if self:GamepadIsGuidePortrait(focus) then
+        if direction == "down" and self.frame and Usable(self.frame.tabActive) then
+            return self.frame.tabActive, true
+        end
+        return focus, true
+    end
     if self:GamepadIsListTab(focus) then
         local tabs = self:GamepadListTabs()
         local index
@@ -854,6 +933,9 @@ function GQ.Log:GamepadListStep(direction, focus, list)
             return rows[1] or focus, true
         end
         if direction == "up" or direction == "left" or direction == "right" then
+            if direction == "up" and focus == self.frame.tabActive and Usable(portrait) then
+                return portrait, true
+            end
             return focus, true
         end
         return nil, false
@@ -968,6 +1050,12 @@ function GQ.Log:GamepadMove(direction)
 end
 
 function GQ.Log:GamepadPage(step)
+    local guide = GQ.PortraitGuide
+    if self:GamepadGuideBubble() and guide and guide.SetPage then
+        guide:SetPage((guide.page or 1) + step)
+        self:GamepadSyncGuide()
+        return
+    end
     if self:GamepadOverlay() then
         return
     end
@@ -1050,6 +1138,9 @@ function GQ.Log:GamepadConfirm()
 end
 
 function GQ.Log:GamepadFilters()
+    if self:GamepadGuideBubble() then
+        return
+    end
     if not self.GetPageTab or self:GetPageTab() ~= "log" then
         return
     end
@@ -1072,6 +1163,10 @@ function GQ.Log:GamepadFilters()
 end
 
 function GQ.Log:GamepadBack()
+    if self:GamepadGuideBubble() and GQ.PortraitGuide and GQ.PortraitGuide.Dismiss then
+        GQ.PortraitGuide:Dismiss()
+        return
+    end
     if self.slotRankPanel and self.slotRankPanel:IsShown() and self.HideSlotRankPanel then
         self:HideSlotRankPanel()
         return
@@ -2515,6 +2610,10 @@ function GQ.Log:GamepadSilence()
     if self.weaponMenu then
         SilenceTree(self.weaponMenu, frame)
     end
+    local bubble = GQ.PortraitGuide and GQ.PortraitGuide.bubble
+    if bubble then
+        SilenceTree(bubble, frame)
+    end
 end
 
 function GQ.Log:GamepadAcquire()
@@ -2555,6 +2654,10 @@ function GQ.Log:GamepadAcquire()
     self:GamepadHookClaim(frame.sourceFilterMenu)
     self:GamepadHookClaim(frame.specPicker)
     self:GamepadHookClaim(self.weaponMenu)
+    local bubble = GQ.PortraitGuide and GQ.PortraitGuide.bubble
+    if bubble then
+        SilenceTree(bubble, frame)
+    end
     self:GamepadSyncOwnership()
     local list = self:GamepadCandidates()
     self:GamepadSetFocus(self:GamepadPickInitial(list))
