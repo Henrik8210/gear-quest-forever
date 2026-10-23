@@ -2,55 +2,47 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.0.4
+## v1.0.5
 
-The window title reads **GearQuest Forever v1.0.4**. The log can show more than three hunts in a slot. The first time you open GearQuest on an account, The GearQuest Knight introduces the window, out loud, and a gold glow marks what he is talking about.
+The window title reads **GearQuest Forever v1.0.5**. The hunt list lines up with its slider, a hovered hunt fades out to the right, and The GearQuest Knight stays on his portrait when you make the window bigger.
 
-### Hunts per gear slot
+### The hunt list
 
-A slider at the lower left of the log reads **Hunts per gear slot**. It runs from 3 to 10. 3 is the default. The number shows while you drag, and the list updates when you let go. The choice is saved on the account, including while you are simulating.
+The **Hunts per gear slot** bar is as wide as the hunt list above it, for every class and spec, on the Log. The words sit on the left, the number on the right, and the slider fills the space between them. It still runs from 3 to 10. 3 is still the default. The number still shows while you drag, and the list still updates when you let go. The choice is still saved on the account, including while you are simulating. Rank numbers stay the real ones. Weapons stay one header.
 
-That number is how many hunts a slot still shows after the source filter and the play style, skipping pieces you already have or removed. Rank numbers stay the real ones. A slot that is showing its fourth piece still says **#4**. Weapons stay one header. Narrowing Weapons to daggers still shows up to that many daggers, each with its own rank.
+Hovering a hunt no longer paints a solid box behind the row. The gold starts at the left, under the rank and the name, and fades out toward the right edge of the list. The row you have selected uses that same fade.
 
-The character panel, the obtain toast, and **Recommended** stay on rank 1, 2, and 3. A green arrow is on a hunt that beats what you are wearing, including a later rank the slider put on the list. An empty slot counts. While you are simulating there is nothing worn to compare, so the listed hunts keep the arrow.
+### The footer
+
+**Play style** sits under the parchment, and its left edge lines up with that parchment. The hunts bar stays under the list. Exit stays at the lower right. This is the same on Lookup, the Simulator, and Settings, because those pages share that column.
+
+### Window size
+
+**General → Window size** still runs from 100% to 150%, one percent at a time. The **100%** and **150%** labels under the slider are black, the same as **Window size** and the rest of that page. The knight's bubble grows with the window, and the tail stays on the portrait. At 150%, if the portrait is already at the top of the screen, the bubble stays on screen and can sit over the title.
 
 ### The GearQuest Knight
 
-The portrait in the corner of the log is the guide. Logging in does not open him. The first time you open GearQuest on an account, leave the window up for 5 seconds. The parchment fades in above the portrait, the tail sits just above him, and he speaks. The title on the bubble is **The GearQuest Knight**.
+Hovering the portrait lights his face, so the click is obvious. The tooltip still says **GearQuest guide**.
 
-Closing the window during those 5 seconds does not count. The next time you open GearQuest, he waits again. Once the bubble has appeared, a reload or a later login does not play it. Click the portrait to start from the first page again. Click it while he is already talking to hear the current page again.
+The bubble has no border. The black around the torn edge of the parchment is gone, and the world shows through those notches. The tail is the same shape.
 
-Page 1 asks if you are ready. It has a **Yes!** button and no arrows. **Yes!** goes to page 2. From page 2 the back and forward arrows and the counter are there: **2/12** through **12/12**. **X** dismisses him.
+The speaker shows how loud he is. Volume 1 is one line out of the horn, volume 2 is two lines, and volume 3 is three lines. Mute is still the speaker with a slash. 2 is still the default. Changing the volume still plays the current page again.
 
-Voice is on. The speaker at the lower right mutes him. **−**, the number, and **+** sit just to the left of that speaker. There are three volumes. 2 is the default. Changing the volume plays the current page again. Mute stops the voice.
+Each page breaks where he pauses. The words he is pointing at are black: the Log, the list, Active, Completed, Removed, the info icon, the slider, Filter, Weapons, Play style, the parchment, Track, Show on map, Remove, the score bar, the spec picker, Lookup, the Simulator, Settings, and the last line.
 
-A gold glow marks what the page is about, and only while you are on that tab.
+Page 3 and page 9 print the info icon in the sentence, the same icon as the (i) beside a slot title.
 
-Page 1 glows the GearQuest Log handle, then waits for **Yes!**.
+Page 4 glows the weapons filter, the arrow on the **Weapons** header, along with Filter and Play style. If that header is below the list, the list scrolls to it once so the glow is on screen. A hunter's Bow, Gun, and Crossbow arrow on Ranged is not that glow.
 
-Page 2 glows Active, Completed, Removed, and the hunt list. He explains the top 3 and the right-click list on the character panel.
+The side handles glow even while you are still on the Log. On page 9 the Lookup handle glows before you click it. On page 10 the Simulator handle glows before you open the Simulator. On page 11 the Settings handle glows before you open Settings. The search box, the warrior button, Alliance, Arms, the level box, Simulate, **Hide minimap icon**, and **Recommended gear enchantment** still wait until that page is the one on screen.
 
-Page 3 glows the (i) beside a slot title and the **Hunts per gear slot** slider.
+### The GearQuest Community
 
-Page 4 glows Filter and Play style, including Zone Focus and No Dungeons.
+Settings → The GearQuest Community lists Deadlybrew after Alteredigor. The names are Eao, MainWon, Stikmyre, Click, Vaniron, Thrayne, Alteredigor, and Deadlybrew.
 
-Page 5 glows the parchment: the rank, where to get the piece, and the reward. Obtaining a top piece still fires the toast.
+### v1.0.4
 
-Page 6 glows Track, Show on map, Remove, and the Removed tab. Remove is on the parchment when a hunt on Active is selected.
-
-Page 7 glows the GearQuest Index Score bar and the spec picker. The score bar is hidden while you are simulating, so that glow waits until simulation is off.
-
-Page 8 stays on the spec picker. Hover the spec name for its weights. A custom spec is still made from **+ custom stat weights**.
-
-Page 9 opens Lookup and glows that handle and the search box.
-
-Page 10 opens the Simulator and glows the Simulator handle, the warrior button, Alliance, Arms, the level box, and Simulate.
-
-Page 11 opens Settings and glows that handle, **Hide minimap icon** on General, and **Recommended gear enchantment** on Hunts. The enchant glow shows once Hunts is the section on screen.
-
-Page 12 glows the whole window. The line is **Let's start Gear Questing... Forever!**
-
-With the gamepad UI on, the bubble takes the pad. The chevron starts on **Yes!**, then on the forward arrow from page 2. A selects the focused button: Yes, the arrows, the volume buttons, mute, and X. The bumpers move one page and stop at the ends. B closes the bubble, and a second B closes the log. Y does nothing while he is talking. On the hunt list, up from Active reaches the portrait, and A there starts him again. Mouse mode is unchanged. The hunts slider stays a mouse control. On Settings, the right stick scrolls General the first time you open that page.
+The window title reads **GearQuest Forever v1.0.4**. **Hunts per gear slot** runs from 3 to 10 at the lower left of the log. The first time you open GearQuest, The GearQuest Knight speaks through 12 pages, with **Yes!** on the first page, a speaker and three volumes, and a gold glow on what he is explaining.
 
 ### v1.0.3
 

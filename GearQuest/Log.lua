@@ -123,6 +123,26 @@ local function GetListRowTextMaxWidth(row, leftInset)
     return math.max(40, width - leftInset - LIST_ROW_RIGHT_PAD)
 end
 
+local function ApplyHuntRowHighlight(tex)
+    tex:SetTexture("Interface\\Buttons\\WHITE8X8")
+    tex:SetVertexColor(1, 1, 1, 1)
+    local leftR, leftG, leftB, leftA = 0.28, 0.22, 0.08, 0.55
+    local applied = false
+    if tex.SetGradient and CreateColor then
+        applied = pcall(tex.SetGradient, tex, "HORIZONTAL",
+            CreateColor(leftR, leftG, leftB, leftA),
+            CreateColor(leftR, leftG, leftB, 0))
+    end
+    if not applied and tex.SetGradientAlpha then
+        applied = pcall(tex.SetGradientAlpha, tex, "HORIZONTAL",
+            leftR, leftG, leftB, leftA,
+            leftR, leftG, leftB, 0)
+    end
+    if not applied then
+        tex:SetColorTexture(leftR, leftG, leftB, leftA)
+    end
+end
+
 local function IsListRowHighlightable(rowType)
     return rowType == "item" or rowType == "notable"
 end
@@ -5582,7 +5602,7 @@ function GQ.Log:CreateListRow(index)
 
     row.highlight = row:CreateTexture(nil, "BACKGROUND")
     row.highlight:SetAllPoints()
-    row.highlight:SetColorTexture(0.28, 0.22, 0.08, 0.55)
+    ApplyHuntRowHighlight(row.highlight)
     row.highlight:Hide()
 
     row.info = CreateFrame("Button", nil, row)
@@ -7276,8 +7296,6 @@ function GQ.Log:EnsureHuntsPerSlot(frame)
         thumb:SetSize(32, 32)
         slider:SetThumbTexture(thumb)
     end
-    slider:SetPoint("LEFT", label, "RIGHT", 10, 0)
-    slider:SetSize(108, 17)
     slider:SetMinMaxValues(3, 10)
     slider:SetValueStep(1)
     if slider.SetObeyStepOnDrag then
@@ -7299,9 +7317,14 @@ function GQ.Log:EnsureHuntsPerSlot(frame)
     end
 
     local valueText = host:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    valueText:SetPoint("LEFT", slider, "RIGHT", 8, 0)
-    valueText:SetJustifyH("LEFT")
+    valueText:SetPoint("RIGHT", host, "RIGHT", -8, 0)
+    valueText:SetWidth(22)
+    valueText:SetJustifyH("RIGHT")
     valueText:SetTextColor(1, 0.82, 0)
+    slider:ClearAllPoints()
+    slider:SetPoint("LEFT", label, "RIGHT", 10, 0)
+    slider:SetPoint("RIGHT", valueText, "LEFT", -8, 0)
+    slider:SetHeight(17)
 
     local function ShowCount(raw)
         local count = math.floor((tonumber(raw) or 3) + 0.5)
@@ -7351,8 +7374,7 @@ function GQ.Log:EnsureHuntsPerSlot(frame)
     slider._gqQuiet = nil
     ShowCount(self:HuntsPerSlot())
 
-    local labelWidth = label:GetStringWidth() or 130
-    host:SetWidth(8 + labelWidth + 10 + 108 + 8 + 24 + 8)
+    host:SetWidth(LEFT_COLUMN_WIDTH)
     frame.huntsPerSlot = host
     frame.huntsPerSlotSlider = slider
 end
@@ -7369,7 +7391,7 @@ function GQ.Log:EnsurePlayStyle(frame)
     local btn = CreateFrame("Button", "GearQuestPlayStyleButton", frame, "UIPanelButtonTemplate")
     btn:SetSize(118, 22)
     btn:SetText("Play style")
-    btn:SetPoint("BOTTOM", frame, "BOTTOM", 0, FOOTER_BUTTON_Y)
+    btn:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", CONTENT_LEFT + LEFT_COLUMN_WIDTH + COLUMN_GAP, FOOTER_BUTTON_Y)
     btn:SetScript("OnClick", function()
         local log = _G.GearQuest and _G.GearQuest.Log
         if log then
@@ -7855,7 +7877,16 @@ function GQ.Log:LayoutFooterButtons(frame)
     end
 
     self:EnsurePlayStyle(frame)
+    if frame.playStyleBtn then
+        frame.playStyleBtn:ClearAllPoints()
+        frame.playStyleBtn:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", CONTENT_LEFT + LEFT_COLUMN_WIDTH + COLUMN_GAP, FOOTER_BUTTON_Y)
+    end
     self:EnsureHuntsPerSlot(frame)
+    if frame.huntsPerSlot then
+        frame.huntsPerSlot:ClearAllPoints()
+        frame.huntsPerSlot:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", CONTENT_LEFT, FOOTER_BUTTON_Y)
+        frame.huntsPerSlot:SetWidth(LEFT_COLUMN_WIDTH)
+    end
 end
 
 function GQ.Log:ApplyPageTab()
@@ -10324,9 +10355,11 @@ function GQ.Log:EnsureSettingsPage(frame)
     local titleText = slider.Text or (sliderName and _G[sliderName .. "Text"])
     if lowText then
         lowText:SetText("100%")
+        lowText:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
     end
     if highText then
         highText:SetText("150%")
+        highText:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
     end
     if titleText then
         titleText:SetText("")
@@ -10652,7 +10685,7 @@ function GQ.Log:EnsureSettingsPage(frame)
     creditsBody:SetPoint("TOPLEFT", creditsTitle, "BOTTOMLEFT", 0, -6)
     creditsBody:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
     creditsBody:SetJustifyH("LEFT")
-    creditsBody:SetText("Eao\nMainWon\nStikmyre\nClick\nVaniron\nThrayne\nAlteredigor")
+    creditsBody:SetText("Eao\nMainWon\nStikmyre\nClick\nVaniron\nThrayne\nAlteredigor\nDeadlybrew")
     creditsBody:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
     creditsBody:Hide()
     frame.settingsCreditsBody = creditsBody

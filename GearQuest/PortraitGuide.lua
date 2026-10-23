@@ -10,71 +10,113 @@ local GUIDE_NAME = "The GearQuest Knight"
 
 -- The counter is the length of this list. Add a page here, and a matching
 -- sound in Sounds/, when the next line is ready.
+-- QuestFont has one weight. Black ink is the bold the parchment can show.
+local function Bold(text)
+    return "|cff000000" .. text .. "|r"
+end
+
+local INFO_ICON = "|TInterface\\FriendsFrame\\InformationIcon:14:14|t"
+
 local PAGES = {
     {
-        text = "Greetings adventurer!\nI have roamed Azeroth for my whole life and discovered a lot of sweet gear! ahem.. I am willing to share one or two hunts with you.. ahh heck.. I'll share them all!\nSo are you ready to go on a quest for gear? wait.. that didn't sound right, let's try that one more time. ARE YOU READY TO GO ON A GEAR QUEST?",
+        text = "Greetings adventurer!\n\n"
+            .. "I have roamed Azeroth for my whole life and discovered a lot of sweet gear! ahem.. I am willing to share one or two hunts with you.. ahh heck.. I'll share them all!\n\n"
+            .. "So are you ready to go on a quest for gear? wait.. that didn't sound right, let's try that one more time.\n\n"
+            .. Bold("ARE YOU READY TO GO ON A GEAR QUEST?"),
         sound = "Interface\\AddOns\\" .. ADDON_NAME .. "\\Sounds\\Guide-05.mp3",
         highlight = "log",
     },
     {
-        text = "Alright, let's begin.\nThis is the GearQuest Log, and here you'll find the list of Active hunts, hunts that you Completed and hunts that you didn't like so you Removed them.. Don't know why you'd do that but..\nThe Log shows you the best gear for your current faction, specialization and of course level. By default the list shows you the top 3 ranked pieces of gear per slot - those are also available if you right-click a slot in your character panel.",
+        text = "Alright, let's begin.\n\n"
+            .. "This is the " .. Bold("GearQuest Log") .. ", and here you'll find the " .. Bold("list") .. " of " .. Bold("Active") .. " hunts, hunts that you " .. Bold("Completed") .. " and hunts that you didn't like so you " .. Bold("Removed") .. " them.. Don't know why you'd do that but..\n\n"
+            .. "The " .. Bold("Log") .. " shows you the best gear for your current faction, specialization and of course level. By default the " .. Bold("list") .. " shows you the " .. Bold("top 3") .. " ranked pieces of gear per slot - those are also available if you right-click a slot in your character panel.",
         sound = "Interface\\AddOns\\" .. ADDON_NAME .. "\\Sounds\\Guide-06.mp3",
         highlight = { "log", "list" },
     },
     {
-        text = "GearQuest carries a lot of gear for you so it can still present you with viable options even when you apply filters. You can see all the ranked options for your current level by hovering your cursor over the info |TInterface\\FriendsFrame\\InformationIcon:14:14|t icon next to each slot title.\nYou can also control how many options you can see for each slot by using the slider right below this list.",
+        text = "GearQuest carries a lot of gear for you so it can still present you with viable options even when you apply filters.\n\n"
+            .. "You can see all the ranked options for your current level by hovering your cursor over the " .. Bold("info " .. INFO_ICON .. " icon") .. " next to each slot title.\n\n"
+            .. "You can also control how many options you can see for each slot by using the " .. Bold("slider") .. " right below this list.",
         sound = "Interface\\AddOns\\" .. ADDON_NAME .. "\\Sounds\\Guide-07.mp3",
         highlight = { "log", "info", "slider" },
     },
     {
-        text = "The Filter lets you well.. filter. So if you only want to see hunts in the list that are from that bastard Van Cleef's dungeon, you can do that along with many other options. There's also a filter if you scroll down near the bottom of the list for Weapons. Lastly there are Play Styles that are sort of a combination of different filters, fx. Zone Focus filters the list only to show you hunts that are available in the zone you're currently located in, while No Dungeons! never leads you into a dungeon.",
+        text = "The " .. Bold("Filter") .. " lets you well.. filter. So if you only want to see hunts in the list that are from that bastard Van Cleef's dungeon, you can do that along with many other options.\n\n"
+            .. "There's also a filter if you scroll down near the bottom of the list for " .. Bold("Weapons") .. ".\n\n"
+            .. "Lastly there are " .. Bold("Play Styles") .. " that are sort of a combination of different filters, fx. " .. Bold("Zone Focus") .. " filters the list only to show you hunts that are available in the zone you're currently located in, while " .. Bold("No Dungeons!") .. " never leads you into a dungeon.",
         sound = "Interface\\AddOns\\" .. ADDON_NAME .. "\\Sounds\\Guide-08.mp3",
-        highlight = { "log", "filter", "playstyle" },
+        highlight = { "log", "filter", "weapons", "playstyle" },
     },
     {
-        text = "Okay, now try to select any hunt from the list. Doing so updates the parchment section with the hunt's details where it will tell you the rank of the gear, where to get it, any prerequisites or recommendations for what is expected from you along with the source of the gear (this is what you also can filter by) and lastly the reward, the sweet gear piece. Oh and by the way, when you obtain one of your top ranked pieces at any level, you get an achievement-like toast!",
+        text = "Okay, now try to select any hunt from the list.\n\n"
+            .. "Doing so updates the " .. Bold("parchment") .. " section with the hunt's details where it will tell you the " .. Bold("rank") .. " of the gear, where to get it, any prerequisites or recommendations for what is expected from you along with the " .. Bold("source") .. " of the gear (this is what you also can filter by) and lastly the " .. Bold("reward") .. ", the sweet gear piece.\n\n"
+            .. "Oh and by the way, when you obtain one of your top ranked pieces at any level, you get an achievement-like toast!",
         sound = "Interface\\AddOns\\" .. ADDON_NAME .. "\\Sounds\\Guide-09.mp3",
         highlight = { "log", "detail" },
     },
     {
-        text = "By the bottom of this section you find 3 buttons. Track adds this hunt to your GearQuest Tracker and also applies an icon on your world map as an indicator of where you have to go. You can also Enable Guide from the Tracker that makes an arrow appear above the Tracker to lead you to the hunt destination. If you are on the opposite continent, it will first lead you to a nearby ship or zeppelin. Show on map does not add an icon but it directly shows you where the hunt's destination is and enables the Guide. Remove just well.. removes the hunt so you don't see it again. You can restore it at any point from the Removed tab.",
+        text = "By the bottom of this section you find 3 buttons.\n\n"
+            .. Bold("Track") .. " adds this hunt to your GearQuest Tracker and also applies an icon on your world map as an indicator of where you have to go. You can also " .. Bold("Enable Guide") .. " from the Tracker that makes an arrow appear above the Tracker to lead you to the hunt destination. If you are on the opposite continent, it will first lead you to a nearby ship or zeppelin.\n\n"
+            .. Bold("Show on map") .. " does not add an icon but it directly shows you where the hunt's destination is and enables the " .. Bold("Guide") .. ".\n\n"
+            .. Bold("Remove") .. " just well.. removes the hunt so you don't see it again. You can restore it at any point from the " .. Bold("Removed") .. " tab.",
         sound = "Interface\\AddOns\\" .. ADDON_NAME .. "\\Sounds\\Guide-10.mp3",
         highlight = { "log", "track", "map", "remove", "removed" },
     },
     {
-        text = "The GearQuest Index Score is an indicator of how well geared you are based on the specialization you have selected. If you hover the score bar, you will get a list of the gear you wear and how each scores. Every gear piece is scored and ranked based on the stat weights your current spec has. In the Spec Picker just below, you can try to change your spec to a different one and you will see the score bar update based on that spec's gear list. This does not work in simulation mode by the way.",
+        text = "The " .. Bold("GearQuest Index Score") .. " is an indicator of how well geared you are based on the specialization you have selected.\n\n"
+            .. "If you hover the " .. Bold("score bar") .. ", you will get a list of the gear you wear and how each scores. Every gear piece is scored and ranked based on the stat weights your current spec has.\n\n"
+            .. "In the " .. Bold("Spec Picker") .. " just below, you can try to change your spec to a different one and you will see the " .. Bold("score bar") .. " update based on that spec's gear list.\n\n"
+            .. "This does not work in simulation mode by the way.",
         sound = "Interface\\AddOns\\" .. ADDON_NAME .. "\\Sounds\\Guide-11.mp3",
         highlight = { "log", "score", "spec" },
     },
     {
-        text = "Once a spec is selected, you can hover on the name of the spec to see what stat weights that spec is scored from. So if you are one of those gear-loving hunters you'd typically go for something with agility on, or healing or perhaps a shield? No but for real, you should see that the weight of agility is higher compared to fx. spirit. If you disagree with any of the premade specs' stat weights you can either give feedback, or just.. dont bother and make your own custom spec with a custom stat weight configuration.",
+        text = "Once a " .. Bold("spec") .. " is selected, you can hover on the name of the " .. Bold("spec") .. " to see what " .. Bold("stat weights") .. " that spec is scored from.\n\n"
+            .. "So if you are one of those gear-loving hunters you'd typically go for something with " .. Bold("agility") .. " on, or healing or perhaps a shield? No but for real, you should see that the weight of " .. Bold("agility") .. " is higher compared to fx. " .. Bold("spirit") .. ".\n\n"
+            .. "If you disagree with any of the premade specs' " .. Bold("stat weights") .. " you can either give feedback, or just.. dont bother and make your own " .. Bold("custom spec") .. " with a custom stat weight configuration.",
         sound = "Interface\\AddOns\\" .. ADDON_NAME .. "\\Sounds\\Guide-12.mp3",
         highlight = { "log", "spec" },
     },
     {
-        text = "Alright, I got just a few other points and then you can run smack Hogger's face in.. ahem. Let's switch to the Lookup tab. This window lets you search my gear database for all the gear that I have come by over the years, so try do a search that is relevant for your class. Once you find it, you can hover the info icon to see when the gear piece is relevant for your class spec's. If you don't find the gear you were looking for, then try Simulate a class that gear piece is relevant for.",
+        text = "Alright, I got just a few other points and then you can run smack Hogger's face in.. ahem.\n\n"
+            .. "Let's switch to the " .. Bold("Lookup") .. " tab. This window lets you search my gear database for all the gear that I have come by over the years, so try do a " .. Bold("search") .. " that is relevant for your class.\n\n"
+            .. "Once you find it, you can hover the " .. Bold("info " .. INFO_ICON .. " icon") .. " to see when the gear piece is relevant for your class spec's.\n\n"
+            .. "If you don't find the gear you were looking for, then try " .. Bold("Simulate") .. " a class that gear piece is relevant for.",
         sound = "Interface\\AddOns\\" .. ADDON_NAME .. "\\Sounds\\Guide-13.mp3",
         tab = "lookup",
         highlight = { "lookup", "search" },
     },
     {
-        text = "Now since I've already mentioned it a few times, let's have a look at the Simulator. This function lets you simulate any class, spec and level you wish - both factions. So.. If you wanna check out how the list of gear looks like for an alliance warrior at level 37 - like myself - then the Simulator is for you!",
+        text = "Now since I've already mentioned it a few times, let's have a look at the " .. Bold("Simulator") .. ".\n\n"
+            .. "This function lets you " .. Bold("simulate") .. " any " .. Bold("class") .. ", " .. Bold("spec") .. " and " .. Bold("level") .. " you wish - both factions.\n\n"
+            .. "So.. If you wanna check out how the list of gear looks like for an " .. Bold("alliance") .. " " .. Bold("warrior") .. " at " .. Bold("level 37") .. " - like myself - then the " .. Bold("Simulator") .. " is for you!",
         sound = "Interface\\AddOns\\" .. ADDON_NAME .. "\\Sounds\\Guide-14.mp3",
         tab = "simulator",
         highlight = { "simulator", "warrior", "alliance", "arms", "level", "simulate" },
     },
     {
-        text = "Okay, last thing. I want to mention the Settings, because some adventurers don't like that minimap button, others want to see the best enchants on the gear's tooltip and more. So check out the different settings to make your journey more pleasant. Oh, and shout out to the amazing GearQuest community on Discord? I don't know what that last line meant, the guy just asked me to read that out.",
+        text = "Okay, last thing. I want to mention the " .. Bold("Settings") .. ", because some adventurers don't like that " .. Bold("minimap button") .. ", others want to see the " .. Bold("best enchants") .. " on the gear's tooltip and more.\n\n"
+            .. "So check out the different settings to make your journey more pleasant.\n\n"
+            .. "Oh, and shout out to the amazing GearQuest community on Discord? I don't know what that last line meant, the guy just asked me to read that out.",
         sound = "Interface\\AddOns\\" .. ADDON_NAME .. "\\Sounds\\Guide-15.mp3",
         tab = "settings",
         highlight = { "settings", "minimap", "enchant" },
     },
     {
-        text = "So.. What are you waiting for? Let's start Gear Questing... Forever!",
+        text = "So.. What are you waiting for?\n\n"
+            .. "Let's start " .. Bold("Gear Questing... Forever!"),
         sound = "Interface\\AddOns\\" .. ADDON_NAME .. "\\Sounds\\Guide-16.mp3",
         tab = "any",
         highlight = "frame",
     },
+}
+
+-- The side handles stay on screen on every page, so their glow does too.
+local HANDLE_MARK = {
+    log = true,
+    lookup = true,
+    simulator = true,
+    settings = true,
 }
 
 for i = 1, #PAGES do
@@ -89,9 +131,11 @@ for i = 1, #PAGES do
     end
 end
 
-local PARCHMENT = "Interface\\AddOns\\" .. ADDON_NAME .. "\\Textures\\GQ-Parchment.png"
+local PARCHMENT = "Interface\\AddOns\\" .. ADDON_NAME .. "\\Art\\GQ-GuideParchment.png"
 local TAIL = "Interface\\AddOns\\" .. ADDON_NAME .. "\\Art\\GQ-GuideTail.png"
-local VOICE_ON = "Interface\\AddOns\\" .. ADDON_NAME .. "\\Art\\GQ-GuideVoice.png"
+local VOICE_1 = "Interface\\AddOns\\" .. ADDON_NAME .. "\\Art\\GQ-GuideVoice1.png"
+local VOICE_2 = "Interface\\AddOns\\" .. ADDON_NAME .. "\\Art\\GQ-GuideVoice2.png"
+local VOICE_3 = "Interface\\AddOns\\" .. ADDON_NAME .. "\\Art\\GQ-GuideVoice3.png"
 local VOICE_OFF = "Interface\\AddOns\\" .. ADDON_NAME .. "\\Art\\GQ-GuideVoiceOff.png"
 
 local BUBBLE_W = 430
@@ -259,13 +303,25 @@ local function SetArrowEnabled(button, enabled)
     button:SetAlpha(enabled and 1 or 0.35)
 end
 
+function GUIDE:VoiceTexture()
+    if not self:VoiceOn() then
+        return VOICE_OFF
+    end
+    local step = self:VolumeStep()
+    if step >= 3 then
+        return VOICE_3
+    elseif step == 2 then
+        return VOICE_2
+    end
+    return VOICE_1
+end
+
 function GUIDE:UpdateMute()
     local bubble = self.bubble
     if not bubble or not bubble.muteIcon then
         return
     end
-    local on = self:VoiceOn()
-    bubble.muteIcon:SetTexture(on and VOICE_ON or VOICE_OFF)
+    bubble.muteIcon:SetTexture(self:VoiceTexture())
 end
 
 function GUIDE:SetVolume(step)
@@ -293,6 +349,7 @@ function GUIDE:UpdateVolume()
     bubble.volumeText:SetText(tostring(step))
     SetArrowEnabled(bubble.volumeDown, step > 1)
     SetArrowEnabled(bubble.volumeUp, step < VOLUME_MAX)
+    self:UpdateMute()
 end
 
 local GLOW_THICK = 14
@@ -624,6 +681,51 @@ function GUIDE:TopHeaderInfo()
     return best
 end
 
+function GUIDE:WeaponsFilterArrow()
+    local log = GQ.Log
+    local rows = log and log.listRows
+    local scroll = log and log.frame and log.frame.scroll
+    if not rows then
+        return nil
+    end
+    local viewTop = scroll and scroll:GetTop()
+    local viewBottom = scroll and scroll:GetBottom()
+    for i = 1, #rows do
+        local row = rows[i]
+        local arrow = row and row.weaponArrow
+        if row and row:IsShown() and arrow and arrow:IsShown() and row.slotName ~= "Ranged" then
+            local top = arrow:GetTop()
+            local bottom = arrow:GetBottom()
+            if not viewTop or not viewBottom or not top or not bottom
+                or (bottom < viewTop - 2 and top > viewBottom + 2) then
+                return arrow, i
+            end
+            return nil, i
+        end
+    end
+    return nil
+end
+
+-- The Weapons arrow sits on that header. Bring it into the list once per visit.
+function GUIDE:RevealWeaponsFilter()
+    if self._weaponsShown == self.page then
+        return
+    end
+    local arrow, index = self:WeaponsFilterArrow()
+    if arrow then
+        self._weaponsShown = self.page
+        return
+    end
+    if not index then
+        return
+    end
+    local log = GQ.Log
+    if log and log.ScrollListToRow then
+        log:ScrollListToRow(index)
+        self._weaponsShown = self.page
+    end
+end
+
 function GUIDE:HighlightPair(kind)
     local log = GQ.Log
     local frame = log and log.frame
@@ -648,6 +750,9 @@ function GUIDE:HighlightPair(kind)
         widget = frame.huntsPerSlot
     elseif kind == "filter" then
         widget = frame.sourceFilterBtn
+    elseif kind == "weapons" then
+        self:RevealWeaponsFilter()
+        widget = self:WeaponsFilterArrow()
     elseif kind == "playstyle" then
         widget = frame.playStyleBtn
     elseif kind == "detail" then
@@ -734,7 +839,12 @@ function GUIDE:SyncListGlow()
     local wantTab = (page and page.tab) or "log"
     local marks = page and page.marks
     local tabOk = wantTab == "any" or pageTab == wantTab
-    if not tabOk or (not marks and not whole) then
+    if whole then
+        if not tabOk then
+            self:HideListGlow()
+            return
+        end
+    elseif not marks then
         self:HideListGlow()
         return
     end
@@ -756,10 +866,13 @@ function GUIDE:SyncListGlow()
     end
     local shown = 0
     for i = 1, #marks do
-        local topBar, list, cap, wide = self:HighlightPair(marks[i])
-        if topBar and list then
-            shown = shown + 1
-            self:LayoutGlow(self:EnsureGlow(shown), topBar, list, cap, wide)
+        local kind = marks[i]
+        if tabOk or HANDLE_MARK[kind] then
+            local topBar, list, cap, wide = self:HighlightPair(kind)
+            if topBar and list then
+                shown = shown + 1
+                self:LayoutGlow(self:EnsureGlow(shown), topBar, list, cap, wide)
+            end
         end
     end
     local glows = self.glows
@@ -841,6 +954,7 @@ function GUIDE:SetPage(index)
     if index == self.page and self.bubble and self.bubble:IsShown() then
         return
     end
+    self._weaponsShown = nil
     self.page = index
     self:Refresh()
     self:PlayCurrent()
@@ -866,32 +980,34 @@ function GUIDE:Place(bubble, frame)
     if frameScale <= 0 or parentScale <= 0 then
         return false
     end
-    local want = frameScale / parentScale
+    local rel = frameScale / parentScale
     local strata = frame.GetFrameStrata and frame:GetFrameStrata() or "DIALOG"
     local level = (frame:GetFrameLevel() or 1) + 30
     local tipX = PORTRAIT_OFFSET_X + (PORTRAIT_SIZE * 0.5)
     local tipY = PORTRAIT_OFFSET_Y + TIP_GAP
     local boxX = tipX - TAIL_CENTER_X
     local boxY = tipY + (TAIL_H - TAIL_OVERLAP)
-    local blX = (left * frameScale + boxX * frameScale) / parentScale
-    local blY = (top * frameScale + boxY * frameScale) / parentScale
+    -- GetLeft/GetTop are already in UIParent space. The portrait offset is in
+    -- the window's own pixels, so only that offset grows with the window scale.
+    local blX = left + boxX * rel
+    local blY = top + boxY * rel
     local height = bubble:GetHeight() or 0
     if height < 40 then
         height = 120
     end
     local screenH = UIParent:GetHeight() or 0
-    local topY = blY + height * want
+    local topY = blY + height * rel
     if topY > screenH - 8 then
         blY = blY - (topY - (screenH - 8))
     end
     if bubble._strata == strata and bubble._level == level
-        and Near(bubble._blX, blX) and Near(bubble._blY, blY) and Near(bubble._want, want) then
+        and Near(bubble._blX, blX) and Near(bubble._blY, blY) and Near(bubble._want, rel) then
         return true
     end
     bubble._strata, bubble._level = strata, level
-    bubble._blX, bubble._blY, bubble._want = blX, blY, want
-    if math.abs((bubble:GetScale() or 1) - want) > 0.001 then
-        bubble:SetScale(want)
+    bubble._blX, bubble._blY, bubble._want = blX, blY, rel
+    if math.abs((bubble:GetScale() or 1) - rel) > 0.001 then
+        bubble:SetScale(rel)
     end
     if bubble.SetFrameStrata then
         bubble:SetFrameStrata(strata)
@@ -1019,40 +1135,69 @@ function GUIDE:Ensure(frame)
     hit:SetPoint("TOPLEFT", frame, "TOPLEFT", PORTRAIT_OFFSET_X, PORTRAIT_OFFSET_Y)
     hit:EnableMouse(true)
     hit:SetFrameLevel((frame:GetFrameLevel() or 1) + 12)
+    local glow = hit:CreateTexture(nil, "OVERLAY")
+    glow:SetAllPoints(hit)
+    local colored = glow.SetColorTexture and pcall(glow.SetColorTexture, glow, 1, 0.82, 0.45, 1)
+    glow:SetBlendMode("ADD")
+    glow:SetAlpha(0.45)
+    local masked = false
+    if colored and hit.CreateMaskTexture and glow.AddMaskTexture then
+        local masks = {
+            "Interface\\Masks\\CircleMaskScalable",
+            "Interface\\CharacterFrame\\TempPortraitAlphaMask",
+        }
+        for i = 1, #masks do
+            local mask = hit:CreateMaskTexture()
+            mask:SetAllPoints(glow)
+            local texOk = pcall(mask.SetTexture, mask, masks[i])
+            local addOk = texOk and pcall(glow.AddMaskTexture, glow, mask)
+            if addOk then
+                masked = true
+                break
+            end
+            mask:Hide()
+        end
+    end
+    if not masked then
+        glow:SetTexture("Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight")
+        glow:SetBlendMode("ADD")
+        glow:SetAlpha(0.9)
+    end
+    glow:Hide()
+    hit.glow = glow
     hit:SetScript("OnClick", function()
         GUIDE:Open(frame)
     end)
     hit:SetScript("OnEnter", function(self)
+        if self.glow then
+            self.glow:Show()
+        end
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
         GameTooltip:SetText("GearQuest guide", 1, 0.82, 0)
         GameTooltip:AddLine("Click the portrait to hear him again.", 1, 1, 1, true)
         GameTooltip:Show()
     end)
-    hit:SetScript("OnLeave", function()
+    hit:SetScript("OnLeave", function(self)
+        if self.glow then
+            self.glow:Hide()
+        end
         GameTooltip:Hide()
     end)
     self.hit = hit
 
     -- The log clips its children, so the bubble lives on UIParent and follows the window.
-    local bubble = CreateFrame("Frame", "GearQuestPortraitGuide", UIParent, "BackdropTemplate")
+    local bubble = CreateFrame("Frame", "GearQuestPortraitGuide", UIParent)
     bubble:SetWidth(BUBBLE_W)
     bubble:SetHeight(120)
     bubble:SetFrameStrata("DIALOG")
     bubble:SetFrameLevel((frame:GetFrameLevel() or 1) + 30)
     bubble:EnableMouse(true)
-    bubble:SetBackdrop({
-        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-        edgeSize = 14,
-        insets = { left = 3, right = 3, top = 3, bottom = 3 },
-    })
-    bubble:SetBackdropBorderColor(0.72, 0.52, 0.22, 1)
     bubble:Hide()
     bubble:SetAlpha(0)
 
     local parchment = bubble:CreateTexture(nil, "BACKGROUND", nil, 0)
     parchment:SetTexture(PARCHMENT)
-    parchment:SetPoint("TOPLEFT", bubble, "TOPLEFT", 4, -4)
-    parchment:SetPoint("BOTTOMRIGHT", bubble, "BOTTOMRIGHT", -4, 4)
+    parchment:SetAllPoints(bubble)
 
     local tail = bubble:CreateTexture(nil, "BACKGROUND", nil, -1)
     tail:SetTexture(TAIL)
