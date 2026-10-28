@@ -62,7 +62,7 @@ Classic ids that 404 are pruned from hunts at load (`GQ.Data:PruneMissingForever
 
 **Relics:** do not rank Totem/Idol/Libram by item level alone. Run `python pipeline/scripts/patch_relic_effects.py` after ingest so Equip lines land in `items.json`, then `relic_score.py` inside `score.py` prices casting mana reg, spell-line buffs, and small utility CD trims per spec.
 
-**Local WoW install:** after changing addon Lua or `_generated/`, always run `scripts/sync-addon.ps1` from repo root (see [README.md](../README.md)). Editing only the git tree does not update `Interface/AddOns/GearQuestForever`.
+**Local WoW install:** after changing addon Lua or `_generated/`, always run `scripts/sync-addon.ps1` from repo root (see [README.md](../README.md)). That copies only to `C:\Program Files (x86)\World of Warcraft\_forever_\Interface\AddOns`. Editing only the git tree does not update `GearQuestForever` there.
 
 **Log — simulation banner:** when preview/simulation is on, the log header shows level, spec, class, and faction; when off, it tells the player they are viewing their character and can use the spec picker.
 

@@ -23,7 +23,6 @@ local function ApplyMinimapIcon(icon)
     end
 
     icon:SetTexture(MINIMAP_TEXTURE)
-    icon:SetTexCoord(0, 1, 1, 0)
 end
 
 local function EnsureMinimapIcon(button)

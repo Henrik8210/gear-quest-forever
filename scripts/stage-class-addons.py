@@ -167,6 +167,7 @@ def write_toc(folder: Path, title: str, files: list[str]) -> None:
         "## Notes: Hunt lists for this class. GearQuest Forever loads this when you play or simulate it.",
         "## Author: Henrik8210",
         f"## Version: {addon_version()}",
+        f"## IconTexture: Interface\\Icons\\ClassIcon_{title}",
         "## LoadOnDemand: 1",
         "## Dependencies: GearQuestForever",
         "## RequiredDeps: GearQuestForever",

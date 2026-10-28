@@ -40,7 +40,7 @@ Compare equipped item vs candidates by item level + simple stat relevance for cl
 - Character panel slot click → popup with 3 options
 - GearQuest log frame: list active/completed hunts
 - Static data file (`GearQuest/Data.lua`)
-- WoW Forever beta: `## Interface: 16001` (CurseForge game version **1.60.1**). Confirm `lastAddonVersion` from the beta `WTF/Config.wtf` after first login. Do not use TBC `20505`.
+- WoW Forever (live client `_forever_`): `## Interface: 16001` (CurseForge game version **1.60.1**). Confirm `lastAddonVersion` in `_forever_\WTF\Config.wtf` after first login. Local sync goes only to `C:\Program Files (x86)\World of Warcraft\_forever_\Interface\AddOns`. Do not use TBC `20505`.
 
 ## Level cap
 

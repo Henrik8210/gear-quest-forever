@@ -944,7 +944,7 @@ client. Item facts come from Wowhead ingest only. BiS arrows still paint on
 loot, vendors, quests, and the player's own trade-skill window — not at a
 trainer NPC.
 
-## When you find a new or retuned item in Forever beta
+## When you find a new or retuned item in Forever
 
 Do not hand-edit generated Lua as the long-term fix. Do not hand-edit
 `items.json` stats when a Forever hunt tip exists — sync from the tip, then

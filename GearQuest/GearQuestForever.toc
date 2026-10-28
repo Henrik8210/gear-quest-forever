@@ -2,7 +2,8 @@
 ## Title: GearQuest Forever
 ## Notes: Leveling gear upgrades for WoW Forever - click a slot, pick a hunt, track it in the log.
 ## Author: Henrik8210
-## Version: 1.0.5
+## Version: 1.0.6
+## IconTexture: Interface\AddOns\GearQuestForever\Art\GearQuest-Icon
 ## X-Curse-Project-ID: 1698950
 ## SavedVariables: GearQuestForeverDB
 ## SavedVariablesPerCharacter: GearQuestForeverCharDB

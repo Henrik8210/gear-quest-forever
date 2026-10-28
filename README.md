@@ -6,13 +6,15 @@ This is a **new repo and a new CurseForge project**. The TBC Anniversary addon s
 
 Click a gear slot on your character panel (right-click), browse from the log, or click the minimap icon to open GearQuest.
 
-## WoW Forever beta (17 September 2026)
+## WoW Forever
 
-Forever is a new 1–60 Classic+ client (original continents, before Molten Core). TOC interface is **16001** (CurseForge game version **1.60.1**). After you launch the client, confirm `lastAddonVersion` in:
+Forever is the live 1–60 Classic+ client (original continents, before Molten Core). TOC interface is **16001** (CurseForge game version **1.60.1**). After you launch the client, confirm `lastAddonVersion` in:
 
-   `World of Warcraft\<forever-folder>\WTF\Config.wtf`
+   `World of Warcraft\_forever_\WTF\Config.wtf`
 
-Install folder is `_classic_beta_` (Forever beta). `scripts/sync-addon.ps1` looks for that first, then a few other likely names, or set `$env:GEARQUEST_WOW_CLIENT`.
+The only install this repo syncs is the live client:
+
+   `C:\Program Files (x86)\World of Warcraft\_forever_\Interface\AddOns`
 
 Lists are the Forever scoring model for all nine classes, levels 1–60, both factions, including paladin and warrior levels 1–9. Do not put a hand-written Alliance list back. Scoring rules: [pipeline/docs/FOREVER-SCORING.md](pipeline/docs/FOREVER-SCORING.md). Paladin has a fourth spec, Shockadin, for spell damage in melee. It is in the spec menu, not a talent tab. Holy, Shockadin, Elemental, and Restoration start with two-hand and one-hand both on. Rogues hunt one-hand axes, swords, maces, fists, and daggers on every spec. Assassination and Subtlety are not dagger-locked. The Weapons menu lists those types under Main Hand and under Off Hand. A one-hand weapon belongs to both hands, so one hand can hide a type while the other still shows it. A main-hand-only weapon stays under Main Hand. An off-hand-only weapon stays under Off Hand. Hunters filter the Ranged header by Bow, Gun, and Crossbow. Rank numbers stay the real ones. Protection and Shockadin score weapon speed at -2, so a faster weapon loses less when the other stats are close. Holy and Retribution do not.
 
@@ -131,22 +133,19 @@ A generic world drop through level 15 is pinned on a published mob, not the ques
 
 **Minimap:** any click opens GearQuest. Use the **Simulator** handle tab (class, faction, spec, level 1–60). **Turn off simulation** = `/gq set me`.
 
+The AddOn List, on the character selection screen, shows the loot sack on **GearQuest Forever**, the same picture as the minimap button. Each class row shows that class's icon: Druid, Hunter, Mage, Paladin, Priest, Rogue, Shaman, Warlock, and Warrior. Those rows stay load-on-demand. The pictures do not change the hunts.
+
 ## Local WoW install
 
-After **every** edit under `GearQuest/` (Lua, `_generated/`, art), sync to your game folder — the repo is not what WoW loads until you do. The install folder is **`GearQuestForever`** (TBC Anniversary uses **`GearQuest`** — same repo name, different products).
+After **every** edit under `GearQuest/` (Lua, `_generated/`, art), sync to the live Forever client. The repo is not what WoW loads until you do. The addon folder is **`GearQuestForever`**.
 
 ```powershell
 .\scripts\sync-addon.ps1
 ```
+
+That copies into `C:\Program Files (x86)\World of Warcraft\_forever_\Interface\AddOns` and nowhere else.
 
 The log shows a line under the **GearQuest** title: **simulation mode** (level, spec, class, faction) or **live character** + spec picker hint.
-
-No Forever client yet? You can still sync beside TBC GearQuest on Anniversary for rough UI testing (enable **Load out of date AddOns**):
-
-```powershell
-$env:GEARQUEST_WOW_CLIENT = "_anniversary_"
-.\scripts\sync-addon.ps1
-```
 
 ## Development
 
@@ -156,7 +155,7 @@ $env:GEARQUEST_WOW_CLIENT = "_anniversary_"
 - Project brief: [docs/PROJECT_BRIEF.md](docs/PROJECT_BRIEF.md)
 - Data rules: [docs/DATA_RULES.md](docs/DATA_RULES.md)
 - Changelog: [CHANGELOG.md](CHANGELOG.md)
-- BiS scorer (authors only, not in CurseForge zip): [pipeline/README.md](pipeline/README.md) — adding Forever beta items: [pipeline/docs/FOREVER-SCORING.md](pipeline/docs/FOREVER-SCORING.md)
+- BiS scorer (authors only, not in CurseForge zip): [pipeline/README.md](pipeline/README.md) — adding Forever items: [pipeline/docs/FOREVER-SCORING.md](pipeline/docs/FOREVER-SCORING.md)
 - CurseForge: [RELEASE.md](RELEASE.md)
 
 ## CurseForge

@@ -3,7 +3,7 @@
 This folder **rebuilds** the generated BiS Lua. It is **not** shipped on CurseForge
 (`.pkgmeta` ignores `pipeline/`). Players only get `GearQuest/_generated/*.lua`.
 
-When Forever beta shows a new or retuned item, follow
+When Forever shows a new or retuned item, follow
 [docs/FOREVER-SCORING.md](docs/FOREVER-SCORING.md): add facts to `data/items.json`
 and `data/sources.json`, append the id to `data/classic_item_ids.json`, re-score,
 copy Lua into `GearQuest/_generated/`.

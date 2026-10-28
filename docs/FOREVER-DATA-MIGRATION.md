@@ -17,7 +17,7 @@ GearQuest Forever targets **WoW Forever 1–60** (Classic+). The fork inherited 
 
 **Repo:** commit `scripts/`, `GearQuest/_generated/data/items_random.classic.json`, generated Lua patches, and docs together so another clone sees the same state — cache and generated files must stay in sync.
 
-**Local playtest:** after `_generated/` or `GearQuest/*.lua` changes, run `scripts/sync-addon.ps1` so `_classic_beta_/Interface/AddOns/GearQuestForever` matches the repo (documented in README and DATA_RULES).
+**Local playtest:** after `_generated/` or `GearQuest/*.lua` changes, run `scripts/sync-addon.ps1`. It copies only to `C:\Program Files (x86)\World of Warcraft\_forever_\Interface\AddOns\GearQuestForever` (documented in README and DATA_RULES).
 
 **Relics (phase 4+):** ingest tooltips → `patch_relic_effects.py` → re-score; combat BiS for totems/idols/librams uses `relic_score.py`, not ilvl alone.
 

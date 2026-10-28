@@ -1,58 +1,28 @@
-# Sync GearQuest Forever addon files to a local WoW install.
+# Sync GearQuest Forever addon files to the live WoW Forever client.
 # Run from repo root after making changes.
 #
-# Installs as Interface\AddOns\GearQuestForever (not GearQuest — that name is TBC Anniversary).
-#
-# Forever beta (default when present):
 #   .\scripts\sync-addon.ps1
 #
-# Side-by-side test on TBC Anniversary (enable "Load out of date AddOns"; different Interface):
-#   $env:GEARQUEST_WOW_CLIENT = "_anniversary_"
-#   .\scripts\sync-addon.ps1
-#
-# Custom client folder name:
-#   $env:GEARQUEST_WOW_CLIENT = "_forever_"
+# Copies into:
+#   C:\Program Files (x86)\World of Warcraft\_forever_\Interface\AddOns\GearQuestForever
+# Class hunt addons land beside that folder. This script does not copy to any other client.
 
 $ErrorActionPreference = "Stop"
 
 $source = Join-Path $PSScriptRoot "..\GearQuest"
 $wowRoot = "C:\Program Files (x86)\World of Warcraft"
 $addonName = "GearQuestForever"
+$clientFolder = Join-Path $wowRoot "_forever_"
 
-$clientCandidates = @(
-    $env:GEARQUEST_WOW_CLIENT,
-    "_classic_beta_",
-    "_forever_",
-    "_forever_beta_",
-    "_wow_forever_",
-    "_classic_forever_"
-) | Where-Object { $_ }
-
-$clientFolder = $null
-foreach ($name in $clientCandidates) {
-    $candidate = Join-Path $wowRoot $name
-    if (Test-Path $candidate) {
-        $clientFolder = $candidate
-        break
-    }
-}
-
-if (-not $clientFolder) {
+if (-not (Test-Path $clientFolder)) {
     $existing = @()
     if (Test-Path $wowRoot) {
         $existing = Get-ChildItem $wowRoot -Directory | Select-Object -ExpandProperty Name
     }
     $list = if ($existing) { $existing -join ", " } else { "(World of Warcraft folder not found)" }
     Write-Error @"
-WoW client folder not found under $wowRoot
-Looked for: $($clientCandidates -join ", ")
+WoW Forever client not found: $clientFolder
 Installed folders: $list
-
-Forever beta: install the client, then re-run this script.
-
-To test on Anniversary next to TBC GearQuest (dev only):
-  `$env:GEARQUEST_WOW_CLIENT = "_anniversary_"
-  .\scripts\sync-addon.ps1
 "@
 }
 
@@ -77,4 +47,4 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host "Synced GearQuest Forever -> $target"
 Write-Host "Class hunt data is a separate addon per class (loaded when you play or simulate that class)."
-Write-Host "In-game addon list: GearQuest Forever (folder $addonName). TBC GearQuest is a separate addon if installed."
+Write-Host "In-game addon list: GearQuest Forever (folder $addonName)."

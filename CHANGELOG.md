@@ -2,43 +2,21 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.0.5
+## v1.0.6
 
-The window title reads **GearQuest Forever v1.0.5**. The hunt list lines up with its slider, a hovered hunt fades out to the right, and The GearQuest Knight stays on his portrait when you make the window bigger.
+The window title reads **GearQuest Forever v1.0.6**. The AddOn List shows the loot sack on GearQuest Forever, and each class row shows that class's icon.
 
-### The hunt list
+### AddOn List
 
-The **Hunts per gear slot** bar is as wide as the hunt list above it, for every class and spec, on the Log. The words sit on the left, the number on the right, and the slider fills the space between them. It still runs from 3 to 10. 3 is still the default. The number still shows while you drag, and the list still updates when you let go. The choice is still saved on the account, including while you are simulating. Rank numbers stay the real ones. Weapons stay one header.
+Open the AddOn List from the character selection screen. **GearQuest Forever** uses the loot sack, the same picture as the minimap button.
 
-Hovering a hunt no longer paints a solid box behind the row. The gold starts at the left, under the rank and the name, and fades out toward the right edge of the list. The row you have selected uses that same fade.
+Under it, one row per class reads **GearQuest Forever: Druid**, **Hunter**, **Mage**, **Paladin**, **Priest**, **Rogue**, **Shaman**, **Warlock**, and **Warrior**. Each row uses that class's icon. Each one still says **Only loadable on demand**. GearQuest loads a class when you play it, and when you simulate it.
 
-### The footer
+The pictures are only on that list. They do not change the minimap button, the hunts, the parchment, or the knight. A missing picture would show the red question mark again, and the addon would still run.
 
-**Play style** sits under the parchment, and its left edge lines up with that parchment. The hunts bar stays under the list. Exit stays at the lower right. This is the same on Lookup, the Simulator, and Settings, because those pages share that column.
+### v1.0.5
 
-### Window size
-
-**General → Window size** still runs from 100% to 150%, one percent at a time. The **100%** and **150%** labels under the slider are black, the same as **Window size** and the rest of that page. The knight's bubble grows with the window, and the tail stays on the portrait. At 150%, if the portrait is already at the top of the screen, the bubble stays on screen and can sit over the title.
-
-### The GearQuest Knight
-
-Hovering the portrait lights his face, so the click is obvious. The tooltip still says **GearQuest guide**.
-
-The bubble has no border. The black around the torn edge of the parchment is gone, and the world shows through those notches. The tail is the same shape.
-
-The speaker shows how loud he is. Volume 1 is one line out of the horn, volume 2 is two lines, and volume 3 is three lines. Mute is still the speaker with a slash. 2 is still the default. Changing the volume still plays the current page again.
-
-Each page breaks where he pauses. The words he is pointing at are black: the Log, the list, Active, Completed, Removed, the info icon, the slider, Filter, Weapons, Play style, the parchment, Track, Show on map, Remove, the score bar, the spec picker, Lookup, the Simulator, Settings, and the last line.
-
-Page 3 and page 9 print the info icon in the sentence, the same icon as the (i) beside a slot title.
-
-Page 4 glows the weapons filter, the arrow on the **Weapons** header, along with Filter and Play style. If that header is below the list, the list scrolls to it once so the glow is on screen. A hunter's Bow, Gun, and Crossbow arrow on Ranged is not that glow.
-
-The side handles glow even while you are still on the Log. On page 9 the Lookup handle glows before you click it. On page 10 the Simulator handle glows before you open the Simulator. On page 11 the Settings handle glows before you open Settings. The search box, the warrior button, Alliance, Arms, the level box, Simulate, **Hide minimap icon**, and **Recommended gear enchantment** still wait until that page is the one on screen.
-
-### The GearQuest Community
-
-Settings → The GearQuest Community lists Deadlybrew after Alteredigor. The names are Eao, MainWon, Stikmyre, Click, Vaniron, Thrayne, Alteredigor, and Deadlybrew.
+The window title reads **GearQuest Forever v1.0.5**. The **Hunts per gear slot** bar matches the hunt list, and a hovered hunt fades out to the right. **Play style** lines up with the parchment. The knight's bubble has no border, the speaker shows one, two, or three lines, and the tail stays on the portrait when the window is larger. Page 4 glows the Weapons filter. Deadlybrew is on **The GearQuest Community**.
 
 ### v1.0.4
 
