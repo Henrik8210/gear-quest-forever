@@ -327,6 +327,13 @@ HORDE_MAPS = {
     "Thunder Bluff", "Deathknell", "Tirisfal Glades", "Brill", "Undercity",
     "Silverpine Forest", "The Barrens", "Camp Mojache",
 }
+# A capital is not a place to farm a world drop. Friendly city NPCs and a
+# Wowhead map filed on the wrong city were landing pins indoors. Dungeon
+# doors that open inside a capital are kept; they are entrance coordinates.
+CAPITAL_CITY_MAPS = {
+    "Ironforge", "Stormwind City", "Orgrimmar",
+    "Thunder Bluff", "Darnassus", "Undercity",
+}
 MAP_IDS = {
     "Stormwind City": 1453, "Orgrimmar": 1454, "Ironforge": 1455,
     "Thunder Bluff": 1456, "Darnassus": 1457, "Undercity": 1458,
@@ -790,6 +797,29 @@ def entrance_spots(key: str) -> list[dict]:
     return copy_spots(DOORS["entrances"].get(key) or [])
 
 
+def capital_door_keys() -> set[tuple]:
+    keys = set()
+    for spots in DOORS["entrances"].values():
+        for spot in spots:
+            name = spot.get("map") or ""
+            if name not in CAPITAL_CITY_MAPS:
+                continue
+            keys.add((name, round(float(spot["x"]), 1), round(float(spot["y"]), 1)))
+    return keys
+
+
+CAPITAL_DOORS = capital_door_keys()
+
+
+def is_capital_farm(spot: dict) -> bool:
+    """A camp standing inside a capital, and not a dungeon door there."""
+    name = spot.get("map") or ""
+    if name not in CAPITAL_CITY_MAPS:
+        return False
+    key = (name, round(float(spot.get("x") or 0), 1), round(float(spot.get("y") or 0), 1))
+    return key not in CAPITAL_DOORS
+
+
 # Generic drops at level 1-15 get one pin per faction. Each number is the
 # first Wowhead Forever spawn of a mob that actually drops that gear, not
 # the quest hub in the same valley. 1-7 is Kobold Vermin and Mottled Boar.
@@ -972,6 +1002,8 @@ def camps_from_npcs(npcs: list[dict], cache: dict, tag_faction: bool) -> list[di
                 continue
             if (spot.get("map") or "") in CONTINENT_MAPS:
                 continue
+            if not tag_faction and is_capital_farm(spot):
+                continue
             door = door_key(spot.get("map") or "")
             if door:
                 if door not in seen_door:
@@ -1089,6 +1121,7 @@ def resolve_item(item_id: int, src: dict, cache: dict, xml_cache: dict) -> tuple
         if not npc:
             return None, "rare npc is not named"
         spots = shared_drop_spots(spots_for_npc_name(npc, cache))
+        spots = [spot for spot in spots if not is_capital_farm(spot)]
         if spots:
             return {"note": NOTE_RARE, "spots": spots, "more": len(spots) > 1}, None
         return None, "rare npc has no map pin"
@@ -1387,6 +1420,64 @@ def index_item_ids(cache: dict, only: list[int]) -> None:
     print(f"patched {len(updates)} left without a pin {missed}", flush=True)
 
 
+_SPOT_BLOB = re.compile(r'\{map="[^"]+"[^{}]*\}')
+
+
+def strip_capital_farm_rows() -> None:
+    """Drop capital-city camps from stored world-drop and rare pins.
+
+    Vendors, quests, and dungeon doors stay. A hunt whose every camp was
+    inside a capital loses the pin instead of pointing indoors.
+    """
+    text = LUA_PATH.read_text(encoding="utf-8")
+    nl = "\r\n" if "\r\n" in text else "\n"
+    kept_lines = []
+    trimmed = 0
+    removed = 0
+    dropped_spots = 0
+    notes = {NOTE_FARM, NOTE_RARE}
+    for line in text.splitlines():
+        match = re.match(r'\s*\[(\d+)\]=\{note="([^"]*)"', line)
+        if not match or match.group(2) not in notes:
+            kept_lines.append(line)
+            continue
+        blobs = _SPOT_BLOB.findall(line)
+        kept_blobs = []
+        for blob in blobs:
+            found = re.search(r'map="([^"]+)".*?x=([0-9.]+),y=([0-9.]+)', blob)
+            if not found:
+                kept_blobs.append(blob)
+                continue
+            spot = {
+                "map": found.group(1),
+                "x": float(found.group(2)),
+                "y": float(found.group(3)),
+            }
+            if is_capital_farm(spot):
+                dropped_spots += 1
+                continue
+            kept_blobs.append(blob)
+        if len(kept_blobs) == len(blobs):
+            kept_lines.append(line)
+            continue
+        item_id = int(match.group(1))
+        if not kept_blobs:
+            removed += 1
+            print(f"  no outdoor camp left {item_id}")
+            continue
+        trimmed += 1
+        more = ",more=true" if len(kept_blobs) > 1 else ""
+        spots = ",".join(kept_blobs)
+        kept_lines.append(
+            '    [%d]={note="%s"%s,spots={%s}},' % (item_id, match.group(2), more, spots)
+        )
+    LUA_PATH.write_text(nl.join(kept_lines) + nl, encoding="utf-8", newline="")
+    print(
+        f"trimmed {trimmed} removed {removed} city camps dropped {dropped_spots}",
+        flush=True,
+    )
+
+
 def main() -> None:
     cache = load_cache()
     if "--smoke" in sys.argv:
@@ -1399,6 +1490,9 @@ def main() -> None:
         i = sys.argv.index("--ids")
         blob = json.loads(Path(sys.argv[i + 1]).read_text(encoding="utf-8"))
         index_item_ids(cache, [int(n) for n in blob])
+        return
+    if "--strip-city-farms" in sys.argv:
+        strip_capital_farm_rows()
         return
     if "--places" in sys.argv:
         ids = hunt_ids()

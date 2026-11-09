@@ -2558,6 +2558,86 @@ function GQ.Log:SourceIconKind(entry)
     return kind
 end
 
+function GQ.Log:EntryProfessionName(entry)
+    local name = entry and entry.profession
+    if (not name or name == "") and entry then
+        local src = entry.sourceType
+        if src == "fishing" then
+            name = "Fishing"
+        elseif src == "skinning" then
+            name = "Skinning"
+        end
+    end
+    if not name or name == "" then
+        return nil
+    end
+    return name
+end
+
+-- A profession uses its own picture. Every other source uses the filter icon,
+-- including a quest, which is the regular or dungeon mark.
+function GQ.Log:SourceMarkKind(entry)
+    local kind = self:SourceIconKind(entry)
+    if kind == "profession" then
+        local name = self:EntryProfessionName(entry)
+        if name then
+            return "profession:" .. name
+        end
+    end
+    return kind
+end
+
+function GQ.Log:SourceSubfilterLabel(entry)
+    local kind = self:SourceIconKind(entry)
+    if kind == "boss_drop" or kind == "raid_trash" then
+        local dungeon = self:BossDungeonKey(entry)
+        if dungeon == "Other" then
+            return L["Other"]
+        end
+        if dungeon and dungeon ~= "" then
+            return GQ.TX(dungeon)
+        end
+    elseif kind == "profession" then
+        local name = self:EntryProfessionName(entry)
+        if name then
+            return GQ.TX(name)
+        end
+    elseif kind == "quest_reward" then
+        return L["Regular quest"]
+    elseif kind == "quest_dungeon" then
+        return L["Dungeon quest"]
+    elseif kind == "vendor" then
+        local rep, honor = self:VendorFlags(entry)
+        if rep and honor then
+            return L["Reputation"] .. ", " .. L["Honor (PvP)"]
+        end
+        if honor then
+            return L["Honor (PvP)"]
+        end
+        if rep then
+            return L["Reputation"]
+        end
+        return L["Ordinary"]
+    end
+    return nil
+end
+
+function GQ.Log:SourceMarkLabel(entry)
+    local kind = self:SourceIconKind(entry)
+    local main = GQ:GetSourceLabel(kind)
+    if kind == "quest_reward" or kind == "quest_dungeon" then
+        main = L["Quest reward"]
+    end
+    local sub = self:SourceSubfilterLabel(entry)
+    if not sub or sub == "" then
+        return main
+    end
+    if kind == "boss_drop" or kind == "raid_trash" then
+        return string.format(L["%s in %s"], main, sub)
+    end
+    return main .. ": " .. sub
+end
+
 function GQ.Log:VendorFlags(entry)
     if not entry then
         return false, false
@@ -5885,7 +5965,7 @@ function GQ.Log:CreateListRow(index)
     row.sourceMark:SetAlpha(0.7)
     row.sourceMark:SetScript("OnEnter", function(self)
         HideItemTooltip()
-        local label = GQ.GetSourceLabel and GQ:GetSourceLabel(self.kind) or self.kind
+        local label = self.sourceLabel or (GQ.GetSourceLabel and GQ:GetSourceLabel(self.kind)) or self.kind
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
         GameTooltip:SetText(label or "")
         GameTooltip:Show()
@@ -8281,6 +8361,8 @@ function GQ.Log:ApplyPageTab()
             self.frame.settingsPage:Show()
             self:RefreshSettings()
             self:LayoutSettingsGeneral(self.frame)
+            self:LayoutSettingsCommands(self.frame)
+            self:LayoutSettingsCredits(self.frame)
         else
             self.frame.settingsPage:Hide()
         end
@@ -9209,9 +9291,13 @@ function GQ.Log:PopulateProfessionBranch(menu)
         if not row then
             row = CreateFrame("CheckButton", nil, branch, "UICheckButtonTemplate")
             row:SetSize(22, 22)
+            local icon = row:CreateTexture(nil, "ARTWORK")
+            icon:SetSize(16, 16)
+            icon:SetPoint("LEFT", row, "RIGHT", 2, 0)
+            row.kindIcon = icon
             local label = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
             ApplyFilterButtonFont(label)
-            label:SetPoint("LEFT", row, "RIGHT", 2, 0)
+            label:SetPoint("LEFT", icon, "RIGHT", 2, 0)
             row.label = label
             row:SetScript("OnEnter", function()
                 HideItemTooltip()
@@ -9241,10 +9327,13 @@ function GQ.Log:PopulateProfessionBranch(menu)
         self:AnchorBranchCheck(branch, row, i)
         row.professionName = name
         row.label:SetText(GQ.TX(name))
+        if row.kindIcon and GQ.Pins and GQ.Pins.ApplyIcon then
+            GQ.Pins:ApplyIcon(row.kindIcon, "profession:" .. name)
+        end
         row:SetChecked(not hidden[name])
-        row:SetHitRectInsets(0, -((row.label:GetStringWidth() or 90) + 8), -2, -2)
+        row:SetHitRectInsets(0, -((row.label:GetStringWidth() or 90) + 28), -2, -2)
         row:Show()
-        local rowWidth = (row.label:GetStringWidth() or 80) + 46
+        local rowWidth = (row.label:GetStringWidth() or 80) + 68
         if rowWidth > width then
             width = rowWidth
         end
@@ -10492,28 +10581,48 @@ function GQ.Log:LayoutSimulatorPage(frame)
     self:LayoutSimulatorContent(frame)
 end
 
--- The game's language, or English (the addon's own). Only on a client whose
--- language the addon has text for. The choice applies after a reload.
-local LANGUAGE_NAMES = {
-    frFR = "Français", deDE = "Deutsch", esES = "Español", esMX = "Español (AL)", itIT = "Italiano",
-    ptBR = "Português", ruRU = "Русский", koKR = "한국어", zhCN = "简体中文", zhTW = "繁體中文",
-}
+-- English is always available. The other languages live in one addon.
+-- Until the client has seen that addon, every language is listed so the
+-- choice can be saved, and a restart loads it. A disabled pack leaves
+-- the menu on English.
+function GQ.Log:LanguageChoices()
+    local options = { { value = "enUS", text = "English" } }
+    local packs = GQ.LocalePacks
+    if not packs then
+        return options
+    end
+    local seen = GQ.LocalePackSeen and GQ:LocalePackSeen()
+    local available = GQ.LocalePackAvailable and GQ:LocalePackAvailable()
+    if available or not seen then
+        for i = 1, #packs do
+            options[#options + 1] = { value = packs[i].id, text = packs[i].name }
+        end
+    end
+    return options
+end
 
 function GQ.Log:CreateLanguageDropdown(frame, detail)
-    local locale = GQ.LOCALE or "enUS"
-    if locale == "enUS" or locale == "enGB" or not next(GQ.LocaleUI or {}) then
+    if frame.settingsLanguageDrop then
         return
     end
-    local options = {
-        { value = false, text = LANGUAGE_NAMES[locale] or locale },
-        { value = true, text = "English" },
-    }
+    local options = self:LanguageChoices()
+    if #options < 2 then
+        return
+    end
     local function Current()
-        local settings = GearQuestForeverDB and GearQuestForeverDB.settings
-        return settings and settings.englishInterface and true or false
+        local id = GQ.ActiveLocale
+        if id and id ~= "enGB" then
+            return id
+        end
+        return "enUS"
     end
     local function TextFor(value)
-        return value and options[2].text or options[1].text
+        for i = 1, #options do
+            if options[i].value == value then
+                return options[i].text
+            end
+        end
+        return "English"
     end
 
     StaticPopupDialogs.GEARQUEST_RELOAD_LANGUAGE = {
@@ -10526,11 +10635,39 @@ function GQ.Log:CreateLanguageDropdown(frame, detail)
         timeout = 0,
         whileDead = true,
         hideOnEscape = true,
+        preferredIndex = 3,
     }
 
-    -- Same pieces as the log's Filter button and weapon flyout.
+    local function ShowLanguagePrompt(needsRestart)
+        local dialog = StaticPopupDialogs.GEARQUEST_RELOAD_LANGUAGE
+        if needsRestart then
+            dialog.text = "World of Warcraft has to restart once before it can see GearQuest Forever: Languages. The choice is saved and loads after that restart."
+            dialog.button1 = OKAY or "Okay"
+            dialog.button2 = nil
+            dialog.OnAccept = function() end
+        else
+            dialog.text = L["Language saved. Reload the interface now to apply it?"]
+            dialog.button1 = YES or "Yes"
+            dialog.button2 = NO or "No"
+            dialog.OnAccept = function()
+                ReloadUI()
+            end
+        end
+        local popup = StaticPopup_Show("GEARQUEST_RELOAD_LANGUAGE")
+        if popup then
+            popup:SetFrameStrata("TOOLTIP")
+            popup:SetFrameLevel(500)
+            if popup.Raise then
+                popup:Raise()
+            end
+        end
+        if needsRestart and GQ.Chat then
+            GQ:Chat("|cffb36b3bGearQuest:|r Restart World of Warcraft once so it can see GearQuest Forever: Languages. The language is saved and loads after that restart.")
+        end
+    end
+
     local btn = CreateFrame("Button", "GearQuestLanguageButton", detail, "UIPanelButtonTemplate")
-    btn:SetSize(96, 22)
+    btn:SetSize(120, 22)
     btn:SetPoint("TOPRIGHT", detail, "TOPRIGHT", -16, -14)
     btn:SetText(TextFor(Current()))
     frame.settingsLanguageDrop = btn
@@ -10540,12 +10677,12 @@ function GQ.Log:CreateLanguageDropdown(frame, detail)
     label:SetText(L["Language"])
     label:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
     frame.settingsLanguageLabel = label
-    if frame.settingsPageTitle then
-        frame.settingsPageTitle:SetPoint("RIGHT", label, "LEFT", -8, 0)
-    end
 
-    local menu = CreateFrame("Frame", "GearQuestLanguageMenu", btn, "BackdropTemplate")
+    -- Parent is UIParent, above the click catcher. A menu parented to this
+    -- window stays under that catcher, so the row looks open and never clicks.
+    local menu = CreateFrame("Frame", "GearQuestLanguageMenu", UIParent, "BackdropTemplate")
     menu:SetFrameStrata("TOOLTIP")
+    menu:SetFrameLevel(400)
     menu:EnableMouse(true)
     menu:SetClampedToScreen(true)
     menu:SetBackdrop({
@@ -10570,41 +10707,65 @@ function GQ.Log:CreateLanguageDropdown(frame, detail)
         menu:Hide()
     end)
     menu:SetScript("OnShow", function(self)
-        catcher:SetFrameLevel(math.max(self:GetFrameLevel() - 1, 0))
+        self:SetFrameStrata("TOOLTIP")
+        self:SetFrameLevel(400)
         catcher:Show()
     end)
     menu:SetScript("OnHide", function()
         catcher:Hide()
     end)
 
-    local width = 96
-    menu.checks = {}
+    local width = 120
+    menu.rows = {}
     for i = 1, #options do
         local option = options[i]
-        local check = CreateFrame("CheckButton", nil, menu, "UICheckButtonTemplate")
-        check:SetSize(22, 22)
-        check:SetPoint("TOPLEFT", menu, "TOPLEFT", 8, -8 - ((i - 1) * 20))
-        check.label = check:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-        check.label:SetPoint("LEFT", check, "RIGHT", 2, 0)
-        check.label:SetText(option.text)
-        check.label:SetTextColor(1, 0.82, 0)
-        local labelWidth = check.label:GetStringWidth() or 60
-        check:SetHitRectInsets(0, -(labelWidth + 12), -1, -1)
-        width = math.max(width, 36 + labelWidth)
-        check:SetScript("OnClick", function()
+        local row = CreateFrame("Button", nil, menu)
+        row:SetHeight(22)
+        row:SetPoint("TOPLEFT", menu, "TOPLEFT", 8, -6 - ((i - 1) * 22))
+        row:SetPoint("TOPRIGHT", menu, "TOPRIGHT", -8, -6 - ((i - 1) * 22))
+        row.check = row:CreateTexture(nil, "ARTWORK")
+        row.check:SetSize(16, 16)
+        row.check:SetPoint("LEFT", row, "LEFT", 2, 0)
+        row.check:SetTexture("Interface\\Buttons\\UI-CheckBox-Check")
+        row.label = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+        row.label:SetPoint("LEFT", row.check, "RIGHT", 4, 0)
+        row.label:SetText(option.text)
+        row.label:SetTextColor(1, 0.82, 0)
+        row.highlight = row:CreateTexture(nil, "BACKGROUND")
+        row.highlight:SetAllPoints()
+        row.highlight:SetColorTexture(0.72, 0.58, 0.22, 0.35)
+        row.highlight:Hide()
+        row:SetScript("OnEnter", function(self)
+            self.highlight:Show()
+            self.label:SetTextColor(1, 0.95, 0.75)
+        end)
+        row:SetScript("OnLeave", function(self)
+            self.highlight:Hide()
+            self.label:SetTextColor(1, 0.82, 0)
+        end)
+        local labelWidth = row.label:GetStringWidth() or 60
+        width = math.max(width, 40 + labelWidth)
+        row:SetScript("OnClick", function()
             menu:Hide()
             btn:SetText(option.text)
             if Current() == option.value then
                 return
             end
-            GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
-            GearQuestForeverDB.settings.englishInterface = option.value
-            StaticPopup_Show("GEARQUEST_RELOAD_LANGUAGE")
+            local db = _G.GearQuestForeverDB
+            if type(db) ~= "table" then
+                db = {}
+                _G.GearQuestForeverDB = db
+            end
+            db.settings = db.settings or {}
+            db.settings.locale = option.value
+            db.settings.englishInterface = nil
+            local needsRestart = option.value ~= "enUS" and GQ.LocalePackAvailable and not GQ:LocalePackAvailable()
+            ShowLanguagePrompt(needsRestart)
         end)
-        check.value = option.value
-        menu.checks[i] = check
+        row.value = option.value
+        menu.rows[i] = row
     end
-    menu:SetSize(width + 12, 16 + #options * 20)
+    menu:SetSize(width + 16, 14 + #options * 22)
     menu:Hide()
 
     btn:SetScript("OnClick", function()
@@ -10613,8 +10774,8 @@ function GQ.Log:CreateLanguageDropdown(frame, detail)
             return
         end
         local current = Current()
-        for i = 1, #menu.checks do
-            menu.checks[i]:SetChecked(menu.checks[i].value == current)
+        for i = 1, #menu.rows do
+            menu.rows[i].check:SetShown(menu.rows[i].value == current)
         end
         menu:Show()
     end)
@@ -11389,7 +11550,7 @@ function GQ.Log:EnsureSettingsPage(frame)
     creditsBody:SetPoint("TOPLEFT", creditsTitle, "BOTTOMLEFT", 0, -6)
     creditsBody:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
     creditsBody:SetJustifyH("LEFT")
-    creditsBody:SetText("Eao\nMainWon\nStikmyre\nClick\nVaniron\nThrayne\nAlteredigor\nDeadlybrew")
+    creditsBody:SetText("Eao\nMainWon\nStikmyre\nClick\nVaniron\nThrayne\nAlteredigor\nDeadlybrew\nTheWawan")
     creditsBody:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
     creditsBody:Hide()
     frame.settingsCreditsBody = creditsBody
@@ -11470,6 +11631,34 @@ function GQ.Log:EnsureSettingsPage(frame)
             end)
         end
     end)
+
+    local creditsScroll = CreatePanelScrollFrame("GearQuestSettingsCreditsScroll", detail)
+    creditsScroll:Hide()
+    frame.settingsCreditsScroll = creditsScroll
+    local creditsChild = CreateFrame("Frame", nil, creditsScroll)
+    creditsChild:SetSize(20, 20)
+    creditsScroll:SetScrollChild(creditsChild)
+    frame.settingsCreditsChild = creditsChild
+    local creditsWidgets = {
+        discordHeader, discordBody, discordBox, discordCopy, creditsTitle, creditsBody,
+    }
+    for i = 1, #creditsWidgets do
+        creditsWidgets[i]:SetParent(creditsChild)
+        creditsWidgets[i]:ClearAllPoints()
+    end
+    discordHeader:SetPoint("TOPLEFT", creditsChild, "TOPLEFT", 4, -2)
+    discordHeader:SetJustifyH("LEFT")
+    discordBody:SetPoint("TOPLEFT", discordHeader, "BOTTOMLEFT", 0, -6)
+    discordBody:SetJustifyH("LEFT")
+    discordCopy:SetPoint("TOPRIGHT", discordBody, "BOTTOMRIGHT", 0, -12)
+    discordBox:SetPoint("TOPLEFT", discordBody, "BOTTOMLEFT", 8, -12)
+    discordBox:SetPoint("RIGHT", discordCopy, "LEFT", -8, 0)
+    creditsTitle:SetPoint("TOPLEFT", discordBox, "BOTTOMLEFT", -8, -18)
+    creditsTitle:SetJustifyH("LEFT")
+    creditsBody:SetPoint("TOPLEFT", creditsTitle, "BOTTOMLEFT", 0, -6)
+    creditsBody:SetJustifyH("LEFT")
+    WireMouseWheel(creditsScroll, creditsScroll)
+    WireMouseWheel(creditsChild, creditsScroll)
 
     local commandScroll = CreatePanelScrollFrame("GearQuestSettingsCommandsScroll", detail)
     commandScroll:Hide()
@@ -11584,6 +11773,8 @@ function GQ.Log:MountSettingsGeneral(frame, detail)
             local target = scroll
             if self.settingsSection == "commands" then
                 target = frame.settingsCommandsScroll or scroll
+            elseif self.settingsSection == "credits" then
+                target = frame.settingsCreditsScroll or scroll
             end
             ScrollFrameOnMouseWheel(target, delta)
         end)
@@ -11741,7 +11932,8 @@ function GQ.Log:SetSettingsSection(section)
     end
 
     local pageTitle = frame.settingsPageTitle
-    if pageTitle then
+    local detail = frame.settingsDetail
+    if pageTitle and detail then
         local titleText = L["General"]
         if section == "hunts" then
             titleText = L["Hunts"]
@@ -11750,6 +11942,15 @@ function GQ.Log:SetSettingsSection(section)
         elseif section == "credits" then
             titleText = L["The GearQuest Community"]
         end
+        pageTitle:ClearAllPoints()
+        pageTitle:SetPoint("TOPLEFT", detail, "TOPLEFT", 16, -16)
+        if section == "general" and frame.settingsLanguageLabel then
+            pageTitle:SetPoint("RIGHT", frame.settingsLanguageLabel, "LEFT", -8, 0)
+        else
+            pageTitle:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
+        end
+        pageTitle:SetJustifyH("LEFT")
+        pageTitle:SetWordWrap(true)
         pageTitle:SetText(titleText)
     end
 
@@ -11835,6 +12036,7 @@ function GQ.Log:SetSettingsSection(section)
     end
     self:LayoutSettingsCommands(frame)
     self:LayoutSettingsGeneral(frame)
+    self:LayoutSettingsCredits(frame)
 end
 
 function GQ.Log:LayoutSettingsPage(frame)
@@ -11855,6 +12057,87 @@ function GQ.Log:LayoutSettingsPage(frame)
     ApplyMetalEdge(frame.settingsDetail, 16)
     self:LayoutSettingsCommands(frame)
     self:LayoutSettingsGeneral(frame)
+    self:LayoutSettingsCredits(frame)
+end
+
+function GQ.Log:LayoutSettingsCredits(frame)
+    local scroll = frame and frame.settingsCreditsScroll
+    local child = frame and frame.settingsCreditsChild
+    local detail = frame and frame.settingsDetail
+    if not scroll or not child or not detail then
+        return
+    end
+
+    scroll:ClearAllPoints()
+    local pageTitle = frame.settingsPageTitle
+    if pageTitle then
+        scroll:SetPoint("TOPLEFT", pageTitle, "BOTTOMLEFT", -2, -8)
+    else
+        scroll:SetPoint("TOPLEFT", detail, "TOPLEFT", 14, -40)
+    end
+    scroll:SetPoint("BOTTOMRIGHT", detail, "BOTTOMRIGHT", -(14 + SCROLLBAR_WIDTH), 12)
+
+    local width = scroll:GetWidth()
+    if not width or width < 40 then
+        width = RIGHT_COLUMN_WIDTH - 56
+    end
+    child:SetWidth(math.max(width, 40))
+    local textWidth = math.max(width - 12, 40)
+    local wrapping = {
+        frame.settingsDiscordHeader,
+        frame.settingsDiscordBody,
+        frame.settingsCreditsTitle,
+        frame.settingsCreditsBody,
+    }
+    for i = 1, #wrapping do
+        if wrapping[i] then
+            wrapping[i]:SetWidth(textWidth)
+        end
+    end
+
+    local function lineHeight(fs, fallback)
+        local h = fs and fs.GetStringHeight and fs:GetStringHeight() or 0
+        if not h or h < 1 then
+            return fallback
+        end
+        return h
+    end
+    local height = 8
+    height = height + lineHeight(frame.settingsDiscordHeader, 18) + 6
+    height = height + lineHeight(frame.settingsDiscordBody, 72) + 12
+    height = height + 22 + 18
+    height = height + lineHeight(frame.settingsCreditsTitle, 18) + 6
+    height = height + lineHeight(frame.settingsCreditsBody, 140) + 16
+    child:SetHeight(height)
+    UpdateScrollChildRect(scroll)
+
+    local barName = scroll.GetName and scroll:GetName()
+    local bar = barName and _G[barName .. "ScrollBar"]
+    if self.settingsSection == "credits" then
+        scroll:Show()
+        ApplyScrollBarVisibility(scroll)
+        if bar and bar.SetFrameLevel and scroll.GetFrameLevel then
+            bar:SetFrameLevel(scroll:GetFrameLevel() + 5)
+        end
+    else
+        scroll:Hide()
+        if scroll.SetVerticalScroll then
+            scroll:SetVerticalScroll(0)
+        end
+        if bar then
+            bar:Hide()
+        end
+    end
+
+    if self.settingsSection == "credits" and not frame.settingsCreditsMeasured and C_Timer and C_Timer.After then
+        frame.settingsCreditsMeasured = true
+        C_Timer.After(0, function()
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if log and log.frame then
+                log:LayoutSettingsCredits(log.frame)
+            end
+        end)
+    end
 end
 
 function GQ.Log:RefreshSettings()
@@ -13192,8 +13475,9 @@ function GQ.Log:PlaceHuntSourceMark(row, entry)
         mark:Hide()
         return
     end
-    local kind = self:SourceIconKind(entry)
+    local kind = self:SourceMarkKind(entry)
     mark.kind = kind
+    mark.sourceLabel = self:SourceMarkLabel(entry)
     if mark.icon and GQ.Pins and GQ.Pins.ApplyIcon then
         GQ.Pins:ApplyIcon(mark.icon, kind)
     end
@@ -14450,13 +14734,14 @@ function GQ.Log:ShowRankBoxTooltip(box)
 end
 
 function GQ.Log:DetailTitleIconPad(entry)
-    if entry and self:SourceIconKind(entry) == "quest_dungeon" then
+    if entry then
         return 26
     end
     return 0
 end
 
--- The same mark the quest log puts beside a dungeon quest title.
+-- The source mark beside the reward name. A profession uses its own picture.
+-- Anything without one uses the filter icon, such as the boss skull.
 function GQ.Log:PlaceDetailTitleIcon(entry)
     local frame = self.frame
     local title = frame and frame.detailTitle
@@ -14464,19 +14749,39 @@ function GQ.Log:PlaceDetailTitleIcon(entry)
         return
     end
     local pad = self:DetailTitleIconPad(entry)
-    local icon = frame.detailTitleIcon
-    if not icon and frame.detailChild then
-        icon = frame.detailChild:CreateTexture(nil, "ARTWORK")
-        icon:SetSize(20, 20)
-        frame.detailTitleIcon = icon
+    local button = frame.detailTitleIcon
+    if not button and frame.detailChild then
+        button = CreateFrame("Button", nil, frame.detailChild)
+        button:SetSize(20, 20)
+        button.icon = button:CreateTexture(nil, "ARTWORK")
+        button.icon:SetAllPoints()
+        button:SetScript("OnEnter", function(self)
+            HideItemTooltip()
+            if not self.sourceLabel or self.sourceLabel == "" then
+                return
+            end
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            GameTooltip:SetText(self.sourceLabel)
+            GameTooltip:Show()
+        end)
+        button:SetScript("OnLeave", function()
+            GameTooltip:Hide()
+        end)
+        frame.detailTitleIcon = button
     end
-    if pad > 0 and icon and GQ.Pins and GQ.Pins.ApplyIcon then
-        GQ.Pins:ApplyIcon(icon, "quest_dungeon")
-        icon:ClearAllPoints()
-        icon:SetPoint("RIGHT", title, "LEFT", -6, 0)
-        icon:Show()
-    elseif icon then
-        icon:Hide()
+    local kind = entry and self:SourceMarkKind(entry)
+    if pad > 0 and button and kind and GQ.Pins and GQ.Pins.ApplyIcon then
+        GQ.Pins:ApplyIcon(button.icon, kind)
+        button.sourceLabel = self:SourceMarkLabel(entry)
+        button:ClearAllPoints()
+        button:SetPoint("RIGHT", title, "LEFT", -6, 0)
+        button:Show()
+    elseif button then
+        local owner = GameTooltip.GetOwner and GameTooltip:GetOwner()
+        if owner == button then
+            GameTooltip:Hide()
+        end
+        button:Hide()
     end
     if frame.detailLore then
         frame.detailLore:ClearAllPoints()
@@ -15519,6 +15824,11 @@ function GQ.Log:FilteredWeaponEntries()
 end
 
 function GQ.Log:HeldOffHandEntries()
+    -- Fury, a rogue, and a hunter wear a weapon in the off hand. That weapon
+    -- is on the Weapons list. The shield section stays for a shield spec.
+    if GQ.Data and GQ.Data.CanDualWield and GQ.Data:CanDualWield() then
+        return {}
+    end
     local ctx = self.GetActiveListCacheContextKey and self:GetActiveListCacheContextKey() or ""
     if self._heldOffHand and self._heldOffBand == ctx then
         return self._heldOffHand
@@ -16689,7 +16999,9 @@ function GQ.Log:ShowLookupDetail(item)
     self.lookupItemKey = item.key
     self.lookupEntry = entry
     self:ApplyEntryDetail(entry)
-    self:LayoutDetailRank(nil)
+    -- Lookup has no rank box. Keep the entry so the source icon still
+    -- reserves its margin and the description stays inside the parchment.
+    self:LayoutDetailRank(nil, entry)
     self:UpdateFooterButtons()
     self:PaintLookupRows()
 end

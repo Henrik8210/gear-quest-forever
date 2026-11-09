@@ -8,7 +8,8 @@ GQ.Pins = GQ.Pins or {}
 local PIN_ICONS = {
     boss_drop = { path = "Interface\\TargetingFrame\\UI-RaidTargetingIcon_8" },
     object_drop = { path = "Interface\\GossipFrame\\BankerGossipIcon" },
-    raid_trash = { path = "Interface\\TargetingFrame\\UI-RaidTargetingIcon_7" },
+    -- The eye on the Looking For Group window portrait.
+    raid_trash = { path = "Interface\\LFGFrame\\UI-LFG-PORTRAIT" },
     profession = { path = "Interface\\QuestFrame\\UI-QuestLog-BookIcon" },
     quest_reward = { path = "Interface\\GossipFrame\\AvailableQuestIcon" },
     -- The round mark on a dungeon quest in the quest log. The atlas is that
@@ -32,8 +33,42 @@ local PIN_ICONS = {
     world_drop = { path = "Interface\\AddOns\\" .. ADDON_NAME .. "\\Art\\GQ-WorldDrop.png" },
 }
 
+-- Spellbook pictures. A profession hunt uses its own one; the book stays
+-- the Profession checkbox.
+local PROFESSION_ICONS = {
+    Alchemy = "Interface\\Icons\\Trade_Alchemy",
+    Blacksmithing = "Interface\\Icons\\Trade_BlackSmithing",
+    Enchanting = "Interface\\Icons\\Trade_Engraving",
+    Engineering = "Interface\\Icons\\Trade_Engineering",
+    Fishing = "Interface\\Icons\\Trade_Fishing",
+    Herbalism = "Interface\\Icons\\Trade_Herbalism",
+    Leatherworking = "Interface\\Icons\\INV_Misc_ArmorKit_17",
+    Mining = "Interface\\Icons\\Trade_Mining",
+    Skinning = "Interface\\Icons\\INV_Misc_Pelt_Wolf_01",
+    Tailoring = "Interface\\Icons\\Trade_Tailoring",
+    Cooking = "Interface\\Icons\\INV_Misc_Food_15",
+    ["First Aid"] = "Interface\\Icons\\Spell_Holy_SealOfSacrifice",
+}
+
+local function IconSpec(kind)
+    local spec = PIN_ICONS[kind]
+    if spec then
+        return spec
+    end
+    if type(kind) == "string" then
+        local name = kind:match("^profession:(.+)$")
+        if name and PROFESSION_ICONS[name] then
+            return { path = PROFESSION_ICONS[name] }
+        end
+        if name then
+            return PIN_ICONS.profession
+        end
+    end
+    return PIN_ICONS.unsourced
+end
+
 local function ApplyPinIcon(icon, kind, owner)
-    local spec = PIN_ICONS[kind] or PIN_ICONS.unsourced
+    local spec = IconSpec(kind)
     icon:SetVertexColor(1, 1, 1, 1)
     icon:SetTexCoord(0, 1, 0, 1)
     local atlasName = spec.atlas
@@ -88,7 +123,7 @@ local pinGen = 0
 local frames = {}
 local driver
 local placed = 0
-local placedMap, placedGen, placedGuided
+local placedMap, placedGen, placedGuided, placedScale
 
 local function ShowPinTooltip(frame)
     local pin = frame.pinData
@@ -244,11 +279,46 @@ end
 
 local PinMixin = {}
 
+-- A pin inherits the canvas, so it shrinks with the continent the way the
+-- client's own map pins do. OpenMap's world view drives that canvas far
+-- below any Blizzard map. Only then is the pin held at a normal size.
+local OPENMAP_CANVAS = 0.08
+local OPENMAP_PIN_SCALE = 1
+
+local function CanvasScale()
+    local canvasScale = WorldMapFrame and WorldMapFrame.GetCanvasScale and WorldMapFrame:GetCanvasScale()
+    if not canvasScale or canvasScale <= 0 then
+        return 1
+    end
+    return canvasScale
+end
+
+local function PinScreenScale()
+    if CanvasScale() < OPENMAP_CANVAS then
+        return OPENMAP_PIN_SCALE
+    end
+    return 1
+end
+
+function PinMixin:ApplyCurrentScale()
+    if CanvasScale() < OPENMAP_CANVAS then
+        self:SetScale(OPENMAP_PIN_SCALE)
+        if self.SetIgnoreParentScale then
+            self:SetIgnoreParentScale(true)
+        end
+        return
+    end
+    self:SetScale(1)
+    if self.SetIgnoreParentScale then
+        self:SetIgnoreParentScale(false)
+    end
+end
+
 function PinMixin:OnLoad()
     if self.owningMap and self.UseFrameLevelType then
         self:UseFrameLevelType("PIN_FRAME_LEVEL_AREA_POI")
     end
-    self:SetScalingLimits(1, 1, 1.2)
+    self:ApplyCurrentScale()
 end
 
 function PinMixin:OnAcquired(pin, x, y)
@@ -256,7 +326,8 @@ function PinMixin:OnAcquired(pin, x, y)
     if self.UseFrameLevelType then
         self:UseFrameLevelType("PIN_FRAME_LEVEL_AREA_POI")
     end
-    self:SetScalingLimits(1, 1, 1.2)
+    -- Scale first. SetPosition divides the offset by the pin scale.
+    self:ApplyCurrentScale()
     self:SetPosition(x, y)
     self.pinData = {
         entry = pin.entry,
@@ -352,13 +423,17 @@ local function PlacePins()
     -- Normalized pin positions do not change while the same map stays open.
     -- Projecting every pin on every frame was a steady map-API cost.
     local guided = GuidedEntryId()
-    if mapId == placedMap and pinGen == placedGen and guided == placedGuided then
+    local scale = PinScreenScale()
+    if placedScale and math.abs(scale - placedScale) < 0.02 then
+        scale = placedScale
+    end
+    if mapId == placedMap and pinGen == placedGen and guided == placedGuided and scale == placedScale then
         return
     end
     if not MapReady() then
         return
     end
-    placedMap, placedGen, placedGuided = mapId, pinGen, guided
+    placedMap, placedGen, placedGuided, placedScale = mapId, pinGen, guided, scale
     local n = 0
     for i = 1, #pins do
         local x, y = ProjectPin(pins[i], mapId)
@@ -399,6 +474,7 @@ function GQ.Pins:Sync()
         pins = {}
         pinGen = pinGen + 1
         placedMap = nil
+        placedScale = nil
         return
     end
     pins = {}

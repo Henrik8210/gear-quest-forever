@@ -2,7 +2,7 @@ local _, GQ = ...
 
 -- French translations of data sentences that no rule covers, keyed by the
 -- exact English sentence. Hand-written; GQ.TL looks these up before the rules.
-if GQ.LOCALE ~= "frFR" then
+if GQ.ActiveLocale ~= "frFR" then
     return
 end
 

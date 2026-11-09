@@ -2,7 +2,49 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.1.0
+## v1.1.1
+
+The window title reads **GearQuest Forever v1.1.1**.
+
+**Languages**
+
+Settings → General has a **Language** menu. English stays the language of the addon until you pick another one. On a French, German, Spanish, Latin American Spanish, Portuguese, Russian, Korean, Simplified Chinese, or Traditional Chinese client, GearQuest follows that client when **GearQuest Forever: Languages** is enabled. That addon is separate. English clients do not load it. Disable it to keep GearQuest in English. The first time you pick a language, restart World of Warcraft once so the client can see the language addon. After that, a reload applies the choice.
+
+The window, the filters, the play-style cards, the tutorial, and the hunt lines use that language. Item names, zones, and factions use the names from the game client. A string that has not been translated yet stays English. The long quest story on a parchment is not translated. The quest steps and the objectives are.
+
+The GearQuest Community lists **TheWawan**.
+
+When a new sentence is added to GearQuest, it is added to each language in the same change. Until that translation exists, the English sentence shows.
+
+**Fury weapons**
+
+A fury warrior dual wields. The off hand is a one-hand weapon, the same way a rogue's is, not a shield. Main Hand and Off Hand are both in the Weapons filter, and a one-hander stays while either hand is still on. Protection still hunts a shield. Arms stays two-hand. Before Dual Wield at 20, the off hand is empty rather than a shield. From 20 the off-hand hunt is a One-Hand or Off Hand weapon. The gamepad controls are the same.
+
+**Source pictures**
+
+Dungeon & Raid trash uses the eye from the Looking For Group window, on the hunt, in the filter, on the parchment, and on the map. Each profession in the Profession flyout has its own picture, and that same picture is on a profession hunt. A hunt with no smaller picture uses the main filter picture: a boss drop is the skull, a world drop is the sunset. The parchment shows that picture beside the reward name. Hovering it names the source and the sub-filter. A boss drop in Ragefire Chasm says **Boss drop in Ragefire Chasm.**
+
+**Map pins**
+
+Tracked pins stay the normal size on the client's own world map and on the OpenMap world map. Closing the map with a gamepad still does not block jump or talking to an NPC.
+
+**Dropped recipes**
+
+These crafted hunts no longer send you to the capital trainer. The pin is where the plans drop, and the log shows the closest spot. City dungeon doors stay when the plans drop inside Hall of Thanes, The Stockade, Ragefire Chasm, or Ruins of Lordaeron.
+
+Blacksmithing: Copper Chain Vest, Gemmed Copper Gauntlets, Runed Copper Breastplate, Deadly Bronze Poniard, Silvered Bronze Shoulders, Green Iron Boots, Mighty Iron Hammer, Green Iron Gauntlets, Green Iron Shoulders, Golden Iron Destroyer, Golden Scale Shoulders, Jade Serpentblade, Polished Steel Boots, Golden Scale Cuirass, Frost Tiger Blade, Golden Scale Boots, Shadow Crescent Axe.
+
+Leatherworking: Fine Leather Gloves, Fine Leather Boots, Dark Leather Tunic, Hillman's Leather Vest, Hillman's Belt, Dark Leather Shoulders, Barbaric Gloves, Guardian Belt, Guardian Armor, Guardian Leather Bracers.
+
+Tailoring: Red Linen Robe, Red Woolen Boots, Gray Woolen Robe, Heavy Woolen Cloak, Reinforced Woolen Shoulders, Phoenix Gloves, Phoenix Pants, Spider Silk Slippers, Shadow Hood, Boots of the Enchanter, Spider Belt.
+
+Recipes you already know, including Rough Copper Vest, no longer point at a trainer. A recipe whose Forever page has not been checked yet still says the trainer teaches it.
+
+**Lookup**
+
+The hunt description on Lookup stays inside the parchment, the same as in the log.
+
+### v1.1.0
 
 The window title reads **GearQuest Forever v1.1.0**.
 

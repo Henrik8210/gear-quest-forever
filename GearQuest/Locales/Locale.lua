@@ -19,14 +19,114 @@ local _, GQ = ...
 --                    quest's objective as the client words it
 -- GQ.LocaleNames     English proper noun -> translation, by kind
 --
--- GQ.LocaleActive is false on an English client, or when the player picks
--- English in the settings (GQ.ApplyLanguageSetting, after /reload). The
--- tables still load then: GQ.TClient gives the client's name for matching
--- against what the client reports (zones, factions, maps).
+-- The game client and the language on screen are separate. A client starts
+-- in its own language when that language addon is enabled. An English client
+-- stays in English until the player picks another language. The choice is
+-- settings.locale and applies after a reload. GQ.TClient still follows the
+-- game client, so map names match the maps.
 
 GQ.LOCALE = (GetLocale and GetLocale()) or "enUS"
 local ENGLISH = GQ.LOCALE == "enUS" or GQ.LOCALE == "enGB"
-GQ.LocaleActive = not ENGLISH
+
+-- Every language other than English lives in one addon, GearQuestForever_Languages.
+-- It stays unloaded while English is selected. Disable that addon to keep
+-- GearQuest in English.
+GQ.LocalePacks = {
+    { id = "frFR", name = "Français" },
+    { id = "deDE", name = "Deutsch" },
+    { id = "esES", name = "Español" },
+    { id = "esMX", name = "Español (AL)" },
+    { id = "ptBR", name = "Português" },
+    { id = "ruRU", name = "Русский" },
+    { id = "koKR", name = "한국어" },
+    { id = "zhCN", name = "简体中文" },
+    { id = "zhTW", name = "繁體中文" },
+}
+
+local PACK_IDS = {}
+for i = 1, #GQ.LocalePacks do
+    PACK_IDS[GQ.LocalePacks[i].id] = true
+end
+
+GQ.LOCALE_ADDON = "GearQuestForever_Languages"
+
+function GQ:LocalePackSeen()
+    local name = self.LOCALE_ADDON
+    if C_AddOns and C_AddOns.DoesAddOnExist then
+        return C_AddOns.DoesAddOnExist(name) and true or false
+    end
+    if GetAddOnInfo then
+        local title = GetAddOnInfo(name)
+        return type(title) == "string" and title ~= ""
+    end
+    return false
+end
+
+function GQ:LocalePackAvailable()
+    if not self:LocalePackSeen() then
+        return false
+    end
+    local name = self.LOCALE_ADDON
+    if C_AddOns and C_AddOns.GetAddOnEnableState then
+        local who = UnitName and UnitName("player")
+        local ok, state = pcall(C_AddOns.GetAddOnEnableState, name, who)
+        if not ok then
+            ok, state = pcall(C_AddOns.GetAddOnEnableState, who, name)
+        end
+        if not ok then
+            ok, state = pcall(C_AddOns.GetAddOnEnableState, name)
+        end
+        if ok and (state == 0 or state == false) then
+            return false
+        end
+    end
+    return true
+end
+
+local function WantLocale(settings)
+    local chosen = settings and settings.locale
+    if chosen == "enUS" or chosen == "enGB" then
+        return "enUS"
+    end
+    if chosen and PACK_IDS[chosen] then
+        return chosen
+    end
+    if settings and settings.englishInterface then
+        return "enUS"
+    end
+    if PACK_IDS[GQ.LOCALE] then
+        return GQ.LOCALE
+    end
+    return "enUS"
+end
+
+local saved = type(GearQuestForeverDB) == "table" and GearQuestForeverDB.settings or nil
+GQ.ActiveLocale = WantLocale(saved)
+GQ.LocaleActive = GQ.ActiveLocale ~= "enUS" and GQ.ActiveLocale ~= "enGB"
+
+function GQ:LoadLocalePack()
+    local id = GQ.ActiveLocale
+    if not id or id == "enUS" or id == "enGB" then
+        return
+    end
+    if not self:LocalePackAvailable() then
+        GQ.ActiveLocale = "enUS"
+        GQ.LocaleActive = false
+        return
+    end
+    local name = self.LOCALE_ADDON
+    local ok, reason
+    if C_AddOns and C_AddOns.LoadAddOn then
+        ok, reason = C_AddOns.LoadAddOn(name)
+    elseif LoadAddOn then
+        ok, reason = LoadAddOn(name)
+    end
+    if not ok then
+        GQ.LocaleLoadReason = reason
+        GQ.ActiveLocale = "enUS"
+        GQ.LocaleActive = false
+    end
+end
 
 local ui = {}
 GQ.LocaleUI = ui
@@ -73,8 +173,19 @@ end
 -- (items, zones) that the game itself hands back in its language.
 function GQ.ApplyLanguageSetting(settings)
     settingsKnown = true
-    GQ.LocaleActive = not ENGLISH and not (settings and settings.englishInterface)
-    if GQ.LocaleActive or ENGLISH then
+    local wasActive = GQ.LocaleActive
+    local id = WantLocale(settings)
+    if id ~= "enUS" and id ~= "enGB" then
+        if GQ.ActiveLocale ~= id or not GQ.LocaleActive then
+            GQ.ActiveLocale = id
+            GQ.LocaleActive = true
+            GQ:LoadLocalePack()
+        end
+        return
+    end
+    GQ.ActiveLocale = "enUS"
+    GQ.LocaleActive = false
+    if not wasActive then
         return
     end
     for i = 1, #loadTimeTables do

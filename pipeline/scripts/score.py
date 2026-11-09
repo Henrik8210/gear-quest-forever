@@ -1268,6 +1268,13 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     # dagger ranks on that damage against the One-Hand daggers.
                     ranked_all = [r for r in ranked_all if is_either_hand(r[1]) or is_offhand_only(r[1])]
                     rows = ranked_all
+                if cls == "WARRIOR" and spec_key == "fury" and sl == "SecondaryHand":
+                    # Same off hand as a rogue once Dual Wield is learned.
+                    # A shield carried up from the earlier levels drops here.
+                    fury_dw = dual_wield_level(cls, spec_key)
+                    if fury_dw is not None and level >= fury_dw:
+                        ranked_all = [r for r in ranked_all if is_either_hand(r[1]) or is_offhand_only(r[1])]
+                        rows = ranked_all
                 split_hands = sl == "MainHand" and cls == "HUNTER"
                 dw_level = dual_wield_level(cls, spec_key)
                 enh_two_only = sl == "MainHand" and cls == "SHAMAN" and spec_key == "enhancement"
@@ -1498,6 +1505,12 @@ def hand_still_legal(it, sl, cls, spec_key, level, dw):
         return is_either_hand(it)
     if cls == "ROGUE" and sl == "SecondaryHand":
         return is_either_hand(it) or is_offhand_only(it)
+    if cls == "WARRIOR" and spec_key == "fury" and sl == "SecondaryHand":
+        # Dual Wield is 20. A shield kept from before that level leaves once
+        # the off hand is a second weapon. Below 20 the shield is still legal.
+        if dw is not None and level >= dw:
+            return is_either_hand(it) or is_offhand_only(it)
+        return True
     if cls == "SHAMAN" and spec_key == "enhancement":
         if sl == "SecondaryHand":
             return False

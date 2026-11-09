@@ -27,6 +27,10 @@ MAP_IDS = {
     "Kalimdor": 1414,
     "Outland": 1945,
     "Riverglades": 2548,
+    # The pin is the door on the parent map. The client has no separate map
+    # under these names.
+    "Hall of Thanes": 1455,
+    "Excavation Site": 1437,
 }
 
 

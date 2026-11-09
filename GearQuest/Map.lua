@@ -54,8 +54,8 @@ function GQ.Map:ZoneMap(zoneName)
 end
 
 function GQ.Map:KindFor(entry)
-    if GQ.Log and GQ.Log.SourceIconKind then
-        return GQ.Log:SourceIconKind(entry)
+    if GQ.Log and GQ.Log.SourceMarkKind then
+        return GQ.Log:SourceMarkKind(entry)
     end
     local src = entry and entry.sourceType or ""
     if GQ.NormalizeSourceType then
@@ -182,7 +182,15 @@ function GQ.Map:Show(entry)
         GQ.Guide:ShowEntry(entry)
     end
     local spot = self:SpotForEntry(entry)
-    local mapId = spot and spot.mapId or self:ZoneMap(entry.zone)
+    -- The pin is the stored spot. Hall of Thanes is the Ironforge door, and
+    -- the Excavation Site is the Wetlands door, so the spot's map wins.
+    local mapId = spot and spot.mapId
+    if not mapId and spot and spot.map then
+        mapId = self:ZoneMap(spot.map)
+    end
+    if not mapId then
+        mapId = self:ZoneMap(entry.zone)
+    end
     local label = (entry.questName and GQ.TN("quest", entry.questName))
         or (entry.npc and GQ.TN("npc", entry.npc))
         or (entry.zone and GQ.TN("zone", entry.zone))
@@ -195,7 +203,7 @@ function GQ.Map:Show(entry)
         return
     end
 
-    local pinned = SetPin(spot.mapId, spot.x, spot.y, label)
+    local pinned = SetPin(mapId, spot.x, spot.y, label)
     GuardWaypointClipboard()
     if C_Timer and C_Timer.After then
         C_Timer.After(0, GuardWaypointClipboard)

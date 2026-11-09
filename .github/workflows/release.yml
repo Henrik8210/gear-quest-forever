@@ -31,6 +31,7 @@ jobs:
             --exclude '_generated/*.md' \
             GearQuest/ .release/GearQuestForever/
           python3 scripts/stage-class-addons.py --dest .release --main .release/GearQuestForever
+          python3 scripts/stage-locale-addons.py --dest .release --main .release/GearQuestForever
           (
             cd .release
             zip -X -r "GearQuestForever-${GITHUB_REF_NAME}.zip" GearQuestForever GearQuestForever_*

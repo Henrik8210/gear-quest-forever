@@ -2731,6 +2731,7 @@ function GQ.Data:PinIgnoresFactionZone(row)
     local note = row and row.note
     if note == "where this rare spawns"
         or note == "a farming spot"
+        or note == "where the recipe drops"
         or note == "entrance to dungeon or raid"
         or note == "where this boss spawns"
         or note == "one of the spots to farm it" then
@@ -7142,8 +7143,14 @@ function GQ.Data:UsesHunterWeaponPairs()
 end
 
 function GQ.Data:UsesRogueWeaponHands()
+    -- Rogue and fury each wear a one-hander in the main hand and another in
+    -- the off hand. A shield stays on Protection.
     local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
-    return classFile == "ROGUE"
+    if classFile == "ROGUE" then
+        return true
+    end
+    local spec = self:RuleSpec()
+    return classFile == "WARRIOR" and spec == "fury"
 end
 
 function GQ.Data:UsesTwoHandOnlyWeapons()

@@ -1,7 +1,7 @@
 local _, GQ = ...
 
 -- French interface text. Keys are the English text in the code.
-if GQ.LOCALE ~= "frFR" then
+if GQ.ActiveLocale ~= "frFR" then
     return
 end
 
@@ -490,6 +490,7 @@ L["Block"] = "Blocage"
 L["Block value"] = "Valeur de blocage"
 L["Resistance"] = "Résistance"
 L["a farming spot"] = "un point de farm"
+L["where the recipe drops"] = "où la recette tombe"
 L["beginning of the quest or chain"] = "début de la quête ou de la suite"
 L["vendor that sells this"] = "marchand qui le vend"
 L["entrance to dungeon or raid"] = "entrée du donjon ou du raid"

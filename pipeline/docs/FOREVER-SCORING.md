@@ -50,6 +50,34 @@ of Agility at 22 is +6–7 Agi (~9.5%). If +7 would be #1, the item **is** #1.
 `suffixChance` tells the player the roll is slim; chance never buries the
 hunt. Implemented in `score.py` `best_variant` (`ROLL_POLICY="bestRoll"`).
 
+## Languages
+
+English is the source text. `GQ.L["sentence"]` returns that sentence until a
+language file has the same key. The files live in `GearQuest/Locales/`.
+French, German, Spanish, Latin American Spanish, Portuguese, Russian,
+Korean, Simplified Chinese, and Traditional Chinese are one LoadOnDemand
+addon, **GearQuest Forever: Languages**, built by
+`scripts/stage-locale-addons.py`. The main addon TOC does not load those
+files. `scripts/sync-addon.ps1` and `.github/workflows/release.yml` both
+run the stager. A file missing from disk is read from the local git ref
+`more-locales`.
+
+Every change that adds, removes, or rewords a player-facing sentence updates
+each language file in the same pass. A new key with no translation shows
+English. Do not leave a new sentence for a later language pass. Item names,
+zones, factions, and enchant names come from the client tables in the
+`*.db2.lua` and `*.names.lua` files. Quest steps and objectives stay.
+Quest story paragraphs are stripped when the language addon is built,
+because classic quest ids were pairing the wrong paragraph. Do not put
+those paragraphs back.
+
+A client starts in its own language when the language addon is enabled.
+An English client stays English until Settings → General → Language is
+changed. The choice is `settings.locale` and applies after a reload. The
+first time the client has not seen the language addon, it needs one
+restart. `GQ.TClient` still follows the game client so map names match
+the maps. Disable the language addon to keep GearQuest in English.
+
 ## Rules that stay unless you ask
 
 **Do not change weights unless asked.** `pipeline/data/weights.json`, the
@@ -816,10 +844,18 @@ The source **Filter** closes on a click outside the menu. The Profession
   Each main-list row draws the source icon after the checkbox and before
   the name, 18px, the same art as the world-map pin. The Quest reward flyout
   shows the yellow exclamation on Regular quest and the client's dungeon-quest
-  icon on Dungeon quest. Other flyout rows keep the chevron and do not get an
-  icon. The row's hit width includes the icon.
+  icon on Dungeon quest. Profession rows use that profession's picture
+  (Alchemy, Blacksmithing, Enchanting, Engineering, Fishing, Leatherworking,
+  Tailoring, and the rest of the profession icon table in `Pins.lua`).
+  The row's hit width includes the icon.
   Each hunt row draws that same picture at the right, 14px, alpha 0.7
-  (`row.sourceMark`). Hovering it names the source. A click still selects
+  (`row.sourceMark`). A profession hunt uses that profession's picture.
+  Hovering it names the source and the sub-filter. A boss drop says
+  **Boss drop in Ragefire Chasm.** A profession says **Profession: Blacksmithing.**
+  Dungeon & Raid trash is the Looking For Group portrait
+  (`Interface\LFGFrame\UI-LFG-PORTRAIT`), not the raid-mark X. The parchment
+  draws the same picture beside the reward name: the sub-filter icon when
+  one exists, otherwise the main filter icon. A click still selects
   the hunt, and the mouse wheel still scrolls the list. Unsourced is
   `GearQuest/Art/GQ-Unsourced.png`, the orange circle.
   Checking Profession, Boss drop, Dungeon & Raid trash, Vendor, or Quest reward opens that flyout
@@ -1545,7 +1581,12 @@ where a player turns a type off for one hand. Combat still scores the axe
 highly. **Axe of the Deep Woods** (811) is a main-hand axe and rank 1 for
 Horde Combat at 52–59. The first view follows the spec: two-hand
 for a hunter, a feral druid, an arms warrior, a retribution paladin, or
-enhancement; one-hand for a rogue, a fury warrior, or a shield spec. Holy,
+enhancement; Main Hand and Off Hand for a rogue or a fury warrior; Main
+Hand for a shield spec. Fury does not list a shield. Before Dual Wield at
+20 the off hand is empty. From 20 the off hand is a One-Hand or Off Hand
+weapon, the same split as a rogue (`UsesRogueWeaponHands`). A shield kept
+from before 20 does not stay on that list (`hand_still_legal` in
+`score.py`). Protection still opens the shield list. Holy,
 Shockadin, Elemental, and Restoration start with both styles on.
 
 **Source filter.** `EntrySourceAllowed` used to return `not hidden[src]`.
@@ -1891,7 +1932,7 @@ does not clear the icon's anchors, so a filter icon keeps its own point.
 |---|---|
 | Boss drop | `Interface\TargetingFrame\UI-RaidTargetingIcon_8` (skull) |
 | Container | `Interface\GossipFrame\BankerGossipIcon` (chest) |
-| Dungeon & Raid trash | `Interface\TargetingFrame\UI-RaidTargetingIcon_7` (red raid mark) |
+| Dungeon & Raid trash | `Interface\LFGFrame\UI-LFG-PORTRAIT` (Looking For Group eye) |
 | Profession | `Interface\QuestFrame\UI-QuestLog-BookIcon` |
 | Quest reward | `Interface\GossipFrame\AvailableQuestIcon` (regular quests) |
 | Dungeon quest | atlas `questlog-questtypeicon-dungeon`, else the dungeon crop of `Interface\QuestFrame\QuestTypeIcons`. The hunt, the parchment title, the Quest reward flyout, and the map pin use it when the quest sends you into an instance. |
@@ -2065,7 +2106,18 @@ What the lookup uses:
   same missing-dropper case uses one shared catalog spot. Do not invent a
   coordinate.
 - Profession taught by a trainer: the trainer pin. Note
-  `(the trainer that teaches this)`. The six leather helms
+  `(the trainer that teaches this)`. A Forever recipe whose source is an
+  item, and whose trainer has not been seen in Forever, is not that pin.
+  `pipeline/scripts/fix_dropped_recipes.py` reads the Forever profession
+  shards and the Wowhead Forever dropped-by list for the plans. The note
+  becomes `(where the recipe drops)`. NPC camps come from the coordinate
+  cache. A dungeon uses the stored entrance, including Hall of Thanes,
+  The Stockade, Ragefire Chasm, and Ruins of Lordaeron. Do not fill a
+  missing page from classic Wowhead, dataEnv 1 or 8, or a TBC loot table.
+  A page that has not been fetched stays on the trainer. **Runed Copper
+  Breastplate** (2864, plans 2881) is one of the dropped plans. An
+  automatic recipe, with no item and no Forever trainer, loses the trainer
+  pin. The six leather helms
   (Brawler's, Trapper's, Stormrider's, Wisdom's, Defender's, Totemic) are
   boss drops of the Leatherworking pattern, not the helm, and not Karolek
   or Pawani. The description says the pattern drops from those bosses and
@@ -2136,7 +2188,10 @@ cursor is held off while the log is open so a direction does not click the
 control under it, and it is restored when the log closes. Do not parent pin frames to the map in this mode.
 Pins are placed from the addon's own update only while the map is shown.
 The world-drop icon is the addon picture `GQ-WorldDrop.png`. The icon keeps
-its size when the map zooms. The same pin is translated onto a continent
+its size when the map zooms. A pin inherits the canvas scale. Only a canvas
+smaller than 0.08 (OpenMap) is drawn at its own scale, so the pin stays
+about 24 pixels on that map and on the client's continent map. Do not force
+`SetIgnoreParentScale` on every canvas. The same pin is translated onto a continent
 map. The minimap does not draw it. The guided pin has the blue ring.
 Left-click guides. Right-click opens the hunt. Untrack removes the pin.
 Track and Untrack are one button under the reward, beside Show on map.

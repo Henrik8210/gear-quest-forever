@@ -5,7 +5,7 @@
 #
 # Copies into:
 #   C:\Program Files (x86)\World of Warcraft\_forever_\Interface\AddOns\GearQuestForever
-# Class hunt addons land beside that folder. This script does not copy to any other client.
+# Class hunt addons and language addons land beside that folder. This script does not copy to any other client.
 
 $ErrorActionPreference = "Stop"
 
@@ -45,6 +45,12 @@ if ($LASTEXITCODE -ne 0) {
     Write-Error "stage-class-addons.py failed"
 }
 
+python (Join-Path $PSScriptRoot "stage-locale-addons.py") --dest $addonsRoot --main $target
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "stage-locale-addons.py failed"
+}
+
 Write-Host "Synced GearQuest Forever -> $target"
 Write-Host "Class hunt data is a separate addon per class (loaded when you play or simulate that class)."
+Write-Host "Languages other than English are one addon, GearQuest Forever: Languages, loaded only when a language is selected."
 Write-Host "In-game addon list: GearQuest Forever (folder $addonName)."

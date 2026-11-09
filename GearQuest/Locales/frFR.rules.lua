@@ -3,7 +3,7 @@ local _, GQ = ...
 -- French patterns for the sentence shapes the data pipeline repeats.
 -- Names inside them are translated through GQ.LocaleNames and the client.
 -- A rule that cannot place a name still answers, with the English name.
-if GQ.LOCALE ~= "frFR" then
+if GQ.ActiveLocale ~= "frFR" then
     return
 end
 
