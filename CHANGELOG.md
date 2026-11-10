@@ -2,7 +2,37 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.1.2
+## v1.1.3
+
+The window title reads **GearQuest Forever v1.1.3**.
+
+**Custom stat weights**
+
+**Save and score items!** scores the list with the numbers you typed.
+
+Spell power counts the classic line, Increases damage and healing done by magical spells and effects by up to N, even when that box has a number in it. On a Protection paladin at level 22, **Crusader's Boots** have +6 of that line. With spell power at 50 they rank above **Guard's Boots**. Defense still uses the Defense box. Defense 0.1 barely moves Guard's Boots. Defense 50 is the weight that makes their +4 defense a large score.
+
+An off-hand weapon uses the full weapon-damage weight, the same as the main hand.
+
+Enhancement Tank agility, when the box is empty, includes armor, dodge, and crit. The grey number is about 1.35. A number you type replaces that whole value. If that box already says 0.5, clear it.
+
+Procs are scored with your weights. An extra attack, chance-on-hit damage, a slow, and a Use effect move the hunt. A chance-on-hit on a weapon that spec never swings stays at 0. A Use effect still counts.
+
+Healing and healing as spell power are 0 on a damage spec unless you type a number. Protection, Retribution, Enhancement, and the other specs that are not healers no longer keep the small shipped healing weights. Holy paladin, Restoration druid, Restoration shaman, and Holy and Discipline priest still use theirs.
+
+For a priest, a mage, a warlock, a druid who is not Feral, and Elemental or Restoration, a one-hand weapon is ranked as that weapon plus the best off-hand in the level band. A staff is scored alone. If a staff is rank 1, rank 2 is the best one-hander. Feral keeps the other weapon style at rank 2. The number stored on the weapon stays the weapon by itself.
+
+**Brutal armor**
+
+Horde warrior **Brutal Legguards**, **Brutal Gauntlets**, and **Brutal Hauberk** list the quest chain, the same way **Brutal Helm** already did. The Quest chain filter treats them as chains. The map pin is the start of Speak with Ruga: Torm Ragetotem in Thunder Bluff, Sorek in Orgrimmar, and Baltus Fowler in Undercity. The log offers the closest of those three. Each step uses the selected language.
+
+**Brutal Legguards** requires 20. The steps are Speak with Ruga, Trial at the Field of Giants, Speak with Thun'grim, Brutal Armor, Velora Nitely and the Brutal Legguards, Dragonmaw Shinbones, and then Brutal Legguards.
+
+**Brutal Gauntlets** uses the same first four steps, then Ula'elek and the Brutal Gauntlets, Satyr Hooves, and Brutal Gauntlets.
+
+**Brutal Hauberk** uses the same first four steps, then Brutal Hauberk from Thun'grim Firegaze. It no longer says there are no prequests.
+
+### v1.1.2
 
 The window title reads **GearQuest Forever v1.1.2**.
 

@@ -74,6 +74,14 @@ local ROTMENDER_SPEC = {
     PALADIN = { holy = true },
     SHAMAN = { restoration = true },
 }
+-- Healing Done is a healer stat. Damage specs score Damage Done, folded into
+-- spell power, and an empty healing box stays at 0. A typed number still scores.
+local HEALER_SPEC = {
+    PALADIN = { holy = true },
+    DRUID = { restoration = true },
+    SHAMAN = { restoration = true },
+    PRIEST = { holy = true, discipline = true },
+}
 
 local function Trim(text)
     if not text then
@@ -96,18 +104,6 @@ local function FormatWeight(value)
     text = text:gsub("0+$", "")
     text = text:gsub("%.$", "")
     return text
-end
-
--- The number an empty box keeps. Through 60 this is the shipped weight times
--- the leveling multiplier, which is the weight the hunt actually uses.
-local function EffectiveShipped(key, value)
-    value = value or 0
-    local leveling = GQ.ScoringLeveling
-    local mult = leveling and leveling[key]
-    if type(mult) == "number" then
-        return value * mult
-    end
-    return value
 end
 
 local function RoundScore(value)
@@ -212,7 +208,7 @@ end
 function GQ.Custom:Weights(classFile, record, level)
     local shipped = self:Shipped(classFile, record.base)
     if not shipped then
-        return {}, 0, 0, 0, {}
+        return {}, 0, 0, 0
     end
     local weights = {}
     for key, value in pairs(shipped.weights) do
@@ -243,14 +239,34 @@ function GQ.Custom:Weights(classFile, record, level)
             end
         end
     end
-    return weights, dps, dpsRanged, speed, typed
+    -- Enhancement tank: 1 agility is also 2 armor, plus 1% dodge and 1% crit
+    -- per 20. A typed agility replaces that whole number. An empty box uses
+    -- the armor, dodge, and crit already on the weights, including a typed
+    -- armor that skipped the leveling multiplier.
+    if record.base == "enhancement_tank" and not typed.agi then
+        weights.agi = (weights.agi or 0)
+            + 2 * (weights.armor or 0)
+            + (weights.dodge or 0) / 20
+            + (weights.crit or 0) / 20
+    end
+    local healers = HEALER_SPEC[classFile]
+    if not (healers and healers[record.base]) then
+        if not typed.heal then
+            weights.heal = 0
+        end
+        if not typed.sp_from_heal then
+            weights.sp_from_heal = 0
+        end
+    end
+    return weights, dps, dpsRanged, speed
 end
 
--- Damage Done stays off Spell Power when the player typed that weight.
--- The "damage and healing" line then scores on Healing. A spec that leaves
--- Spell power empty still folds Damage Done in, matching the premade list.
--- Healing with no Spell Power and no Damage Done is one third spell power.
-local function Fold(stats, spellPowerTyped)
+-- "Increases damage and healing by up to N" is stored as heal and damageDone.
+-- Damage Done always folds into spell power, including when that weight was
+-- typed. Leaving it off made a typed spell power ignore the classic line and
+-- score it as healing only. A heal-only line, with no spell power and no
+-- Damage Done, is one third spell power.
+local function Fold(stats)
     local out = {}
     for key, value in pairs(stats) do
         if type(value) == "number" and not SKIP_STAT[key] and not DEAD_STAT[key] then
@@ -265,7 +281,7 @@ local function Fold(stats, spellPowerTyped)
     end
     local damage = out.damageDone
     out.damageDone = nil
-    if damage and damage ~= 0 and not spellPowerTyped then
+    if damage and damage ~= 0 then
         out.sp = (out.sp or 0) + damage
     end
     if out.heal and not out.sp and not (damage and damage ~= 0) then
@@ -288,7 +304,366 @@ local function StatScore(stats, weights)
     return total
 end
 
-local function ScorePiece(entry, row, weights, dpsWeight, dpsRanged, speedWeight, armorClass, spellPowerTyped)
+-- Proc text is priced in the same points as stats. The channels match
+-- pipeline/scripts/procs.py: damage becomes DPS times the hand's weapon
+-- weight, a stat buff is the stat times uptime, and a slow or absorb is
+-- effective health times stamina. A stun is worth nothing.
+local PPM_DEFAULT = 2
+local FIGHT_SECONDS = 45
+local SWING_1H = 2.6
+local SWING_2H = 3.4
+local MELEE_SHARE = 0.70
+local AOE_TARGETS = 4
+local HP_PER_STA = 10
+local FROZEN_MELEE = {
+    battlemage_frost = 0.25,
+    battlemage_fire = 0.15,
+    battlemage_arcane = 0.15,
+}
+local MIT_RELEVANCE = {
+    protection = 1, retribution = 0.35, holy = 0.35, shockadin = 0.35, levelling_1_9 = 0.40,
+}
+local THREAT_RELEVANCE = {
+    protection = 1, retribution = 0.10, holy = 0.05, shockadin = 0.10, levelling_1_9 = 0.15,
+}
+local STAT_WORDS = {
+    { "strength", "str" },
+    { "agility", "agi" },
+    { "stamina", "sta" },
+    { "intellect", "int" },
+    { "spirit", "spi" },
+    { "attack power", "ap" },
+    { "haste rating", "haste" },
+    { "critical strike rating", "crit" },
+    { "spell critical strike rating", "spellCrit" },
+    { "hit rating", "hit" },
+    { "dodge rating", "dodge" },
+    { "parry rating", "parry" },
+    { "defense rating", "defense" },
+    { "block value", "blockValue" },
+    { "armor", "armor" },
+    { "healing", "heal" },
+    { "damage and healing done by magical spells and effects", "sp" },
+    { "spell damage", "sp" },
+    { "fire resistance", "resist" },
+    { "shadow resistance", "resist" },
+}
+local CREATURE = {
+    furbolg = true, furbolgs = true, beast = true, beasts = true,
+    demon = true, demons = true, undead = true, dragon = true, dragons = true,
+    dragonkin = true, elemental = true, elementals = true, giant = true, giants = true,
+    humanoid = true, humanoids = true, mechanical = true, mechanicals = true,
+    plant = true, plants = true, aberration = true, aberrations = true,
+}
+
+local function ProcNum(text)
+    if not text then
+        return nil
+    end
+    return tonumber((tostring(text):gsub(",", "")))
+end
+
+local function StatKey(word)
+    if not word then
+        return nil
+    end
+    for i = 1, #STAT_WORDS do
+        local phrase = STAT_WORDS[i][1]
+        if word:find(phrase, 1, true) then
+            return STAT_WORDS[i][2]
+        end
+    end
+end
+
+local function CreatureLimited(low)
+    local word = low:match("against ([%a]+)")
+    return word and CREATURE[word] or false
+end
+
+local function CooldownSeconds(low)
+    local minutes = low:match("%((%d+)%s*min[^%)]*cooldown%)")
+    if minutes then
+        return ProcNum(minutes) * 60
+    end
+    local seconds = low:match("%((%d+)%s*sec[^%)]*cooldown%)")
+    if seconds then
+        return ProcNum(seconds)
+    end
+end
+
+local function DamageAmounts(slice)
+    if not slice or not slice:find("damage", 1, true) then
+        return nil
+    end
+    local a, b = slice:match("(%d[%d,]*)%s+to%s+(%d[%d,]*)")
+    if a then
+        return (ProcNum(a) + ProcNum(b)) / 2
+    end
+    a = slice:match("(%d[%d,]*)")
+    if a then
+        return ProcNum(a)
+    end
+end
+
+local function FirstTrigger(low)
+    local words = { "causing", "causes", "blasts", "blast", "bolts", "bolt", "dealing", "deals", "deal", "for" }
+    local at
+    for i = 1, #words do
+        local pos = 1
+        while true do
+            local found = low:find(words[i], pos, true)
+            if not found then
+                break
+            end
+            local prev = found > 1 and low:sub(found - 1, found - 1) or ""
+            if not prev:match("%a") then
+                if not at or found < at then
+                    at = found
+                end
+                break
+            end
+            pos = found + 1
+        end
+    end
+    return at
+end
+
+local function ClassifyProc(text)
+    local low = string.lower(" " .. tostring(text or "") .. " ")
+    low = low:gsub("%s+", " ")
+    local out = {}
+    if low:match("^%s*use:%s*use%s") or low:match("^%s*use:%s*use$") then
+        return out
+    end
+    local frozen = low:match("melee attacks deal (%d[%d,]*)%s+%a+%s+additional damage against frozen")
+        or low:match("melee attacks deal (%d[%d,]*)%s+additional damage against frozen")
+    if frozen then
+        out[#out + 1] = { kind = "frozen_melee", amt = ProcNum(frozen) }
+        return out
+    end
+    local onUse = low:match("^%s*use:") ~= nil
+    local cd = CooldownSeconds(low)
+    local pct = low:match("(%d+)%%%s*chance")
+    if pct then
+        pct = ProcNum(pct) / 100
+    end
+    if low:find("attack speed", 1, true) and (low:find("slow", 1, true) or low:find("reduc", 1, true)) then
+        local slowPct, slowDur = low:match("attack speed by (%d+)%%%s*for%s*(%d+)%s*sec")
+        if not slowPct then
+            slowPct = low:match("attack speed by (%d+)%%")
+        end
+        if slowPct then
+            out[#out + 1] = {
+                kind = "slow",
+                pct = ProcNum(slowPct) / 100,
+                dur = ProcNum(slowDur) or 12,
+            }
+        end
+    end
+    local stun = low:match("stuns the target for ([%d%.]+) sec")
+        or low:match("stun the target for ([%d%.]+) sec")
+        or low:match("stuns target for ([%d%.]+) sec")
+        or low:match("stun target for ([%d%.]+) sec")
+    if stun then
+        out[#out + 1] = { kind = "stun", dur = ProcNum(stun) }
+    end
+    local absorbA, absorbB = low:match("absorb%a*%s+(%d[%d,]*)%s+to%s+(%d[%d,]*)")
+    if not absorbA then
+        absorbA = low:match("absorb%a*%s+(%d[%d,]*)")
+        absorbB = absorbA
+    end
+    if absorbA and low:find("damage", 1, true) then
+        out[#out + 1] = { kind = "absorb", amt = (ProcNum(absorbA) + ProcNum(absorbB)) / 2, cd = cd }
+    end
+    if low:find("extra attack", 1, true) then
+        out[#out + 1] = { kind = "extra_attack", pct = pct }
+    end
+    local stealA, stealB = low:match("steal%a*%s+(%d[%d,]*)%s+to%s+(%d[%d,]*)")
+    if not stealA then
+        stealA = low:match("steal%a*%s+(%d[%d,]*)")
+        stealB = stealA
+    end
+    if stealA and (low:find("life", 1, true) or low:find("health", 1, true)) then
+        out[#out + 1] = { kind = "lifesteal", amt = (ProcNum(stealA) + ProcNum(stealB)) / 2 }
+        return out
+    end
+    local dotA, dotB, dotDur = low:match("(%d[%d,]*)%s+to%s+(%d[%d,]*)%s+%a*%s*damage over%s+(%d+)%s*sec")
+    if not dotA then
+        dotA, dotDur = low:match("(%d[%d,]*)%s+damage over%s+(%d+)%s*sec")
+        dotB = dotA
+    end
+    local sawDot = false
+    if dotA then
+        sawDot = true
+        out[#out + 1] = {
+            kind = "dot",
+            amt = (ProcNum(dotA) + ProcNum(dotB)) / 2,
+            dur = ProcNum(dotDur),
+            cd = cd,
+            onUse = onUse,
+            pct = pct,
+        }
+    end
+    if not sawDot then
+        local trigger = FirstTrigger(low)
+        if trigger then
+            local amount = DamageAmounts(low:sub(trigger, trigger + 90))
+            if amount then
+                out[#out + 1] = { kind = "dmg", amt = amount, cd = cd, onUse = onUse, pct = pct }
+            end
+        end
+    end
+    local function AddBuff(amt, word, dur)
+        local key = StatKey(word)
+        if not key or not amt then
+            return
+        end
+        out[#out + 1] = {
+            kind = "stat_buff",
+            stat = key,
+            amt = ProcNum(amt),
+            dur = ProcNum(dur),
+            cd = cd,
+            onUse = onUse,
+        }
+    end
+    local grantAt = low:find("grant", 1, true)
+    if grantAt then
+        local slice = low:sub(grantAt, grantAt + 120)
+        local amt1, word1, amt2, word2, dur = slice:match("(%d[%d,]*)%s+([%a ]+)%s+and%s+(%d[%d,]*)%s+([%a ]+)%s+for%s+(%d+)%s*sec")
+        if amt1 then
+            AddBuff(amt1, word1, dur)
+            AddBuff(amt2, word2, dur)
+        else
+            amt1, word1, dur = slice:match("(%d[%d,]*)%s+([%a ]+)%s+for%s+(%d+)%s*sec")
+            AddBuff(amt1, word1, dur)
+        end
+    end
+    local critDur = low:match("guaranteed to land and will be critical strikes for the next (%d+) sec")
+    if critDur then
+        out[#out + 1] = { kind = "guaranteed_crit", dur = ProcNum(critDur) }
+    end
+    local buffWord, buffAmt, buffDur = low:match("increas%a+%s+your%s+maximum%s+(.-)%s+by%s+(%d[%d,]*)%s+for%s+(%d+)%s*sec")
+    if not buffWord then
+        buffWord, buffAmt, buffDur = low:match("increas%a+%s+your%s+(.-)%s+by%s+(%d[%d,]*)%s+for%s+(%d+)%s*sec")
+    end
+    if not buffWord then
+        buffWord, buffAmt, buffDur = low:match("increas%a+%s+maximum%s+(.-)%s+by%s+(%d[%d,]*)%s+for%s+(%d+)%s*sec")
+    end
+    if not buffWord then
+        buffWord, buffAmt, buffDur = low:match("increas%a+%s+(.-)%s+by%s+(%d[%d,]*)%s+for%s+(%d+)%s*sec")
+    end
+    if not buffWord then
+        buffWord, buffAmt = low:match("increas%a+%s+your%s+maximum%s+(.-)%s+by%s+(%d[%d,]*)")
+    end
+    if not buffWord then
+        buffWord, buffAmt = low:match("increas%a+%s+(.-)%s+by%s+(%d[%d,]*)")
+    end
+    if buffWord then
+        if not buffDur then
+            buffDur = onUse and 20 or 10
+        end
+        AddBuff(buffAmt, buffWord, buffDur)
+    end
+    if low:find("nearby enemies", 1, true) or low:find("all enemies", 1, true)
+        or (low:find("jump", 1, true) and low:find("to additional", 1, true)) then
+        out[#out + 1] = { kind = "aoe_threat" }
+    end
+    return out
+end
+
+local function ProcPoints(entry, row, weights, dpsWeight, specId, level, onUseOnly)
+    local text = entry and entry.proc
+    if not text or text == "" then
+        return 0
+    end
+    local effects = ClassifyProc(text)
+    if #effects == 0 then
+        return 0
+    end
+    local speed = (row and row.spd) or 0
+    if speed <= 0 then
+        speed = entry.hand == "two" and SWING_2H or SWING_1H
+    end
+    local swings = 60 / speed
+    local hp = 60 + (level or 1) * 55
+    local mit = MIT_RELEVANCE[specId] or 0.35
+    local threat = THREAT_RELEVANCE[specId] or 0.1
+    local stamina = weights.sta or 0.25
+    local weapon = dpsWeight or 0
+    local total = 0
+    local lineDamage = 0
+    local function DamagePoints(amount, perMin)
+        return (amount * perMin / 60) * weapon
+    end
+    for i = 1, #effects do
+        local effect = effects[i]
+        if not (onUseOnly and not effect.onUse) then
+            if effect.kind == "frozen_melee" then
+                local up = FROZEN_MELEE[specId] or 0
+                if up > 0 and weapon ~= 0 then
+                    total = total + DamagePoints(effect.amt, swings * up)
+                end
+            elseif effect.kind == "dmg" or effect.kind == "dot" then
+                if not CreatureLimited(string.lower(text)) then
+                    local rate
+                    if effect.onUse then
+                        rate = 60 / math.max(effect.cd or FIGHT_SECONDS, 1)
+                    elseif effect.pct then
+                        rate = effect.pct * swings
+                    else
+                        rate = PPM_DEFAULT
+                    end
+                    local points = DamagePoints(effect.amt, rate)
+                    lineDamage = lineDamage + points
+                    total = total + points
+                end
+            elseif effect.kind == "lifesteal" then
+                local points = DamagePoints(effect.amt, PPM_DEFAULT)
+                local heal = effect.amt * PPM_DEFAULT / 60
+                total = total + points + (heal * FIGHT_SECONDS / HP_PER_STA * stamina * mit)
+            elseif effect.kind == "extra_attack" then
+                local rate = effect.pct and (effect.pct * swings) or PPM_DEFAULT
+                local swing = ((row and row.dps) or 0) * speed
+                if swing <= 0 then
+                    local base = entry.hand == "two" and SWING_2H or SWING_1H
+                    swing = (level or 1) * 1.05 * base
+                end
+                total = total + DamagePoints(swing, rate)
+            elseif effect.kind == "stat_buff" then
+                local up
+                if effect.onUse then
+                    local wait = math.max(effect.cd or FIGHT_SECONDS, effect.dur or 0)
+                    if wait <= FIGHT_SECONDS then
+                        up = math.min(1, (effect.dur or 0) / wait)
+                    else
+                        up = math.min(1, (effect.dur or 0) / FIGHT_SECONDS) * math.min(1, FIGHT_SECONDS / wait)
+                    end
+                else
+                    up = math.min(1, PPM_DEFAULT * (effect.dur or 0) / 60)
+                end
+                total = total + (effect.amt or 0) * up * (weights[effect.stat] or 0)
+            elseif effect.kind == "slow" then
+                local up = math.min(0.85, PPM_DEFAULT * (effect.dur or 12) / 60 + 0.15)
+                local red = (effect.pct or 0) * MELEE_SHARE * up
+                local ehp = hp * red / math.max(1e-6, 1 - red)
+                total = total + ehp / HP_PER_STA * stamina * mit
+            elseif effect.kind == "absorb" then
+                local wait = effect.cd or FIGHT_SECONDS
+                local share = math.min(1, FIGHT_SECONDS / math.max(wait, 1))
+                total = total + (effect.amt or 0) * share / HP_PER_STA * stamina * mit
+            elseif effect.kind == "guaranteed_crit" then
+                local up = math.min(1, PPM_DEFAULT * (effect.dur or 0) / 60)
+                total = total + ((row and row.dps) or 0) * up * weapon
+            elseif effect.kind == "aoe_threat" then
+                total = total + lineDamage * (AOE_TARGETS - 1) * threat
+            end
+        end
+    end
+    return total
+end
+
+local function ScorePiece(entry, row, weights, dpsWeight, dpsRanged, speedWeight, armorClass, specId, level)
     local base = {}
     if row then
         for key, value in pairs(row) do
@@ -297,7 +672,7 @@ local function ScorePiece(entry, row, weights, dpsWeight, dpsRanged, speedWeight
             end
         end
     end
-    local folded = Fold(base, spellPowerTyped)
+    local folded = Fold(base)
     local best = StatScore(folded, weights)
     local suffix, suffixChance, suffixRange, suffixId
     local rolls = GQ.Data.itemRolls and entry.itemId and GQ.Data.itemRolls[entry.itemId]
@@ -313,7 +688,7 @@ local function ScorePiece(entry, row, weights, dpsWeight, dpsRanged, speedWeight
                     merged[key] = (merged[key] or 0) + value
                 end
             end
-            local score = StatScore(Fold(merged, spellPowerTyped), weights)
+            local score = StatScore(Fold(merged), weights)
             if score > best then
                 best = score
                 suffix = roll.n
@@ -327,19 +702,22 @@ local function ScorePiece(entry, row, weights, dpsWeight, dpsRanged, speedWeight
     if ARMOR_SLOTS[slot] and armorClass and row and row.kind then
         best = best * (armorClass[row.kind] or 1)
     end
+    local weaponWeight = dpsWeight or 0
+    if slot == "Ranged" then
+        weaponWeight = dpsRanged or weaponWeight
+    end
     local dps = row and row.dps or 0
     if dps > 0 then
-        local weaponWeight = dpsWeight or 0
-        if slot == "Ranged" then
-            weaponWeight = dpsRanged or weaponWeight
-        elseif slot == "SecondaryHand" then
-            weaponWeight = weaponWeight * 0.5
-        end
+        -- Printed damage is the damage in either hand. An off-hand weapon
+        -- keeps the full weapon-damage weight.
         best = best + dps * weaponWeight
         if speedWeight and speedWeight ~= 0 and slot ~= "Ranged" and slot ~= "SecondaryHand" then
             best = best + speedWeight * (row.spd or 0)
         end
-    elseif row and RELIC_KIND[row.kind] and best <= 0 then
+    end
+    local attacksWithItem = slot == "Ranged" or slot == "MainHand" or slot == "SecondaryHand"
+    best = best + ProcPoints(entry, row, weights, weaponWeight, specId, level or 1, attacksWithItem and weaponWeight == 0)
+    if row and RELIC_KIND[row.kind] and best <= 0 then
         best = (row.ilvl or 0) * 0.01
     end
     return best, suffix, suffixChance, suffixRange, suffixId
@@ -376,6 +754,89 @@ local function BestOther(list, itemId)
         end
     end
     return best
+end
+
+local function PairsOffHand(classFile, base)
+    if classFile == "PRIEST" or classFile == "MAGE" or classFile == "WARLOCK" then
+        return true
+    end
+    if classFile == "DRUID" and base ~= "feral" then
+        return true
+    end
+    if classFile == "SHAMAN" and (base == "elemental" or base == "restoration") then
+        return true
+    end
+    return false
+end
+
+local function PromotesWeaponStyle(classFile, base)
+    if PairsOffHand(classFile, base) then
+        return true
+    end
+    return classFile == "DRUID" and (base == "feral" or base == "bear")
+end
+
+local function BestHeldScore(list)
+    local best = 0
+    if not list then
+        return 0
+    end
+    for i = 1, #list do
+        local entry = list[i]
+        local damaging = GQ.Data and GQ.Data.EntryIsDamagingWeapon and GQ.Data:EntryIsDamagingWeapon(entry)
+        if not entry.healOnly and not damaging and (entry.pipelineScore or 0) > best then
+            best = entry.pipelineScore
+        end
+    end
+    return best
+end
+
+local function CompareMain(entry, offScore)
+    local score = entry.pipelineScore or 0
+    if offScore > 0 and (entry.hand == "one" or entry.hand == "main") then
+        return score + offScore
+    end
+    return score
+end
+
+-- Rank 1 stays the best weapon. Rank 2 is the best of the other hand style,
+-- so a second staff does not hide the one-hander that pairs with the off hand.
+local function PromoteOtherStyle(list)
+    if #list < 2 then
+        return
+    end
+    local two, one
+    for i = 1, #list do
+        if list[i].hand == "two" then
+            if not two then
+                two = list[i]
+            end
+        elseif not one then
+            one = list[i]
+        end
+    end
+    if not two or not one then
+        return
+    end
+    local best = list[1]
+    local other = best.hand == "two" and one or two
+    if other == best then
+        return
+    end
+    local rest = {}
+    for i = 1, #list do
+        if list[i] ~= best and list[i] ~= other then
+            rest[#rest + 1] = list[i]
+        end
+    end
+    for i = #list, 3, -1 do
+        list[i] = nil
+    end
+    list[1] = best
+    list[2] = other
+    for i = 1, #rest do
+        list[i + 2] = rest[i]
+    end
 end
 
 local function Promote(list, entry)
@@ -525,11 +986,11 @@ function GQ.Custom:Prepare(classFile, specId)
     local function weightsAt(level)
         local cached = weightCache[level]
         if not cached then
-            local weights, dpsWeight, dpsRanged, speedWeight, typed = self:Weights(classFile, record, level)
-            cached = { weights, dpsWeight, dpsRanged, speedWeight, typed and typed.sp or false }
+            local weights, dpsWeight, dpsRanged, speedWeight = self:Weights(classFile, record, level)
+            cached = { weights, dpsWeight, dpsRanged, speedWeight }
             weightCache[level] = cached
         end
-        return cached[1], cached[2], cached[3], cached[4], cached[5]
+        return cached[1], cached[2], cached[3], cached[4]
     end
 
     local entries = GQ.Data.entries
@@ -570,12 +1031,12 @@ function GQ.Custom:Consume(job, entry)
             copy.customSpec = specId
             copy.id = tostring(entry.id) .. ":" .. specId
             local level = entry.minLevel or 1
-            local weights, dpsWeight, dpsRanged, speedWeight, spellPowerTyped = job.weightsAt(level)
+            local weights, dpsWeight, dpsRanged, speedWeight = job.weightsAt(level)
             local stats = job.stats
             local row = stats and stats[entry.itemId]
             if row then
                 local score, suffix, chance, range, suffixId = ScorePiece(
-                    entry, row, weights, dpsWeight, dpsRanged, speedWeight, job.armorClass, spellPowerTyped
+                    entry, row, weights, dpsWeight, dpsRanged, speedWeight, job.armorClass, base, level
                 )
                 copy.pipelineScore = RoundScore(score)
                 if GQ.Data.itemRolls and GQ.Data.itemRolls[entry.itemId] then
@@ -648,6 +1109,20 @@ function GQ.Custom:Finish(job)
                 end
             end
             band.slots[slot] = unique
+        end
+        if PromotesWeaponStyle(classFile, record.base) and band.slots.MainHand then
+            local hands = band.slots.MainHand
+            if PairsOffHand(classFile, record.base) then
+                local offScore = BestHeldScore(band.slots.SecondaryHand)
+                table.sort(hands, function(a, b)
+                    local as, bs = CompareMain(a, offScore), CompareMain(b, offScore)
+                    if as ~= bs then
+                        return as > bs
+                    end
+                    return (a.itemId or 0) < (b.itemId or 0)
+                end)
+            end
+            PromoteOtherStyle(hands)
         end
         if useEmbrace or useRotmender then
             local weights, dpsWeight = weightsAt(band.level)
@@ -1339,6 +1814,31 @@ function GQ.Custom:FocusNextBox(box, backward)
     target:SetFocus()
 end
 
+-- The grey number is what an empty box scores. Leveling, the enhancement-tank
+-- agility conversion, and a damage spec's zeroed healing are already in Weights.
+-- Other typed stats stay in, so a typed armor still changes the empty agility box.
+local function EmptyBoxWeight(classFile, baseId, key, overrides)
+    local record = { base = baseId, overrides = {} }
+    if overrides then
+        for stat, value in pairs(overrides) do
+            if stat ~= key then
+                record.overrides[stat] = value
+            end
+        end
+    end
+    local weights, dps, dpsRanged, speed = GQ.Custom:Weights(classFile, record, 1)
+    if key == "dpsWeight" then
+        return dps or 0
+    end
+    if key == "dpsWeightRanged" then
+        return dpsRanged or 0
+    end
+    if key == "speedWeight" then
+        return speed or 0
+    end
+    return (weights and weights[key]) or 0
+end
+
 function GQ.Custom:RefreshFields()
     local panel = self._editor
     if not panel then
@@ -1358,12 +1858,7 @@ function GQ.Custom:RefreshFields()
     for i = 1, #panel.rows do
         local row = panel.rows[i]
         local field = row.field
-        local value
-        if field.weapon then
-            value = shipped[field.key] or 0
-        else
-            value = EffectiveShipped(field.key, shipped.weights[field.key])
-        end
+        local value = EmptyBoxWeight(panel.classFile, panel.baseId, field.key, overrides)
         local shown = FormatWeight(value)
         row.shipped:SetText(string.format(L["shipped %s"], shown))
         if row.ghost then

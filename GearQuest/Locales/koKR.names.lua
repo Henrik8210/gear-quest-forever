@@ -2951,6 +2951,10 @@ for k, v in pairs({
     ["Trying Times"] = "고된 시기",
     ["Understanding Our Present"] = "현재를 이해하려면",
     ["Valuable Vantages"] = "승패의 고지",
+    ["Dragonmaw Shinbones"] = "용아귀 정강이뼈",
+    ["Satyr Hooves"] = "사티로스의 발굽",
+    ["Ula'elek and the Brutal Gauntlets"] = "울라엘레크와 투사 건틀릿",
+    ["Velora Nitely and the Brutal Legguards"] = "벨로라 나이틀리와 투사 다리보호구",
 }) do names.quest[k] = v end
 GQ.LocaleQuestTitle = {
     [174] = "별 관측",
@@ -2996,6 +3000,13 @@ GQ.LocaleQuestTitle = {
     [98310] = "미래를 엿보다",
     [98823] = "대지의 메아리",
     [98824] = "태고의 분광경",
+    [1839] = "울라엘레크와 투사 건틀릿",
+    [1841] = "벨로라 나이틀리와 투사 다리보호구",
+    [1842] = "사티로스의 발굽",
+    [1843] = "투사 건틀릿",
+    [1846] = "용아귀 정강이뼈",
+    [1847] = "투사 다리보호구",
+    [1848] = "투사 갑옷",
 }
 
 for k, v in pairs({

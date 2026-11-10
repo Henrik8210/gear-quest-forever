@@ -2361,6 +2361,10 @@ for k, v in pairs({
     ["Return to Delgren"] = "Regresa con Delgren",
     ["The Horn of Xelthos"] = "El cuerno de Xelthos",
     ["The Offering Stone"] = "La piedra de ofrenda",
+    ["Dragonmaw Shinbones"] = "Espinillas de los Faucedraco",
+    ["Satyr Hooves"] = "Pezuñas de sátiro",
+    ["Ula'elek and the Brutal Gauntlets"] = "Ula'elek y los guanteletes brutales",
+    ["Velora Nitely and the Brutal Legguards"] = "Velora Noctis y las musleras brutales",
 }) do names.quest[k] = v end
 GQ.LocaleQuestTitle = {
     [19] = "Tharil'zun",
@@ -2417,6 +2421,13 @@ GQ.LocaleQuestTitle = {
     [98191] = "Un amigo de la familia",
     [98240] = "Entrega de cajón carmesí",
     [98283] = "Carnicería",
+    [1839] = "Ula'elek y los guanteletes brutales",
+    [1841] = "Velora Noctis y las musleras brutales",
+    [1842] = "Pezuñas de sátiro",
+    [1843] = "Guanteletes brutales",
+    [1846] = "Espinillas de los Faucedraco",
+    [1847] = "Musleras brutales",
+    [1848] = "Camisote brutal",
 }
 
 for k, v in pairs({

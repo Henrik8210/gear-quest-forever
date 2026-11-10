@@ -87,9 +87,14 @@ REPLACE_CHAIN_ROOTS = {
     # Wowhead's series on The Wrath of Rath'mael is empty. The chain starts
     # at Rear Guard Patrol, Deathguard Linnea, not at Kristof.
     92422: (356,),
-    # Brutal Helm's own page has no series and lists Orm Stonehoof as the
-    # start. He turns the helm in. The chain begins at Speak with Ruga.
+    # The Brutal armor reward pages have no series. The helm lists Orm,
+    # the legguards list Velora, the gauntlets list Ula'elek, and the
+    # hauberk lists Thun'grim. Each of those is the turn-in. The chain
+    # begins at Speak with Ruga.
+    1843: (1823,),
     1845: (1823,),
+    1847: (1823,),
+    1848: (1823,),
 }
 # The quest page has no start pin. The note that begins the chain drops from
 # this patrol. Three published camps, far apart, so the log can pick the nearest.

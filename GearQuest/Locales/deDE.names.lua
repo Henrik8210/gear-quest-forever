@@ -2003,6 +2003,10 @@ for k, v in pairs({
     ["Return to Delgren"] = "Kehrt zu Delgren zurück",
     ["Stopping the Cycle"] = "Den Kreislauf durchbrechen",
     ["The Moonsilver Blade"] = "Die Mondsilberklinge",
+    ["Dragonmaw Shinbones"] = "Schienbeinknochen der Dragonmaw",
+    ["Satyr Hooves"] = "Satyrhufe",
+    ["Ula'elek and the Brutal Gauntlets"] = "Ula'elek und die brutalen Stulpen",
+    ["Velora Nitely and the Brutal Legguards"] = "Velora Nitely und die brutalen Beinschützer",
 }) do names.quest[k] = v end
 GQ.LocaleQuestTitle = {
     [19] = "Tharil'zun",
@@ -2084,6 +2088,13 @@ GQ.LocaleQuestTitle = {
     [96984] = "Das Herz der Störung",
     [98156] = "Paket mit makellosen Fellen",
     [98297] = "Den Kreislauf durchbrechen",
+    [1839] = "Ula'elek und die brutalen Stulpen",
+    [1841] = "Velora Nitely und die brutalen Beinschützer",
+    [1842] = "Satyrhufe",
+    [1843] = "Brutale Stulpen",
+    [1846] = "Schienbeinknochen der Dragonmaw",
+    [1847] = "Brutale Beinschützer",
+    [1848] = "Brutale Halsberge",
 }
 
 for k, v in pairs({

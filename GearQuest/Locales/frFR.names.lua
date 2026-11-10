@@ -2070,6 +2070,10 @@ for k, v in pairs({
     ["This Land Was Their Land"] = "Cette terre était la leur",
     ["Valley of Bones"] = "Vallée des Ossements",
     ["Valuable Vantages"] = "Positions stratégiques",
+    ["Dragonmaw Shinbones"] = "Tibias de Gueules-de-Dragon",
+    ["Satyr Hooves"] = "Sabots de satyre",
+    ["Ula'elek and the Brutal Gauntlets"] = "Ula'elek et les gantelets de brutalité",
+    ["Velora Nitely and the Brutal Legguards"] = "Velora Nitely et les jambières de brutalité",
 }) do names.quest[k] = v end
 GQ.LocaleQuestTitle = {
     [19] = "Tharil'zun",
@@ -2180,6 +2184,13 @@ GQ.LocaleQuestTitle = {
     [98310] = "Entrevoir notre avenir",
     [98823] = "Écho terrestre",
     [98824] = "Prisme préhistorique",
+    [1839] = "Ula'elek et les gantelets de brutalité",
+    [1841] = "Velora Nitely et les jambières de brutalité",
+    [1842] = "Sabots de satyre",
+    [1843] = "Gantelets de brutalité",
+    [1846] = "Tibias de Gueules-de-Dragon",
+    [1847] = "Jambières de brutalité",
+    [1848] = "Le haubert de brutalité",
 }
 
 for k, v in pairs({

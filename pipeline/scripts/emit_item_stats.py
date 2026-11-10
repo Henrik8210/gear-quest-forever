@@ -77,8 +77,9 @@ def forever_stats(stats):
     for key in DEAD:
         if key in out:
             out[key] = 0
-    # Keep Damage Done off Spell Power. The custom scorer adds it to spell
-    # power only when Healing is 0. A heal-only line still grants one third.
+    # Keep Damage Done on its own key. The custom scorer folds it into spell
+    # power when it scores, using whatever spell power weight is in effect.
+    # A heal-only line, with no spell power and no Damage Done, is one third.
     damage = out.get("damageDone") or 0
     heal = out.get("heal") or 0
     explicit = out.get("sp") or 0

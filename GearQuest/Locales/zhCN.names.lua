@@ -2906,6 +2906,10 @@ for k, v in pairs({
     ["Valuable Vantages"] = "宝贵制高点",
     ["Welcome to Azeroth"] = "欢迎来到艾泽拉斯",
     ["Welcome to Shen'dar Village"] = "欢迎来到申达尔村",
+    ["Dragonmaw Shinbones"] = "龙喉胫骨",
+    ["Satyr Hooves"] = "萨特之蹄",
+    ["Ula'elek and the Brutal Gauntlets"] = "尤拉莱克和野蛮护手",
+    ["Velora Nitely and the Brutal Legguards"] = "维罗拉·奈特雷和野蛮腿甲",
 }) do names.quest[k] = v end
 GQ.LocaleQuestTitle = {
     [174] = "仰望星空",
@@ -2950,6 +2954,13 @@ GQ.LocaleQuestTitle = {
     [98095] = "宝贵制高点",
     [98823] = "大地的回音",
     [98824] = "史前棱镜",
+    [1839] = "尤拉莱克和野蛮护手",
+    [1841] = "维罗拉·奈特雷和野蛮腿甲",
+    [1842] = "萨特之蹄",
+    [1843] = "野蛮护手",
+    [1846] = "龙喉胫骨",
+    [1847] = "野蛮腿甲",
+    [1848] = "野蛮锁甲",
 }
 
 for k, v in pairs({

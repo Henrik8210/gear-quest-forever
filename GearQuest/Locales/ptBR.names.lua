@@ -2523,6 +2523,10 @@ for k, v in pairs({
     ["Trying Times"] = "Tempos de penúria",
     ["Underground Map"] = "Mapa subterrâneo",
     ["Valuable Vantages"] = "Vantagens valiosas",
+    ["Dragonmaw Shinbones"] = "Canelas dos Presa do Dragão",
+    ["Satyr Hooves"] = "Cascos de Sátiro",
+    ["Ula'elek and the Brutal Gauntlets"] = "Ula'elek e as Manoplas Brutais",
+    ["Velora Nitely and the Brutal Legguards"] = "Velora Noitile e os Guarda-pernas Brutais",
 }) do names.quest[k] = v end
 GQ.LocaleQuestTitle = {
     [19] = "Tharil'zun",
@@ -2592,6 +2596,13 @@ GQ.LocaleQuestTitle = {
     [98283] = "Chacina",
     [98291] = "Morte aos Presa do Dragão",
     [98823] = "Eco telúrico",
+    [1839] = "Ula'elek e as Manoplas Brutais",
+    [1841] = "Velora Noitile e os Guarda-pernas Brutais",
+    [1842] = "Cascos de Sátiro",
+    [1843] = "Manoplas Brutais",
+    [1846] = "Canelas dos Presa do Dragão",
+    [1847] = "Guarda-pernas Brutais",
+    [1848] = "Cota brutal",
 }
 
 for k, v in pairs({
