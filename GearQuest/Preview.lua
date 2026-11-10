@@ -108,6 +108,12 @@ end
 
 function GQ.Preview:SetEnabled(enabled)
     self:GetSettings().enabled = enabled
+    if enabled and GQ.Indicator and GQ.Indicator.ClearUpgradeArrowCache then
+        GQ.Indicator:ClearUpgradeArrowCache()
+        if GQ.Indicator.ApplyArrowVisibility then
+            GQ.Indicator:ApplyArrowVisibility()
+        end
+    end
     if not enabled and GQ.Data and GQ.Data.ReleaseIdleHuntClasses then
         if GQ.Data:ReleaseIdleHuntClasses() and GQ.Data.BuildIndex then
             GQ.Data:BuildIndex()

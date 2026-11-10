@@ -83,7 +83,32 @@ function GQ.AddPhraseRules(P)
         return translated ~= cap and translated or nil
     end
     local function Rest(text)
+        if GQ.TL then
+            return GQ.TL(text)
+        end
         return GQ.LocaleTranslateSentence(text)
+    end
+    -- "A, B, and C in Zone, from D in Zone, and from E in Zone."
+    local function DropPlace(chunk)
+        local names, zone = chunk:match("^(.*) in (.-)$")
+        if names and names ~= "" and zone and zone ~= "" then
+            zone = zone:gsub("^the ", "")
+            return Fill(P.names_in or "{1} ({2})", List(names), Zone(zone))
+        end
+        return List(chunk)
+    end
+    local function DropPlaces(text)
+        local marked = text:gsub(", and from ", "\n"):gsub(" and from ", "\n"):gsub(", from ", "\n")
+        local parts = {}
+        for piece in (marked .. "\n"):gmatch("(.-)\n") do
+            if piece ~= "" then
+                parts[#parts + 1] = DropPlace(piece)
+            end
+        end
+        if #parts <= 1 then
+            return parts[1] or List(text)
+        end
+        return table.concat(parts, P.place_sep or "; ")
     end
 
     -- add(key, pattern, function(captures...) return piece1, piece2... end)
@@ -123,6 +148,9 @@ function GQ.AddPhraseRules(P)
     add("drops_from_in", "^Drops from (.+) in (.+)%.$", function(w, z) return List(w), Zone(z) end)
     add("drops_from", "^Drops from (.+)%.$", function(w) return List(w) end)
     add("drops_from", "^Dropped by (.+)%.$", function(w) return List(w) end)
+    add("pattern_drops", "^The (%a[%a ]-) pattern drops from (.+)%.$", function(p, who) return L[p], DropPlaces(who) end)
+    add("pattern_dropped", "^The (%a[%a ]-) pattern is dropped by (.+)%.$", function(p, who) return L[p], DropPlaces(who) end)
+    add("pattern_is_drop", "^The (%a[%a ]-) pattern is the drop%.$", function(p) return L[p] end)
     add("world_drop_range", "^World drop around level (%d+)%-(%d+)%.$")
     add("world_drop_level", "^World drop around level (%d+)%.$")
     add("world_drop", "^World drop%.$")
@@ -162,6 +190,51 @@ function GQ.AddPhraseRules(P)
     add("kill", "^Kill (.+)%.$", function(w) return List(w) end)
     add("speak", "^Speak with (.+)%.$", function(w) return NpcAt(w) end)
     add("speak", "^Talk to (.+)%.$", function(w) return NpcAt(w) end)
+    add("return_if", "^Return to (.+) if you succeed%.$", function(w) return Any(w) end)
+    add("return_mission", "^Return to (.+) when the mission is complete%.$", function(w) return Any(w) end)
+    add("return_should", "^Return to (.+) should you succeed%.$", function(w) return Any(w) end)
+    add("return_task", "^Return to (.+) when the task is completed%.$", function(w) return Any(w) end)
+    add("return_this", "^Return to (.+) when this task is complete%.$", function(w) return Any(w) end)
+    add("return_news", "^Return to (.+) to report the good news%.$", function(w) return Any(w) end)
+    add("return_fluid", "^Return to (.+) when you have collected enough of the blessed fluid%.$", function(w) return Any(w) end)
+    add("do_not_perish", "^Do not let (.+) perish%.$", function(w) return Any(w) end)
+    add("do_not_slay", "^Do not slay (.+)%.$", function(w) return Any(w) end)
+    add("await_who", "^Await (.+)%.$", function(w) return Any(w) end)
+    add("defend_yourself", "^Defend yourself%.$")
+    add("hours_task", "^You have (%d+) hours to complete this task%.$")
+    add("effect_sec", "^Effect lasts for (%d+) sec%.$")
+    add("apply_times", "^Can be applied up to (%d+) times%.$")
+    add("affect_targets", "^Will affect up to (%d+) targets%.$")
+    add("once_every", "^This effect cannot occur more than once every (%d+) sec%.$")
+    add("once_every_only", "^Can only occur once every (%d+) sec%.$")
+    add("once_every_this", "^This effect can only occur once every (%d+) sec%.$")
+    add("qiraji_stun", "^Qiraji and Silithid targets are stunned for (%d+) sec%.$")
+    add("quest_faction", "^This quest also requires (%a+) faction with (.+)%.$", function(s, f) return Standing(s), Faction(f) end)
+    add("zandalar_be", "^You must also be (%a+) with Zandalar%.$", function(s) return Standing(s), Faction("Zandalar") end)
+    add("zandalar_rep", "^You must also have a reputation equal to or greater than (%a+) with the Zandalar Tribe%.$", function(s) return Standing(s), Faction("Zandalar Tribe") end)
+    add("located_on", "^(.+) is located on (.+), (.+)%.$", function(w, a, b) return Any(w), Zone(a), Zone(b) end)
+    add("deals_times", "^Deals (%d+) times as much damage to (.+)%.$", function(n, who) return n, Thing(who) end)
+    add("deals_facing", "^Deals (%d+) times as much damage if the target is facing you%.$")
+    add("inflicts_beast", "^Inflicts (%d+) times as much damage to Beast and Serpentine targets%.$")
+    add("ogre_stun", "^Ogres are Stunned for (%d+) sec and refund (%d+)%% of the cooldown%.$")
+    add("no_stealth", "^While affected, the target cannot stealth or turn invisible%.$")
+    add("lasts_sec", "^Lasts (%d+) sec%.?$")
+    add("lasts_min", "^Lasts (%d+) min%.?$")
+    add("stacks", "^Stacks up to (%d+) times%.?$")
+    add("min_cd", "^%((%d+) Min Cooldown%)$")
+    add("hour_cd", "^%((%d+) Hours? Cooldown%)$")
+    add("hrs_cd", "^%((%d+) Hrs Cooldown%)$")
+    add("min_sec_cd", "^%((%d+) Min, (%d+) Sec Cooldown%)$")
+    add("sec_cd", "^%((%d+) Sec Cooldown%)$")
+    add("unit_cd", "^%((%d+)(m?s?) cooldown%)$", function(n, unit)
+        local word = unit == "m" and (P.unit_min or "min") or unit == "ms" and "ms" or (P.unit_sec or "s")
+        return n .. " " .. word
+    end)
+    add("proc_chance", "^%(Proc chance: (%d+%%)%)$")
+    add("proc_chance_cd", "^%(Proc chance: (%d+%%), (%d+)(m?s?) cooldown%)$", function(p, n, unit)
+        local word = unit == "m" and (P.unit_min or "min") or unit == "ms" and "ms" or (P.unit_sec or "s")
+        return p, n .. " " .. word
+    end)
 
     -- Stat lines: "+10 Intellect", "(2) +10 Intellect.", "+7 Intellect, +6 Stamina".
     local function StatPart(part)

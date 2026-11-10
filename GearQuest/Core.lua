@@ -13,7 +13,7 @@ if GQ.LoadLocalePack then
     GQ:LoadLocalePack()
 end
 
-GQ.VERSION = "1.1.1"
+GQ.VERSION = "1.1.2"
 GQ.ADDON_NAME = ADDON_NAME
 
 -- General -> Hide chat messages. Off until the player checks it.
@@ -212,9 +212,67 @@ function GQ:NormalizeSourceType(sourceType)
     return SOURCE_ALIAS[sourceType] or sourceType
 end
 
+-- GetFont returns only the roman file. SetFont of that file drops the
+-- Russian, Korean, and Chinese members, so those languages draw as boxes.
+-- These files are the other members of the same Blizzard face, and each
+-- one also draws Latin. ElvUI's outline and shadow stay off.
+local CALM_FONT = {
+    ruRU = "Fonts\\FRIZQT___CYR.TTF",
+    koKR = "Fonts\\2002.TTF",
+    zhCN = "Fonts\\ARKai_T.ttf",
+    zhTW = "Fonts\\bLEI00D.TTF",
+}
+
+function GQ:CalmFont(widget)
+    if not widget or not widget.GetFont then
+        return widget
+    end
+    local face, size = widget:GetFont()
+    if face and size then
+        local locale = self.ActiveLocale or self.LOCALE
+        local scriptFont = locale and CALM_FONT[locale]
+        local use = scriptFont or face
+        local applied = widget:SetFont(use, size, "")
+        if scriptFont and not applied then
+            widget:SetFont(face, size, "")
+        end
+    end
+    if widget.SetShadowOffset then
+        widget:SetShadowOffset(0, 0)
+    end
+    if widget.SetShadowColor then
+        widget:SetShadowColor(0, 0, 0, 0)
+    end
+    return widget
+end
+
+-- A translated label is often wider than the English button. Grow the
+-- button to the words, and stop at maxWidth when the row has no more room.
+function GQ:FitButton(btn, minWidth, maxWidth)
+    if not btn or not btn.GetFontString then
+        return
+    end
+    local fs = btn:GetFontString()
+    local textWidth = fs and fs:GetStringWidth() or 0
+    local width = math.ceil(textWidth + 40)
+    if minWidth and width < minWidth then
+        width = minWidth
+    end
+    if maxWidth and width > maxWidth then
+        width = maxWidth
+    end
+    if width > 0 then
+        btn:SetWidth(width)
+    end
+end
+
 function GQ:GetSourceLabel(sourceType)
     sourceType = self:NormalizeSourceType(sourceType)
-    return SOURCE_LABELS[sourceType] or sourceType
+    local label = SOURCE_LABELS[sourceType] or sourceType
+    if self.L and type(label) == "string" then
+        return self.L[label]
+    end
+    return label
 end
 
 function GQ:GetSourceTag(sourceType)

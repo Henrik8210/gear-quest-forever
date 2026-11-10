@@ -1479,6 +1479,47 @@ function GQ.Data:GetEntryDisplayName(entry)
     return base
 end
 
+-- The name to print when a language pack is on. Matching a looted item
+-- still uses GetEntryDisplayName, which follows the client.
+function GQ.Data:LocaleItemName(itemId)
+    if not itemId or not GQ.LocaleActive then
+        return nil
+    end
+    local localized = GQ.LocaleItemNames and GQ.LocaleItemNames[itemId]
+    if type(localized) == "string" and localized ~= "" and not self:IsPlaceholderItemName(localized, itemId) then
+        return localized
+    end
+    local fact = self.GetItemFact and self:GetItemFact(itemId)
+    local english = fact and fact.name
+    if (not english or english == "") and self.GetForeverAudit then
+        local audit = self:GetForeverAudit(itemId)
+        english = audit and audit.name
+    end
+    if english and not self:IsPlaceholderItemName(english, itemId) then
+        local translated = GQ.TN("item", english)
+        if translated and translated ~= english then
+            return translated
+        end
+    end
+    return nil
+end
+
+function GQ.Data:ShownEntryName(entry)
+    if not entry then
+        return nil
+    end
+    local base = self:LocaleItemName(entry.itemId) or self:GetItemDisplayName(entry.itemId)
+    if not base or base == "" then
+        return nil
+    end
+    local suffix = entry.suffix
+    if suffix and suffix ~= "" then
+        suffix = L[(tostring(suffix):gsub("^%s+", ""))]
+        return base .. " " .. suffix
+    end
+    return base
+end
+
 function GQ.Data:ItemNameMatchesSuffixTarget(itemName, targetName, entry)
     itemName = self:NormalizeItemName(itemName)
     targetName = self:NormalizeItemName(targetName)
@@ -2545,7 +2586,8 @@ function GQ.Data:ShowForeverItemTooltip(tooltip, entry)
         return false
     end
 
-    local displayName = self:GetEntryDisplayName(entry) or audit.name or ("Item " .. tostring(entry.itemId))
+    local displayName = (self.ShownEntryName and self:ShownEntryName(entry))
+        or self:GetEntryDisplayName(entry) or audit.name or ("Item " .. tostring(entry.itemId))
     local quality = self:GetItemQualityForDisplay(entry.itemId)
     local r, g, b = 1, 0.82, 0
     local c = ITEM_QUALITY_COLORS and quality and ITEM_QUALITY_COLORS[quality]
@@ -3178,6 +3220,53 @@ function GQ.Data:QuestChainLines(entry)
         return nil, nil
     end
     return L["Part of a quest chain."], string.format(L["%d quests until you get this."], math.floor(steps))
+end
+
+-- The title the installed client uses for this quest. The stored Forever
+-- title is the fallback when the client has not loaded that quest yet.
+function GQ.Data:QuestStepTitle(questId, englishName)
+    questId = tonumber(questId)
+    if questId and C_QuestLog and C_QuestLog.GetTitleForQuestID then
+        local ok, title = pcall(C_QuestLog.GetTitleForQuestID, questId)
+        if ok and type(title) == "string" and title ~= "" then
+            return title
+        end
+    end
+    local byId = GQ.LocaleQuestTitle
+    local stored = byId and questId and byId[questId]
+    if type(stored) == "string" and stored ~= ""
+        and not (stored:sub(1, 1) == "[" and stored:sub(-1) == "]" and stored:find("%[", 2) == nil) then
+        return stored
+    end
+    if type(englishName) == "string" and englishName ~= "" then
+        if GQ.TN then
+            return GQ.TN("quest", englishName)
+        end
+        return englishName
+    end
+    return nil
+end
+
+function GQ.Data:RewardQuestTitle(entry)
+    local name = entry and entry.questName
+    if type(name) ~= "string" or name == "" then
+        return nil
+    end
+    if self.QuestChainSteps and self.QuestStepTitle then
+        local steps = self:QuestChainSteps(entry)
+        if steps then
+            for i = #steps, 1, -1 do
+                local step = steps[i]
+                if type(step) == "table" and step[2] == name then
+                    return self:QuestStepTitle(tonumber(step[1]), name)
+                end
+            end
+        end
+    end
+    if GQ.TN then
+        return GQ.TN("quest", name)
+    end
+    return name
 end
 
 function GQ.Data:VisibleCoordinateSpots(itemId)
@@ -4591,7 +4680,8 @@ function GQ.Data:ShowStoredForeverTooltip(tooltip, entry)
         return false
     end
 
-    local displayName = self:GetEntryDisplayName(entry) or audit.name or ("Item " .. tostring(entry.itemId))
+    local displayName = (self.ShownEntryName and self:ShownEntryName(entry))
+        or self:GetEntryDisplayName(entry) or audit.name or ("Item " .. tostring(entry.itemId))
     local quality = self:GetItemQualityForDisplay(entry.itemId)
     local r, g, b = 1, 0.82, 0
     local c = ITEM_QUALITY_COLORS and quality and ITEM_QUALITY_COLORS[quality]
@@ -6274,9 +6364,11 @@ function GQ.Data:GearScoreContext(slotName, handKind)
     local worn = {}
     local wornOff
     local empty = false
+    local unscoredWorn = {}
     local slots = dataSlot and self:GetInventorySlots(dataSlot) or {}
     for i = 1, #slots do
-        local itemId = self:EquippedItemId(slots[i])
+        local invSlot = slots[i]
+        local itemId = self:EquippedItemId(invSlot)
         if not itemId then
             empty = true
         else
@@ -6285,6 +6377,11 @@ function GQ.Data:GearScoreContext(slotName, handKind)
             if score then
                 worn[#worn + 1] = score
                 push(score)
+            else
+                local link = GetInventoryItemLink and GetInventoryItemLink("player", invSlot)
+                if link then
+                    unscoredWorn[#unscoredWorn + 1] = { link = link, slot = dataSlot }
+                end
             end
         end
     end
@@ -6356,6 +6453,8 @@ function GQ.Data:GearScoreContext(slotName, handKind)
         equippedIds = equippedIds,
         bestListScore = bestList,
         lines = {},
+        empty = empty,
+        unscoredWorn = unscoredWorn,
     }
     self._gearScoreCache = self._gearScoreCache or {}
     self._gearScoreCache[cacheKey] = ctx
@@ -6393,6 +6492,67 @@ function GQ.Data:EquippedPipelineScore(itemId, slotName)
     return below or above
 end
 
+-- A worn piece that is not on the hunt list has no pipeline score. Scale the
+-- candidate's score by the stat ratio so the slot is not treated as empty.
+-- The worn roll is the exact item link. A zero score is not cached: the
+-- item is not loaded yet, and the next call tries again.
+function GQ.Data:EstimateUnscoredBaseline(entry, ctx, slotName)
+    if not entry or type(entry.pipelineScore) ~= "number" or not ctx or ctx.empty or ctx.baselineScore ~= nil then
+        return nil
+    end
+    local links = ctx.unscoredWorn
+    if not links or #links == 0 or not GQ.Compare or not GQ.Compare.ScoreItemLinkStats then
+        return nil
+    end
+    local wornScore = ctx.unscoredStat
+    if wornScore == nil then
+        local weakest
+        for i = 1, #links do
+            local row = links[i]
+            local score = GQ.Compare:ScoreItemLinkStats(row.link, row.slot)
+            if not score or score <= 0 then
+                return nil
+            end
+            if not weakest or score < weakest then
+                weakest = score
+            end
+        end
+        wornScore = weakest
+        ctx.unscoredStat = wornScore
+    end
+    local itemId = entry.itemId
+    if not itemId then
+        return nil
+    end
+    if GQ.Equip and GQ.Equip.IsItemDataCached and not GQ.Equip:IsItemDataCached(itemId) then
+        if GQ.Equip.PrimeItem then
+            GQ.Equip:PrimeItem(itemId)
+        end
+        return nil
+    end
+    local link = GetItemInfo and select(2, GetItemInfo(itemId))
+    if not link then
+        return nil
+    end
+    local candSlot = slotName == "WeaponPair" and "MainHand" or slotName
+    if entry.slot and self.NormalizeSlotName then
+        local entrySlot = self:NormalizeSlotName(entry.slot)
+        if entrySlot == "MainHand" or entrySlot == "SecondaryHand" or entrySlot == "Ranged" then
+            candSlot = entrySlot
+        end
+    end
+    ctx.candStat = ctx.candStat or {}
+    local candScore = ctx.candStat[itemId]
+    if candScore == nil then
+        candScore = GQ.Compare:ScoreItemLinkStats(link, candSlot)
+        if not candScore or candScore <= 0 then
+            return nil
+        end
+        ctx.candStat[itemId] = candScore
+    end
+    return entry.pipelineScore * (wornScore / candScore)
+end
+
 -- How much of an upgrade this piece is versus what is worn in the slot.
 -- The number is raw pipeline score, the same currency in every slot, so a
 -- weapon upgrade can beat filling an empty shoulder. An empty slot's gain
@@ -6428,6 +6588,12 @@ function GQ.Data:GearScoreUpgradeDelta(entry, slotName, handKind)
     end
     if ctx.baselineScore ~= nil then
         return entry.pipelineScore - ctx.baselineScore, true
+    end
+    if not ctx.empty then
+        local estimate = self:EstimateUnscoredBaseline(entry, ctx, slotName)
+        if estimate then
+            return entry.pipelineScore - estimate, true
+        end
     end
     return entry.pipelineScore, false
 end
@@ -6467,6 +6633,12 @@ function GQ.Data:GearScoreTrail(entry, ctx)
             slot = "SecondaryHand"
         end
         baseline = ctx.handBaseline[slot]
+    end
+    if baseline == nil and not ctx.empty then
+        local estimate = self:EstimateUnscoredBaseline(entry, ctx, entry.slot)
+        if estimate then
+            baseline = self:GearScoreIndex(estimate, ctx.minScore, ctx.maxScore)
+        end
     end
     local delta = ""
     if not (entry.itemId and ctx.equippedIds and ctx.equippedIds[entry.itemId]) then

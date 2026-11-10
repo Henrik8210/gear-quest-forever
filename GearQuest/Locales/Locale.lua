@@ -199,8 +199,9 @@ GQ.LocaleRules = {}
 GQ.LocaleObjectives = {}
 GQ.LocaleNames = { zone = {}, npc = {}, quest = {}, item = {}, object = {}, enchant = {}, faction = {} }
 
--- Zone names come from the client, in its own language, through the ids in
--- Locales/Zones.lua (positive = area id, negative = uiMapId).
+-- Zone names come from the language pack when one is selected. The client
+-- name, through the ids in Locales/Zones.lua, is only the fallback, and that
+-- follows the installed client (positive = area id, negative = uiMapId).
 local zoneCache = {}
 local function ClientZoneName(name)
     local cached = zoneCache[name]
@@ -314,6 +315,36 @@ local function TranslateSentence(sentence)
 end
 GQ.LocaleTranslateSentence = TranslateSentence
 
+-- A period after one letter is an initial (S. J. Erlgadin), not a sentence end.
+local function InitialPeriod(line, dotAt)
+    if line:sub(dotAt, dotAt) ~= "." then
+        return false
+    end
+    if not line:sub(dotAt - 1, dotAt - 1):match("%a") then
+        return false
+    end
+    local before = dotAt > 1 and line:sub(dotAt - 2, dotAt - 2) or ""
+    return before == "" or not before:match("%a")
+end
+
+-- Quest names are wrapped in quotes. "Wanted! Otto" is one name, not two sentences.
+local function InsideQuotes(line, pos)
+    local singles, doubles = 0, 0
+    for i = 1, pos - 1 do
+        local ch = line:sub(i, i)
+        if ch == "'" then
+            local prev = i > 1 and line:sub(i - 1, i - 1) or ""
+            local nxt = line:sub(i + 1, i + 1)
+            if not (prev:match("%a") and nxt:match("%a")) then
+                singles = singles + 1
+            end
+        elseif ch == '"' then
+            doubles = doubles + 1
+        end
+    end
+    return (singles % 2 == 1) or (doubles % 2 == 1)
+end
+
 -- One line: split after . ! ? when a space and a capital, quote or bracket follow.
 local function TranslateLine(line)
     if line == "" then
@@ -330,12 +361,16 @@ local function TranslateLine(line)
             if not s then
                 break
             end
-            local following = line:sub(e + 1, e + 1)
-            if following:match("[%u%(\"'%d%+]") then
-                stop, nextStart = e, e + 1
-                break
+            if InitialPeriod(line, s) or InsideQuotes(line, s) then
+                search = e + 1
+            else
+                local following = line:sub(e + 1, e + 1)
+                if following:match("[%u%(\"'%d%+]") then
+                    stop, nextStart = e, e + 1
+                    break
+                end
+                search = e + 1
             end
-            search = e + 1
         end
         if not stop then
             out[#out + 1] = TranslateSentence(line:sub(start))
@@ -350,8 +385,12 @@ local function TranslateLine(line)
 end
 
 local cache = {}
+local translating = 0
 function GQ.TL(text)
     if type(text) ~= "string" or not GQ.LocaleActive or text == "" then
+        return text
+    end
+    if translating > 3 then
         return text
     end
     local whole = GQ.LocaleText[text]
@@ -363,6 +402,7 @@ function GQ.TL(text)
         return cached
     end
     local source = text
+    translating = translating + 1
     -- A quest objective is the tail of the text and is translated whole.
     local objectiveTail
     local at = text:find("Objective: ", 1, true)
@@ -385,5 +425,6 @@ function GQ.TL(text)
         translated = translated ~= "" and (translated .. " " .. objectiveTail) or objectiveTail
     end
     cache[source] = translated
+    translating = translating - 1
     return translated
 end

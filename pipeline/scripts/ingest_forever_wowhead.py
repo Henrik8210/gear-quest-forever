@@ -688,11 +688,16 @@ def main():
     if not os.path.exists(TIPS):
         sys.exit(f"missing {TIPS} — run node scripts/scrape-forever-wowhead-items.mjs --tooltips")
 
-    index = json.load(open(INDEX, encoding="utf-8"))
-    tips = json.load(open(TIPS, encoding="utf-8"))
-    items = json.load(open(G + "items.json", encoding="utf-8"))
-    sources = json.load(open(G + "sources.json", encoding="utf-8"))
-    pool = json.load(open(G + "classic_item_ids.json", encoding="utf-8"))
+    with open(INDEX, encoding="utf-8") as handle:
+        index = json.load(handle)
+    with open(TIPS, encoding="utf-8") as handle:
+        tips = json.load(handle)
+    with open(G + "items.json", encoding="utf-8") as handle:
+        items = json.load(handle)
+    with open(G + "sources.json", encoding="utf-8") as handle:
+        sources = json.load(handle)
+    with open(G + "classic_item_ids.json", encoding="utf-8") as handle:
+        pool = json.load(handle)
     pool_set = set(pool)
 
     added_items = 0

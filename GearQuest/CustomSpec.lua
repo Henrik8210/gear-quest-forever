@@ -793,6 +793,11 @@ function GQ.Custom:NoteListPainted()
     if self._job or not self._awaitList then
         return
     end
+    -- The class import for Simulate is still on this click. The list that
+    -- just painted is the previous one.
+    if GQ.Log and GQ.Log._simApplyPending then
+        return
+    end
     self._awaitList = nil
     self:HideWorking()
 end
@@ -958,6 +963,7 @@ function GQ.Custom:CancelJob(classFile)
     if job.modal and panel and panel.saveButton then
         panel.saveButton:Enable()
         panel.saveButton:SetText(L["Save and score items!"])
+        GQ:FitButton(panel.saveButton, 180, 460)
     end
 end
 
@@ -1189,6 +1195,7 @@ function GQ.Custom:EnsureEditor()
     deleteButton:SetSize(90, 24)
     deleteButton:SetPoint("BOTTOMLEFT", panel, "BOTTOMLEFT", 18, 16)
     deleteButton:SetText(L["Delete"])
+    GQ:FitButton(deleteButton, 90)
     deleteButton:SetScript("OnClick", function()
         GQ.Custom:DeleteEditing()
     end)
@@ -1199,6 +1206,7 @@ function GQ.Custom:EnsureEditor()
     closeButton:SetSize(80, 24)
     closeButton:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -18, 16)
     closeButton:SetText(L["Close"])
+    GQ:FitButton(closeButton, 80)
     closeButton:SetScript("OnClick", function()
         panel:Hide()
     end)
@@ -1207,6 +1215,7 @@ function GQ.Custom:EnsureEditor()
     saveButton:SetSize(180, 24)
     saveButton:SetPoint("RIGHT", closeButton, "LEFT", -8, 0)
     saveButton:SetText(L["Save and score items!"])
+    GQ:FitButton(saveButton, 180, 460)
     saveButton:SetScript("OnClick", function()
         GQ.Custom:SaveAndScore()
     end)
@@ -1489,6 +1498,7 @@ function GQ.Custom:SaveAndScore()
     end
     panel.saveButton:Disable()
     panel.saveButton:SetText(L["Scoring..."])
+    GQ:FitButton(panel.saveButton, 180, 460)
     self._built = self._built or {}
     self._built[record.id] = nil
     self._failed = self._failed or {}
@@ -1498,6 +1508,7 @@ function GQ.Custom:SaveAndScore()
         if panel.saveButton then
             panel.saveButton:Enable()
             panel.saveButton:SetText(L["Save and score items!"])
+            GQ:FitButton(panel.saveButton, 180, 460)
         end
         if not ok then
             if panel.errorText then

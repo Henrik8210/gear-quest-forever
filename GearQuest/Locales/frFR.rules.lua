@@ -219,6 +219,9 @@ end)
 
 -- Objectives with no client text (new Forever quests, renamed quests).
 local function Rest(text)
+    if GQ.TL then
+        return GQ.TL(text)
+    end
     return GQ.LocaleTranslateSentence(text)
 end
 add("^Objective: (.+)$", function(rest)
@@ -690,3 +693,40 @@ local TIP_WORDS = {
     ["Ammo Pouch"] = "Giberne", Bag = "Sac", Ammo = "Munitions",
 }
 Tip("^([%a][%a%- ]*)$", function(word) return TIP_WORDS[word] end)
+
+add("^Effect lasts for (%d+) sec%.$", function(n) return "L'effet dure " .. n .. " s." end)
+add("^Can be applied up to (%d+) times%.$", function(n) return "Peut être appliqué jusqu'à " .. n .. " fois." end)
+add("^Will affect up to (%d+) targets%.$", function(n) return "Affecte jusqu'à " .. n .. " cibles." end)
+add("^This effect cannot occur more than once every (%d+) sec%.$", function(n)
+    return "Cet effet ne peut se produire plus d'une fois toutes les " .. n .. " s."
+end)
+add("^This effect can only occur once every (%d+) sec%.$", function(n)
+    return "Cet effet ne peut se produire qu'une fois toutes les " .. n .. " s."
+end)
+add("^Qiraji and Silithid targets are stunned for (%d+) sec%.$", function(n)
+    return "Les cibles qiraji et silithides sont étourdies pendant " .. n .. " s."
+end)
+add("^Deals (%d+) times as much damage if the target is facing you%.$", function(n)
+    return "Inflige " .. n .. " fois plus de dégâts si la cible vous fait face."
+end)
+add("^Inflicts (%d+) times as much damage to Beast and Serpentine targets%.$", function(n)
+    return "Inflige " .. n .. " fois plus de dégâts aux bêtes et aux cibles serpentines."
+end)
+add("^Ogres are Stunned for (%d+) sec and refund (%d+)%% of the cooldown%.$", function(n, p)
+    return "Les ogres sont étourdis pendant " .. n .. " s et " .. p .. " % du temps de recharge est rendu."
+end)
+add("^While affected, the target cannot stealth or turn invisible%.$", function()
+    return "Tant que l'effet dure, la cible ne peut ni se camoufler ni devenir invisible."
+end)
+add("^You have (%d+) hours to complete this task%.$", function(n)
+    return "Vous avez " .. n .. " heures pour accomplir cette tâche."
+end)
+add("^Return to (.+) if you succeed%.$", function(w) return "Retournez voir " .. Any(w) .. " si vous réussissez." end)
+add("^Return to (.+) when the mission is complete%.$", function(w) return "Retournez voir " .. Any(w) .. " une fois la mission accomplie." end)
+add("^Return to (.+) should you succeed%.$", function(w) return "Retournez voir " .. Any(w) .. " si vous réussissez." end)
+add("^Return to (.+) when the task is completed%.$", function(w) return "Retournez voir " .. Any(w) .. " une fois la tâche terminée." end)
+add("^Return to (.+) when this task is complete%.$", function(w) return "Retournez voir " .. Any(w) .. " une fois cette tâche terminée." end)
+add("^Defend yourself%.$", function() return "Défendez-vous." end)
+add("^Await (.+)%.$", function(w) return "Attendez " .. Any(w) .. "." end)
+add("^Do not slay (.+)%.$", function(w) return "Ne tuez pas " .. Any(w) .. "." end)
+add("^Do not let (.+) perish%.$", function(w) return "Ne laissez pas " .. Any(w) .. " périr." end)

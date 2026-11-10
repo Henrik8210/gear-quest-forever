@@ -312,6 +312,10 @@ function GQ.Tracker:BeginExpand()
     if not self.frame then
         return
     end
+    if self:IsHiddenBySetting() then
+        self.frame:Hide()
+        return
+    end
 
     self:CancelExpandLayoutTimer()
 
@@ -535,9 +539,11 @@ function GQ.Tracker:LayoutEntries(entries, descWordLimit)
         local row = self.entryRows[i]
         if row.cachedEntryId ~= entry.id or not row.cachedItemName then
             row.cachedEntryId = entry.id
-            row.cachedItemName = GQ.Data:GetEntryDisplayName(entry) or ("Item " .. entry.itemId)
+            row.cachedItemName = (GQ.Data.ShownEntryName and GQ.Data:ShownEntryName(entry))
+                or GQ.Data:GetEntryDisplayName(entry) or ("Item " .. entry.itemId)
         elseif row.cachedItemName:match("^Item %d+$") then
-            local resolved = GQ.Data:GetEntryDisplayName(entry)
+            local resolved = (GQ.Data.ShownEntryName and GQ.Data:ShownEntryName(entry))
+                or GQ.Data:GetEntryDisplayName(entry)
             if resolved then
                 row.cachedItemName = resolved
             end
@@ -1141,11 +1147,22 @@ function GQ.Tracker:BeginResize()
     self.frame:StartSizing("BOTTOMRIGHT")
 end
 
+function GQ.Tracker:IsHiddenBySetting()
+    local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+    return settings and settings.hideTracker and true or false
+end
+
 function GQ.Tracker:Refresh(widthOverride, heightOverride)
     if GQ.Pins and GQ.Pins.Sync then
         GQ.Pins:Sync()
     end
     if not self.frame then
+        return
+    end
+    if self:IsHiddenBySetting() then
+        self:StopResize()
+        self:HideResizeBorder()
+        self.frame:Hide()
         return
     end
 

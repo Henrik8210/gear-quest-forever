@@ -374,6 +374,13 @@ local function ParseStatAmount(statKey)
         ITEM_MOD_HASTE_SPELL_RATING = "Spell Haste Rating",
         ITEM_MOD_SPELLPOWER_SHORT = "Spell Damage",
         ITEM_MOD_SPELL_POWER_SHORT = "Spell Damage",
+        -- Classic healing and spell damage are separate stats. The combined
+        -- "damage and healing" line arrives as spell power and is also added
+        -- to Healing in ScoreNormalizedStats.
+        ITEM_MOD_SPELL_HEALING_DONE_SHORT = "Healing",
+        ITEM_MOD_SPELL_HEALING_DONE = "Healing",
+        ITEM_MOD_SPELL_DAMAGE_DONE_SHORT = "Spell Damage",
+        ITEM_MOD_SPELL_DAMAGE_DONE = "Spell Damage",
     }
     local alias = modAliases[statKey]
     if alias then
@@ -412,8 +419,32 @@ local function CollectItemStats(itemLink, itemId)
     return statTable
 end
 
-local function ScoreNormalizedStats(statTable)
+local function IsSpellPowerKey(statKey)
+    return statKey == "ITEM_MOD_SPELL_POWER_SHORT"
+        or statKey == "ITEM_MOD_SPELLPOWER_SHORT"
+        or statKey == "Spell Power"
+end
+
+-- Hunt scores multiply stamina, intellect, spirit, and mana through level 60.
+-- The raw profile weight is what GetStatWeight returns.
+local function LeveledStatWeight(statName)
+    local weight = SuffixStatWeight(statName)
+    local level = GQ.GetEffectiveLevel and GQ:GetEffectiveLevel() or 1
+    local leveling = GQ.ScoringLeveling
+    if not leveling or level > (leveling.untilLevel or 60) then
+        return weight
+    end
+    local key = ResolveStatWeightKey(statName)
+    local mult = key and leveling[key]
+    if mult then
+        return weight * mult
+    end
+    return weight
+end
+
+local function ScoreNormalizedStats(statTable, leveled)
     local byName = {}
+    local spellPower = 0
 
     for statKey, amount in pairs(statTable) do
         if type(amount) == "number" and amount > 0 then
@@ -422,13 +453,23 @@ local function ScoreNormalizedStats(statTable)
                 local value = parsedAmount or amount
                 -- Melee/ranged hit often duplicate the same equip aura — take max.
                 byName[statName] = math.max(byName[statName] or 0, value)
+                if IsSpellPowerKey(statKey) and value > spellPower then
+                    spellPower = value
+                end
             end
         end
     end
 
+    -- Classic spell power is damage and healing. Healers score the healing
+    -- half, and casters still score the damage half.
+    if spellPower > 0 then
+        byName.Healing = math.max(byName.Healing or 0, spellPower)
+    end
+
+    local weightOf = leveled and LeveledStatWeight or SuffixStatWeight
     local total = 0
     for statName, amount in pairs(byName) do
-        total = total + amount * SuffixStatWeight(statName)
+        total = total + amount * weightOf(statName)
     end
 
     return total
@@ -438,6 +479,22 @@ local function ParseTooltipStatLine(text, byName)
     text = GQ.PublicText(text)
     if not text then
         return
+    end
+
+    local lower = text:lower()
+    -- A party-only line is not the wearer's stat.
+    if not lower:find("party", 1, true) then
+        local heal, damage = text:match("[Ii]ncreases healing done by up to (%d+) and damage done by up to (%d+)")
+        if heal and damage then
+            byName.Healing = math.max(byName.Healing or 0, tonumber(heal))
+            byName["Spell Damage"] = math.max(byName["Spell Damage"] or 0, tonumber(damage))
+        end
+        local both = text:match("[Ii]ncreases damage and healing done by magical spells and effects by up to (%d+)")
+        if both then
+            local amount = tonumber(both)
+            byName.Healing = math.max(byName.Healing or 0, amount)
+            byName["Spell Damage"] = math.max(byName["Spell Damage"] or 0, amount)
+        end
     end
 
     for amount, stat in text:gmatch("+(%d+) ([^+]+)") do
@@ -458,7 +515,6 @@ local function ParseTooltipStatLine(text, byName)
         { "[Ii]ncreases healing done by spells and effects by up to (%d+)", "Healing" },
     }
 
-    local lower = text:lower()
     for _, pattern in ipairs(patterns) do
         local amount = text:match(pattern[1])
         if not amount and lower then
@@ -471,7 +527,7 @@ local function ParseTooltipStatLine(text, byName)
     end
 end
 
-local function ScoreItemStatsFromTooltip(itemId, itemLink)
+local function ScoreItemStatsFromTooltip(itemId, itemLink, leveled)
     if not GQ.Data or not GQ.Data.GetTooltipScanner then
         return 0
     end
@@ -493,20 +549,109 @@ local function ScoreItemStatsFromTooltip(itemId, itemLink)
     end
 
     local byName = {}
+    local dps
     local scannerName = scanner:GetName()
+    local weightOf = leveled and LeveledStatWeight or SuffixStatWeight
     for i = 1, scanner:NumLines() do
         local line = _G[scannerName .. "TextLeft" .. i]
-        if line then
-            ParseTooltipStatLine(line:GetText(), byName)
+        local text = line and GQ.PublicText(line:GetText())
+        if text then
+            ParseTooltipStatLine(text, byName)
+            if not dps then
+                local found = text:match("%(([%d%.]+) damage per second%)")
+                    or text:match("([%d%.]+) damage per second")
+                dps = found and tonumber(found)
+            end
         end
     end
 
     local total = 0
     for statName, amount in pairs(byName) do
-        total = total + amount * SuffixStatWeight(statName)
+        total = total + amount * weightOf(statName)
     end
 
-    return total
+    return total, dps
+end
+
+local function WeaponDpsWeight(slotName)
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    local specId = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec()
+    local level = GQ.GetEffectiveLevel and GQ:GetEffectiveLevel() or 1
+    local dps, dpsRanged = 0, 0
+    local custom = GQ.Custom and classFile and specId and GQ.Custom.Get and GQ.Custom:Get(classFile, specId)
+    if custom and GQ.Custom.Weights then
+        local _, dw, dr = GQ.Custom:Weights(classFile, custom, level)
+        dps, dpsRanged = dw or 0, dr or 0
+    else
+        local classTable = GQ.ScoringWeights and classFile and GQ.ScoringWeights[classFile]
+        local specRow = classTable and specId and classTable[specId]
+        if specRow then
+            dps = specRow.dpsWeight or 0
+            dpsRanged = specRow.dpsWeightRanged or 0
+        end
+    end
+    if slotName == "Ranged" then
+        return dpsRanged
+    end
+    if slotName == "SecondaryHand" then
+        return dps * 0.5
+    end
+    return dps
+end
+
+local function StatTableHasSpell(statTable)
+    for key in pairs(statTable) do
+        if IsSpellPowerKey(key)
+            or key == "ITEM_MOD_SPELL_HEALING_DONE_SHORT"
+            or key == "ITEM_MOD_SPELL_HEALING_DONE"
+            or key == "ITEM_MOD_SPELL_DAMAGE_DONE_SHORT"
+            or key == "ITEM_MOD_SPELL_DAMAGE_DONE" then
+            return true
+        end
+    end
+    return false
+end
+
+-- The worn random-suffix link, scored the way the hunt scores stats.
+-- Spell power counts as healing and as spell damage. Weapon damage uses
+-- this spec's weapon weight, and an off-hand weapon is half of that.
+-- A zero means the item is not loaded yet.
+function GQ.Compare:ScoreItemLinkStats(itemLink, slotName)
+    if not itemLink or itemLink == "" then
+        return 0
+    end
+    local itemId = tonumber(itemLink) or tonumber(string.match(tostring(itemLink), "item:(%d+)"))
+    if itemId and GQ.Equip and GQ.Equip.IsItemDataCached and not GQ.Equip:IsItemDataCached(itemId) then
+        if GQ.Equip.PrimeItem then
+            GQ.Equip:PrimeItem(itemId)
+        end
+        return 0
+    end
+
+    local link = type(itemLink) == "string" and itemLink or nil
+    local statTable = CollectItemStats(link, itemId)
+    local apiScore = next(statTable) and ScoreNormalizedStats(statTable, true) or 0
+    local dpsWeight = WeaponDpsWeight(slotName)
+    local tooltipScore, dps
+    -- A healer's weapon weight is 0. Item stats are enough once healing or
+    -- spell power was actually read. Otherwise the tooltip still has the line.
+    if apiScore <= 0 or dpsWeight > 0 or not StatTableHasSpell(statTable) then
+        tooltipScore, dps = ScoreItemStatsFromTooltip(itemId, link, true)
+    end
+    local statScore = apiScore or 0
+    if tooltipScore and tooltipScore > statScore then
+        statScore = tooltipScore
+    end
+    if dps and dps > 0 and dpsWeight > 0 then
+        statScore = statScore + dps * dpsWeight
+    end
+    if statScore <= 0 then
+        return 0
+    end
+    if itemId then
+        statScore = statScore * GetArmorClassMultiplier(itemId)
+    end
+    return statScore
 end
 
 function GQ.Compare:ScoreItemStats(entry)

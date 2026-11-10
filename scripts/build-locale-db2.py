@@ -115,16 +115,29 @@ def main() -> None:
     spells = pairs(cache, "SpellName", "Name_lang", locale)
     factions = pairs(cache, "Faction", "Name_lang", locale)
     areas = pairs(cache, "AreaTable", "AreaName_lang", locale)
+    # Continents are map names, not area rows.
+    for key, value in pairs(cache, "UiMap", "Name_lang", locale).items():
+        areas.setdefault(key, value)
     suffixes = pairs(cache, "ItemRandomProperties", "Name_lang", locale, ERA_BUILD)
 
     zone_ids = set(re.findall(r'^\s*\["((?:[^"\\]|\\.)*)"\] =', (ADDON / "Locales" / "Zones.lua").read_text(encoding="utf-8"), re.M))
     zone_fields = set(re.findall(r'\b(?:zone|map|place)\s*=\s*"((?:[^"\\]|\\.)*)"', blob))
+    # A short addon name uses the longer area row.
+    zone_alias = {"Grom'gol": "Grom'gol Base Camp", "Theramore": "Theramore Isle"}
+    # Zones.lua ids used to be left to the client. That stays English on an
+    # English client even when another language is selected, so the pack
+    # carries those names too.
+    zone_names = {}
+    for zone in zone_fields | zone_ids:
+        translated = areas.get(zone) or areas.get(zone_alias.get(zone, ""))
+        if translated:
+            zone_names[zone] = translated
     enchants = re.findall(r'name = "(Enchant[^"]+)"', (ADDON / "Enchant.lua").read_text(encoding="utf-8"))
     out = {
         "item": names.used_names(items, texts, fields["name"]),
         "enchant": {e: spells[e] for e in enchants if e in spells},
         "faction": {f: fr for f, fr in factions.items() if f'"{f}"' in blob or f"{f} - " in blob},
-        "zone": {z: areas[z] for z in zone_fields - zone_ids if z in areas},
+        "zone": zone_names,
     }
     used_suffixes = set(re.findall(r'"(of [^"]+)"', blob))
     suffix = {s: suffixes[s] for s in sorted(used_suffixes) if s in suffixes}

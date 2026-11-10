@@ -1122,7 +1122,7 @@ local function MakeTitle(parent)
     if not ok or not title then
         title = parent:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     end
-    return title
+    return GQ:CalmFont(title)
 end
 
 local function MakeBody(parent)
@@ -1130,7 +1130,7 @@ local function MakeBody(parent)
     if not ok or not body then
         body = parent:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     end
-    return body
+    return GQ:CalmFont(body)
 end
 
 function GUIDE:Ensure(frame)

@@ -132,7 +132,8 @@ local function ShowPinTooltip(frame)
     end
     local entry = pin.entry
     GameTooltip:SetOwner(frame, "ANCHOR_RIGHT")
-    local name = GQ.Data and GQ.Data.GetEntryDisplayName and GQ.Data:GetEntryDisplayName(entry)
+    local name = GQ.Data and ((GQ.Data.ShownEntryName and GQ.Data:ShownEntryName(entry))
+        or (GQ.Data.GetEntryDisplayName and GQ.Data:GetEntryDisplayName(entry)))
     GameTooltip:AddLine(name or ("Item " .. tostring(entry.itemId)), 1, 0.82, 0)
     local info = C_Map and C_Map.GetMapInfo and C_Map.GetMapInfo(pin.mapId)
     local zone = (pin.map and GQ.TN("zone", pin.map)) or (info and info.name) or (entry.zone and GQ.TN("zone", entry.zone)) or ""
@@ -411,8 +412,35 @@ local function EnsureFrame(index)
     return frame
 end
 
+local function MapPinsHidden()
+    local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+    return settings and settings.hideMapPins and true or false
+end
+
+local function ReleasePlaced()
+    for i = 1, #frames do
+        local frame = frames[i]
+        if frame then
+            frame:Hide()
+            if frame.OnReleased then
+                frame:OnReleased()
+            end
+        end
+    end
+    placed = 0
+    placedMap = nil
+    placedScale = nil
+    placedGen = nil
+end
+
 -- Runs from our own OnUpdate, never from the map's show or hide.
 local function PlacePins()
+    if MapPinsHidden() then
+        if placed > 0 or placedMap then
+            ReleasePlaced()
+        end
+        return
+    end
     if not MapIsOpen() then
         return
     end
@@ -475,6 +503,14 @@ function GQ.Pins:Sync()
         pinGen = pinGen + 1
         placedMap = nil
         placedScale = nil
+        return
+    end
+    -- Hunt settings can hide these icons. The waypoint from Show on map
+    -- and the guide stays.
+    if MapPinsHidden() then
+        pins = {}
+        pinGen = pinGen + 1
+        ReleasePlaced()
         return
     end
     pins = {}

@@ -191,7 +191,8 @@ function GQ.Map:Show(entry)
     if not mapId then
         mapId = self:ZoneMap(entry.zone)
     end
-    local label = (entry.questName and GQ.TN("quest", entry.questName))
+    local label = (GQ.Data and GQ.Data.RewardQuestTitle and GQ.Data:RewardQuestTitle(entry))
+        or (entry.questName and GQ.TN("quest", entry.questName))
         or (entry.npc and GQ.TN("npc", entry.npc))
         or (entry.zone and GQ.TN("zone", entry.zone))
         or "GearQuest"

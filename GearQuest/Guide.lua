@@ -833,7 +833,10 @@ function GQ.Guide:Init()
             return
         end
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-        local name = GQ.Data.GetEntryDisplayName and GQ.Data:GetEntryDisplayName(entry) or (entry.questName and GQ.TN("quest", entry.questName)) or L["Hunt"]
+        local name = (GQ.Data.ShownEntryName and GQ.Data:ShownEntryName(entry))
+            or (GQ.Data.GetEntryDisplayName and GQ.Data:GetEntryDisplayName(entry))
+            or (GQ.Data.RewardQuestTitle and GQ.Data:RewardQuestTitle(entry))
+            or (entry.questName and GQ.TN("quest", entry.questName)) or L["Hunt"]
         GameTooltip:SetText(name, GOLD_R, GOLD_G, GOLD_B)
         local spot = self.spot
         if spot and spot.map then

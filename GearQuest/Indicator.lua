@@ -875,8 +875,25 @@ function GQ.Indicator:HideButton(button)
 end
 
 function GQ.Indicator:UpgradeArrowsHidden()
+    -- Simulation compares another class. An arrow there marks gear that is
+    -- not ranked for the class being played, so none are painted.
+    if GQ.IsPreviewEnabled and GQ:IsPreviewEnabled() then
+        return true
+    end
     local settings = GearQuestForeverDB and GearQuestForeverDB.settings
     return settings and settings.hideUpgradeArrows and true or false
+end
+
+function GQ.Indicator:ClearUpgradeArrowCache()
+    if self._rebuildCacheTimer and self._rebuildCacheTimer.Cancel then
+        self._rebuildCacheTimer:Cancel()
+        self._rebuildCacheTimer = nil
+    end
+    self._rebuildGen = (self._rebuildGen or 0) + 1
+    self._rebuildItems = nil
+    self._rebuildNames = nil
+    self.upgradeItems = {}
+    self.upgradeItemNames = {}
 end
 
 function GQ.Indicator:ApplyArrowVisibility()
@@ -952,6 +969,10 @@ function GQ.Indicator:ScheduleRebuildCache()
 end
 
 function GQ.Indicator:RebuildCache()
+    if GQ.IsPreviewEnabled and GQ:IsPreviewEnabled() then
+        self:ClearUpgradeArrowCache()
+        return
+    end
     self._rebuildGen = (self._rebuildGen or 0) + 1
     self._rebuildItems = nil
     self._rebuildNames = nil
@@ -1044,6 +1065,17 @@ end
 local REBUILD_SLOTS_PER_FRAME = 2
 
 function GQ.Indicator:RebuildCacheAsync(onComplete, slotsPerFrame)
+    if GQ.IsPreviewEnabled and GQ:IsPreviewEnabled() then
+        self:ClearUpgradeArrowCache()
+        if onComplete then
+            onComplete()
+        end
+        if self.RefreshAll then
+            self:RefreshAll()
+        end
+        return
+    end
+
     if not GQ.Data or not GQ.Data.GetSlotsForClass then
         if onComplete then
             onComplete()

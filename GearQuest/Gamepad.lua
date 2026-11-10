@@ -817,6 +817,10 @@ function GQ.Log:GamepadScrollDetail(direction)
         scroll = frame and frame.settingsGeneralScroll
         if self.settingsSection == "commands" then
             scroll = frame and frame.settingsCommandsScroll
+        elseif self.settingsSection == "hunts" then
+            scroll = frame and frame.settingsHuntsScroll
+        elseif self.settingsSection == "credits" then
+            scroll = frame and frame.settingsCreditsScroll
         elseif self.settingsSection and self.settingsSection ~= "general" then
             scroll = nil
         end

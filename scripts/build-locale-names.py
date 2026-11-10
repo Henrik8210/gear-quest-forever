@@ -3,7 +3,8 @@
 items, objects and enchants, taken from QuestieDB's Forever build.
 
 Only names the addon data actually uses are kept: npc= and questName= fields,
-quoted quest names, and capitalised runs inside data text that match a name.
+quoted quest names, quest-chain steps, and capitalised runs inside data text
+that match a name.
 A name with two different translations keeps the first one after quote
 normalisation; a name with no translation is left out (it stays English).
 
@@ -139,6 +140,14 @@ def addon_texts() -> tuple[list[str], dict[str, set[str]]]:
     return texts, fields
 
 
+def chain_quest_names() -> set[str]:
+    path = ADDON / "_generated" / "Data.HuntFacts.generated.lua"
+    if not path.is_file():
+        return set()
+    text = path.read_text(encoding="utf-8", errors="replace")
+    return set(re.findall(r'\{\d+,\s*"((?:[^"\\]|\\.)*)"\}', text))
+
+
 def used_names(names: dict[str, str], texts: list[str], exact: set[str]) -> dict[str, str]:
     lengths = sorted({len(n.split()) for n in names})
     keep = {n: names[n] for n in exact if n in names}
@@ -165,7 +174,7 @@ def main() -> None:
 
     out = {
         "npc": used_names(names["npc"], texts, fields["npc"]),
-        "quest": used_names(names["quest"], [], fields["questName"] | quoted),
+        "quest": used_names(names["quest"], [], fields["questName"] | quoted | chain_quest_names()),
         "item": used_names(names["item"], texts, fields["name"]),
         "object": used_names(names["object"], texts, set()),
     }

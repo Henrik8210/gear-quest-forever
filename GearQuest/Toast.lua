@@ -184,7 +184,8 @@ function GQ.Toast:ApplyEntryVisuals(entry)
         return
     end
 
-    local itemName = GQ.Data:GetEntryDisplayName(entry) or ("Item " .. entry.itemId)
+    local itemName = (GQ.Data.ShownEntryName and GQ.Data:ShownEntryName(entry))
+        or GQ.Data:GetEntryDisplayName(entry) or ("Item " .. entry.itemId)
     local title = GQ.Log and GQ.Log.ObtainToastTitle and GQ.Log:ObtainToastTitle(entry)
     frame.title:SetText(title or L["|cffffd200Hunt obtained|r"])
     frame.subtitle:SetText(itemName)

@@ -519,4 +519,6 @@ for k, v in pairs({
     ["Bought from Rune Broker in Stormwind, Ironforge, Darnassus, Elwynn Forest, Dun Morogh, and Teldrassil."] = "Vendu par le courtier en runes à Hurlevent, Forgefer, Darnassus, dans la forêt d'Elwynn, à Dun Morogh et à Teldrassil.",
     ["Bought from Rune Broker in Orgrimmar, Thunder Bluff, Undercity, Durotar, Mulgore, and Tirisfal Glades."] = "Vendu par le courtier en runes à Orgrimmar, aux Pitons-du-Tonnerre, à Fossoyeuse, en Durotar, en Mulgore et dans les clairières de Tirisfal.",
     ["Bought from Rune Broker in Stormwind, Ironforge, Darnassus, Elwynn Forest, Dun Morogh, and Teldrassil, and in Orgrimmar, Thunder Bluff, Undercity, Durotar, Mulgore, and Tirisfal Glades."] = "Vendu par le courtier en runes à Hurlevent, Forgefer, Darnassus, dans la forêt d'Elwynn, à Dun Morogh et à Teldrassil, ainsi qu'à Orgrimmar, aux Pitons-du-Tonnerre, à Fossoyeuse, en Durotar, en Mulgore et dans les clairières de Tirisfal.",
+    ["The Blacksmithing plans are a drop."] = "Les plans de forge sont un butin.",
+    ["The creature is not named yet."] = "La créature n'a pas encore de nom.",
 }) do sentences[k] = v end

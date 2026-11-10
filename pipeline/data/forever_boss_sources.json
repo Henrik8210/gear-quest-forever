@@ -227,5 +227,15 @@
       "The Stockade"
     ],
     "instructions": "Drops from Gelihast, Twilight Lord Kelris, Old Serra'kis, and Aku'mai in Blackfathom Deeps, from Charlga Razorflank in Razorfen Kraul, and from Bazil Thredd and Dextren Ward in the Stockade."
+  },
+  {
+    "id": 250499,
+    "npc": "Lorgus Jett",
+    "zone": "Blackfathom Deeps",
+    "zones": [
+      "Blackfathom Deeps",
+      "The Stockade"
+    ],
+    "instructions": "Drops from Lorgus Jett, Twilight Lord Kelris, Aku'mai, and Old Serra'kis in Blackfathom Deeps, and from Kam Deepfury, Dextren Ward, and Hamhock in the Stockade."
   }
 ]

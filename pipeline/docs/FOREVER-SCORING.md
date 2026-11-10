@@ -64,12 +64,26 @@ run the stager. A file missing from disk is read from the local git ref
 
 Every change that adds, removes, or rewords a player-facing sentence updates
 each language file in the same pass. A new key with no translation shows
-English. Do not leave a new sentence for a later language pass. Item names,
-zones, factions, and enchant names come from the client tables in the
-`*.db2.lua` and `*.names.lua` files. Quest steps and objectives stay.
-Quest story paragraphs are stripped when the language addon is built,
-because classic quest ids were pairing the wrong paragraph. Do not put
-those paragraphs back.
+English. Do not leave a new sentence for a later language pass. A translated sentence does not keep an English word in the middle. German
+keeps Hunt. French says traque. Spanish says caza, Portuguese caça, Russian
+охота, Korean 사냥, Simplified Chinese 狩猎, Traditional Chinese 狩獵.
+Slash commands and class file names stay English.
+
+Item names, zones, factions, and enchant names come from the client tables
+in the `*.db2.lua` and `*.names.lua` files. GearQuest prints those for the
+selected language. The client item tooltip stays in the installed client's
+language. Quest steps and objectives stay. Quest story paragraphs live in
+`*.lore.lua`, keyed by the exact English paragraph. The old quest-id pairing
+inside `*.quests.lua` is still dropped when the language addon is built.
+
+A chain step on the parchment uses that quest's own title, the words the Forever client shows in the quest log. `GQ.Data:QuestStepTitle` asks `C_QuestLog.GetTitleForQuestID` first, then `GQ.LocaleQuestTitle[questId]` in the language file, then the English-name table. The id table is the Wowhead Forever tooltip name (`dataEnv=16`). Questie fills the name table when it has that exact English title. A Forever quest Questie does not have is taken from that tooltip, not written by hand. Wowhead's `[English]` placeholder is not a title and is not stored. Two quests that share an English name can have different client titles, so the step is looked up by id. Alliance Heart of Disruption is An Alarming Request (`Une requête alarmante`, `Eine alarmierende Bitte`) then Heart of Disruption (`Cœur de la perturbation`, `Das Herz der Störung`). The description header, the quest line, and the story paragraph use the selected language. The filter boxes are painted with `GQ.TX` when the menu opens, so a label captured before the language pack loads still translates.
+
+When a hunt or an item is indexed or updated, that same pass fills every
+locale: the name in `*.names.lua` and `*.db2.lua`, a new or changed sentence
+in `*.sentences.lua` and the rules, a new or changed story paragraph in
+`*.lore.lua`, and any new window sentence as a `GQ.L` key.
+
+Do not `SetFont` player text from `GameFontHighlight`, and do not `SetFont` the path `GetFont()` returns. That path is only the roman file, so Russian, Korean, and Chinese draw as empty boxes. Use `GameFontNormal` and set the color. Parchment text drops ElvUI's outline. Russian uses `Fonts\FRIZQT___CYR.TTF`, Korean `Fonts\2002.TTF`, Simplified Chinese `Fonts\ARKai_T.ttf`, and Traditional Chinese `Fonts\bLEI00D.TTF`.
 
 A client starts in its own language when the language addon is enabled.
 An English client stays English until Settings → General → Language is
@@ -801,20 +815,34 @@ Changing zone, logging in, and opening a merchant rebuild those arrows in the ba
 - **Turn off simulation** on the Simulator page is enabled only while a
   simulation is applied. On your own character it stays grey. The hover says
   you are already seeing your character unsimulated. The button is 148px.
-  The older preview dialog still says Reset.
-- **Settings** pages are General, Hunts, GearQuest Commands, and Credits.
+  The older preview dialog still says Reset. **Simulate** shows the working
+  spinner (the same portrait used while a custom spec is scoring) until the
+  hunt list for that class is painted and can scroll. The click only shows
+  the spinner. The class import and the list build run on the next frame.
+- **Settings** pages are General settings, Hunt settings, GearQuest Commands, and Credits.
   Rows highlight on hover (0.62, 0.50, 0.18, 0.55). The selected row keeps
   its gold bar. The page heading is centered. The setting name is the large
   text; the note under it is smaller. Clicking the label toggles the
   checkbox. Hide minimap is `GearQuestForeverDB.settings.hideMinimapIcon`.
   **GearQuest score on tooltips** is on the General page, under the
   background-art row (`settings.showGearScore`, on when nil).
-  **Hide upgrade arrows** is under Hunts
+  **Hide upgrade arrows** is under Hunt settings
   (`settings.hideUpgradeArrows`). It removes the green arrow from the quest
-  log, quest giver, loot, and vendors. **Hide chat messages** is on General
+  log, quest giver, loot, and vendors. Simulation hides those arrows as well,
+  until simulation is turned off. **Hide lower ranks** is the first box on
+  that page (`settings.hideLowerRanks`, off when nil). It hides a hunt row
+  ranked worse than the piece worn in that slot. Rings and trinkets use the
+  worse worn rank. An empty slot, or a worn piece that is not on that rank
+  list, leaves the hunts up. Simulation does not use worn ranks. The (i)
+  list stays the full order. Hunt settings scrolls, the same way General
+  does. **Hide tracker** is the last box on that page
+  (`settings.hideTracker`, off when nil). It hides the GearQuest tracker.
+  Tracked hunts stay tracked. Turning it off shows the tracker again. **Hide map pins** sits above Hide tracker (`settings.hideMapPins`, off when nil). It removes the square GearQuest icons from the world map. Show on map and the guide still set the Blizzard waypoint. **Hide guide arrow** removes the arrow
+  that points at a hunt. It does not hide the tracker. `/gq log` toggles
+  the window. There is no keybind for the log. **Hide chat messages** is on General settings
   (`settings.hideChat`, off when nil). It stops every GearQuest line in chat,
   including login, obtain notices, errors, and `/gq` replies. The log,
-  tooltips, obtain popup, and score bar stay. The General page scrolls when
+  tooltips, obtain popup, and score bar stay. The General settings page scrolls when
   the options run past the pane. The chat box reads the saved check whenever
   Settings is shown and writes it on the next frame. **GearQuest Commands** lists each
   slash command with a 1px shadow and the explanation in plain text under it.
@@ -837,14 +865,19 @@ The source **Filter** closes on a click outside the menu. The Profession
   that are not in an instance. The flyouts do not scroll. A cleared box
   stays cleared. Select all / Deselect all on the filter menu covers the source
   list and the profession, boss, trash, vendor, and quest sub-filters. Quest reward
-  opens Regular quest and Dungeon quest. A dungeon quest is one that sends you
-  into an instance, the same test as No Dungeons. Unchecking Quest reward hides
-  both. Unchecking one box hides only that kind. Each of those
+  opens Regular quest, Dungeon quest, Quest chain, and Single quest. A dungeon
+  quest is one that sends you into an instance, the same test as No Dungeons.
+  A chain is a stored list of at least two steps. A single quest is the number 1,
+  a quest that was checked and has no earlier step. A missing value, or 0, is
+  neither, so it stays when only one of those two boxes is off. Unchecking Quest
+  reward hides every quest reward. Unchecking one box hides only that kind.
+  The two pairs apply together. Each of those
   flyouts has the same button, and it covers only the boxes on that flyout. Menu text uses the Filter button's font.
   Each main-list row draws the source icon after the checkbox and before
   the name, 18px, the same art as the world-map pin. The Quest reward flyout
   shows the yellow exclamation on Regular quest and the client's dungeon-quest
-  icon on Dungeon quest. Profession rows use that profession's picture
+  icon on Dungeon quest. Quest chain and Single quest use the quest-reward icon.
+  The four labels are drawn with `GQ.TX` when the flyout opens. Profession rows use that profession's picture
   (Alchemy, Blacksmithing, Enchanting, Engineering, Fishing, Leatherworking,
   Tailoring, and the rest of the profession icon table in `Pins.lua`).
   The row's hit width includes the icon.
@@ -861,11 +894,11 @@ The source **Filter** closes on a click outside the menu. The Profession
   Checking Profession, Boss drop, Dungeon & Raid trash, Vendor, or Quest reward opens that flyout
   on the click. You do not have to leave the row and come back.
 - **Play style** is the button at the bottom of the log
-  (`GearQuestForeverDB.ui`). While any of the eight is on, the button reads
-  **Play style***. Eight cards, names under the pictures, three then three,
-  then **Focus Zone** under **Manageable Dungeons** and **Their Cities** under
-  **Manageable Quests**. **Get it now!** can be on
-  with either dungeon card, and with **Manageable Dungeons**, **Manageable Quests**, **Buy it**, **Focus Zone**, and **Their Cities**.
+  (`GearQuestForeverDB.ui`). While any of the nine is on, the button reads
+  **Play style***. Nine cards, names under the pictures, three then three,
+  then **Focus Zone** under **Manageable Dungeons**, **Their Cities** under
+  **Manageable Quests**, and **No Zephras!** under **Buy it**. **Get it now!** can be on
+  with either dungeon card, and with **Manageable Dungeons**, **Manageable Quests**, **Buy it**, **Focus Zone**, **Their Cities**, and **No Zephras!**.
   **No Dungeons!** and **Dungeon Enjoyer** turn each other off. A play
   style hides hunts across several sources. The filter still only chooses a source. Any of them widens the slot list the
   same way a filter does, so a later rank can show, and the rank box says why.
@@ -936,6 +969,13 @@ The source **Filter** closes on a click outside the menu. The Profession
     there go. A piece filed in another dungeon stays. The rows stay in the
     scored lists, so the rank number does not close up. The art is
     `GearQuest/Art/GQ-Play-TheirCities.png`.
+  - **No Zephras!** (`playNoZephras`) hides a hunt you can only get on
+    Zephras Isle, the Skyborne island. The stored zone is Zephras Isle, or
+    every visible spot is that island (map 2521). Quests, vendors, crafts,
+    and drops that are only there go. A piece with a spot somewhere else
+    stays, including a world drop or a vendor that also sells on the
+    mainland. The rows stay in the scored lists, so the rank number does
+    not close up. The art is `GearQuest/Art/GQ-Play-NoZephras.png`.
 - **Rank on the parchment.** Above the item title, a black box reads
   `Rank #N` from that piece's place on the rank list this character can
   see. A hunt the other faction cannot get is left out and the numbers
@@ -1244,6 +1284,8 @@ Hunt-id probe (`pipeline/scripts/probe_forever_hunt_tooltips.py`) labels 200 vs 
 Quest rewards and the pickup level. Horde 30, A Tale Spun Around the Fire (96078, no series, chain 1): Ceremonial Mallet (279885), Sacrificial Sword (279886), I'lalai Flayer (279887). Alliance 30, Findings for the Explorer's League (95799): Ancient Voodoo Pouch (279880), Intrepid Explorer's Chainmail (279881). Alliance 30, The Web of Magic (95798): Apprentice Sorcerer's Slacks (279878), Rune-Etched Epaulets (279879). Alliance 35, The Lost Tablets of Will (1139, no series): Medal of Valor (270095), pin Ironforge 76.4, 10.8, required level 35. Horde 36, Death to the Executioner (95433): the series through the reward is Rise Up! (95432) then Death to the Executioner. Later steps stay off. Thud Hammer (275011). Horde 36, Farholde Scouting Report (93971): Head-Harvest Crossbow (275040), Bloodied Sash (275041), no pin. Alliance 36, Fit for a Princess (95913): Apple of My Eye (95561) then Fit for a Princess. Stepped Out is after the reward. Fur-Lined Bracers (274931), Coyote Hide Wraps (274932), no pin. Horde 36, Jom-jom's Escape (94556): Jom-jom's Gabbar (274952), chain 1, and the page names no giver and no coordinate, so there is no pin. Alliance 36, Preventative Measures (95064): Farholde Horns (274959). Alliance 36, The Rog'mar Situation (95066): Orc Bone Bow (275052). Alliance 37, The Hidden Chamber (2240): Guardian Staff (270078), pin Ironforge 73.8, 13.0, faction Alliance. The earlier quest 2398 has no stored name, so the chain line stays quiet. Horde 38, A Token of Vengeance (94975): Semblance of Twilight (267090). Alliance 38, Drop the Hammer (94926): Pauldron of Order (275036). Alliance 38, Dunston Checks Out (94927): Prisoner Handwraps (275021), Bolder'ok Loincloth (275023), Dunston's Ogre Duster (275025). Horde 38, Gordunni Cobalt (2987): Orwin's Axe (287073), chain 1, pin Feralas 75.6, 44.2. Tome of Twilight, pickup 39. Alliance 94984 is A Small Favor (94907) then Tome of Twilight: Twilight Initiate's Belt (279854), Torn Cultist Cloak (279855). Horde 94972 has no series: Indoctrinated Choker (279859), Convert's Bindings (279860). Both 40, Eye of Mugg (Horde 94968, Alliance 94982, no series, no pins): Bigger Rock on Bigger Stick (279480), Rock on Stick (279852), Stick No Rock (279853), required level 40. Both 43, Tiara of the Deep (2846), chain Tabetha's Task (2861) then Tiara of the Deep: Dank Shoulderpads (270098). Four trainer pins: Undercity 84.4, 11.0, Ironforge 26.4, 9.4, Stormwind 38.4, 79.4, Orgrimmar 37.8, 86.6. The log shows the closest of the viewer's faction. Both 44, Divino-matic Rod (2768, chain 1): Magister Cowl (270099), pin Tanaris 52.4, 28.4. Both 50, Jammal'an the Prophet (1446, chain 1): Leggings of Freedom and Sorrow (270115), pin the Hinterlands 33.6, 75.2. Required level was lowered from the item-level floor to the quest's Requires level only when the tooltip had no Requires Level above 1. Do not run `apply_quest_req_levels.py` on the catalog.
 
 Stopping the Cycle (98297) rewards Subdued Dragon's Fang (281314), Trusty Sword (281313), and Fallen Dragon's Scepter (281312). Wowhead's series box is empty. The chain is still Old Habits (98223), Crocs of the Sky (98072), Crimson Crate Delivery (98240), Razormaw Needling (98245), Trying Times (98246), This Land Was Their Land (98230), Death to the Dragonmaw (98291), then Stopping the Cycle. Razormaw Needling's own series is the two steps before it. Word to Ironforge (98300) is after the reward and stays off. The pin is the Tattered Spellbook in the Wetlands at 53.4, 54.5, not Howin Kindfeather at 77.0, 45.4. Alliance. Do not write the chain back to 1, and do not move the pin back to the reward giver. `quest_faction.json` marks the three Alliance. A rescore is what drops them from a Horde list.
+
+The Wrath of Rath'mael (92422) rewards Forsaken Greataxe (251533) and Gnarled Necromancer's Staff (251534). Wowhead's series box is empty. The chain is still Rear Guard Patrol (356), Rear Guard Patrol (99156), then The Wrath of Rath'mael. Both earlier steps start with Deathguard Linnea. The pin is her camp in Tirisfal Glades at 65.4, 60.2, not Deathguard Kristof at 65.2, 60.2. Horde. Do not write the chain back to 1.
 **14 Oct 2026 index: 3,796** (10 Oct was 3,785). The listview armor column is base armor. Stored armor is base plus the green bonus, so a lower listview number is not a tooltip change. Live dataEnv 16 still matched Violet Sash, Gravewalker Boots, Desperate Barrier (1257), Feralheart Embrace, and Summit Guardian Polearm. Those rows were left as they were.
 
 Eleven ids were new to the index. Jewelcrafting Chisel (271965) and the paladin monster shield (286140) stay skipped. Blackthorne Maul (273830) is a quest objective, not a reward, and stays out. The other ten were inserted from the dataEnv 16 tooltip. Wowhead names no drop, quest, vendor, or recipe for them, so the source is unsourced and the hunt says the source is not listed yet. No coordinate was invented. `build_forever_new.py` stamped the uncached ids. New in Forever is 2,785.

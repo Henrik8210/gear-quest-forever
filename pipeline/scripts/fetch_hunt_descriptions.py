@@ -72,9 +72,15 @@ def save_cache(cache: dict) -> None:
 
 
 def series_steps(html: str, quest_id: int) -> int:
+    """1 is a series of only this quest. 0 means Wowhead listed no series.
+
+    An empty series box is not the same as a one-quest series. Brutal Helm
+    (1845) has no series, and the chain is stored on the earlier quests.
+    Calling that 1 made the log say there were no prequests.
+    """
     match = SERIES_RE.search(html or "")
     if not match:
-        return 1
+        return 0
     steps = []
     for num, cell in STEP_RE.findall(match.group(1)):
         link = LINK_RE.search(cell)
@@ -110,7 +116,7 @@ def quest_steps(quest_id: int, cache: dict) -> int:
     if key in cache["quest"]:
         return int(cache["quest"][key])
     body = fetch(f"https://www.wowhead.com/forever/quest={quest_id}?power")
-    steps = series_steps(body, quest_id) if body else 1
+    steps = series_steps(body, quest_id) if body else 0
     cache["quest"][key] = steps
     return steps
 
@@ -247,11 +253,12 @@ def main() -> None:
                 linked = item_fact(item_id, cache).get("quests") or []
         if not linked:
             continue
-        best = 1
+        best = 0
         for quest_id in linked:
             best = max(best, quest_steps(int(quest_id), cache))
         # 1 means the reward quest is the whole series. The log says there
-        # are no prequests. A later step stays the chain length.
+        # are no prequests. 0 means the series box was empty or the page
+        # did not load, and the log stays quiet. A later step stays the length.
         chain_out[item_id] = best
         if n % 25 == 0:
             save_cache(cache)

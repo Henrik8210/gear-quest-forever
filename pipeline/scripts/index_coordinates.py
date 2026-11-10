@@ -84,6 +84,12 @@ EXTRA_CHAIN_ROOTS = {
 # Call of Air is the starter; Prate Cloudseer is where that step turns in.
 REPLACE_CHAIN_ROOTS = {
     79442: (1531, 1532),
+    # Wowhead's series on The Wrath of Rath'mael is empty. The chain starts
+    # at Rear Guard Patrol, Deathguard Linnea, not at Kristof.
+    92422: (356,),
+    # Brutal Helm's own page has no series and lists Orm Stonehoof as the
+    # start. He turns the helm in. The chain begins at Speak with Ruga.
+    1845: (1823,),
 }
 # The quest page has no start pin. The note that begins the chain drops from
 # this patrol. Three published camps, far apart, so the log can pick the nearest.

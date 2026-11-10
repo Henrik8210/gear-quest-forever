@@ -525,4 +525,6 @@ for k, v in pairs({
     ["Collect 4 pieces for the heal and mana, and all 5 for Dream Venom."] = "Sammle 4 Teile für Heilung und Mana und alle 5 für Traumgift.",
     ["Collect 4 pieces for the heal and mana."] = "Sammle 4 Teile für Heilung und Mana.",
     ["Provided item:."] = "Bereitgestellter Gegenstand: –",
+    ["The Blacksmithing plans are a drop."] = "Die Pläne der Schmiedekunst werden erbeutet.",
+    ["The creature is not named yet."] = "Die Kreatur ist noch nicht benannt.",
 }) do sentences[k] = v end
