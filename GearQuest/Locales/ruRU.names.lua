@@ -1750,6 +1750,11 @@ for k, v in pairs({
     ["Zorbin Fandazzle"] = "Зорбин Дребезгун",
     ["Zulrg"] = "Злург",
     ["Zureetha Fargaze"] = "Зурита Востроглазая",
+    ["Black Guard Swordsmith"] = "Оружейник Черной Стражи",
+    ["Blazeroar"] = "Пламеяра",
+    ["Sabella No-Eyes"] = "Сабелла Безглазая",
+    ["Varrox Bleakhoof"] = "Варрокс Мутное Копыто",
+    ["Gatekeeper Rageroar"] = "Привратник Грознорев",
 }) do names.npc[k] = v end
 
 for k, v in pairs({

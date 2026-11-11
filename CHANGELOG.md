@@ -2,73 +2,49 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.1.3
+## v1.1.4
 
-The window title reads **GearQuest Forever v1.1.3**.
+The window title reads **GearQuest Forever v1.1.4**.
 
-**Custom stat weights**
+**The GearQuest Knight**
 
-**Save and score items!** scores the list with the numbers you typed.
+All 13 pages are in the language you pick in Settings: French, German, Spanish, Latin American Spanish, Portuguese, Russian, Korean, Simplified Chinese, and Traditional Chinese. The bold words are the same words as the buttons. In Simplified Chinese the first page starts **问候，冒险者！** The voice is still the English recording. The Tracked page is as loud as the other pages on the middle and loud arrows.
 
-Spell power counts the classic line, Increases damage and healing done by magical spells and effects by up to N, even when that box has a number in it. On a Protection paladin at level 22, **Crusader's Boots** have +6 of that line. With spell power at 50 they rank above **Guard's Boots**. Defense still uses the Defense box. Defense 0.1 barely moves Guard's Boots. Defense 50 is the weight that makes their +4 defense a large score.
+**A newer version in guild chat**
 
-An off-hand weapon uses the full weapon-damage weight, the same as the main hand.
+Once after you log in, if a guild mate is running a newer GearQuest, chat says **A newer version of GearQuest is available (vX.Y.Z).** That line still shows when **Hide chat messages** is on. It prints once per session.
 
-Enhancement Tank agility, when the box is empty, includes armor, dodge, and crit. The grey number is about 1.35. A number you type replaces that whole value. If that box already says 0.5, clear it.
+**What you have equipped**
 
-Procs are scored with your weights. An extra attack, chance-on-hit damage, a slow, and a Use effect move the hunt. A chance-on-hit on a weapon that spec never swings stays at 0. A Use effect still counts.
+The (i) list for a slot writes **Equipped** after the piece you are wearing. The 0–100 index is followed by the raw score in parentheses, for example **#1 Name  100 (206.22)**. Hunt rows and the parchment do not add Equipped.
 
-Healing and healing as spell power are 0 on a damage spec unless you type a number. Protection, Retribution, Enhancement, and the other specs that are not healers no longer keep the small shipped healing weights. Holy paladin, Restoration druid, Restoration shaman, and Holy and Discipline priest still use theirs.
+**Show on map with TomTom**
 
-For a priest, a mage, a warlock, a druid who is not Feral, and Elemental or Restoration, a one-hand weapon is ranked as that weapon plus the best off-hand in the level band. A staff is scored alone. If a staff is rank 1, rank 2 is the best one-hander. Feral keeps the other weapon style at rank 2. The number stored on the weapon stays the weapon by itself.
+When TomTom is installed, **Show on map** adds a TomTom waypoint and leaves the earlier TomTom pins. It does not also drop a Blizzard waypoint. A Blizzard pin GearQuest had already set is cleared.
 
-**Brutal armor**
+**Enhancement shaman**
 
-Horde warrior **Brutal Legguards**, **Brutal Gauntlets**, and **Brutal Hauberk** list the quest chain, the same way **Brutal Helm** already did. The Quest chain filter treats them as chains. The map pin is the start of Speak with Ruga: Torm Ragetotem in Thunder Bluff, Sorek in Orgrimmar, and Baltus Fowler in Undercity. The log offers the closest of those three. Each step uses the selected language.
+Intellect is **0.7** and is not doubled while you level. The weight tooltip shows 0.7. Strength stays 1.1, attack power 0.55, and spell power 0.2. Enhancement Tank is unchanged. Shaman was scored again.
 
-**Brutal Legguards** requires 20. The steps are Speak with Ruga, Trial at the Field of Giants, Speak with Thun'grim, Brutal Armor, Velora Nitely and the Brutal Legguards, Dragonmaw Shinbones, and then Brutal Legguards.
+**Shaman class weapons**
 
-**Brutal Gauntlets** uses the same first four steps, then Ula'elek and the Brutal Gauntlets, Satyr Hooves, and Brutal Gauntlets.
+**Rage of the Storm**, **Tidebringer's Claw**, **Lightning's Grasp**, and **Elementalist's Guard** come from The Tempest's Weapons, the shaman Call of Air quest. They are only on shaman lists. A retribution paladin at 30 no longer sees Rage of the Storm as the best two-hander, and no longer sees Elementalist's Guard on the off hand. Warrior, druid, and hunter lists dropped them too. Those four classes were scored again so the ranks close up.
 
-**Brutal Hauberk** uses the same first four steps, then Brutal Hauberk from Thun'grim Firegaze. It no longer says there are no prequests.
+**Recipes with no named seller**
+
+A crafted hunt whose seller was only a guess is **Unsourced**, with no map pin. That includes the camp pins for **Veteran's Chain Helm**, the silvered blacksmithing plans, **Edge of Winter**, and **Iron Morningstar**. Forever does not name those sellers. A recipe a city trainer really teaches, such as **Green Iron Helm**, still points at Stormwind and Orgrimmar. A piece Forever names a trainer for, but whose stall is not pinned, still says Crafted with that profession and has no pin.
+
+**New Forever hunts**
+
+37 pieces from Wowhead Forever are on the lists. All nine classes were scored again. The ones with a named source are **Flightblade Throwing Axe** from War Master Voone, the Blackmaw Reclamation rings **Ouroboros Ring**, **Eagle's Head Signet**, **Malefactor's End**, and **Engraved Band**, **Plague Defiled Buckler** from the Black Guard Swordsmith, **Zarla's Snack Pouch** and **Beastbond Robe** from Blazeroar, **Heartflame Gauntlets** and **Cinderedge Crescent** from Cinder, **Horns of Varrox** from Varrox Bleakhoof, and **Furbolg Rib Protector** from Sabella No-Eyes. The rest of that batch is Unsourced until Forever lists a drop, a vendor, or a recipe. That includes **The Black Helm**, **Scarlet Bonebreaker**, **Masterwork Crimson Hammer**, **Swordsmith Mitts**, **Hammer of the Fallen Thane**, and **Dragonblood Greatsword**.
+
+### v1.1.3
+
+The window title reads **GearQuest Forever v1.1.3**. **Save and score items!** scores a custom spec with the numbers you typed, including the classic damage-and-healing line. An off-hand weapon uses the full weapon-damage weight. Healing stays 0 on a damage spec unless you type a number. For a priest, a mage, a warlock, a non-feral druid, and Elemental or Restoration, a one-hander is ranked with the best off-hand. Horde **Brutal Legguards**, **Brutal Gauntlets**, and **Brutal Hauberk** list the Speak with Ruga chain. The pin is the closest of Torm Ragetotem, Sorek, and Baltus Fowler. Brutal Legguards requires 20.
 
 ### v1.1.2
 
-The window title reads **GearQuest Forever v1.1.2**.
-
-**Quest chain and Single quest**
-
-Quest reward opens four boxes: **Regular quest**, **Dungeon quest**, **Quest chain**, and **Single quest**. A chain is a hunt whose parchment lists two or more steps. A single quest was checked and has no earlier quest. Unchecking Quest reward hides every quest reward. Unchecking one box hides only that kind. A hunt that has not been checked is neither a chain nor a single quest, so it stays when only one of those two boxes is off. The four labels use the language you selected. In French they read Quête normale, Quête de donjon, Chaîne de quêtes, and Quête seule. In German they read Normale Quest, Dungeonquest, Questreihe, and Einzelquest.
-
-**The parchment in your language**
-
-The description header reads **DESCRIPTION** in the selected language. The quest name, each chain step, and the story paragraph use that language. A step uses the title the Forever client shows in the quest log, so the parchment and the quest log name the same quest. A finished step ends with **completed** in green. An open step ends with **not completed yet**. On a Russian client those words are **выполнено** and **еще не выполнено**.
-
-Alliance **Heart of Disruption** lists **An Alarming Request**, then **Heart of Disruption**. In French that is Une requête alarmante, then Cœur de la perturbation. In German, Eine alarmierende Bitte, then Das Herz der Störung. Horde lists **Blood in the Streets**, then the same Heart of Disruption quest. The rewards are Spellguard Pauldrons, Renewing Footpads, or Defender of Dalaran for Alliance, and Battle Spaulders, Enchanted Sandals, or Striking Staff for Horde. A quest the client has not translated stays English. The long story on the parchment is translated paragraph by paragraph. Russian, Korean, and Chinese use a font that can draw those letters, so the parchment no longer shows empty boxes.
-
-**Chains that were wrong**
-
-A quest that is not the second step of a series no longer says there are no prequests. **Stopping the Cycle**, Alliance, picked up at 24, still lists Old Habits, Crocs of the Sky, Crimson Crate Delivery, Razormaw Needling, Trying Times, This Land Was Their Land, Death to the Dragonmaw, and then Stopping the Cycle. The rewards are Subdued Dragon's Fang, Trusty Sword, and Fallen Dragon's Scepter. **The Wrath of Rath'mael** lists Rear Guard Patrol, Rear Guard Patrol, then The Wrath of Rath'mael. The rewards are Forsaken Greataxe and Gnarled Necromancer's Staff. The pin is Deathguard Linnea in Tirisfal Glades at 65.4, 60.2. **Bloodfury Bloodline** lists Harpies Threaten, then Bloodfury Bloodline. Both lines say completed, in green, when this character has finished those quests.
-
-**Hunt settings**
-
-The page is **Hunt settings**. **Hide lower ranks** hides a hunt ranked worse than the piece you are wearing in that slot. An empty slot still shows its hunts. Rings and trinkets use the weaker piece. The (i) list still shows every rank. **Hide map pins** sits above Hide tracker. It removes the square GearQuest icons from the world map. Show on map and the guide still place the normal map marker. **Hide tracker** hides the GearQuest tracker. Tracked hunts stay tracked.
-
-**No Zephras!**
-
-Play style has a ninth card, under Buy it. **No Zephras!** hides hunts you can only get on Zephras Isle, the Skyborne island. A piece you can also get somewhere else stays. Rank numbers do not close up. It can be on with either dungeon card.
-
-**What counts as an upgrade**
-
-A worn piece that is not on the hunt list is no longer treated as an empty slot. A Restoration druid wearing **Hook Dagger of Healing** does not get a green arrow, or Recommended, on a weaker weapon. The healing on the dagger counts. The arrow is only for your own gear. A party member's upgrade does not paint it. While simulating, the arrows stay off.
-
-**Beast Mastery weapons**
-
-Levels 26–28 keep the two-handers. The off-hand list can be shorter than the main-hand list. Alliance off hand is 26–27 and then 28, and the two-handers stay on 26–28. Horde off hand is the same split, and the two-handers stay on 26–30.
-
-**General settings**
-
-The settings page is **General settings**.
+The window title reads **GearQuest Forever v1.1.2**. Quest reward adds **Quest chain** and **Single quest**. The parchment header, quest names, chain steps, and story use the selected language. **Stopping the Cycle** and **The Wrath of Rath'mael** keep their real chains. Hunt settings adds **Hide lower ranks** and **Hide map pins**. **No Zephras!** hides Skyborne-only hunts. A worn piece that is not on the list is not an empty slot. Beast Mastery 26–28 keeps the two-handers.
 
 ### v1.1.1
 
@@ -80,33 +56,7 @@ The window title reads **GearQuest Forever v1.1.0**. Their Cities hides the othe
 
 ### v1.0.9
 
-The window title reads **GearQuest Forever v1.0.9**.
-
-**Where a hunt comes from**
-
-Each hunt has a small picture at the right of the row, drawn a little soft. It is the same picture as the filter and the map pin. Hover it and the tooltip names the source. Boss drop is the skull. Dungeon & Raid trash is the red raid mark. A quest is the yellow exclamation. A vendor is the sack. A world drop is the sunset. A profession is the book. A rare is the silver dragon. A container is the chest. Unsourced is an orange circle. A click on the picture still opens the hunt, and the mouse wheel still scrolls the list.
-
-**Dungeons in the other faction's city**
-
-Horde no longer sees hunts from **The Stockade** or **Hall of Thanes**. Alliance no longer sees hunts from **Ragefire Chasm** or **Ruins of Lordaeron**. That covers boss drops, dungeon trash, rares, and quest rewards filed in those dungeons. The Boss drop flyout and the Dungeon & Raid trash flyout leave those dungeons off, because the hunts are gone. A piece that also drops somewhere the other faction can reach stays. All nine classes were scored again, so the ranks close up.
-
-**Catacomb Cloak** and **Deepgrave Trousers**, from An Ancient Grudge, are Hall of Thanes. They stay on the Alliance list.
-
-**Item tooltips**
-
-The hunt hover, the lookup, and the reward on the parchment use the tooltip from the game client. Bags, the character panel, chat, and the quest log already did. GearQuest still adds the recommended enchantment, the rank line, and the GearQuest score under that tooltip.
-
-A random green shows the base piece. One line under it names the jackpot suffix and the chance. **Bonelink Gauntlets of the Monkey** shows Bonelink Gauntlets, then the line for of the Monkey.
-
-On a client in another language, the item name and the stats are that language. The GearQuest lines stay English.
-
-When the game client has no tooltip for the item, the hover shows the Wowhead Forever tooltip instead. Two red lines sit under it:
-
-Wowhead Forever lists this item.
-
-This game client does not have it yet.
-
-The parchment says the same sentence on one line. **Marsh Serpent's Scales** and **Dawnstalker Handguards** are hunts Wowhead Forever lists, and this client does not have a tooltip for them yet. While the client is still loading an item, the hover says it is retrieving it. The Wowhead tooltip is only the fallback after the client says the item is not there.
+The window title reads **GearQuest Forever v1.0.9**. Each hunt shows a small source picture. Horde hides The Stockade and Hall of Thanes. Alliance hides Ragefire Chasm and Ruins of Lordaeron. Hovers use the client tooltip, and the Wowhead Forever tip only when the client has no such item.
 
 ### v1.0.8
 

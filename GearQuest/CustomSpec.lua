@@ -234,7 +234,8 @@ function GQ.Custom:Weights(classFile, record, level)
     local leveling = GQ.ScoringLeveling
     if leveling and (tonumber(level) or 1) <= (leveling.untilLevel or 60) then
         for key, mult in pairs(leveling) do
-            if key ~= "untilLevel" and type(mult) == "number" and weights[key] and not typed[key] then
+            if key ~= "untilLevel" and type(mult) == "number" and weights[key] and not typed[key]
+                and not (record.base == "enhancement" and key == "int") then
                 weights[key] = weights[key] * mult
             end
         end

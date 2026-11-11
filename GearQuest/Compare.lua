@@ -435,6 +435,13 @@ local function LeveledStatWeight(statName)
         return weight
     end
     local key = ResolveStatWeightKey(statName)
+    -- Enhancement intellect stays the raw weight. The endurance double put it above strength.
+    if key == "int" then
+        local specId = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec()
+        if specId == "enhancement" then
+            return weight
+        end
+    end
     local mult = key and leveling[key]
     if mult then
         return weight * mult
@@ -923,7 +930,7 @@ function GQ.Compare:GetEffectiveScoringRows(classFile, specId, playerLevel)
     local weights = {}
     for key, raw in pairs(specRow.weights) do
         local mult = 1
-        if useLeveling and leveling[key] then
+        if useLeveling and leveling[key] and not (specId == "enhancement" and key == "int") then
             mult = leveling[key]
         end
         local value = raw * mult

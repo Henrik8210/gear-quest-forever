@@ -824,6 +824,9 @@ for k, v in pairs({
     ["Yowler"] = "Jauler",
     ["Zanzil the Outcast"] = "Zanzil der Ausgestoßene",
     ["Zardeth of the Black Claw"] = "Zardeth von den Blackclaw",
+    ["Black Guard Swordsmith"] = "Schwertschmied der schwarzen Wache",
+    ["Gatekeeper Rageroar"] = "Torhüter Donnerschrei",
+    ["Sabella No-Eyes"] = "Sabella Ohne-Augen",
 }) do names.npc[k] = v end
 
 for k, v in pairs({

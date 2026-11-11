@@ -896,6 +896,9 @@ for k, v in pairs({
     ["Zanzil the Outcast"] = "Zanzil le Paria",
     ["Zardeth of the Black Claw"] = "Zardeth de la Griffe noire",
     ["Zarlman Two-Moons"] = "Zarlman Deux-Lunes",
+    ["Black Guard Swordsmith"] = "Fabricant d'épées de la Garde noire",
+    ["Sabella No-Eyes"] = "Sabella Sans-Regard",
+    ["Gatekeeper Rageroar"] = "Portier Hurlerage",
 }) do names.npc[k] = v end
 
 for k, v in pairs({

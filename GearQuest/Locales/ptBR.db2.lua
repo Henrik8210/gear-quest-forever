@@ -6068,6 +6068,7 @@ for k, v in pairs({
     ["Wetlands"] = "Pantanal",
     ["Winterspring"] = "Hibérnia",
     ["Zephras Isle"] = "Ilha de Zefras",
+    ["Alcaz Prison"] = "Prisão de Alcaz",
 }) do names.zone[k] = v end
 
 -- Item names by item id, for items whose English name the data lacks.

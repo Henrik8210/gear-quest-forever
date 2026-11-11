@@ -210,6 +210,8 @@ L["Select an upgrade to see how to get it."] = "업그레이드를 선택하면 
 L["Active"] = "진행 중"
 L["Completed"] = "완료"
 L["Removed"] = "제거됨"
+L["Tracked"] = "추적 중"
+L["Equipped"] = "착용 중"
 L["Filter*"] = "필터*"
 L["Filter"] = "필터"
 L["No profession hunts"] = "전문 기술 사냥 없음"
@@ -229,7 +231,8 @@ L["Shows the score bar in the log header. Off restores the viewing-upgrades line
 L["Hide chat messages"] = "대화 메시지 숨기기"
 L["Hide tracker"] = "추적기 숨기기"
 L["Hides the GearQuest tracker. Tracked hunts stay tracked. Turn this off to show the tracker again."] = "GearQuest 추적기를 숨깁니다. 추적 중인 사냥은 그대로 추적됩니다. 끄면 추적기가 다시 나타납니다."
-L["Stops every GearQuest line in chat, including login, obtain notices, and /gq replies. The log stays."] = "접속, 획득 알림, /gq 응답을 포함한 GearQuest의 모든 대화 메시지를 막습니다. 기록은 유지됩니다."
+L["Stops GearQuest lines in chat, including login, obtain notices, and /gq replies. A notice that a newer version is available still shows. The log stays."] = "접속, 획득 알림, /gq 응답을 포함한 GearQuest 대화 메시지를 막습니다. 새 버전 알림은 그대로 표시됩니다. 기록은 유지됩니다."
+L["A newer version of GearQuest is available (v%s)."] = "새 GearQuest 버전이 있습니다 (v%s)."
 L["General settings"] = "일반 설정"
 L["Hunts"] = "사냥"
 L["Hunt settings"] = "사냥 설정"
@@ -291,8 +294,10 @@ L["|cff00ff00(Tracked)|r"] = "|cff00ff00(추적 중)|r"
 L["Weapons"] = "무기"
 L["No completed hunts in this slot."] = "이 칸에 완료한 사냥이 없습니다."
 L["No removed hunts in this slot."] = "이 칸에 제거한 사냥이 없습니다."
+L["No tracked hunts in this slot."] = "이 칸에 추적 중인 사냥이 없습니다."
 L["No upgrades for your level yet."] = "아직 현재 레벨의 업그레이드가 없습니다."
 L["No removed hunts."] = "제거한 사냥이 없습니다."
+L["No tracked hunts."] = "추적 중인 사냥이 없습니다."
 L["No completed hunts yet."] = "아직 완료한 사냥이 없습니다."
 L[" %sYour %s is %d.|r"] = " %s%s 숙련도: %d.|r"
 L[" |cff6e1212You don't have %s.|r"] = " |cff6e1212%s 기술이 없습니다.|r"
@@ -545,3 +550,21 @@ L["Their Cities"] = "상대 진영 도시"
 L["Hides hunts from dungeons inside the other faction's cities. Alliance hides Ragefire Chasm and Ruins of Lordaeron. Horde hides Hall of Thanes and The Stockade. Boss drops, trash, rares, and quest rewards filed in those dungeons go. A piece filed in another dungeon stays."] = "상대 진영 도시 안의 던전 사냥을 숨깁니다. 얼라이언스는 성난불길 협곡과 로데론의 폐허를 숨깁니다. 호드는 영주의 전당과 스톰윈드 지하감옥을 숨깁니다. 이 던전들의 우두머리 드롭, 일반 몹, 희귀 몹, 퀘스트 보상이 빠집니다. 다른 던전으로 분류된 아이템은 남습니다."
 L["No Zephras!"] = "제프라스 제외!"
 L["Hides hunts you can only get on Zephras Isle, the Skyborne island. Quests, vendors, crafts, and drops that are only there go. A piece you can also get somewhere else stays."] = "Skyborne의 섬인 Zephras Isle에서만 얻을 수 있는 사냥을 숨깁니다. 그곳에만 있는 퀘스트, 상인, 제작, 드롭이 빠집니다. 다른 곳에서도 얻을 수 있는 아이템은 남습니다."
+
+
+-- Tutorial pages (PortraitGuide.lua). {b}...{/b} is bold, {info} the info icon.
+GQ.LocaleGuidePages = {
+    "안녕하시오, 모험가여!\n\n나는 평생 아제로스를 떠돌며 괜찮은 장비를 잔뜩 발견했소! 에헴…… 사냥을 한두 개쯤 나눠 줄 생각은 있었소…… 아, 에라 모르겠다…… 전부 나눠 주겠소!\n\n자, 장비를 찾으러 떠날 준비가 되었소? 잠깐…… 그 말은 좀 이상했군, 다시 해 보겠소.\n\n{b}장비 사냥을 떠날 준비가 되었소?{/b}",
+    "좋소, 시작합시다.\n\n이것이 {b}GearQuest 기록{/b}이오. 여기서 {b}진행 중{/b}인 사냥 {b}목록{/b}, {b}완료{/b}한 사냥, 그리고 마음에 안 들어 {b}제거됨{/b}으로 치운 사냥을 볼 수 있소…… 왜 그러시는지는 모르겠지만……\n\n{b}기록{/b}은 지금 진영, 전문화, 그리고 물론 레벨에 맞는 가장 좋은 장비를 보여 주오. 기본적으로 {b}목록{/b}은 칸마다 순위 {b}상위 3{/b}개의 장비를 보여 주고, 캐릭터 창에서 칸을 오른쪽 클릭해도 같은 것을 볼 수 있소.",
+    "GearQuest는 장비를 많이 들고 있어서, 필터를 켜도 쓸 만한 선택지를 남겨 두오.\n\n각 칸 제목 옆의 {b}정보 {info} 아이콘{/b}에 커서를 올리면, 현재 레벨의 순위가 전부 보이오.\n\n이 목록 바로 아래 {b}슬라이더{/b}로 칸마다 몇 개까지 볼지도 정할 수 있소.",
+    "{b}필터{/b}는 말 그대로…… 거르는 것이오. 그 나쁜 밴클리프의 던전에서 나오는 사냥만 보고 싶다면 그렇게 할 수 있고, 다른 선택도 많소.\n\n목록을 거의 끝까지 내리면 {b}무기{/b} 필터도 있소.\n\n마지막으로 {b}플레이 스타일{/b}이 있는데, 여러 필터를 묶어 둔 것이오. 예를 들어 {b}현재 지역{/b}은 지금 서 있는 지역에서 얻을 수 있는 사냥만 보여주고, {b}던전 금지!{/b}는 절대 던전으로 안내하지 않소.",
+    "자, 이제 목록에서 사냥을 하나 골라 보시오.\n\n고르면 {b}양피지{/b}에 그 사냥의 내용이 나오오. 장비의 {b}순위{/b}, 어디서 구하는지, 필요한 조건이나 권장 사항, 장비의 {b}출처{/b}(출처로도 필터할 수 있소), 그리고 마지막으로 {b}보상{/b}, 그 멋진 장비 말이오.\n\n아, 그리고 어느 레벨에서든 순위가 높은 장비를 얻으면, 업적처럼 알림이 뜨오!",
+    "이 칸 아래쪽에 버튼이 3개 있소.\n\n{b}추적{/b}은 이 사냥을 GearQuest 추적기에 넣고, 세계 지도에 가야 할 곳을 가리키는 아이콘을 찍소. 추적기에서 {b}안내 켜기{/b}를 하면 추적기 위에 화살표가 나타나 사냥의 목적지까지 이끌어 주오. 반대편 대륙에 있으면, 먼저 가까운 배나 비행선으로 안내하오.\n\n{b}지도에 표시{/b}는 아이콘을 추가하지 않고, 목적지를 바로 보여 주며 {b}안내{/b}를 켜오.\n\n{b}제거{/b}는 그냥…… 이 사냥을 치워서 다시 보이지 않게 하오. {b}제거됨{/b} 탭에서 언제든 되돌릴 수 있소.",
+    "추적 중인 사냥을 한데 모아 두고 싶은 꼼꼼한 모험가라면, {b}추적 중{/b} 탭이 바로 그것을 위한 것이오!\n\n지금 추적 중인 퀘스트가 이 화면에 모두 나오니, 정리에 파묻히지 않고 사냥에 더 많은 시간을 쓸 수 있소.",
+    "{b}GearQuest 지수 점수{/b}는 선택한 전문화를 기준으로 장비가 얼마나 좋은지 보여 주오.\n\n{b}점수 막대{/b}에 커서를 올리면, 착용 중인 장비와 각 점수가 나오오. 모든 장비는 현재 전문화의 능력치 가중치로 점수가 매겨지고 순위가 정해지오.\n\n바로 아래 {b}전문화 선택{/b}에서 다른 전문화로 바꿔 보면, {b}점수 막대{/b}가 그 전문화의 장비 목록에 맞춰 바뀌오.\n\n참고로 시뮬레이션 모드에서는 되지 않소.",
+    "{b}전문화{/b}를 고른 뒤, 그 {b}전문화{/b} 이름에 커서를 올리면 어떤 {b}능력치 가중치{/b}로 점수를 매기는지 볼 수 있소.\n\n장비를 사랑하는 사냥꾼이라면 보통 {b}민첩성{/b}이 붙은 것을 고르겠고, 치유나 방패는 아니겠지? 아니, 정말로 {b}민첩성{/b}의 가중치가 {b}정신력{/b}보다 높은 것이 보여야 하오.\n\n준비된 전문화의 {b}능력치 가중치{/b}가 마음에 들지 않으면 의견을 남기거나…… 신경 쓰지 말고 원하는 가중치로 {b}사용자 전문화{/b}를 만드시오.",
+    "좋소, 몇 가지만 더 말하고 나면 들창코의 얼굴에 한 대 먹이러 가도 되오…… 에헴.\n\n{b}찾기{/b} 탭으로 가 봅시다. 이 창에서는 내가 오랜 세월 모아 온 장비를 모두 찾을 수 있으니, 직업에 맞는 {b}검색{/b}을 해 보시오.\n\n찾았으면 {b}정보 {info} 아이콘{/b}에 커서를 올려, 그 장비가 직업의 어떤 전문화에 언제 쓸모 있는지 보시오.\n\n찾는 장비가 없으면, 그 장비가 어울리는 직업을 {b}시뮬레이션{/b}해 보시오.",
+    "이미 여러 번 말했으니, 이제 {b}시뮬레이터{/b}를 봅시다.\n\n이 기능으로는 원하는 {b}직업{/b}, {b}전문화{/b}, {b}레벨{/b}을 양쪽 진영 모두 {b}시뮬레이션{/b}할 수 있소.\n\n그러니…… 나처럼 {b}37 레벨{/b}의 {b}얼라이언스{/b} {b}전사{/b} 장비 목록이 어떻게 보이는지 궁금하다면, {b}시뮬레이터{/b}가 바로 그것이오!",
+    "좋소, 마지막이오. {b}설정{/b}을 말해 두고 싶소. 어떤 모험가는 그 {b}미니맵 아이콘{/b}을 싫어하고, 어떤 이는 장비 툴팁에 {b}추천 장비 마법부여{/b}를 보고 싶어 하며, 그 밖에도 많소.\n\n여정을 더 편하게 만들려면 설정을 둘러보시오.\n\n아, 그리고 Discord의 멋진 GearQuest 커뮤니티에게 인사를? 마지막 문장이 무슨 뜻인지는 모르겠소. 그 사람이 그냥 읽어 달라고 했소.",
+    "그래서…… 무엇을 더 기다리고 있소?\n\n{b}장비 사냥을…… 영원히!{/b}",
+}

@@ -341,7 +341,7 @@ function GQ.Enchant:Weights()
     local weights = {}
     for key, raw in pairs(specRow.weights) do
         local mult = 1
-        if useLeveling and leveling[key] then
+        if useLeveling and leveling[key] and not (specId == "enhancement" and key == "int") then
             mult = leveling[key]
         end
         weights[key] = raw * mult

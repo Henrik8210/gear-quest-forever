@@ -47,6 +47,13 @@ W      = json.load(open(G+"weights.json"))
 CLASS_BIT={"WARRIOR":1,"PALADIN":2,"HUNTER":4,"ROGUE":8,"PRIEST":16,"SHAMAN":64,
            "MAGE":128,"WARLOCK":256,"DRUID":1024}
 
+# The Tempest's Weapons, the end of the shaman Call of Air chain. The mace,
+# the two fists, and the shield have no "Classes:" line, so any class that
+# can hold the weapon was scoring them. Only a shaman is offered the quest.
+# Rage of the Storm (280604), Tidebringer's Claw (280605), Lightning's Grasp
+# (280607), Elementalist's Guard (280696).
+TEMPEST_WEAPON_IDS = {280604, 280605, 280607, 280696}
+
 # Wowhead Forever "Classes: Priest" (and multi-class lists). Item allowClass is
 # often -1 on remakes, so the tooltip line is the lock.
 TIP_CLASS_LOCK = {}
@@ -461,6 +468,8 @@ def eligible(it, cls, spec, level, faction, prof, wsubs):
     # over by a class-locked quest, so without this a paladin's list happily picked
     # Warrior, Druid, Hunter, Rogue, Priest and Shaman tier 3.
     qc=src.get("questClasses") or 0
+    if it["id"] in TEMPEST_WEAPON_IDS:
+        qc = CLASS_BIT["SHAMAN"]
     if qc and not (qc & CLASS_BIT[cls]): return False
     ar=it["allowRace"]
     mask=(CLASS_RACES.get(cls) or {}).get(faction, FACTION_MASK[faction])
@@ -1037,6 +1046,11 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
         for level in levels:
             rscale=70.0/max(1,level)
             wl=weights_at_level(w, level)
+            if cls == "SHAMAN" and spec_key == "enhancement":
+                # Mental Quickness is 100% of intellect as attack power.
+                # The endurance double put intellect above strength and
+                # cloth ahead of mail. Enhancement keeps the raw intellect.
+                wl["int"] = w.get("int", 0.0)
             if cls == "SHAMAN" and spec_key == "enhancement_tank":
                 # 1 agility is 2 armor, 1% dodge per 20, and 1% crit per 20.
                 # The listed agility weight is the rest. Armor from agility
@@ -1236,8 +1250,6 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     if s>0: buckets["SecondaryHand"].append((s,it,suf,ch,st,chAny,s+_roll_gain,srange,sid))
             for sl,rows in buckets.items():
                 rows.sort(key=lambda r:(-r[0], r[1]["id"]))
-                if sl == "Ranged":
-                    rows = promote_hunter_ranged_proc(rows, cls)
                 # Best item in this slot whose value is an effect the score cannot
                 # price, when it did not make the top 3 on stats alone. Thunderfury
                 # prints 5 Agility and 8 Stamina and scores 30.9 against a 118-point
@@ -1443,28 +1455,6 @@ def guide_override(spec, sl, faction, rows, cls):
             picks.append(other[0]); origin.append("model")
         other=other[1:]
     return picks[:3], origin[:3]
-
-def promote_hunter_ranged_proc(rows, cls):
-    """Ranged proc weapons (Heartseeking Crossbow) often lose to high listed DPS on
-    Forever-indexed bows whose tooltips we trust less than a classic proc BiS. When
-    a proc-driven ranged weapon is still in the top 8 and within 15% of the leader,
-    promote it to rank 1 so it ships in picks, not as a notable."""
-    if cls != "HUNTER" or not rows or len(rows) < 4:
-        return rows
-    lead = rows[0][0]
-    if lead <= 0:
-        return rows
-    floor = lead * 0.85
-    for i, r in enumerate(rows):
-        if i < 3:
-            continue
-        it = r[1]
-        if not it.get("effectDriven") or not it.get("procs"):
-            continue
-        if r[0] < floor:
-            continue
-        return [r] + [x for j, x in enumerate(rows) if j != i]
-    return rows
 
 TWO_HAND_KINDS = {"Staff", "Polearm", "Mace2H", "Sword2H", "Axe2H", "FishingPole"}
 

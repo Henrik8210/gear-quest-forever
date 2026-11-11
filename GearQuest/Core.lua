@@ -13,7 +13,7 @@ if GQ.LoadLocalePack then
     GQ:LoadLocalePack()
 end
 
-GQ.VERSION = "1.1.3"
+GQ.VERSION = "1.1.4"
 GQ.ADDON_NAME = ADDON_NAME
 
 -- General -> Hide chat messages. Off until the player checks it.
@@ -23,6 +23,132 @@ function GQ:Chat(...)
         return
     end
     _G.print(...)
+end
+
+-- One guild ping per session, the way Attune does it. Other GearQuest copies
+-- compare the number and print once. No timer loop, and the listener returns
+-- on the first line unless the prefix is ours.
+local VERSION_PREFIX = "GQ_Version"
+
+local function VersionParts(text)
+    if type(text) ~= "string" or #text > 24 then
+        return nil
+    end
+    local major, minor, patch = text:match("^(%d+)%.(%d+)%.(%d+)")
+    if not major then
+        return nil
+    end
+    return tonumber(major), tonumber(minor), tonumber(patch)
+end
+
+local function VersionCompare(remote, localText)
+    local r1, r2, r3 = VersionParts(remote)
+    local l1, l2, l3 = VersionParts(localText)
+    if not r1 or not l1 then
+        return 0
+    end
+    if r1 ~= l1 then
+        return r1 > l1 and 1 or -1
+    end
+    if r2 ~= l2 then
+        return r2 > l2 and 1 or -1
+    end
+    if r3 ~= l3 then
+        return r3 > l3 and 1 or -1
+    end
+    return 0
+end
+
+local function VersionSenderIsSelf(sender)
+    if type(sender) ~= "string" or sender == "" or not UnitName then
+        return false
+    end
+    local me = UnitName("player")
+    if type(me) ~= "string" or me == "" then
+        return false
+    end
+    if sender == me then
+        return true
+    end
+    if Ambiguate then
+        local ok, short = pcall(Ambiguate, sender, "none")
+        if ok and short == me then
+            return true
+        end
+    end
+    return false
+end
+
+function GQ:NoteNewerVersion(remote)
+    if self.versionWarned or type(remote) ~= "string" then
+        return
+    end
+    self.versionWarned = true
+    local line = "|cff66ccffGearQuest|r: " .. string.format(L["A newer version of GearQuest is available (v%s)."], remote)
+    if DEFAULT_CHAT_FRAME and DEFAULT_CHAT_FRAME.AddMessage then
+        DEFAULT_CHAT_FRAME:AddMessage(line)
+    end
+end
+
+function GQ:SendVersionPing()
+    if self.versionPingSent then
+        return true
+    end
+    if not (C_ChatInfo and C_ChatInfo.SendAddonMessage) or not GetGuildInfo then
+        return false
+    end
+    local guild = GQ.PublicText(GetGuildInfo("player"))
+    if not guild then
+        return false
+    end
+    self.versionPingSent = true
+    pcall(C_ChatInfo.SendAddonMessage, VERSION_PREFIX, self.VERSION, "GUILD", "")
+    return true
+end
+
+function GQ:OnVersionMessage(message, sender)
+    if type(message) ~= "string" or VersionSenderIsSelf(sender) then
+        return
+    end
+    local order = VersionCompare(message, self.VERSION)
+    if order > 0 then
+        self:NoteNewerVersion(message)
+    elseif order < 0 and self.versionPingSent and not self.versionReplySent then
+        -- They logged in after our ping, so they never heard it. One reply.
+        self.versionReplySent = true
+        if C_ChatInfo and C_ChatInfo.SendAddonMessage then
+            pcall(C_ChatInfo.SendAddonMessage, VERSION_PREFIX, self.VERSION, "GUILD", "")
+        end
+    end
+end
+
+function GQ:StartVersionCheck()
+    if self.versionCheckStarted then
+        return
+    end
+    self.versionCheckStarted = true
+    if C_ChatInfo and C_ChatInfo.RegisterAddonMessagePrefix then
+        pcall(C_ChatInfo.RegisterAddonMessagePrefix, VERSION_PREFIX)
+    end
+    local frame = CreateFrame("Frame")
+    frame:RegisterEvent("CHAT_MSG_ADDON")
+    frame:SetScript("OnEvent", function(_, _, prefix, message, _, sender)
+        if prefix ~= VERSION_PREFIX then
+            return
+        end
+        pcall(GQ.OnVersionMessage, GQ, message, sender)
+    end)
+    if not (C_Timer and C_Timer.After) then
+        return
+    end
+    C_Timer.After(12, function()
+        if GQ:SendVersionPing() then
+            return
+        end
+        C_Timer.After(20, function()
+            GQ:SendVersionPing()
+        end)
+    end)
 end
 -- WoW Forever: 1–60 Classic+ (no TBC level cap).
 GQ.MAX_PLAYER_LEVEL = 60
@@ -246,6 +372,43 @@ function GQ:CalmFont(widget)
     return widget
 end
 
+-- A tab that has to share the row steps its face down until the words fit.
+-- The locale face stays the one CalmFont uses, so Cyrillic and East Asian
+-- letters do not fall back to the roman file.
+function GQ:FitCalmFont(widget, maxWidth, minSize)
+    if not widget or not widget.GetFont or not maxWidth or maxWidth < 8 then
+        return widget
+    end
+    local face, size = widget:GetFont()
+    if not face or not size then
+        return widget
+    end
+    local locale = self.ActiveLocale or self.LOCALE
+    local scriptFont = locale and CALM_FONT[locale]
+    local use = scriptFont or face
+    minSize = minSize or 8
+    local start = math.floor(size)
+    if start < minSize then
+        start = minSize
+    end
+    for s = start, minSize, -1 do
+        local applied = widget:SetFont(use, s, "")
+        if scriptFont and not applied then
+            widget:SetFont(face, s, "")
+        end
+        if (widget:GetStringWidth() or 0) <= maxWidth then
+            break
+        end
+    end
+    if widget.SetShadowOffset then
+        widget:SetShadowOffset(0, 0)
+    end
+    if widget.SetShadowColor then
+        widget:SetShadowColor(0, 0, 0, 0)
+    end
+    return widget
+end
+
 -- A translated label is often wider than the English button. Grow the
 -- button to the words, and stop at maxWidth when the row has no more room.
 function GQ:FitButton(btn, minWidth, maxWidth)
@@ -382,6 +545,7 @@ function GQ:PLAYER_LOGIN()
             self.Log:ScheduleAutoCompletionCheck()
         end)
     end
+    self:StartVersionCheck()
 end
 
 function GQ:SyncLevelOverride()

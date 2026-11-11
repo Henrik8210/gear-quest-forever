@@ -231,7 +231,7 @@ def parse_tooltip(t):
         if f"sp{school}" not in o["stats"]:
             add("spSchool", int(amt))
             add("sp" + school, int(amt))
-    for amt in re.findall(r"\+(\d+) Attack Power against Humanoids", text):
+    for amt in re.findall(r"\+(\d+) Attack Power against [A-Za-z]+", text):
         if "apVs" not in o["stats"]:
             add("apVs", int(amt))
     for amt in re.findall(r"\+(\d+) (?:Arcane|Fire|Frost|Nature|Shadow) Resistance", text):
@@ -470,6 +470,58 @@ def source_from_row(row, parsed, name):
         "obtainable": True,
         "excludedBecause": None,
     }
+
+
+# Wowhead lists these drops. They are not confirmed in the Forever client,
+# so a later ingest must not put the creature or the pin back.
+# 213594 Idol of the Heckler (Zai'enki, Thousand Needles).
+HELD_UNSOURCED = {213594}
+
+
+def held_unsourced_ids():
+    """Drops and crafts whose seller was guessed and is not in Forever's data."""
+    ids = set(HELD_UNSOURCED)
+    path = os.path.join(G, "forever_wowhead", "held_unsourced_crafts.json")
+    if os.path.exists(path):
+        blob = json.load(open(path, encoding="utf-8"))
+        ids.update(int(n) for n in blob.get("ids") or [])
+    return ids
+
+
+# Same four rewards as score.py TEMPEST_WEAPON_IDS. A listview ingest writes
+# questClasses 0 because the item page has no class mask. The quest is shaman.
+TEMPEST_WEAPON_IDS = {280604, 280605, 280607, 280696}
+SHAMAN_CLASS_BIT = 64
+
+def apply_tempest_quest_class(sources):
+    """Keep the Call of Air weapon rewards on the shaman list only."""
+    n = 0
+    for iid in TEMPEST_WEAPON_IDS:
+        src = sources.get(str(iid))
+        if not src:
+            continue
+        if src.get("questClasses") != SHAMAN_CLASS_BIT:
+            src["questClasses"] = SHAMAN_CLASS_BIT
+            n += 1
+    return n
+
+
+def apply_held_unsourced(sources):
+    """Keep an unconfirmed drop or plans seller unsourced until it is seen."""
+    n = 0
+    for iid in held_unsourced_ids():
+        src = sources.get(str(iid))
+        if not src:
+            continue
+        src["sourceType"] = "unsourced"
+        src["instructions"] = "Indexed from Wowhead Forever. Source not listed yet."
+        src["zone"] = None
+        src["npc"] = None
+        src["questName"] = None
+        src["profession"] = None
+        src["alts"] = []
+        n += 1
+    return n
 
 
 def apply_pinned_boss_sources(sources):
@@ -778,6 +830,10 @@ def main():
     apply_pinned_boss_sources(sources)
     apply_pinned_faction_zones(sources)
     apply_named_drop_kinds(sources)
+    apply_tempest_quest_class(sources)
+    apply_held_unsourced(sources)
+    held_ids = held_unsourced_ids()
+    coord_ids = [iid for iid in coord_ids if iid not in held_ids]
     def dump_json(path, obj):
         tmp = path + ".tmp"
         with open(tmp, "w", encoding="utf-8", newline="\n") as handle:

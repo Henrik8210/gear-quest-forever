@@ -2265,3 +2265,7 @@ GQ.Data.questChain[279881] = 1
 GQ.Data.questChain[279885] = 1
 GQ.Data.questChain[279886] = 1
 GQ.Data.questChain[279887] = 1
+GQ.Data.questChain[260216] = { {86777, "Master Feardred"}, {86792, "Thinning Their Forces"}, {86796, "Later, Satyr"}, {86797, "Return to Rageroar"}, {86798, "Timbermaw Reinforcements"}, {87346, "Chieftain Bloodmaw"}, {86814, "Blackmaw Counter-Offensive"}, {92065, "Blackmaw Reclamation"} }
+GQ.Data.questChain[260217] = { {86777, "Master Feardred"}, {86792, "Thinning Their Forces"}, {86796, "Later, Satyr"}, {86797, "Return to Rageroar"}, {86798, "Timbermaw Reinforcements"}, {87346, "Chieftain Bloodmaw"}, {86814, "Blackmaw Counter-Offensive"}, {92065, "Blackmaw Reclamation"} }
+GQ.Data.questChain[260218] = { {86777, "Master Feardred"}, {86792, "Thinning Their Forces"}, {86796, "Later, Satyr"}, {86797, "Return to Rageroar"}, {86798, "Timbermaw Reinforcements"}, {87346, "Chieftain Bloodmaw"}, {86814, "Blackmaw Counter-Offensive"}, {92065, "Blackmaw Reclamation"} }
+GQ.Data.questChain[260219] = { {86777, "Master Feardred"}, {86792, "Thinning Their Forces"}, {86796, "Later, Satyr"}, {86797, "Return to Rageroar"}, {86798, "Timbermaw Reinforcements"}, {87346, "Chieftain Bloodmaw"}, {86814, "Blackmaw Counter-Offensive"}, {92065, "Blackmaw Reclamation"} }

@@ -210,6 +210,8 @@ L["Select an upgrade to see how to get it."] = "Choisissez une amélioration pou
 L["Active"] = "Actives"
 L["Completed"] = "Terminées"
 L["Removed"] = "Retirées"
+L["Tracked"] = "Suivies"
+L["Equipped"] = "Équipé"
 L["Filter*"] = "Filtre*"
 L["Filter"] = "Filtre"
 L["No profession hunts"] = "Aucune traque de métier"
@@ -229,7 +231,8 @@ L["Shows the score bar in the log header. Off restores the viewing-upgrades line
 L["Hide chat messages"] = "Masquer les messages de discussion"
 L["Hide tracker"] = "Masquer le suivi"
 L["Hides the GearQuest tracker. Tracked hunts stay tracked. Turn this off to show the tracker again."] = "Masque le suivi GearQuest. Les traques suivies restent suivies. Décochez pour afficher le suivi à nouveau."
-L["Stops every GearQuest line in chat, including login, obtain notices, and /gq replies. The log stays."] = "Supprime toutes les lignes GearQuest de la discussion, y compris à la connexion, les objets obtenus et les réponses à /gq. Le journal reste."
+L["Stops GearQuest lines in chat, including login, obtain notices, and /gq replies. A notice that a newer version is available still shows. The log stays."] = "Supprime les lignes GearQuest de la discussion, y compris à la connexion, les objets obtenus et les réponses à /gq. L'avis qu'une version plus récente est disponible s'affiche quand même. Le journal reste."
+L["A newer version of GearQuest is available (v%s)."] = "Une version plus récente de GearQuest est disponible (v%s)."
 L["General settings"] = "Réglages généraux"
 L["Hunts"] = "Traques"
 L["Hunt settings"] = "Réglages des traques"
@@ -291,8 +294,10 @@ L["|cff00ff00(Tracked)|r"] = "|cff00ff00(Suivie)|r"
 L["Weapons"] = "Armes"
 L["No completed hunts in this slot."] = "Aucune traque terminée pour cet emplacement."
 L["No removed hunts in this slot."] = "Aucune traque retirée pour cet emplacement."
+L["No tracked hunts in this slot."] = "Aucune traque suivie pour cet emplacement."
 L["No upgrades for your level yet."] = "Pas encore d'amélioration pour votre niveau."
 L["No removed hunts."] = "Aucune traque retirée."
+L["No tracked hunts."] = "Aucune traque suivie."
 L["No completed hunts yet."] = "Aucune traque terminée pour l'instant."
 L[" %sYour %s is %d.|r"] = " %sVotre %s est à %d.|r"
 L[" |cff6e1212You don't have %s.|r"] = " |cff6e1212Vous n'avez pas %s.|r"
@@ -548,6 +553,7 @@ GQ.LocaleGuidePages = {
     "Le {b}Filtre{/b}, eh bien... filtre. Si vous ne voulez voir que les traques du donjon de cette crapule de Van Cleef, c'est possible, avec plein d'autres options.\n\nIl y a aussi un filtre pour les {b}Armes{/b}, tout en bas de la liste.\n\nEnfin, il y a les {b}Styles de jeu{/b}, des sortes de combinaisons de filtres. Par exemple, {b}Zone actuelle{/b} ne montre que les traques disponibles dans la zone où vous êtes, et {b}Pas de donjons !{/b} ne vous envoie jamais en donjon.",
     "Bon, maintenant essayez de choisir une traque dans la liste.\n\nLe {b}parchemin{/b} se met alors à jour avec les détails de la traque : le {b}rang{/b} de l'objet, où l'obtenir, les prérequis ou ce qui est conseillé, la {b}source{/b} de l'objet (vous pouvez aussi filtrer par source) et enfin la {b}récompense{/b}, la belle pièce d'équipement.\n\nAh, et au passage : quand vous obtenez une de vos pièces les mieux classées, à n'importe quel niveau, une alerte façon haut fait s'affiche !",
     "En bas de cette partie, vous trouverez 3 boutons.\n\n{b}Suivre{/b} ajoute la traque à votre suivi GearQuest et place une icône sur la carte du monde pour indiquer où aller. Depuis le suivi, vous pouvez aussi {b}Activer le guide{/b} : une flèche apparaît au-dessus du suivi et vous mène à la destination. Si vous êtes sur l'autre continent, elle vous mène d'abord à un bateau ou un zeppelin proche.\n\n{b}Voir sur la carte{/b} n'ajoute pas d'icône mais vous montre directement la destination et active le {b}guide{/b}.\n\n{b}Retirer{/b}, eh bien... retire la traque pour ne plus la voir. Vous pouvez la restaurer quand vous voulez depuis l'onglet {b}Retirées{/b}.",
+    "Si vous faites partie de ces joueurs organisés qui aiment garder un œil sur toutes leurs traques suivies, l'onglet {b}Suivies{/b} est là pour vous !\n\nToutes les quêtes que vous suivez en ce moment sont listées dans cette vue, pour passer plus de temps à traquer plutôt que de vous perdre dans le chaos de la coordination.",
     "L'{b}indice GearQuest{/b} indique à quel point vous êtes bien équipé, selon la spécialisation choisie.\n\nEn survolant la {b}barre de score{/b}, vous obtenez la liste de l'équipement porté et le score de chaque pièce. Chaque pièce est notée et classée selon les pondérations de votre spé actuelle.\n\nDans le {b}choix de spé{/b} juste en dessous, vous pouvez essayer une autre spé : la {b}barre de score{/b} se met à jour selon la liste d'équipement de cette spé.\n\nAu passage, ça ne marche pas en mode simulation.",
     "Une fois une {b}spé{/b} choisie, survolez le nom de la {b}spé{/b} pour voir sur quelles {b}pondérations{/b} elle est notée.\n\nSi vous êtes un de ces chasseurs fous d'équipement, vous chercherez sûrement de l'{b}agilité{/b}, ou des soins, ou peut-être un bouclier ? Non, sérieusement, vous devriez voir que le poids de l'{b}agilité{/b} est plus élevé que celui de l'{b}esprit{/b}, par exemple.\n\nSi vous n'êtes pas d'accord avec les {b}pondérations{/b} des spés prédéfinies, vous pouvez donner votre avis, ou bien... ne pas vous embêter et créer votre propre {b}spé personnalisée{/b} avec vos pondérations.",
     "Bien, encore quelques points et vous pourrez aller écraser la tête de Lardeur... hum.\n\nPassons à l'onglet {b}Recherche{/b}. Cette fenêtre vous permet de fouiller ma base de données de tout l'équipement croisé au fil des ans. Essayez une {b}recherche{/b} utile pour votre classe.\n\nUne fois l'objet trouvé, survolez l'{b}icône info {info}{/b} pour voir quand il est utile aux spés de votre classe.\n\nSi vous ne trouvez pas l'objet voulu, essayez de {b}simuler{/b} une classe à qui il sert.",

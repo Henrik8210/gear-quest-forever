@@ -23,6 +23,30 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from commerce_camps import CAMP_NOTE, camp_pins
 
 ROOT = Path(__file__).resolve().parents[2]
+_RECIPE_SRC = None
+
+
+def generic_trainer_allowed(item_id):
+    """City-trainer pin only when Forever lists a trainer and no named one.
+
+    A recipe whose source is only a plans item is not taught there. A recipe
+    that names its own trainers (src.fv) is not the generic city spot.
+    """
+    global _RECIPE_SRC
+    if _RECIPE_SRC is None:
+        folder = ROOT / "pipeline" / "data" / "forever_wowhead" / "professions"
+        index = {}
+        for path in folder.glob("*.json"):
+            data = json.loads(path.read_text(encoding="utf-8"))
+            for row in data.get("recipes") or []:
+                make = row.get("make") or []
+                if make and isinstance(make[0], int):
+                    index[make[0]] = row.get("src") or {}
+        _RECIPE_SRC = index
+    src = _RECIPE_SRC.get(int(item_id))
+    if not src or src.get("fv") or "trainer" not in src:
+        return False
+    return True
 OURS = ROOT / "GearQuest" / "_generated" / "Data.Coordinates.generated.lua"
 GAPS = ROOT / "pipeline" / "data" / "coordinate_gaps.json"
 SOURCES = ROOT / "pipeline" / "data" / "sources.json"
@@ -274,6 +298,10 @@ def main() -> None:
                 rows.append((item_id, lua_row(item_id, note, spots, more)))
                 filled_ids.add(item_id)
                 by_type[source_type] += 1
+                continue
+            # A plans item with no trainer is not taught at the city trainer.
+            # Named Forever trainers are not that same generic spot either.
+            if not generic_trainer_allowed(item_id):
                 continue
             prof = src.get("profession") or ""
             prof = str(prof).strip().lower()

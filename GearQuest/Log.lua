@@ -8,8 +8,6 @@ local FRAME_HEIGHT = 512
 local ROW_HEIGHT = 16
 -- A hunt is two of those lines: the name, then the notes.
 local TAB_HEIGHT = 24
-local TAB_BAR_PAD = 4
-local TAB_ROW_HEIGHT = TAB_HEIGHT + TAB_BAR_PAD
 local CONTEXT_BAND_HEIGHT = 46
 local CONTEXT_BAND_TOP = -27
 local TAB_TOP_OFFSET = 56 + CONTEXT_BAND_HEIGHT
@@ -20,7 +18,6 @@ local PORTRAIT_OFFSET_Y = 7
 
 -- Track and Show on map sit inside the description. Remove sits to the right of those.
 -- A removed hunt's parchment shows Restore only. Exit sits in the footer on every tab.
-local HEADER_OFFSET = 74
 local FOOTER_OFFSET = 42
 local FOOTER_BUTTON_Y = 14
 local DETAIL_BUTTON_BAND = 36
@@ -30,15 +27,18 @@ local COLUMN_GAP = 8
 local USABLE_WIDTH = FRAME_WIDTH - CONTENT_LEFT - CONTENT_RIGHT_GUTTER
 local LEFT_COLUMN_WIDTH = math.floor((USABLE_WIDTH - COLUMN_GAP) / 2)
 local RIGHT_COLUMN_WIDTH = USABLE_WIDTH - COLUMN_GAP - LEFT_COLUMN_WIDTH
-local PANEL_WIDTH = LEFT_COLUMN_WIDTH
 local PANEL_INSET = 4
-local GUTTER_INSET = 6
-local PAGE_TAB_LOG_WIDTH = 108
-local PAGE_TAB_SIM_WIDTH = 92
-local FILTER_TAB_WIDTH = 84
-local PAGE_GROUP_WIDTH = PAGE_TAB_LOG_WIDTH + PAGE_TAB_SIM_WIDTH + 4
 local FILTER_TAB_OVERLAP = 3
 local FILTER_TAB_LEFT = 12
+-- Four list tabs share the row and stop short of the Filter button.
+local LIST_TAB_COUNT = 4
+local LIST_TAB_GAP = 4
+local LIST_TAB_FILTER_GAP = 8
+local FILTER_BUTTON_WIDTH = 72
+local FILTER_TAB_WIDTH = math.floor(
+    (LEFT_COLUMN_WIDTH - FILTER_TAB_LEFT - 2 - FILTER_BUTTON_WIDTH - LIST_TAB_FILTER_GAP
+        - LIST_TAB_GAP * (LIST_TAB_COUNT - 1)) / LIST_TAB_COUNT
+)
 -- Status band lives on the main frame above logPage; tabs still sit on the list edge.
 local LOG_SECTION_TOP = -(TAB_HEIGHT - FILTER_TAB_OVERLAP)
 local SIDE_TAB_HEIGHT = 53
@@ -46,7 +46,6 @@ local SIDE_TAB_WIDTH = 53
 local SIDE_TAB_OVERLAP = 8
 local SIDE_TAB_GAP = 10
 local SIDE_TAB_ICON_SIZE = 36
-local SIDE_TAB_ICON_PAD = 8
 local SIDE_TAB_TOP = -(TAB_TOP_OFFSET - LOG_SECTION_TOP)
 local TAB_BORDER_EDGE = 12
 local FILTER_BORDER_EDGE = 8
@@ -62,7 +61,6 @@ local METAL_EDGE = "Interface\\Tooltips\\UI-Tooltip-Border"
 local GOLD = { 0.90, 0.75, 0.28 }
 local GOLD_DIM = { 0.55, 0.45, 0.22 }
 local FRAME_METAL = { 0.78, 0.72, 0.58 }
-local FRAME_METAL_DIM = { 0.42, 0.38, 0.30 }
 local PANEL_BG = { 0.14, 0.10, 0.06, 1 }
 local LIST_BG = { 0.02, 0.02, 0.02, 1 }
 local WHEEL_STEP = ROW_HEIGHT * 4
@@ -257,7 +255,6 @@ local SPEC_CONTROL_GAP = 2
 local SPEC_LABEL_WIDTH = 130
 local SPEC_CONTROL_WIDTH = SPEC_LABEL_WIDTH + SPEC_CONTROL_GAP + SPEC_ICON_SIZE + SPEC_CONTROL_GAP + SPEC_ARROW_SIZE
 local SPEC_CONTROL_HEIGHT = math.max(SPEC_ICON_SIZE, SPEC_ARROW_SIZE)
-local SPEC_ROW_GAP = 2
 local LOG_FRAME_STRATA = "DIALOG"
 local LOG_FRAME_LEVEL = 100
 
@@ -291,7 +288,6 @@ local function BringLogWindowToFront(frame)
         log:LayoutSideTabs(frame)
     end
 end
-local TAB_GROUP_WIDTH = (88 * 2) + 4
 local DETAIL_TEXT_COLOR = { 0, 0, 0 }
 local LORE_TEXT_COLOR = { 0, 0, 0 }
 -- Same faces as the quest log: QuestTitleFont for the title and
@@ -1395,6 +1391,12 @@ local function StyleGoldTab(btn, selected)
     -- The open bottom edge sits above ARTWORK. Lift the wash over it, then the label.
     if btn.gqHover then
         btn.gqHover:SetDrawLayer("OVERLAY", 6)
+    end
+    if fs.SetWordWrap then
+        fs:SetWordWrap(false)
+    end
+    if GQ.FitCalmFont then
+        GQ:FitCalmFont(fs, (btn:GetWidth() or FILTER_TAB_WIDTH) - 14, 8)
     end
     if fs.SetDrawLayer then
         fs:SetDrawLayer("OVERLAY", 7)
@@ -5211,7 +5213,25 @@ function GQ.Log:GetSlotListEntries(slotName)
     if tab == "removed" then
         return self:GetRemovedSlotListEntries(slotName)
     end
+    if tab == "tracked" then
+        return self:GetTrackedSlotListEntries(slotName)
+    end
     return self:GetActiveSlotListEntries(slotName)
+end
+
+function GQ.Log:GetTrackedSlotListEntries(slotName)
+    local results = {}
+    if not GQ.Tracker or not GQ.Tracker.GetTrackedEntries then
+        return results
+    end
+    local tracked = GQ.Tracker:GetTrackedEntries() or {}
+    for i = 1, #tracked do
+        local entry = tracked[i]
+        if GQ.Data:EntryMatchesSlot(entry, slotName) then
+            results[#results + 1] = entry
+        end
+    end
+    return results
 end
 
 function GQ.Log:TrackHunt(id)
@@ -5597,7 +5617,7 @@ function GQ.Log:UntrackHunt(id)
 
     CharProgress().hunts[id] = nil
 
-    if self.selectedHuntId == id and (willDisappear or onCompletedTab) then
+    if self.selectedHuntId == id and (willDisappear or onCompletedTab or self:GetListTab() == "tracked") then
         self.selectedHuntId = nil
     self.selectedEntry = nil
         self:ClearDetail()
@@ -7139,6 +7159,7 @@ function GQ.Log:LayoutListTopOpening()
     local which = self.GetListTab and self:GetListTab()
     local tab = which == "completed" and frame.tabCompleted
         or which == "removed" and frame.tabRemoved
+        or which == "tracked" and frame.tabTracked
         or frame.tabActive
     if page ~= "log" or not tab or not tab:IsShown() or not list:IsShown() then
         restore()
@@ -7204,11 +7225,17 @@ function GQ.Log:UpdateTabVisuals()
     if self.frame.tabRemoved then
         StyleGoldTab(self.frame.tabRemoved, tab == "removed")
     end
+    if self.frame.tabTracked then
+        StyleGoldTab(self.frame.tabTracked, tab == "tracked")
+    end
     local listLevel = (self.frame.listInset and self.frame.listInset:GetFrameLevel()) or (self.frame:GetFrameLevel() + 2)
     self.frame.tabActive:SetFrameLevel(tab == "active" and (listLevel + 8) or math.max(1, listLevel - 1))
     self.frame.tabCompleted:SetFrameLevel(tab == "completed" and (listLevel + 8) or math.max(1, listLevel - 1))
     if self.frame.tabRemoved then
         self.frame.tabRemoved:SetFrameLevel(tab == "removed" and (listLevel + 8) or math.max(1, listLevel - 1))
+    end
+    if self.frame.tabTracked then
+        self.frame.tabTracked:SetFrameLevel(tab == "tracked" and (listLevel + 8) or math.max(1, listLevel - 1))
     end
     self:LayoutListTopOpening()
     self:UpdatePageTabVisuals()
@@ -8842,6 +8869,51 @@ function GQ.Log:ApplyPageTab()
     end
 end
 
+function GQ.Log:LayoutListTabs(frame)
+    local tabBar = frame and frame.tabBar
+    if not tabBar then
+        return
+    end
+    local specs = {
+        { "tabActive", "GearQuestLogTabActive", L["Active"], "active" },
+        { "tabCompleted", "GearQuestLogTabCompleted", L["Completed"], "completed" },
+        { "tabRemoved", "GearQuestLogTabRemoved", L["Removed"], "removed" },
+        { "tabTracked", "GearQuestLogTabTracked", L["Tracked"], "tracked" },
+    }
+    tabBar:SetWidth(FILTER_TAB_WIDTH * #specs + LIST_TAB_GAP * (#specs - 1))
+    local current = self:GetListTab()
+    local prev
+    for i = 1, #specs do
+        local key, name, label, tab = specs[i][1], specs[i][2], specs[i][3], specs[i][4]
+        local btn = frame[key]
+        if not btn then
+            btn = CreateGoldTab(tabBar, name, label, FILTER_TAB_WIDTH)
+            btn:SetScript("OnClick", function()
+                local log = _G.GearQuest and _G.GearQuest.Log
+                if log then
+                    log:HideSpecPicker()
+                    log:SetListTab(tab)
+                end
+            end)
+            frame[key] = btn
+        else
+            btn:SetWidth(FILTER_TAB_WIDTH)
+            local fs = btn:GetFontString()
+            if fs then
+                fs:SetText(label)
+            end
+        end
+        btn:ClearAllPoints()
+        if prev then
+            btn:SetPoint("TOPLEFT", prev, "TOPRIGHT", LIST_TAB_GAP, 0)
+        else
+            btn:SetPoint("TOPLEFT", tabBar, "TOPLEFT", 0, 0)
+        end
+        StyleGoldTab(btn, current == tab)
+        prev = btn
+    end
+end
+
 function GQ.Log:EnsureTabBar(frame)
     local pageBar = self:EnsurePageBar(frame)
     self:EnsureLogPages(frame)
@@ -8849,71 +8921,17 @@ function GQ.Log:EnsureTabBar(frame)
     if not frame.tabBar then
         local tabBar = CreateFrame("Frame", nil, pageBar)
         tabBar:SetHeight(TAB_HEIGHT)
-        tabBar:SetWidth(FILTER_TAB_WIDTH * 3 + 8)
         tabBar:SetPoint("TOPLEFT", pageBar, "TOPLEFT", FILTER_TAB_LEFT, 0)
         frame.tabBar = tabBar
         tabBar.tabGroup = tabBar
-
-        local tabActive = CreateGoldTab(tabBar, "GearQuestLogTabActive", L["Active"], FILTER_TAB_WIDTH)
-        tabActive:SetPoint("TOPLEFT", tabBar, "TOPLEFT", 0, 0)
-        frame.tabActive = tabActive
-
-        local tabCompleted = CreateGoldTab(tabBar, "GearQuestLogTabCompleted", L["Completed"], FILTER_TAB_WIDTH)
-        tabCompleted:SetPoint("TOPLEFT", tabActive, "TOPRIGHT", 4, 0)
-        frame.tabCompleted = tabCompleted
-
-        local tabRemoved = CreateGoldTab(tabBar, "GearQuestLogTabRemoved", L["Removed"], FILTER_TAB_WIDTH)
-        tabRemoved:SetPoint("TOPLEFT", tabCompleted, "TOPRIGHT", 4, 0)
-        frame.tabRemoved = tabRemoved
-
-        tabActive:SetScript("OnClick", function()
-            local log = _G.GearQuest and _G.GearQuest.Log
-            if log then
-                log:HideSpecPicker()
-                log:SetListTab("active")
-            end
-        end)
-
-        tabCompleted:SetScript("OnClick", function()
-            local log = _G.GearQuest and _G.GearQuest.Log
-            if log then
-                log:HideSpecPicker()
-                log:SetListTab("completed")
-            end
-        end)
-
-        tabRemoved:SetScript("OnClick", function()
-            local log = _G.GearQuest and _G.GearQuest.Log
-            if log then
-                log:HideSpecPicker()
-                log:SetListTab("removed")
-            end
-        end)
     else
         if frame.tabBar:GetParent() ~= pageBar then
             frame.tabBar:SetParent(pageBar)
         end
         frame.tabBar:ClearAllPoints()
-        frame.tabBar:SetWidth(FILTER_TAB_WIDTH * 3 + 8)
         frame.tabBar:SetPoint("TOPLEFT", pageBar, "TOPLEFT", FILTER_TAB_LEFT, 0)
-        if not frame.tabRemoved and frame.tabCompleted then
-            local tabRemoved = CreateGoldTab(frame.tabBar, "GearQuestLogTabRemoved", L["Removed"], FILTER_TAB_WIDTH)
-            tabRemoved:SetPoint("TOPLEFT", frame.tabCompleted, "TOPRIGHT", 4, 0)
-            tabRemoved:SetScript("OnClick", function()
-                local log = _G.GearQuest and _G.GearQuest.Log
-                if log then
-                    log:HideSpecPicker()
-                    log:SetListTab("removed")
-                end
-            end)
-            frame.tabRemoved = tabRemoved
-        end
-        StyleGoldTab(frame.tabActive, self:GetListTab() == "active")
-        StyleGoldTab(frame.tabCompleted, self:GetListTab() == "completed")
-        if frame.tabRemoved then
-            StyleGoldTab(frame.tabRemoved, self:GetListTab() == "removed")
-        end
     end
+    self:LayoutListTabs(frame)
 
     self:EnsureSourceFilter(frame)
     self:EnsureSimulatorPage(frame)
@@ -11488,7 +11506,7 @@ function GQ.Log:CreateChatSetting(frame, detail, anchor)
     hint:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
     hint:SetJustifyH("LEFT")
     hint:SetWordWrap(true)
-    hint:SetText(L["Stops every GearQuest line in chat, including login, obtain notices, and /gq replies. The log stays."])
+    hint:SetText(L["Stops GearQuest lines in chat, including login, obtain notices, and /gq replies. A notice that a newer version is available still shows. The log stays."])
     hint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
     frame.settingsChatHint = hint
 end
@@ -14661,6 +14679,8 @@ function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry, label, hand
             row.text:SetText(L["No completed hunts in this slot."])
         elseif listTab == "removed" then
             row.text:SetText(L["No removed hunts in this slot."])
+        elseif listTab == "tracked" then
+            row.text:SetText(L["No tracked hunts in this slot."])
         else
             row.text:SetText(L["No upgrades for your level yet."])
         end
@@ -14675,6 +14695,8 @@ function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry, label, hand
         row.text:SetPoint("RIGHT", row, "RIGHT", -6, 0)
         if self:GetListTab() == "removed" then
             row.text:SetText(L["No removed hunts."])
+        elseif self:GetListTab() == "tracked" then
+            row.text:SetText(L["No tracked hunts."])
         else
             row.text:SetText(L["No completed hunts yet."])
         end
@@ -15511,6 +15533,29 @@ function GQ.Log:HideSlotRankPanel()
     end
 end
 
+function GQ.Log:SlotRankEquipSlots(slotName, weaponList)
+    if weaponList then
+        return { 16, 17 }
+    end
+    if GQ.Data and GQ.Data.GetInventorySlots then
+        return GQ.Data:GetInventorySlots(slotName) or {}
+    end
+    return {}
+end
+
+function GQ.Log:EntryIsEquippedInSlots(entry, invSlots)
+    if not entry or not entry.itemId or not GetInventoryItemLink or not invSlots or not GQ.Data then
+        return false
+    end
+    for i = 1, #invSlots do
+        local link = GetInventoryItemLink("player", invSlots[i])
+        if link and GQ.Data:EntrySuffixMatchesLink(entry, link) then
+            return true
+        end
+    end
+    return false
+end
+
 function GQ.Log:ShowSlotRankTooltip(row)
     if not row or not GQ.Data then
         return
@@ -15551,10 +15596,20 @@ function GQ.Log:ShowSlotRankTooltip(row)
         if not text or text == "" then
             return ""
         end
+        if type(entry.pipelineScore) == "number" then
+            local raw = string.format(" |cffffffff(%.2f)|r", entry.pipelineScore)
+            local head, tail = text:match("^(|c%x+%d+|r)(.*)$")
+            if head then
+                text = head .. raw .. (tail or "")
+            else
+                text = text .. raw
+            end
+        end
         return "  " .. text
     end
 
     local lines = {}
+    local equipSlots = self:SlotRankEquipSlots(slotName, weaponList)
     local function add(text, gap)
         lines[#lines + 1] = { text = text, gap = gap or 0 }
     end
@@ -15571,7 +15626,11 @@ function GQ.Log:ShowSlotRankTooltip(row)
             if weaponList and self.WeaponTrueRank then
                 place = self:WeaponTrueRank(entry) or i
             end
-            add(string.format("|cffffd100#%d|r %s%s|r%s", place, color, name, scoreTrail(entry)))
+            local equipped = ""
+            if self:EntryIsEquippedInSlots(entry, equipSlots) then
+                equipped = "  |cffffd100" .. L["Equipped"] .. "|r"
+            end
+            add(string.format("|cffffd100#%d|r %s%s|r%s%s", place, color, name, equipped, scoreTrail(entry)))
         end
     end
 
@@ -16068,6 +16127,11 @@ function GQ.Log:SelectHunt(id, scrollToSelection, entryOverride)
         targetTab = "removed"
     elseif self:IsEntryObtained(id) then
         targetTab = "completed"
+    elseif self:GetListTab() == "tracked" then
+        local record = GetHuntRecord(id)
+        if record and NormalizeHuntStatus(record.status) == "tracked" then
+            targetTab = "tracked"
+        end
     end
     if self:GetListTab() ~= targetTab then
         GearQuestForeverDB.ui = GearQuestForeverDB.ui or {}
@@ -17312,6 +17376,46 @@ function GQ.Log:Refresh()
         if not anyRemoved then
             table.insert(layoutRows, { type = "empty_all" })
         end
+    elseif tab == "tracked" then
+        local bySlot = {}
+        local tracked = (GQ.Tracker and GQ.Tracker.GetTrackedEntries and GQ.Tracker:GetTrackedEntries()) or {}
+        for i = 1, #tracked do
+            local entry = tracked[i]
+            local slotName = entry.slot and GQ.Data:NormalizeSlotName(entry.slot)
+            if slotName then
+                local list = bySlot[slotName]
+                if not list then
+                    list = {}
+                    bySlot[slotName] = list
+                end
+                list[#list + 1] = entry
+            end
+        end
+        local seen = {}
+        local anyTracked = false
+        local function addSlot(slotName)
+            local list = bySlot[slotName]
+            if not list or #list == 0 or seen[slotName] then
+                return
+            end
+            seen[slotName] = true
+            anyTracked = true
+            table.insert(layoutRows, { type = "header", slotName = slotName })
+            if not self:IsSlotCollapsed(slotName, list) then
+                for _, entry in ipairs(list) do
+                    table.insert(layoutRows, { type = "item", slotName = slotName, entry = entry })
+                end
+            end
+        end
+        for _, slotName in ipairs(slots) do
+            addSlot(slotName)
+        end
+        for slotName in pairs(bySlot) do
+            addSlot(slotName)
+        end
+        if not anyTracked then
+            table.insert(layoutRows, { type = "empty_all" })
+        end
     else
         for _, slotName in ipairs(slots) do
             if slotName == "MainHand" then
@@ -17449,6 +17553,8 @@ function GQ.Log:Refresh()
         elseif tab == "completed" and status ~= "completed" and not self:IsEntryObtained(self.selectedHuntId) then
             clearSelection = true
         elseif tab == "removed" and not self:IsHuntRemoved(entry) then
+            clearSelection = true
+        elseif tab == "tracked" and status ~= "tracked" then
             clearSelection = true
         elseif tab == "active" and (status == "completed" or self:IsHuntRemoved(entry)) then
             clearSelection = true

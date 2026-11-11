@@ -34,6 +34,14 @@ At **runtime**, a generated hunt with `curatedRank` keeps that pipeline order. `
 
 **Faction gating (pipeline):** wrong-faction rows are stripped at emit time using vendor stock analysis (`npc_faction.json`), PvP prefix rules (`pvp_prefix_faction.json`), reputation exclusivity (mirror pairs + hand-verified names like Tranquillien), and quest/class locks on adjacent rows — **not** sub-zone lists alone (shared camps can host both factions’ vendors).
 
+**11 Nov 2026 (v1.1.4) — do not undo these:**
+
+- Enhancement intellect is **0.7** and is **not** doubled through 60. Strength stays 1.1. Enhancement Tank is unchanged. The tooltip shows the raw 0.7.
+- Rage of the Storm, Tidebringer's Claw, Lightning's Grasp, and Elementalist's Guard are shaman quest rewards (`TEMPEST_WEAPON_IDS`). A paladin list must not rank them.
+- A crafted name is not a camp seller. `camp_profession()` returns None. Guessed Redridge and Barrens pins stay Unsourced until Forever names that vendor.
+- The knight's 13 pages live in `GQ.LocaleGuidePages` for every language. Apply them when the parchment is shown. The language pack can load after `PortraitGuide.lua`.
+- `Log.lua` is at 191 of 200 file-scope locals. One more file-scope `local` can stop the file compiling, and then the minimap button does nothing.
+
 **Shared-ID PvP (do not pin one quartermaster):** Warsong Gulch **Rune of Duty** (21567/21568) and **Rune of Perfection** (21565/21566) are the **same item IDs** for both factions. Alliance buys them from Illiyana Moonblaze (Silverwing Grove); Horde from Kelm Hargunth (Mor'shan Base Camp). `sources.json` must keep `npc`/`zone` unset and put both vendors in `instructions`. Pinning Illiyana made `npc_ok` treat them as Alliance-only and left **Horde with no trinket hunts from 20–27** (first pick was Defiler's Talisman at 28). Forever tooltips have no `Classes:` line — `allowClass` is `-1`. Both runes are Unique-Equipped: Rune of Battle (1), so they are alternatives, not a pair. Details: [`pipeline/docs/FOREVER-SCORING.md`](../pipeline/docs/FOREVER-SCORING.md).
 
 ---

@@ -181,20 +181,13 @@ def _options(exact_l):
 
 
 def camp_profession(item_name):
-    """Return the camp profession when this crafted name belongs to a camp set."""
-    if not item_name:
-        return None
-    low = item_name.lower()
-    if low in NOT_CAMP_RECIPES:
-        return None
-    for exact_l, prof in _EXACT:
-        for opt in _options(exact_l):
-            if low == opt or low.endswith(" " + opt):
-                return prof
-    for prof, prefixes in SET_PREFIX.items():
-        for prefix in prefixes:
-            if item_name.startswith(prefix):
-                return prof
+    """A crafted name is not a seller.
+
+    Forever's profession row has to name the vendor. Matching "Veteran's",
+    or any name on the old Merchant's Favor list, pinned the camp onto plans
+    that vendor does not sell. Until a recipe names that vendor, this
+    returns None. OUTPUTS and SET_PREFIX stay as the old catalog.
+    """
     return None
 
 

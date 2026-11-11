@@ -210,6 +210,8 @@ L["Select an upgrade to see how to get it."] = "选择一个升级以查看获�
 L["Active"] = "进行中"
 L["Completed"] = "已完成"
 L["Removed"] = "已移除"
+L["Tracked"] = "已追踪"
+L["Equipped"] = "已装备"
 L["Filter*"] = "过滤器*"
 L["Filter"] = "过滤器"
 L["No profession hunts"] = "没有专业技能狩猎"
@@ -229,7 +231,8 @@ L["Shows the score bar in the log header. Off restores the viewing-upgrades line
 L["Hide chat messages"] = "隐藏聊天消息"
 L["Hide tracker"] = "隐藏追踪器"
 L["Hides the GearQuest tracker. Tracked hunts stay tracked. Turn this off to show the tracker again."] = "隐藏 GearQuest 追踪器。已追踪的狩猎仍然保持追踪。关掉后追踪器会再显示。"
-L["Stops every GearQuest line in chat, including login, obtain notices, and /gq replies. The log stays."] = "屏蔽聊天中所有 GearQuest 信息，包括登录提示、获得通知和 /gq 回复。日志保留。"
+L["Stops GearQuest lines in chat, including login, obtain notices, and /gq replies. A notice that a newer version is available still shows. The log stays."] = "屏蔽聊天中的 GearQuest 信息，包括登录提示、获得通知和 /gq 回复。有新版本时的提示仍会显示。日志保留。"
+L["A newer version of GearQuest is available (v%s)."] = "有新的 GearQuest 版本可用 (v%s)。"
 L["General settings"] = "常规设置"
 L["Hunts"] = "狩猎"
 L["Hunt settings"] = "狩猎设置"
@@ -291,8 +294,10 @@ L["|cff00ff00(Tracked)|r"] = "|cff00ff00（已追踪）|r"
 L["Weapons"] = "武器"
 L["No completed hunts in this slot."] = "此栏位没有已完成的狩猎。"
 L["No removed hunts in this slot."] = "此栏位没有已移除的狩猎。"
+L["No tracked hunts in this slot."] = "此栏位没有已追踪的狩猎。"
 L["No upgrades for your level yet."] = "你的等级暂时没有升级。"
 L["No removed hunts."] = "没有已移除的狩猎。"
+L["No tracked hunts."] = "没有已追踪的狩猎。"
 L["No completed hunts yet."] = "还没有已完成的狩猎。"
 L[" %sYour %s is %d.|r"] = " %s你的%s为 %d。|r"
 L[" |cff6e1212You don't have %s.|r"] = " |cff6e1212你没有%s。|r"
@@ -545,3 +550,21 @@ L["Their Cities"] = "对方的城市"
 L["Hides hunts from dungeons inside the other faction's cities. Alliance hides Ragefire Chasm and Ruins of Lordaeron. Horde hides Hall of Thanes and The Stockade. Boss drops, trash, rares, and quest rewards filed in those dungeons go. A piece filed in another dungeon stays."] = "隐藏位于另一阵营城市中的地下城狩猎。联盟隐藏怒焰裂谷和洛丹伦废墟。部落隐藏领主大厅和监狱。这些地下城中的首领掉落、小怪、稀有怪和任务奖励都会隐藏。归入其他地下城的装备保留。"
 L["No Zephras!"] = "不去 Zephras！"
 L["Hides hunts you can only get on Zephras Isle, the Skyborne island. Quests, vendors, crafts, and drops that are only there go. A piece you can also get somewhere else stays."] = "隐藏只能在 Skyborne 的岛屿 Zephras Isle 获得的狩猎。只在那里的任务、商人、制造和掉落都会隐藏。也能在别处获得的装备保留。"
+
+
+-- Tutorial pages (PortraitGuide.lua). {b}...{/b} is bold, {info} the info icon.
+GQ.LocaleGuidePages = {
+    "问候，冒险者！\n\n我这一生都在艾泽拉斯游荡，发现了不少好装备！咳……我愿意跟你分享一两项狩猎……啊，管它的……我全部分享给你！\n\n那么，你准备好去寻找装备了吗？等等……这话听着不对，我们再来一次。\n\n{b}你准备好开始装备狩猎了吗？{/b}",
+    "好，我们开始。\n\n这就是 {b}GearQuest 日志{/b}。在这里你会看到 {b}进行中{/b} 的狩猎{b}列表{/b}，你{b}已完成{/b}的狩猎，还有你不喜欢所以{b}已移除{/b}的狩猎……不知道你为什么要那样做，不过……\n\n{b}日志{/b}会按你当前的阵营、专精，当然还有等级，显示最好的装备。默认情况下，{b}列表{/b}每个装备栏位显示排名{b}前 3{/b}的装备。在角色面板里右键点击栏位，也能看到它们。",
+    "GearQuest 为你准备了很多装备，所以就算你打开了过滤器，它仍能给你可行的选择。\n\n把鼠标停在每个栏位标题旁边的{b}信息 {info} 图标{/b}上，就能看到你当前等级的全部排名。\n\n你也可以用这份列表正下方的{b}滑块{/b}，决定每个栏位显示多少项。",
+    "{b}过滤器{/b}可以……嗯……过滤。如果你只想看那个混蛋范克里夫的副本里的狩猎，可以，还有很多别的选项。\n\n把列表往下滚到接近底部，还有一个{b}武器{/b}过滤器。\n\n最后还有{b}游戏风格{/b}，算是几种过滤器的组合。比如{b}当前区域{/b}只显示你所在区域能拿到的狩猎，而{b}不进副本！{/b}绝不会把你领进副本。",
+    "好，现在试着从列表里选一项狩猎。\n\n选中之后，{b}羊皮纸{/b}会换成这项狩猎的详情：装备的{b}排名{/b}、去哪里拿、对你有什么前提或建议、装备的{b}来源{/b}（你也可以按来源过滤），最后是{b}奖励{/b}，那件漂亮的装备。\n\n对了，无论在哪个等级，当你拿到一项排名靠前的装备时，会弹出一个类似成就的提示！",
+    "这一栏的底部有 3 个按钮。\n\n{b}追踪{/b}会把这项狩猎加进 GearQuest 追踪器，并在世界地图上放一个图标，标出你该去的地方。你也可以在追踪器里{b}启用向导{/b}，追踪器上方会出现一支箭头，带你前往狩猎的目的地。如果你在另一片大陆，它会先带你去附近的船或飞艇。\n\n{b}在地图上显示{/b}不会加图标，但会直接指出目的地，并启用{b}向导{/b}。\n\n{b}移除{/b}就是……把这项狩猎去掉，让你不再看见它。你可以随时在{b}已移除{/b}分页里把它找回来。",
+    "如果你是那种喜欢把正在追踪的狩猎都整理清楚的玩家，{b}已追踪{/b}分页就是为你准备的！\n\n你当前追踪的任务都会列在这个视图里，这样你可以把更多时间花在狩猎上，而不是陷在安排的混乱里。",
+    "{b}GearQuest 指数评分{/b}表示以你所选专精来看，你的装备有多好。\n\n把鼠标停在{b}评分条{/b}上，会列出你穿戴的装备以及每一件的分数。每件装备都按当前专精的属性权重评分和排名。\n\n就在下面的{b}专精选择{/b}里，你可以换成另一个专精，{b}评分条{/b}会按那个专精的装备列表更新。\n\n顺便说一句，这在模拟模式下不起作用。",
+    "选定一个{b}专精{/b}之后，把鼠标停在这个{b}专精{/b}的名字上，就能看到它是按哪些{b}属性权重{/b}评分的。\n\n所以如果你是那种热爱装备的猎人，通常会找带{b}敏捷{/b}的东西，或者治疗，又或者一面盾？不，说真的，你应该会看到{b}敏捷{/b}的权重比{b}精神{/b}更高。\n\n如果你不同意某个现成专精的{b}属性权重{/b}，可以去提反馈，或者……别费那个劲，自己做一个{b}自定义专精{/b}，配上你自己的属性权重。",
+    "好，还剩几点，然后你就可以去给霍格的脸来一下了……咳。\n\n我们换到{b}查找{/b}分页。这个窗口可以搜索我这些年收集到的全部装备，所以试着做一次对你的职业有用的{b}搜索{/b}。\n\n找到之后，把鼠标停在{b}信息 {info} 图标{/b}上，就能看到这件装备在什么时候对你职业的各个专精有用。\n\n如果你没找到想要的装备，就试着{b}模拟{/b}一个用得上它的职业。",
+    "既然我已经提过好几次，我们来看看{b}模拟器{/b}。\n\n这个功能可以让你{b}模拟{/b}任意{b}职业{/b}、{b}专精{/b}和{b}等级{/b}，两个阵营都可以。\n\n所以……如果你想看看一名{b}联盟{/b}{b}战士{/b}在{b}37 级{/b}时的装备列表是什么样，就像我这样，那{b}模拟器{/b}就是给你的！",
+    "好，最后一件事。我想提一下{b}设置{/b}，因为有的冒险者不喜欢那个{b}小地图图标{/b}，有的人想在装备的鼠标提示里看到{b}推荐装备附魔{/b}，还有更多。\n\n所以去看看各项设置，让你的旅途更舒服。\n\n哦，还要向 Discord 上出色的 GearQuest 社区喊一声？我不知道最后那句是什么意思，那家伙只是让我照着念。",
+    "那么……你还在等什么？\n\n开始{b}装备狩猎……永远！{/b}",
+}

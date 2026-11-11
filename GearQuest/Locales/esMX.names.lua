@@ -1198,6 +1198,8 @@ for k, v in pairs({
     ["Zor Lonetree"] = "Zor Árbol Solitario",
     ["Zorbin Fandazzle"] = "Zorbin Hipnoviento",
     ["Zureetha Fargaze"] = "Zureetha Vistalonga",
+    ["Black Guard Swordsmith"] = "Armero Guardia Negra",
+    ["Sabella No-Eyes"] = "Sabella Sin Ojos",
 }) do names.npc[k] = v end
 
 for k, v in pairs({

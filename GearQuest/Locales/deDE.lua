@@ -211,6 +211,8 @@ L["Select an upgrade to see how to get it."] = "Wähle eine Verbesserung, um zu 
 L["Active"] = "Aktiv"
 L["Completed"] = "Abgeschlossen"
 L["Removed"] = "Entfernt"
+L["Tracked"] = "Verfolgt"
+L["Equipped"] = "Angelegt"
 L["Filter*"] = "Filter*"
 L["Filter"] = "Filter"
 L["No profession hunts"] = "Keine Berufs-Hunts"
@@ -230,7 +232,8 @@ L["Shows the score bar in the log header. Off restores the viewing-upgrades line
 L["Hide chat messages"] = "Chatmeldungen ausblenden"
 L["Hide tracker"] = "Tracker ausblenden"
 L["Hides the GearQuest tracker. Tracked hunts stay tracked. Turn this off to show the tracker again."] = "Blendet den GearQuest-Tracker aus. Verfolgte Hunts bleiben verfolgt. Ausschalten zeigt den Tracker wieder."
-L["Stops every GearQuest line in chat, including login, obtain notices, and /gq replies. The log stays."] = "Unterdrückt jede GearQuest-Zeile im Chat, auch beim Einloggen, bei Erhalt-Meldungen und Antworten auf /gq. Das Log bleibt."
+L["Stops GearQuest lines in chat, including login, obtain notices, and /gq replies. A notice that a newer version is available still shows. The log stays."] = "Unterdrückt GearQuest-Zeilen im Chat, auch beim Einloggen, bei Erhalt-Meldungen und Antworten auf /gq. Ein Hinweis auf eine neuere Version erscheint trotzdem. Das Log bleibt."
+L["A newer version of GearQuest is available (v%s)."] = "Eine neuere Version von GearQuest ist verfügbar (v%s)."
 L["General settings"] = "Allgemeine Einstellungen"
 L["Hunts"] = "Hunts"
 L["Hunt settings"] = "Hunt-Einstellungen"
@@ -292,8 +295,10 @@ L["|cff00ff00(Tracked)|r"] = "|cff00ff00(Verfolgt)|r"
 L["Weapons"] = "Waffen"
 L["No completed hunts in this slot."] = "Keine abgeschlossenen Hunts für diesen Platz."
 L["No removed hunts in this slot."] = "Keine entfernten Hunts für diesen Platz."
+L["No tracked hunts in this slot."] = "Keine verfolgten Hunts für diesen Platz."
 L["No upgrades for your level yet."] = "Noch keine Verbesserungen für deine Stufe."
 L["No removed hunts."] = "Keine entfernten Hunts."
+L["No tracked hunts."] = "Keine verfolgten Hunts."
 L["No completed hunts yet."] = "Noch keine abgeschlossenen Hunts."
 L[" %sYour %s is %d.|r"] = " %sDeine Fertigkeit in %s ist %d.|r"
 L[" |cff6e1212You don't have %s.|r"] = " |cff6e1212Du beherrschst %s nicht.|r"
@@ -555,6 +560,7 @@ GQ.LocaleGuidePages = {
     "Mit dem {b}Filter{/b} könnt Ihr.. nun ja.. filtern. Wollt Ihr also nur Hunts aus dem Dungeon dieses Mistkerls Van Cleef sehen, geht das genauso wie viele andere Optionen.\n\nScrollt Ihr fast bis ans Ende der Liste, findet Ihr außerdem einen Filter für {b}Waffen{/b}.\n\nUnd schließlich gibt es noch {b}Spielstile{/b}, eine Art Kombination verschiedener Filter. {b}Fokuszone{/b} zeigt Euch zum Beispiel nur Hunts, die in der Zone verfügbar sind, in der Ihr Euch gerade befindet, während {b}Keine Dungeons!{/b} Euch niemals in einen Dungeon führt.",
     "Gut, versucht jetzt, eine beliebige Hunt aus der Liste auszuwählen.\n\nDadurch wird der {b}Pergament{/b}-Bereich mit den Details der Hunt aktualisiert. Dort erfahrt Ihr den {b}Rang{/b} der Ausrüstung, wo Ihr sie bekommt, welche Voraussetzungen oder Empfehlungen es gibt, die {b}Quelle{/b} der Ausrüstung (danach könnt Ihr auch filtern) und zuletzt die {b}Belohnung{/b} - das schicke Ausrüstungsteil.\n\nAch, übrigens: Wenn Ihr auf irgendeiner Stufe eines Eurer bestbewerteten Teile erhaltet, gibt es eine Erfolgs-ähnliche Einblendung!",
     "Unten in diesem Bereich findet Ihr 3 Schaltflächen.\n\n{b}Verfolgen{/b} fügt diese Hunt Eurem GearQuest-Tracker hinzu und setzt ein Symbol auf Eure Weltkarte, das anzeigt, wohin Ihr müsst. Im Tracker könnt Ihr außerdem {b}Wegweiser aktivieren{/b} - dann erscheint über dem Tracker ein Pfeil, der Euch zum Ziel der Hunt führt. Seid Ihr auf dem anderen Kontinent, führt er Euch zuerst zu einem nahen Schiff oder Zeppelin.\n\n{b}Auf Karte zeigen{/b} setzt kein Symbol, zeigt Euch aber direkt, wo das Ziel der Hunt liegt, und aktiviert den {b}Wegweiser{/b}.\n\n{b}Entfernen{/b} entfernt.. nun ja.. die Hunt, damit Ihr sie nicht wieder seht. Ihr könnt sie jederzeit im Reiter {b}Entfernt{/b} wiederherstellen.",
+    "Wenn Ihr zu den Spielern gehört, die gern den Überblick über alle verfolgten Hunts behalten, ist der Reiter {b}Verfolgt{/b} genau für Euch!\n\nAlle Quests, die Ihr gerade verfolgt, stehen in dieser Ansicht. So bleibt mehr Zeit für die Hunt, statt dass Ihr im Koordinationschaos steckt.",
     "Der {b}GearQuest-Indexwert{/b} zeigt an, wie gut Ihr ausgerüstet seid - gemessen an der Spezialisierung, die Ihr gewählt habt.\n\nFahrt Ihr über die {b}Wertungsleiste{/b}, bekommt Ihr eine Liste Eurer getragenen Ausrüstung und wie jedes Teil abschneidet. Jedes Ausrüstungsteil wird anhand der Wertegewichtung Eurer aktuellen Spezialisierung bewertet und eingestuft.\n\nIn der {b}Spezialisierungsauswahl{/b} direkt darunter könnt Ihr eine andere Spezialisierung ausprobieren und seht, wie sich die {b}Wertungsleiste{/b} anhand der Ausrüstungsliste dieser Spezialisierung ändert.\n\nIm Simulationsmodus funktioniert das übrigens nicht.",
     "Ist eine {b}Spezialisierung{/b} gewählt, könnt Ihr über ihren Namen fahren, um zu sehen, nach welcher {b}Wertegewichtung{/b} sie bewertet wird.\n\nWenn Ihr also einer dieser ausrüstungsverliebten Jäger seid, greift Ihr normalerweise zu etwas mit {b}Beweglichkeit{/b}, oder mit Heilung, oder vielleicht zu einem Schild? Nein, im Ernst: Ihr solltet sehen, dass {b}Beweglichkeit{/b} höher gewichtet ist als zum Beispiel {b}Willenskraft{/b}.\n\nSeid Ihr mit der {b}Wertegewichtung{/b} einer vorgefertigten Spezialisierung nicht einverstanden, könnt Ihr entweder Feedback geben oder.. Euch die Mühe sparen und Eure eigene {b}benutzerdefinierte Spezialisierung{/b} mit eigener Wertegewichtung anlegen.",
     "Also gut, nur noch ein paar Punkte, dann dürft Ihr Hogger eins auf die Nase geben.. ähem.\n\nWechseln wir zum Reiter {b}Nachschlagen{/b}. In diesem Fenster könnt Ihr meine Ausrüstungsdatenbank mit allem durchsuchen, was mir im Laufe der Jahre untergekommen ist. Probiert eine {b}Suche{/b}, die für Eure Klasse relevant ist.\n\nHabt Ihr etwas gefunden, fahrt über das {b}Info-{info}-Symbol{/b}, um zu sehen, wann das Teil für die Spezialisierungen Eurer Klasse relevant ist.\n\nFindet Ihr die gesuchte Ausrüstung nicht, versucht, eine Klasse zu {b}simulieren{/b}, für die das Teil relevant ist.",

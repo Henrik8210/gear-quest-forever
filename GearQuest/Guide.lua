@@ -521,6 +521,19 @@ function GQ.Guide:ShowEntry(entry)
 end
 
 function GQ.Guide:PlaceForeverPin(entry)
+    -- TomTom draws its own waypoint. Leaving the Blizzard pin up as well is
+    -- the extra marker players see beside the TomTom arrow.
+    if TomTom and TomTom.AddWaypoint then
+        self.ownsWaypoint = false
+        self._waypointKey = nil
+        if C_Map and C_Map.ClearUserWaypoint then
+            pcall(C_Map.ClearUserWaypoint)
+        end
+        if C_SuperTrack and C_SuperTrack.SetSuperTrackedUserWaypoint then
+            pcall(C_SuperTrack.SetSuperTrackedUserWaypoint, false)
+        end
+        return
+    end
     if not (entry and GQ.Map and GQ.Map.SpotForEntry and C_Map and C_Map.SetUserWaypoint and UiMapPoint) then
         return
     end

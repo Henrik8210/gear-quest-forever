@@ -1734,6 +1734,9 @@ for k, v in pairs({
     ["Zorbin Fandazzle"] = "조브린 팬대즐",
     ["Zulrg"] = "줄르그",
     ["Zureetha Fargaze"] = "주리타 파게이즈",
+    ["Black Guard Swordsmith"] = "검은호위대 검제작자",
+    ["Sabella No-Eyes"] = "눈 없는 사벨라",
+    ["Gatekeeper Rageroar"] = "문지기 레이지로어",
 }) do names.npc[k] = v end
 
 for k, v in pairs({

@@ -210,6 +210,8 @@ L["Select an upgrade to see how to get it."] = "Selecione uma melhoria para ver 
 L["Active"] = "Ativas"
 L["Completed"] = "Concluídas"
 L["Removed"] = "Removidas"
+L["Tracked"] = "Rastreadas"
+L["Equipped"] = "Equipado"
 L["Filter*"] = "Filtro*"
 L["Filter"] = "Filtro"
 L["No profession hunts"] = "Nenhuma caça de profissão"
@@ -229,7 +231,8 @@ L["Shows the score bar in the log header. Off restores the viewing-upgrades line
 L["Hide chat messages"] = "Ocultar mensagens no chat"
 L["Hide tracker"] = "Ocultar o rastreador"
 L["Hides the GearQuest tracker. Tracked hunts stay tracked. Turn this off to show the tracker again."] = "Oculta o rastreador do GearQuest. As caças rastreadas continuam rastreadas. Desligue para mostrar o rastreador de novo."
-L["Stops every GearQuest line in chat, including login, obtain notices, and /gq replies. The log stays."] = "Silencia todas as linhas do GearQuest no chat, incluindo login, avisos de obtenção e respostas de /gq. O registro fica."
+L["Stops GearQuest lines in chat, including login, obtain notices, and /gq replies. A notice that a newer version is available still shows. The log stays."] = "Silencia as linhas do GearQuest no chat, incluindo login, avisos de obtenção e respostas de /gq. O aviso de uma versão mais recente continua aparecendo. O registro fica."
+L["A newer version of GearQuest is available (v%s)."] = "Há uma versão mais recente do GearQuest (v%s)."
 L["General settings"] = "Ajustes gerais"
 L["Hunts"] = "Caças"
 L["Hunt settings"] = "Ajustes de caças"
@@ -291,8 +294,10 @@ L["|cff00ff00(Tracked)|r"] = "|cff00ff00(Rastreada)|r"
 L["Weapons"] = "Armas"
 L["No completed hunts in this slot."] = "Nenhuma caça concluída neste compartimento."
 L["No removed hunts in this slot."] = "Nenhuma caça removida neste compartimento."
+L["No tracked hunts in this slot."] = "Nenhuma caça rastreada neste compartimento."
 L["No upgrades for your level yet."] = "Ainda não há melhorias para o seu nível."
 L["No removed hunts."] = "Nenhuma caça removida."
+L["No tracked hunts."] = "Nenhuma caça rastreada."
 L["No completed hunts yet."] = "Nenhuma caça concluída ainda."
 L[" %sYour %s is %d.|r"] = " %sSeu %s é %d.|r"
 L[" |cff6e1212You don't have %s.|r"] = " |cff6e1212Você não tem %s.|r"
@@ -545,3 +550,21 @@ L["Their Cities"] = "Cidades deles"
 L["Hides hunts from dungeons inside the other faction's cities. Alliance hides Ragefire Chasm and Ruins of Lordaeron. Horde hides Hall of Thanes and The Stockade. Boss drops, trash, rares, and quest rewards filed in those dungeons go. A piece filed in another dungeon stays."] = "Oculta caças de masmorras dentro das cidades da outra facção. A Aliança oculta o Abismo Ardente e as Ruínas de Lordaeron. A Horda oculta o Salão dos Thanes e o Cárcere. Saem saques de chefes, lixo, raros e recompensas de missão dessas masmorras. Uma peça de outra masmorra fica."
 L["No Zephras!"] = "Sem Zephras!"
 L["Hides hunts you can only get on Zephras Isle, the Skyborne island. Quests, vendors, crafts, and drops that are only there go. A piece you can also get somewhere else stays."] = "Oculta caças que você só consegue em Zephras Isle, a ilha dos Skyborne. Missões, vendedores, fabricações e saques que só existem lá somem. Uma peça que você também consegue em outro lugar fica."
+
+
+-- Tutorial pages (PortraitGuide.lua). {b}...{/b} is bold, {info} the info icon.
+GQ.LocaleGuidePages = {
+    "Saudações, aventureiro!\n\nPassei a vida inteira vagando por Azeroth e encontrei um bocado de equipamento bom! Hm…… Eu até ia dividir uma ou duas caças com você…… ah, que se dane…… vou dividir todas!\n\nEntão, você está pronto para sair atrás de equipamento? Espera…… isso soou errado, vamos de novo.\n\n{b}VOCÊ ESTÁ PRONTO PARA SAIR NUMA CAÇA DE EQUIPAMENTO?{/b}",
+    "Certo, vamos começar.\n\nEste é o {b}registro do GearQuest{/b}. Aqui fica a {b}lista{/b} das caças {b}ativas{/b}, das que você {b}concluiu{/b} e das que você não gostou e {b}removeu{/b}…… Não sei por que você faria isso, mas……\n\nO {b}registro{/b} mostra o melhor equipamento para a sua facção, a sua especialização e, claro, o seu nível. Por padrão, a {b}lista{/b} mostra as {b}3 melhores{/b} peças de cada espaço. Elas também aparecem se você clicar com o botão direito num espaço do painel do personagem.",
+    "O GearQuest carrega muito equipamento, então ainda oferece opções úteis mesmo quando você liga os filtros.\n\nDá para ver todas as peças classificadas do seu nível atual passando o cursor no {b}ícone de informação {info}{/b} ao lado do título de cada espaço.\n\nVocê também escolhe quantas opções vê em cada espaço com o {b}controle deslizante{/b} logo abaixo desta lista.",
+    "O {b}filtro{/b} serve para, bem…… filtrar. Se você só quer ver as caças da masmorra daquele canalha do Van Cleef, dá, e há muitas outras opções.\n\nSe rolar a lista quase até o fim, também há um filtro de {b}Armas{/b}.\n\nPor último existe o {b}Estilo de jogo{/b}, uma espécie de combinação de filtros. Por exemplo, {b}Zona atual{/b} deixa só as caças da zona em que você está, e {b}Sem masmorras!{/b} nunca leva você para uma masmorra.",
+    "Certo, agora tente escolher qualquer caça da lista.\n\nIsso atualiza o {b}pergaminho{/b} com os detalhes: a {b}posição{/b} do equipamento, onde consegui-lo, quais requisitos ou recomendações existem, a {b}fonte{/b} do equipamento (você também pode filtrar por ela) e, por fim, a {b}recompensa{/b}, aquela bela peça.\n\nAh, e por falar nisso: em qualquer nível, quando você obtém uma das peças mais bem classificadas, aparece um aviso parecido com uma conquista!",
+    "No pé desta seção há 3 botões.\n\n{b}Rastrear{/b} coloca esta caça no rastreador do GearQuest e marca um ícone no mapa-múndi mostrando aonde ir. No rastreador você também pode {b}ativar o guia{/b}: uma seta aparece acima do rastreador e leva você ao destino da caça. Se você estiver no outro continente, ela primeiro leva a um navio ou zepelim próximo.\n\n{b}Mostrar no mapa{/b} não adiciona um ícone, mas mostra direto onde fica o destino e ativa o {b}guia{/b}.\n\n{b}Remover{/b} simplesmente…… tira a caça para você não vê-la de novo. Dá para restaurá-la quando quiser na aba {b}removidas{/b}.",
+    "Se você é daqueles jogadores organizados que gostam de acompanhar todas as caças rastreadas, a aba {b}rastreadas{/b} existe para isso!\n\nTodas as missões que você está rastreando aparecem nesta vista, para você passar mais tempo na caça e menos perdido no meio de tanta coordenação.",
+    "A {b}pontuação de índice GearQuest{/b} mostra o quanto você está bem equipado segundo a especialização escolhida.\n\nSe passar o cursor na {b}barra de pontuação{/b}, você vê o equipamento que está usando e a pontuação de cada peça. Cada peça é pontuada e ordenada pelos pesos de atributos da especialização atual.\n\nNo {b}seletor de especialização{/b}, logo abaixo, dá para experimentar outra especialização, e a {b}barra de pontuação{/b} se atualiza com a lista de equipamento dessa especialização.\n\nIsso, aliás, não funciona no modo de simulação.",
+    "Com uma {b}especialização{/b} escolhida, passe o cursor no nome dela para ver com quais {b}pesos de atributos{/b} ela é pontuada.\n\nSe você é daqueles caçadores apaixonados por equipamento, normalmente pega algo com {b}agilidade{/b}, ou cura, ou talvez um escudo? Não, falando sério: o peso da {b}agilidade{/b} deve aparecer maior do que, por exemplo, o do {b}espírito{/b}.\n\nSe você discordar dos {b}pesos de atributos{/b} de uma especialização pronta, pode dar uma opinião ou…… não se incomodar e criar a sua própria {b}especialização personalizada{/b} com os pesos que quiser.",
+    "Certo, só mais alguns pontos e você pode ir acertar a cara do Hogger…… hm.\n\nVamos para a aba {b}consulta{/b}. Esta janela deixa você vasculhar todo o equipamento que cruzei ao longo dos anos, então tente uma {b}busca{/b} útil para a sua classe.\n\nQuando achar, passe o cursor no {b}ícone de informação {info}{/b} para ver quando a peça serve às especializações da sua classe.\n\nSe não achar o equipamento que procurava, tente {b}simular{/b} uma classe para a qual ele sirva.",
+    "Já que mencionei isso algumas vezes, vamos olhar o {b}simulador{/b}.\n\nEsta função deixa você {b}simular{/b} qualquer {b}classe{/b}, {b}especialização{/b} e {b}nível{/b} que quiser, das duas facções.\n\nEntão…… se você quiser ver como fica a lista de equipamento de um {b}guerreiro{/b} da {b}Aliança{/b} no {b}nível 37{/b}, que nem eu, o {b}simulador{/b} é para você!",
+    "Certo, última coisa. Quero falar das {b}configurações{/b}, porque alguns aventureiros não gostam daquele {b}ícone do minimapa{/b}, outros querem ver o {b}encantamento de equipamento recomendado{/b} na dica do equipamento, e há mais.\n\nEntão dê uma olhada nas configurações para a jornada ficar mais agradável.\n\nAh, e um oi para a incrível comunidade do GearQuest no Discord? Não sei o que aquela última frase quer dizer, o sujeito só me pediu para ler.",
+    "Então…… o que você está esperando?\n\nVamos começar a {b}caça de equipamento…… para sempre!{/b}",
+}

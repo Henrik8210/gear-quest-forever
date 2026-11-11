@@ -64,6 +64,13 @@ local PAGES = {
         highlight = { "log", "track", "map", "remove", "removed" },
     },
     {
+        text = "If you are one of those structured players that like to keep track of all your tracked hunts, the " .. Bold("Tracked") .. " tab is all for your convenience!\n\n"
+            .. "All the quests you are currently tracking are being listed in this view so you can spend more time hunting rather than feeling you're in coordination hell.",
+        sound = "Interface\\AddOns\\" .. ADDON_NAME .. "\\Sounds\\Guide-17.mp3",
+        listTab = "tracked",
+        highlight = { "log", "tracked" },
+    },
+    {
         text = "The " .. Bold("GearQuest Index Score") .. " is an indicator of how well geared you are based on the specialization you have selected.\n\n"
             .. "If you hover the " .. Bold("score bar") .. ", you will get a list of the gear you wear and how each scores. Every gear piece is scored and ranked based on the stat weights your current spec has.\n\n"
             .. "In the " .. Bold("Spec Picker") .. " just below, you can try to change your spec to a different one and you will see the " .. Bold("score bar") .. " update based on that spec's gear list.\n\n"
@@ -114,15 +121,23 @@ local PAGES = {
 
 -- A locale can replace a page's text (GQ.LocaleGuidePages, by page number).
 -- {b}...{/b} marks bold and {info} is the info icon.
-if GQ.LocaleGuidePages then
+-- The language pack loads after this file when the player picked a language
+-- other than the game client's. Bake again at display time if it arrived late.
+local function ApplyLocalePages()
+    local pages = GQ.LocaleGuidePages
+    if not pages then
+        return
+    end
     for i = 1, #PAGES do
-        local text = GQ.LocaleGuidePages[i]
-        if text then
+        local text = pages[i]
+        if text and not PAGES[i].localText then
             text = text:gsub("{info}", INFO_ICON)
             PAGES[i].localText = (text:gsub("{b}(.-){/b}", Bold))
         end
     end
 end
+
+ApplyLocalePages()
 
 -- The side handles stay on screen on every page, so their glow does too.
 
@@ -779,6 +794,8 @@ function GUIDE:HighlightPair(kind)
         widget = frame.removeBtn
     elseif kind == "removed" then
         widget = frame.tabRemoved
+    elseif kind == "tracked" then
+        widget = frame.tabTracked
     elseif kind == "score" then
         widget = frame.gearScoreBar
         cap = widget and widget.title
@@ -913,6 +930,9 @@ function GUIDE:Refresh()
     end
     self.page = index
     local page = PAGES[index]
+    if GQ.LocaleActive and page and not page.localText then
+        ApplyLocalePages()
+    end
     bubble.body:SetText(page and (GQ.LocaleActive and page.localText or page.text) or "")
     local textHeight = bubble.body:GetStringHeight() or 0
     if textHeight < 20 then
@@ -970,6 +990,11 @@ function GUIDE:SetPage(index)
     end
     self._weaponsShown = nil
     self.page = index
+    local page = PAGES[index]
+    if page and page.listTab and GQ.Log and GQ.Log.SetListTab and GQ.Log.GetListTab
+        and GQ.Log:GetListTab() ~= page.listTab then
+        GQ.Log:SetListTab(page.listTab)
+    end
     self:Refresh()
     self:PlayCurrent()
     if GQ.Log and GQ.Log.GamepadSyncGuide then

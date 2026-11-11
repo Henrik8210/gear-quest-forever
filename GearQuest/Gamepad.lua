@@ -432,6 +432,7 @@ function GQ.Log:GamepadIsListTarget(widget)
         return false
     end
     return widget == frame.tabActive or widget == frame.tabCompleted or widget == frame.tabRemoved
+        or widget == frame.tabTracked
         or widget == frame.trackBtn or widget == frame.mapBtn or widget == frame.removeBtn
         or self:GamepadIsGuidePortrait(widget)
 end
@@ -443,7 +444,8 @@ end
 
 function GQ.Log:GamepadIsListTab(widget)
     local frame = self.frame
-    return frame and (widget == frame.tabActive or widget == frame.tabCompleted or widget == frame.tabRemoved) or false
+    return frame and (widget == frame.tabActive or widget == frame.tabCompleted
+        or widget == frame.tabRemoved or widget == frame.tabTracked) or false
 end
 
 function GQ.Log:GamepadIsFilterTarget(widget)
@@ -889,7 +891,7 @@ function GQ.Log:GamepadListTabs()
     if not frame then
         return tabs
     end
-    local widgets = { frame.tabActive, frame.tabCompleted, frame.tabRemoved }
+    local widgets = { frame.tabActive, frame.tabCompleted, frame.tabRemoved, frame.tabTracked }
     for i = 1, #widgets do
         if Usable(widgets[i]) then
             tabs[#tabs + 1] = widgets[i]
@@ -903,9 +905,9 @@ function GQ.Log:GamepadListTabs()
     return tabs
 end
 
--- Up and down on the hunt list stay on the hunts. The Active, Completed, and
--- Removed tabs are reached by pressing up from the top hunt, then left and
--- right. Down from a tab returns to the first hunt.
+-- Up and down on the hunt list stay on the hunts. The Active, Completed,
+-- Removed, and Tracked tabs are reached by pressing up from the top hunt,
+-- then left and right. Down from a tab returns to the first hunt.
 function GQ.Log:GamepadListStep(direction, focus, list)
     local page = self.GetPageTab and self:GetPageTab() or "log"
     if page ~= "log" or self._padFilterMode or self:GamepadOverlay() then
