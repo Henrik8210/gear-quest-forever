@@ -144,6 +144,27 @@ end)
 add("^Drops in (.+)%.$", function(z)
     return "Tombe dans " .. Zone(z) .. "."
 end)
+local function DropPlaces(text)
+    local marked = text:gsub(", and from ", "\n"):gsub(" and from ", "\n"):gsub(", from ", "\n")
+    local parts = {}
+    for piece in (marked .. "\n"):gmatch("(.-)\n") do
+        if piece ~= "" then
+            local names, zone = piece:match("^(.*) in (.-)$")
+            if names and names ~= "" and zone and zone ~= "" then
+                parts[#parts + 1] = De(List(names)) .. " (" .. Zone((zone:gsub("^the ", ""))) .. ")"
+            else
+                parts[#parts + 1] = De(List(piece))
+            end
+        end
+    end
+    return table.concat(parts, ", ")
+end
+add("^Drops from (.+), and from (.+)%.$", function(a, b)
+    return "Butin " .. DropPlaces(a .. ", and from " .. b) .. "."
+end)
+add("^Drops from (.+), from (.+)%.$", function(a, b)
+    return "Butin " .. DropPlaces(a .. ", from " .. b) .. "."
+end)
 add("^Drops from (.+) in (.+)%.$", function(who, z)
     return "Butin " .. De(List(who)) .. " (" .. Zone(z) .. ")."
 end)
@@ -174,6 +195,9 @@ end)
 add("^Bought from (.+)%.$", function(who)
     if who == "a vendor" then
         return "Vendu par un marchand."
+    end
+    if not who:find(" in ", 1, true) and not who:find(" at ", 1, true) then
+        return "Vendu par " .. List(who) .. "."
     end
     return "Vendu par " .. NpcAt(who) .. "."
 end)

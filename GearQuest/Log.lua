@@ -11740,6 +11740,29 @@ function GQ.Log:EnsureSettingsPage(frame)
     WireSettingsListHover(credits)
     frame.settingsCreditsBtn = credits
 
+    local donations = CreateFrame("Button", "GearQuestSettingsDonations", list)
+    donations:SetHeight(22)
+    donations:SetPoint("TOPLEFT", credits, "BOTTOMLEFT", 0, -2)
+    donations:SetPoint("TOPRIGHT", credits, "BOTTOMRIGHT", 0, -2)
+    donations.highlight = donations:CreateTexture(nil, "BACKGROUND")
+    donations.highlight:SetAllPoints()
+    donations.highlight:SetColorTexture(0.28, 0.22, 0.08, 0.85)
+    donations.highlight:Hide()
+    donations.text = donations:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    donations.text:SetPoint("LEFT", donations, "LEFT", 8, 0)
+    donations.text:SetPoint("RIGHT", donations, "RIGHT", -8, 0)
+    donations.text:SetJustifyH("LEFT")
+    donations.text:SetText(L["Donations"])
+    donations.text:SetTextColor(GOLD[1], GOLD[2], GOLD[3])
+    donations:SetScript("OnClick", function()
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if log then
+            log:SetSettingsSection("donations")
+        end
+    end)
+    WireSettingsListHover(donations)
+    frame.settingsDonationsBtn = donations
+
     local detail = CreateFrame("Frame", nil, page)
     EnableClipping(detail)
     ApplyParchmentBackground(detail)
@@ -12397,6 +12420,89 @@ function GQ.Log:EnsureSettingsPage(frame)
     WireMouseWheel(creditsScroll, creditsScroll)
     WireMouseWheel(creditsChild, creditsScroll)
 
+    local donationUrl = "https://buymeacoffee.com/weber8210"
+    local donationText = "Building GearQuest might be easier than it would have been 5 years ago, but code is expensive and I appreciate any support I can get, and donations enable me to do even more including implementing new cool features that hopefully make your Forever experience smoother :)\n\nAny donations are very much appreciated, thanks!"
+
+    local donationScroll = CreatePanelScrollFrame("GearQuestSettingsDonationsScroll", detail)
+    donationScroll:Hide()
+    frame.settingsDonationsScroll = donationScroll
+    local donationChild = CreateFrame("Frame", nil, donationScroll)
+    donationChild:SetSize(20, 20)
+    donationScroll:SetScrollChild(donationChild)
+    frame.settingsDonationsChild = donationChild
+
+    local donationBody = CreateFontStringWithFallback(donationChild, QUEST_DETAIL_BODY_FONTS)
+    donationBody:SetPoint("TOPLEFT", donationChild, "TOPLEFT", 4, -2)
+    donationBody:SetJustifyH("LEFT")
+    donationBody:SetWordWrap(true)
+    donationBody:SetText(L[donationText])
+    donationBody:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    donationBody:Hide()
+    frame.settingsDonationBody = donationBody
+
+    local donationCopy = CreateFrame("Button", "GearQuestDonationCopy", donationChild, "UIPanelButtonTemplate")
+    donationCopy:SetSize(72, 22)
+    donationCopy:SetPoint("TOPRIGHT", donationBody, "BOTTOMRIGHT", 0, -12)
+    donationCopy:SetText(L["Copy"])
+    GQ:FitButton(donationCopy, 72, 140)
+    donationCopy:Hide()
+    frame.settingsDonationCopy = donationCopy
+
+    local donationBox = CreateFrame("EditBox", "GearQuestDonationLink", donationChild, "InputBoxTemplate")
+    donationBox:SetAutoFocus(false)
+    donationBox:SetHeight(22)
+    donationBox:SetPoint("TOPLEFT", donationBody, "BOTTOMLEFT", 8, -12)
+    donationBox:SetPoint("RIGHT", donationCopy, "LEFT", -8, 0)
+    donationBox:SetText(donationUrl)
+    donationBox:SetCursorPosition(0)
+    GQ:CalmFont(donationBox)
+    donationBox:HookScript("OnShow", function(self)
+        GQ:CalmFont(self)
+    end)
+    donationBox:Hide()
+    frame.settingsDonationBox = donationBox
+
+    local function KeepDonationUrl(box)
+        if box._gqLock then
+            return
+        end
+        if box:GetText() ~= donationUrl then
+            box._gqLock = true
+            box:SetText(donationUrl)
+            box._gqLock = false
+        end
+    end
+    donationBox:SetScript("OnEscapePressed", function(self)
+        self:ClearFocus()
+    end)
+    donationBox:SetScript("OnEditFocusGained", function(self)
+        KeepDonationUrl(self)
+        self:HighlightText()
+    end)
+    donationBox:SetScript("OnTextChanged", function(self)
+        KeepDonationUrl(self)
+    end)
+    donationBox:SetScript("OnChar", function(self)
+        KeepDonationUrl(self)
+        self:HighlightText()
+    end)
+    donationCopy:SetScript("OnClick", function(self)
+        donationBox:Show()
+        KeepDonationUrl(donationBox)
+        donationBox:SetFocus()
+        donationBox:HighlightText()
+        self:SetText("Ctrl+C")
+        if C_Timer and C_Timer.After then
+            C_Timer.After(1.6, function()
+                if self:GetText() == "Ctrl+C" then
+                    self:SetText(L["Copy"])
+                end
+            end)
+        end
+    end)
+    WireMouseWheel(donationScroll, donationScroll)
+    WireMouseWheel(donationChild, donationScroll)
+
     local commandScroll = CreatePanelScrollFrame("GearQuestSettingsCommandsScroll", detail)
     commandScroll:Hide()
     frame.settingsCommandsScroll = commandScroll
@@ -12523,6 +12629,8 @@ function GQ.Log:MountSettingsGeneral(frame, detail)
                 target = frame.settingsCommandsScroll or scroll
             elseif self.settingsSection == "credits" then
                 target = frame.settingsCreditsScroll or scroll
+            elseif self.settingsSection == "donations" then
+                target = frame.settingsDonationsScroll or scroll
             elseif self.settingsSection == "hunts" then
                 target = frame.settingsHuntsScroll or scroll
             end
@@ -12779,7 +12887,7 @@ function GQ.Log:LayoutSettingsCommands(frame)
 end
 
 function GQ.Log:SetSettingsSection(section)
-    if section ~= "hunts" and section ~= "credits" and section ~= "commands" then
+    if section ~= "hunts" and section ~= "credits" and section ~= "commands" and section ~= "donations" then
         section = "general"
     end
     self.settingsSection = section
@@ -12798,6 +12906,8 @@ function GQ.Log:SetSettingsSection(section)
             titleText = L["GearQuest Commands"]
         elseif section == "credits" then
             titleText = L["The GearQuest Community"]
+        elseif section == "donations" then
+            titleText = L["Donations"]
         end
         pageTitle:ClearAllPoints()
         pageTitle:SetPoint("TOPLEFT", detail, "TOPLEFT", 16, -16)
@@ -12821,6 +12931,7 @@ function GQ.Log:SetSettingsSection(section)
     setHighlight(frame.settingsHuntsBtn, section == "hunts")
     setHighlight(frame.settingsCommandsBtn, section == "commands")
     setHighlight(frame.settingsCreditsBtn, section == "credits")
+    setHighlight(frame.settingsDonationsBtn, section == "donations")
 
     local function setShown(widgets, on)
         for i = 1, #widgets do
@@ -12897,10 +13008,23 @@ function GQ.Log:SetSettingsSection(section)
     if frame.settingsDiscordCopy and showCredits then
         frame.settingsDiscordCopy:SetText(L["Copy"])
     end
+    local showDonations = section == "donations"
+    setShown({
+        frame.settingsDonationBody,
+        frame.settingsDonationBox,
+        frame.settingsDonationCopy,
+    }, showDonations)
+    if frame.settingsDonationBox and not showDonations then
+        frame.settingsDonationBox:ClearFocus()
+    end
+    if frame.settingsDonationCopy and showDonations then
+        frame.settingsDonationCopy:SetText(L["Copy"])
+    end
     self:LayoutSettingsCommands(frame)
     self:LayoutSettingsGeneral(frame)
     self:LayoutSettingsHunts(frame)
     self:LayoutSettingsCredits(frame)
+    self:LayoutSettingsDonations(frame)
 end
 
 function GQ.Log:LayoutSettingsPage(frame)
@@ -12923,6 +13047,7 @@ function GQ.Log:LayoutSettingsPage(frame)
     self:LayoutSettingsGeneral(frame)
     self:LayoutSettingsHunts(frame)
     self:LayoutSettingsCredits(frame)
+    self:LayoutSettingsDonations(frame)
 end
 
 function GQ.Log:LayoutSettingsCredits(frame)
@@ -13000,6 +13125,75 @@ function GQ.Log:LayoutSettingsCredits(frame)
             local log = _G.GearQuest and _G.GearQuest.Log
             if log and log.frame then
                 log:LayoutSettingsCredits(log.frame)
+            end
+        end)
+    end
+end
+
+function GQ.Log:LayoutSettingsDonations(frame)
+    local scroll = frame and frame.settingsDonationsScroll
+    local child = frame and frame.settingsDonationsChild
+    local detail = frame and frame.settingsDetail
+    if not scroll or not child or not detail then
+        return
+    end
+
+    scroll:ClearAllPoints()
+    local pageTitle = frame.settingsPageTitle
+    if pageTitle then
+        scroll:SetPoint("TOPLEFT", pageTitle, "BOTTOMLEFT", -2, -8)
+    else
+        scroll:SetPoint("TOPLEFT", detail, "TOPLEFT", 14, -40)
+    end
+    scroll:SetPoint("BOTTOMRIGHT", detail, "BOTTOMRIGHT", -(14 + SCROLLBAR_WIDTH), 12)
+
+    local width = scroll:GetWidth()
+    if not width or width < 40 then
+        width = RIGHT_COLUMN_WIDTH - 56
+    end
+    child:SetWidth(math.max(width, 40))
+    local textWidth = math.max(width - 12, 40)
+    if frame.settingsDonationBody then
+        frame.settingsDonationBody:SetWidth(textWidth)
+    end
+
+    local function lineHeight(fs, fallback)
+        local h = fs and fs.GetStringHeight and fs:GetStringHeight() or 0
+        if not h or h < 1 then
+            return fallback
+        end
+        return h
+    end
+    local height = 8
+    height = height + lineHeight(frame.settingsDonationBody, 96) + 12
+    height = height + 22 + 16
+    child:SetHeight(height)
+    UpdateScrollChildRect(scroll)
+
+    local barName = scroll.GetName and scroll:GetName()
+    local bar = barName and _G[barName .. "ScrollBar"]
+    if self.settingsSection == "donations" then
+        scroll:Show()
+        ApplyScrollBarVisibility(scroll)
+        if bar and bar.SetFrameLevel and scroll.GetFrameLevel then
+            bar:SetFrameLevel(scroll:GetFrameLevel() + 5)
+        end
+    else
+        scroll:Hide()
+        if scroll.SetVerticalScroll then
+            scroll:SetVerticalScroll(0)
+        end
+        if bar then
+            bar:Hide()
+        end
+    end
+
+    if self.settingsSection == "donations" and not frame.settingsDonationsMeasured and C_Timer and C_Timer.After then
+        frame.settingsDonationsMeasured = true
+        C_Timer.After(0, function()
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if log and log.frame then
+                log:LayoutSettingsDonations(log.frame)
             end
         end)
     end

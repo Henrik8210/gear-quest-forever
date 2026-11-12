@@ -237,5 +237,1181 @@
       "The Stockade"
     ],
     "instructions": "Drops from Lorgus Jett, Twilight Lord Kelris, Aku'mai, and Old Serra'kis in Blackfathom Deeps, and from Kam Deepfury, Dextren Ward, and Hamhock in the Stockade."
+  },
+  {
+    "id": 11604,
+    "npc": "Ribbly Screwspigot",
+    "zone": "Blackrock Depths",
+    "zones": [
+      "Blackrock Depths"
+    ],
+    "instructions": "Drops from Ribbly Screwspigot in Blackrock Depths."
+  },
+  {
+    "id": 11607,
+    "npc": "Hammered Patron",
+    "zone": "Blackrock Depths",
+    "zones": [
+      "Blackrock Depths"
+    ],
+    "instructions": "Drops from Hammered Patron and Ribbly's Crony in Blackrock Depths."
+  },
+  {
+    "id": 11608,
+    "npc": "Grizzle",
+    "zone": "Blackrock Depths",
+    "zones": [
+      "Blackrock Depths"
+    ],
+    "instructions": "Drops from Grizzle in Blackrock Depths."
+  },
+  {
+    "id": 11811,
+    "npc": "Lord Roccor",
+    "zone": "Blackrock Depths",
+    "zones": [
+      "Blackrock Depths"
+    ],
+    "instructions": "Drops from Lord Roccor in Blackrock Depths."
+  },
+  {
+    "id": 12783,
+    "npc": "Cannon Master Willey",
+    "zone": "Stratholme",
+    "zones": [
+      "Stratholme"
+    ],
+    "instructions": "Drops from Cannon Master Willey in Stratholme."
+  },
+  {
+    "id": 12790,
+    "npc": "Goraluk Anvilcrack",
+    "zone": "Blackrock Spire",
+    "zones": [
+      "Blackrock Spire"
+    ],
+    "instructions": "Drops from Goraluk Anvilcrack in Blackrock Spire."
+  },
+  {
+    "id": 12794,
+    "npc": "Goraluk Anvilcrack",
+    "zone": "Blackrock Spire",
+    "zones": [
+      "Blackrock Spire"
+    ],
+    "instructions": "Drops from Goraluk Anvilcrack in Blackrock Spire."
+  },
+  {
+    "id": 12796,
+    "npc": "Maleki the Pallid",
+    "zone": "Stratholme",
+    "zones": [
+      "Stratholme"
+    ],
+    "instructions": "Drops from Maleki the Pallid in Stratholme."
+  },
+  {
+    "id": 12798,
+    "npc": "Quartermaster Zigris",
+    "zone": "Blackrock Spire",
+    "zones": [
+      "Blackrock Spire"
+    ],
+    "instructions": "Drops from Quartermaster Zigris in Blackrock Spire."
+  },
+  {
+    "id": 14134,
+    "npc": "Overmaster Pyron",
+    "zone": "Blackrock Depths",
+    "zones": [
+      "Blackrock Depths"
+    ],
+    "instructions": "Drops from Overmaster Pyron in Blackrock Depths."
+  },
+  {
+    "id": 14144,
+    "npc": "Spectral Citizen",
+    "zone": "Stratholme",
+    "zones": [
+      "Stratholme"
+    ],
+    "instructions": "Drops from Spectral Citizen in Stratholme."
+  },
+  {
+    "id": 14153,
+    "npc": "Darkmaster Gandling",
+    "zone": "Scholomance",
+    "zones": [
+      "Scholomance"
+    ],
+    "instructions": "Drops from Darkmaster Gandling in Scholomance."
+  },
+  {
+    "id": 14154,
+    "npc": "Grand Crusader Dathrohan",
+    "zone": "Stratholme",
+    "zones": [
+      "Stratholme"
+    ],
+    "instructions": "Drops from Grand Crusader Dathrohan and Balnazzar in Stratholme."
+  },
+  {
+    "id": 15051,
+    "npc": "Anvilrage Marshal",
+    "zone": "Blackrock Depths",
+    "zones": [
+      "Blackrock Depths"
+    ],
+    "instructions": "Drops from Anvilrage Marshal in Blackrock Depths."
+  },
+  {
+    "id": 15052,
+    "npc": "Anvilrage Captain",
+    "zone": "Blackrock Depths",
+    "zones": [
+      "Blackrock Depths"
+    ],
+    "instructions": "Drops from Anvilrage Captain in Blackrock Depths."
+  },
+  {
+    "id": 15085,
+    "npc": "Spectral Researcher",
+    "zone": "Scholomance",
+    "zones": [
+      "Scholomance"
+    ],
+    "instructions": "Drops from Spectral Researcher in Scholomance."
+  },
+  {
+    "id": 250488,
+    "npc": "Sneed",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "Ragefire Chasm"
+    ],
+    "instructions": "Drops from Sneed, Rhahk'Zor, Cookie, Mr. Smite, Captain Greenskin, Gilnid, and Miner Johnson in The Deadmines, from Kresh, Lord Cobrahn, Lady Anacondra, and Deviate Faerie Dragon in Wailing Caverns, from Fel Steed, Shadow Charger, and Rethilgore in Shadowfang Keep, from Oggleflint, Jergosh the Invoker, Bazzalan, and Taragaman the Hungerer in Ragefire Chasm."
+  },
+  {
+    "id": 250489,
+    "npc": "Sneed",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "Ragefire Chasm"
+    ],
+    "instructions": "Drops from Sneed, Rhahk'Zor, Cookie, Mr. Smite, Captain Greenskin, Gilnid, and Miner Johnson in The Deadmines, from Kresh, Lord Cobrahn, Lady Anacondra, and Deviate Faerie Dragon in Wailing Caverns, from Fel Steed, Shadow Charger, and Rethilgore in Shadowfang Keep, and from Oggleflint, Jergosh the Invoker, Bazzalan, and Taragaman the Hungerer in Ragefire Chasm."
+  },
+  {
+    "id": 250490,
+    "npc": "Sneed",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "Ragefire Chasm"
+    ],
+    "instructions": "Drops from Sneed, Rhahk'Zor, Cookie, Mr. Smite, Captain Greenskin, Gilnid, and Miner Johnson in The Deadmines, from Kresh, Lord Cobrahn, and Lady Anacondra in Wailing Caverns, from Fel Steed, Shadow Charger, and Rethilgore in Shadowfang Keep, and from Oggleflint, Jergosh the Invoker, Bazzalan, and Taragaman the Hungerer in Ragefire Chasm."
+  },
+  {
+    "id": 250491,
+    "npc": "Sneed",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "Ragefire Chasm"
+    ],
+    "instructions": "Drops from Sneed, Rhahk'Zor, Cookie, Mr. Smite, Captain Greenskin, Gilnid, and Miner Johnson in The Deadmines, from Kresh, Lord Cobrahn, and Lady Anacondra in Wailing Caverns, from Fel Steed, Shadow Charger, and Rethilgore in Shadowfang Keep, and from Oggleflint, Jergosh the Invoker, Bazzalan, and Taragaman the Hungerer in Ragefire Chasm."
+  },
+  {
+    "id": 250492,
+    "npc": "Sneed",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "Ragefire Chasm"
+    ],
+    "instructions": "Drops from Sneed, Rhahk'Zor, Cookie, Mr. Smite, Captain Greenskin, Gilnid, and Miner Johnson in The Deadmines, from Kresh, Lord Cobrahn, Lady Anacondra, and Deviate Faerie Dragon in Wailing Caverns, from Fel Steed, Shadow Charger, and Rethilgore in Shadowfang Keep, and from Oggleflint, Jergosh the Invoker, Bazzalan, and Taragaman the Hungerer in Ragefire Chasm."
+  },
+  {
+    "id": 250493,
+    "npc": "Edwin VanCleef",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "The Stockade",
+      "Blackfathom Deeps"
+    ],
+    "instructions": "Drops from Edwin VanCleef in The Deadmines, from Mutanus the Devourer, Lord Pythas, Lord Serpentis, Skum, and Verdan the Everliving in Wailing Caverns, from Shadow Charger, Razorclaw the Butcher, Baron Silverlaine, Wolf Master Nandos, Fenrus the Devourer, Archmage Arugal, Commander Springvale, Odo the Blindwatcher, and Deathsworn Captain in Shadowfang Keep, from Targorr the Dread in The Stockade, and from Lady Sarevess and Ghamoo-ra in Blackfathom Deeps."
+  },
+  {
+    "id": 250494,
+    "npc": "Edwin VanCleef",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "The Stockade",
+      "Blackfathom Deeps"
+    ],
+    "instructions": "Drops from Edwin VanCleef in The Deadmines, from Mutanus the Devourer, Lord Pythas, Lord Serpentis, Skum, and Verdan the Everliving in Wailing Caverns, from Shadow Charger, Razorclaw the Butcher, Baron Silverlaine, Wolf Master Nandos, Fenrus the Devourer, Archmage Arugal, Commander Springvale, Odo the Blindwatcher, and Deathsworn Captain in Shadowfang Keep, from Targorr the Dread in The Stockade, and from Lady Sarevess and Ghamoo-ra in Blackfathom Deeps."
+  },
+  {
+    "id": 250495,
+    "npc": "Edwin VanCleef",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "The Stockade",
+      "Blackfathom Deeps"
+    ],
+    "instructions": "Drops from Edwin VanCleef in The Deadmines, from Mutanus the Devourer, Lord Pythas, Lord Serpentis, Skum, and Verdan the Everliving in Wailing Caverns, from Shadow Charger, Razorclaw the Butcher, Baron Silverlaine, Wolf Master Nandos, Fenrus the Devourer, Archmage Arugal, Commander Springvale, and Odo the Blindwatcher in Shadowfang Keep, from Targorr the Dread in The Stockade, and from Lady Sarevess and Ghamoo-ra in Blackfathom Deeps."
+  },
+  {
+    "id": 250496,
+    "npc": "Edwin VanCleef",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "The Stockade",
+      "Blackfathom Deeps"
+    ],
+    "instructions": "Drops from Edwin VanCleef in The Deadmines, from Mutanus the Devourer, Lord Pythas, Lord Serpentis, Skum, and Verdan the Everliving in Wailing Caverns, from Shadow Charger, Razorclaw the Butcher, Baron Silverlaine, Wolf Master Nandos, Fenrus the Devourer, Archmage Arugal, Commander Springvale, and Odo the Blindwatcher in Shadowfang Keep, from Targorr the Dread in The Stockade, and from Lady Sarevess and Ghamoo-ra in Blackfathom Deeps."
+  },
+  {
+    "id": 250497,
+    "npc": "Edwin VanCleef",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "The Stockade",
+      "Blackfathom Deeps"
+    ],
+    "instructions": "Drops from Edwin VanCleef in The Deadmines, from Mutanus the Devourer, Lord Pythas, Lord Serpentis, Skum, and Verdan the Everliving in Wailing Caverns, from Shadow Charger, Razorclaw the Butcher, Baron Silverlaine, Wolf Master Nandos, Fenrus the Devourer, Archmage Arugal, Commander Springvale, Odo the Blindwatcher, and Deathsworn Captain in Shadowfang Keep, from Targorr the Dread in The Stockade, and from Lady Sarevess and Ghamoo-ra in Blackfathom Deeps."
+  },
+  {
+    "id": 250498,
+    "npc": "Dextren Ward",
+    "zone": "The Stockade",
+    "zones": [
+      "The Stockade",
+      "Blackfathom Deeps",
+      "Gnomeregan",
+      "Razorfen Kraul",
+      "Scarlet Monastery"
+    ],
+    "instructions": "Drops from Dextren Ward, Kam Deepfury, Bazil Thredd, Hamhock, and Bruegal Ironknuckle in The Stockade, from Aku'mai, Old Serra'kis, Twilight Lord Kelris, Gelihast, Baron Aquanis, and Lorgus Jett in Blackfathom Deeps, from Crowd Pummeler 9-60, Electrocutioner 6000, Viscous Fallout, Grubbis, Mekgineer Thermaplugg, and Dark Iron Ambassador in Gnomeregan, from Overlord Ramtusk, Charlga Razorflank, Agathelos the Raging, Aggem Thorncurse, Death Speaker Jargba, and Roogug in Razorfen Kraul, and from Houndmaster Loksey, Interrogator Vishas, Bloodmage Thalnos, Ironspine, and Azshir the Sleepless in Scarlet Monastery."
+  },
+  {
+    "id": 250500,
+    "npc": "Dextren Ward",
+    "zone": "The Stockade",
+    "zones": [
+      "The Stockade",
+      "Blackfathom Deeps",
+      "Gnomeregan",
+      "Razorfen Kraul",
+      "Scarlet Monastery"
+    ],
+    "instructions": "Drops from Dextren Ward, Kam Deepfury, Bazil Thredd, and Hamhock in The Stockade, from Aku'mai, Old Serra'kis, Twilight Lord Kelris, Gelihast, Baron Aquanis, and Lorgus Jett in Blackfathom Deeps, from Crowd Pummeler 9-60, Electrocutioner 6000, Viscous Fallout, Grubbis, and Dark Iron Ambassador in Gnomeregan, from Overlord Ramtusk, Charlga Razorflank, Agathelos the Raging, Aggem Thorncurse, Death Speaker Jargba, Roogug, Blind Hunter, and Earthcaller Halmgar in Razorfen Kraul, and from Houndmaster Loksey, Bloodmage Thalnos, Fallen Champion, and Azshir the Sleepless in Scarlet Monastery."
+  },
+  {
+    "id": 250501,
+    "npc": "Dextren Ward",
+    "zone": "The Stockade",
+    "zones": [
+      "The Stockade",
+      "Blackfathom Deeps",
+      "Gnomeregan",
+      "Razorfen Kraul",
+      "Scarlet Monastery"
+    ],
+    "instructions": "Drops from Dextren Ward, Kam Deepfury, Bazil Thredd, and Hamhock in The Stockade, from Aku'mai, Old Serra'kis, Twilight Lord Kelris, Gelihast, Baron Aquanis, and Lorgus Jett in Blackfathom Deeps, from Crowd Pummeler 9-60, Electrocutioner 6000, Viscous Fallout, Grubbis, and Mekgineer Thermaplugg in Gnomeregan, from Overlord Ramtusk, Charlga Razorflank, Agathelos the Raging, Aggem Thorncurse, Death Speaker Jargba, Roogug, Blind Hunter, and Earthcaller Halmgar in Razorfen Kraul, and from Houndmaster Loksey, Interrogator Vishas, Bloodmage Thalnos, Fallen Champion, and Ironspine in Scarlet Monastery."
+  },
+  {
+    "id": 250502,
+    "npc": "Dextren Ward",
+    "zone": "The Stockade",
+    "zones": [
+      "The Stockade",
+      "Blackfathom Deeps",
+      "Gnomeregan",
+      "Razorfen Kraul",
+      "Scarlet Monastery"
+    ],
+    "instructions": "Drops from Dextren Ward, Kam Deepfury, Bazil Thredd, Hamhock, and Bruegal Ironknuckle in The Stockade, from Aku'mai, Old Serra'kis, Twilight Lord Kelris, Gelihast, Baron Aquanis, and Lorgus Jett in Blackfathom Deeps, from Crowd Pummeler 9-60, Viscous Fallout, Grubbis, and Mekgineer Thermaplugg in Gnomeregan, from Overlord Ramtusk, Charlga Razorflank, Agathelos the Raging, Aggem Thorncurse, Death Speaker Jargba, and Roogug in Razorfen Kraul, and from Houndmaster Loksey, Interrogator Vishas, Bloodmage Thalnos, and Azshir the Sleepless in Scarlet Monastery."
+  },
+  {
+    "id": 250546,
+    "npc": "Herod",
+    "zone": "Scarlet Monastery",
+    "zones": [
+      "Scarlet Monastery",
+      "Razorfen Downs",
+      "Uldaman",
+      "Zul'Farrak"
+    ],
+    "instructions": "Drops from Herod, Scarlet Commander Mograine, High Inquisitor Whitemane, High Inquisitor Fairbanks, and Arcanist Doan in Scarlet Monastery, from Tuten'kash, Plaguemaw the Rotting, Mordresh Fire Eye, Amnennar the Coldbringer, and Glutton in Razorfen Downs, from Grimlok, Eric \"The Swift\", Revelosh, Obsidian Sentinel, and Ancient Stone Keeper in Uldaman, and from Theka the Martyr, Sergeant Bly, and Nekrum Gutchewer in Zul'Farrak."
+  },
+  {
+    "id": 250547,
+    "npc": "Herod",
+    "zone": "Scarlet Monastery",
+    "zones": [
+      "Scarlet Monastery",
+      "Razorfen Downs",
+      "Uldaman",
+      "Zul'Farrak"
+    ],
+    "instructions": "Drops from Herod, Scarlet Commander Mograine, High Inquisitor Whitemane, High Inquisitor Fairbanks, and Arcanist Doan in Scarlet Monastery, from Ragglesnout, Tuten'kash, Plaguemaw the Rotting, Mordresh Fire Eye, Amnennar the Coldbringer, and Glutton in Razorfen Downs, from Grimlok, Eric \"The Swift\", Revelosh, Obsidian Sentinel, Ancient Stone Keeper, and Galgann Firehammer in Uldaman, and from Sandarr Dunereaver in Zul'Farrak."
+  },
+  {
+    "id": 250548,
+    "npc": "Herod",
+    "zone": "Scarlet Monastery",
+    "zones": [
+      "Scarlet Monastery",
+      "Razorfen Downs",
+      "Uldaman",
+      "Zul'Farrak"
+    ],
+    "instructions": "Drops from Herod, Scarlet Commander Mograine, High Inquisitor Whitemane, High Inquisitor Fairbanks, and Arcanist Doan in Scarlet Monastery, from Tuten'kash, Plaguemaw the Rotting, Mordresh Fire Eye, and Glutton in Razorfen Downs, from Grimlok, Revelosh, Ancient Stone Keeper, and Galgann Firehammer in Uldaman, and from Nekrum Gutchewer in Zul'Farrak."
+  },
+  {
+    "id": 250549,
+    "npc": "Herod",
+    "zone": "Scarlet Monastery",
+    "zones": [
+      "Scarlet Monastery",
+      "Razorfen Downs",
+      "Uldaman",
+      "Zul'Farrak"
+    ],
+    "instructions": "Drops from Herod, Scarlet Commander Mograine, High Inquisitor Whitemane, High Inquisitor Fairbanks, and Arcanist Doan in Scarlet Monastery, from Ragglesnout, Tuten'kash, Plaguemaw the Rotting, Mordresh Fire Eye, and Amnennar the Coldbringer in Razorfen Downs, from Revelosh, Ancient Stone Keeper, Ironaya, and Galgann Firehammer in Uldaman, and from Theka the Martyr in Zul'Farrak."
+  },
+  {
+    "id": 250550,
+    "npc": "Herod",
+    "zone": "Scarlet Monastery",
+    "zones": [
+      "Scarlet Monastery",
+      "Razorfen Downs",
+      "Uldaman",
+      "Zul'Farrak"
+    ],
+    "instructions": "Drops from Herod, Scarlet Commander Mograine, High Inquisitor Whitemane, and High Inquisitor Fairbanks in Scarlet Monastery, from Tuten'kash, Plaguemaw the Rotting, and Amnennar the Coldbringer in Razorfen Downs, from Revelosh, Ancient Stone Keeper, Ironaya, and Galgann Firehammer in Uldaman, and from Nekrum Gutchewer in Zul'Farrak."
+  },
+  {
+    "id": 250551,
+    "npc": "Archaedas",
+    "zone": "Uldaman",
+    "zones": [
+      "Uldaman",
+      "Zul'Farrak",
+      "The Temple of Atal'Hakkar",
+      "Maraudon"
+    ],
+    "instructions": "Drops from Archaedas in Uldaman, from Chief Ukorz Sandscalp, Witch Doctor Zum'rah, Gahz'rilla, and Ruuzlu in Zul'Farrak, from Shade of Eranikus in The Temple of Atal'Hakkar, and from Celebras the Cursed, Razorlash, and Tinkerer Gizlock in Maraudon."
+  },
+  {
+    "id": 250552,
+    "npc": "Chief Ukorz Sandscalp",
+    "zone": "Zul'Farrak",
+    "zones": [
+      "Zul'Farrak",
+      "Blackrock Depths",
+      "Maraudon"
+    ],
+    "instructions": "Drops from Chief Ukorz Sandscalp, Witch Doctor Zum'rah, Gahz'rilla, Ruuzlu, and Antu'sul in Zul'Farrak, from Hurley Blackbreath in Blackrock Depths, and from Lord Vyletongue and Rotgrip in Maraudon."
+  },
+  {
+    "id": 250553,
+    "npc": "Theka the Martyr",
+    "zone": "Zul'Farrak",
+    "zones": [
+      "Zul'Farrak",
+      "Maraudon"
+    ],
+    "instructions": "Drops from Theka the Martyr, Shadowpriest Sezz'ziz, and Ruuzlu in Zul'Farrak, and from Princess Theradras, Razorlash, and Noxxion in Maraudon."
+  },
+  {
+    "id": 250554,
+    "npc": "Archaedas",
+    "zone": "Uldaman",
+    "zones": [
+      "Uldaman",
+      "Zul'Farrak",
+      "The Temple of Atal'Hakkar",
+      "Maraudon"
+    ],
+    "instructions": "Drops from Archaedas in Uldaman, from Witch Doctor Zum'rah, Theka the Martyr, Shadowpriest Sezz'ziz, Nekrum Gutchewer, and Ruuzlu in Zul'Farrak, from Shade of Hakkar in The Temple of Atal'Hakkar, and from Landslide, Lord Vyletongue, Razorlash, Noxxion, and Rotgrip in Maraudon."
+  },
+  {
+    "id": 250555,
+    "npc": "Gahz'rilla",
+    "zone": "Zul'Farrak",
+    "zones": [
+      "Zul'Farrak",
+      "Blackrock Depths",
+      "Maraudon"
+    ],
+    "instructions": "Drops from Gahz'rilla, Shadowpriest Sezz'ziz, and Antu'sul in Zul'Farrak, from Phalanx in Blackrock Depths, and from Celebras the Cursed, Lord Vyletongue, and Noxxion in Maraudon."
+  },
+  {
+    "id": 252434,
+    "npc": "Sneed",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "Ragefire Chasm"
+    ],
+    "instructions": "Drops from Sneed, Rhahk'Zor, Cookie, Mr. Smite, Captain Greenskin, Gilnid, and Miner Johnson in The Deadmines, from Kresh, Lord Cobrahn, and Lady Anacondra in Wailing Caverns, from Fel Steed, Shadow Charger, and Rethilgore in Shadowfang Keep, and from Oggleflint, Jergosh the Invoker, Bazzalan, and Taragaman the Hungerer in Ragefire Chasm."
+  },
+  {
+    "id": 252435,
+    "npc": "Sneed",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "Ragefire Chasm"
+    ],
+    "instructions": "Drops from Sneed, Rhahk'Zor, Cookie, Mr. Smite, Captain Greenskin, Gilnid, and Miner Johnson in The Deadmines, from Kresh, Lord Cobrahn, and Lady Anacondra in Wailing Caverns, from Fel Steed, Shadow Charger, and Rethilgore in Shadowfang Keep, and from Oggleflint, Jergosh the Invoker, Bazzalan, and Taragaman the Hungerer in Ragefire Chasm."
+  },
+  {
+    "id": 252445,
+    "npc": "Edwin VanCleef",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "The Stockade",
+      "Blackfathom Deeps"
+    ],
+    "instructions": "Drops from Edwin VanCleef in The Deadmines, from Mutanus the Devourer, Lord Pythas, Lord Serpentis, Skum, and Verdan the Everliving in Wailing Caverns, from Shadow Charger, Razorclaw the Butcher, Baron Silverlaine, Wolf Master Nandos, Fenrus the Devourer, Archmage Arugal, Commander Springvale, Odo the Blindwatcher, and Deathsworn Captain in Shadowfang Keep, from Targorr the Dread in The Stockade, and from Lady Sarevess and Ghamoo-ra in Blackfathom Deeps."
+  },
+  {
+    "id": 252446,
+    "npc": "Edwin VanCleef",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "The Stockade",
+      "Blackfathom Deeps"
+    ],
+    "instructions": "Drops from Edwin VanCleef in The Deadmines, from Mutanus the Devourer, Lord Pythas, Lord Serpentis, Skum, and Verdan the Everliving in Wailing Caverns, from Shadow Charger, Razorclaw the Butcher, Baron Silverlaine, Wolf Master Nandos, Fenrus the Devourer, Archmage Arugal, Commander Springvale, Odo the Blindwatcher, and Deathsworn Captain in Shadowfang Keep, from Targorr the Dread in The Stockade, and from Lady Sarevess and Ghamoo-ra in Blackfathom Deeps."
+  },
+  {
+    "id": 252465,
+    "npc": "Herod",
+    "zone": "Scarlet Monastery",
+    "zones": [
+      "Scarlet Monastery",
+      "Razorfen Downs",
+      "Uldaman",
+      "Zul'Farrak"
+    ],
+    "instructions": "Drops from Herod, Scarlet Commander Mograine, High Inquisitor Whitemane, High Inquisitor Fairbanks, and Arcanist Doan in Scarlet Monastery, from Tuten'kash, Mordresh Fire Eye, Amnennar the Coldbringer, and Glutton in Razorfen Downs, from Eric \"The Swift\", Revelosh, Ancient Stone Keeper, and Galgann Firehammer in Uldaman, and from Theka the Martyr, Sergeant Bly, and Zerillis in Zul'Farrak."
+  },
+  {
+    "id": 252466,
+    "npc": "Herod",
+    "zone": "Scarlet Monastery",
+    "zones": [
+      "Scarlet Monastery",
+      "Razorfen Downs",
+      "Uldaman",
+      "Zul'Farrak"
+    ],
+    "instructions": "Drops from Herod, Scarlet Commander Mograine, High Inquisitor Whitemane, High Inquisitor Fairbanks, and Arcanist Doan in Scarlet Monastery, from Ragglesnout, Tuten'kash, Plaguemaw the Rotting, Amnennar the Coldbringer, and Glutton in Razorfen Downs, from Revelosh, Ironaya, and Galgann Firehammer in Uldaman, and from Theka the Martyr, Sergeant Bly, Nekrum Gutchewer, and Zerillis in Zul'Farrak."
+  },
+  {
+    "id": 252490,
+    "npc": "Sneed",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "Ragefire Chasm"
+    ],
+    "instructions": "Drops from Sneed, Rhahk'Zor, Cookie, Mr. Smite, Captain Greenskin, and Gilnid in The Deadmines, from Kresh, Lord Cobrahn, Lady Anacondra, and Deviate Faerie Dragon in Wailing Caverns, from Fel Steed, Shadow Charger, and Rethilgore in Shadowfang Keep, and from Oggleflint, Jergosh the Invoker, Bazzalan, and Taragaman the Hungerer in Ragefire Chasm."
+  },
+  {
+    "id": 252491,
+    "npc": "Sneed",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "Ragefire Chasm"
+    ],
+    "instructions": "Drops from Sneed, Rhahk'Zor, Cookie, Mr. Smite, Captain Greenskin, Gilnid, and Miner Johnson in The Deadmines, from Kresh, Lord Cobrahn, Lady Anacondra, and Deviate Faerie Dragon in Wailing Caverns, from Fel Steed, Shadow Charger, and Rethilgore in Shadowfang Keep, and from Oggleflint, Jergosh the Invoker, Bazzalan, and Taragaman the Hungerer in Ragefire Chasm."
+  },
+  {
+    "id": 252492,
+    "npc": "Sneed",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "Ragefire Chasm"
+    ],
+    "instructions": "Drops from Sneed, Rhahk'Zor, Cookie, Mr. Smite, Captain Greenskin, Gilnid, and Miner Johnson in The Deadmines, from Kresh, Lord Cobrahn, Lady Anacondra, and Deviate Faerie Dragon in Wailing Caverns, from Fel Steed, Shadow Charger, and Rethilgore in Shadowfang Keep, and from Oggleflint, Jergosh the Invoker, Bazzalan, and Taragaman the Hungerer in Ragefire Chasm."
+  },
+  {
+    "id": 252493,
+    "npc": "Sneed",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "Ragefire Chasm"
+    ],
+    "instructions": "Drops from Sneed, Rhahk'Zor, Cookie, Mr. Smite, Captain Greenskin, Gilnid, and Miner Johnson in The Deadmines, from Kresh, Lord Cobrahn, Lady Anacondra, and Deviate Faerie Dragon in Wailing Caverns, from Fel Steed, Shadow Charger, and Rethilgore in Shadowfang Keep, and from Oggleflint, Jergosh the Invoker, Bazzalan, and Taragaman the Hungerer in Ragefire Chasm."
+  },
+  {
+    "id": 252500,
+    "npc": "Edwin VanCleef",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "The Stockade",
+      "Blackfathom Deeps"
+    ],
+    "instructions": "Drops from Edwin VanCleef in The Deadmines, from Mutanus the Devourer, Lord Pythas, Lord Serpentis, Skum, and Verdan the Everliving in Wailing Caverns, from Shadow Charger, Razorclaw the Butcher, Baron Silverlaine, Wolf Master Nandos, Fenrus the Devourer, Archmage Arugal, Commander Springvale, and Odo the Blindwatcher in Shadowfang Keep, from Targorr the Dread in The Stockade, and from Lady Sarevess and Ghamoo-ra in Blackfathom Deeps."
+  },
+  {
+    "id": 252501,
+    "npc": "Edwin VanCleef",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "The Stockade",
+      "Blackfathom Deeps"
+    ],
+    "instructions": "Drops from Edwin VanCleef in The Deadmines, from Mutanus the Devourer, Lord Pythas, Lord Serpentis, Skum, and Verdan the Everliving in Wailing Caverns, from Shadow Charger, Razorclaw the Butcher, Baron Silverlaine, Wolf Master Nandos, Fenrus the Devourer, Archmage Arugal, Commander Springvale, Odo the Blindwatcher, and Deathsworn Captain in Shadowfang Keep, from Targorr the Dread in The Stockade, and from Lady Sarevess and Ghamoo-ra in Blackfathom Deeps."
+  },
+  {
+    "id": 252502,
+    "npc": "Edwin VanCleef",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "The Stockade",
+      "Blackfathom Deeps"
+    ],
+    "instructions": "Drops from Edwin VanCleef in The Deadmines, from Mutanus the Devourer, Lord Pythas, Lord Serpentis, Skum, and Verdan the Everliving in Wailing Caverns, from Shadow Charger, Razorclaw the Butcher, Baron Silverlaine, Wolf Master Nandos, Fenrus the Devourer, Archmage Arugal, Commander Springvale, Odo the Blindwatcher, and Deathsworn Captain in Shadowfang Keep, from Targorr the Dread in The Stockade, and from Lady Sarevess and Ghamoo-ra in Blackfathom Deeps."
+  },
+  {
+    "id": 252503,
+    "npc": "Edwin VanCleef",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "The Stockade",
+      "Blackfathom Deeps"
+    ],
+    "instructions": "Drops from Edwin VanCleef in The Deadmines, from Mutanus the Devourer, Lord Pythas, Lord Serpentis, Skum, and Verdan the Everliving in Wailing Caverns, from Shadow Charger, Razorclaw the Butcher, Baron Silverlaine, Wolf Master Nandos, Fenrus the Devourer, Archmage Arugal, Commander Springvale, Odo the Blindwatcher, and Deathsworn Captain in Shadowfang Keep, from Targorr the Dread in The Stockade, and from Lady Sarevess and Ghamoo-ra in Blackfathom Deeps."
+  },
+  {
+    "id": 252531,
+    "npc": "Herod",
+    "zone": "Scarlet Monastery",
+    "zones": [
+      "Scarlet Monastery",
+      "Razorfen Downs",
+      "Uldaman",
+      "Zul'Farrak"
+    ],
+    "instructions": "Drops from Herod, Scarlet Commander Mograine, High Inquisitor Whitemane, High Inquisitor Fairbanks, and Arcanist Doan in Scarlet Monastery, from Ragglesnout, Tuten'kash, Plaguemaw the Rotting, Mordresh Fire Eye, Amnennar the Coldbringer, and Glutton in Razorfen Downs, from Grimlok, Revelosh, Ancient Stone Keeper, Ironaya, and Galgann Firehammer in Uldaman, and from Sergeant Bly in Zul'Farrak."
+  },
+  {
+    "id": 252532,
+    "npc": "Herod",
+    "zone": "Scarlet Monastery",
+    "zones": [
+      "Scarlet Monastery",
+      "Razorfen Downs",
+      "Uldaman",
+      "Zul'Farrak"
+    ],
+    "instructions": "Drops from Herod, Scarlet Commander Mograine, High Inquisitor Whitemane, High Inquisitor Fairbanks, and Arcanist Doan in Scarlet Monastery, from Ragglesnout, Tuten'kash, Plaguemaw the Rotting, Mordresh Fire Eye, Amnennar the Coldbringer, and Glutton in Razorfen Downs, from Baelog, Obsidian Sentinel, and Ironaya in Uldaman, and from Nekrum Gutchewer in Zul'Farrak."
+  },
+  {
+    "id": 252533,
+    "npc": "Herod",
+    "zone": "Scarlet Monastery",
+    "zones": [
+      "Scarlet Monastery",
+      "Razorfen Downs",
+      "Uldaman",
+      "Zul'Farrak"
+    ],
+    "instructions": "Drops from Herod, Scarlet Commander Mograine, High Inquisitor Whitemane, High Inquisitor Fairbanks, and Arcanist Doan in Scarlet Monastery, from Ragglesnout, Tuten'kash, Plaguemaw the Rotting, Mordresh Fire Eye, Amnennar the Coldbringer, and Glutton in Razorfen Downs, from Grimlok, Eric \"The Swift\", and Galgann Firehammer in Uldaman, and from Sergeant Bly, Nekrum Gutchewer, Sandarr Dunereaver, and Zerillis in Zul'Farrak."
+  },
+  {
+    "id": 252547,
+    "npc": "Archaedas",
+    "zone": "Uldaman",
+    "zones": [
+      "Uldaman",
+      "Zul'Farrak",
+      "The Temple of Atal'Hakkar",
+      "Blackrock Depths",
+      "Maraudon"
+    ],
+    "instructions": "Drops from Archaedas in Uldaman, from Witch Doctor Zum'rah, Theka the Martyr, Gahz'rilla, Shadowpriest Sezz'ziz, and Antu'sul in Zul'Farrak, from Jammal'an the Prophet, Hukku, and Shade of Hakkar in The Temple of Atal'Hakkar, from Houndmaster Grebmar in Blackrock Depths, and from Princess Theradras, Noxxion, and Rotgrip in Maraudon."
+  },
+  {
+    "id": 252548,
+    "npc": "Witch Doctor Zum'rah",
+    "zone": "Zul'Farrak",
+    "zones": [
+      "Zul'Farrak",
+      "Blackrock Depths",
+      "Maraudon"
+    ],
+    "instructions": "Drops from Witch Doctor Zum'rah, Gahz'rilla, and Ruuzlu in Zul'Farrak, from High Interrogator Gerstahn and Fineous Darkvire in Blackrock Depths, and from Rotgrip in Maraudon."
+  },
+  {
+    "id": 252549,
+    "npc": "Archaedas",
+    "zone": "Uldaman",
+    "zones": [
+      "Uldaman",
+      "Zul'Farrak",
+      "The Temple of Atal'Hakkar",
+      "Maraudon"
+    ],
+    "instructions": "Drops from Archaedas in Uldaman, from Theka the Martyr, Shadowpriest Sezz'ziz, and Antu'sul in Zul'Farrak, from Atal'alarion in The Temple of Atal'Hakkar, and from Landslide in Maraudon."
+  },
+  {
+    "id": 252550,
+    "npc": "Archaedas",
+    "zone": "Uldaman",
+    "zones": [
+      "Uldaman",
+      "Zul'Farrak",
+      "Maraudon"
+    ],
+    "instructions": "Drops from Archaedas in Uldaman, from Chief Ukorz Sandscalp, Gahz'rilla, Shadowpriest Sezz'ziz, Nekrum Gutchewer, Ruuzlu, and Antu'sul in Zul'Farrak, and from Princess Theradras, Razorlash, and Noxxion in Maraudon."
+  },
+  {
+    "id": 252551,
+    "npc": "Theka the Martyr",
+    "zone": "Zul'Farrak",
+    "zones": [
+      "Zul'Farrak",
+      "The Temple of Atal'Hakkar",
+      "Blackrock Depths",
+      "Maraudon"
+    ],
+    "instructions": "Drops from Theka the Martyr, Gahz'rilla, Shadowpriest Sezz'ziz, and Ruuzlu in Zul'Farrak, from Shade of Hakkar and Atal'alarion in The Temple of Atal'Hakkar, from High Interrogator Gerstahn in Blackrock Depths, and from Celebras the Cursed in Maraudon."
+  },
+  {
+    "id": 252562,
+    "npc": "Herod",
+    "zone": "Scarlet Monastery",
+    "zones": [
+      "Scarlet Monastery",
+      "Razorfen Downs",
+      "Uldaman",
+      "Zul'Farrak"
+    ],
+    "instructions": "Drops from Herod, Scarlet Commander Mograine, High Inquisitor Whitemane, High Inquisitor Fairbanks, and Arcanist Doan in Scarlet Monastery, from Tuten'kash, Plaguemaw the Rotting, Mordresh Fire Eye, Amnennar the Coldbringer, and Glutton in Razorfen Downs, from Grimlok, Eric \"The Swift\", Revelosh, Obsidian Sentinel, Ironaya, and Galgann Firehammer in Uldaman, and from Theka the Martyr and Sergeant Bly in Zul'Farrak."
+  },
+  {
+    "id": 252563,
+    "npc": "Herod",
+    "zone": "Scarlet Monastery",
+    "zones": [
+      "Scarlet Monastery",
+      "Razorfen Downs",
+      "Uldaman",
+      "Zul'Farrak"
+    ],
+    "instructions": "Drops from Herod, Scarlet Commander Mograine, High Inquisitor Whitemane, High Inquisitor Fairbanks, and Arcanist Doan in Scarlet Monastery, from Tuten'kash, Plaguemaw the Rotting, Mordresh Fire Eye, and Glutton in Razorfen Downs, from Ancient Stone Keeper, Ironaya, and Galgann Firehammer in Uldaman, and from Theka the Martyr and Sergeant Bly in Zul'Farrak."
+  },
+  {
+    "id": 252564,
+    "npc": "Herod",
+    "zone": "Scarlet Monastery",
+    "zones": [
+      "Scarlet Monastery",
+      "Razorfen Downs",
+      "Uldaman",
+      "Zul'Farrak"
+    ],
+    "instructions": "Drops from Herod, Scarlet Commander Mograine, High Inquisitor Whitemane, High Inquisitor Fairbanks, and Arcanist Doan in Scarlet Monastery, from Ragglesnout, Tuten'kash, Plaguemaw the Rotting, Mordresh Fire Eye, and Amnennar the Coldbringer in Razorfen Downs, from Revelosh, Ancient Stone Keeper, and Galgann Firehammer in Uldaman, and from Theka the Martyr and Sergeant Bly in Zul'Farrak."
+  },
+  {
+    "id": 252565,
+    "npc": "Herod",
+    "zone": "Scarlet Monastery",
+    "zones": [
+      "Scarlet Monastery",
+      "Razorfen Downs",
+      "Zul'Farrak"
+    ],
+    "instructions": "Drops from Herod, Scarlet Commander Mograine, High Inquisitor Whitemane, High Inquisitor Fairbanks, and Arcanist Doan in Scarlet Monastery, from Tuten'kash, Plaguemaw the Rotting, Mordresh Fire Eye, Amnennar the Coldbringer, and Glutton in Razorfen Downs, and from Nekrum Gutchewer in Zul'Farrak."
+  },
+  {
+    "id": 252584,
+    "npc": "Chief Ukorz Sandscalp",
+    "zone": "Zul'Farrak",
+    "zones": [
+      "Zul'Farrak"
+    ],
+    "instructions": "Drops from Chief Ukorz Sandscalp, Theka the Martyr, Gahz'rilla, Shadowpriest Sezz'ziz, Nekrum Gutchewer, and Ruuzlu in Zul'Farrak."
+  },
+  {
+    "id": 252585,
+    "npc": "Archaedas",
+    "zone": "Uldaman",
+    "zones": [
+      "Uldaman",
+      "Zul'Farrak",
+      "The Temple of Atal'Hakkar",
+      "Blackrock Depths",
+      "Maraudon"
+    ],
+    "instructions": "Drops from Archaedas in Uldaman, from Witch Doctor Zum'rah, Theka the Martyr, Shadowpriest Sezz'ziz, and Antu'sul in Zul'Farrak, from Shade of Eranikus in The Temple of Atal'Hakkar, from Ribbly Screwspigot in Blackrock Depths, and from Lord Vyletongue and Tinkerer Gizlock in Maraudon."
+  },
+  {
+    "id": 252586,
+    "npc": "Chief Ukorz Sandscalp",
+    "zone": "Zul'Farrak",
+    "zones": [
+      "Zul'Farrak",
+      "The Temple of Atal'Hakkar",
+      "Blackrock Depths"
+    ],
+    "instructions": "Drops from Chief Ukorz Sandscalp, Gahz'rilla, and Shadowpriest Sezz'ziz in Zul'Farrak, from Dreamscythe in The Temple of Atal'Hakkar, and from Lord Roccor in Blackrock Depths."
+  },
+  {
+    "id": 252587,
+    "npc": "Chief Ukorz Sandscalp",
+    "zone": "Zul'Farrak",
+    "zones": [
+      "Zul'Farrak",
+      "Blackrock Depths",
+      "Maraudon"
+    ],
+    "instructions": "Drops from Chief Ukorz Sandscalp, Witch Doctor Zum'rah, Theka the Martyr, Shadowpriest Sezz'ziz, Ruuzlu, and Antu'sul in Zul'Farrak, from Fineous Darkvire in Blackrock Depths, and from Razorlash and Rotgrip in Maraudon."
+  },
+  {
+    "id": 252606,
+    "npc": "Spectral Researcher",
+    "zone": "Scholomance",
+    "zones": [
+      "Scholomance"
+    ],
+    "instructions": "Drops from Spectral Researcher in Scholomance."
+  },
+  {
+    "id": 253901,
+    "npc": "Sneed",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "Ragefire Chasm"
+    ],
+    "instructions": "Drops from Sneed, Rhahk'Zor, Cookie, Mr. Smite, Captain Greenskin, Gilnid, and Miner Johnson in The Deadmines, from Kresh, Lord Cobrahn, Lady Anacondra, and Deviate Faerie Dragon in Wailing Caverns, from Fel Steed, Shadow Charger, and Rethilgore in Shadowfang Keep, and from Oggleflint, Jergosh the Invoker, Bazzalan, and Taragaman the Hungerer in Ragefire Chasm."
+  },
+  {
+    "id": 253903,
+    "npc": "Sneed",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "Ragefire Chasm"
+    ],
+    "instructions": "Drops from Sneed, Rhahk'Zor, Cookie, Mr. Smite, Captain Greenskin, Gilnid, and Miner Johnson in The Deadmines, from Kresh, Lord Cobrahn, Lady Anacondra, and Deviate Faerie Dragon in Wailing Caverns, from Fel Steed, Shadow Charger, and Rethilgore in Shadowfang Keep, from Oggleflint, Jergosh the Invoker, Bazzalan, and Taragaman the Hungerer in Ragefire Chasm."
+  },
+  {
+    "id": 253905,
+    "npc": "Sneed",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "Ragefire Chasm"
+    ],
+    "instructions": "Drops from Sneed, Rhahk'Zor, Cookie, Mr. Smite, Captain Greenskin, Gilnid, and Miner Johnson in The Deadmines, from Kresh, Lord Cobrahn, Lady Anacondra, and Deviate Faerie Dragon in Wailing Caverns, from Fel Steed, Shadow Charger, and Rethilgore in Shadowfang Keep, and from Oggleflint, Jergosh the Invoker, Bazzalan, and Taragaman the Hungerer in Ragefire Chasm."
+  },
+  {
+    "id": 253907,
+    "npc": "Sneed",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "Ragefire Chasm"
+    ],
+    "instructions": "Drops from Sneed, Rhahk'Zor, Cookie, Mr. Smite, Captain Greenskin, Gilnid, and Miner Johnson in The Deadmines, from Kresh, Lord Cobrahn, Lady Anacondra, and Deviate Faerie Dragon in Wailing Caverns, from Fel Steed, Shadow Charger, and Rethilgore in Shadowfang Keep, from Oggleflint, Jergosh the Invoker, Bazzalan, and Taragaman the Hungerer in Ragefire Chasm."
+  },
+  {
+    "id": 253909,
+    "npc": "Sneed",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "Ragefire Chasm"
+    ],
+    "instructions": "Drops from Sneed, Rhahk'Zor, Cookie, Mr. Smite, Captain Greenskin, Gilnid, and Miner Johnson in The Deadmines, from Kresh, Lord Cobrahn, Lady Anacondra, and Deviate Faerie Dragon in Wailing Caverns, from Fel Steed, Shadow Charger, and Rethilgore in Shadowfang Keep, from Oggleflint, Jergosh the Invoker, Bazzalan, and Taragaman the Hungerer in Ragefire Chasm."
+  },
+  {
+    "id": 253911,
+    "npc": "Sneed",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "Ragefire Chasm"
+    ],
+    "instructions": "Drops from Sneed, Rhahk'Zor, Cookie, Mr. Smite, Captain Greenskin, Gilnid, and Miner Johnson in The Deadmines, from Kresh, Lord Cobrahn, and Lady Anacondra in Wailing Caverns, from Fel Steed, Shadow Charger, and Rethilgore in Shadowfang Keep, and from Oggleflint, Jergosh the Invoker, Bazzalan, and Taragaman the Hungerer in Ragefire Chasm."
+  },
+  {
+    "id": 253937,
+    "npc": "Edwin VanCleef",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "The Stockade",
+      "Blackfathom Deeps"
+    ],
+    "instructions": "Drops from Edwin VanCleef in The Deadmines, from Mutanus the Devourer, Lord Pythas, Lord Serpentis, Skum, and Verdan the Everliving in Wailing Caverns, from Shadow Charger, Razorclaw the Butcher, Baron Silverlaine, Wolf Master Nandos, Fenrus the Devourer, Archmage Arugal, Commander Springvale, and Odo the Blindwatcher in Shadowfang Keep, from Targorr the Dread in The Stockade, and from Lady Sarevess and Ghamoo-ra in Blackfathom Deeps."
+  },
+  {
+    "id": 253939,
+    "npc": "Edwin VanCleef",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "The Stockade",
+      "Blackfathom Deeps"
+    ],
+    "instructions": "Drops from Edwin VanCleef in The Deadmines, from Mutanus the Devourer, Lord Pythas, Lord Serpentis, Skum, and Verdan the Everliving in Wailing Caverns, from Shadow Charger, Razorclaw the Butcher, Baron Silverlaine, Wolf Master Nandos, Fenrus the Devourer, Archmage Arugal, Commander Springvale, Odo the Blindwatcher, and Deathsworn Captain in Shadowfang Keep, from Targorr the Dread in The Stockade, and from Lady Sarevess and Ghamoo-ra in Blackfathom Deeps."
+  },
+  {
+    "id": 253941,
+    "npc": "Edwin VanCleef",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "The Stockade",
+      "Blackfathom Deeps"
+    ],
+    "instructions": "Drops from Edwin VanCleef in The Deadmines, from Mutanus the Devourer, Lord Pythas, Lord Serpentis, Skum, and Verdan the Everliving in Wailing Caverns, from Shadow Charger, Razorclaw the Butcher, Baron Silverlaine, Wolf Master Nandos, Fenrus the Devourer, Archmage Arugal, Commander Springvale, Odo the Blindwatcher, and Deathsworn Captain in Shadowfang Keep, from Targorr the Dread in The Stockade, and from Lady Sarevess and Ghamoo-ra in Blackfathom Deeps."
+  },
+  {
+    "id": 253943,
+    "npc": "Edwin VanCleef",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "The Stockade",
+      "Blackfathom Deeps"
+    ],
+    "instructions": "Drops from Edwin VanCleef in The Deadmines, from Mutanus the Devourer, Lord Pythas, Lord Serpentis, Skum, and Verdan the Everliving in Wailing Caverns, from Shadow Charger, Razorclaw the Butcher, Baron Silverlaine, Wolf Master Nandos, Fenrus the Devourer, Archmage Arugal, Commander Springvale, Odo the Blindwatcher, and Deathsworn Captain in Shadowfang Keep, from Targorr the Dread in The Stockade, and from Lady Sarevess and Ghamoo-ra in Blackfathom Deeps."
+  },
+  {
+    "id": 253945,
+    "npc": "Edwin VanCleef",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "The Stockade",
+      "Blackfathom Deeps"
+    ],
+    "instructions": "Drops from Edwin VanCleef in The Deadmines, from Mutanus the Devourer, Lord Pythas, Lord Serpentis, Skum, and Verdan the Everliving in Wailing Caverns, from Shadow Charger, Razorclaw the Butcher, Baron Silverlaine, Wolf Master Nandos, Fenrus the Devourer, Archmage Arugal, Commander Springvale, Odo the Blindwatcher, and Deathsworn Captain in Shadowfang Keep, from Targorr the Dread in The Stockade, and from Lady Sarevess and Ghamoo-ra in Blackfathom Deeps."
+  },
+  {
+    "id": 253947,
+    "npc": "Edwin VanCleef",
+    "zone": "The Deadmines",
+    "zones": [
+      "The Deadmines",
+      "Wailing Caverns",
+      "Shadowfang Keep",
+      "The Stockade",
+      "Blackfathom Deeps"
+    ],
+    "instructions": "Drops from Edwin VanCleef in The Deadmines, from Mutanus the Devourer, Lord Pythas, Lord Serpentis, Skum, and Verdan the Everliving in Wailing Caverns, from Shadow Charger, Razorclaw the Butcher, Baron Silverlaine, Wolf Master Nandos, Fenrus the Devourer, Archmage Arugal, Commander Springvale, Odo the Blindwatcher, and Deathsworn Captain in Shadowfang Keep, from Targorr the Dread in The Stockade, and from Lady Sarevess and Ghamoo-ra in Blackfathom Deeps."
+  },
+  {
+    "id": 253975,
+    "npc": "Dextren Ward",
+    "zone": "The Stockade",
+    "zones": [
+      "The Stockade",
+      "Blackfathom Deeps",
+      "Gnomeregan",
+      "Razorfen Kraul",
+      "Scarlet Monastery"
+    ],
+    "instructions": "Drops from Dextren Ward, Kam Deepfury, Bazil Thredd, and Hamhock in The Stockade, from Aku'mai, Old Serra'kis, Twilight Lord Kelris, Gelihast, Baron Aquanis, and Lorgus Jett in Blackfathom Deeps, from Crowd Pummeler 9-60, Electrocutioner 6000, Viscous Fallout, Grubbis, Mekgineer Thermaplugg, and Dark Iron Ambassador in Gnomeregan, from Overlord Ramtusk, Charlga Razorflank, Agathelos the Raging, Aggem Thorncurse, Death Speaker Jargba, Roogug, Blind Hunter, and Earthcaller Halmgar in Razorfen Kraul, and from Houndmaster Loksey, Interrogator Vishas, Bloodmage Thalnos, and Ironspine in Scarlet Monastery."
+  },
+  {
+    "id": 253977,
+    "npc": "Dextren Ward",
+    "zone": "The Stockade",
+    "zones": [
+      "The Stockade",
+      "Blackfathom Deeps",
+      "Gnomeregan",
+      "Razorfen Kraul",
+      "Scarlet Monastery"
+    ],
+    "instructions": "Drops from Dextren Ward, Kam Deepfury, Bazil Thredd, and Hamhock in The Stockade, from Aku'mai, Old Serra'kis, Twilight Lord Kelris, Gelihast, Baron Aquanis, and Lorgus Jett in Blackfathom Deeps, from Crowd Pummeler 9-60, Electrocutioner 6000, Viscous Fallout, Grubbis, Mekgineer Thermaplugg, and Dark Iron Ambassador in Gnomeregan, from Overlord Ramtusk, Charlga Razorflank, Agathelos the Raging, Aggem Thorncurse, Death Speaker Jargba, Roogug, and Blind Hunter in Razorfen Kraul, and from Houndmaster Loksey and Bloodmage Thalnos in Scarlet Monastery."
+  },
+  {
+    "id": 253979,
+    "npc": "Dextren Ward",
+    "zone": "The Stockade",
+    "zones": [
+      "The Stockade",
+      "Blackfathom Deeps",
+      "Gnomeregan",
+      "Razorfen Kraul",
+      "Scarlet Monastery"
+    ],
+    "instructions": "Drops from Dextren Ward, Kam Deepfury, Bazil Thredd, Hamhock, and Bruegal Ironknuckle in The Stockade, from Aku'mai, Old Serra'kis, Twilight Lord Kelris, Gelihast, Baron Aquanis, and Lorgus Jett in Blackfathom Deeps, from Crowd Pummeler 9-60, Electrocutioner 6000, Viscous Fallout, Grubbis, and Mekgineer Thermaplugg in Gnomeregan, from Overlord Ramtusk, Charlga Razorflank, Agathelos the Raging, Aggem Thorncurse, Death Speaker Jargba, Roogug, Blind Hunter, and Earthcaller Halmgar in Razorfen Kraul, and from Houndmaster Loksey, Interrogator Vishas, and Bloodmage Thalnos in Scarlet Monastery."
+  },
+  {
+    "id": 253981,
+    "npc": "Dextren Ward",
+    "zone": "The Stockade",
+    "zones": [
+      "The Stockade",
+      "Blackfathom Deeps",
+      "Gnomeregan",
+      "Razorfen Kraul",
+      "Scarlet Monastery"
+    ],
+    "instructions": "Drops from Dextren Ward, Kam Deepfury, Bazil Thredd, and Hamhock in The Stockade, from Aku'mai, Old Serra'kis, Twilight Lord Kelris, Gelihast, Baron Aquanis, and Lorgus Jett in Blackfathom Deeps, from Crowd Pummeler 9-60, Electrocutioner 6000, Viscous Fallout, and Mekgineer Thermaplugg in Gnomeregan, from Overlord Ramtusk, Charlga Razorflank, Agathelos the Raging, Aggem Thorncurse, Death Speaker Jargba, Roogug, and Blind Hunter in Razorfen Kraul, and from Houndmaster Loksey, Interrogator Vishas, and Bloodmage Thalnos in Scarlet Monastery."
+  },
+  {
+    "id": 253983,
+    "npc": "Dextren Ward",
+    "zone": "The Stockade",
+    "zones": [
+      "The Stockade",
+      "Blackfathom Deeps",
+      "Gnomeregan",
+      "Razorfen Kraul",
+      "Scarlet Monastery"
+    ],
+    "instructions": "Drops from Dextren Ward, Kam Deepfury, Bazil Thredd, and Hamhock in The Stockade, from Aku'mai, Old Serra'kis, Twilight Lord Kelris, Gelihast, Baron Aquanis, and Lorgus Jett in Blackfathom Deeps, from Crowd Pummeler 9-60, Electrocutioner 6000, Viscous Fallout, Grubbis, and Mekgineer Thermaplugg in Gnomeregan, from Overlord Ramtusk, Charlga Razorflank, Agathelos the Raging, Aggem Thorncurse, Death Speaker Jargba, Roogug, Blind Hunter, and Earthcaller Halmgar in Razorfen Kraul, and from Houndmaster Loksey, Interrogator Vishas, Bloodmage Thalnos, Ironspine, and Azshir the Sleepless in Scarlet Monastery."
+  },
+  {
+    "id": 253985,
+    "npc": "Dextren Ward",
+    "zone": "The Stockade",
+    "zones": [
+      "The Stockade",
+      "Blackfathom Deeps",
+      "Gnomeregan",
+      "Razorfen Kraul",
+      "Scarlet Monastery"
+    ],
+    "instructions": "Drops from Dextren Ward, Kam Deepfury, Bazil Thredd, Hamhock, and Bruegal Ironknuckle in The Stockade, from Aku'mai, Old Serra'kis, Twilight Lord Kelris, Gelihast, Baron Aquanis, and Lorgus Jett in Blackfathom Deeps, from Crowd Pummeler 9-60, Electrocutioner 6000, Grubbis, and Mekgineer Thermaplugg in Gnomeregan, from Overlord Ramtusk, Charlga Razorflank, Agathelos the Raging, Aggem Thorncurse, Death Speaker Jargba, and Roogug in Razorfen Kraul, and from Houndmaster Loksey, Interrogator Vishas, Bloodmage Thalnos, Fallen Champion, and Ironspine in Scarlet Monastery."
+  },
+  {
+    "id": 254037,
+    "npc": "Scarlet Commander Mograine",
+    "zone": "Scarlet Monastery",
+    "zones": [
+      "Scarlet Monastery",
+      "Razorfen Downs",
+      "Uldaman",
+      "Zul'Farrak"
+    ],
+    "instructions": "Drops from Scarlet Commander Mograine, High Inquisitor Whitemane, High Inquisitor Fairbanks, and Arcanist Doan in Scarlet Monastery, from Tuten'kash, Plaguemaw the Rotting, Amnennar the Coldbringer, and Glutton in Razorfen Downs, from Grimlok, Baelog, Obsidian Sentinel, Ancient Stone Keeper, and Ironaya in Uldaman, and from Nekrum Gutchewer in Zul'Farrak."
+  },
+  {
+    "id": 254039,
+    "npc": "Herod",
+    "zone": "Scarlet Monastery",
+    "zones": [
+      "Scarlet Monastery",
+      "Razorfen Downs",
+      "Uldaman",
+      "Zul'Farrak"
+    ],
+    "instructions": "Drops from Herod, Scarlet Commander Mograine, High Inquisitor Whitemane, High Inquisitor Fairbanks, and Arcanist Doan in Scarlet Monastery, from Tuten'kash, Plaguemaw the Rotting, Mordresh Fire Eye, Amnennar the Coldbringer, and Glutton in Razorfen Downs, from Eric \"The Swift\", Revelosh, Ancient Stone Keeper, and Ironaya in Uldaman, and from Theka the Martyr, Sergeant Bly, and Nekrum Gutchewer in Zul'Farrak."
+  },
+  {
+    "id": 254041,
+    "npc": "Herod",
+    "zone": "Scarlet Monastery",
+    "zones": [
+      "Scarlet Monastery",
+      "Razorfen Downs",
+      "Uldaman",
+      "Zul'Farrak"
+    ],
+    "instructions": "Drops from Herod, Scarlet Commander Mograine, High Inquisitor Whitemane, High Inquisitor Fairbanks, and Arcanist Doan in Scarlet Monastery, from Tuten'kash, Plaguemaw the Rotting, Mordresh Fire Eye, Amnennar the Coldbringer, and Glutton in Razorfen Downs, from Eric \"The Swift\", Obsidian Sentinel, and Galgann Firehammer in Uldaman, and from Sergeant Bly and Nekrum Gutchewer in Zul'Farrak."
+  },
+  {
+    "id": 254043,
+    "npc": "Herod",
+    "zone": "Scarlet Monastery",
+    "zones": [
+      "Scarlet Monastery",
+      "Razorfen Downs",
+      "Uldaman",
+      "Zul'Farrak"
+    ],
+    "instructions": "Drops from Herod, Scarlet Commander Mograine, High Inquisitor Whitemane, High Inquisitor Fairbanks, and Arcanist Doan in Scarlet Monastery, from Tuten'kash, Plaguemaw the Rotting, Mordresh Fire Eye, Amnennar the Coldbringer, and Glutton in Razorfen Downs, from Revelosh, Ironaya, and Galgann Firehammer in Uldaman, and from Theka the Martyr, Sergeant Bly, and Nekrum Gutchewer in Zul'Farrak."
+  },
+  {
+    "id": 254045,
+    "npc": "Herod",
+    "zone": "Scarlet Monastery",
+    "zones": [
+      "Scarlet Monastery",
+      "Razorfen Downs",
+      "Uldaman",
+      "Zul'Farrak"
+    ],
+    "instructions": "Drops from Herod, Scarlet Commander Mograine, High Inquisitor Whitemane, High Inquisitor Fairbanks, and Arcanist Doan in Scarlet Monastery, from Plaguemaw the Rotting, Mordresh Fire Eye, Amnennar the Coldbringer, and Glutton in Razorfen Downs, from Grimlok, Obsidian Sentinel, and Ancient Stone Keeper in Uldaman, and from Sergeant Bly and Zerillis in Zul'Farrak."
+  },
+  {
+    "id": 254047,
+    "npc": "Herod",
+    "zone": "Scarlet Monastery",
+    "zones": [
+      "Scarlet Monastery",
+      "Razorfen Downs",
+      "Uldaman",
+      "Zul'Farrak"
+    ],
+    "instructions": "Drops from Herod, Scarlet Commander Mograine, High Inquisitor Whitemane, High Inquisitor Fairbanks, and Arcanist Doan in Scarlet Monastery, from Tuten'kash, Plaguemaw the Rotting, Mordresh Fire Eye, Amnennar the Coldbringer, and Glutton in Razorfen Downs, from Eric \"The Swift\", Obsidian Sentinel, Ancient Stone Keeper, and Ironaya in Uldaman, and from Sandarr Dunereaver in Zul'Farrak."
+  },
+  {
+    "id": 254095,
+    "npc": "Archaedas",
+    "zone": "Uldaman",
+    "zones": [
+      "Uldaman",
+      "Zul'Farrak",
+      "The Temple of Atal'Hakkar",
+      "Maraudon"
+    ],
+    "instructions": "Drops from Archaedas in Uldaman, from Chief Ukorz Sandscalp, Theka the Martyr, Ruuzlu, and Antu'sul in Zul'Farrak, from Dreamscythe in The Temple of Atal'Hakkar, and from Celebras the Cursed, Lord Vyletongue, Noxxion, and Rotgrip in Maraudon."
+  },
+  {
+    "id": 254097,
+    "npc": "Witch Doctor Zum'rah",
+    "zone": "Zul'Farrak",
+    "zones": [
+      "Zul'Farrak",
+      "The Temple of Atal'Hakkar",
+      "Blackrock Depths",
+      "Maraudon"
+    ],
+    "instructions": "Drops from Witch Doctor Zum'rah, Gahz'rilla, and Ruuzlu in Zul'Farrak, from Morphaz in The Temple of Atal'Hakkar, from Houndmaster Grebmar in Blackrock Depths, and from Princess Theradras and Tinkerer Gizlock in Maraudon."
+  },
+  {
+    "id": 254099,
+    "npc": "Archaedas",
+    "zone": "Uldaman",
+    "zones": [
+      "Uldaman",
+      "Zul'Farrak",
+      "Maraudon"
+    ],
+    "instructions": "Drops from Archaedas in Uldaman, from Chief Ukorz Sandscalp, Gahz'rilla, and Ruuzlu in Zul'Farrak, and from Princess Theradras and Noxxion in Maraudon."
+  },
+  {
+    "id": 254101,
+    "npc": "Archaedas",
+    "zone": "Uldaman",
+    "zones": [
+      "Uldaman",
+      "Zul'Farrak",
+      "The Temple of Atal'Hakkar",
+      "Blackrock Depths",
+      "Maraudon"
+    ],
+    "instructions": "Drops from Archaedas in Uldaman, from Witch Doctor Zum'rah and Antu'sul in Zul'Farrak, from Atal'alarion in The Temple of Atal'Hakkar, from Phalanx in Blackrock Depths, and from Landslide, Celebras the Cursed, Razorlash, Noxxion, and Tinkerer Gizlock in Maraudon."
+  },
+  {
+    "id": 254103,
+    "npc": "Chief Ukorz Sandscalp",
+    "zone": "Zul'Farrak",
+    "zones": [
+      "Zul'Farrak",
+      "Maraudon"
+    ],
+    "instructions": "Drops from Chief Ukorz Sandscalp, Witch Doctor Zum'rah, Theka the Martyr, Shadowpriest Sezz'ziz, Nekrum Gutchewer, Ruuzlu, and Antu'sul in Zul'Farrak, and from Lord Vyletongue, Noxxion, and Rotgrip in Maraudon."
+  },
+  {
+    "id": 254105,
+    "npc": "Archaedas",
+    "zone": "Uldaman",
+    "zones": [
+      "Uldaman",
+      "Zul'Farrak",
+      "The Temple of Atal'Hakkar",
+      "Maraudon"
+    ],
+    "instructions": "Drops from Archaedas in Uldaman, from Chief Ukorz Sandscalp, Gahz'rilla, and Antu'sul in Zul'Farrak, from Shade of Eranikus and Morphaz in The Temple of Atal'Hakkar, and from Landslide and Rotgrip in Maraudon."
   }
 ]

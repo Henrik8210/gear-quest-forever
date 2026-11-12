@@ -835,11 +835,11 @@ EMBRACE_SPECS = {
 # The pieces are item level 19-23. Dream Venom does not scale with the
 # wearer, so the stun is priced at this level even when the character is higher.
 EMBRACE_ITEM_LEVEL = 22
-# Cat form melees and the weapon dpsWeight is 0 (the weapon is a stat stick).
-# Classic cat: 1 agility = 1 attack power, 1 attack power = 1/14 white dps,
-# so 1 white dps = 14 agility. Hunters with no melee dpsWeight still swing
-# sometimes; that is a smaller share, priced off their agility the same way
-# weapon dps is priced off strength at the top of this file.
+# The Fang stun stays at 14 agility of white DPS for a cat, even though the
+# hunt now prices weapon DPS at 14 attack power (dpsWeight 4.9). Hunters with
+# no melee dpsWeight still swing sometimes; that is a smaller share, priced
+# off their agility the same way weapon dps is priced off strength at the
+# top of this file.
 
 def embrace_bonus(wl, _level, dps_w, spec_key, pieces):
     """Points for wearing `pieces` of Embrace of the Viper. Same currency as stats."""
@@ -861,7 +861,7 @@ def embrace_bonus(wl, _level, dps_w, spec_key, pieces):
             pts += (100.0 / 15.0) * wl.get("int", 0.0)
     if pieces >= 5:
         dw = dps_w or 0.0
-        if dw <= 0 and spec_key == "feral":
+        if spec_key == "feral":
             dw = 14.0
         elif dw <= 0 and spec_key in ("beast_mastery", "marksmanship"):
             dw = DPS_PER_STR * wl.get("agi", 0.0)
@@ -1183,16 +1183,17 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     # Generalised: if the spec's dps weight for THIS slot is zero,
                     # the character does not attack with the item at all, so nothing
                     # that triggers on an attack can fire. That is the ranged slot
-                    # for everyone but a hunter, both weapon hands for a druid
-                    # (weapon procs do not fire in cat or bear form), and an
-                    # elemental or restoration shaman. Beast Mastery and
+                    # for everyone but a hunter, and an elemental or restoration
+                    # shaman. Cat and bear do use weapon DPS, but an on-hit weapon
+                    # proc still does not fire in form. Beast Mastery and
                     # Marksmanship melee dpsWeight is 0.05, so their melee procs
                     # fire. It matters beyond damage procs: a
                     # "Chance on hit: +30 Strength for 8 sec" line is priced by
                     # uptime x stat weight, not by dpsWeight, so it was scoring in
                     # full on weapons that are never swung.
+                    form_procs_off = cls == "DRUID" and spec_key in ("feral", "bear")
                     onUseOnly = (sl in ("Ranged","MainHand","SecondaryHand")
-                                 and not procDw)
+                                 and (not procDw or form_procs_off))
                     pp,_=PROCS.value(pr,it,spec_key,wl,procDw,level,onUseOnly=onUseOnly)
                     s+=pp
                 # RELICS: Totem, Idol, Libram. 108 of them in the dataset and only

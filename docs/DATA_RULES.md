@@ -38,9 +38,18 @@ At **runtime**, a generated hunt with `curatedRank` keeps that pipeline order. `
 
 - Enhancement intellect is **0.7** and is **not** doubled through 60. Strength stays 1.1. Enhancement Tank is unchanged. The tooltip shows the raw 0.7.
 - Rage of the Storm, Tidebringer's Claw, Lightning's Grasp, and Elementalist's Guard are shaman quest rewards (`TEMPEST_WEAPON_IDS`). A paladin list must not rank them.
-- A crafted name is not a camp seller. `camp_profession()` returns None. Guessed Redridge and Barrens pins stay Unsourced until Forever names that vendor.
+- A crafted name is not a camp seller. `camp_profession()` returns None. Do not invent a Redridge or Barrens pin. v1.1.5 stores a source only when the Wowhead Forever page names the seller, the boss, or the creature.
 - The knight's 13 pages live in `GQ.LocaleGuidePages` for every language. Apply them when the parchment is shown. The language pack can load after `PortraitGuide.lua`.
 - `Log.lua` is at 191 of 200 file-scope locals. One more file-scope `local` can stop the file compiling, and then the minimap button does nothing.
+
+**12 Nov 2026 (v1.1.5) — do not undo these:**
+
+- 530 crafted hunts Forever names are sourced again: 409 vendors, 101 boss drops, 20 named creatures. A page that still names nobody stays Unsourced, with no pin. **Brawler's Leather Hood** and the other Merchant's Favor pieces Pawani and Daniel Stitchsong sell are vendor hunts. Leather Armor, Leather Pants, and the leather helms whose pages name a boss stay boss drops. **Veteran's Chain Helm** drops from the bosses Forever lists, including The Stockade. **Veteran's Silvered Chain Helm** is the camp recipe, Gor'mak and Stondry Darkhammer.
+- **Guise of Battle** (287011) is a world drop. The line is `World drop.` No creature and no pin. **Idol of the Heckler** (213594) stays Unsourced.
+- Cat `dpsWeight` is **4.9**. Bear is **2.52**. Balance, Restoration, and levels 1–9 stay as they were. The Fang stun stays 14 plus 1 point. On-hit weapon procs stay off in cat and bear form.
+- **Whitemane's Chapeau** (7720) is 52 armor, 9 stamina, 10 intellect, 12 spirit, 20 healing, and 7 damage. **Jumanza Grips** (18083) is 43 armor, 10 stamina, 7 intellect, 4 mana per 5, 18 healing, and 6 damage. Both halves of the classic damage-and-healing line stay. Do not score the revive-cast line on the chapeau.
+- Scout's Medallion (19534–19537, 20442) requires Honored with Warsong Outriders. Sentinel's Medallion (19538–19541, 20444) requires Honored with Silverwing Sentinels.
+- Settings has **Donations** under The GearQuest Community. The copy box is `https://buymeacoffee.com/weber8210`. The same `GQ.L` key is in every locale file.
 
 **Shared-ID PvP (do not pin one quartermaster):** Warsong Gulch **Rune of Duty** (21567/21568) and **Rune of Perfection** (21565/21566) are the **same item IDs** for both factions. Alliance buys them from Illiyana Moonblaze (Silverwing Grove); Horde from Kelm Hargunth (Mor'shan Base Camp). `sources.json` must keep `npc`/`zone` unset and put both vendors in `instructions`. Pinning Illiyana made `npc_ok` treat them as Alliance-only and left **Horde with no trinket hunts from 20–27** (first pick was Defiler's Talisman at 28). Forever tooltips have no `Classes:` line — `allowClass` is `-1`. Both runes are Unique-Equipped: Rune of Battle (1), so they are alternatives, not a pair. Details: [`pipeline/docs/FOREVER-SCORING.md`](../pipeline/docs/FOREVER-SCORING.md).
 

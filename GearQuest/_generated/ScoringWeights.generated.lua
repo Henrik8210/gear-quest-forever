@@ -44,6 +44,7 @@ GQ.ScoringWeights = {
         },
         bear = {
             label = "Guardian (Bear)",
+            dpsWeight = 2.52,
             weights = {
                 str = 0.35,
                 agi = 0.55,
@@ -67,6 +68,7 @@ GQ.ScoringWeights = {
         },
         feral = {
             label = "Feral (Cat)",
+            dpsWeight = 4.9,
             weights = {
                 str = 0.7,
                 agi = 1,

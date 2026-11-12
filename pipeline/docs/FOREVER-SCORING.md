@@ -241,9 +241,20 @@ above, with Beast Mastery and Marksmanship melee `dpsWeight` still **0.05**):
 
 Gloves (from 14) and legs (from 17) are already hunts on their own stats.
 Dream Venom is priced at item level 22, not the wearer’s level, or
-Enhancement keeps the chest too long. Feral has no weapon `dpsWeight`; the
-stun uses 14 (cat: 1 AP = 1/14 white dps) plus 1 point. Do not drop that
-extra point. The 10 Oct chest no longer pays for every slot through 23.
+Enhancement keeps the chest too long. Cat weapon `dpsWeight` is **4.9** and
+bear is **2.52** (14 attack power per weapon DPS, at each spec’s attack
+power weight). Balance, Restoration, and levels 1–9 are unchanged.
+Druid was scored again from these weights. On-hit weapon procs stay off in
+cat and bear form. The Fang stun still uses 14 plus 1 point. Do not drop that
+extra point, and do not price the stun at 4.9. The 10 Oct chest no longer
+pays for every slot through 23.
+
+The 12 Nov 2026 dataEnv 16 tooltip is the score for **Whitemane's Chapeau**
+(7720: 52 armor, stamina 9, intellect 10, spirit 12, healing 20, damage 7)
+and **Jumanza Grips** (18083: 43 armor, stamina 10, intellect 7, mana per 5
+4, healing 18, damage 6). The revive-cast line on the chapeau is not scored.
+Priest, mage, warlock, druid, shaman, and paladin were scored again. Holy
+paladin cloth `armorClass` 0.62 keeps both pieces off the kept list.
 
 The list tags these rows `(Set piece)`, the same way a proc row is tagged
 `(Notable)`. The drop text names the bonuses and the level window for that
@@ -1290,6 +1301,14 @@ Hunt-id probe (`pipeline/scripts/probe_forever_hunt_tooltips.py`) labels 200 vs 
 - **TomTom.** `PlaceForeverPin` returns after `TomTom:AddWaypoint` and clears a Blizzard user waypoint. Each Show on map adds one TomTom pin and leaves the earlier ones.
 - **(i) list.** `ShowSlotRankTooltip` writes Equipped only on the full-slot list, matched by inventory id and suffix. The same row prints the raw `pipelineScore` in parentheses after the 0–100 index. Hunt rows and the parchment do not.
 - **New Forever pieces.** 37 gear ids were ingested and all nine classes re-scored. Named sources: Flightblade Throwing Axe (13173, War Master Voone), Blackmaw Reclamation rings 260216–260219, Plague Defiled Buckler (276456, Black Guard Swordsmith), Zarla's Snack Pouch and Beastbond Robe (276744, 276745, Blazeroar), Heartflame Gauntlets and Cinderedge Crescent (280028, 280029, Cinder), Horns of Varrox (280076), Furbolg Rib Protector (280084, Sabella No-Eyes). The rest of that batch stayed Unsourced. Do not invent a dropper. 8663 Mithril Insignia is a blacksmithing quest item and stayed out.
+
+**12 Nov 2026 (v1.1.5).**
+
+- **Cat and bear weapon damage.** `weights.json` feral `dpsWeight` is **4.9** and bear is **2.52**. Balance, restoration, and levelling_1_9 stay. `embrace_bonus` still forces the Fang stun to 14 for feral. `form_procs_off` keeps on-hit weapon procs off in cat and bear. Druid was re-scored. At 30 a Horde cat ranks Ceremonial Mallet, Viscous Hammer, Striking Staff, then Manual Crowd Pummeler.
+- **Whitemane's Chapeau (7720) and Jumanza Grips (18083).** Stats are the dataEnv 16 tooltip above. Priest, mage, warlock, druid, shaman, and paladin were re-scored. Holy cloth `armorClass` keeps both off the kept eight. Do not score the chapeau's revive line.
+- **Named craft sources.** 409 vendors, 101 boss drops, and 20 named creatures moved off Unsourced. `camp_profession()` still returns None. Guise of Battle (287011) is `world_drop` with no npc. Idol of the Heckler (213594) stays unsourced.
+- **Medallions.** `reqRep` Honored: Warsong Outriders on 19534–19537 and 20442, Silverwing Sentinels on 19538–19541 and 20444.
+- **Donations.** Settings section `donations`, under The GearQuest Community. Copy target `https://buymeacoffee.com/weber8210`. The body is one `GQ.L` key in every locale file.
 
 **7 Nov 2026 catalog.** Wowhead Forever listed 196 pieces that were not in the addon. All 196 return a classic nether tooltip 404, so all of them are stamped New in Forever (`new_in_forever.json` is 2,985). 33 are quest rewards and 163 stayed Unsourced. The gear list named no drop, seller, or recipe for those 163, and no farm was invented. They were added to `classic_item_ids.json` so the score pool keeps them, then all nine classes were rescored with `GQ_NO_GUIDES=1`. Weights were not changed. Wicked Ritualist's Kris (273832) is a quest item and was not added. Nine stored ids that are missing from the live gear list stay: Phoenix Bindings (210781), Invoker's Mantle (215365), Invoker's Cord (215366), Turtle Scale Gloves (217270), Golden Scale Gauntlets (217273), Greater Mystic Wand (217287), and the three Leafre rings (274978, 276765, 285326). A missing list row is not a 404. Leafre's Ring of Precise Spell Power stays required level 60.
 

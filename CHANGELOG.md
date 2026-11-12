@@ -2,7 +2,45 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.1.4
+## v1.1.5
+
+The window title reads **GearQuest Forever v1.1.5**.
+
+**Crafted hunts Forever names**
+
+A recipe v1.1.4 had marked Unsourced is sourced again when the Wowhead Forever page names a seller, a boss, or a creature. 409 of those are vendors, 101 are boss drops, and 20 are a named creature. The map pin is back with that source. A recipe the page still does not name stays Unsourced, and it still has no pin. Hiding Unsourced no longer hides the ones Forever has filled in. The parchment names the sellers in one line, such as **Bought from Jutak, Sumi, and Kaita Deepforge.**
+
+**Merchant's Favor leather**
+
+The leather Pawani sells at the Barrens camp, and Daniel Stitchsong at the Redridge camp, is a vendor hunt again. That includes **Brawler's Leather Hood**, and the tunics, belts, boots, gloves, and legguards those two sell. The skill line is green when you meet the recipe and red when you are short. Leather Armor, Leather Pants, and the leather helms whose Forever page names a boss stay boss drops. The helm is still the crafted piece from that pattern drop.
+
+**Veteran's helms**
+
+**Veteran's Chain Helm** is a boss drop. The parchment lists the Stockade bosses, Dextren Ward, Kam Deepfury, Bazil Thredd, Hamhock, and Bruegal Ironknuckle, and the other bosses Forever names for that piece. **Veteran's Silvered Chain Helm** is the recipe from Gor'mak at the Barrens camp and Stondry Darkhammer at the Redridge camp.
+
+**Guise of Battle**
+
+**Guise of Battle** is a world drop. It requires level 40. It is the mail helm with 222 armor, 17 agility, 12 stamina, and 10 intellect, on the warrior, hunter, paladin, and shaman lists. Forever does not name a creature, so the line says **World drop.** and there is no camp pin.
+
+**Whitemane's Chapeau and Jumanza Grips**
+
+Both pieces use the current Forever tooltip. **Whitemane's Chapeau** requires 39 and drops from High Inquisitor Whitemane in Scarlet Monastery. It is 52 armor, 9 stamina, 10 intellect, 12 spirit, 20 healing, and 7 spell damage. The faster-revive line is shown on the tooltip and is not part of the score. **Jumanza Grips** require 43 and drop from Witch Doctor Zum'rah in Zul'Farrak. They are 43 armor, 10 stamina, 7 intellect, 4 mana per 5, 18 healing, and 6 spell damage.
+
+At 39, the chapeau is rank 1 on the head for Holy and Discipline priest, Demonology and Affliction warlock. It is rank 2 for Arcane mage, Frost Battle Mage, and Destruction warlock, rank 3 for Shadow priest and Restoration druid and Restoration shaman, and rank 4 for Frost and Fire mage. The grips are rank 1 on the hands from 43 for Holy and Discipline priest, Restoration druid, and Restoration shaman. They are rank 2 for Demonology and Destruction warlock on Alliance, and rank 3 for Arcane mage. Shadow priest sees the grips at rank 5. Holy paladin keeps cloth behind plate and mail, so neither piece makes that hunt list. Warrior, rogue, and hunter do not hunt these cloth pieces.
+
+**Cat and bear weapon damage**
+
+Feral cat and Guardian bear now count the weapon's damage. Cat prices it at 4.9. Bear prices it at 2.52. Attack power, strength, and agility are unchanged. Balance, Restoration, and levels 1–9 are unchanged. Druid was scored again. At 30, a Horde cat ranks **Ceremonial Mallet**, then **Viscous Hammer**, then **Striking Staff**, then **Manual Crowd Pummeler**. An Alliance cat ranks **Rock Pulverizer** first. A bear at 30 ranks **Defender of Dalaran** on Alliance and **Ceremonial Mallet** on Horde. The Crowd Pummeler use still counts. An on-hit weapon proc still does not, because it does not fire in form. The Fang set stun is still priced the same way as before.
+
+**Warsong and Silverwing medallions**
+
+Every **Scout's Medallion** requires Honored with Warsong Outriders. Kelm Hargunth sells them. Every **Sentinel's Medallion** requires Honored with Silverwing Sentinels. Illiyana Moonblaze sells them. The parchment says that standing, then the standing this character has now. The standing line is green when you have reached it and red when you are short. The honor cost stays on the line under that.
+
+**Donations**
+
+Settings has a **Donations** button under **The GearQuest Community**. The page thanks you for supporting GearQuest and has the same **Copy** button as the Discord box. The address is `https://buymeacoffee.com/weber8210`. French, German, Spanish, Portuguese, Russian, Korean, Simplified Chinese, and Traditional Chinese use that page's own words. The right stick scrolls it while the gamepad UI is on.
+
+### v1.1.4
 
 The window title reads **GearQuest Forever v1.1.4**.
 

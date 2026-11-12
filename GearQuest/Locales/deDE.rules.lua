@@ -135,6 +135,27 @@ end)
 add("^Drops in (.+)%.$", function(z)
     return "Beute in: " .. Zone(z) .. "."
 end)
+local function DropPlaces(text)
+    local marked = text:gsub(", and from ", "\n"):gsub(" and from ", "\n"):gsub(", from ", "\n")
+    local parts = {}
+    for piece in (marked .. "\n"):gmatch("(.-)\n") do
+        if piece ~= "" then
+            local names, zone = piece:match("^(.*) in (.-)$")
+            if names and names ~= "" and zone and zone ~= "" then
+                parts[#parts + 1] = List(names) .. " (" .. Zone((zone:gsub("^the ", ""))) .. ")"
+            else
+                parts[#parts + 1] = List(piece)
+            end
+        end
+    end
+    return table.concat(parts, ", ")
+end
+add("^Drops from (.+), and from (.+)%.$", function(a, b)
+    return "Beute von " .. DropPlaces(a .. ", and from " .. b) .. "."
+end)
+add("^Drops from (.+), from (.+)%.$", function(a, b)
+    return "Beute von " .. DropPlaces(a .. ", from " .. b) .. "."
+end)
 add("^Drops from (.+) in (.+)%.$", function(who, z)
     return "Beute von " .. List(who) .. " (" .. Zone(z) .. ")."
 end)
@@ -165,6 +186,9 @@ end)
 add("^Bought from (.+)%.$", function(who)
     if who == "a vendor" then
         return "Bei einem Händler erhältlich."
+    end
+    if not who:find(" in ", 1, true) and not who:find(" at ", 1, true) then
+        return "Erhältlich bei " .. List(who) .. "."
     end
     return "Erhältlich bei " .. NpcAt(who) .. "."
 end)

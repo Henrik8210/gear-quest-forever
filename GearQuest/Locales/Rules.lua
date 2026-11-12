@@ -145,6 +145,12 @@ function GQ.AddPhraseRules(P)
     add("drops_trash", "^Drops from trash in (.+)%.$", function(z) return Zone((z:gsub("^the ", ""))) end)
     add("drops_in", "^Drops in the (.+)%.$", function(z) return Zone(z) end)
     add("drops_in", "^Drops in (.+)%.$", function(z) return Zone(z) end)
+    add("drops_from", "^Drops from (.+), and from (.+)%.$", function(a, b)
+        return DropPlaces(a .. ", and from " .. b)
+    end)
+    add("drops_from", "^Drops from (.+), from (.+)%.$", function(a, b)
+        return DropPlaces(a .. ", from " .. b)
+    end)
     add("drops_from_in", "^Drops from (.+) in (.+)%.$", function(w, z) return List(w), Zone(z) end)
     add("drops_from", "^Drops from (.+)%.$", function(w) return List(w) end)
     add("drops_from", "^Dropped by (.+)%.$", function(w) return List(w) end)
@@ -160,7 +166,12 @@ function GQ.AddPhraseRules(P)
     if P.bought_vendor then
         rules[#rules + 1] = { "^Bought from a vendor%.$", function() return P.bought_vendor end }
     end
-    add("bought_from", "^Bought from (.+)%.$", function(w) return NpcAt(w) end)
+    add("bought_from", "^Bought from (.+)%.$", function(w)
+        if w:find(" in ", 1, true) or w:find(" at ", 1, true) then
+            return NpcAt(w)
+        end
+        return List(w)
+    end)
     add("crafted_skill", "^Crafted with (%a[%a ]-) %(requires skill (%d+)%)%.$", function(p, n) return L[p], n end)
     add("crafted", "^Crafted with (%a[%a ]-)%.$", function(p) return L[p] end)
     add("craft_item", "^Craft (.+) %((%a+)%)%.$", function(item, p) return Thing(item), L[p] end)

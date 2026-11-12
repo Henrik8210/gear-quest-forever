@@ -92,6 +92,10 @@ With the gamepad UI on, the log takes the pad while it is open and GearQuest is 
 
 **The GearQuest Community**, on the Settings page, lists Eao, MainWon, Stikmyre, Click, Vaniron, Thrayne, Alteredigor, Deadlybrew, and TheWawan.
 
+**Donations** is the Settings button under that page. It says donations help build GearQuest, and **Copy** puts `https://buymeacoffee.com/weber8210` on the clipboard the same way the Discord box does. The page is translated with the rest of the window.
+
+A crafted hunt uses the source Wowhead Forever names. A trainer or camp seller is a vendor pin. A boss the page names is a boss drop, including **Veteran's Chain Helm** in The Stockade. **Veteran's Silvered Chain Helm** is the recipe from Gor'mak and Stondry Darkhammer. Merchant's Favor leather that Pawani and Daniel Stitchsong sell, including **Brawler's Leather Hood**, is a vendor hunt again. Leather Armor, Leather Pants, and the leather helms whose pages name a boss stay boss drops. A recipe the page still does not name stays Unsourced, with no pin. **Guise of Battle** is a world drop and has no camp pin. **Scout's Medallion** requires Honored with Warsong Outriders. **Sentinel's Medallion** requires Honored with Silverwing Sentinels. The parchment shows that standing and the standing this character has now.
+
 Leveling up, changing zone, logging in, and opening a merchant spread the paper-doll arrows and the hunt list across frames. The arrows you already have stay until the new set is ready. Opening the log or a filter keeps the current rows until the rank lists are built, then swaps them in once. Hovering a tooltip and switching class in the Simulator are unchanged.
 
 ## Guide and the world map
