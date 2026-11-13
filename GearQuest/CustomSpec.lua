@@ -18,8 +18,8 @@ local FOLD_INTO = {
 local DEAD_STAT = { expertise = true, armorPen = true, resilience = true }
 
 local FIELDS = {
-    { key = "dpsWeight", label = "Weapon damage", weapon = true },
-    { key = "dpsWeightRanged", label = "Ranged weapon damage", weapon = true },
+    { key = "dpsWeight", label = "Weapon DPS", weapon = true },
+    { key = "dpsWeightRanged", label = "Ranged weapon DPS", weapon = true },
     { key = "speedWeight", label = "Weapon speed", weapon = true },
     { key = "str", label = "Strength" },
     { key = "agi", label = "Agility" },

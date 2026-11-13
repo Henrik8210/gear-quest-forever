@@ -2293,11 +2293,14 @@ local PROFESSION_FILTERS = {
     "Tailoring",
 }
 
--- Dungeons and raids that have a boss-drop hunt, alphabetical.
--- The flyout only lists the ones that have a hunt in the current level
--- window, including ranks below the top 3. A cleared box stays cleared.
+-- Dungeons and raids, alphabetical. The flyout only lists the ones that
+-- have a boss-drop hunt in the current level window, including ranks below
+-- the top 3. A cleared box stays cleared.
 GQ.Log.DUNGEON_FILTERS = {
+    "Ahn'Qiraj",
+    "Alcaz Prison",
     "Blackfathom Deeps",
+    "Blackmaw Hold",
     "Blackrock Depths",
     "Blackrock Spire",
     "Blackwing Lair",
@@ -2306,6 +2309,7 @@ GQ.Log.DUNGEON_FILTERS = {
     "Excavation Site",
     "Gnomeregan",
     "Hall of Thanes",
+    "Krol'dok Stronghold",
     "Maraudon",
     "Molten Core",
     "Naxxramas",
@@ -2319,10 +2323,12 @@ GQ.Log.DUNGEON_FILTERS = {
     "Scarlet Monastery",
     "Scholomance",
     "Shadowfang Keep",
+    "Shaper's Terrace",
     "Stratholme",
     "Sunken Temple",
     "Temple of Ahn'Qiraj",
     "The Deadmines",
+    "The Drowned City",
     "The Stockade",
     "Uldaman",
     "Wailing Caverns",
@@ -3104,6 +3110,53 @@ function GQ.Log:TextNamesInstance(text)
     return false
 end
 
+-- A stored step sends you into an instance when Wowhead Forever marks that
+-- quest as a dungeon quest, or as a raid quest filed in a raid. The direct
+-- reward list is the gear those quests hand out, including a chain that was
+-- not stored. Steps after the reward quest are ignored.
+function GQ.Log:ChainEntersInstance(entry)
+    if not entry then
+        return false
+    end
+    local faction = GQ.GetEffectiveFaction and GQ:GetEffectiveFaction() or ""
+    if entry._gqInstanceFaction == faction and entry._gqInstanceChain ~= nil then
+        return entry._gqInstanceChain
+    end
+    local enters = false
+    local rewards = GQ.Data and GQ.Data.instanceReward
+    if rewards and entry.itemId and rewards[entry.itemId] then
+        enters = true
+    end
+    if not enters and GQ.Data and GQ.Data.QuestChainSteps then
+        local steps = GQ.Data:QuestChainSteps(entry, 1)
+        if steps then
+            local last = #steps
+            local rewardName = entry.questName
+            if type(rewardName) == "string" and rewardName ~= "" then
+                for i = 1, #steps do
+                    local step = steps[i]
+                    if type(step) == "table" and step[2] == rewardName then
+                        last = i
+                    end
+                end
+            end
+            local quests = GQ.Data.instanceQuest
+            for i = 1, last do
+                local step = steps[i]
+                local qid = type(step) == "table" and tonumber(step[1])
+                local name = type(step) == "table" and step[2]
+                if (qid and quests and quests[qid]) or self:TextNamesInstance(name) then
+                    enters = true
+                    break
+                end
+            end
+        end
+    end
+    entry._gqInstanceFaction = faction
+    entry._gqInstanceChain = enters
+    return enters
+end
+
 function GQ.Log:EntryRequiresInstance(entry)
     if not entry then
         return false
@@ -3128,6 +3181,9 @@ function GQ.Log:EntryRequiresInstance(entry)
         return true
     end
     if src == "quest_reward" then
+        if self:ChainEntersInstance(entry) then
+            return true
+        end
         if self:TextNamesInstance(entry.instructions) or self:TextNamesInstance(entry.questName) then
             return true
         end
@@ -11621,6 +11677,128 @@ function GQ.Log:CreateMapPinSetting(frame, detail, anchor)
     hint:SetText(L["Hides the icons GearQuest puts on the world map. Show on map and the guide still place the normal map marker."])
     hint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
     frame.settingsMapPinHint = hint
+
+    local sizeLabel = CreateFontStringWithFallback(detail, QUEST_DETAIL_TITLE_FONTS)
+    sizeLabel:SetJustifyH("LEFT")
+    sizeLabel:SetText(L["Map pin size"])
+    sizeLabel:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    frame.settingsMapPinSizeLabel = sizeLabel
+
+    local sizeHit = CreateFrame("Button", nil, detail)
+    sizeHit:SetPoint("TOPLEFT", hint, "BOTTOMLEFT", 0, -16)
+    sizeHit:SetSize(math.max(sizeLabel:GetStringWidth() or 0, 1) + 4, math.max(sizeLabel:GetStringHeight() or 0, 18))
+    sizeLabel:SetParent(sizeHit)
+    sizeLabel:ClearAllPoints()
+    sizeLabel:SetPoint("LEFT", sizeHit, "LEFT", 0, 0)
+    frame.settingsMapPinSizeHit = sizeHit
+
+    local sizeValue = CreateFontStringWithFallback(detail, QUEST_DETAIL_TITLE_FONTS)
+    sizeValue:SetPoint("LEFT", sizeHit, "RIGHT", 8, 0)
+    sizeValue:SetJustifyH("LEFT")
+    sizeValue:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    frame.settingsMapPinSizeValue = sizeValue
+
+    local function PinPercent()
+        local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+        local percent = math.floor((tonumber(settings and settings.mapPinScalePercent) or 100) + 0.5)
+        if percent < 50 then
+            percent = 50
+        elseif percent > 150 then
+            percent = 150
+        end
+        return percent
+    end
+
+    local slider
+    local createdOk, created = pcall(CreateFrame, "Slider", "GearQuestMapPinScaleSlider", detail, "OptionsSliderTemplate")
+    if createdOk and created then
+        slider = created
+    else
+        slider = CreateFrame("Slider", "GearQuestMapPinScaleSlider", detail)
+        slider:SetOrientation("HORIZONTAL")
+        local thumb = slider:CreateTexture(nil, "ARTWORK")
+        thumb:SetTexture("Interface\\Buttons\\UI-SliderBar-Button-Horizontal")
+        thumb:SetSize(32, 32)
+        slider:SetThumbTexture(thumb)
+    end
+    slider:SetPoint("TOPLEFT", sizeHit, "BOTTOMLEFT", 0, -6)
+    slider:SetWidth(220)
+    slider:SetHeight(17)
+    slider:SetMinMaxValues(50, 150)
+    slider:SetValueStep(1)
+    if slider.SetObeyStepOnDrag then
+        slider:SetObeyStepOnDrag(true)
+    end
+    local sliderName = slider:GetName()
+    local lowText = slider.Low or (sliderName and _G[sliderName .. "Low"])
+    local highText = slider.High or (sliderName and _G[sliderName .. "High"])
+    local titleText = slider.Text or (sliderName and _G[sliderName .. "Text"])
+    if lowText then
+        lowText:SetText("50%")
+        lowText:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    end
+    if highText then
+        highText:SetText("150%")
+        highText:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    end
+    if titleText then
+        titleText:SetText("")
+        titleText:Hide()
+    end
+    local function ApplyPinPercent(percent)
+        percent = math.floor((tonumber(percent) or 100) + 0.5)
+        if percent < 50 then
+            percent = 50
+        elseif percent > 150 then
+            percent = 150
+        end
+        GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+        GearQuestForeverDB.settings.mapPinScalePercent = percent
+        if GQ.Pins and GQ.Pins.Rescale then
+            GQ.Pins:Rescale()
+        end
+    end
+    slider:SetScript("OnValueChanged", function(self, value)
+        local percent = math.floor((tonumber(value) or 100) + 0.5)
+        if percent < 50 then
+            percent = 50
+        elseif percent > 150 then
+            percent = 150
+        end
+        sizeValue:SetText(tostring(percent) .. "%")
+        if self._gqQuiet then
+            return
+        end
+        if IsMouseButtonDown and IsMouseButtonDown("LeftButton") then
+            return
+        end
+        ApplyPinPercent(percent)
+    end)
+    slider:SetScript("OnMouseUp", function(self)
+        if self._gqQuiet then
+            return
+        end
+        ApplyPinPercent(self:GetValue())
+    end)
+    slider._gqQuiet = true
+    slider:SetValue(PinPercent())
+    slider._gqQuiet = nil
+    sizeValue:SetText(tostring(PinPercent()) .. "%")
+    frame.settingsMapPinSizeSlider = slider
+
+    local sizeHint = CreateFontStringWithFallback(detail, {
+        "QuestFontNormalSmall",
+        "SystemFont_Small",
+        "SystemFont_Shadow_Small",
+        "QuestFont",
+    })
+    sizeHint:SetPoint("TOPLEFT", slider, "BOTTOMLEFT", 0, -4)
+    sizeHint:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
+    sizeHint:SetJustifyH("LEFT")
+    sizeHint:SetWordWrap(true)
+    sizeHint:SetText(L["100% is the normal icon. It keeps this size when the map zooms, including OpenMap."])
+    sizeHint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
+    frame.settingsMapPinSizeHint = sizeHint
 end
 
 
@@ -12267,7 +12445,7 @@ function GQ.Log:EnsureSettingsPage(frame)
     frame.settingsEnchantHint = enchantHint
 
     self:CreateMapPinSetting(frame, detail, enchantHint)
-    self:CreateTrackerSetting(frame, detail, frame.settingsMapPinHint or enchantHint)
+    self:CreateTrackerSetting(frame, detail, frame.settingsMapPinSizeHint or frame.settingsMapPinHint or enchantHint)
     if frame.settingsMapPinLabelHit then
         frame.settingsMapPinLabelHit:Hide()
     end
@@ -12276,6 +12454,18 @@ function GQ.Log:EnsureSettingsPage(frame)
     end
     if frame.settingsMapPinHint then
         frame.settingsMapPinHint:Hide()
+    end
+    if frame.settingsMapPinSizeHit then
+        frame.settingsMapPinSizeHit:Hide()
+    end
+    if frame.settingsMapPinSizeValue then
+        frame.settingsMapPinSizeValue:Hide()
+    end
+    if frame.settingsMapPinSizeSlider then
+        frame.settingsMapPinSizeSlider:Hide()
+    end
+    if frame.settingsMapPinSizeHint then
+        frame.settingsMapPinSizeHint:Hide()
     end
     if frame.settingsTrackerLabelHit then
         frame.settingsTrackerLabelHit:Hide()
@@ -12658,6 +12848,7 @@ function GQ.Log:MountSettingsHunts(frame, detail)
         frame.settingsGuideLabelHit, frame.settingsGuideCheck, frame.settingsGuideHint,
         frame.settingsEnchantLabelHit, frame.settingsEnchantCheck, frame.settingsEnchantHint,
         frame.settingsMapPinLabelHit, frame.settingsMapPinCheck, frame.settingsMapPinHint,
+        frame.settingsMapPinSizeHit, frame.settingsMapPinSizeValue, frame.settingsMapPinSizeSlider, frame.settingsMapPinSizeHint,
         frame.settingsTrackerLabelHit, frame.settingsTrackerCheck, frame.settingsTrackerHint,
     }
     for i = 1, #widgets do
@@ -12672,7 +12863,7 @@ function GQ.Log:MountSettingsHunts(frame, detail)
     local hints = {
         frame.settingsLowerHint, frame.settingsToastHint, frame.settingsArrowHint,
         frame.settingsGuideHint, frame.settingsEnchantHint, frame.settingsMapPinHint,
-        frame.settingsTrackerHint,
+        frame.settingsMapPinSizeHint, frame.settingsTrackerHint,
     }
     for i = 1, #hints do
         if hints[i] then
@@ -12989,6 +13180,10 @@ function GQ.Log:SetSettingsSection(section)
         frame.settingsMapPinLabelHit,
         frame.settingsMapPinCheck,
         frame.settingsMapPinHint,
+        frame.settingsMapPinSizeHit,
+        frame.settingsMapPinSizeValue,
+        frame.settingsMapPinSizeSlider,
+        frame.settingsMapPinSizeHint,
         frame.settingsTrackerLabelHit,
         frame.settingsTrackerCheck,
         frame.settingsTrackerHint,
@@ -13269,6 +13464,22 @@ function GQ.Log:RefreshSettings()
     if mapPinCheck then
         local settings = GearQuestForeverDB and GearQuestForeverDB.settings
         mapPinCheck:SetChecked(settings and settings.hideMapPins and true or false)
+    end
+    local mapPinSlider = frame.settingsMapPinSizeSlider
+    if mapPinSlider and not mapPinSlider._gqQuiet then
+        local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+        local percent = math.floor((tonumber(settings and settings.mapPinScalePercent) or 100) + 0.5)
+        if percent < 50 then
+            percent = 50
+        elseif percent > 150 then
+            percent = 150
+        end
+        mapPinSlider._gqQuiet = true
+        mapPinSlider:SetValue(percent)
+        mapPinSlider._gqQuiet = nil
+        if frame.settingsMapPinSizeValue then
+            frame.settingsMapPinSizeValue:SetText(tostring(percent) .. "%")
+        end
     end
     local mapPinLabel = frame.settingsMapPinLabel
     local mapPinHit = frame.settingsMapPinLabelHit
@@ -15369,6 +15580,16 @@ function GQ.Log:EnsureItemInfoListener()
             GQ.Data:NoteClientItemMissing(itemId)
         end
         log:RefreshLookupRowName(itemId)
+        if success ~= false and itemId and GetInventoryItemLink and log.UpdateGearScoreBar then
+            for slot = 1, 19 do
+                local worn = GetInventoryItemLink("player", slot)
+                local wornId = worn and tonumber(string.match(worn, "item:(%d+)"))
+                if wornId == itemId then
+                    log:UpdateGearScoreBar()
+                    break
+                end
+            end
+        end
         local entry
         if log:GetPageTab() == "lookup" then
             entry = log.lookupEntry

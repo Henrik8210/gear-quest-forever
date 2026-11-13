@@ -3,7 +3,7 @@
 ## Notes: Leveling gear upgrades for WoW Forever - click a slot, pick a hunt, track it in the log.
 ## Notes-frFR: Améliorations d'équipement pour monter de niveau sur WoW Forever : cliquez sur un emplacement, choisissez une traque, suivez-la dans le journal.
 ## Author: Henrik8210
-## Version: 1.1.5
+## Version: 1.1.6
 ## IconTexture: Interface\AddOns\GearQuestForever\Art\GearQuest-Icon
 ## X-Curse-Project-ID: 1698950
 ## SavedVariables: GearQuestForeverDB
@@ -27,6 +27,7 @@ _generated/Data.ScoredStats.generated.lua
 _generated/Data.Coordinates.generated.lua
 _generated/Data.QuestFaction.generated.lua
 _generated/Data.HuntFacts.generated.lua
+_generated/Data.InstanceQuests.generated.lua
 _generated/Data.ForeverNew.generated.lua
 Map.lua
 Pins.lua

@@ -1,9 +1,10 @@
 """Point crafted hunts at the Forever recipe drop, not a city trainer.
 
-Forever client recipes come from
-https://foreverdb.net/data/professions/{slug}.json
-A recipe whose source is an item, and whose trainer has not been seen in
-Forever, is not taught by the trainer the coordinate file names.
+Which crafts are a dropped pattern, rather than a trainer recipe, is read
+from the local profession notes. The drop, the seller, and the quest come
+from the Wowhead Forever item page. The recipe skill does not come from
+ForeverDB. A recipe whose source is an item, and whose trainer has not been
+seen in Forever, is not taught by the trainer the coordinate file names.
 
 Where that item drops or who sells it comes from the Wowhead Forever item
 page (dataEnv 16 listviews), saved as

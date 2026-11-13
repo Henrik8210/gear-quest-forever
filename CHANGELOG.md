@@ -2,79 +2,65 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.1.5
+## v1.1.6
 
-The window title reads **GearQuest Forever v1.1.5**.
+The window title reads **GearQuest Forever v1.1.6**.
 
-**Crafted hunts Forever names**
+**A worn piece no longer scores 0**
 
-A recipe v1.1.4 had marked Unsourced is sourced again when the Wowhead Forever page names a seller, a boss, or a creature. 409 of those are vendors, 101 are boss drops, and 20 are a named creature. The map pin is back with that source. A recipe the page still does not name stays Unsourced, and it still has no pin. Hiding Unsourced no longer hides the ones Forever has filled in. The parchment names the sellers in one line, such as **Bought from Jutak, Sumi, and Kaita Deepforge.**
+The score bar printed 0 for gear you were wearing when that piece was not on your faction's hunt list. The item tooltip still showed the stats. Players saw it on necks, rings, trinkets, and on crafted leather that both factions can make. An empty slot is still 0 and still says (empty slot). A piece you are wearing is scored from its tooltip when the hunt list has no stored score for it. If the client has not loaded the item yet, the bar fills in when the item arrives. It does not stay 0.
 
-**Merchant's Favor leather**
+**Hunt names match the tooltip color**
 
-The leather Pawani sells at the Barrens camp, and Daniel Stitchsong at the Redridge camp, is a vendor hunt again. That includes **Brawler's Leather Hood**, and the tunics, belts, boots, gloves, and legguards those two sell. The skill line is green when you meet the recipe and red when you are short. Leather Armor, Leather Pants, and the leather helms whose Forever page names a boss stay boss drops. The helm is still the crafted piece from that pattern drop.
+A hunt whose tooltip is green is green on the list. Sprightring Helm stayed blue on the list in v1.1.5 while the tooltip was already green, because the stored record was still the old rare item.
 
-**Veteran's helms**
+**Twisted Evils rewards use the green stats**
 
-**Veteran's Chain Helm** is a boss drop. The parchment lists the Stockade bosses, Dextren Ward, Kam Deepfury, Bazil Thredd, Hamhock, and Bruegal Ironknuckle, and the other bosses Forever names for that piece. **Veteran's Silvered Chain Helm** is the recipe from Gor'mak at the Barrens camp and Stondry Darkhammer at the Redridge camp.
+All nine classes were scored again from the current Forever tooltips. The four rewards from Twisted Evils in Maraudon are the green pieces, not the old blue ones.
 
-**Guise of Battle**
+Sprightring Helm is 106 armor, +11 Agility, and +16 Stamina. Combat ranks it 5th at 40–43, score 16.86. It was rank 1 at 22.47 on the old rare stats.
 
-**Guise of Battle** is a world drop. It requires level 40. It is the mail helm with 222 armor, 17 agility, 12 stamina, and 10 intellect, on the warrior, hunter, paladin, and shaman lists. Forever does not name a creature, so the line says **World drop.** and there is no camp pin.
+Hulkstone Pauldrons are 354 armor and +13 Stamina. The strength is gone. Arms ranks them 6th at 40–41, score 23.91. They were rank 1 at 36.06.
 
-**Whitemane's Chapeau and Jumanza Grips**
+Acumen Robes are 64 armor, +15 Intellect, and +14 healing and spell damage. Holy ranks them 9th at 40–41, score 35.21. They were 3rd at 47.26.
 
-Both pieces use the current Forever tooltip. **Whitemane's Chapeau** requires 39 and drops from High Inquisitor Whitemane in Scarlet Monastery. It is 52 armor, 9 stamina, 10 intellect, 12 spirit, 20 healing, and 7 spell damage. The faster-revive line is shown on the tooltip and is not part of the score. **Jumanza Grips** require 43 and drop from Witch Doctor Zum'rah in Zul'Farrak. They are 43 armor, 10 stamina, 7 intellect, 4 mana per 5, 18 healing, and 6 spell damage.
+Relentless Chain is 268 armor, +11 Stamina, +11 Intellect, and +20 Attack Power. It leaves the Beast Mastery chest list. Marksmanship ranks it 16th at 40–44, score 16.78. Survival ranks it 15th, score 18.28.
 
-At 39, the chapeau is rank 1 on the head for Holy and Discipline priest, Demonology and Affliction warlock. It is rank 2 for Arcane mage, Frost Battle Mage, and Destruction warlock, rank 3 for Shadow priest and Restoration druid and Restoration shaman, and rank 4 for Frost and Fire mage. The grips are rank 1 on the hands from 43 for Holy and Discipline priest, Restoration druid, and Restoration shaman. They are rank 2 for Demonology and Destruction warlock on Alliance, and rank 3 for Arcane mage. Shadow priest sees the grips at rank 5. Holy paladin keeps cloth behind plate and mail, so neither piece makes that hunt list. Warrior, rogue, and hunter do not hunt these cloth pieces.
+**No Dungeons hides a quest that enters a dungeon**
 
-**Cat and bear weapon damage**
+Quest rewards plus No Dungeons still showed a reward when the chain sends you into a dungeon before you get the item, including a chain that starts outside. Those hunts hide now. A world drop stays. An outdoor quest stays.
 
-Feral cat and Guardian bear now count the weapon's damage. Cat prices it at 4.9. Bear prices it at 2.52. Attack power, strength, and agility are unchanged. Balance, Restoration, and levels 1–9 are unchanged. Druid was scored again. At 30, a Horde cat ranks **Ceremonial Mallet**, then **Viscous Hammer**, then **Striking Staff**, then **Manual Crowd Pummeler**. An Alliance cat ranks **Rock Pulverizer** first. A bear at 30 ranks **Defender of Dalaran** on Alliance and **Ceremonial Mallet** on Horde. The Crowd Pummeler use still counts. An on-hit weapon proc still does not, because it does not fire in form. The Fang set stun is still priced the same way as before.
+**Crafts both factions can make stay on both lists**
 
-**Warsong and Silverwing medallions**
+v1.1.5 filed some patterns under the Barrens camp. Alliance then lost the hunt, and wearing the piece scored 0. Brawler's Leather Hood and the other leather Pawani and Daniel Stitchsong both sell stay crafted hunts. The line names both sellers, and there is no faction zone on the hunt. A crafted Protector's, Sentinel's, or Champion's piece stays on both factions. Those words are also PvP ranks, and that rank gate does not apply to a pattern.
 
-Every **Scout's Medallion** requires Honored with Warsong Outriders. Kelm Hargunth sells them. Every **Sentinel's Medallion** requires Honored with Silverwing Sentinels. Illiyana Moonblaze sells them. The parchment says that standing, then the standing this character has now. The standing line is green when you have reached it and red when you are short. The honor cost stays on the line under that.
+**Cat and bear weapons**
 
-**Donations**
+Bear prices weapon damage at 4.9, the same as cat. v1.1.5 had bear at 2.52. An on-hit weapon proc scores in cat and bear, because it fires in form. Druid was scored again. Heavehammer at 24 is still 153.64 for a bear.
 
-Settings has a **Donations** button under **The GearQuest Community**. The page thanks you for supporting GearQuest and has the same **Copy** button as the Discord box. The address is `https://buymeacoffee.com/weber8210`. French, German, Spanish, Portuguese, Russian, Korean, Simplified Chinese, and Traditional Chinese use that page's own words. The right stick scrolls it while the gamepad UI is on.
+**Map pins stay the size you pick**
+
+Hunt settings has a map pin size from 50% to 150%. 100% is the normal icon. The icon keeps that size when the map zooms, including OpenMap. The zoomed-out map was drawing the icon gigantic.
+
+**Minimap button collectors**
+
+GearQuest adds a launcher button for addons that gather minimap buttons into one menu.
+
+**Weight tooltip**
+
+The spec weight tooltip says Melee weapon DPS and Ranged weapon DPS.
+
+**Level up**
+
+On a ding, the weapon lists are walked a few milliseconds at a time, so the weapon catalog is not one frame.
+
+### v1.1.5
+
+The window title reads **GearQuest Forever v1.1.5**. Crafted hunts Forever names are sourced again: 409 vendors, 101 boss drops, and 20 named creatures. Merchant's Favor leather from Pawani and Daniel Stitchsong, including Brawler's Leather Hood, is a vendor hunt. Veteran's Chain Helm lists the Stockade bosses. Veteran's Silvered Chain Helm is the camp recipe. Guise of Battle is a world drop at 40. Whitemane's Chapeau and Jumanza Grips use the current tooltips. Cat prices weapon damage at 4.9 and bear at 2.52, and an on-hit proc does not fire in form. Scout's Medallion and Sentinel's Medallion require Honored. Settings has a Donations page.
 
 ### v1.1.4
 
-The window title reads **GearQuest Forever v1.1.4**.
-
-**The GearQuest Knight**
-
-All 13 pages are in the language you pick in Settings: French, German, Spanish, Latin American Spanish, Portuguese, Russian, Korean, Simplified Chinese, and Traditional Chinese. The bold words are the same words as the buttons. In Simplified Chinese the first page starts **问候，冒险者！** The voice is still the English recording. The Tracked page is as loud as the other pages on the middle and loud arrows.
-
-**A newer version in guild chat**
-
-Once after you log in, if a guild mate is running a newer GearQuest, chat says **A newer version of GearQuest is available (vX.Y.Z).** That line still shows when **Hide chat messages** is on. It prints once per session.
-
-**What you have equipped**
-
-The (i) list for a slot writes **Equipped** after the piece you are wearing. The 0–100 index is followed by the raw score in parentheses, for example **#1 Name  100 (206.22)**. Hunt rows and the parchment do not add Equipped.
-
-**Show on map with TomTom**
-
-When TomTom is installed, **Show on map** adds a TomTom waypoint and leaves the earlier TomTom pins. It does not also drop a Blizzard waypoint. A Blizzard pin GearQuest had already set is cleared.
-
-**Enhancement shaman**
-
-Intellect is **0.7** and is not doubled while you level. The weight tooltip shows 0.7. Strength stays 1.1, attack power 0.55, and spell power 0.2. Enhancement Tank is unchanged. Shaman was scored again.
-
-**Shaman class weapons**
-
-**Rage of the Storm**, **Tidebringer's Claw**, **Lightning's Grasp**, and **Elementalist's Guard** come from The Tempest's Weapons, the shaman Call of Air quest. They are only on shaman lists. A retribution paladin at 30 no longer sees Rage of the Storm as the best two-hander, and no longer sees Elementalist's Guard on the off hand. Warrior, druid, and hunter lists dropped them too. Those four classes were scored again so the ranks close up.
-
-**Recipes with no named seller**
-
-A crafted hunt whose seller was only a guess is **Unsourced**, with no map pin. That includes the camp pins for **Veteran's Chain Helm**, the silvered blacksmithing plans, **Edge of Winter**, and **Iron Morningstar**. Forever does not name those sellers. A recipe a city trainer really teaches, such as **Green Iron Helm**, still points at Stormwind and Orgrimmar. A piece Forever names a trainer for, but whose stall is not pinned, still says Crafted with that profession and has no pin.
-
-**New Forever hunts**
-
-37 pieces from Wowhead Forever are on the lists. All nine classes were scored again. The ones with a named source are **Flightblade Throwing Axe** from War Master Voone, the Blackmaw Reclamation rings **Ouroboros Ring**, **Eagle's Head Signet**, **Malefactor's End**, and **Engraved Band**, **Plague Defiled Buckler** from the Black Guard Swordsmith, **Zarla's Snack Pouch** and **Beastbond Robe** from Blazeroar, **Heartflame Gauntlets** and **Cinderedge Crescent** from Cinder, **Horns of Varrox** from Varrox Bleakhoof, and **Furbolg Rib Protector** from Sabella No-Eyes. The rest of that batch is Unsourced until Forever lists a drop, a vendor, or a recipe. That includes **The Black Helm**, **Scarlet Bonebreaker**, **Masterwork Crimson Hammer**, **Swordsmith Mitts**, **Hammer of the Fallen Thane**, and **Dragonblood Greatsword**.
+The window title reads **GearQuest Forever v1.1.4**. The knight's 13 pages are translated. Guild chat says once when a guild mate runs a newer version. The (i) list writes Equipped and the raw score. Show on map uses TomTom when it is installed and leaves the earlier TomTom pins. Enhancement intellect is 0.7 and is not doubled. Rage of the Storm and the other Tempest's Weapons are shaman only. A crafted hunt with no named seller is Unsourced, with no pin. 37 new Forever pieces are on the lists.
 
 ### v1.1.3
 

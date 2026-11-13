@@ -430,7 +430,12 @@ def eff_req(it):
 # vendor row at all and are also left ungated. See pvp_prefix_faction.json.
 PVP_PREFIX = json.load(open(G+"pvp_prefix_faction.json"))
 _PVP_ORDER = sorted(PVP_PREFIX, key=len, reverse=True)
-def pvp_side(name):
+def pvp_side(name, source_type=None):
+    # A crafted Protector's or Sentinel's piece is the Merchant's Favor set.
+    # The same words are also an Alliance PvP family. The craft is made by
+    # both factions, so the rank-title gate does not apply to a profession.
+    if source_type == "profession":
+        return None
     # Premier is the Forever name in front of the same rank title.
     if name.startswith("Premier "):
         name = name[8:]
@@ -490,13 +495,19 @@ def eligible(it, cls, spec, level, faction, prof, wsubs):
     iid = it["id"]
     if iid in RUNE_BROKER_ALLIANCE and faction != "Alliance": return False
     if iid in RUNE_BROKER_HORDE and faction != "Horde": return False
-    side=pvp_side(it["name"])
+    side=pvp_side(it["name"], src.get("sourceType"))
     if side and side!=faction: return False
     if not rep_ok(it, faction): return False
     if not npc_ok(src, faction): return False
     if not vendor_side_ok(it, faction): return False
     if it["cls"]==4:                                     # armour / shield / relic
-        need=prof.get(it["kind"])
+        kind = it["kind"]
+        # Inventory type Shield is a shield even when the stored subclass is
+        # miscellaneous. Thrash's Trash (276204) is that row. A priest, mage,
+        # warlock, druid, rogue, or hunter cannot equip it.
+        if it.get("slot") == "Shield" or it.get("inv") == 14:
+            kind = "Shield"
+        need=prof.get(kind)
         if need is None or level<need: return False
     else:                                                # weapon
         if it["kind"] not in wsubs: return False
@@ -1184,16 +1195,15 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     # the character does not attack with the item at all, so nothing
                     # that triggers on an attack can fire. That is the ranged slot
                     # for everyone but a hunter, and an elemental or restoration
-                    # shaman. Cat and bear do use weapon DPS, but an on-hit weapon
-                    # proc still does not fire in form. Beast Mastery and
-                    # Marksmanship melee dpsWeight is 0.05, so their melee procs
-                    # fire. It matters beyond damage procs: a
+                    # shaman. Cat and bear swing in form, and an on-hit effect
+                    # fires there: a weapon proc and an on-hit enchant both land.
+                    # Beast Mastery and Marksmanship melee dpsWeight is 0.05, so
+                    # their melee procs fire. It matters beyond damage procs: a
                     # "Chance on hit: +30 Strength for 8 sec" line is priced by
                     # uptime x stat weight, not by dpsWeight, so it was scoring in
                     # full on weapons that are never swung.
-                    form_procs_off = cls == "DRUID" and spec_key in ("feral", "bear")
                     onUseOnly = (sl in ("Ranged","MainHand","SecondaryHand")
-                                 and (not procDw or form_procs_off))
+                                 and not procDw)
                     pp,_=PROCS.value(pr,it,spec_key,wl,procDw,level,onUseOnly=onUseOnly)
                     s+=pp
                 # RELICS: Totem, Idol, Libram. 108 of them in the dataset and only

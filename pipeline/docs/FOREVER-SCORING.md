@@ -241,11 +241,8 @@ above, with Beast Mastery and Marksmanship melee `dpsWeight` still **0.05**):
 
 Gloves (from 14) and legs (from 17) are already hunts on their own stats.
 Dream Venom is priced at item level 22, not the wearer’s level, or
-Enhancement keeps the chest too long. Cat weapon `dpsWeight` is **4.9** and
-bear is **2.52** (14 attack power per weapon DPS, at each spec’s attack
-power weight). Balance, Restoration, and levels 1–9 are unchanged.
-Druid was scored again from these weights. On-hit weapon procs stay off in
-cat and bear form. The Fang stun still uses 14 plus 1 point. Do not drop that
+Enhancement keeps the chest too long. Cat and bear weapon `dpsWeight` is **4.9**. Cat is 14 times attack power 0.35. Bear attack power stays 0.18. The form white hit is the weapon's DPS for both forms, so bear does not price that hit at 14 times 0.18. Balance, Restoration, and levels 1–9 are unchanged.
+Druid was scored again from these weights. On-hit weapon procs score in cat and bear, because those effects fire in form. The Fang stun still uses 14 plus 1 point. Do not drop that
 extra point, and do not price the stun at 4.9. The 10 Oct chest no longer
 pays for every slot through 23.
 
@@ -530,7 +527,7 @@ Alchemy (Horde: Apothecary Durelle, Alliance: Nina Surefire) and cooking
 (Horde: Aza'bek, Alliance: Kalsey Sanden) stand in the same camps. They do not
 make worn gear, so those recipes are not hunt text.
 
-`camp_profession()` returns None. A crafted name is not a seller. Forever's profession row has to name the vendor. Matching "Veteran's", or any name on the old OUTPUTS / SET_PREFIX catalog, pinned the Redridge and Barrens stalls onto plans those NPCs do not sell. Those hunts are Unsourced (`Indexed from Wowhead Forever. Source not listed yet.`) with no pin. Do not put Veteran's Chain Helm (250498), the silvered set, Edge of Winter (17704), Iron Morningstar (250606), or Enriched Thorium Helm (250597) back on Stondry or Gor'mak unless someone standing at that stall confirms that exact plan. The six leather chests and pants Pawani and Daniel Stitchsong do sell stay camp hunts. A recipe whose Forever row names a trainer stays `Crafted with {Profession}.` Eighteen belts and slippers name a trainer and have no stored pin. Do not invent those coordinates. A city-trainer pin is only for a recipe whose `src` has `trainer` and no named `fv` (`generic_trainer_allowed` in `enrich_coordinates.py`). Green Iron Helm (3836) still points at Stormwind and Orgrimmar. `held_unsourced_ids()` keeps Idol of the Heckler (213594) and, when the file exists, every id in `pipeline/data/forever_wowhead/held_unsourced_crafts.json`. The camp vendor table above is the old catalog. It is not a source.
+`camp_profession()` returns None. A crafted name is not a seller. Forever's profession row has to name the vendor. Matching "Veteran's", or any name on the old OUTPUTS / SET_PREFIX catalog, pinned the Redridge and Barrens stalls onto plans those NPCs do not sell. The finished piece stays `profession`, so both factions keep it and a worn piece still has a score. The plan page's seller or dropper is the next sentence. Do not set `zone` to The Barrens or `npc` to one stall when the other faction sells the same pattern: that Horde zone removed the hunt from Alliance and the worn piece scored 0. Do not put Veteran's Chain Helm (250498), the silvered set, Edge of Winter (17704), Iron Morningstar (250606), or Enriched Thorium Helm (250597) back on Stondry or Gor'mak unless someone standing at that stall confirms that exact plan. The pieces Pawani and Daniel Stitchsong both sell, including Brawler's Leather Hood, name both camps and store no zone. A recipe whose Forever row names a trainer stays `Crafted with {Profession}.` Eighteen belts and slippers name a trainer and have no stored pin. Do not invent those coordinates. A city-trainer pin is only for a recipe whose `src` has `trainer` and no named `fv` (`generic_trainer_allowed` in `enrich_coordinates.py`). Green Iron Helm (3836) still points at Stormwind and Orgrimmar. `held_unsourced_ids()` keeps Idol of the Heckler (213594) and, when the file exists, every id in `pipeline/data/forever_wowhead/held_unsourced_crafts.json`. The camp vendor table above is the old catalog. It is not a source.
 
 The coordinate for a camp recipe Forever actually names is that vendor, not a capital-city trainer. Horde is The Barrens (map 1413), northwest of the Crossroads. Alliance is Redridge Mountains (map 1433), at Three Corners. The note is `(vendor that sells the recipe)`. One pin per faction. Trainer recipes (linen, mageweave, mithril, scorpid, and the rest) stay on the short profession line.
 
@@ -570,8 +567,15 @@ Index listview rows are not item facts. Veldt is not item facts. Unless an id is
 Players should see the Wowhead Forever tip, not the client's stale Equip
 paragraph.
 
-- **Quality** comes from Forever first (`GetItemQualityForDisplay`). Reinforced
-  Woolen Shoulders is **green**, even if `items.json` still says quality 1.
+- **Quality** on the hunt line is the loaded client quality first
+  (`GetItemQualityForDisplay` asks `GetKnownItemQuality`, then the Forever
+  audit, then the fact). Sprightring Helm stayed blue on the list while its
+  tooltip was already green, because the stored record was still rare and
+  that record was painted first. Do not paint a stale stored quality over a
+  loaded client item. When the client has not cached the item, the Forever
+  audit still wins over a stale `items.json` quality. Reinforced Woolen
+  Shoulders is **green** on that audit, even if `items.json` still says
+  quality 1.
 - **Layout:** slot on the left, armor type on the right (`Shoulder | Leather`).
   Same for `Damage | Speed`.
 - **Sets:** Wowhead order. Stats, durability, required level, then the set
@@ -751,7 +755,7 @@ When you are not simulating, and the log page is open, the header is a four-sect
 
 The fill is the average GearQuest index of every gear slot, then clamped to **0–100**. `GearScoreWornRows` builds one row per slot. Head, neck, shoulder, chest, waist, legs, feet, wrist, hands, back, main hand, and ranged each count once. Finger counts both rings. Trinket counts both trinkets. An empty off hand is left out when the main hand is a two-hand weapon, and Enhancement (`UsesTwoHandOnlyWeapons`) never counts an off hand. Hunter two-hand uses the two-hand list. Hunter one-hand main uses the main-hand list. Rogue main hand uses the main-hand list.
 
-An empty slot is **0** and the tooltip writes **(empty slot)** after that score. A worn piece with no pipeline score is **0**. A worn piece that aged out of the band still has an index, from the nearest same-spec, same-faction band (`EquippedPipelineScore`). The tooltip list shows that same 0–100 number. The line above the list is one sentence: "The average GearQuest index of the gear you are wearing."
+An empty slot is **0** and the tooltip writes **(empty slot)** after that score. A worn piece with no pipeline score is not an empty slot and is not a score of 0. v1.1.5 returned 0 from `WornSlotIndex` the moment `EquippedPipelineScore` missed, so a worn neck, ring, trinket, or craft the list had dropped painted 0 while the tooltip showed real stats. `WornSlotIndex` scores the worn link with `ScoreItemLinkStats` when the stored score is missing, and `GearScoreWornRows` passes that link. A non-positive result means the client has not loaded the item yet. `GET_ITEM_INFO_RECEIVED` refreshes the bar when that worn item arrives. Do not return 0 as soon as the stored score is missing. Do not file a craft both factions can make under one faction's zone: Alliance then loses the hunt and the worn piece has nothing stored to score. A worn piece that aged out of the band still has an index, from the nearest same-spec, same-faction band (`EquippedPipelineScore`). The tooltip list shows that same 0–100 number. The line above the list is one sentence: "The average GearQuest index of the gear you are wearing."
 
 Each 25 points is one section. The fill color uses the raw average, before it is rounded for the word: above 75 legendary orange, above 50 epic purple, above 25 rare blue, otherwise uncommon green. The hover word uses the rounded integer: **Below average** (0–25, green), **Fair** (26–50, blue), **Great** (51–75, purple), **Legend** (76–100, orange). The number stays white. The header is yellow **GearQuest Score**, then `N / 100 · WORD`.
 
@@ -803,7 +807,7 @@ promotion or the weights to make those two numbers match.
 
 ## Staying smooth
 
-A ding does not build the new list, the paper-doll arrows, and the obtain check on one frame. `PLAYER_LEVEL_UP` warms the query cache one slot per frame, then an idle frame (`WarmQueryCacheAsync` with gap 1). Milestones, the obtain check, and the redraw each wait a frame after that. Paper-doll arrows on a ding are one slot per frame. The previous-level "new" probe idles between slots. The arrows you already have stay up until the new set is ready.
+A ding does not build the new list, the paper-doll arrows, and the obtain check on one frame. `PLAYER_LEVEL_UP` warms the query cache one slot per frame, then an idle frame (`WarmQueryCacheAsync` with gap 1). On that ding the weapon lists are walked a few milliseconds at a time. Other slots stay one frame. A warm that is not a ding still builds a weapon slot in one frame. Milestones, the obtain check, and the redraw each wait a frame after that. Paper-doll arrows on a ding are one slot per frame. The previous-level "new" probe idles between slots. The arrows you already have stay up until the new set is ready.
 
 Changing zone, logging in, and opening a merchant rebuild those arrows in the background the same way. Opening the log, changing a filter, or returning to Active, when the rank lists are not ready, keeps the rows on screen and swaps the whole list once they are built. Completed and Removed do not wait. A list that is already warm opens at once. Hovering an item tooltip, and switching class in the Simulator, stay on the frame they already used. Do not slice those.
 
@@ -923,18 +927,20 @@ The source **Filter** closes on a click outside the menu. The Profession
     craft stays. A world drop stays, even when its zone is a dungeon or
     raid name or the pin is that entrance. **Melrache's Cape** drops from
     Captain Melrache in the outdoor graveyard, and the stored zone is
-    Scarlet Monastery. A quest goes when its instructions or quest name contain a
-    catalog dungeon, or when the pin note says `entrance to dungeon`. The
-    match is the catalog spelling, case-sensitive: **Whelgar Excavation
-    Site** is not **Excavation Site**. **the Deadmines** is not **The
-    Deadmines**, so Underground Assault stays. **Ahn'Qiraj** is not **Ruins
-    of Ahn'Qiraj** or **Temple of Ahn'Qiraj**, so Genesis Helm and Savior
-    of Kalimdor stay.
+    Scarlet Monastery. A quest goes when any stored step up through the reward
+    is a Wowhead Forever dungeon quest, or a raid quest filed in a raid, or
+    when the reward itself is one of those quests. The same quest goes when
+    its instructions, its name, or a step title contains a catalog dungeon,
+    or when the pin note says `entrance to dungeon`. A chain that starts
+    outside still goes once a step sends you in. The catalog match is
+    case-sensitive: **Whelgar Excavation Site** is not **Excavation Site**.
+    **Ahn'Qiraj** is its own catalog name, so The Savior of Kalimdor goes.
+    Overmaster Pyron stays, because that kill is outside Blackrock Depths.
+    The Restless Souls stays, because it looks for Egan outside Stratholme.
   - **Dungeon Enjoyer** (`playDungeonEnjoyer`) is that same test, kept
     instead of hidden. The list is dungeon and raid bosses, trash, and
     quests that enter an instance. World bosses, crafts, vendors, and
-    outdoor hunts stay off. The Deadmines and Ahn'Qiraj misses above stay
-    off this list too, because they fail the same match.
+    outdoor hunts stay off.
   - **Get it now!** (`playGetItToday`) hides a hunt this character cannot
     get yet. Reputation uses the standing stored on that item (`reqRep`).
     A bind-on-pickup craft waits until the character has that profession
@@ -1143,21 +1149,20 @@ re-score the class, then copy Lua back.
    profession, and again whenever an existing indexed hunt with a profession
    source is updated. The old sentence `requires skill 1` is not a lookup.
 
-   ForeverDB `https://foreverdb.net/data/crafting/{itemId % 64}.json` stores
-   `made` as `[profession, spellId, skill, name, count]`. The Wowhead Forever
-   item tooltip does not carry the recipe skill. The spell page does:
-   `Requires Leatherworking (40)`. When Wowhead is up, confirm the stored
-   skill against that line.
+   The Wowhead Forever profession spell is the skill. `learnedat` on that
+   spell is the same number as `Requires Leatherworking (40)`. The item
+   tooltip does not carry it. ForeverDB `made` is not the skill. It still
+   says 145 for Shining Silver Breastplate, whose Forever spell page says 120.
 
    ```powershell
    python pipeline/scripts/fetch_craft_skills.py
    ```
 
    That rewrites `GearQuest/_generated/CraftSkills.generated.lua` for every
-   profession hunt. A skill of 1 is real when ForeverDB and the spell page
-   say 1 (Linen Cloak, Copper Bracers, the first leather kits). Do not
-   invent 1 when both are empty. Dress Shoes (6836) has no recipe, so the
-   parchment line stays off.
+   profession hunt from `wowhead_recipe_skills.json`. A skill of 1 is real
+   when the Wowhead spell says 1 (Linen Cloak, Copper Bracers, the first
+   leather kits). Do not invent 1 when that spell has no learnedat. Dress
+   Shoes (6836) has no recipe, so the parchment line stays off.
 
 Python 3.12 is installed on the authoring PC.
 
@@ -1302,11 +1307,21 @@ Hunt-id probe (`pipeline/scripts/probe_forever_hunt_tooltips.py`) labels 200 vs 
 - **(i) list.** `ShowSlotRankTooltip` writes Equipped only on the full-slot list, matched by inventory id and suffix. The same row prints the raw `pipelineScore` in parentheses after the 0–100 index. Hunt rows and the parchment do not.
 - **New Forever pieces.** 37 gear ids were ingested and all nine classes re-scored. Named sources: Flightblade Throwing Axe (13173, War Master Voone), Blackmaw Reclamation rings 260216–260219, Plague Defiled Buckler (276456, Black Guard Swordsmith), Zarla's Snack Pouch and Beastbond Robe (276744, 276745, Blazeroar), Heartflame Gauntlets and Cinderedge Crescent (280028, 280029, Cinder), Horns of Varrox (280076), Furbolg Rib Protector (280084, Sabella No-Eyes). The rest of that batch stayed Unsourced. Do not invent a dropper. 8663 Mithril Insignia is a blacksmithing quest item and stayed out.
 
+**14 Nov 2026 (v1.1.6).**
+
+- **Worn gear is not a score of 0.** See the score-bar paragraph above. Dragon's Eye (10829), Woodseed Hoop (17768), and Blessed Prayer Beads (19990) were the reported zeros. The first two are still status missing, http 404, so the emitter drops them. Live dataEnv 16 lists them with different stats than items.json (neck: 15 spirit, 13 healing, 4 spell damage, requires 51; ring: 10 intellect and 6 damage and healing). Do not clear the 404 and rescore from the stored rows. The beads have an empty stored stat row. procs.classify does not read "by up to N", so the stored 190-healing use scores 0 and never enters a list. The live tooltip is 7 shadow resistance, equip 11 healing and 4 spell damage, and a use that heals for 583 to 713 on a 5 minute cooldown. Do not treat that 0 as a judgment that the trinket is weak.
+- **Hunt color follows the client.** GetItemQualityForDisplay prefers GetKnownItemQuality. A stale rare audit must not keep Sprightring Helm blue on the list.
+- **Twisted Evils was rescored after the green tooltips.** Acumen Robes (17775), Sprightring Helm (17776), Relentless Chain (17777), and Hulkstone Pauldrons (17779) are uncommon. Shipping the green stats without a rescore left the rare scores in the hunt rows: Sprightring 22.47 rank 1 for Combat, now 16.86 rank 5 at 40-43. Hulkstone 36.06 rank 1 for Arms, now 23.91 rank 6 at 40-41. Acumen Robes 47.26, now 35.21 and holy rank 9 at 40-41. Relentless Chain left Beast Mastery. Do not ship a tooltip stat change until every class that lists the id has been rescored.
+- **A random-enchant list name keeps the jackpot suffix.** Sentinel Cap, Cutthroat's Hat, and Archer's Cap of the Monkey are the Beast Mastery roll. Do not strip it.
+- **No Dungeons** hides a quest reward when any step up to the reward sends you into an instance (ChainEntersInstance, Data.InstanceQuests.generated.lua). A chain that starts outside still hides. World drops stay.
+- **Map pins.** Scale is the Hunt settings percent (50-150, settings.mapPinScalePercent) divided by the canvas scale. Do not SetIgnoreParentScale. OpenMap zooms the canvas, and ignoring the parent scale makes the icon gigantic.
+- **Bear weapon DPS** stays **4.9**, the same as cat. On-hit procs score in form. v1.1.5 had shipped bear at 2.52 with procs off. Heavehammer at 24 for bear stays 153.64.
+
 **12 Nov 2026 (v1.1.5).**
 
-- **Cat and bear weapon damage.** `weights.json` feral `dpsWeight` is **4.9** and bear is **2.52**. Balance, restoration, and levelling_1_9 stay. `embrace_bonus` still forces the Fang stun to 14 for feral. `form_procs_off` keeps on-hit weapon procs off in cat and bear. Druid was re-scored. At 30 a Horde cat ranks Ceremonial Mallet, Viscous Hammer, Striking Staff, then Manual Crowd Pummeler.
+- **Cat and bear weapon damage.** `weights.json` feral and bear `dpsWeight` are **4.9**. Balance, restoration, and levelling_1_9 stay. `embrace_bonus` still forces the Fang stun to 14 for feral. On-hit weapon procs score in cat and bear. The form gate is gone. Druid was re-scored. At 30 a Horde cat ranks Ceremonial Mallet, Viscous Hammer, Striking Staff, then Manual Crowd Pummeler.
 - **Whitemane's Chapeau (7720) and Jumanza Grips (18083).** Stats are the dataEnv 16 tooltip above. Priest, mage, warlock, druid, shaman, and paladin were re-scored. Holy cloth `armorClass` keeps both off the kept eight. Do not score the chapeau's revive line.
-- **Named craft sources.** 409 vendors, 101 boss drops, and 20 named creatures moved off Unsourced. `camp_profession()` still returns None. Guise of Battle (287011) is `world_drop` with no npc. Idol of the Heckler (213594) stays unsourced.
+- **Named craft sources.** The finished piece stays `profession`. The plan page's seller or dropper is the next sentence. Do not store `zone` `The Barrens` or `npc` Pawani on a pattern Daniel Stitchsong also sells. That Horde zone removed the hunt from Alliance, and the worn piece scored 0. Brawler's Leather Hood (252504) is Leatherworking 100, both camps, no zone. A page that rewards the pattern from a quest stays profession. The next sentence is `Reward from the quest "Name".` Moonglow Vest (6709) is Alliance. The Orgrimmar blacksmith quests (7913-7917) are Horde, and those crafted ids are in `quest_faction.json`. A pattern that drops from many creatures uses `The {Profession} pattern is the drop.` A short list uses `The {Profession} pattern drops from`. Edge of Winter (17704) is found in Smokywood Pastures Special Gift. A page that has not been read stays the craft skill line. A crafted Protector's, Sentinel's, or Champion's piece shares its name with a PvP rank. `pvp_side` skips a profession source, so both factions keep that craft. A vendor or quest piece with the same name stays on its faction. Guise of Battle (287011) is `world_drop` with no npc. Idol of the Heckler (213594) stays unsourced.
 - **Medallions.** `reqRep` Honored: Warsong Outriders on 19534–19537 and 20442, Silverwing Sentinels on 19538–19541 and 20444.
 - **Donations.** Settings section `donations`, under The GearQuest Community. Copy target `https://buymeacoffee.com/weber8210`. The body is one `GQ.L` key in every locale file.
 
@@ -1455,9 +1470,9 @@ then diff against `items.json`). Nether
 (`https://nether.wowhead.com/forever/tooltip/item/{id}`) is still the
 tooltip. When Nether 404s, the item page
 `https://www.wowhead.com/forever/item={id}&xml` has `htmlTooltip`. A 403 is
-not an empty source and is not cached as "no pin". ForeverDB
-(`https://foreverdb.net`) is the fallback when neither has the fact. The
-5 Oct pieces were not in ForeverDB.
+not an empty source and is not cached as "no pin". A fact the Wowhead
+Forever page does not list stays missing. ForeverDB is not that fallback.
+The 5 Oct pieces were not in ForeverDB either.
 
 Ingest **inserts new ids only**. An existing `items.json` row keeps its
 facts. Refreshing every cached tooltip put Erudite's Amulet back to a stale
@@ -1484,34 +1499,27 @@ Re-score with `python pipeline/scripts/rescore_hunter_shaman.py` after new
 gear is actually ingested. One class name does one class. Do not
 `reemit_all.py` from stale JSON.
 
-`Requires Level` on the tooltip is the equip level. Item level is not.
-ForeverDB field `rl` is that same required level. ForeverDB field `il` is
-item level. Do not equip from `il`. A stated level greater than 1 is never
+`Requires Level` on the Wowhead Forever tooltip is the equip level. Item
+level is not. Do not equip from item level, and do not read a ForeverDB
+`rl` or `il` for either number. A stated level greater than 1 is never
 replaced. An item with no required level (or Wowhead's stub of 1) is still
 looked up, and the hunt level is the source gate, not the item-level floor.
 
-When Nether or www does not have the fact, ForeverDB
-(`https://foreverdb.net`) is the source. The files are static. No key.
+Wowhead Forever (dataEnv 16) is the source. A fact that page does not list
+stays missing. Do not fill the gap from ForeverDB.
 
-- `data/items.json` — name, class, subclass, inventory type, quality, `il`, `rl`, stats.
-- `data/sources/{id % 64}.json` — drop, quest, and vendor rows.
-- `data/questguides/index.json` — `min` is the pickup level. `lv` is the suggested level. Do not use `lv`.
-- `data/questguides/{id % 64}.json` — quest giver, faction (`side`), and coordinates.
-- `data/rares.json` — rare zone and spawns.
-- `data/world.json` — map id to zone name. Type 3 is a zone. Type 2 is a continent.
+A new equippable piece is built from the Nether tooltip
+`https://nether.wowhead.com/tooltip/item/{id}?dataEnv=16` and the Forever
+item page. An item with no inventory slot (seals, toys, hidden
+placeholders, a deprecated name) is not hunt gear.
 
-The browsable lists are `https://foreverdb.net/items?cls=2` (weapons) and
-`https://foreverdb.net/items?cls=4` (armor). A new equippable piece is built
-from the Nether tooltip plus that ForeverDB row. An item with no inventory
-slot (seals, toys, hidden placeholders, a deprecated name) is not hunt gear.
-
-Quest pickup from ForeverDB: Arachnophobia (6284) is min 15 and lv 21. The
-Tower of Althalaxx is min 13. A quest source row has `t` `quest` and quest
-id `q`. Only fill an item whose `rlvl` is still 0 or 1. Do not lower a
-level the tooltip already set.
+Quest pickup is the Wowhead Forever `Requires level`. Arachnophobia (6284)
+is 15. The Tower of Althalaxx is 13. Only fill an item whose required level
+is still missing or Wowhead's stub of 1. Do not lower a level the tooltip
+already set.
 
 The hunt zone is the zone, not a place inside it. Tower of Ilgalar is
-Redridge Mountains. ForeverDB `data/world.json` pins name that parent, and
+Redridge Mountains. The parent zone is the one the Wowhead page names, and
 an existing coordinate row that sits entirely on one zone map wins over the
 area name. An open-world rare stays on both factions' lists when that zone
 is the other side's territory, and the rare pin ignores the faction map
@@ -1965,10 +1973,14 @@ Thanes 43.6, 51.7 in Ironforge, Ruins of Lordaeron 71.6, 11.4 in
 Undercity, Excavation Site 47.8, 56.3 in the Wetlands (Wowhead Forever
 dungeon guide, zone 11 pin "Entrance to Excavation Site"), and City of
 Dalaran in Alterac Mountains (map 1416): Alliance 14.2, 61.1 in front of
-the city, Horde 8.8, 59.6 at the outside sewer. These five have a
-description only, so nothing is pinned there: The Drowned City (Gillijim's
-Isle), Krol'dok Stronghold (Riverglades), Alcaz Prison (Alcaz Island),
-Blackmaw Hold (northern Azshara), Shaper's Terrace (northern Un'Goro).
+the city, Horde 8.8, 59.6 at the outside sewer. Forever's own dungeon
+guide still says Coming Soon for three doors, so the pin is the published
+spawn at that door. Blackmaw Hold is Azshara 42.4, 20.2, where Gatekeeper
+Rageroar stands at the furbolg gate. Alcaz Prison is Dustwallow Marsh
+75.6, 13.8, the north end of Alcaz Island. The Drowned City is
+Stranglethorn Vale 21.0, 27.7, the west edge of the Brinescale Skirmisher
+patrol at the underwater cave. Krol'dok Stronghold (Riverglades) and
+Shaper's Terrace (northern Un'Goro) still have a description only.
 Table: `pipeline/data/dungeon_entrances.json`.
 
 ### What could not be indexed (2 Oct 2026)
@@ -2116,8 +2128,7 @@ names a source, index those ids the same way. Every new id is also checked
 for New in Forever (`build_forever_new.py`) and stamped on the parchment
 when the classic nether tooltip 404s. A profession source, new or already
 indexed, is also checked for its recipe skill in that same pass
-(`fetch_craft_skills.py`, ForeverDB `made`, confirmed on the Wowhead spell
-page when it is up). Coordinates are patched with
+(`fetch_craft_skills.py`, the Wowhead Forever spell `learnedat`, not ForeverDB). Coordinates are patched with
 `python pipeline/scripts/index_coordinates.py --ids <json list>`. A full
 `emit()` rewrites every coordinate. The cache is
 `pipeline/data/forever_wowhead/coord_cache.json` (gitignored). Use the
@@ -2260,11 +2271,11 @@ open. Mouse mode never starts it. Closing the log stops it. The gamepad
 cursor is held off while the log is open so a direction does not click the
 control under it, and it is restored when the log closes. Do not parent pin frames to the map in this mode.
 Pins are placed from the addon's own update only while the map is shown.
-The world-drop icon is the addon picture `GQ-WorldDrop.png`. The icon keeps
-its size when the map zooms. A pin inherits the canvas scale. Only a canvas
-smaller than 0.08 (OpenMap) is drawn at its own scale, so the pin stays
-about 24 pixels on that map and on the client's continent map. Do not force
-`SetIgnoreParentScale` on every canvas. The same pin is translated onto a continent
+The world-drop icon is the addon picture `GQ-WorldDrop.png`. The icon stays
+the same size on screen at every zoom. Its scale is the Hunt settings map
+pin size (50% to 150%, 100% when unset) divided by the canvas scale. Do not
+`SetIgnoreParentScale`. OpenMap zooms that canvas, and ignoring the parent
+scale makes the icon gigantic. The same pin is translated onto a continent
 map. The minimap does not draw it. The guided pin has the blue ring.
 Left-click guides. Right-click opens the hunt. Untrack removes the pin.
 Track and Untrack are one button under the reward, beside Show on map.

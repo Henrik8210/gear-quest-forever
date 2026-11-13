@@ -884,10 +884,10 @@ local function ScoringRowsFromWeights(weights, dpsWeight, dpsRanged, speedWeight
         end
     end
     if (dpsWeight or 0) > 0 then
-        rows[#rows + 1] = { label = "Melee weapon damage", value = dpsWeight }
+        rows[#rows + 1] = { label = "Melee weapon DPS", value = dpsWeight }
     end
     if (dpsRanged or 0) > 0 then
-        rows[#rows + 1] = { label = "Ranged weapon damage", value = dpsRanged }
+        rows[#rows + 1] = { label = "Ranged weapon DPS", value = dpsRanged }
     end
     table.sort(rows, function(a, b)
         if a.value ~= b.value then
@@ -898,7 +898,7 @@ local function ScoringRowsFromWeights(weights, dpsWeight, dpsRanged, speedWeight
     if (speedWeight or 0) ~= 0 then
         local at = #rows + 1
         for i = 1, #rows do
-            if rows[i].label == "Melee weapon damage" then
+            if rows[i].label == "Melee weapon DPS" then
                 at = i + 1
                 break
             end

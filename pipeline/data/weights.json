@@ -803,7 +803,7 @@
   "bear": {
    "label": "Guardian (Bear)",
    "weaponStyle": "twohand_or_onehand",
-   "dpsWeight": 2.52,
+   "dpsWeight": 4.9,
    "armorClass": {
     "Leather": 1.0,
     "Cloth": 0.3

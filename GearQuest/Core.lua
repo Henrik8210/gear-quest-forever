@@ -13,7 +13,7 @@ if GQ.LoadLocalePack then
     GQ:LoadLocalePack()
 end
 
-GQ.VERSION = "1.1.5"
+GQ.VERSION = "1.1.6"
 GQ.ADDON_NAME = ADDON_NAME
 
 -- General -> Hide chat messages. Off until the player checks it.

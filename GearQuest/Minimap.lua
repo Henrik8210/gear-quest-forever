@@ -123,7 +123,50 @@ function GQ.Minimap:SetHidden(hidden)
     self:ApplyVisibility()
 end
 
+local function RegisterLauncher()
+    if GQ.Minimap.launcher or not LibStub then
+        return GQ.Minimap.launcher and true or false
+    end
+    local ok, lib = pcall(LibStub, "LibDataBroker-1.1", true)
+    if not ok or not lib or not lib.NewDataObject then
+        return false
+    end
+    GQ.Minimap.launcher = lib:NewDataObject("GearQuest", {
+        type = "launcher",
+        text = "GearQuest",
+        label = "GearQuest",
+        icon = MINIMAP_TEXTURE,
+        OnClick = function()
+            OnMinimapClick()
+        end,
+        OnTooltipShow = function(tooltip)
+            if not tooltip then
+                return
+            end
+            tooltip:SetText("GearQuest", 0.90, 0.75, 0.28)
+            tooltip:AddLine(L["Click to open GearQuest"], 1, 1, 1)
+        end,
+    })
+    return true
+end
+
+function GQ.Minimap:RegisterLauncher()
+    if RegisterLauncher() or self.launcherWatch then
+        return
+    end
+    local watch = CreateFrame("Frame")
+    self.launcherWatch = watch
+    watch:RegisterEvent("ADDON_LOADED")
+    watch:SetScript("OnEvent", function(frame)
+        if RegisterLauncher() then
+            frame:UnregisterAllEvents()
+            frame:SetScript("OnEvent", nil)
+        end
+    end)
+end
+
 function GQ.Minimap:Init()
+    self:RegisterLauncher()
     if self.initialized then
         return
     end

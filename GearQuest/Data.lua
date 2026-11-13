@@ -3158,14 +3158,18 @@ function GQ.Data:AccessLine(entry)
     return nil
 end
 
-function GQ.Data:QuestChainSteps(entry)
+function GQ.Data:QuestChainSteps(entry, minSteps)
     local row = self.questChain and entry and entry.itemId and self.questChain[entry.itemId]
     if type(row) ~= "table" then
         return nil
     end
+    -- The chain filter wants two steps. No Dungeons also reads a one-step row.
+    if type(minSteps) ~= "number" or minSteps < 1 then
+        minSteps = 2
+    end
     local function usable(steps)
         local first = type(steps) == "table" and steps[1]
-        return type(steps) == "table" and #steps >= 2
+        return type(steps) == "table" and #steps >= minSteps
             and type(first) == "table" and type(first[2]) == "string" and first[2] ~= ""
     end
     if row.Alliance or row.Horde then
@@ -4264,15 +4268,16 @@ function GQ.Data:GetItemQualityForDisplay(itemId)
     if not itemId then
         return nil
     end
-    -- Forever quality wins (Reinforced Woolen Shoulders is green on Wowhead,
-    -- but stale items.json still says common/white).
+    -- The hunt line uses the same quality as the tooltip on screen. A loaded
+    -- client item wins. Sprightring Helm stayed blue on the list while its
+    -- tooltip was already green, because the stored record was still rare.
+    local known = GQ.Equip and GQ.Equip.GetKnownItemQuality and GQ.Equip:GetKnownItemQuality(itemId)
+    if type(known) == "number" then
+        return known
+    end
     local audit = self:GetForeverAudit(itemId)
     if audit and type(audit.quality) == "number" then
         return audit.quality
-    end
-    local quality = GQ.Equip and GQ.Equip.GetKnownItemQuality and GQ.Equip:GetKnownItemQuality(itemId)
-    if type(quality) == "number" then
-        return quality
     end
     local fact = self:GetItemFact(itemId)
     if fact and type(fact.quality) == "number" then
@@ -6159,13 +6164,21 @@ function GQ.Data:SlotScoreSpan(slotName, handKind)
     return minScore, maxScore
 end
 
-function GQ.Data:WornSlotIndex(slotName, itemId, handKind)
+function GQ.Data:WornSlotIndex(slotName, itemId, handKind, itemLink)
     if not itemId then
         return 0
     end
     local score = self:EquippedPipelineScore(itemId, slotName)
+    -- A worn piece that never made this faction's list still has stats.
+    -- Score the link the character is wearing. Zero means the client has
+    -- not loaded the item yet, and the bar asks again when it arrives.
     if type(score) ~= "number" then
-        return 0
+        if itemLink and GQ.Compare and GQ.Compare.ScoreItemLinkStats then
+            score = GQ.Compare:ScoreItemLinkStats(itemLink, slotName)
+        end
+        if type(score) ~= "number" or score <= 0 then
+            return 0
+        end
     end
     local minScore, maxScore = self:SlotScoreSpan(slotName, handKind)
     if not minScore then
@@ -6205,7 +6218,7 @@ function GQ.Data:GearScoreWornRows()
         end
         local index = 0
         if itemId then
-            index = self:WornSlotIndex(slotName, itemId, handKind)
+            index = self:WornSlotIndex(slotName, itemId, handKind, link)
         end
         rows[#rows + 1] = {
             slot = label,
@@ -7187,10 +7200,188 @@ end
 
 local WARM_MAX_PASSES = 3
 
+function GQ.Data:WeaponWarmSlot(slotName)
+    slotName = self:NormalizeSlotName(slotName)
+    return slotName == "MainHand" or slotName == "SecondaryHand" or slotName == "Ranged"
+end
+
+-- A ding walks the weapon catalog a few milliseconds at a time. The filtered
+-- list is stored only when the walk finishes, the same rows BuildCandidatesForSlot
+-- would have kept. Other slots stay one frame. A warm that is not a ding still
+-- builds a weapon slot in one frame.
+function GQ.Data:WarmWeaponSlotAsync(slotName, onDone)
+    slotName = self:NormalizeSlotName(slotName)
+    self:EnsureQueryCache()
+    local key = self._queryCache and self._queryCache.key
+    local cached = self._queryCache and self._queryCache.candidates and self._queryCache.candidates[slotName]
+    if cached then
+        local ok = pcall(function()
+            if #cached > 0 then
+                self:GetTopUpgradesForSlot(slotName)
+            end
+        end)
+        if not ok and self._queryCache and self._queryCache.key == key then
+            self._queryCache.warmFailed = self._queryCache.warmFailed or {}
+            self._queryCache.warmFailed[slotName] = true
+        end
+        if onDone then
+            onDone()
+        end
+        return
+    end
+
+    local lists = {}
+    local listIndex = 1
+    local rowIndex = 0
+    local results = {}
+    local seen = {}
+    local listed = false
+    local CHUNK_MS = 4
+    local CHUNK_ROWS = 400
+
+    local function done()
+        if onDone then
+            onDone()
+        end
+    end
+
+    local function fail()
+        if self._queryCache and self._queryCache.key == key then
+            self._queryCache.warmFailed = self._queryCache.warmFailed or {}
+            self._queryCache.warmFailed[slotName] = true
+        end
+        done()
+    end
+
+    local function finishWalk()
+        if not self._queryCache or self._queryCache.key ~= key then
+            done()
+            return
+        end
+        local equip = GQ.Equip
+        local prevSuppress = equip and equip._suppressItemPrime
+        if equip then
+            equip._suppressItemPrime = true
+        end
+        local ok = pcall(function()
+            if not self._queryCache.candidates[slotName] then
+                local filtered = self:FilterToActiveBand(results)
+                filtered = self:BackfillCandidates(results, filtered, 3)
+                filtered = self:DeduplicateEntriesByItem(filtered)
+                self._queryCache.candidates[slotName] = filtered
+            end
+            local rows = self._queryCache.candidates[slotName]
+            if rows and #rows > 0 then
+                self:GetTopUpgradesForSlot(slotName)
+            end
+        end)
+        if equip then
+            equip._suppressItemPrime = prevSuppress
+        end
+        if not ok then
+            fail()
+            return
+        end
+        done()
+    end
+
+    local function chunk()
+        if not self._queryCache or self._queryCache.key ~= key then
+            done()
+            return
+        end
+        if self._queryCache.candidates[slotName] then
+            finishWalk()
+            return
+        end
+        local equip = GQ.Equip
+        local prevSuppress = equip and equip._suppressItemPrime
+        if equip then
+            equip._suppressItemPrime = true
+        end
+        local playerLevel = GQ:GetEffectiveLevel() or 1
+        local grace = (equip and equip.LEVEL_GRACE) or 0
+        local stamp = debugprofilestop and debugprofilestop()
+        local walked = 0
+        local ok = pcall(function()
+            if not listed then
+                listed = true
+                for _, slotKey in ipairs(self:GetCandidateSlotKeys(slotName)) do
+                    lists[#lists + 1] = self:GetClassSlotEntryList(slotKey) or {}
+                end
+            end
+            while listIndex <= #lists do
+                local list = lists[listIndex]
+                rowIndex = rowIndex + 1
+                local entry = list[rowIndex]
+                if not entry then
+                    listIndex = listIndex + 1
+                    rowIndex = 0
+                else
+                    walked = walked + 1
+                    if not seen[entry.id]
+                        and playerLevel >= (entry.minLevel or 1)
+                        and playerLevel <= (entry.maxLevel or playerLevel) + grace
+                        and self:ShouldShowEntry(entry)
+                        and self:EntryMatchesPlayer(entry)
+                        and (not equip or not equip.EntryArmorIsWearable or equip:EntryArmorIsWearable(entry, slotName)) then
+                        seen[entry.id] = true
+                        results[#results + 1] = entry
+                    end
+                    local timed = stamp and debugprofilestop and (debugprofilestop() - stamp) >= CHUNK_MS
+                    if timed or (not stamp and walked >= CHUNK_ROWS) then
+                        break
+                    end
+                end
+            end
+        end)
+        if equip then
+            equip._suppressItemPrime = prevSuppress
+        end
+        if not ok then
+            fail()
+            return
+        end
+        if listIndex > #lists then
+            local quiet = stamp and debugprofilestop and (debugprofilestop() - stamp) < 2
+            if quiet or not (C_Timer and C_Timer.After) then
+                finishWalk()
+            else
+                C_Timer.After(0, function()
+                    if GQ.WithContextSnapshot then
+                        GQ:WithContextSnapshot(finishWalk)
+                    else
+                        finishWalk()
+                    end
+                end)
+            end
+            return
+        end
+        if C_Timer and C_Timer.After then
+            C_Timer.After(0, function()
+                if GQ.WithContextSnapshot then
+                    GQ:WithContextSnapshot(chunk)
+                else
+                    chunk()
+                end
+            end)
+        else
+            chunk()
+        end
+    end
+
+    if GQ.WithContextSnapshot then
+        GQ:WithContextSnapshot(chunk)
+    else
+        chunk()
+    end
+end
+
 -- One slot per frame. Building every slot on a ding, or inside a bag event
 -- after a dungeon kill, trips a hitch or "script ran too long".
 -- gapFrames is extra idle frames after each slot. A ding passes 1 so the
 -- level-up frame and the game's own level-up work are not on top of a scan.
+-- That same ding walks each weapon list a few milliseconds at a time.
 function GQ.Data:WarmQueryCacheAsync(onComplete, gapFrames)
     if not (C_Timer and C_Timer.After) or self:IsQueryCacheWarm() then
         if onComplete then
@@ -7216,6 +7407,7 @@ function GQ.Data:WarmQueryCacheAsync(onComplete, gapFrames)
     end
     self._warmRunning = true
     self._warmGap = gapFrames
+    self._warmSplitWeapons = gapFrames >= 1
 
     local slots = {}
     local index = 0
@@ -7224,6 +7416,7 @@ function GQ.Data:WarmQueryCacheAsync(onComplete, gapFrames)
     local function finish()
         self._warmRunning = false
         self._warmGap = nil
+        self._warmSplitWeapons = nil
         local callbacks = self._warmCallbacks or {}
         self._warmCallbacks = nil
         for i = 1, #callbacks do
@@ -7252,7 +7445,21 @@ function GQ.Data:WarmQueryCacheAsync(onComplete, gapFrames)
         end
         index = index + 1
         local slotName = slots[index]
-        if slotName then
+        if slotName and self._warmSplitWeapons and self:WeaponWarmSlot(slotName) and C_Timer and C_Timer.After then
+            local started = pcall(function()
+                self:WarmWeaponSlotAsync(slotName, function()
+                    gapLeft = self._warmGap or 0
+                    C_Timer.After(0, step)
+                end)
+            end)
+            if started then
+                return
+            end
+            if self._queryCache and self._queryCache.key == self:GetQueryCacheKey() then
+                self._queryCache.warmFailed = self._queryCache.warmFailed or {}
+                self._queryCache.warmFailed[slotName] = true
+            end
+        elseif slotName then
             local built = pcall(function()
                 if #self:GetCandidatesForSlot(slotName) > 0 then
                     self:GetTopUpgradesForSlot(slotName)

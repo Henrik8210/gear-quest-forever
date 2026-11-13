@@ -123,7 +123,7 @@ local pinGen = 0
 local frames = {}
 local driver
 local placed = 0
-local placedMap, placedGen, placedGuided, placedScale
+local placedMap, placedGen, placedGuided, placedCanvas
 
 local function ShowPinTooltip(frame)
     local pin = frame.pinData
@@ -280,12 +280,10 @@ end
 
 local PinMixin = {}
 
--- A pin inherits the canvas, so it shrinks with the continent the way the
--- client's own map pins do. OpenMap's world view drives that canvas far
--- below any Blizzard map. Only then is the pin held at a normal size.
-local OPENMAP_CANVAS = 0.08
-local OPENMAP_PIN_SCALE = 1
-
+-- The pin is a child of the canvas, and OpenMap zooms by scaling that canvas.
+-- Dividing the pin's scale by the canvas scale keeps it one size on screen.
+-- Ignoring the parent scale instead leaves that division in place, and a
+-- zoomed-out canvas turns the icon gigantic.
 local function CanvasScale()
     local canvasScale = WorldMapFrame and WorldMapFrame.GetCanvasScale and WorldMapFrame:GetCanvasScale()
     if not canvasScale or canvasScale <= 0 then
@@ -294,25 +292,27 @@ local function CanvasScale()
     return canvasScale
 end
 
-local function PinScreenScale()
-    if CanvasScale() < OPENMAP_CANVAS then
-        return OPENMAP_PIN_SCALE
+local function ChosenPinScale()
+    local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+    local percent = settings and tonumber(settings.mapPinScalePercent)
+    percent = math.floor((tonumber(percent) or 100) + 0.5)
+    if percent < 50 then
+        percent = 50
+    elseif percent > 150 then
+        percent = 150
     end
-    return 1
+    return percent / 100
+end
+
+local function PinScreenScale()
+    return ChosenPinScale() / CanvasScale()
 end
 
 function PinMixin:ApplyCurrentScale()
-    if CanvasScale() < OPENMAP_CANVAS then
-        self:SetScale(OPENMAP_PIN_SCALE)
-        if self.SetIgnoreParentScale then
-            self:SetIgnoreParentScale(true)
-        end
-        return
-    end
-    self:SetScale(1)
     if self.SetIgnoreParentScale then
         self:SetIgnoreParentScale(false)
     end
+    self:SetScale(PinScreenScale())
 end
 
 function PinMixin:OnLoad()
@@ -328,6 +328,7 @@ function PinMixin:OnAcquired(pin, x, y)
         self:UseFrameLevelType("PIN_FRAME_LEVEL_AREA_POI")
     end
     -- Scale first. SetPosition divides the offset by the pin scale.
+    self.placedX, self.placedY = x, y
     self:ApplyCurrentScale()
     self:SetPosition(x, y)
     self.pinData = {
@@ -429,7 +430,7 @@ local function ReleasePlaced()
     end
     placed = 0
     placedMap = nil
-    placedScale = nil
+    placedCanvas = nil
     placedGen = nil
 end
 
@@ -451,17 +452,28 @@ local function PlacePins()
     -- Normalized pin positions do not change while the same map stays open.
     -- Projecting every pin on every frame was a steady map-API cost.
     local guided = GuidedEntryId()
-    local scale = PinScreenScale()
-    if placedScale and math.abs(scale - placedScale) < 0.02 then
-        scale = placedScale
+    local canvas = CanvasScale()
+    if placedCanvas and math.abs(canvas - placedCanvas) < 0.0001 then
+        canvas = placedCanvas
     end
-    if mapId == placedMap and pinGen == placedGen and guided == placedGuided and scale == placedScale then
+    if mapId == placedMap and pinGen == placedGen and guided == placedGuided and canvas == placedCanvas then
+        return
+    end
+    if mapId == placedMap and pinGen == placedGen and guided == placedGuided and placed > 0 then
+        placedCanvas = canvas
+        for i = 1, placed do
+            local frame = frames[i]
+            if frame and frame:IsShown() and frame.placedX and frame.SetPosition then
+                frame:ApplyCurrentScale()
+                frame:SetPosition(frame.placedX, frame.placedY)
+            end
+        end
         return
     end
     if not MapReady() then
         return
     end
-    placedMap, placedGen, placedGuided, placedScale = mapId, pinGen, guided, scale
+    placedMap, placedGen, placedGuided, placedCanvas = mapId, pinGen, guided, canvas
     local n = 0
     for i = 1, #pins do
         local x, y = ProjectPin(pins[i], mapId)
@@ -491,6 +503,10 @@ local function RefreshPins()
     PlacePins()
 end
 
+function GQ.Pins:Rescale()
+    placedCanvas = nil
+end
+
 function GQ.Pins:Sync()
     if not driver then
         self:Init()
@@ -502,7 +518,7 @@ function GQ.Pins:Sync()
         pins = {}
         pinGen = pinGen + 1
         placedMap = nil
-        placedScale = nil
+        placedCanvas = nil
         return
     end
     -- Hunt settings can hide these icons. The waypoint from Show on map
