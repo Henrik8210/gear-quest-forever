@@ -1024,10 +1024,7 @@ function GQ.Custom:Consume(job, entry)
         and (specHit or (not entry.specs and not entry.generated))
     if specMatch then
         job.matched = (job.matched or 0) + 1
-            local copy = {}
-            for key, value in pairs(entry) do
-                copy[key] = value
-            end
+            local copy = GQ.Data:CopyEntry(entry)
             copy.specs = { [specId] = true }
             copy.customSpec = specId
             copy.id = tostring(entry.id) .. ":" .. specId

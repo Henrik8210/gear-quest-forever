@@ -55,7 +55,7 @@ end
 local LOWER_ARMOR_ILVL_MARGIN = 8
 local LOWER_ARMOR_SCORE_PENALTY = 500
 
--- Stat-based BiS reordering applies to generated sub-60 picks and notables only.
+-- Stat-based BiS reordering applies to generated sub-60 picks only.
 -- Level 60 Wowhead guide rows (origin="guide") and hand-curated Data.lua rows
 -- (generated=false, curatedRank) keep their professional list order untouched.
 -- Weights come from GearQuest/_generated/*.weights.json (TBC stat priorities) via
@@ -775,7 +775,7 @@ function GQ.Compare:GetSortScore(entry, slotName, equippedIlvl, maxPreferredIlvl
     -- A hand-placed Forever piece is not marked generated. Scoring it as raw
     -- item power dropped it out of the three hunt rows while the rank list
     -- still counted it, so the rows read #1, #3, #4 or #1, #3, #2.
-    if type(entry.curatedRank) == "number" and entry.curatedRank > 0 and not entry.notable then
+    if type(entry.curatedRank) == "number" and entry.curatedRank > 0 then
         return 500000 - entry.curatedRank + (tonumber(entry.pipelineScore) or 0) * 0.0001
     end
 

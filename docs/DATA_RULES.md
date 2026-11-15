@@ -42,12 +42,22 @@ At **runtime**, a generated hunt with `curatedRank` keeps that pipeline order. `
 - The knight's 13 pages live in `GQ.LocaleGuidePages` for every language. Apply them when the parchment is shown. The language pack can load after `PortraitGuide.lua`.
 - `Log.lua` is at 191 of 200 file-scope locals. One more file-scope `local` can stop the file compiling, and then the minimap button does nothing.
 
+**15 Nov 2026 (v1.1.7) — do not undo these:**
+
+- The Forever audit went from **1,412** missing to **661** missing. **751** items now resolve, including Dragon's Eye (10829: 15 spirit, 13 healing, 4 spell damage, required level 51) and Woodseed Hoop (17768: 10 intellect and 6 damage and healing). Stats were written from dataEnv 16, then all nine classes were rescored. Do not rescore from the old rows. Blessed Prayer Beads stay unpriced.
+- Coordinates were patched for recovered ids that already had a place in the local cache. Do not full-emit. **Guise of Battle** (287011) still has no creature and no pin. Do not invent one.
+- The target tooltip (`MobDrop.lua`) lists up to three pieces from that creature, vendor, trainer, or quest giver, and only when the piece is on the current level's hunt list. The rank is that list's rank. An older band stays off. Hunts settings can hide it.
+- Weapon rank is the comparison score, highest first, on every class. `CollectWeaponPool` must not sort by `minLevel`. Rank #1 is the weapon that reads 100. A one-hander on a pairing spec includes its best off hand. A two-hander is the piece alone. A shield stays off that scale. Beast Mastery Horde at 44: the off hand is 44–44 and the two-handers are 43–46, and Eyegouger is rank #1, not #22. Other slots keep one band. Do not merge those bands. A set piece can still be rank 1 inside its own band with a lower raw score.
+- Hunt rows share item facts. The logged-in class drops its pick arrays after expand. Simulated classes keep theirs. `byClass` is not built. `byClassSlot` stays. Weights were not changed.
+- The notable shelf is gone from the addon. Do not put `GetNotableForSlot` back.
+- The other-camps (i) hangs on the last coordinate line. Lookup stays empty until a result is clicked. A completed quest whose reward was not taken stays on Active in red.
+
 **14 Nov 2026 (v1.1.6) — do not undo these:**
 
 - A worn piece with no stored hunt score is not 0. `WornSlotIndex` scores the worn link. A non-positive link score means the item is not loaded yet, and `GET_ITEM_INFO_RECEIVED` refreshes the bar. v1.1.5 returned 0 immediately, and players saw 0 on real gear.
 - The hunt line color is the loaded client quality. A stale rare fact must not paint Sprightring Helm blue over a green tooltip.
 - The four Twisted Evils rewards are the uncommon tooltips. Do not restore the rare scores (Sprightring 22.47, Hulkstone 36.06, Acumen Robes 47.26, Relentless Chain 14.15). A stat change and the rescore of every class that lists the item ship together.
-- Dragon's Eye (10829) and Woodseed Hoop (17768) stay off the lists while the audit says http 404. Do not rescore them from the old stored stats. Blessed Prayer Beads (19990) stays off until the use line is priced. A missed "by up to N" line is not a verdict that the item is weak.
+- Dragon's Eye (10829) and Woodseed Hoop (17768) were 404s at v1.1.6 and are status ok as of 15 Nov 2026. Do not put the 404 back, and do not rescore them from the pre-recovery rows. Blessed Prayer Beads (19990) stays off until the use line is priced. A missed "by up to N" line is not a verdict that the item is weak.
 - Beast Mastery list names keep the jackpot suffix, including of the Monkey.
 
 **12 Nov 2026 (v1.1.5) — do not undo these:**

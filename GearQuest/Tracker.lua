@@ -563,6 +563,14 @@ function GQ.Tracker:LayoutEntries(entries, descWordLimit)
         if GQ.Data and GQ.Data.SanitizeText then
             instructions = GQ.Data:SanitizeText(instructions) or instructions
         end
+        if GQ.Data and GQ.Data.NearestCoordinateSpot and entry.itemId
+            and (entry.sourceType == "world_drop" or entry.sourceType == "vendor") then
+            local whereSpot, whereSpots = GQ.Data:NearestCoordinateSpot(entry.itemId)
+            if whereSpot and whereSpots and #whereSpots > 1 and whereSpot.map and whereSpot.map ~= "" then
+                local where = string.format("%s %.1f, %.1f. ", GQ.TN("zone", whereSpot.map), whereSpot.x or 0, whereSpot.y or 0)
+                instructions = where .. (instructions or "")
+            end
+        end
         local desc = FirstWords(instructions, descWordLimit)
 
         row.name:SetText(itemName)

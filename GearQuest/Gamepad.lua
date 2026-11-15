@@ -424,7 +424,7 @@ end
 
 function GQ.Log:GamepadIsListTarget(widget)
     local kind = widget.rowType
-    if kind == "item" or kind == "notable" or kind == "header" then
+    if kind == "item" or kind == "header" then
         return true
     end
     local frame = self.frame
@@ -439,7 +439,7 @@ end
 
 function GQ.Log:GamepadIsRow(widget)
     local kind = widget and widget.rowType
-    return kind == "item" or kind == "notable" or kind == "header"
+    return kind == "item" or kind == "header"
 end
 
 function GQ.Log:GamepadIsListTab(widget)
@@ -729,7 +729,7 @@ function GQ.Log:GamepadPickInitial(list)
                     bestX = x
                 end
                 local kind = widget.rowType
-                if preferRow and (kind == "item" or kind == "notable" or kind == "header") then
+                if preferRow and (kind == "item" or kind == "header") then
                     if not rowBest or y > rowY + 4 or (math.abs(y - rowY) <= 4 and x < rowX) then
                         rowBest = widget
                         rowY = y
@@ -1125,7 +1125,7 @@ function GQ.Log:GamepadConfirm()
     local before = self:GamepadOverlay()
     local rowType = widget.rowType
     self:GamepadActivate(widget)
-    if (rowType == "item" or rowType == "notable") and not before then
+    if rowType == "item" and not before then
         self._padReading = false
         local track = self.frame and self.frame.trackBtn
         if Usable(track) then
@@ -1731,7 +1731,7 @@ function GQ.Log:GamepadFollowClick(widget)
     if not Usable(target) then
         target = self:GamepadPickInitial(self:GamepadCandidates())
     end
-    if target and (target.rowType == "item" or target.rowType == "notable") then
+    if target and target.rowType == "item" then
         self._padFilterMode = false
         self._padReading = true
     elseif target and target.rowType == "header" then

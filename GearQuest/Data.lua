@@ -1241,7 +1241,6 @@ function GQ.Data:BuildIndex()
     self.bySlot = {}
     self.byItemId = {}
     self.byId = {}
-    self.byClass = {}
     self.byClassSlot = {}
     self.byClassSlotSpec = {}
     for _, entry in ipairs(self.entries) do
@@ -1255,8 +1254,6 @@ function GQ.Data:BuildIndex()
         end
         if entry.classes then
             for classFile in pairs(entry.classes) do
-                self.byClass[classFile] = self.byClass[classFile] or {}
-                table.insert(self.byClass[classFile], entry)
                 self.byClassSlot[classFile] = self.byClassSlot[classFile] or {}
                 self.byClassSlot[classFile][slot] = self.byClassSlot[classFile][slot] or {}
                 table.insert(self.byClassSlot[classFile][slot], entry)
@@ -2650,7 +2647,7 @@ function GQ.Data:GetSuffixHint(entry)
 end
 
 -- Novelty on-use effects (fall damage/speed, drunk, party-only buffs, etc.) are not
--- real upgrades for the level band — hide them from picks and notables.
+-- real upgrades for the level band — hide them from picks.
 local NOVELTY_PROC_PATTERNS = {
     "fall speed",
     "fall damage",
@@ -3273,6 +3270,178 @@ function GQ.Data:RewardQuestTitle(entry)
     return name
 end
 
+-- The quest that hands over this reward. A one-step hunt stores no id, so
+-- the title of the completed quest is the other way to recognize it.
+function GQ.Data:RewardQuestId(entry)
+    local name = entry and entry.questName
+    if type(name) ~= "string" or name == "" or not self.QuestChainSteps then
+        return nil
+    end
+    local steps = self:QuestChainSteps(entry, 1)
+    if not steps then
+        return nil
+    end
+    for i = #steps, 1, -1 do
+        local step = steps[i]
+        if type(step) == "table" and step[2] == name then
+            return tonumber(step[1])
+        end
+    end
+    return nil
+end
+
+function GQ.Data:QuestTitleKey(name)
+    if type(name) ~= "string" then
+        return nil
+    end
+    name = name:lower()
+    name = name:gsub("|c%x%x%x%x%x%x%x%x", "")
+    name = name:gsub("|r", "")
+    name = name:gsub("[\"'`]", "")
+    name = name:gsub("%s+", " ")
+    name = name:match("^%s*(.-)%s*$")
+    if not name or name == "" then
+        return nil
+    end
+    return name
+end
+
+function GQ.Data:CompletedQuestMarks()
+    if self._doneQuestTitles and self._doneQuestIds then
+        return self._doneQuestIds, self._doneQuestTitles
+    end
+    local ids = {}
+    local titles = {}
+    local resolved = 0
+    local count = 0
+    local function addTitle(title)
+        local key = self:QuestTitleKey(title)
+        if key then
+            titles[key] = true
+            resolved = resolved + 1
+        end
+    end
+    local function addId(id)
+        id = tonumber(id)
+        if not id or ids[id] then
+            return
+        end
+        ids[id] = true
+        count = count + 1
+        if C_QuestLog and C_QuestLog.GetTitleForQuestID then
+            local ok, title = pcall(C_QuestLog.GetTitleForQuestID, id)
+            if ok then
+                addTitle(title)
+            end
+        end
+    end
+    local listed = false
+    if C_QuestLog and C_QuestLog.GetAllCompletedQuestIDs then
+        local ok, list = pcall(C_QuestLog.GetAllCompletedQuestIDs)
+        if ok and type(list) == "table" and #list > 0 then
+            listed = true
+            for i = 1, #list do
+                addId(list[i])
+            end
+        end
+    end
+    if not listed and GetQuestsCompleted then
+        local ok, map = pcall(GetQuestsCompleted)
+        if ok and type(map) == "table" then
+            for id, done in pairs(map) do
+                if done == true or done == 1 then
+                    addId(id)
+                end
+            end
+        end
+    end
+    self._doneQuestIds = ids
+    self._doneQuestTitles = titles
+    self._doneQuestCount = count
+    self._doneQuestTitlesWeak = (count > 0 and resolved == 0) or nil
+    return ids, titles
+end
+
+function GQ.Data:QuestTitleDone(name, titles)
+    local key = self:QuestTitleKey(name)
+    if key and titles[key] then
+        return true
+    end
+    if GQ.TN and type(name) == "string" and name ~= "" then
+        local shown = self:QuestTitleKey(GQ.TN("quest", name))
+        if shown and titles[shown] then
+            return true
+        end
+    end
+    return false
+end
+
+function GQ.Data:QuestRewardClosed(entry)
+    if not entry or entry.sourceType ~= "quest_reward" then
+        return false
+    end
+    local questId = self:RewardQuestId(entry)
+    if questId then
+        if C_QuestLog and C_QuestLog.IsQuestFlaggedCompleted then
+            local ok, flagged = pcall(C_QuestLog.IsQuestFlaggedCompleted, questId)
+            if ok then
+                return flagged and true or false
+            end
+        end
+        local doneIds = self:CompletedQuestMarks()
+        return doneIds[questId] and true or false
+    end
+    local _, titles = self:CompletedQuestMarks()
+    return self:QuestTitleDone(entry.questName, titles)
+end
+
+function GQ.Data:NoteCompletedQuestChange(log)
+    if self._doneQuestTitlesWeak then
+        local tries = self._doneQuestTries or 0
+        if tries >= 3 then
+            self._doneQuestTitlesWeak = nil
+            return
+        end
+        local now = GetTime and GetTime() or 0
+        if self._doneQuestRetry and (now - self._doneQuestRetry) < 2 then
+            return
+        end
+        self._doneQuestRetry = now
+        self._doneQuestTries = tries + 1
+    else
+        local count
+        if C_QuestLog and C_QuestLog.GetAllCompletedQuestIDs then
+            local ok, list = pcall(C_QuestLog.GetAllCompletedQuestIDs)
+            if ok and type(list) == "table" and #list > 0 then
+                count = #list
+            end
+        end
+        if count == nil and GetQuestsCompleted then
+            local ok, map = pcall(GetQuestsCompleted)
+            if ok and type(map) == "table" then
+                count = 0
+                for _, done in pairs(map) do
+                    if done then
+                        count = count + 1
+                    end
+                end
+            end
+        end
+        if count == nil or count == self._doneQuestCount then
+            return
+        end
+        self._doneQuestCount = count
+        self._doneQuestTries = 0
+    end
+    self._doneQuestIds = nil
+    self._doneQuestTitles = nil
+    if log and log.frame and log.frame:IsShown() and log.Refresh and not log._questRefresh then
+        log._questRefresh = true
+        log:Refresh()
+        log._questRefresh = nil
+    end
+end
+
 function GQ.Data:VisibleCoordinateSpots(itemId)
     local row = self.coordinates and itemId and self.coordinates[itemId]
     if not row or not row.spots or #row.spots == 0 then
@@ -3297,13 +3466,15 @@ function GQ.Data:SpotMapId(spot)
     if not spot then
         return nil
     end
-    if spot.mapId then
-        return spot.mapId
-    end
+    -- The zone name is the client map. A stored id can be a Wowhead id, and
+    -- then the distance between camps cannot be measured.
     if spot.map and GQ.Map and GQ.Map.ZoneMap then
-        return GQ.Map:ZoneMap(spot.map)
+        local mapId = GQ.Map:ZoneMap(spot.map)
+        if mapId then
+            return mapId
+        end
     end
-    return nil
+    return spot.mapId
 end
 
 local function WorldXY(world)
@@ -3969,7 +4140,7 @@ function GQ.Data:EnsureProfessionCraftSkillListener()
         GQ.Data:InvalidateCraftSkillCache(itemId)
 
         if GQ.Log and GQ.Log.frame and GQ.Log.frame:IsShown() then
-            local entry = GQ.Log.selectedEntry
+            local entry = GQ.Log.DetailEntry and GQ.Log:DetailEntry() or GQ.Log.selectedEntry
             if entry and entry.sourceType == "profession" and entry.itemId == itemId then
                 if GQ.Equip and GQ.Equip.IsBindOnPickup and GQ.Equip:IsBindOnPickup(itemId) then
                     GQ.Data:EnrichProfessionEntry(entry)
@@ -5084,14 +5255,14 @@ function GQ.Data:GetEntryById(id)
     -- Walking self.entries here scans every generated row (about 467k) and
     -- the Completed tab does that once per slot, which trips "script ran too long".
     if self.byId then
-        return self.byId[id] or self:GetNotableEntryById(id)
+        return self.byId[id]
     end
     for _, entry in ipairs(self.entries or {}) do
         if entry.id == id then
             return entry
         end
     end
-    return self:GetNotableEntryById(id)
+    return nil
 end
 
 function GQ.Data:InvalidatePlayerBandCache()
@@ -5106,7 +5277,6 @@ end
 function GQ.Data:InvalidateQueryCache()
     self._queryCache = nil
     self._activeBandCache = nil
-    self._notableEntryCache = nil
     self._gearScoreCache = nil
     self._linkEntryCache = nil
     self._scoreMissCache = nil
@@ -5166,8 +5336,6 @@ end
 
 function GQ.Data:InvalidateClassCache()
     self:InvalidateQueryCache()
-    self.notableBySlot = nil
-    self._notableBySlotClass = nil
 end
 
 function GQ.Data:GetQueryCacheKey()
@@ -5184,7 +5352,6 @@ function GQ.Data:EnsureQueryCache()
         key = cacheKey,
         candidates = {},
         topUpgrades = {},
-        notables = {},
         activeBandMin = nil,
     }
 end
@@ -5418,7 +5585,7 @@ function GQ.Data:BackfillCandidates(allEntries, filtered, minCount)
 
     local extras = {}
     for _, entry in ipairs(allEntries or {}) do
-        if not seen[entry.id] and not entry.notable and self:ShouldShowEntry(entry)
+        if not seen[entry.id] and self:ShouldShowEntry(entry)
             and self:EntryMatchesPlayer(entry) then
             local key = self:EntryListKey(entry)
             if key and not seenItem[key] and activeMinLevel
@@ -5452,250 +5619,6 @@ function GQ.Data:BackfillCandidates(allEntries, filtered, minCount)
     return self:DeduplicateEntriesByItem(filtered)
 end
 
-local NOTABLE_CLASS = {
-    PALADIN = { rows = "paladinNotable", facts = "itemFacts" },
-    WARRIOR = { rows = "warriorNotable", facts = "warriorItemFacts" },
-    HUNTER  = { rows = "hunterNotable",  facts = "hunterItemFacts" },
-    DRUID   = { rows = "druidNotable",   facts = "druidItemFacts" },
-    SHAMAN  = { rows = "shamanNotable",  facts = "shamanItemFacts" },
-    ROGUE   = { rows = "rogueNotable",   facts = "rogueItemFacts" },
-    PRIEST  = { rows = "priestNotable",  facts = "priestItemFacts" },
-    WARLOCK = { rows = "warlockNotable", facts = "warlockItemFacts" },
-    MAGE    = { rows = "mageNotable",    facts = "mageItemFacts" },
-}
-
-local NOTABLE_SPECS = {
-    PALADIN = {
-        retribution = { retribution = true },
-        protection = { protection = true },
-        holy = { holy = true },
-    },
-    WARRIOR = {
-        arms = { arms = true },
-        fury = { fury = true },
-        protection = { protection = true },
-    },
-    HUNTER = {
-        beast_mastery = { beast_mastery = true },
-        marksmanship  = { marksmanship  = true },
-        survival      = { survival      = true },
-    },
-    DRUID = {
-        bear        = { bear        = true },
-        feral       = { feral       = true },
-        balance     = { balance     = true },
-        restoration = { restoration = true },
-    },
-    SHAMAN = {
-        elemental   = { elemental   = true },
-        enhancement = { enhancement = true },
-        enhancement_tank = { enhancement_tank = true },
-        restoration = { restoration = true },
-    },
-    ROGUE = {
-        combat        = { combat        = true },
-        assassination = { assassination = true },
-        subtlety      = { subtlety      = true },
-    },
-    PRIEST = {
-        holy       = { holy       = true },
-        discipline = { discipline = true },
-        shadow     = { shadow     = true },
-    },
-    WARLOCK = {
-        affliction  = { affliction  = true },
-        demonology  = { demonology  = true },
-        destruction = { destruction = true },
-    },
-    MAGE = {
-        frost  = { frost  = true },
-        fire   = { fire   = true },
-        arcane = { arcane = true },
-    },
-}
-
-function GQ.Data:BuildNotableEntry(row, facts, classFile)
-    if not row or not facts then
-        return nil
-    end
-
-    local itemId, slot, minL, maxL = row[1], row[2], row[3], row[4]
-    local spec, faction = row[5], row[6]
-    local f = facts[itemId]
-    if not f then
-        return nil
-    end
-
-    if self:IsExcludedItem({ itemId = itemId, proc = f.proc }) then
-        return nil
-    end
-
-    if f.proc then
-        local probe = { itemId = itemId, proc = f.proc }
-        if self:IsNoveltyProcItem(probe) then
-            return nil
-        end
-    end
-
-    local classTbl = { [classFile] = true }
-    local specTbl = NOTABLE_SPECS[classFile]
-    local FACTION = {
-        Alliance = { Alliance = true },
-        Horde = { Horde = true },
-    }
-
-    local entry = {
-        id = string.format("notable:%s:%d:%s:%d:%s:%s", classFile, itemId, slot, minL, tostring(spec), tostring(faction)),
-        itemId = itemId,
-        slot = slot,
-        minLevel = minL,
-        maxLevel = maxL,
-        classes = classTbl,
-        specs = spec and specTbl and specTbl[spec] or nil,
-        factions = faction and FACTION[faction] or nil,
-        sourceType = f.sourceType,
-        instructions = f.instructions,
-        setPiece = f.setPiece,
-        zone = f.zone,
-        npc = f.npc,
-        questName = f.questName,
-        profession = f.profession,
-        proc = f.proc,
-        suffix = row.suffix,
-        suffixChance = row.suffixChance,
-        suffixId = row.suffixId,
-        suffixRange = row.suffixRange,
-        pipelineScore = self:LookupPipelineScore(itemId, slot, minL, faction, spec),
-        generated = true,
-        notable = true,
-    }
-
-    self._notableEntryCache = self._notableEntryCache or {}
-    local cached = self._notableEntryCache[entry.id]
-    if cached then
-        return cached
-    end
-
-    entry = self:EnrichEntrySuffix(entry)
-    entry = self:EnrichProfessionEntry(entry)
-    self._notableEntryCache[entry.id] = entry
-    return entry
-end
-
-function GQ.Data:AsMainBiSEntry(entry)
-    if not entry or not entry.notable then
-        return entry
-    end
-
-    local copy = {}
-    for key, value in pairs(entry) do
-        copy[key] = value
-    end
-    copy.notable = false
-    return copy
-end
-
-function GQ.Data:ShouldDisplayAsNotable(entry, slotName)
-    if not entry or not entry.notable then
-        return false
-    end
-
-    slotName = slotName and self:NormalizeSlotName(slotName)
-    if not slotName then
-        return true
-    end
-
-    local itemKey = self:EntryListKey(entry)
-    if not itemKey then
-        return true
-    end
-
-    for _, top in ipairs(self:GetTopUpgradesForSlot(slotName)) do
-        if self:EntryListKey(top) == itemKey then
-            return false
-        end
-    end
-
-    return true
-end
-
-local function NormalizeEntryIdToken(value)
-    if value == nil or value == "" or value == "nil" then
-        return nil
-    end
-    return value
-end
-
-function GQ.Data:GetNotableEntryById(id)
-    if type(id) ~= "string" or not id:match("^notable:") then
-        return nil
-    end
-
-    local classFile, itemId, slot, minL, spec, faction = id:match(
-        "^notable:([^:]+):(%d+):([^:]+):(%d+):([^:]*):([^:]*)$"
-    )
-    if not classFile then
-        return nil
-    end
-
-    itemId = tonumber(itemId)
-    minL = tonumber(minL)
-    spec = NormalizeEntryIdToken(spec)
-    faction = NormalizeEntryIdToken(faction)
-
-    local src = NOTABLE_CLASS[classFile]
-    if not src then
-        return nil
-    end
-
-    local rows = self[src.rows]
-    local facts = self[src.facts]
-    if not rows or not facts then
-        return nil
-    end
-
-    for i = 1, #rows do
-        local row = rows[i]
-        if row[1] == itemId
-            and row[2] == slot
-            and row[3] == minL
-            and (row[5] or nil) == spec
-            and (row[6] or nil) == faction then
-            return self:BuildNotableEntry(row, facts, classFile)
-        end
-    end
-
-    return nil
-end
-
-function GQ.Data:EnsureNotableBySlot(classFile)
-    classFile = classFile or GQ:GetEffectiveClass()
-    if self._notableBySlotClass == classFile and self.notableBySlot then
-        return
-    end
-
-    self._notableEntryCache = nil
-    self.notableBySlot = {}
-    self._notableBySlotClass = classFile
-
-    local src = NOTABLE_CLASS[classFile]
-    local rows = src and self[src.rows]
-    if not rows then
-        return
-    end
-
-    for i = 1, #rows do
-        local row = rows[i]
-        local slot = self:NormalizeSlotName(row[2])
-        self.notableBySlot[slot] = self.notableBySlot[slot] or {}
-        table.insert(self.notableBySlot[slot], row)
-    end
-end
-
-function GQ.Data:GetNotableForSlot(slotName)
-    -- Notables are ranked with everything else. Nothing is pulled out as a fourth hunt.
-    return {}
-end
 
 function GQ.Data:GetActiveBandMinLevel()
     local cacheKey = self:GetActiveBandCacheKey()
@@ -5770,13 +5693,6 @@ function GQ.Data:PreviousLevelShownKeys()
             local top = self:GetTopUpgradesForSlot(slotName)
             for j = 1, #top do
                 local key = self:EntryListKey(top[j])
-                if key then
-                    keys[key] = true
-                end
-            end
-            local notables = self:GetNotableForSlot(slotName) or {}
-            for j = 1, #notables do
-                local key = self:EntryListKey(notables[j])
                 if key then
                     keys[key] = true
                 end
@@ -6104,7 +6020,7 @@ function GQ.Data:RegisterPipelineScore(itemId, slot, minLevel, faction, spec, sc
     if not score then
         return
     end
-    self._pipelineScoreLookup = self._pipelineScoreLookup or {}
+    self._pipelineScoreExtra = self._pipelineScoreExtra or {}
     local key = string.format(
         "%d:%s:%d:%s:%s",
         itemId or 0,
@@ -6113,22 +6029,70 @@ function GQ.Data:RegisterPipelineScore(itemId, slot, minLevel, faction, spec, sc
         tostring(faction),
         tostring(spec)
     )
-    self._pipelineScoreLookup[key] = score
+    self._pipelineScoreExtra[key] = score
 end
 
 function GQ.Data:LookupPipelineScore(itemId, slot, minLevel, faction, spec)
-    if not self._pipelineScoreLookup then
+    if not itemId then
         return nil
     end
-    local key = string.format(
-        "%d:%s:%d:%s:%s",
-        itemId or 0,
-        slot or "",
-        minLevel or 0,
-        tostring(faction),
-        tostring(spec)
-    )
-    return self._pipelineScoreLookup[key]
+    if self._pipelineScoreExtra then
+        local key = string.format(
+            "%d:%s:%d:%s:%s",
+            itemId or 0,
+            slot or "",
+            minLevel or 0,
+            tostring(faction),
+            tostring(spec)
+        )
+        local extra = self._pipelineScoreExtra[key]
+        if extra then
+            return extra
+        end
+    end
+    local function match(entry)
+        if not entry or not entry.generated or entry.customSpec then
+            return false
+        end
+        if entry.itemId ~= itemId or not entry.pipelineScore then
+            return false
+        end
+        if (entry.slot or "") ~= (slot or "") or (entry.minLevel or 0) ~= (minLevel or 0) then
+            return false
+        end
+        if faction == nil then
+            if entry.factions ~= nil then
+                return false
+            end
+        elseif not (entry.factions and entry.factions[faction]) then
+            return false
+        end
+        if spec == nil then
+            if entry.specs ~= nil then
+                return false
+            end
+        elseif not (entry.specs and entry.specs[spec]) then
+            return false
+        end
+        return true
+    end
+    local list = self.byItemId and self.byItemId[itemId]
+    if list then
+        for i = #list, 1, -1 do
+            if match(list[i]) then
+                return list[i].pipelineScore
+            end
+        end
+    end
+    local entries = self.entries
+    if entries then
+        for i = #entries, 1, -1 do
+            if match(entries[i]) then
+                return entries[i].pipelineScore
+            end
+        end
+    end
+    return nil
 end
 
 -- Tooltip display only. pipelineScore and curatedRank stay the hunt order.
@@ -6149,16 +6113,11 @@ function GQ.Data:SlotScoreSpan(slotName, handKind)
     end
     if GQ.Log and GQ.Log.GetSlotRankList and slotName then
         for _, entry in ipairs(GQ.Log:GetSlotRankList(slotName, handKind) or {}) do
-            push(entry.pipelineScore)
-        end
-    end
-    local dataSlot = slotName == "WeaponPair" and "MainHand" or slotName
-    if dataSlot and self.GetNotableForSlot then
-        for _, notable in ipairs(self:GetNotableForSlot(dataSlot) or {}) do
-            if not handKind or not GQ.Log or not GQ.Log.EntryInWeaponHand
-                or GQ.Log:EntryInWeaponHand(notable, dataSlot, handKind) then
-                push(notable.pipelineScore)
+            local score = entry.pipelineScore
+            if handKind == "both" then
+                score = self:DisplayedWeaponScore(entry)
             end
+            push(score)
         end
     end
     return minScore, maxScore
@@ -6187,8 +6146,251 @@ function GQ.Data:WornSlotIndex(slotName, itemId, handKind, itemLink)
     return self:GearScoreIndex(score, minScore, maxScore) or 0
 end
 
+-- A two-hander replaces both hands. The hunt stores each weapon alone, so the
+-- arrow and the bar add the main hand and the off hand (a second weapon, a
+-- shield, or a held item) before they call one loadout better.
+local DUAL_WIELD_READY = { HUNTER = 20, ROGUE = 10, WARRIOR = 20 }
+
+function GQ.Data:ItemCountsAsTwoHand(itemId)
+    if not itemId then
+        return false
+    end
+    local entries = self.GetEntriesByItemId and self:GetEntriesByItemId(itemId)
+    if entries then
+        for i = 1, #entries do
+            local hand = entries[i].hand
+            if hand == "two" then
+                return true
+            end
+            if hand == "main" or hand == "one" or hand == "off" then
+                return false
+            end
+        end
+    end
+    if GQ.Equip and GQ.Equip.GetEquipSlot and GQ.Equip:GetEquipSlot(itemId) then
+        return GQ.Equip:IsTwoHandWeapon(itemId) and true or false
+    end
+    return false
+end
+
+function GQ.Data:DualWieldReady()
+    if not self:CanDualWield() then
+        return false
+    end
+    local level = GQ.GetEffectiveLevel and GQ:GetEffectiveLevel() or 1
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    local need = classFile and DUAL_WIELD_READY[classFile]
+    if need and level < need then
+        return false
+    end
+    return true
+end
+
+-- Pipeline score of one worn weapon. An empty hand is 0. Nil means the item
+-- is equipped but the client has not loaded it yet.
+function GQ.Data:WornHandScore(invSlot, slotName)
+    if not GetInventoryItemLink then
+        return 0
+    end
+    local link = GetInventoryItemLink("player", invSlot)
+    if not link then
+        return 0
+    end
+    local itemId = tonumber(string.match(link, "item:(%d+)"))
+    local score = itemId and self:EquippedPipelineScore(itemId, slotName)
+    if type(score) == "number" then
+        return score
+    end
+    -- The hunt prices the printed damage in either hand, so the off-hand
+    -- link uses the main-hand weight instead of the half off-hand weight.
+    if GQ.Compare and GQ.Compare.ScoreItemLinkStats then
+        local linkScore = GQ.Compare:ScoreItemLinkStats(link, "MainHand")
+        if type(linkScore) == "number" and linkScore > 0 then
+            return linkScore
+        end
+    end
+    return nil
+end
+
+function GQ.Data:WornWeaponHands()
+    local main = self:WornHandScore(16, "MainHand")
+    local off = self:WornHandScore(17, "SecondaryHand")
+    if main == nil or off == nil then
+        return nil
+    end
+    local mainIsTwo = self:ItemCountsAsTwoHand(self:EquippedItemId(16))
+    if mainIsTwo then
+        off = 0
+    end
+    return main, off, mainIsTwo
+end
+
+function GQ.Data:TwoHandCompetesWithPair()
+    -- Enhancement has no second weapon. A rogue cannot wear a two-hander.
+    -- Feral stays on the two-hand list. Everyone else can hold a two-hander
+    -- or a main hand plus an off-hand piece, so those two loadouts share a scale.
+    if self:UsesTwoHandOnlyWeapons() then
+        return false
+    end
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    if classFile == "ROGUE" then
+        return false
+    end
+    if classFile == "WARRIOR" or classFile == "HUNTER" or classFile == "PALADIN"
+        or classFile == "PRIEST" or classFile == "MAGE" or classFile == "WARLOCK" then
+        return true
+    end
+    local spec = self.RuleSpec and self:RuleSpec()
+    if classFile == "DRUID" then
+        return spec ~= "feral"
+    end
+    if classFile == "SHAMAN" then
+        return spec == "elemental" or spec == "restoration" or spec == "enhancement_tank"
+    end
+    return false
+end
+
+function GQ.Data:BestOffHandPartner()
+    if self:UsesTwoHandOnlyWeapons() then
+        return nil
+    end
+    local ctx = self.GetActiveBandCacheKey and self:GetActiveBandCacheKey() or ""
+    local kind = self:DualWieldReady() and "weapon" or "item"
+    if self._offPartnerBand == ctx and self._offPartnerKind == kind then
+        return self._offPartnerEntry
+    end
+    local offList = self:GetCandidatesForSlot("SecondaryHand") or {}
+    local mainList = self:GetCandidatesForSlot("MainHand") or {}
+    if #offList == 0 and #mainList == 0 then
+        return nil
+    end
+    local best
+    local wantWeapon = kind == "weapon"
+    for _, entry in ipairs(offList) do
+        if type(entry.pipelineScore) == "number" and not self:EntryIsTwoHand(entry) then
+            local weapon = self:EntryIsDamagingWeapon(entry)
+            if weapon == wantWeapon and (not best or entry.pipelineScore > best.pipelineScore) then
+                best = entry
+            end
+        end
+    end
+    self._offPartnerBand = ctx
+    self._offPartnerKind = kind
+    self._offPartnerEntry = best
+    return best
+end
+
+function GQ.Data:BestOneHandPartner()
+    local ctx = self.GetActiveBandCacheKey and self:GetActiveBandCacheKey() or ""
+    if self._onePartnerBand == ctx then
+        return self._onePartnerEntry
+    end
+    local list = self:GetCandidatesForSlot("MainHand") or {}
+    if #list == 0 then
+        return nil
+    end
+    local best
+    for _, entry in ipairs(list) do
+        if type(entry.pipelineScore) == "number" and not self:EntryIsTwoHand(entry) then
+            if not best or entry.pipelineScore > best.pipelineScore then
+                best = entry
+            end
+        end
+    end
+    self._onePartnerBand = ctx
+    self._onePartnerEntry = best
+    return best
+end
+
+function GQ.Data:BestWeaponLoadoutScore()
+    local ctx = self.GetActiveBandCacheKey and self:GetActiveBandCacheKey() or ""
+    if self._loadoutBand == ctx and self._loadoutBest then
+        return self._loadoutBest
+    end
+    local bestTwo, bestOne = 0, 0
+    for _, entry in ipairs(self:GetCandidatesForSlot("MainHand") or {}) do
+        local score = entry.pipelineScore
+        if type(score) == "number" then
+            if self:EntryIsTwoHand(entry) then
+                if score > bestTwo then
+                    bestTwo = score
+                end
+            elseif score > bestOne then
+                bestOne = score
+            end
+        end
+    end
+    local partner = self:BestOffHandPartner()
+    local pair = bestOne + ((partner and partner.pipelineScore) or 0)
+    local best = bestTwo > pair and bestTwo or pair
+    self._loadoutBand = ctx
+    self._loadoutBest = best
+    return best
+end
+
+-- Nil when this piece does not replace the other hand. The second return is
+-- true when a weapon is already worn, so an empty pair stays the old path.
+function GQ.Data:WeaponLoadoutPipelineDelta(entry)
+    if not entry or type(entry.pipelineScore) ~= "number" then
+        return nil
+    end
+    local slot = self:NormalizeSlotName(entry.slot)
+    if slot ~= "MainHand" and slot ~= "SecondaryHand" then
+        return nil
+    end
+    if not self:TwoHandCompetesWithPair() then
+        return nil
+    end
+    local mainScore, offScore, mainIsTwo = self:WornWeaponHands()
+    if mainScore == nil or offScore == nil then
+        return nil
+    end
+    local somethingWorn = mainIsTwo or mainScore > 0 or offScore > 0
+    if not somethingWorn then
+        return nil
+    end
+    local isTwo = self:EntryIsTwoHand(entry)
+    local candidate
+    if isTwo then
+        candidate = entry.pipelineScore
+    elseif mainIsTwo and slot == "SecondaryHand" then
+        local one = self:BestOneHandPartner()
+        candidate = entry.pipelineScore + ((one and one.pipelineScore) or 0)
+    elseif mainIsTwo then
+        local off = self:BestOffHandPartner()
+        candidate = entry.pipelineScore + ((off and off.pipelineScore) or 0)
+    else
+        return nil
+    end
+    local worn = mainIsTwo and mainScore or (mainScore + offScore)
+    return candidate - worn, true
+end
+
+-- One index for the weapon set, shared by both hands, so a two-hander and a
+-- pair move the bar in the same direction. Nil keeps each hand on its own index.
+function GQ.Data:WornWeaponLoadoutIndex()
+    if not self:TwoHandCompetesWithPair() then
+        return nil
+    end
+    local mainScore, offScore, mainIsTwo = self:WornWeaponHands()
+    if mainScore == nil or offScore == nil then
+        return nil
+    end
+    local filledPair = (not mainIsTwo) and mainScore > 0 and offScore > 0
+    if not mainIsTwo and not filledPair then
+        return nil
+    end
+    local best = self:BestWeaponLoadoutScore()
+    if not best or best <= 0 then
+        return nil
+    end
+    local loadout = mainIsTwo and mainScore or (mainScore + offScore)
+    return self:GearScoreIndex(loadout, 0, best)
+end
+
 -- One row per slot that goes into the bar. An empty slot counts as 0.
--- A two-hand weapon does not also count an empty off hand.
+-- A two-hand weapon fills both weapon rows with the loadout index when a
+-- one-hand pair is a real alternative. It does not leave the off hand at 0.
 function GQ.Data:GearScoreWornRows()
     local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
     if not classFile then
@@ -6201,14 +6403,16 @@ function GQ.Data:GearScoreWornRows()
     if mainId and GetItemInfo then
         mainLoc = select(9, GetItemInfo(mainId))
     end
-    local twoHandWorn = mainLoc == "INVTYPE_2HWEAPON"
-    local skipOff = twoHandWorn or self:UsesTwoHandOnlyWeapons()
+    local mainIsTwo = self:ItemCountsAsTwoHand(mainId)
+    local twoHandWorn = mainIsTwo or mainLoc == "INVTYPE_2HWEAPON"
+    local loadoutIndex = self:WornWeaponLoadoutIndex()
+    local skipOff = (twoHandWorn or self:UsesTwoHandOnlyWeapons()) and not loadoutIndex
     local rows = {}
 
-    local function add(slotName, invSlot, handKind)
+    local function add(slotName, invSlot, handKind, indexOverride, nameOverride, itemOverride)
         local link = GetInventoryItemLink and GetInventoryItemLink("player", invSlot)
-        local itemId = link and tonumber(string.match(link, "item:(%d+)"))
-        local name = link and string.match(link, "%[(.-)%]")
+        local itemId = itemOverride or (link and tonumber(string.match(link, "item:(%d+)")))
+        local name = nameOverride or (link and string.match(link, "%[(.-)%]"))
         if name == "" then
             name = nil
         end
@@ -6217,7 +6421,9 @@ function GQ.Data:GearScoreWornRows()
             label = self:SlotHeaderLabel(slotName)
         end
         local index = 0
-        if itemId then
+        if indexOverride ~= nil then
+            index = indexOverride
+        elseif itemId then
             index = self:WornSlotIndex(slotName, itemId, handKind, link)
         end
         rows[#rows + 1] = {
@@ -6231,7 +6437,12 @@ function GQ.Data:GearScoreWornRows()
 
     for i = 1, #slots do
         local slotName = slots[i]
-        if slotName == "SecondaryHand" and skipOff then
+        if slotName == "SecondaryHand" and twoHandWorn and loadoutIndex then
+            -- The two-hander stands in for the off hand as well, on the same
+            -- loadout index as the pair it replaced.
+            local mainName = mainLink and string.match(mainLink, "%[(.-)%]")
+            add("SecondaryHand", 17, nil, loadoutIndex, mainName, mainId)
+        elseif slotName == "SecondaryHand" and skipOff then
             -- A two-hand weapon fills this slot. It is not a second piece of gear.
         elseif slotName == "Finger" then
             add("Finger", 11)
@@ -6242,7 +6453,10 @@ function GQ.Data:GearScoreWornRows()
         elseif slotName == "MainHand" then
             -- The whole main-hand list, two-hand and one-hand together.
             -- The weapon filter hides hunt rows. It does not change this index.
-            add("MainHand", 16)
+            -- A pair and a two-hander share one loadout index when both routes exist.
+            add("MainHand", 16, nil, loadoutIndex)
+        elseif slotName == "SecondaryHand" and loadoutIndex then
+            add("SecondaryHand", 17, nil, loadoutIndex)
         else
             local invSlot = self:GetInventorySlot(slotName)
             if invSlot then
@@ -6277,6 +6491,17 @@ function GQ.Data:GearScoreBarAverage()
         return 100
     end
     return avg
+end
+
+-- The hunt rank and the white 0-100 number use this score. A one-hander that
+-- is worn with an off hand includes that off hand. A two-hander stays itself.
+-- A later level band does not change the number.
+function GQ.Data:DisplayedWeaponScore(entry)
+    if entry and self.EntryIsDamagingWeapon and self:EntryIsDamagingWeapon(entry)
+        and GQ.Log and GQ.Log.WeaponCompareScore then
+        return GQ.Log:WeaponCompareScore(entry)
+    end
+    return entry and entry.pipelineScore
 end
 
 function GQ.Data:GearScoreIndex(score, minScore, maxScore)
@@ -6322,11 +6547,6 @@ function GQ.Data:ShownPipelineScore(itemId, slotName)
     for _, entry in ipairs(self:GetCandidatesForSlot(slotName) or {}) do
         consider(entry)
     end
-    if self.GetNotableForSlot then
-        for _, entry in ipairs(self:GetNotableForSlot(slotName) or {}) do
-            consider(entry)
-        end
-    end
     return best
 end
 
@@ -6361,14 +6581,15 @@ function GQ.Data:GearScoreContext(slotName, handKind)
 
     if GQ.Log and GQ.Log.GetSlotRankList and slotName then
         for _, entry in ipairs(GQ.Log:GetSlotRankList(slotName, handKind) or {}) do
-            push(entry.pipelineScore, true)
-        end
-    end
-    if dataSlot and self.GetNotableForSlot then
-        for _, notable in ipairs(self:GetNotableForSlot(dataSlot) or {}) do
-            if not handKind or not GQ.Log or not GQ.Log.EntryInWeaponHand
-                or GQ.Log:EntryInWeaponHand(notable, dataSlot, handKind) then
-                push(notable.pipelineScore, true)
+            -- Shields stay in the off-hand slot. A shield score is several
+            -- times a weapon score, and putting it on this scale turned the
+            -- rank #1 weapon into a 9.
+            if not (handKind == "both" and self.EntryIsDamagingWeapon and not self:EntryIsDamagingWeapon(entry)) then
+                local listed = entry.pipelineScore
+                if handKind == "both" then
+                    listed = self:DisplayedWeaponScore(entry)
+                end
+                push(listed, true)
             end
         end
     end
@@ -6387,6 +6608,17 @@ function GQ.Data:GearScoreContext(slotName, handKind)
         else
             equippedIds[itemId] = true
             local score = self:EquippedPipelineScore(itemId, dataSlot)
+            if handKind == "both" then
+                for _, entry in ipairs(self:GetEntriesByItemId(itemId) or {}) do
+                    if self.EntryIsDamagingWeapon and self:EntryIsDamagingWeapon(entry) then
+                        local shown = self:DisplayedWeaponScore(entry)
+                        if type(shown) == "number" then
+                            score = shown
+                        end
+                        break
+                    end
+                end
+            end
             if score then
                 worn[#worn + 1] = score
                 push(score)
@@ -6405,7 +6637,25 @@ function GQ.Data:GearScoreContext(slotName, handKind)
             local offId = self:EquippedItemId(invSlot)
             if offId then
                 equippedIds[offId] = true
-                local offScore = self:EquippedPipelineScore(offId, "SecondaryHand")
+                local offIsWeapon = false
+                for _, entry in ipairs(self:GetEntriesByItemId(offId) or {}) do
+                    if self.EntryIsDamagingWeapon and self:EntryIsDamagingWeapon(entry) then
+                        offIsWeapon = true
+                        break
+                    end
+                end
+                local offScore = offIsWeapon and self:EquippedPipelineScore(offId, "SecondaryHand")
+                if offIsWeapon then
+                    for _, entry in ipairs(self:GetEntriesByItemId(offId) or {}) do
+                        if self:EntryIsDamagingWeapon(entry) then
+                            local shown = self:DisplayedWeaponScore(entry)
+                            if type(shown) == "number" then
+                                offScore = shown
+                            end
+                            break
+                        end
+                    end
+                end
                 if offScore then
                     wornOff = offScore
                     push(offScore)
@@ -6599,6 +6849,10 @@ function GQ.Data:GearScoreUpgradeDelta(entry, slotName, handKind)
             return 0
         end
     end
+    local loadoutDelta, loadoutWorn = self:WeaponLoadoutPipelineDelta(entry)
+    if loadoutWorn and type(loadoutDelta) == "number" then
+        return loadoutDelta, true
+    end
     if ctx.baselineScore ~= nil then
         return entry.pipelineScore - ctx.baselineScore, true
     end
@@ -6612,7 +6866,7 @@ function GQ.Data:GearScoreUpgradeDelta(entry, slotName, handKind)
 end
 
 function GQ.Data:GearScoreDeltaText(index, baseline)
-    if not index or not baseline then
+    if not index or baseline == nil then
         return ""
     end
     local delta = index - baseline
@@ -6632,7 +6886,14 @@ function GQ.Data:GearScoreTrail(entry, ctx)
     if not ctx or not entry or type(entry.pipelineScore) ~= "number" then
         return ""
     end
-    local index = self:GearScoreIndex(entry.pipelineScore, ctx.minScore, ctx.maxScore)
+    local indexScore = entry.pipelineScore
+    if self.EntryIsDamagingWeapon and self:EntryIsDamagingWeapon(entry) then
+        local shown = self:DisplayedWeaponScore(entry)
+        if type(shown) == "number" then
+            indexScore = shown
+        end
+    end
+    local index = self:GearScoreIndex(indexScore, ctx.minScore, ctx.maxScore)
     if not index then
         return ""
     end
@@ -6652,6 +6913,31 @@ function GQ.Data:GearScoreTrail(entry, ctx)
         if estimate then
             baseline = self:GearScoreIndex(estimate, ctx.minScore, ctx.maxScore)
         end
+    end
+    -- A two-hander and the pair it replaces share one comparison. The white
+    -- index stays this piece's place among weapons. The arrow uses the
+    -- loadout scale, whose top is the best two-hander or the best one-hand
+    -- plus its off-hand, shield included. The shield is not the 100 mark
+    -- on the white number.
+    local loadoutDelta, loadoutWorn = self:WeaponLoadoutPipelineDelta(entry)
+    local loadoutBest = loadoutWorn and self:BestWeaponLoadoutScore()
+    local loadoutSpan = (loadoutBest and loadoutBest > 0) and loadoutBest
+        or ((ctx.maxScore and ctx.minScore and ctx.maxScore > ctx.minScore) and (ctx.maxScore - ctx.minScore))
+    if loadoutWorn and type(loadoutDelta) == "number" and loadoutSpan then
+        local indexDelta = loadoutDelta / loadoutSpan * 100
+        if indexDelta > 0 then
+            indexDelta = math.floor(indexDelta + 0.5)
+        elseif indexDelta < 0 then
+            indexDelta = -math.floor(-indexDelta + 0.5)
+        else
+            indexDelta = 0
+        end
+        if indexDelta == 0 and loadoutDelta > 0 then
+            indexDelta = 1
+        elseif indexDelta == 0 and loadoutDelta < 0 then
+            indexDelta = -1
+        end
+        baseline = index - indexDelta
     end
     local delta = ""
     if not (entry.itemId and ctx.equippedIds and ctx.equippedIds[entry.itemId]) then
@@ -7085,10 +7371,6 @@ function GQ.Data:GetRankableEntriesForSlot(slotName)
         add(entry)
     end
 
-    for _, entry in ipairs(self:GetNotableForSlot(slotName)) do
-        add(entry)
-    end
-
     return merged
 end
 
@@ -7138,7 +7420,7 @@ function GQ.Data:BuildTopUpgradesForSlot(slotName, maxResults, ignoreWeaponFilte
     end
     local results = {}
     for i = 1, #ranked do
-        results[i] = self:AsMainBiSEntry(ranked[i])
+        results[i] = ranked[i]
     end
     self._queryCache.topUpgrades[cacheKey] = results
     return results

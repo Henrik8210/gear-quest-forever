@@ -2,57 +2,41 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.1.6
+## v1.1.7
 
-The window title reads **GearQuest Forever v1.1.6**.
+The window title reads **GearQuest Forever v1.1.7**.
 
-**A worn piece no longer scores 0**
+**Weapon rank is the score you see**
 
-The score bar printed 0 for gear you were wearing when that piece was not on your faction's hunt list. The item tooltip still showed the stats. Players saw it on necks, rings, trinkets, and on crafted leather that both factions can make. An empty slot is still 0 and still says (empty slot). A piece you are wearing is scored from its tooltip when the hunt list has no stored score for it. If the client has not loaded the item yet, the bar fills in when the item arrives. It does not stay 0.
+Rank #1 on Weapons is the piece that reads 100. A weapon band that starts one level later no longer jumps ahead of a higher score.
 
-**Hunt names match the tooltip color**
+Beast Mastery Horde at 44 keeps the off hand on 44 and the two-handers on 43–46. **Eyegouger** is rank #1, score 25.09. **Nordic Longshank** stays down the list. The off-hand band was putting those one-handers at #1 through #21.
 
-A hunt whose tooltip is green is green on the list. Sprightring Helm stayed blue on the list in v1.1.5 while the tooltip was already green, because the stored record was still the old rare item.
+A priest, a mage, a warlock, a balance or restoration druid, and an elemental or restoration shaman count the best off hand in a one-hander's number. A two-hander is the weapon alone. A shield does not set that 100. **Crest of Darkshire** was pulling **Blade of Silverlaine** down to about 9 on one shared scale. The green arrow and the score bar still compare a two-hander with the main hand plus the off hand, and the shield still counts in that comparison. Other slots stay one band. A set piece can still be rank 1 when you wear the set, even when another piece in the slot scores higher on its own.
 
-**Twisted Evils rewards use the green stats**
+**Items Forever already listed**
 
-All nine classes were scored again from the current Forever tooltips. The four rewards from Twisted Evils in Maraudon are the green pieces, not the old blue ones.
+751 items the addon had marked missing now use the current Forever tooltip, and all nine classes were scored again. 661 items are still missing from Forever.
 
-Sprightring Helm is 106 armor, +11 Agility, and +16 Stamina. Combat ranks it 5th at 40–43, score 16.86. It was rank 1 at 22.47 on the old rare stats.
+**Dragon's Eye** is a priest neck from Shade of Eranikus in the Sunken Temple. It requires 51. The tooltip is 15 spirit, 13 healing, and 4 spell damage. Holy ranks it 1st at 51–54, score 33.7, on both factions. Discipline ranks it 3rd at 51–54, score 30.7. A recovered piece that still does not beat the slot stays off the hunt list.
 
-Hulkstone Pauldrons are 354 armor and +13 Stamina. The strength is gone. Arms ranks them 6th at 40–41, score 23.91. They were rank 1 at 36.06.
+**Quest rewards name the earlier steps**
 
-Acumen Robes are 64 armor, +15 Intellect, and +14 healing and spell damage. Holy ranks them 9th at 40–41, score 35.21. They were 3rd at 47.26.
+Recovered quest hunts now list the chain, or say there are no prequests. **Medal of Courage** (Saving Yenniku, required 35) lists The Fate of Yenniku, The Singing Crystals, The Mind's Eye, then Saving Yenniku. **Dwarven Charge** (The Hidden Chamber, required 35) lists The Lost Dwarves, then The Hidden Chamber. **Lightforged Blade** (Forging the Mightstone, required 47) lists Chillwind Point, Dispelling Evil, Inert Scourgestones, then Forging the Mightstone. Lethtendris's Web lists Feathermoon Stronghold, then Lethtendris's Web, for Alliance, and Camp Mojache, then Lethtendris's Web, for Horde. 31 of these quests say there are no prequests.
 
-Relentless Chain is 268 armor, +11 Stamina, +11 Intellect, and +20 Attack Power. It leaves the Beast Mastery chest list. Marksmanship ranks it 16th at 40–44, score 16.78. Survival ranks it 15th, score 18.28.
+A step uses the quest title from the game client. On an English client those names stay English, including when GearQuest is set to German. The item name on the hunt still follows the language you picked.
 
-**No Dungeons hides a quest that enters a dungeon**
+**Hover a creature, a vendor, a trainer, or a quest giver**
 
-Quest rewards plus No Dungeons still showed a reward when the chain sends you into a dungeon before you get the item, including a chain that starts outside. Those hunts hide now. A world drop stays. An outdoor quest stays.
+The tooltip adds up to three hunt pieces from that unit. A line appears only when the piece is on this level's hunt list and it beats what you are wearing, or the slot is empty. The line is the rank, the item, the slot, and the score, with a green arrow when it is an upgrade. Hunt settings has **Hide unit gear tips**. The lines show until you check that box.
 
-**Crafts both factions can make stay on both lists**
+**Map pin size**
 
-v1.1.5 filed some patterns under the Barrens camp. Alliance then lost the hunt, and wearing the piece scored 0. Brawler's Leather Hood and the other leather Pawani and Daniel Stitchsong both sell stay crafted hunts. The line names both sellers, and there is no faction zone on the hunt. A crafted Protector's, Sentinel's, or Champion's piece stays on both factions. Those words are also PvP ranks, and that rank gate does not apply to a pattern.
+The 50% and 150% labels under Map pin size no longer sit on the sentence under the slider.
 
-**Cat and bear weapons**
+### v1.1.6
 
-Bear prices weapon damage at 4.9, the same as cat. v1.1.5 had bear at 2.52. An on-hit weapon proc scores in cat and bear, because it fires in form. Druid was scored again. Heavehammer at 24 is still 153.64 for a bear.
-
-**Map pins stay the size you pick**
-
-Hunt settings has a map pin size from 50% to 150%. 100% is the normal icon. The icon keeps that size when the map zooms, including OpenMap. The zoomed-out map was drawing the icon gigantic.
-
-**Minimap button collectors**
-
-GearQuest adds a launcher button for addons that gather minimap buttons into one menu.
-
-**Weight tooltip**
-
-The spec weight tooltip says Melee weapon DPS and Ranged weapon DPS.
-
-**Level up**
-
-On a ding, the weapon lists are walked a few milliseconds at a time, so the weapon catalog is not one frame.
+The window title reads **GearQuest Forever v1.1.6**. A worn piece that is not on your hunt list is scored from its tooltip, so the score bar no longer prints 0 for gear you are wearing. An empty slot is still 0. Hunt names use the tooltip color. The Twisted Evils rewards are the green pieces: Sprightring Helm is rank 5 for Combat at 40–43, Hulkstone Pauldrons are rank 6 for Arms at 40–41, Acumen Robes are rank 9 for Holy at 40–41, and Relentless Chain leaves the Beast Mastery chest list. No Dungeons hides a quest that enters a dungeon. Crafts both factions can make stay on both lists, including Brawler's Leather Hood. Bear prices weapon damage at 4.9, the same as cat. Map pins keep the size you pick when the map zooms. GearQuest adds a launcher for minimap-button collectors. The weight tooltip says Melee weapon DPS and Ranged weapon DPS. On a ding, the weapon lists are walked a few milliseconds at a time.
 
 ### v1.1.5
 

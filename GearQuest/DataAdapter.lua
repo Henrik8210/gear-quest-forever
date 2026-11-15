@@ -143,18 +143,6 @@ local CLASS_ADDONS = {
     MAGE    = "GearQuestForever_MAGE",
 }
 
-local NOTABLE_TABLE = {
-    PALADIN = "paladinNotable",
-    WARRIOR = "warriorNotable",
-    HUNTER  = "hunterNotable",
-    DRUID   = "druidNotable",
-    SHAMAN  = "shamanNotable",
-    ROGUE   = "rogueNotable",
-    PRIEST  = "priestNotable",
-    WARLOCK = "warlockNotable",
-    MAGE    = "mageNotable",
-}
-
 local function AddonIsLoaded(name)
     if C_AddOns and C_AddOns.IsAddOnLoaded then
         return C_AddOns.IsAddOnLoaded(name)
@@ -180,6 +168,14 @@ end
 
 local CLASSTBL = {}
 
+local function PlayerClassFile()
+    if UnitClass then
+        local _, classFile = UnitClass("player")
+        return classFile and string.upper(classFile) or nil
+    end
+    return nil
+end
+
 local function ExtractPipelineScore(r, src)
     if src.hasSpec then
         if type(r[5]) == "number" and type(r[8]) == "number" then
@@ -202,14 +198,104 @@ local function PipelineScoreKey(itemId, slot, minLevel, faction, spec)
     )
 end
 
+-- Item facts and the repeating suffix / route / hand fields live once per
+-- item. A row keeps the band, the rank, and the score. Reads of entry.zone
+-- and the rest still find those facts. A write lands on that row.
+local SHARED_FACT_FIELDS = {
+    "sourceType", "instructions", "setPiece", "lore", "zone", "npc",
+    "questName", "profession", "reqRep", "reqSkills", "proc",
+}
+local OPTIONAL_ROW_FIELDS = {
+    "suffix", "suffixChance", "suffixId", "suffixRange", "route", "hand",
+    "origin", "reserve", "healOnly",
+}
+local SHARED_MT = setmetatable({}, { __mode = "k" })
+
+local function SharedMetatable(classFile, classes, itemId, f, r)
+    local byClass = SHARED_MT[f]
+    if not byClass then
+        byClass = {}
+        SHARED_MT[f] = byClass
+    end
+    local variant = classFile
+    local hasExtra = false
+    for i = 1, #OPTIONAL_ROW_FIELDS do
+        if r[OPTIONAL_ROW_FIELDS[i]] ~= nil then
+            hasExtra = true
+            break
+        end
+    end
+    if hasExtra then
+        local parts = { classFile }
+        for i = 1, #OPTIONAL_ROW_FIELDS do
+            local value = r[OPTIONAL_ROW_FIELDS[i]]
+            parts[#parts + 1] = value == nil and "" or (type(value) .. ":" .. tostring(value))
+        end
+        variant = table.concat(parts, "\0")
+    end
+    local mt = byClass[variant]
+    if mt then
+        return mt
+    end
+    local base = byClass[classFile]
+    if hasExtra and not base then
+        base = SharedMetatable(classFile, classes, itemId, f, {})
+    end
+    local shared = { itemId = itemId, classes = classes, generated = true }
+    for i = 1, #SHARED_FACT_FIELDS do
+        local key = SHARED_FACT_FIELDS[i]
+        local value = f[key]
+        if value ~= nil then
+            shared[key] = value
+        end
+    end
+    if hasExtra then
+        for i = 1, #OPTIONAL_ROW_FIELDS do
+            local key = OPTIONAL_ROW_FIELDS[i]
+            local value = r[key]
+            if value ~= nil then
+                shared[key] = value
+            end
+        end
+    end
+    mt = { __index = shared, __gqShared = shared }
+    mt.__gqBase = hasExtra and base or mt
+    byClass[variant] = mt
+    return mt
+end
+
+function GQ.Data:CopyEntry(entry)
+    local copy = {}
+    if not entry then
+        return copy
+    end
+    for key, value in pairs(entry) do
+        copy[key] = value
+    end
+    local mt = getmetatable(entry)
+    if mt and mt.__gqShared then
+        local shared = mt.__gqShared
+        for i = 1, #OPTIONAL_ROW_FIELDS do
+            local key = OPTIONAL_ROW_FIELDS[i]
+            if rawget(copy, key) == nil and shared[key] ~= nil then
+                copy[key] = shared[key]
+            end
+        end
+        setmetatable(copy, mt.__gqBase or mt)
+    end
+    return copy
+end
+
 local function Expand(src, data, out)
     local rows, facts = data[src.picks], data[src.facts]
     if not rows or not facts then return 0 end
 
     CLASSTBL[src.class] = CLASSTBL[src.class] or { [src.class] = true }
     local classes = CLASSTBL[src.class]
+    local classFile = src.class
     local prefix  = "gen:" .. src.class:lower() .. ":"
     local added   = 0
+    local n = #out
 
     for i = 1, #rows do
         local r = rows[i]
@@ -233,43 +319,20 @@ local function Expand(src, data, out)
                 faction = src.factionInRow and r.faction or src.faction
             end
             local pipelineScore = ExtractPipelineScore(r, src)
-            out[#out + 1] = {
+            local entry = {
                 id           = prefix .. itemId .. ":" .. r[2] .. ":" .. r[3]
                                  .. ":" .. tostring(spec) .. ":" .. tostring(faction),
-                itemId       = itemId,
                 slot         = r[2],
                 minLevel     = r[3],
                 maxLevel     = r[4],
                 curatedRank  = rank,
                 pipelineScore = pipelineScore,
-                classes      = classes,
                 specs        = spec and src.specs and src.specs[spec] or nil,
                 factions     = faction and FACTION[faction] or nil,
-                sourceType   = f.sourceType,
-                instructions = f.instructions,
-                setPiece     = f.setPiece,
-                lore         = f.lore,
-                zone         = f.zone,
-                npc          = f.npc,
-                questName    = f.questName,
-                profession   = f.profession,
-                reqRep       = f.reqRep,
-                reqSkills    = f.reqSkills,
-                suffix       = r.suffix,
-                suffixChance = r.suffixChance,
-                suffixId     = r.suffixId,
-                suffixRange  = r.suffixRange,
-                route        = r.route,
-                hand         = r.hand,
-                origin       = r.origin,
-                proc         = f.proc,
-                generated    = true,
-                reserve      = r.reserve,
-                healOnly     = r.healOnly,
             }
-            if pipelineScore and GQ.Data.RegisterPipelineScore then
-                GQ.Data:RegisterPipelineScore(itemId, r[2], r[3], faction, spec, pipelineScore)
-            end
+            setmetatable(entry, SharedMetatable(classFile, classes, itemId, f, r))
+            n = n + 1
+            out[n] = entry
             added = added + 1
         end
     end
@@ -347,8 +410,20 @@ function GQ.Data:EnsureClassLoaded(classFile)
         self:EnrichEntrySuffix(self.entries[i])
         self:EnrichBossChestEntry(self.entries[i])
     end
-    -- Pick arrays stay. WoW will not run this class file again, and leaving
-    -- the class drops only the expanded rows.
+    -- The suffix lookup is already built. Your own class is never released,
+    -- so its pick arrays are not read again. A simulated class keeps them,
+    -- because leaving that class drops only the expanded rows and WoW will
+    -- not run the file again.
+    if classFile == PlayerClassFile() then
+        self._picksDropped = self._picksDropped or {}
+        for i = 1, #SOURCES do
+            local src = SOURCES[i]
+            if src.class == classFile then
+                self[src.picks] = nil
+            end
+        end
+        self._picksDropped[classFile] = true
+    end
     self._loadedClasses[classFile] = true
     self._expandedClasses[classFile] = true
     self._generatedCount = (self._generatedCount or 0) + n
@@ -361,6 +436,10 @@ end
 function GQ.Data:ReleaseExpandedClass(classFile)
     classFile = classFile and string.upper(classFile)
     if not classFile or not self._expandedClasses or not self._expandedClasses[classFile] then
+        return false
+    end
+    -- Its pick arrays are gone, so it could not be expanded again.
+    if self._picksDropped and self._picksDropped[classFile] then
         return false
     end
     local kept = {}
@@ -513,24 +592,6 @@ function GQ.Data:BuildSuffixLookup(classFile)
         if not classFile or (entry.classes and entry.classes[classFile]) then
             ingest(entry.itemId, entry.suffix, entry.minLevel, entry.suffixId, entry.suffixRange)
             ingestRange(entry.itemId, entry.suffix, entry.minLevel, entry.suffixRange)
-        end
-    end
-
-    if classFile then
-        local rows = self[NOTABLE_TABLE[classFile]]
-        if rows then
-            for i = 1, #rows do
-                ingestRow(rows[i])
-            end
-        end
-    else
-        for _, tableName in pairs(NOTABLE_TABLE) do
-            local rows = self[tableName]
-            if rows then
-                for i = 1, #rows do
-                    ingestRow(rows[i])
-                end
-            end
         end
     end
 end
