@@ -6882,9 +6882,17 @@ function GQ.Data:GearScoreDeltaText(index, baseline)
     return string.format("  %s |cffff4040%d|r", arrow, delta)
 end
 
-function GQ.Data:GearScoreTrail(entry, ctx)
+-- The same green or red number the item tooltip prints. Positive beats
+-- what is worn. Negative is a downgrade. Nil means the worn piece could
+-- not be compared. Zero means the same piece, or a tie.
+function GQ.Data:GearScoreArrowDelta(entry, ctx)
     if not ctx or not entry or type(entry.pipelineScore) ~= "number" then
-        return ""
+        return nil
+    end
+    if entry.itemId and ctx.equippedIds and ctx.equippedIds[entry.itemId] then
+        if not entry.suffix or entry.suffix == "" then
+            return 0
+        end
     end
     local indexScore = entry.pipelineScore
     if self.EntryIsDamagingWeapon and self:EntryIsDamagingWeapon(entry) then
@@ -6895,7 +6903,7 @@ function GQ.Data:GearScoreTrail(entry, ctx)
     end
     local index = self:GearScoreIndex(indexScore, ctx.minScore, ctx.maxScore)
     if not index then
-        return ""
+        return nil
     end
     local baseline = ctx.baseline
     if ctx.handBaseline then
@@ -6937,11 +6945,35 @@ function GQ.Data:GearScoreTrail(entry, ctx)
         elseif indexDelta == 0 and loadoutDelta < 0 then
             indexDelta = -1
         end
-        baseline = index - indexDelta
+        return indexDelta
+    end
+    if baseline == nil then
+        return nil
+    end
+    return index - baseline
+end
+
+function GQ.Data:GearScoreTrail(entry, ctx)
+    if not ctx or not entry or type(entry.pipelineScore) ~= "number" then
+        return ""
+    end
+    local indexScore = entry.pipelineScore
+    if self.EntryIsDamagingWeapon and self:EntryIsDamagingWeapon(entry) then
+        local shown = self:DisplayedWeaponScore(entry)
+        if type(shown) == "number" then
+            indexScore = shown
+        end
+    end
+    local index = self:GearScoreIndex(indexScore, ctx.minScore, ctx.maxScore)
+    if not index then
+        return ""
     end
     local delta = ""
     if not (entry.itemId and ctx.equippedIds and ctx.equippedIds[entry.itemId]) then
-        delta = self:GearScoreDeltaText(index, baseline)
+        local arrow = self:GearScoreArrowDelta(entry, ctx)
+        if arrow and arrow ~= 0 then
+            delta = self:GearScoreDeltaText(arrow, 0)
+        end
     end
     return string.format("|cffffffff%d|r%s", index, delta)
 end

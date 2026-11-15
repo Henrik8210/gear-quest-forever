@@ -68,7 +68,7 @@ The line is **Rank #N for your level** and a GearQuest index from **0** to **100
 
 When the slot has something equipped, a green up arrow and **+N** means this piece is better by that many index points. A red down arrow and **−N** means it is worse. An empty slot shows the index only. The same item shows no arrow. Rings and trinkets compare to the weaker piece, and only when both slots are filled.
 
-Mousing over a creature, a vendor, a trainer, or a quest giver adds up to three lines, and only for pieces on this level's hunt list. The rank matches the (i) list. Hunt settings can hide those lines. Lookup stays empty until a result is clicked. A completed quest whose reward you did not take stays on Active in red.
+Mousing over a creature, a vendor, a trainer, or a quest giver adds up to three lines. A line appears only when the piece is on this level's hunt list and it beats what you are wearing, or the slot is empty. A downgrade stays off. The line is the rank, the item, the slot, the white score, the green arrow, and the green comparison number, the same +N as the item tooltip. The arrow is never printed without that number. Hunt settings can hide those lines. Lookup stays empty until a result is clicked. A completed quest whose reward you did not take stays on Active in red.
 
 A set piece can stay rank 1 because the set is scored together even when another piece in the slot has a higher score on its own. The tooltip then adds **Rank 1 when you wear multiple pieces of this set.** Enhancement at 25–27: **Leggings of the Fang** stay rank 1 for Embrace of the Viper; **Triprunner Dungarees** can still read **+100**.
 

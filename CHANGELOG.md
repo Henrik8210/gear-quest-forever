@@ -2,7 +2,23 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.1.7
+## v1.1.8
+
+The window title reads **GearQuest Forever v1.1.8**.
+
+**A target lists upgrades only**
+
+Mouse over a creature, a vendor, a trainer, or a quest giver. The tooltip adds up to three pieces from that unit. A line appears only when the piece is on this level's hunt list and it beats what you are wearing, or the slot is empty. A downgrade stays off, even when that piece is on the hunt list and it is not the item you have on.
+
+The line is the rank, the item, the slot, the white score, the green arrow, and the green comparison number. That number is the same +N the item tooltip prints. The arrow is not shown without it. The three lines are the biggest upgrades.
+
+Rings and trinkets compare to the weaker piece when both slots are filled. One empty ring slot, or one empty trinket slot, counts as an upgrade. A piece from an earlier level band stays off.
+
+**Disengagement Ring** is the case that was wrong. Friz Frazzlespark in Powderfuse Port sells it. For a hunter at 44 it is finger rank #8, and it beats Seal of Sylvanas and Monkey Ring. His tooltip now lists that ring with the green comparison number. A piece he sells that scores worse than what you are wearing does not appear. The same test is used for every creature, vendor, trainer, and quest giver, and for every slot.
+
+Hunt settings still has **Hide unit gear tips**. The lines show until you check that box.
+
+### v1.1.7
 
 The window title reads **GearQuest Forever v1.1.7**.
 

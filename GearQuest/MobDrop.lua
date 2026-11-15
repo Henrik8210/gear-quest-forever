@@ -115,6 +115,28 @@ local function CurrentListRank(entry, list)
     return scored, place
 end
 
+-- The piece already in that slot. A ring or trinket counts in either slot.
+-- A different item in the slot still leaves this one on the tooltip.
+local function WearingEntry(entry, slotName)
+    if not entry or not entry.itemId or not GQ.Data.GetInventorySlots or not GQ.Data.EquippedItemId then
+        return false
+    end
+    local slots = GQ.Data:GetInventorySlots(slotName)
+    for i = 1, #slots do
+        local inv = slots[i]
+        if GQ.Data:EquippedItemId(inv) == entry.itemId then
+            if not entry.suffix or entry.suffix == "" then
+                return true
+            end
+            local link = GetInventoryItemLink and GetInventoryItemLink("player", inv)
+            if link and GQ.Data.EntrySuffixMatchesLink and GQ.Data:EntrySuffixMatchesLink(entry, link) then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 function GQ.Data:TopUnitGear(name, limit)
     limit = limit or 3
     local key = MobKey(name)
@@ -170,21 +192,28 @@ function GQ.Data:TopUnitGear(name, limit)
         local slotName, handKind = TooltipSlot(entry)
         local list = GQ.Log and GQ.Log.GetSlotRankList and GQ.Log:GetSlotRankList(slotName, handKind) or {}
         local scored, place = CurrentListRank(entry, list)
-        local scoreText, index = scored and UnitGearScore(scored, slotName, handKind)
-        if scoreText and index and place then
-            picks[i].entry = scored
-            picks[i].rank = place
-            picks[i].scoreText = scoreText
-            picks[i].index = index
-            kept[#kept + 1] = picks[i]
+        -- On this level's list, and it beats what is worn, or the slot is
+        -- empty. A downgrade stays off. The arrow is that same comparison.
+        if scored and place and not WearingEntry(scored, slotName) then
+            local scoreText, index, arrow = UnitGearScore(scored, slotName, handKind)
+            if scoreText and index then
+                picks[i].entry = scored
+                picks[i].rank = place
+                picks[i].scoreText = scoreText
+                picks[i].index = index
+                picks[i].arrow = arrow
+                kept[#kept + 1] = picks[i]
+            end
         end
     end
     if #kept == 0 then
         return nil
     end
     table.sort(kept, function(a, b)
-        if a.index ~= b.index then
-            return a.index > b.index
+        local again = a.arrow or a.index or 0
+        local bgain = b.arrow or b.index or 0
+        if again ~= bgain then
+            return again > bgain
         end
         local arank = a.rank or 99
         local brank = b.rank or 99
@@ -258,32 +287,32 @@ function UnitGearScore(entry, slotName, handKind)
             slotName = GQ.Data:NormalizeSlotName(slotName) or slotName
         end
     end
-    local delta, worn = GQ.Data:GearScoreUpgradeDelta(entry, slotName, handKind)
-    if not delta then
-        return nil
-    end
     local ctx = GQ.Data:GearScoreContext(slotName, handKind)
-    -- A filled slot we cannot compare is not shown. An empty slot is an upgrade.
-    if worn then
-        if delta <= 0 then
-            return nil
-        end
-    elseif delta <= 0 or (ctx and not ctx.empty) or not ctx then
+    if not ctx then
         return nil
     end
-    local score
-    if ctx then
-        score = GQ.Data:GearScoreIndex(entry.pipelineScore, ctx.minScore, ctx.maxScore)
+    -- The item tooltip's green number. A downgrade, a tie, and a piece we
+    -- cannot compare stay off. An empty slot is an upgrade.
+    local arrow = GQ.Data:GearScoreArrowDelta(entry, ctx)
+    if not ctx.empty and (not arrow or arrow <= 0) then
+        return nil
     end
+    local indexScore = entry.pipelineScore
+    if GQ.Data.EntryIsDamagingWeapon and GQ.Data:EntryIsDamagingWeapon(entry) then
+        local shown = GQ.Data:DisplayedWeaponScore(entry)
+        if type(shown) == "number" then
+            indexScore = shown
+        end
+    end
+    local score = GQ.Data:GearScoreIndex(indexScore, ctx.minScore, ctx.maxScore)
     if not score then
         score = math.floor(entry.pipelineScore + 0.5)
     end
     local text = "|cffffffff" .. score .. "|r"
-    if worn then
-        local addon = GQ.ADDON_NAME or "GearQuestForever"
-        text = text .. " |TInterface\\AddOns\\" .. addon .. "\\Art\\GQ-ArrowUp.png:14:14:0:-1|t"
+    if arrow and arrow > 0 and GQ.Data.GearScoreDeltaText then
+        text = text .. GQ.Data:GearScoreDeltaText(arrow, 0)
     end
-    return text, score
+    return text, score, arrow
 end
 
 local function AddLines(tooltip, picks)
