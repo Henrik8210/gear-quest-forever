@@ -2,7 +2,21 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.1.8
+## v1.1.9
+
+The window title reads **GearQuest Forever v1.1.9**. This is a hotfix.
+
+**Mouseover in a dungeon no longer errors**
+
+Mousing over a creature in Wailing Caverns, or any other dungeon, was throwing a Lua error. The client hands that tooltip a hidden unit token, and GearQuest was passing it to `UnitExists`. The error is gone.
+
+The tooltip still adds up to three lines when the creature's name can be read. A line appears only when the piece is on this level's hunt list and it beats what you are wearing, or the slot is empty. A downgrade stays off. The line is the rank, the item, the slot, the white score, the green arrow, and the green comparison number, the same +N as the item tooltip. When the client hides the name as well, the tooltip stays quiet and does not error. Hunt settings **Hide unit gear tips** still hides the lines.
+
+**The knight's face pulses once**
+
+The first time you open the log, the portrait pulses gold, the same highlight as the **Play style** button. It keeps pulsing until the guide opens. That is a click on the portrait, or leaving the window up so he speaks on his own. After that the pulse stays off. Hovering the portrait still lights his face.
+
+### v1.1.8
 
 The window title reads **GearQuest Forever v1.1.8**.
 

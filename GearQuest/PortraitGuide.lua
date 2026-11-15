@@ -197,6 +197,40 @@ function GUIDE:MarkOnboarded()
     UI().portraitGuideIntro = true
 end
 
+-- Same gold pulse as the Play style button. It runs until the portrait is
+-- opened once, then portraitBlinkSeen keeps it off.
+function GUIDE:StartPortraitIntro()
+    local hit = self.hit
+    local ui = GearQuestForeverDB and GearQuestForeverDB.ui
+    if not hit or not hit.glow or (ui and ui.portraitBlinkSeen) or hit._portraitIntro then
+        return
+    end
+    hit._portraitIntro = true
+    hit._pulseT = 0
+    hit.glow:Show()
+    local glow = hit.glow
+    local peak = hit._glowRest or 0.45
+    hit:SetScript("OnUpdate", function(self, elapsed)
+        self._pulseT = (self._pulseT or 0) + (elapsed or 0)
+        local wave = 0.5 - 0.5 * math.cos(self._pulseT * 1.4)
+        glow:SetAlpha(wave * peak)
+    end)
+end
+
+function GUIDE:DismissPortraitIntro()
+    UI().portraitBlinkSeen = true
+    local hit = self.hit
+    if not hit then
+        return
+    end
+    hit._portraitIntro = nil
+    hit:SetScript("OnUpdate", nil)
+    if hit.glow then
+        hit.glow:SetAlpha(hit._glowRest or 0.45)
+        hit.glow:Hide()
+    end
+end
+
 function GUIDE:VoiceOn()
     return UI().portraitGuideVoice ~= false
 end
@@ -1072,6 +1106,7 @@ function GUIDE:Begin(frame)
     bubble:Show()
     self:SetBubbleWatch(true)
     self:MarkOnboarded()
+    self:DismissPortraitIntro()
     self.page = nil
     self:SetPage(1)
     if GQ.Log and GQ.Log.GamepadSyncGuide then
@@ -1098,6 +1133,7 @@ function GUIDE:OnLogShown(frame)
         return
     end
     self:Ensure(frame)
+    self:StartPortraitIntro()
     if self:Onboarded() then
         return
     end
@@ -1166,6 +1202,7 @@ function GUIDE:Ensure(frame)
         if self.hit and self.hit:GetParent() ~= frame then
             self.hit:SetParent(frame)
         end
+        self:StartPortraitIntro()
         return
     end
 
@@ -1202,13 +1239,15 @@ function GUIDE:Ensure(frame)
         glow:SetBlendMode("ADD")
         glow:SetAlpha(0.9)
     end
+    hit._glowRest = glow:GetAlpha() or 0.45
     glow:Hide()
     hit.glow = glow
     hit:SetScript("OnClick", function()
         GUIDE:Open(frame)
     end)
     hit:SetScript("OnEnter", function(self)
-        if self.glow then
+        if self.glow and not self._portraitIntro then
+            self.glow:SetAlpha(self._glowRest or 0.45)
             self.glow:Show()
         end
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
@@ -1217,7 +1256,7 @@ function GUIDE:Ensure(frame)
         GameTooltip:Show()
     end)
     hit:SetScript("OnLeave", function(self)
-        if self.glow then
+        if self.glow and not self._portraitIntro then
             self.glow:Hide()
         end
         GameTooltip:Hide()
@@ -1408,4 +1447,5 @@ function GUIDE:Ensure(frame)
     self.bubble = bubble
     self:UpdateMute()
     self:UpdateVolume()
+    self:StartPortraitIntro()
 end

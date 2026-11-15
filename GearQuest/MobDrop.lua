@@ -346,23 +346,88 @@ local function AddLines(tooltip, picks)
     end
 end
 
-function GQ.Data:AddUnitGearLines(tooltip, unit)
-    if not tooltip or not unit or not UnitExists or not UnitExists(unit) then
+-- The first line of a unit tooltip is the creature name. World-cursor
+-- tooltips (a dungeon nameplate, a mouseover inside Wailing Caverns) mark
+-- the unit token as a secret. UnitExists, UnitIsPlayer, UnitGUID, and
+-- UnitName throw if addon code passes that secret. Read the painted name
+-- instead, and add nothing when that text is secret too.
+local function TooltipUnitName(tooltip)
+    local left = tooltip.TextLeft1
+    if not left or not left.GetText then
+        local tipName = tooltip.GetName and tooltip:GetName()
+        if tipName then
+            left = _G[tipName .. "TextLeft1"]
+        end
+    end
+    if not left or not left.GetText then
+        return nil
+    end
+    local ok, text = pcall(left.GetText, left)
+    if not ok then
+        return nil
+    end
+    if GQ.PublicText then
+        return GQ.PublicText(text)
+    end
+    if type(text) ~= "string" or text == "" then
+        return nil
+    end
+    return text
+end
+
+local function PublicUnitCall(fn, unit)
+    if not fn or not unit then
+        return nil
+    end
+    local ok, value = pcall(fn, unit)
+    if not ok then
+        return nil
+    end
+    if GQ.PublicText then
+        return GQ.PublicText(value)
+    end
+    return value
+end
+
+function GQ.Data:AddUnitGearLines(tooltip, unit, hintedName)
+    if not tooltip then
         return
     end
     local settings = GearQuestForeverDB and GearQuestForeverDB.settings
     if settings and settings.hideUnitGearTips then
         return
     end
-    if UnitIsPlayer and UnitIsPlayer(unit) then
+    -- A secret token is not a unit id. Never hand it to UnitExists.
+    local token = GQ.PublicText and GQ.PublicText(unit) or nil
+    if token and UnitExists then
+        local ok, exists = pcall(UnitExists, token)
+        if not ok or not exists then
+            token = nil
+        end
+    end
+    local name = GQ.PublicText and GQ.PublicText(hintedName) or nil
+    local guid
+    if token and UnitIsPlayer then
+        local ok, player = pcall(UnitIsPlayer, token)
+        if ok and player then
+            return
+        end
+        guid = PublicUnitCall(UnitGUID, token) or token
+        if not name then
+            name = PublicUnitCall(UnitName, token)
+        end
+    end
+    if not name then
+        name = TooltipUnitName(tooltip)
+    end
+    if not name then
         return
     end
-    local guid = (UnitGUID and UnitGUID(unit)) or unit
+    guid = guid or ("name:" .. string.lower(name))
     if tooltip.gqUnitGear == guid then
         return
     end
     tooltip.gqUnitGear = guid
-    local name = UnitName(unit)
     local picks = self:TopUnitGear(name, 3)
     if not picks then
         return
@@ -393,16 +458,34 @@ function GQ.Data:InstallUnitGearTips()
         and Enum and Enum.TooltipDataType and Enum.TooltipDataType.Unit
     HookTip(GameTooltip)
     if hasUnit then
-        TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function(tooltip)
-            local _, unit = tooltip:GetUnit()
-            GQ.Data:AddUnitGearLines(tooltip, unit)
+        TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function(tooltip, data)
+            local name, unit
+            if tooltip.GetUnit then
+                local ok, hinted, token = pcall(tooltip.GetUnit, tooltip)
+                if ok then
+                    name, unit = hinted, token
+                end
+            end
+            local line = data and data.lines and data.lines[1]
+            -- GetUnit's name is often the same secret as the unit token.
+            -- A public line on the tooltip data still names the creature.
+            if line and line.leftText and not (GQ.PublicText and GQ.PublicText(name)) then
+                name = line.leftText
+            end
+            GQ.Data:AddUnitGearLines(tooltip, unit, name)
         end)
         return
     end
     if GameTooltip and GameTooltip.HookScript then
         GameTooltip:HookScript("OnTooltipSetUnit", function(self)
-            local _, unit = self:GetUnit()
-            GQ.Data:AddUnitGearLines(self, unit)
+            local name, unit
+            if self.GetUnit then
+                local ok, hinted, token = pcall(self.GetUnit, self)
+                if ok then
+                    name, unit = hinted, token
+                end
+            end
+            GQ.Data:AddUnitGearLines(self, unit, name)
         end)
     end
 end
