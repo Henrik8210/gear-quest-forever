@@ -100,6 +100,26 @@ numbers in `score.py` `weights_at_level()`, and
 you explicitly ask for a retune. A piece ranking first because of an
 existing weight is the model working.
 
+**Level-30 Molten Core copies are not hunts.** The 96 ids in
+`pipeline/data/forever_beta_copies.json` (288823 through 288925, skipping
+the holes at 288895–288900 and 288912) are level-30 epic copies of the
+Molten Core tier sets and raid gear. They were spawned during the level-30
+beta, including from level-1 wolves, and they do not drop on live servers.
+The level-60 ids are the ones that drop. A rescrape must skip that list
+fully: the Forever item scrape, tooltip refresh, ingest, the new-item
+scan, and scoring. Do not index them again. Do not turn one back into a
+hunt because Forever still has the client row. The sets are Arcanist,
+Felheart, Prophecy, Nightslayer, Cenarion, Earthfury, Giantstalker,
+Lawbringer, and Might, plus the matching level-30 weapons and accessories
+(Spinal Reaper, Bonereaver's Edge, Perdition's Blade, Band of Accuria, and
+the rest of that id run).
+
+**Tester items stay out of the catalog.** Invisible Dagger (280304) is
+spell 1308095, a hidden dummy aura. QATest +1000 Spell Dmg Ring (24358)
+and the two 2200 Test swords (19503 and 19504) are test items. A rescrape
+must not index them. An item whose name is UNUSED, (DNT), or Placeholder
+is the same kind of record and stays out of the addon.
+
 **Where to look up a weight change.** The community sheet is
 [GearQuest Forever - Class Stat Weights](https://docs.google.com/spreadsheets/d/1jMC89KgzHpPZHYgcjOq6ef7lENhh8OGgypG2rC2m0Ok/edit).
 One tab per class (Druid, Hunter, Mage, Paladin, Priest, Rogue, Shaman,
@@ -759,7 +779,7 @@ When you are not simulating, and the log page is open, the header is a four-sect
 
 The fill is the average GearQuest index of every gear slot, then clamped to **0–100**. `GearScoreWornRows` builds one row per slot. Head, neck, shoulder, chest, waist, legs, feet, wrist, hands, back, main hand, and ranged each count once. Finger counts both rings. Trinket counts both trinkets. An empty off hand is left out when the main hand is a two-hand weapon, and Enhancement (`UsesTwoHandOnlyWeapons`) never counts an off hand. Hunter two-hand uses the two-hand list. Hunter one-hand main uses the main-hand list. Rogue main hand uses the main-hand list.
 
-An empty slot is **0** and the tooltip writes **(empty slot)** after that score. A worn piece with no pipeline score is not an empty slot and is not a score of 0. v1.1.5 returned 0 from `WornSlotIndex` the moment `EquippedPipelineScore` missed, so a worn neck, ring, trinket, or craft the list had dropped painted 0 while the tooltip showed real stats. `WornSlotIndex` scores the worn link with `ScoreItemLinkStats` when the stored score is missing, and `GearScoreWornRows` passes that link. A non-positive result means the client has not loaded the item yet. `GET_ITEM_INFO_RECEIVED` refreshes the bar when that worn item arrives. Do not return 0 as soon as the stored score is missing. Do not file a craft both factions can make under one faction's zone: Alliance then loses the hunt and the worn piece has nothing stored to score. A worn piece that aged out of the band still has an index, from the nearest same-spec, same-faction band (`EquippedPipelineScore`). The tooltip list shows that same 0–100 number. The line above the list is one sentence: "The average GearQuest index of the gear you are wearing."
+An empty slot is **0** and the tooltip writes **(empty slot)** after that score. A worn piece with no pipeline score is not an empty slot and is not a score of 0. v1.1.5 returned 0 from `WornSlotIndex` the moment `EquippedPipelineScore` missed, so a worn neck, ring, trinket, or craft the list had dropped painted 0 while the tooltip showed real stats. `WornSlotIndex` scores the worn link with `ScoreItemLinkStats` when the stored score is missing or indexes to 0. A school line (`Increases damage done by Shadow spells and effects by up to N`) is that school's spell power, and `N Armor` is armor, using the scoring-row weight. **Scaled Cloak of Shadow Wrath** (+9 shadow spell power) reads about 74 for a shadow priest, the same place as Sage's Cloak of Shadow Wrath. Do not print 0 for that link. `GearScoreWornRows` passes the link. A non-positive result means the client has not loaded the item yet. `GET_ITEM_INFO_RECEIVED` refreshes the bar when that worn item arrives. Do not return 0 as soon as the stored score is missing. Do not file a craft both factions can make under one faction's zone: Alliance then loses the hunt and the worn piece has nothing stored to score. A worn piece that aged out of the band still has an index, from the nearest same-spec, same-faction band (`EquippedPipelineScore`). The tooltip list shows that same 0–100 number. The line above the list is one sentence: "The average GearQuest index of the gear you are wearing."
 
 Each 25 points is one section. The fill color uses the raw average, before it is rounded for the word: above 75 legendary orange, above 50 epic purple, above 25 rare blue, otherwise uncommon green. The hover word uses the rounded integer: **Below average** (0–25, green), **Fair** (26–50, blue), **Great** (51–75, purple), **Legend** (76–100, orange). The number stays white. The header is yellow **GearQuest Score**, then `N / 100 · WORD`.
 
@@ -949,7 +969,13 @@ The source **Filter** closes on a click outside the menu. The Profession
     get yet. Reputation uses the standing stored on that item (`reqRep`).
     A bind-on-pickup craft waits until the character has that profession
     and the recipe skill. A bind-on-equip craft stays, unless the item
-    itself requires the profession to wear (`reqSkills`). Reaching the
+    itself requires the profession to wear (`reqSkills`). That wear line
+    is honored for every source, including a profession craft. Flying
+    Tiger Goggles (4368) require Engineering (100) to equip, so Get it now
+    hides them from a tailor who does not have Engineering, and unchecking
+    Engineering hides them too. A linen craft with no wear line stays.
+    Spellpower Goggles Xtreme require Engineering 215 to wear; the recipe
+    is 225, and the hunt can show once the character can equip them. Reaching the
     standing or the skill shows the hunt without turning the style off.
     If the reputation scan fails, reputation hunts stay. A bind type that
     is still unknown does not hide the craft.
@@ -1532,7 +1558,10 @@ stays missing. Do not fill the gap from ForeverDB.
 A new equippable piece is built from the Nether tooltip
 `https://nether.wowhead.com/tooltip/item/{id}?dataEnv=16` and the Forever
 item page. An item with no inventory slot (seals, toys, hidden
-placeholders, a deprecated name) is not hunt gear.
+placeholders, a deprecated name) is not hunt gear. The level-30 Molten
+Core copies in `forever_beta_copies.json` and the four tester items
+(280304, 24358, 19503, 19504) are not hunt gear either. Skip them in the
+scrape, the tooltip refresh, ingest, the new-item scan, and scoring.
 
 Quest pickup is the Wowhead Forever `Requires level`. Arachnophobia (6284)
 is 15. The Tower of Althalaxx is 13. Only fill an item whose required level

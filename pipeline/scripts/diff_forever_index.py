@@ -1,16 +1,20 @@
 """Compare the latest Wowhead Forever index to items.json."""
 import json
 import os
-from gq_paths import G, DATA
+from gq_paths import G, DATA, forever_beta_copy_ids
 
 index = json.load(open(os.path.join(DATA, "forever_wowhead", "index.json"), encoding="utf-8"))
 items = json.load(open(G + "items.json", encoding="utf-8"))
 pool = set(json.load(open(G + "classic_item_ids.json", encoding="utf-8")))
+NOT_GEAR = {24358, 19503, 19504, 280304}
+beta_copies = forever_beta_copy_ids() | NOT_GEAR
 
 new_ids = []
 changed = []
 for row in index["items"]:
     iid = row["id"]
+    if iid in beta_copies:
+        continue
     key = str(iid)
     it = items.get(key)
     if not it:

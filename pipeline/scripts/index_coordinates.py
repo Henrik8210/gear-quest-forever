@@ -73,6 +73,8 @@ HAND_FACTION = {
     # Opportunistic Education is Side: Horde. City of Dalaran, Rexxie Copperclutch.
     279845: "Horde",
     279846: "Horde",
+    # Gleaming Crescent Necklace (98027) turns in to Maliynn in Astranaar.
+    281290: "Alliance",
     282283: "Alliance",
 }
 

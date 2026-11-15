@@ -29,7 +29,7 @@ import urllib.request
 from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from gq_paths import DATA
+from gq_paths import DATA, forever_beta_copy_ids
 from ingest_forever_wowhead import ARMOR_SUB, parse_tooltip
 from probe_forever_hunt_tooltips import plain as plain_tip
 
@@ -160,6 +160,8 @@ def hunt_row(iid: int, raw: dict, item: dict) -> dict:
     return row
 
 
+BETA_COPIES = forever_beta_copy_ids() | {24358, 19503, 19504, 280304}
+
 def missing_ids():
     import re
     root = Path(__file__).resolve().parents[2]
@@ -200,11 +202,11 @@ def main():
         ids = set()
         for row in index["items"]:
             iid = int(row["id"])
-            if str(iid) in pins or iid == WAND:
+            if str(iid) in pins or iid == WAND or iid in BETA_COPIES:
                 continue
             ids.add(iid)
         for iid in hunt_ids_from_addon():
-            if str(iid) in pins or str(iid) not in items or iid == WAND:
+            if str(iid) in pins or str(iid) not in items or iid == WAND or iid in BETA_COPIES:
                 continue
             ids.add(iid)
         ids = sorted(ids)
@@ -212,6 +214,7 @@ def main():
         ids = [i for i in ids if i in only] or [
             i for i in sorted(only) if str(i) not in pins and i != WAND and str(i) in items
         ]
+    ids = [i for i in ids if i not in BETA_COPIES]
 
     def retryable(raw: dict) -> bool:
         err = raw.get("error") or ""

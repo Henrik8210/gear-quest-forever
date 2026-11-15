@@ -13,6 +13,8 @@ import urllib.error
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+from gq_paths import forever_beta_copy_ids
+
 socket.setdefaulttimeout(20)
 UA = "GearQuestForever-data/1.0"
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -22,12 +24,13 @@ GEN = os.path.join(ROOT, "GearQuest", "_generated")
 LUA = os.path.join(GEN, "Data.ForeverNew.generated.lua")
 
 def load_ids():
+    beta = forever_beta_copy_ids() | {24358, 19503, 19504, 280304}
     ids = set()
     if os.path.exists(INDEX):
         index = json.load(open(INDEX, encoding="utf-8"))
         for row in index.get("items") or []:
             iid = int(row["id"])
-            if iid >= 200000:
+            if iid >= 200000 and iid not in beta:
                 ids.add(iid)
     for name in os.listdir(GEN):
         if not name.startswith("Data.") or not name.endswith(".generated.lua"):
@@ -37,7 +40,7 @@ def load_ids():
         text = open(os.path.join(GEN, name), "rb").read().decode("latin-1", "replace")
         for match in re.finditer(r"\[(\d{6,})\]=", text):
             iid = int(match.group(1))
-            if iid >= 200000:
+            if iid >= 200000 and iid not in beta:
                 ids.add(iid)
     return sorted(ids)
 

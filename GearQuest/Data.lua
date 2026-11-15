@@ -6127,23 +6127,56 @@ function GQ.Data:WornSlotIndex(slotName, itemId, handKind, itemLink)
     if not itemId then
         return 0
     end
-    local score = self:EquippedPipelineScore(itemId, slotName)
-    -- A worn piece that never made this faction's list still has stats.
-    -- Score the link the character is wearing. Zero means the client has
-    -- not loaded the item yet, and the bar asks again when it arrives.
-    if type(score) ~= "number" then
-        if itemLink and GQ.Compare and GQ.Compare.ScoreItemLinkStats then
-            score = GQ.Compare:ScoreItemLinkStats(itemLink, slotName)
-        end
+    local function indexFrom(score)
         if type(score) ~= "number" or score <= 0 then
-            return 0
+            return nil
+        end
+        local minScore, maxScore = self:SlotScoreSpan(slotName, handKind)
+        if not minScore then
+            return nil
+        end
+        return self:GearScoreIndex(score, minScore, maxScore)
+    end
+    -- The row for the link the character is wearing, including its suffix.
+    -- Another suffix of the same item must not stand in for this roll.
+    if itemLink and self.EntryForItemLink then
+        local entry = self:EntryForItemLink(itemLink)
+        if entry and type(entry.pipelineScore) == "number" then
+            local indexScore = entry.pipelineScore
+            if self.EntryIsDamagingWeapon and self:EntryIsDamagingWeapon(entry) then
+                local shown = self:DisplayedWeaponScore(entry)
+                if type(shown) == "number" and shown > 0 then
+                    indexScore = shown
+                end
+            end
+            local index = indexFrom(indexScore)
+            if type(index) == "number" and index > 0 then
+                return index
+            end
         end
     end
-    local minScore, maxScore = self:SlotScoreSpan(slotName, handKind)
-    if not minScore then
-        return 0
+    local stored = indexFrom(self:EquippedPipelineScore(itemId, slotName))
+    if type(stored) == "number" and stored > 0 then
+        return stored
     end
-    return self:GearScoreIndex(score, minScore, maxScore) or 0
+    -- A worn piece that never made this list still has stats. Scaled Cloak
+    -- of Shadow Wrath is +9 shadow spell power, the same roll Sage's Cloak
+    -- indexes at 74, and the bar was printing 0. A non-positive link score
+    -- means the client has not loaded the item yet.
+    local linkIndex
+    if itemLink and GQ.Compare and GQ.Compare.ScoreItemLinkStats then
+        linkIndex = indexFrom(GQ.Compare:ScoreItemLinkStats(itemLink, slotName))
+    end
+    if type(linkIndex) == "number" and linkIndex > 0 then
+        return linkIndex
+    end
+    if type(stored) == "number" then
+        return stored
+    end
+    if type(linkIndex) == "number" then
+        return linkIndex
+    end
+    return 0
 end
 
 -- A two-hander replaces both hands. The hunt stores each weapon alone, so the
@@ -6360,6 +6393,10 @@ function GQ.Data:WeaponLoadoutPipelineDelta(entry)
         local off = self:BestOffHandPartner()
         candidate = entry.pipelineScore + ((off and off.pipelineScore) or 0)
     else
+        -- The other piece stays. A better one-hander is judged on the weapon
+        -- list, where the white numbers already live. Adding the shield here
+        -- would only cancel, and it would put the arrow on a different scale
+        -- from the number printed beside it.
         return nil
     end
     local worn = mainIsTwo and mainScore or (mainScore + offScore)
@@ -6559,6 +6596,35 @@ function GQ.Data:GearScoreEquipKey(slotName)
     return table.concat(parts, ",")
 end
 
+-- The row of this item on the list in front of the player. Another spec's
+-- row of the same item is a different score, and using it as the worn piece
+-- makes that piece the 100 mark on a list where it is not rank 1.
+function GQ.Data:WornListScore(itemId, slotName)
+    if not itemId then
+        return nil
+    end
+    local slot = slotName and self:NormalizeSlotName(slotName)
+    local matched
+    local matchedScore
+    for _, entry in ipairs(self:GetEntriesByItemId(itemId) or {}) do
+        if type(entry.pipelineScore) == "number"
+            and self:EntryMatchesPlayerBand(entry)
+            and (not slot or self:NormalizeSlotName(entry.slot) == slot) then
+            if not matchedScore or entry.pipelineScore > matchedScore then
+                matched = entry
+                matchedScore = entry.pipelineScore
+            end
+        end
+    end
+    if matched then
+        local shown = self:DisplayedWeaponScore(matched)
+        if type(shown) == "number" and shown > 0 then
+            return shown
+        end
+    end
+    return self:EquippedPipelineScore(itemId, slotName)
+end
+
 function GQ.Data:GearScoreContext(slotName, handKind)
     local dataSlot = slotName == "WeaponPair" and "MainHand" or slotName
     local band = self:GetActiveBandCacheKey()
@@ -6609,14 +6675,9 @@ function GQ.Data:GearScoreContext(slotName, handKind)
             equippedIds[itemId] = true
             local score = self:EquippedPipelineScore(itemId, dataSlot)
             if handKind == "both" then
-                for _, entry in ipairs(self:GetEntriesByItemId(itemId) or {}) do
-                    if self.EntryIsDamagingWeapon and self:EntryIsDamagingWeapon(entry) then
-                        local shown = self:DisplayedWeaponScore(entry)
-                        if type(shown) == "number" then
-                            score = shown
-                        end
-                        break
-                    end
+                local shown = self:WornListScore(itemId, dataSlot)
+                if type(shown) == "number" then
+                    score = shown
                 end
             end
             if score then
@@ -6644,18 +6705,7 @@ function GQ.Data:GearScoreContext(slotName, handKind)
                         break
                     end
                 end
-                local offScore = offIsWeapon and self:EquippedPipelineScore(offId, "SecondaryHand")
-                if offIsWeapon then
-                    for _, entry in ipairs(self:GetEntriesByItemId(offId) or {}) do
-                        if self:EntryIsDamagingWeapon(entry) then
-                            local shown = self:DisplayedWeaponScore(entry)
-                            if type(shown) == "number" then
-                                offScore = shown
-                            end
-                            break
-                        end
-                    end
-                end
+                local offScore = offIsWeapon and self:WornListScore(offId, "SecondaryHand")
                 if offScore then
                     wornOff = offScore
                     push(offScore)
@@ -6922,14 +6972,29 @@ function GQ.Data:GearScoreArrowDelta(entry, ctx)
             baseline = self:GearScoreIndex(estimate, ctx.minScore, ctx.maxScore)
         end
     end
-    -- A two-hander and the pair it replaces share one comparison. The white
-    -- index stays this piece's place among weapons. The arrow uses the
-    -- loadout scale, whose top is the best two-hander or the best one-hand
-    -- plus its off-hand, shield included. The shield is not the 100 mark
-    -- on the white number.
+    -- The white index stays this piece's place among weapons. A one-hander
+    -- worn against a one-hander keeps the off-hand, so that arrow is the gap
+    -- between the two white numbers. A two-hander replaces the off-hand too,
+    -- shield included, and that arrow uses the loadout scale below. The same
+    -- split runs the other way when a two-hander is what you are wearing. The
+    -- shield is not the 100 mark on the white number.
     local loadoutDelta, loadoutWorn = self:WeaponLoadoutPipelineDelta(entry)
-    local loadoutBest = loadoutWorn and self:BestWeaponLoadoutScore()
-    local loadoutSpan = (loadoutBest and loadoutBest > 0) and loadoutBest
+    -- A two-hander replaces the off-hand as well, shield included. The worn
+    -- pair is part of the scale, so an off-hand that outscores the current
+    -- band does not turn a small gap into a huge red number.
+    local loadoutBest = loadoutWorn and self:BestWeaponLoadoutScore() or 0
+    local wornLoadout = 0
+    if loadoutWorn then
+        local mainScore, offScore, mainIsTwo = self:WornWeaponHands()
+        if type(mainScore) == "number" then
+            wornLoadout = mainIsTwo and mainScore or (mainScore + (offScore or 0))
+        end
+    end
+    local loadoutTop = loadoutBest
+    if wornLoadout > loadoutTop then
+        loadoutTop = wornLoadout
+    end
+    local loadoutSpan = (loadoutTop > 0) and loadoutTop
         or ((ctx.maxScore and ctx.minScore and ctx.maxScore > ctx.minScore) and (ctx.maxScore - ctx.minScore))
     if loadoutWorn and type(loadoutDelta) == "number" and loadoutSpan then
         local indexDelta = loadoutDelta / loadoutSpan * 100

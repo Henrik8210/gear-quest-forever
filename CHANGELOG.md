@@ -2,7 +2,67 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.1.9
+## v1.2.0
+
+The window title reads **GearQuest Forever v1.2.0**.
+
+**Untrack from the list**
+
+On the Tracked tab, each hunt has a checkbox at the left of the row. It starts checked. Clear it and that hunt is untracked. You do not have to open the parchment and press Untrack. Hovering the box says Untrack. The Untrack button on a selected hunt still works.
+
+**Wear the piece before it is recommended**
+
+Get it now hides a piece whose tooltip says you need a profession to equip it. **Flying Tiger Goggles** require Engineering (100). A character with Tailoring and Enchanting, and no Engineering, no longer sees them as the Head recommendation. Unchecking Engineering in the Profession filter hides them as well. A bind-on-equip craft with no wear line, such as linen armor, stays. **Spellpower Goggles Xtreme** need Engineering 215 to wear. The recipe is 225. Once you can equip them, the hunt can show.
+
+**Replica Crescent Necklace is Alliance**
+
+**Replica Crescent Necklace** is the reward from Gleaming Crescent Necklace, turned in to Maliynn in Astranaar. Horde no longer has that hunt, on any class. Alliance keeps it. Beast Mastery lists it from level 25. The parchment recommends picking the quest up at 25, because it cannot be taken earlier.
+
+**A two-hander is compared with both hands**
+
+The green or red arrow on a two-hander counts the main hand and the off hand you would replace, including a shield. A one-hander compared with a two-hander you are wearing counts that one-hander plus the off-hand it pairs with. A one-hander compared with the one-hander you already wear uses the white score on the weapon list. The score bar still scores each slot on its own.
+
+**School spell power and armor count**
+
+A worn piece that is not on your hunt list is scored from its tooltip. A line that increases Shadow, Fire, Frost, Nature, Arcane, or Holy spell damage is that school's spell power. The armor number on the piece counts as armor. **Scaled Cloak of Shadow Wrath** is +9 shadow spell power and reads about 74 for a shadow priest, the same place as Sage's Cloak of Shadow Wrath. The score bar no longer prints 0 for that cloak.
+
+**New Forever hunts**
+
+These pieces are on the lists. Eight of them have no source on Wowhead Forever yet, so the hunt says the source is not listed and there is no map pin.
+
+**Gravetoll Gavel** is a two-hander, required 54, for Druid, Paladin, and Shaman. **Soulwoven Drape** is a back, required 56, for Druid, Mage, Paladin, Priest, Shaman, and Warlock. **Band of the Damned** is a ring, required 56, for the same classes. **Wit's Edge** is a main hand, required 57, for Mage. **Scales of the Devourer** is a chest, required 57, for Hunter and Shaman. **Silithid Queen's Husk** is a chest, required 56, for Paladin and Warrior. **Predaceous Band** is a ring, required 55, for Hunter, Druid, Paladin, Rogue, Shaman, and Warrior. **Pylon Poker** is a two-hander, required 56, for Hunter, Druid, Mage, Priest, Shaman, Warlock, and Warrior.
+
+**Predator's Shroud** is a back, required 55, and drops from Stegodon Young. Hunter lists it. **Ancient Mattock** is a one-hander, required 56, and drops from Ravasaur Juvenile. Hunter, Paladin, Rogue, Shaman, and Warrior list it.
+
+**Hunts that joined a class**
+
+**Scaled Cloak** and **Cutthroat's Cape** are world drops, and every class now hunts the jackpot suffix. **Green Iron Bracers** joined Shaman. The craft is Blacksmithing 140. **Medal of Courage** joined Rogue. It is Saving Yenniku, from Kin'weelay in Stranglethorn Vale, required 35. **Pratt's Handcrafted Gloves** joined Warrior. The Mark of Quality starts with Jangdor Swiftstrider in Feralas. **Ringtail Girdle** joined Paladin. Clam Bait starts with Mai'Lahii in Desolace. **Soft Willow Cape** joined Hunter. Je'neu of the Earthen Ring starts with Mastok Wrilehiss in Ashenvale. **Warsong Gauntlets** joined Shaman. Warsong Supplies starts with Locke Okarr in Ashenvale. **Boorguard Tunic** joined Paladin. King of the Foulweald starts with Karang Amakkar in Ashenvale. **Thorn Protecting Girdle** joined Hunter, from A Green Sample, and it gained attack power against beasts. **Essene's Hope** joined Hunter, from Sentiments of the Lost.
+
+**Defender's Leather Pants** require level 20, down from 25. Paladin, Rogue, and Warrior gained the hunt. Hunters have it for Horde as well as Alliance. It is still the Leatherworking craft whose pattern drops in the Deadmines, Wailing Caverns, Shadowfang Keep, the Stockade, and Blackfathom Deeps.
+
+**Dreamer's Chestguard is rare**
+
+**Dreamer's Chestguard**, from Baron Aquanis, is rare. It was uncommon. Spirit is 11, strength is 10, and stamina is 5. Hunter, Druid, Paladin, Rogue, Shaman, and Warrior still list it.
+
+**Less armor on the Forever tooltip**
+
+These pieces have less armor, and the ranks moved with that number. **Desperate Barrier** dropped from 1257 armor to 711. The others are Violet Sash, Gravewalker Boots, Undead Knight's Bracers, Staghide Armguards, Tanned Shoulderpads, Bronzed Shoulderguards, Silvered Gauntlets, Town Clerk's Mittens, Tattered Mittens, Technician's Bracers, Operator's Gloves, Sentinel's Boots, Cultist's Chestguard, Charged Leather Bracers, Restorer's Fine Gloves, Excavator Gauntlets, Doomcaller's Pants, Fists of Impending Doom, Songblade Stabilizer, Vine Pruner's Cloak, Thorn Protecting Girdle, Construct Cloak, and Runebound Gloves.
+
+**Hunts that left a class**
+
+These fell off the class that had been listing them. The way you get the piece is unchanged.
+
+**Ribbed Breastplate** left Druid, Shaman, and Warrior. It is still Humbert's Sword. **Crusader Belt** left Shaman. Syndicate Assassins. **Cloak of Rot** left Hunter. Lord Malathrom. **Grimsteel Cape** left Mage. Vorrel's Revenge. **Blackforge Cape** left Priest. **Twilight Cape** left Hunter. **Ivycloth Pants** and **Pagan Britches** left Rogue. **Resilient Cape** left Paladin. The Priest list still has the Horde row. **Dark Iron Reaver** left Mage. **The Shadowfoot Stabber** left Druid. **Silvered Gauntlets** left Warrior. Twilight Falls. **Cultist's Chestguard** left Hunter. An Unholy Alliance. **Excavator Gauntlets** left Shaman. Agmond's Fate. **Premier High Warlord's Pig Sticker** left Paladin. **Drape of Shifting Energy** left Hunter. Arcanic Enigma. **Well-Weathered Cloak** left Mage. Terror of the Desert Skies. **Unerring Purpose**, **Tracker's Signet of Resolve**, **Watcher's Signet of Brilliance**, **Warden's Signet of Resolve**, **Lightcrest Hammer**, **Horseman's Unyielding Shroud**, **Blade of Senseless Slaughter**, and **Ranger Lord's Longsword** left the one class that had them. Those last eight are still unsourced.
+
+**One faction's list moved**
+
+**Blocking Targe** gained a Horde hunt on Shaman. **Feathered Cape** gained Horde on Hunter and Rogue. **Sage's Cloak** gained Horde on Hunter. **Runed Gauntlets** gained Alliance on Shaman. **Shadowforge Shield** gained Alliance on Warrior. **Reverence** lost Alliance on Mage. **Thick Ogre's Belt** lost Alliance on Paladin. **Sergeant's Cloak** lost Horde on Warlock. **Premier Sergeant's Cape** lost Horde on Priest. **Construct Cloak** lost Alliance on Warrior.
+
+**Level-30 Molten Core copies are not listed**
+
+The addon does not hunt the level-30 copies of Arcanist, Felheart, Prophecy, Nightslayer, Cenarion, Earthfury, Giantstalker, Lawbringer, or Might, or the level-30 Spinal Reaper, Bonereaver's Edge, Perdition's Blade, Band of Accuria, and the other pieces from that beta. Those items were spawned during the level-30 beta, including from level-1 wolves, and they do not drop on live servers. The level-60 pieces are the ones that drop. **Invisible Dagger**, the QA spell-damage ring, and the two test swords are not hunts.
+
+### v1.1.9
 
 The window title reads **GearQuest Forever v1.1.9**. This is a hotfix.
 

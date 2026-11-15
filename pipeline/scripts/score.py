@@ -17,9 +17,10 @@ import relic_score as RELIC
 # Strength weight keeps the physics ratio intact inside that spec's scale.
 DPS_PER_STR = 4.31
 
-from gq_paths import G, GUIDES_DIR, OUT, forever_missing_ids, tbc_only_ids
+from gq_paths import G, GUIDES_DIR, OUT, forever_missing_ids, tbc_only_ids, forever_beta_copy_ids
 FOREVER_MISSING = forever_missing_ids()
 TBC_ONLY = tbc_only_ids()
+BETA_COPIES = forever_beta_copy_ids()
 NO_GUIDES = os.environ.get("GQ_NO_GUIDES") == "1"
 
 # ilvl -> typical RequiredLevel, median over every item that states one.
@@ -448,6 +449,9 @@ RUNE_BROKER_ALLIANCE = {205420, 208849, 208851, 211472}
 RUNE_BROKER_HORDE = {206381, 206382, 206386, 206387, 206388, 225838}
 
 def eligible(it, cls, spec, level, faction, prof, wsubs):
+    # Level-30 copies of Molten Core gear. The level-60 ids stay eligible.
+    if it["id"] in BETA_COPIES:
+        return False
     src=srcs[str(it["id"])]
     if not src["obtainable"]: return False
     if it.get("temporary"): return False        # conjured / duration-limited, not gear
@@ -771,9 +775,10 @@ def best_variant(it, w, level, rscale):
 #   10020 Stormcloth Vest           -- inconclusive; only player speculation. Left in
 #                                       and surfaced in the review page instead.
 HAND_EXCLUDED={15141, 6730, 2867}
-# Forever lists these, but they are spells rather than gear you can hunt.
+# Forever lists these, but they are spells or QA items rather than gear you can hunt.
 # 280304 Invisible Dagger is spell 1308095, a hidden dummy aura.
-SPELL_NOT_GEAR={280304}
+# 24358 is QATest +1000 Spell Dmg Ring. 19503 and 19504 are the 2200 Test swords.
+SPELL_NOT_GEAR={280304, 24358, 19503, 19504}
 
 def hidden_spell_item(it):
     """A hidden spell or an unused placeholder. Not gear a player can hunt."""
@@ -1050,7 +1055,7 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
     prof=ARMOR_PROF[cls]; wsubs=set(W[cls]["_weaponSubclasses"])
     notable={}; full60={}; source_alts={}
     armorClass=cfg.get("armorClass") or {}
-    pool=[it for it in items.values() if slot_for(it,cls) and it['id'] not in EXCLUDED and not hidden_spell_item(it)]
+    pool=[it for it in items.values() if slot_for(it,cls) and it['id'] not in EXCLUDED and it['id'] not in BETA_COPIES and not hidden_spell_item(it)]
     pool=[it for it in pool if it["id"] in CLASSIC_IDS and it["id"] not in TBC_ONLY]
     per={}
     for faction in factions:

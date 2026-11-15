@@ -42,6 +42,14 @@ At **runtime**, a generated hunt with `curatedRank` keeps that pipeline order. `
 - The knight's 13 pages live in `GQ.LocaleGuidePages` for every language. Apply them when the parchment is shown. The language pack can load after `PortraitGuide.lua`.
 - `Log.lua` is at 191 of 200 file-scope locals. One more file-scope `local` can stop the file compiling, and then the minimap button does nothing.
 
+**15 Nov 2026 (v1.2.0) — do not undo these:**
+
+- The 96 level-30 Molten Core copies in `pipeline/data/forever_beta_copies.json` (288823–288925, skipping 288895–288900 and 288912) are not hunts. They spawned in the level-30 beta and do not drop on live servers. The level-60 ids are the ones that drop. A rescrape skips that list in the item scrape, tooltip refresh, ingest, the new-item scan, and scoring. Do not index one again because Forever still has the client row.
+- Invisible Dagger (280304), QATest +1000 Spell Dmg Ring (24358), and the 2200 Test swords (19503, 19504) stay out of the catalog. A rescrape must not put them back. UNUSED, (DNT), and Placeholder names stay out too.
+- `reqSkills` is the tooltip wear line (`Requires Engineering (100)`). Get it now and the Profession filter honor it for every source, including a profession craft. Flying Tiger Goggles are Engineering 100 to equip. A bind-on-equip craft with no wear line stays. Do not skip `reqSkills` when `sourceType` is profession.
+- Replica Crescent Necklace (281290) is Alliance only. Quest 98027, Gleaming Crescent Necklace, turns in to Maliynn in Astranaar. Do not put it back on a Horde list.
+- The Tracked tab checkbox unchecks into `RequestUntrackHunt`. It does not select the row.
+
 **15 Nov 2026 (v1.1.9) — do not undo these:**
 
 - A world-cursor mouseover inside a dungeon, including Wailing Caverns, passes a secret unit token. `AddUnitGearLines` must not call `UnitExists`, `UnitIsPlayer`, `UnitGUID`, or `UnitName` with that token. Read the name through `GQ.PublicText` from `GetUnit`, the tooltip data line, or the first painted line. A secret name adds no lines and does not error. The v1.1.8 upgrade test stays: on this level's list and better than what is worn, or the slot is empty, and the line includes the green comparison number.
@@ -59,7 +67,7 @@ At **runtime**, a generated hunt with `curatedRank` keeps that pipeline order. `
 
 **14 Nov 2026 (v1.1.6) — do not undo these:**
 
-- A worn piece with no stored hunt score is not 0. `WornSlotIndex` scores the worn link. A non-positive link score means the item is not loaded yet, and `GET_ITEM_INFO_RECEIVED` refreshes the bar. v1.1.5 returned 0 immediately, and players saw 0 on real gear.
+- A worn piece with no stored hunt score is not 0. `WornSlotIndex` scores the worn link. A school line (`Increases damage done by Shadow spells and effects by up to N`) is that school's spell power, and `N Armor` is armor, on the scoring-row weights. A stored index of 0 must not hide a positive index from that link. **Scaled Cloak of Shadow Wrath** is +9 shadow spell power and reads about 74 for a shadow priest, the same place as Sage's Cloak of Shadow Wrath. A non-positive link score means the item is not loaded yet, and `GET_ITEM_INFO_RECEIVED` refreshes the bar. v1.1.5 returned 0 immediately, and players saw 0 on real gear.
 - The hunt line color is the loaded client quality. A stale rare fact must not paint Sprightring Helm blue over a green tooltip.
 - The four Twisted Evils rewards are the uncommon tooltips. Do not restore the rare scores (Sprightring 22.47, Hulkstone 36.06, Acumen Robes 47.26, Relentless Chain 14.15). A stat change and the rescore of every class that lists the item ship together.
 - Dragon's Eye (10829) and Woodseed Hoop (17768) were 404s at v1.1.6 and are status ok as of 15 Nov 2026. Do not put the 404 back, and do not rescore them from the pre-recovery rows. Blessed Prayer Beads (19990) stays off until the use line is priced. A missed "by up to N" line is not a verdict that the item is weak.

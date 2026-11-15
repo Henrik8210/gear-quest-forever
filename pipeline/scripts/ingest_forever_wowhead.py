@@ -25,7 +25,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from commerce_camps import camp_instructions
-from gq_paths import G, DATA
+from gq_paths import G, DATA, forever_beta_copy_ids
 
 def _client_pins():
     path = os.path.join(G, "client_item_overrides.json")
@@ -110,7 +110,9 @@ PATS = [(re.compile(p), k) for p, k in PATS]
 rx_tag = re.compile(r"<[^>]+>")
 SKIP_NAME = re.compile(r"\(DNT\)|\AHidden |\AMonster ", re.I)
 # Not hunt gear. The chisel is a Jewelcrafting tool. The shield is a creature model.
-SKIP_IDS = {271965, 286140}
+# 24358, 19503, and 19504 are QA test items. 280304 is a hidden spell, not a dagger.
+# Beta copies are the level-30 Molten Core sets and weapons. Never index them.
+SKIP_IDS = {271965, 286140, 24358, 19503, 19504, 280304} | forever_beta_copy_ids()
 UNKNOWN_RTG = {}
 
 

@@ -23,6 +23,15 @@ const root = path.join(__dirname, "..");
 const outDir = path.join(root, "pipeline", "data", "forever_wowhead");
 const indexPath = path.join(outDir, "index.json");
 const tooltipPath = path.join(outDir, "tooltips.json");
+const betaSkipPath = path.join(root, "pipeline", "data", "forever_beta_copies.json");
+const BETA_SKIP = new Set(
+  JSON.parse(fs.readFileSync(betaSkipPath, "utf8")).ids || []
+);
+
+function withoutBetaCopies(list) {
+  const notGear = new Set([24358, 19503, 19504, 280304]);
+  return list.filter((it) => it && !BETA_SKIP.has(it.id) && !notGear.has(it.id));
+}
 
 const UA = "GearQuestForever-data/1.0";
 const PAGE_DELAY = Number(process.env.GQ_SCRAPE_DELAY_MS || 2000);
@@ -163,7 +172,7 @@ async function buildIndex() {
     notes.push({ slot, slotName, n, truncated: true });
   }
 
-  const items = [...byId.values()].sort((a, b) => a.id - b.id);
+  const items = withoutBetaCopies([...byId.values()]).sort((a, b) => a.id - b.id);
   fs.mkdirSync(outDir, { recursive: true });
   fs.writeFileSync(
     indexPath,
@@ -222,12 +231,12 @@ let items = [];
 if (doIndex) {
   items = await buildIndex();
 } else if (fs.existsSync(indexPath)) {
-  items = JSON.parse(fs.readFileSync(indexPath, "utf8")).items;
+  items = withoutBetaCopies(JSON.parse(fs.readFileSync(indexPath, "utf8")).items);
 }
 
 if (doTips) {
   if (!items.length && fs.existsSync(indexPath)) {
-    items = JSON.parse(fs.readFileSync(indexPath, "utf8")).items;
+    items = withoutBetaCopies(JSON.parse(fs.readFileSync(indexPath, "utf8")).items);
   }
   if (!items.length) {
     throw new Error("No index. Run --index first.");

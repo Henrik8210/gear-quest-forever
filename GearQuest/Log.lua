@@ -3867,7 +3867,7 @@ function GQ.Log:ProfessionWearSkill(entry)
         if string.find(line, "%(%d+/%d+%)") then
             break
         end
-        local wearProf, wearNeed = string.match(line, "^Requires ([%a][%a ]-) %((%d+)%)")
+        local wearProf, wearNeed = string.match(line, "^Requires (%a+) %((%d+)%)")
         if wearProf and wearProf ~= "Level" then
             prof = wearProf
             need = tonumber(wearNeed)
@@ -3896,16 +3896,19 @@ function GQ.Log:EntryBlockedToday(entry)
         end
     end
     local src = GQ.NormalizeSourceType and GQ:NormalizeSourceType(entry.sourceType or "") or (entry.sourceType or "")
+    -- reqSkills is the "Requires Engineering (100)" line. That is the skill
+    -- to wear the item. The recipe skill is separate, and a bind-on-equip
+    -- craft stays unless this line is set. Flying Tiger Goggles are that
+    -- case: Engineering 100 to equip, and the same number happens to be the
+    -- recipe.
     local skills = entry.reqSkills
-    -- A crafted row stores the recipe in reqSkills. A drop or a quest that
-    -- needs the profession to equip still uses that field.
-    if skills and src ~= "profession" then
+    if skills then
         local ranks = self:PlayerProfessionRanks()
         for i = 1, #skills do
             local row = skills[i]
-            local prof = row[1]
-            local need = row[2] or 1
-            if (ranks[prof] or 0) < need then
+            local prof = row and row[1]
+            local need = row and (row[2] or 1) or 1
+            if prof and (ranks[self:EnglishProfession(prof)] or 0) < need then
                 return true
             end
         end
@@ -4021,6 +4024,19 @@ function GQ.Log:EntrySourceAllowed(entry)
         end
         if name and name ~= "" and self:GetHiddenProfessions()[name] then
             return false
+        end
+    end
+    -- A piece that requires the profession to wear leaves when that box is
+    -- off, including a craft whose source line and the wear line differ.
+    local wearSkills = entry and entry.reqSkills
+    if wearSkills then
+        local hiddenProfs = self:GetHiddenProfessions()
+        for i = 1, #wearSkills do
+            local row = wearSkills[i]
+            local wearName = row and row[1]
+            if wearName and wearName ~= "" and hiddenProfs[wearName] then
+                return false
+            end
         end
     end
     if src == "boss_drop" and self:GetHiddenDungeons()[self:BossDungeonKey(entry)] then
@@ -6481,6 +6497,38 @@ function GQ.Log:CreateListRow(index)
             log:ToggleWeaponMenu(self)
         end
     end)
+
+    row.trackCheck = CreateFrame("CheckButton", nil, row, "UICheckButtonTemplate")
+    row.trackCheck:SetSize(22, 22)
+    row.trackCheck:SetFrameLevel(row:GetFrameLevel() + 6)
+    row.trackCheck:SetHitRectInsets(0, 0, -4, -4)
+    row.trackCheck:EnableMouseWheel(true)
+    row.trackCheck:SetScript("OnEnter", function(self)
+        HideItemTooltip()
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetText(L["Untrack"])
+        GameTooltip:Show()
+    end)
+    row.trackCheck:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+    row.trackCheck:SetScript("OnMouseWheel", function(_, delta)
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if log and log.frame and log.frame.scroll then
+            ScrollFrameOnMouseWheel(log.frame.scroll, delta)
+        end
+    end)
+    row.trackCheck:SetScript("OnClick", function(self)
+        if self:GetChecked() then
+            return
+        end
+        local id = self.huntId
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if log and id then
+            log:RequestUntrackHunt(id)
+        end
+    end)
+    row.trackCheck:Hide()
 
     row:SetScript("OnEnter", function(self)
         if self.rowType == "header" then
@@ -15224,6 +15272,10 @@ function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry, label, hand
     if row.sourceMark then
         row.sourceMark:Hide()
     end
+    if row.trackCheck then
+        row.trackCheck:Hide()
+        row.trackCheck.huntId = nil
+    end
 
     if rowType == "header" then
         row.icon:Show()
@@ -15337,10 +15389,21 @@ function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry, label, hand
 
         row.icon:Hide()
         row.icon:SetTexture(nil)
-        local iconLeft = LIST_ROW_ITEM_LEFT
+        local trackShift = 0
+        if listTab == "tracked" and entry.id and row.trackCheck then
+            row.trackCheck.huntId = entry.id
+            row.trackCheck:SetChecked(true)
+            row.trackCheck:ClearAllPoints()
+            row.trackCheck:SetPoint("LEFT", row, "LEFT", 0, 0)
+            row.trackCheck:Show()
+            trackShift = 22
+        end
+        local iconLeft = LIST_ROW_ITEM_LEFT + trackShift
         local rank = self:HuntListRank(entry, slotName, handKind)
         if row.rankMark and type(rank) == "number" and rank >= 1 then
             local markWidth = self:RankMarkWidth()
+            row.rankMark:ClearAllPoints()
+            row.rankMark:SetPoint("LEFT", row, "LEFT", 4 + trackShift, 0)
             row.rankMark:SetWidth(markWidth)
             row.rankMark:SetText("#" .. rank)
             if self:QuestRewardMissed(entry) then
@@ -15349,7 +15412,7 @@ function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry, label, hand
                 row.rankMark:SetTextColor(0.55, 0.55, 0.55)
             end
             row.rankMark:Show()
-            local markRight = 4 + markWidth + 1
+            local markRight = 4 + trackShift + markWidth + 1
             if markRight > iconLeft then
                 iconLeft = markRight
             end

@@ -86,6 +86,13 @@ local STAT_NAME_TO_KEY = {
     ["Spell Critical Strike Rating"] = "spellCrit",
     ["Spell Critical Strike"] = "spellCrit",
     ["Spell Haste Rating"] = "spellHaste",
+    ["Shadow Spell Power"] = "spShadow",
+    ["Fire Spell Power"] = "spFire",
+    ["Frost Spell Power"] = "spFrost",
+    ["Nature Spell Power"] = "spNature",
+    ["Arcane Spell Power"] = "spArcane",
+    ["Holy Spell Power"] = "spHoly",
+    Armor = "armor",
 }
 
 local DEFAULT_STAT_WEIGHT = {
@@ -229,8 +236,19 @@ function GQ.Compare:GetStatWeight(statName)
     local specId = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec() or nil
 
     local profile = GetStatWeightProfile(classFile, playerLevel, specId)
+    local key = ResolveStatWeightKey(statName)
+    -- School spell power and armor are on the scoring row. The shorter
+    -- stat table does not carry them, and the 0.5 fallback would turn
+    -- +9 shadow spell power, or 21 armor, into a nonsense score.
+    if key then
+        local scoring = GQ.ScoringWeights and GQ.ScoringWeights[classFile]
+        local specRow = scoring and specId and scoring[specId]
+        local weights = specRow and specRow.weights
+        if weights and weights[key] ~= nil and (not profile or profile[key] == nil) then
+            return weights[key]
+        end
+    end
     if profile then
-        local key = ResolveStatWeightKey(statName)
         if key and profile[key] ~= nil then
             -- Gear "+N Attack Power" is ranged DPS for hunters (1 AP ≈ 1 RAP).
             if classFile == "HUNTER" and key == "ap" then
@@ -381,6 +399,13 @@ local function ParseStatAmount(statKey)
         ITEM_MOD_SPELL_HEALING_DONE = "Healing",
         ITEM_MOD_SPELL_DAMAGE_DONE_SHORT = "Spell Damage",
         ITEM_MOD_SPELL_DAMAGE_DONE = "Spell Damage",
+        ITEM_MOD_ARMOR_SHORT = "Armor",
+        ITEM_MOD_SHADOW_SPELL_POWER = "Shadow Spell Power",
+        ITEM_MOD_FIRE_SPELL_POWER = "Fire Spell Power",
+        ITEM_MOD_FROST_SPELL_POWER = "Frost Spell Power",
+        ITEM_MOD_NATURE_SPELL_POWER = "Nature Spell Power",
+        ITEM_MOD_ARCANE_SPELL_POWER = "Arcane Spell Power",
+        ITEM_MOD_HOLY_SPELL_POWER = "Holy Spell Power",
     }
     local alias = modAliases[statKey]
     if alias then
@@ -502,6 +527,28 @@ local function ParseTooltipStatLine(text, byName)
             byName.Healing = math.max(byName.Healing or 0, amount)
             byName["Spell Damage"] = math.max(byName["Spell Damage"] or 0, amount)
         end
+        -- "Increases damage done by Shadow spells and effects by up to 9."
+        -- A school line is that school's spell power, not generic spell power.
+        -- "magical" is the generic line above.
+        local school, schoolAmount = text:match("[Ii]ncreases damage done by (%a+) spells and effects by up to (%d+)")
+        if school and schoolAmount and school:lower() ~= "magical" then
+            local schoolStat = {
+                shadow = "Shadow Spell Power",
+                fire = "Fire Spell Power",
+                frost = "Frost Spell Power",
+                nature = "Nature Spell Power",
+                arcane = "Arcane Spell Power",
+                holy = "Holy Spell Power",
+            }
+            local statName = schoolStat[school:lower()]
+            if statName then
+                byName[statName] = math.max(byName[statName] or 0, tonumber(schoolAmount))
+            end
+        end
+    end
+    local armorAmount = text:match("^(%d+) Armor%s*$")
+    if armorAmount then
+        byName.Armor = math.max(byName.Armor or 0, tonumber(armorAmount))
     end
 
     for amount, stat in text:gmatch("+(%d+) ([^+]+)") do

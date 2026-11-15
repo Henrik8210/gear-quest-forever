@@ -31,6 +31,18 @@ def forever_missing_ids():
             return {int(m.group(1)) for m in re.finditer(r'\[(\d+)\]=\{status="missing"', text)}
     return set()
 
+def forever_beta_copy_ids():
+    """Level-30 epic copies of level-60 raid gear. Not live drops.
+
+    Spawned during the level-30 beta, including from level-1 wolves.
+    The level-60 ids are the ones that drop. A rescrape must skip these.
+    """
+    import json
+    path = os.path.join(DATA, "forever_beta_copies.json")
+    if not os.path.exists(path):
+        return set()
+    return set(json.load(open(path, encoding="utf-8")).get("ids") or [])
+
 def tbc_only_ids():
     """Item ids that exist only in TBC/Outland. Never a Forever hunt target."""
     import json
