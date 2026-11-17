@@ -18,6 +18,7 @@ ROW_RE = re.compile(r"^\s*\{(\d+),")
 SKIP = {
     "Data.ForeverAudit.generated.lua",
     "Data.ForeverNew.generated.lua",
+    "Data.Unconfirmed.generated.lua",
     "Data.ScoredStats.generated.lua",
     "Data.HuntFacts.generated.lua",
     "Data.QuestFaction.generated.lua",

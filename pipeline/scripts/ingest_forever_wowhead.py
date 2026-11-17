@@ -8,12 +8,10 @@ scripts/scrape-forever-wowhead-items.mjs and merges new ids into:
   pipeline/data/classic_item_ids.json
 
 New Forever-only ids are inserted. An id already in items.json keeps its
-facts. Re-score after this:
+facts. Re-score after this, one class at a time (score, emit, copy to the
+addon, with GQ_NO_GUIDES=1):
 
-  $env:GQ_CLASS="SHAMAN"; $env:GQ_GUIDES="guides_shaman.json"; $env:GQ_OUT="shaman.json"
-  python pipeline/scripts/score.py
-  python pipeline/scripts/payload.py
-  python pipeline/scripts/emit_early.py
+  python pipeline/scripts/rescore_hunter_shaman.py SHAMAN
 """
 from __future__ import annotations
 

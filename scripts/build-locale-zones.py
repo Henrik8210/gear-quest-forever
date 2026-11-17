@@ -33,6 +33,11 @@ MAP_IDS = {
     "Excavation Site": 1437,
 }
 
+# Forever areas Questie does not list. The id is the Wowhead Forever zone id.
+FOREVER_AREAS = {
+    "Krol'dok Stronghold": 16842,
+}
+
 
 # Short names the addon uses for an area the client lists under a longer name.
 ALIASES = {
@@ -79,6 +84,9 @@ def main() -> None:
     for name in sorted(names):
         if name in map_ids:
             rows.append((name, -map_ids[name]))
+            continue
+        if name in FOREVER_AREAS:
+            rows.append((name, FOREVER_AREAS[name]))
             continue
         chosen = pick(area.get(ALIASES.get(name, name), []))
         if chosen is None:

@@ -39,11 +39,22 @@ def run(cls, out_name, kind):
 
 
 def copy_generated():
+    """Copy only the files this run wrote. Anything else in out/ may be stale."""
     dest = Path(ADDON_GEN)
     dest.mkdir(parents=True, exist_ok=True)
-    for path in Path(OUT).glob("Data.*.generated.lua"):
-        shutil.copy2(path, dest / path.name)
-        print("copied", path.name)
+    for cls, _out_name, kind in CLASSES:
+        title = cls.title()
+        names = [f"Data.{title}.generated.lua"]
+        if kind == "horde":
+            names.append(f"Data.{title}.Horde.1to9.generated.lua")
+        else:
+            names.append(f"Data.{title}.Early.1to9.generated.lua")
+        for name in names:
+            path = Path(OUT) / name
+            if not path.exists():
+                raise SystemExit(f"{name} was not written to {OUT}")
+            shutil.copy2(path, dest / name)
+            print("copied", name)
 
 
 def main():

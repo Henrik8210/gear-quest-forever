@@ -13,7 +13,7 @@ if GQ.LoadLocalePack then
     GQ:LoadLocalePack()
 end
 
-GQ.VERSION = "1.2.1"
+GQ.VERSION = "1.2.2"
 GQ.ADDON_NAME = ADDON_NAME
 
 -- General -> Hide chat messages. Off until the player checks it.
@@ -349,6 +349,24 @@ local CALM_FONT = {
     zhTW = "Fonts\\bLEI00D.TTF",
 }
 
+function GQ:LocaleFontFace(face)
+    local locale = self.ActiveLocale or self.LOCALE
+    return (locale and CALM_FONT[locale]) or face
+end
+
+-- SetFont with the selected language's face, keeping size and flags. A face
+-- the client cannot load falls back to the one passed in.
+function GQ:SetLocaleFont(widget, face, size, flags)
+    if not widget or not widget.SetFont or not face then
+        return widget
+    end
+    local use = self:LocaleFontFace(face)
+    if not widget:SetFont(use, size, flags or "") and use ~= face then
+        widget:SetFont(face, size, flags or "")
+    end
+    return widget
+end
+
 function GQ:CalmFont(widget)
     if not widget or not widget.GetFont then
         return widget
@@ -579,6 +597,25 @@ function GQ:WithContextSnapshot(fn, ...)
     end
     self._ctx = {}
     return CloseContextSnapshot(self, pcall(fn, ...))
+end
+
+-- A full collect walks the whole catalog in one frame. This finishes the
+-- same cycle in small steps, one per frame, and stops after about 20 seconds.
+function GQ:CollectGarbageSoon()
+    if not collectgarbage or self._gcStepping or not (C_Timer and C_Timer.NewTicker) then
+        return
+    end
+    self._gcStepping = true
+    local ticks = 0
+    local ticker
+    ticker = C_Timer.NewTicker(0, function()
+        ticks = ticks + 1
+        local ok, done = pcall(collectgarbage, "step", 256)
+        if not ok or done or ticks >= 1200 then
+            ticker:Cancel()
+            GQ._gcStepping = nil
+        end
+    end)
 end
 
 function GQ:GetEffectiveLevel()

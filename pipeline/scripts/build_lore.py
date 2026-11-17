@@ -1,4 +1,7 @@
-"""lore.json -- a short piece of flavour for an item, shown under its name.
+"""LEGACY (TBC Anniversary). Do not run for Forever: it reads a TBC tbc.db that is not
+in this repo and would overwrite lore.json.
+
+lore.json -- a short piece of flavour for an item, shown under its name.
 
 Henrik: "for named gear that has a background story to it, could you add some nice text
 before the description/below the title of the item ... just to have a nice 'Ah, cool - i

@@ -257,8 +257,8 @@ above, with Beast Mastery and Marksmanship melee `dpsWeight` still **0.05**):
   leather slots. Once it stops, **Blackened Defias Belt** (10402) enters
   the top 3 from 17 and is rank 1 from 22. That is the Fang chest getting
   worse, not a Defias stat change.
-- Enhancement: the chest stays forced at rank 1 through 27. At 29 the
-  other four leave as well.
+- Enhancement: all five pieces are rank 1 through 27. At 28 the whole set
+  leaves (since the 17 Nov 2026 retune to agility 0.65, intellect 0.75).
 - Feral: the chest is rank 1 only at 18–21. At 22 feet and waist lose the
   set share. Legs stay rank 1 on agility.
 
@@ -374,7 +374,7 @@ Ret and Enhance stay hybrids.
 
 **Wolfsbane (267369)** is the Horde paladin two-hander from the Diplomatic Incident chain (Danitha Morr, Bandarion Keep, Tirisfal). The quest can be finished at level 20. Wowhead has no Requires Level; the stored level 26 was inferred from item level 31. `client_item_overrides.json` pins required level 20 and Classes: Paladin, so Alliance and other classes do not get it. 25.59 weapon damage is why it is rank 1 for Horde Retribution at 20.
 
-**Enhancement intellect is 0.7 raw, and it is not doubled.** Mental Quickness is 100% of intellect as attack power (it was 150%). The scorer does not convert intellect into attack power on its own. `weights_at_level()` still doubles intellect for every other spec through 60. Enhancement forces the raw **0.7** after that multiply, in `score.py`, and the tooltip does the same in `Compare.lua`, `Enchant.lua`, and `CustomSpec.lua`. The weight hover shows **0.7**, not 1.4. Strength stays **1.1**, agility **1.0**, attack power **0.55**, spell power **0.2**, healing **0.05**, spell power from a healing line **0.2**, weapon damage **18**. Do not put intellect back above strength. Enhancement Tank is unchanged and still stamina-first. Its intellect stays on the leveling double.
+**Enhancement intellect is 0.75 raw, and it is not doubled.** Mental Quickness is 100% of intellect as attack power (it was 150%). The scorer does not convert intellect into attack power on its own. `weights_at_level()` still doubles intellect for every other spec through 60. Enhancement forces the raw **0.75** after that multiply, in `score.py`, and the tooltip does the same in `Compare.lua`, `Enchant.lua`, and `CustomSpec.lua`. The weight hover shows **0.75**, not 1.5. Strength stays **1.1**, agility **0.65** (17 Nov 2026 retune from agility 1.0 and intellect 0.7), attack power **0.55**, spell power **0.2**, healing **0.05**, spell power from a healing line **0.2**, weapon damage **18**. Do not put intellect back above strength. Enhancement Tank is unchanged and still stamina-first. Its intellect stays on the leveling double.
 
 **Shaman Enhancement Tank is a hybrid**, like paladin Protection: 1h + shield,
 stamina / armor / defense first, then Rockbiter melee threat, then Earth Shock /
@@ -443,8 +443,8 @@ gates and the random-suffix score. The hunt hover uses the client item
 tooltip. GearQuest adds the recommended enchantment, the rank line, and the
 score after it. A random-suffix green uses that same client tooltip, which
 is the base piece, and one line under it names the jackpot suffix and the
-chance. Do not paint the stored Wowhead tip on the hover when the client has
-the item. If the client has no such item, the hover shows that stored
+chance. That line wraps, so a long range does not widen the tooltip. Do not
+paint the stored Wowhead tip on the hover when the client has the item. If the client has no such item, the hover shows that stored
 tip, and two red lines under it read `Wowhead Forever lists this item.`
 and `This game client does not have it yet.` The hunt description says
 the same sentence in one line. A hover that is still waiting on the client
@@ -764,17 +764,25 @@ Each hunt row shows a small item icon immediately before the name, the same heig
 
 A quest reward states `This quest can be picked up at level N.` on the line just before Source. N is the stored required level, the same gate the hunt list uses. Skip the line when that level is missing. The line is green when this character (the simulated level, when simulation is on) is at that level or above, and red when they are below. The following line is `Recommended to pick this quest up at level M.` M is the item level minus 4, the same wait as Manageable Quests, never past 60, and at least 1. When that quest cannot be picked up until a higher level, M is that pickup level. A missing item level skips it. That line uses the same green and red. **Replica Crescent Necklace** (281290) recommends 25, because the quest cannot be picked up until 25, which is above the item level minus 4. The pickup line stays the earliest the quest can be taken. A reward from a chain of at least two quests lists the Wowhead series from the first quest through the quest that gives the item, and no later quest. Each step the character has not completed stays in the parchment color and ends with `- not completed yet`. A completed step ends with `- completed` in green. A single quest does not get that list. A boss drop and dungeon or raid trash say `Recommended dungeon entry at level N.` on the line just before Source. N is the item level minus 4, the same wait as Manageable Dungeons, and it stops at 60. The line is green once the viewed level has reached it, and red before that. A missing item level skips it.
 
-A vendor hunt states the price on its own line, `Costs` followed by the same icons the game uses, with the number beside each icon. The number is the price of the seller named on the line when Wowhead's sellers disagree. Gold, silver, and copper use the money-frame coins. Honor uses the faction honor icon when Wowhead lists honor. A mark or other token uses that token's item icon, with the count, when Wowhead lists it. The old sentence `Costs Honor Points and tokens (Marks of Honor).` is left off once that line is present. A rank-named purchase states the required rank on the line just before Source (`Requires Sergeant (Rank 3).`). A reputation requirement is printed for every source that stores one, not only vendors, and the character's standing is green or red the same way. A boss, trash, world, or rare drop in Onyxia's Lair says the lair requires the Drakefire Amulet.
+A vendor hunt states the price on its own line, `Costs` followed by the same icons the game uses, with the number beside each icon. The number is the price of the seller named on the line when Wowhead's sellers disagree. Gold, silver, and copper use the money-frame coins. Honor uses the faction honor icon when Wowhead lists honor. A mark or other token uses that token's item icon, with the count, when Wowhead lists it. The old sentence `Costs Honor Points and tokens (Marks of Honor).` is left off once that line is present. A rank-named purchase states the required rank on the line just before Source (`Requires Sergeant (Rank 3).`). A reputation requirement is printed for every source that stores one, not only vendors, and the character's standing is green or red the same way. A weapon whose type this character has not learned (a priest starts with maces and buys daggers and staves from a weapon master) adds a red line, You have not learned to use Daggers yet., with the skill name the weapon master trains. The test is IsPlayerSpell on that skill (Daggers 1180, Staves 227, One-Handed Maces 198, and the rest in GQ.Data.WEAPON_SKILL_SPELLS). Simulation adds no such line. When none of the weapon skills reads as known, the check is not working and no line is added. A boss, trash, world, or rare drop in Onyxia's Lair says the lair requires the Drakefire Amulet.
 
 `SanitizeText` decodes Wowhead quest entities before the parchment, the lore, and the tracker draw. `&nbsp;` is a space. `&lt;name&gt;` is `UnitName("player")`, or "you". `&lt;class&gt;` and `&lt;race&gt;` use this character. `&lt;sir/madam&gt;` follows `UnitSex`. A remaining `&lt;...&gt;` emote is the sentence inside it. `commended!Please` gains a space. **Wildhunter Cloak** (16658), The Hunt Completed, is the check.
 
-**Lookup** is the log handle. It searches the loaded class database, 2000 rows a frame, and does not change the hunt selection or the Simulator. The detail parchment is the same hunt detail, and it stays empty until a result is clicked. Opening the page does not paint the last log hunt. `ApplyEntryDetail` refuses any entry that is not `lookupEntry` while the page is Lookup. The nearest-camp refresh uses `DetailEntry`, which is the lookup entry on that page. A chain of at least two steps is the list in `GQ.Data.questChain`, from the first series quest through the reward. **Thunderbrew's Boot Flask** (744) is 5 steps.
+**Lookup** is the log handle. It searches the loaded class database, 2000 rows a frame, and does not change the hunt selection or the Simulator. Results scroll, up to 100 (`LOOKUP_RESULT_LIMIT`); rows are made on demand. Clicking a slot's (i) on the hunt list, or the open (i) list, switches to Lookup and lists that slot's rank list in the (i) order, each row starting with its `#N` (`OpenSlotRankInLookup`). Weapons keep their true weapon rank. The search box shows `<slot> rank list` and selects that text on focus. Enter on the unchanged text keeps the list. Typing a search replaces it. The detail parchment is the same hunt detail, and it stays empty until a result is clicked. Opening the page does not paint the last log hunt. `ApplyEntryDetail` refuses any entry that is not `lookupEntry` while the page is Lookup. The nearest-camp refresh uses `DetailEntry`, which is the lookup entry on that page. A chain of at least two steps is the list in `GQ.Data.questChain`, from the first series quest through the reward. **Thunderbrew's Boot Flask** (744) is 5 steps.
 
 The minimap button center is half the minimap plus 5 (`MINIMAP_BORDER_OUTSET` in `Minimap.lua`).
 
 **General → Window size** (`settings.windowScalePercent`, 100 when nil) is a slider from 100 to 150. Each step is one percent. 100 is the normal log. 150 is half again as tall and wide. The percent uses the same color as the **Window size** label. Dragging updates the percent and leaves the window alone until the mouse button is released, so the frame does not jump under the cursor. A click on the track, or the mouse wheel, applies that step immediately. An old `largeWindow` check still means 150 until the slider is moved. Hunt rows, icons, parchment, buttons, Play style, the filter and its flyouts, the weapon filter, and the spec picker are children of the log and grow with it. Do not set their scale again. The (i) rank list is parented to UIParent, so `ApplyWindowScale` sets that panel to the same scale. The filter click-catcher stays full screen. The tracker, the guide arrow, the toast, the map pins, and item tooltips stay at the normal size.
 
 A hunt hover asks Auctionator for its price lines only when that addon is loaded (`Auctionator.Tooltip.ShowTipWithPricing`). The Forever tip stays. Auctionator appends its own vendor, auction, and disenchant lines. The GearQuest score stays under those. If Auctionator is not enabled, nothing is added.
+
+## Ranks for your other specs
+
+The item tooltip lists, under the rank line, the rank the item has at this level for each other spec of the class on screen, for example `Restoration: Rank #3 for your level`. It works while simulating and needs no hunt. A spec that does not rank that item at this level gets a grey line, `Holy: Not ranked for your level`, for every class, so a missing rank does not look like a line that failed to load. Netherpearl Shoulders (Shadow damage only) reads Shadow #2 and Discipline and Holy not ranked at 47. When no spec of the class ranks the item at any level (plate on a mage, food), no line is added. A random-suffix hunt is matched on its suffix. Each spec ranks its own jackpot roll, so a spec that ranks a different roll shows that roll's rank and names it (`Marksmanship: Rank #1 for your level (of the Falcon)` on Fire Opal Necklace of Agility). **General → Ranks for your other specs** (`settings.showOtherSpecRanks`) is on unless that setting is false. Off shows only the spec being played or simulated. `GQ.Log:WithSpecProbe` forces the spec through `GQ._ctx` and swaps in per-spec rank caches, so the active spec's hunt list and caches stay untouched. `InvalidateQueryCache` drops the probe caches.
+
+## Settings pages
+
+Both settings pages are grouped under headings (`GQ.Log:StackSettingsSections`). General: **Interface** (language, minimap icon, window size, background art, hide chat), then **Tooltips and score** (score on tooltips, ranks for other specs, score bar). Hunt settings: **Hunt list** (hide lower ranks, obtain popup), **Tooltips** (recommended enchantment, unit gear tips), then **Arrows, map and tracker** (upgrade arrows, guide arrow, map pins, map pin size, and Hide tracker last).
 
 ## GearQuest Index Score bar
 
@@ -804,8 +812,8 @@ aged out, it uses the nearest same-spec, same-faction band: the highest
 
 `EntryForItemLink` prefers the suffix, then filters to the active band
 (exact min and max, not `LEVEL_GRACE`). A chat link then matches the hunt
-list. **Kodohide Legguards** (285338) is rank 4 for Enhancement Horde at
-25–27 (score 18.52). **Pathfinder Belt** (15347) is the unsuffixed base;
+list. **Kodohide Legguards** (285338) is rank 10 for Enhancement Horde at
+25–27 (score 13.98; rank 9 Alliance). **Pathfinder Belt** (15347) is the unsuffixed base;
 Enhancement ranks **Pathfinder Belt of the Falcon**.
 
 When the hovered piece is gear and it is not the ranked row, say why
@@ -816,7 +824,7 @@ When the hovered piece is gear and it is not the ranked row, say why
 - **Not ranked at your level. Ranked from N to M.** / **Ranked at level N.**
 - **Not ranked for &lt;spec label&gt;.**
 - **Not ranked for your class.** / **Not ranked for your faction.**
-- **GearQuest has no score for this item.** Food, reagents, quest items, trade goods, bags, quivers, and ammo get no line at all.
+- **GearQuest is not scoring this item for your class.** Food, reagents, quest items, trade goods, bags, quivers, and ammo get no line at all.
 
 Simulation mode does not score. The line is **Turn off simulation mode to
 see your GearQuest Score for this item.** The Simulator page button says
@@ -827,9 +835,9 @@ score is below another piece in that slot, adds **Rank 1 when you wear
 multiple pieces of this set.** Embrace of the Viper inserts each piece at
 the front of the slot (`apply_embrace_package`): the score is the piece
 plus an equal share of the set bonus, which does not always beat the next
-individual piece. Enhancement Horde legs at 25–27: **Leggings of the Fang**
-(10410) rank 1, score 20.87, index 94; **Triprunner Dungarees** (9624)
-rank 2, score 21.56, index 100. Fang stays rank 1. Do not change the set
+individual piece. Enhancement chest at 26–27, both factions: **Armor of
+the Fang** (6473) rank 1, score 13.09; **Garb of Florid Feathers** rank 2,
+score 16.34. Fang stays rank 1. Do not change the set
 promotion or the weights to make those two numbers match.
 
 ## Staying smooth
@@ -837,6 +845,8 @@ promotion or the weights to make those two numbers match.
 A ding does not build the new list, the paper-doll arrows, and the obtain check on one frame. `PLAYER_LEVEL_UP` warms the query cache one slot per frame, then an idle frame (`WarmQueryCacheAsync` with gap 1). On that ding the weapon lists are walked a few milliseconds at a time. Other slots stay one frame. A warm that is not a ding still builds a weapon slot in one frame. Milestones, the obtain check, and the redraw each wait a frame after that. Paper-doll arrows on a ding are one slot per frame. The previous-level "new" probe idles between slots. The arrows you already have stay up until the new set is ready.
 
 Changing zone, logging in, and opening a merchant rebuild those arrows in the background the same way. Opening the log, changing a filter, or returning to Active, when the rank lists are not ready, keeps the rows on screen and swaps the whole list once they are built. Completed and Removed do not wait. A list that is already warm opens at once. Hovering an item tooltip, and switching class in the Simulator, stay on the frame they already used. Do not slice those.
+
+After the active spec is warm, the other specs' rank lists are built one spec and slot per frame with an idle frame between (`WarmOtherSpecRanksAsync`), so the first hover finds the other-spec lines ready. A band change or a dropped query cache stops that pass. Do not run `collectgarbage("collect")`. `GQ:CollectGarbageSoon` steps the same cycle over frames. The active list reads owned and obtained items from two sets (`EnsureOwnedItemSets`), rebuilt after a bag or equipment change, so it does not walk the bags or the progress table once per hunt. Bag and equipment events rebuild those sets at most once per frame. `QUEST_LOG_UPDATE` counts completed quests only within 10 seconds of a turn-in, on the first check, or while the quest titles are still being read. A weapon sort scores each piece once (`WeaponCompareScoreMap`).
 
 ## Log window
 
@@ -931,16 +941,19 @@ The source **Filter** closes on a click outside the menu. The Profession
   (`Interface\LFGFrame\UI-LFG-PORTRAIT`), not the raid-mark X. The parchment
   draws the same picture beside the reward name: the sub-filter icon when
   one exists, otherwise the main filter icon. A click still selects
-  the hunt, and the mouse wheel still scrolls the list. Unsourced is
+  the hunt, and the mouse wheel still scrolls the list. Unsourced (source id `unsourced`) is
   `GearQuest/Art/GQ-Unsourced.png`, the orange circle.
   Checking Profession, Boss drop, Dungeon & Raid trash, Vendor, or Quest reward opens that flyout
   on the click. You do not have to leave the row and come back.
 - **Play style** is the button at the bottom of the log
-  (`GearQuestForeverDB.ui`). While any of the nine is on, the button reads
-  **Play style***. Nine cards, names under the pictures, three then three,
+  (`GearQuestForeverDB.ui`). While any of them is on, the button reads
+  **Play style***. A page holds nine cards, names under the pictures, three then three,
   then **Focus Zone** under **Manageable Dungeons**, **Their Cities** under
-  **Manageable Quests**, and **No Zephras!** under **Buy it**. **Get it now!** can be on
-  with either dungeon card, and with **Manageable Dungeons**, **Manageable Quests**, **Buy it**, **Focus Zone**, **Their Cities**, and **No Zephras!**.
+  **Manageable Quests**, and **No Zephras!** under **Buy it**. Page 2 starts
+  with **No crafted BoP!** in the first place. Two arrows and `Page N / M`
+  sit just above Close. The arrows wrap, and the panel opens on page 1.
+  **Get it now!** can be on
+  with either dungeon card, and with **Manageable Dungeons**, **Manageable Quests**, **Buy it**, **Focus Zone**, **Their Cities**, **No Zephras!**, and **No crafted BoP!**.
   **No Dungeons!** and **Dungeon Enjoyer** turn each other off. A play
   style hides hunts across several sources. The filter still only chooses a source. Any of them widens the slot list the
   same way a filter does, so a later rank can show, and the rank box says why.
@@ -1026,6 +1039,23 @@ The source **Filter** closes on a click outside the menu. The Profession
     stays, including a world drop or a vendor that also sells on the
     mainland. The rows stay in the scored lists, so the rank number does
     not close up. The art is `GearQuest/Art/GQ-Play-NoZephras.png`.
+  - **No crafted BoP!** (`playNoCraftedBoP`) hides a crafted piece that
+    binds when picked up until the character has the profession that
+    makes it and the skill the recipe needs (`CraftSkills` skill, then
+    `ProfessionCraftRequirement`, then `requires skill N` in the text).
+    The recipe can be bought or traded, the skill cannot. **Stalker's
+    Mail Shoulders** needs Leatherworking 210, so a leatherworker at 195
+    does not see it. A piece is crafted when `GQ.CraftSkills` has
+    a recipe for it or the source is Profession. Fishing, skinning,
+    mining, and herbalism are not crafts. The source the hunt is filed
+    under does not matter, so a craft whose recipe is bought from a
+    vendor and the six leather helms whose pattern drops from a boss go
+    the same way. Bind on pickup is the Forever tooltip, then the client.
+    A bind-on-equip craft stays, because another player can sell it.
+    Learning the profession or a skill-up brings the hunts back without
+    turning the style off.
+    The rows stay in the scored lists, so the rank number does not close
+    up. The art is `GearQuest/Art/GQ-Play-NoCraftedBoP.png`.
 - **Rank on the parchment.** Above the item title, a black box reads
   `Rank #N` from that piece's place on the rank list this character can
   see. A hunt the other faction cannot get is left out and the numbers
@@ -1344,7 +1374,7 @@ Hunt-id probe (`pipeline/scripts/probe_forever_hunt_tooltips.py`) labels 200 vs 
 
 - **Recovered Forever items.** v1.1.6 had **1,412** audit rows `status="missing"`. **751** of those now resolve on dataEnv 16, so the audit has **10,372** ok and **661** still missing. The row count stayed 11,034. Dragon's Eye (10829) is 15 spirit, 13 healing, 4 spell damage, required level 51. Woodseed Hoop (17768) is 10 intellect and 6 damage and healing. The audit, `Data.ItemStats.generated.lua`, and `items.json` were written from those tooltips, then all nine classes were rescored. Do not rescore from the old stored rows. Blessed Prayer Beads stay unpriced.
 - **Coordinates.** `Data.Coordinates.generated.lua` was patched for recovered ids that already had a real place in the local cache. Do not call `emit()`. Creature-less world drops above level 15 still have no pin. **Guise of Battle** (287011) has never had one, including in v1.1.6. Do not invent a camp, and do not pin it in Elwynn or Durotar.
-- **Target tooltip.** `MobDrop.lua` and `Data.MobDrops.generated.lua`. Mousing over a creature, vendor, trainer, or quest giver lists up to three pieces that unit drops or sells. A line appears only when the piece is on this level's hunt list and `GearScoreArrowDelta` is positive, or the slot is empty. A downgrade stays off. Being on the list is not enough, and "not the item worn" is not enough. That second test shipped a downgrade onto the tooltip in v1.1.8's first draft. Do not put it back. The comparison is the item tooltip's number. Do not write a second one, and do not drop a real upgrade because the worn piece has no stored hunt score. Rings and trinkets compare to the weaker piece when both are filled. One empty ring or trinket slot is an upgrade. An older band stays off. Cloudy Skyforged Pauldrons is rank 19 for Beast Mastery at 40–41 only. It is not rank 21, and it is not Failed Flying Experiment. The line prints the rank, the item, the slot, the white index, the green arrow, and the green comparison number (`GearScoreDeltaText`). Never the arrow without that number. The three lines are the biggest upgrades. **Disengagement Ring** (276202) is finger rank #8 for a hunter at 44 and beats Seal of Sylvanas and Monkey Ring, so Friz Frazzlespark lists it with the green number. A piece he sells that scores worse stays off. Hunts settings hides the lines (`settings.hideUnitGearTips`). The sentences are `GQ.L` keys in every locale. The unit token from a world-cursor tooltip (a dungeon nameplate, a mouseover inside Wailing Caverns) is a secret string. Do not pass it to `UnitExists`, `UnitIsPlayer`, `UnitGUID`, or `UnitName`. Read the name with `GQ.PublicText` from `GetUnit`, the tooltip data line, or the first painted line. When that text is secret too, add no lines and do not error.
+- **Target tooltip.** `MobDrop.lua` and `Data.MobDrops.generated.lua`. Mousing over a creature, vendor, trainer, or quest giver lists up to three pieces that unit drops or sells. A line appears only when the piece is on this level's hunt list and `GearScoreArrowDelta` is positive, or the slot is empty. A downgrade stays off. Being on the list is not enough, and "not the item worn" is not enough. That second test shipped a downgrade onto the tooltip in v1.1.8's first draft. Do not put it back. The comparison is the item tooltip's number. Do not write a second one, and do not drop a real upgrade because the worn piece has no stored hunt score. Rings and trinkets compare to the weaker piece when both are filled. One empty ring or trinket slot is an upgrade. An older band stays off. Cloudy Skyforged Pauldrons is rank 19 for Beast Mastery at 40–41 only. It is not rank 21, and it is not Failed Flying Experiment. The line prints the rank, the item, the slot, the white index, the green arrow, and the green comparison number (`GearScoreDeltaText`). Never the arrow without that number. The three lines are the biggest upgrades. A mob you can attack also gets a second header, Your top world drops from this mob:, with up to three generic world drops by the same test. A generic world drop names no creature, so its stored range (World drop around level 42-52.) decides: the mob's level from the tooltip has to be inside it. A world drop with a named dropper stays on that creature's own rows and is not repeated. Friendly units, players, and pets get no world-drop lines. Hide unit gear tips hides both headers. A hover is answered from a cache: the pieces a unit answers for are kept per level, spec, class, and faction, and the lines per worn gear on top of that. A blacksmith trainer walks every crafted hunt of that profession, and walking it again on every hover froze the game for a moment. An answer that waited on a worn piece the client had not loaded is not kept. **Disengagement Ring** (276202) is finger rank #8 for a hunter at 44 and beats Seal of Sylvanas and Monkey Ring, so Friz Frazzlespark lists it with the green number. A piece he sells that scores worse stays off. Hunts settings hides the lines (`settings.hideUnitGearTips`). The sentences are `GQ.L` keys in every locale. The unit token from a world-cursor tooltip (a dungeon nameplate, a mouseover inside Wailing Caverns) is a secret string. Do not pass it to `UnitExists`, `UnitIsPlayer`, `UnitGUID`, or `UnitName`. Read the name with `GQ.PublicText` from `GetUnit`, the tooltip data line, or the first painted line. When that text is secret too, add no lines and do not error. That is every unit inside a dungeon, world drops included. A quest giver outside who sends you into a dungeon still lists its rewards. Every line drops a hunt this character has obtained or removed, read on each hover so a looted piece leaves without waiting for the cache.
 - **Two-hand against the pair.** `TwoHandCompetesWithPair` and `WeaponLoadoutPipelineDelta` compare a two-hander with the main hand plus the off hand, including a shield, and a one-hander with a worn two-hander. That is the arrow and the score bar. The white 0–100 number uses the same score as the hunt rank (`WeaponCompareScore`): the piece itself, or a one-hander plus its best off hand on a spec that pairs them. The highest of those scores is rank #1 and reads 100. A band that starts later does not outrank a higher score. Beast Mastery Horde at 44 keeps the off hand on 44–44 and the two-handers on 43–46, and Eyegouger (9480, 25.09) is rank #1 ahead of the off-hand band. The shield is not on that scale.
 - **Memory.** Shared hunt-row facts, dropped player-class picks, no duplicate score table, no `byClass`. See the 28 Sep memory paragraph. Weights were not retuned for this.
 - **Notables are gone from the addon.** `GetNotableForSlot` and the shelf are not in `Data.lua` or `Log.lua`. Hunt order is unchanged. `score.py` still has an empty `notable` dict. Do not rescore to delete it, and do not put the shelf back.
@@ -1377,7 +1407,7 @@ Hunt-id probe (`pipeline/scripts/probe_forever_hunt_tooltips.py`) labels 200 vs 
 
 **7 Nov 2026 catalog.** Wowhead Forever listed 196 pieces that were not in the addon. All 196 return a classic nether tooltip 404, so all of them are stamped New in Forever (`new_in_forever.json` is 2,985). 33 are quest rewards and 163 stayed Unsourced. The gear list named no drop, seller, or recipe for those 163, and no farm was invented. They were added to `classic_item_ids.json` so the score pool keeps them, then all nine classes were rescored with `GQ_NO_GUIDES=1`. Weights were not changed. Wicked Ritualist's Kris (273832) is a quest item and was not added. Nine stored ids that are missing from the live gear list stay: Phoenix Bindings (210781), Invoker's Mantle (215365), Invoker's Cord (215366), Turtle Scale Gloves (217270), Golden Scale Gauntlets (217273), Greater Mystic Wand (217287), and the three Leafre rings (274978, 276765, 285326). A missing list row is not a 404. Leafre's Ring of Precise Spell Power stays required level 60.
 
-Quest rewards and the pickup level. Horde 30, A Tale Spun Around the Fire (96078, no series, chain 1): Ceremonial Mallet (279885), Sacrificial Sword (279886), I'lalai Flayer (279887). Alliance 30, Findings for the Explorer's League (95799): Ancient Voodoo Pouch (279880), Intrepid Explorer's Chainmail (279881). Alliance 30, The Web of Magic (95798): Apprentice Sorcerer's Slacks (279878), Rune-Etched Epaulets (279879). Alliance 35, The Lost Tablets of Will (1139, no series): Medal of Valor (270095), pin Ironforge 76.4, 10.8, required level 35. Horde 36, Death to the Executioner (95433): the series through the reward is Rise Up! (95432) then Death to the Executioner. Later steps stay off. Thud Hammer (275011). Horde 36, Farholde Scouting Report (93971): Head-Harvest Crossbow (275040), Bloodied Sash (275041), no pin. Alliance 36, Fit for a Princess (95913): Apple of My Eye (95561) then Fit for a Princess. Stepped Out is after the reward. Fur-Lined Bracers (274931), Coyote Hide Wraps (274932), no pin. Horde 36, Jom-jom's Escape (94556): Jom-jom's Gabbar (274952), chain 1, and the page names no giver and no coordinate, so there is no pin. Alliance 36, Preventative Measures (95064): Farholde Horns (274959). Alliance 36, The Rog'mar Situation (95066): Orc Bone Bow (275052). Alliance 37, The Hidden Chamber (2240): Guardian Staff (270078), pin Ironforge 73.8, 13.0, faction Alliance. The earlier quest 2398 has no stored name, so the chain line stays quiet. Horde 38, A Token of Vengeance (94975): Semblance of Twilight (267090). Alliance 38, Drop the Hammer (94926): Pauldron of Order (275036). Alliance 38, Dunston Checks Out (94927): Prisoner Handwraps (275021), Bolder'ok Loincloth (275023), Dunston's Ogre Duster (275025). Horde 38, Gordunni Cobalt (2987): Orwin's Axe (287073), chain 1, pin Feralas 75.6, 44.2. Tome of Twilight, pickup 39. Alliance 94984 is A Small Favor (94907) then Tome of Twilight: Twilight Initiate's Belt (279854), Torn Cultist Cloak (279855). Horde 94972 has no series: Indoctrinated Choker (279859), Convert's Bindings (279860). Both 40, Eye of Mugg (Horde 94968, Alliance 94982, no series, no pins): Bigger Rock on Bigger Stick (279480), Rock on Stick (279852), Stick No Rock (279853), required level 40. Both 43, Tiara of the Deep (2846), chain Tabetha's Task (2861) then Tiara of the Deep: Dank Shoulderpads (270098). Four trainer pins: Undercity 84.4, 11.0, Ironforge 26.4, 9.4, Stormwind 38.4, 79.4, Orgrimmar 37.8, 86.6. The log shows the closest of the viewer's faction. Both 44, Divino-matic Rod (2768, chain 1): Magister Cowl (270099), pin Tanaris 52.4, 28.4. Both 50, Jammal'an the Prophet (1446, chain 1): Leggings of Freedom and Sorrow (270115), pin the Hinterlands 33.6, 75.2. Required level was lowered from the item-level floor to the quest's Requires level only when the tooltip had no Requires Level above 1. Do not run `apply_quest_req_levels.py` on the catalog.
+Quest rewards and the pickup level. Horde 30, A Tale Spun Around the Fire (96078), the last step of the Drowned City chain: The Vile Reef (629), The Gurubashi Legends of Old (95748), Locating the Lost City (95770), The Drowned City (95775), then A Tale Spun Around the Fire. The pin is the first step, Stranglethorn Vale 32.2, 27.8: Ceremonial Mallet (279885), Sacrificial Sword (279886), I'lalai Flayer (279887). Alliance 30, Findings for the Explorer's League (95799): Ancient Voodoo Pouch (279880), Intrepid Explorer's Chainmail (279881). Alliance 30, The Web of Magic (95798): Apprentice Sorcerer's Slacks (279878), Rune-Etched Epaulets (279879). Alliance 35, The Lost Tablets of Will (1139, no series): Medal of Valor (270095), pin Ironforge 76.4, 10.8, required level 35. Horde 36, Death to the Executioner (95433): the series through the reward is Rise Up! (95432) then Death to the Executioner. Later steps stay off. Thud Hammer (275011). Horde 36, Farholde Scouting Report (93971): Head-Harvest Crossbow (275040), Bloodied Sash (275041), no pin. Alliance 36, Fit for a Princess (95913): Apple of My Eye (95561) then Fit for a Princess. Stepped Out is after the reward. Fur-Lined Bracers (274931), Coyote Hide Wraps (274932), no pin. Horde 36, Jom-jom's Escape (94556): Jom-jom's Gabbar (274952), chain 1, and the page names no giver and no coordinate, so there is no pin. Alliance 36, Preventative Measures (95064): Farholde Horns (274959). Alliance 36, The Rog'mar Situation (95066): Orc Bone Bow (275052). Alliance 37, The Hidden Chamber (2240): Guardian Staff (270078), pin Ironforge 73.8, 13.0, faction Alliance. The earlier quest 2398 has no stored name, so the chain line stays quiet. Horde 38, A Token of Vengeance (94975): Semblance of Twilight (267090). Alliance 38, Drop the Hammer (94926): Pauldron of Order (275036). Alliance 38, Dunston Checks Out (94927): Prisoner Handwraps (275021), Bolder'ok Loincloth (275023), Dunston's Ogre Duster (275025). Horde 38, Gordunni Cobalt (2987): Orwin's Axe (287073), chain 1, pin Feralas 75.6, 44.2. Tome of Twilight, pickup 39. Alliance 94984 is A Small Favor (94907) then Tome of Twilight: Twilight Initiate's Belt (279854), Torn Cultist Cloak (279855). Horde 94972 has no series: Indoctrinated Choker (279859), Convert's Bindings (279860). Both 40, Eye of Mugg (Horde 94968, Alliance 94982, no series, no pins): Bigger Rock on Bigger Stick (279480), Rock on Stick (279852), Stick No Rock (279853), required level 40. Both 43, Tiara of the Deep (2846), chain Tabetha's Task (2861) then Tiara of the Deep: Dank Shoulderpads (270098). Four trainer pins: Undercity 84.4, 11.0, Ironforge 26.4, 9.4, Stormwind 38.4, 79.4, Orgrimmar 37.8, 86.6. The log shows the closest of the viewer's faction. Both 44, Divino-matic Rod (2768, chain 1): Magister Cowl (270099), pin Tanaris 52.4, 28.4. Both 50, Jammal'an the Prophet (1446, chain 1): Leggings of Freedom and Sorrow (270115), pin the Hinterlands 33.6, 75.2. Required level was lowered from the item-level floor to the quest's Requires level only when the tooltip had no Requires Level above 1. `apply_quest_req_levels.py` runs only in the scrape pass, right after the tooltip write, as the pipeline order says. It never replaces a stated Requires Level above 1, and the `DUNGEON_SET_60` pieces stay at 60.
 
 Stopping the Cycle (98297) rewards Subdued Dragon's Fang (281314), Trusty Sword (281313), and Fallen Dragon's Scepter (281312). Wowhead's series box is empty. The chain is still Old Habits (98223), Crocs of the Sky (98072), Crimson Crate Delivery (98240), Razormaw Needling (98245), Trying Times (98246), This Land Was Their Land (98230), Death to the Dragonmaw (98291), then Stopping the Cycle. Razormaw Needling's own series is the two steps before it. Word to Ironforge (98300) is after the reward and stays off. The pin is the Tattered Spellbook in the Wetlands at 53.4, 54.5, not Howin Kindfeather at 77.0, 45.4. Alliance. Do not write the chain back to 1, and do not move the pin back to the reward giver. `quest_faction.json` marks the three Alliance. A rescore is what drops them from a Horde list.
 
@@ -1544,6 +1574,14 @@ items stayed Unsourced because the tooltip named no dropper. Do not call
 those world drops.
 
 **Then check every newly indexed id for New in Forever.** Wowhead prints that badge when the id is absent from the classic item database. Probe `https://nether.wowhead.com/classic/tooltip/item/{id}`: HTTP 404 is the badge, HTTP 200 is a classic or Season of Discovery item and stays unstamped. `id >= 200000` is not the test. Privateer's Ornate Pistol (202256) is in that range and is not new. Run `python pipeline/scripts/build_forever_new.py`. It probes only ids missing from `pipeline/data/forever_wowhead/new_in_forever.json` and rewrites `GearQuest/_generated/Data.ForeverNew.generated.lua`. The log draws the burnt Forever mark beside the reward for those ids. Hovering it says "New in Forever".
+
+**Then crawl the Unconfirmed flags.** The gear list `https://www.wowhead.com/forever/items?filter=195;1;0` carries `envChange` on every row: new, updated, unchanged, or unconfirmed. Crawl it in item-level slices (`/forever/items/min-level:A/max-level:B?filter=195;1;0`, split a slice again when it says fewer displayed than found) from the browser, and save the rows to `pipeline/data/forever_wowhead/env_change.json` (12,833 rows on 17 Nov 2026). An unconfirmed page shows the Unconfirmed label, and a Season of Discovery leftover also says "This item may not be in WoW: Forever". Rune of the Protector (221511) from the Rune Broker is that case. An updated row lists what changed (`Strength 9 instead of 16`). Refetch those hunts with `refresh_forever_tips.py --ids ... --refetch`, then run `apply_quest_req_levels.py --apply-only`, `apply_chain_gates.py`, and `emit_forever_audit.py`.
+
+Run `python pipeline/scripts/apply_unconfirmed.py`. An unconfirmed item moves to the `unsourced` source, which the log labels **Unsourced** and starts hidden. The stored instructions, zone, npc, and pins stay, and the old type is kept in `unconfirmedFrom`, so a later crawl that no longer flags it puts it back. The hover says Wowhead Forever marks the item unconfirmed (`GQ.Data.unconfirmed`, `Data.Unconfirmed.generated.lua`). The same pass copies Wowhead's item set id onto an item whose stored `itemset` is 0. Every piece with an item set gets the **(Set piece)** label in `payload.py`. Only Embrace of the Viper, Defias, Scarlet, and Rotmender carry bonus text and a set score package.
+
+Run `python pipeline/scripts/apply_forever_absent.py` before the rescore. `pipeline/data/forever_absent.json` lists the raids the client has rows for that are not in the game (Molten Core, Blackwing Lair, Zul'Gurub, both Ahn'Qiraj raids, Naxxramas), the reputations that go with them (Brood of Nozdormu, Zandalar Tribe), and single ids with the reason. A boss drop, trash, rare, vendor, or quest reward filed in one of those raids, or dropped by a boss `bossNpcs` files there, gets `obtainable` false and `absentRaid`. A world drop keeps its row, so Onyx Shredder Plate stays. Single ids: Ice Barbed Spear, Bloodseeker, and Wand of Biting Cold (Korrak the Bloodrager is not offered, and the Alterac Valley victory quests give reputation only), Sageblade and Persuader (the plans drop only in those raids), Thunderfury, the Treasure of the Timeless One weapons, The Only Prescription, and the test items. Remove a raid from `absentRaids` when it opens and run the script again; its rows come back. Onyxia's Lair stays in.
+
+Then run `python pipeline/scripts/apply_client_missing.py`. Wowhead Forever lists items the game client cannot load: `GetItemInfo` fails, and the hover could only show the stored tip with the red "This game client does not have it yet" lines. Those items stay out of the addon. `pipeline/data/client_missing.json` holds the list and the client build it was taken from. An item is in the client when that build's ItemSparse table (wago.tools) has the row, or the installed client's `Cache/ADB/enUS/DBCache.bin` holds a valid ItemSparse hotfix for it. An Item row alone is not enough, and the server answers those hotfix requests as invalid. Build 1.60.1.70938 is missing 10009 catalog items, 684 of them hunts: the Season of Discovery PvP rank sets, the Inquisition, Fireleaf, and Waywatcher sets, Baron Charr's Sceptre, and Abomination Skin Leggings among them. Each row gets `clientMissing` (the build) and `obtainable` false. The rows stay in `items.json` and `sources.json`. After a client patch, run it with `--refresh` (the installed build, or `--build`) and rescore; an item the new build has leaves the list and its row comes back. The red lines stay for anything the list does not catch.
 
 Re-score with `python pipeline/scripts/rescore_hunter_shaman.py` after new
 gear is actually ingested. One class name does one class. Do not
@@ -1929,15 +1967,44 @@ A crafted hunt states the Forever recipe skill on the line just before
 Source: `Requires Leatherworking (155) to craft. Your Leatherworking is 157.`
 or `You don't have Leatherworking.` That clause is green when the character's skill is at least the recipe, and red when it is short or the profession is missing. The description does not repeat that
 skill. `Crafted with Leatherworking (requires skill 130).` is stripped.
-In its place the description lists the recipe materials from the Wowhead
-Forever spell tooltip, `Materials: Light Leather (8), Coarse Thread (4).`,
-when that spell page has them. `fetch_craft_skills.py --reagents` writes
-those onto `GQ.CraftSkills`. Look the skill up for every new
+A craft the trainer teaches lists the recipe materials in its place, from
+the Wowhead Forever spell tooltip, `Materials: Light Leather (8), Coarse Thread (4).`,
+when that spell page has them. A craft with a recipe row leaves the
+materials off the parchment, because the recipe's tooltip lists them. The
+tracker keeps them. `fetch_craft_skills.py --reagents` writes
+those onto `GQ.CraftSkills`.
+
+The parchment drops stored sentences that repeat another line
+(`CleanDetailIntro`). "Pick it over the other reward choices.", "Indexed
+from Wowhead Forever.", and "Source not listed yet." go. A description
+that is only "Quest reward." or "Bought from a vendor." is empty, because
+Source says the same. "Requires <faction> - <standing>." goes when the hunt
+has `reqRep`, since the standing line prints it with this character's
+standing. A set piece drops the `(N)` bonus sentences, which the client
+tooltip shows (with Rotmender's "Twice as much mana in Haunted and
+Wasteland."), and the "A druid in all five turns into a serpent" note on
+other classes. The set name, the spec advice, and the druid's own serpent
+sentence stay. Stored data is not changed, and each sentence is still
+translated one at a time. The random-vendor note, the recipe seller
+sentence, the Auction House line, and Source stay. Look the skill up for every new
 profession hunt, and again when an existing profession hunt is updated.
 See step 6 under **When you find a new or retuned item**. The character's
 rank is `GetProfessions` / `GetProfessionInfo`, then the skill-line list.
 Do not print a stub skill of 1. Dress Shoes (6836) have no Forever recipe,
 so that line stays off.
+
+Just above that skill line, a craft taught by a recipe item shows that
+item: its icon and name on a dark strip in the item's quality color, the
+same look as the reward box. Hovering it is the client item tooltip, with
+no GearQuest score. Shift-click links it in chat. The name is the client's
+name for the item. The stored English name stands in until the client has
+it, and when English is chosen on a client in another language.
+`build_craft_recipes.py` writes `GQ.CraftRecipes` from the Wowhead Forever
+profession lists (`src.items` on each recipe spell): 896 of the 1087 crafts.
+A craft the trainer teaches, or one known from the start, has no row. When a
+spell lists more than one item, the one named for the crafted piece wins,
+then the lowest id, so Plans: Stronger-hold Gauntlets (228118) is not
+Stronghold Gauntlets. Run it again after `fetch_craft_skills.py`.
 
 A named dungeon boss is `boss_drop`, even when the old sentence said
 "(rare elite)". Mutanus the Devourer is Wailing Caverns, not a world drop.
@@ -2032,8 +2099,16 @@ spawn at that door. Blackmaw Hold is Azshara 42.4, 20.2, where Gatekeeper
 Rageroar stands at the furbolg gate. Alcaz Prison is Dustwallow Marsh
 75.6, 13.8, the north end of Alcaz Island. The Drowned City is
 Stranglethorn Vale 21.0, 27.7, the west edge of the Brinescale Skirmisher
-patrol at the underwater cave. Krol'dok Stronghold (Riverglades) and
-Shaper's Terrace (northern Un'Goro) still have a description only.
+patrol at the underwater cave. Krol'dok Stronghold (northern Riverglades)
+and Shaper's Terrace (northern Un'Goro) still have a description only.
+Wowhead Forever puts Krol'dok's creatures on the Eastern Kingdoms continent
+map, which is not a place to stand, so the door stays unpinned until a
+Riverglades coordinate is published. Its six bosses (Slavecrusher Grox,
+Twilight Commander Zarmok, War Handler Ashka, Nar'gurk, Bossman Toof,
+Overlord Mugg) are in `bossNpcs`, and their 19 pieces are Boss drop in
+Krol'dok Stronghold. The nine pieces Wowhead lists only on the Krol'dok
+elites (287007-287016, no 287010) are Dungeon & Raid trash, named on
+Krol'dok Brute, who drops all nine.
 Table: `pipeline/data/dungeon_entrances.json`.
 
 ### What could not be indexed (2 Oct 2026)
@@ -2309,7 +2384,7 @@ them. A dark bar under the window reads A Select, Y Filters, Navigate, and B Clo
 An open filter, play style, weapon, or spec menu gets a smaller bar under it
 that reads A Select, Navigate, and B Close. The arrow, the gold border, the bumper marks, and both bars
 hide while another window has the pad. Opening a Blizzard window while GearQuest has the pad gives that window the pad. A click anywhere on GearQuest takes the pad back. That check only reads
-FrameControlsManager.currentFrame. Do not call its methods. Down on the hunt list moves to the next hunt. Up from the top hunt reaches Active, Completed, and Removed. Left and right move among those tabs, and down from a tab returns to the first hunt. On Settings, Lookup, and the Simulator, up and down walk the next control in that column and stop at the ends. Left and right move only when a control sits that way. One press is one action. A direction does not also confirm or close. Closing Play Style, the source filter, or the weapon menu clears the highlight, so a card that just closed does not leave the blue square on the list. The top face button (Y / Triangle) moves the arrow onto the source filter, Play style, and the weapon arrows, and does not change the list. A second Y returns to the hunts. A on a filter control opens it. The bottom face
+FrameControlsManager.currentFrame. Do not call its methods. Down on the hunt list moves to the next hunt. Up from the top hunt reaches Active, Completed, and Removed. Left and right move among those tabs, and down from a tab returns to the first hunt. On Settings, Lookup, and the Simulator, up and down walk the next control in that column and stop at the ends. The column is the controls whose left and right edges overlap the focus. Only when it has nothing left does a control within 140 pixels to the side count (`GamepadVerticalStep`). Left and right move only when a control sits that way. The first pick on a page is never the window close button. One press is one action. A direction does not also confirm or close. Closing Play Style, the source filter, or the weapon menu clears the highlight, so a card that just closed does not leave the blue square on the list. The top face button (Y / Triangle) moves the arrow onto the filter controls: the source filter, Play style, each slot header's arrow and (i), Hunts per gear slot, the spec name, and Turn off simulation (`GamepadIsFilterTarget`). It does not change the list. A second Y returns to the hunts. A on a filter control opens it. In the source filter menu the pad opens on the first source, not Deselect all. Moving onto a source opens its flyout the same as a hover, and the flyout stays open while the pad is on that row or inside it (`PadFocusWithin`). A on the source still only toggles it. The language menu takes the pad, and B closes that menu. The bottom face
 button (A / Cross) confirms. Moving onto a checkbox or a button does not
 change it. A on a hunt moves the arrow to Track. The d-pad and the left stick
 then move among Track, Show on map, and Remove, and back to the hunts. The

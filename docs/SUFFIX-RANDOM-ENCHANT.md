@@ -166,4 +166,4 @@ After `/reload` in-game:
 | `GearQuest/Log.lua` | list quality colors, tooltip hover |
 | `GearQuest/Core.lua` | clears legacy `GearQuestDB.suffixLinks` cache on login |
 
-See also `_rootcause-import/CURSOR-NOTE-ROOT-CAUSE.md` for the original diagnosis.
+See also [`CURSOR-NOTE-ROOT-CAUSE.md`](../pipeline/docs/CURSOR-NOTE-ROOT-CAUSE.md) for the original diagnosis.

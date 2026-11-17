@@ -20,8 +20,8 @@ from gq_paths import DATA
 
 ITEMS = Path(DATA) / "items.json"
 SOURCES = Path(DATA) / "sources.json"
+# The dataEnv 16 cache only. The old /forever/tooltip/ cache lags the item page.
 CACHE_TIPS = Path(DATA) / "forever_wowhead" / "refresh_cache_env16.json"
-CACHE_TIPS_OLD = Path(DATA) / "forever_wowhead" / "refresh_cache.json"
 CACHE_XML = Path(DATA) / "forever_wowhead" / "quest_req_cache.json"
 PINS = Path(DATA) / "client_item_overrides.json"
 # The reward step says Requires level 24. The chain cannot start until the
@@ -101,11 +101,7 @@ def tooltip_states_level(raw: dict) -> int:
 def main():
     items = json.loads(ITEMS.read_text(encoding="utf-8"))
     sources = json.loads(SOURCES.read_text(encoding="utf-8"))
-    tips = {}
-    if CACHE_TIPS_OLD.exists():
-        tips.update(json.loads(CACHE_TIPS_OLD.read_text(encoding="utf-8")))
-    if CACHE_TIPS.exists():
-        tips.update(json.loads(CACHE_TIPS.read_text(encoding="utf-8")))
+    tips = json.loads(CACHE_TIPS.read_text(encoding="utf-8")) if CACHE_TIPS.exists() else {}
     pins = set(json.loads(PINS.read_text(encoding="utf-8"))) if PINS.exists() else set()
     xml_cache = json.loads(CACHE_XML.read_text(encoding="utf-8")) if CACHE_XML.exists() else {}
 
@@ -250,7 +246,7 @@ def main():
 
     tmp_items = ITEMS.with_suffix(".json.tmp")
     tmp_src = SOURCES.with_suffix(".json.tmp")
-    tmp_items.write_text(json.dumps(items, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
+    tmp_items.write_text(json.dumps(items, separators=(",", ":"), ensure_ascii=True), encoding="utf-8")
     tmp_src.write_text(json.dumps(sources, separators=(",", ":"), ensure_ascii=True), encoding="utf-8")
     tmp_items.replace(ITEMS)
     tmp_src.replace(SOURCES)

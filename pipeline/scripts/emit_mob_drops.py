@@ -6,6 +6,9 @@ was stored.
 
 Vendors, recipe sellers, and quest givers come from the coordinate pins, the
 vendor price table, and the Wowhead coord cache when a pin stored no name.
+A quest giver the cache only knows by id has no name to match a tooltip, so
+`--fetch-names` first stores the Wowhead Forever name of each one
+(nether tooltip, dataEnv 16) in the cache.
 A recipe seller is indexed by the pieces that person sells. A profession
 trainer who does not sell the recipe is indexed by name to that profession.
 The tooltip then uses the crafted hunts of that profession. The trainer
@@ -16,6 +19,10 @@ from __future__ import annotations
 
 import json
 import re
+import sys
+import time
+import urllib.error
+import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -24,6 +31,7 @@ COORDS = ROOT / "GearQuest" / "_generated" / "Data.Coordinates.generated.lua"
 FACTS = ROOT / "GearQuest" / "_generated" / "Data.HuntFacts.generated.lua"
 CACHE = ROOT / "pipeline" / "data" / "forever_wowhead" / "coord_cache.json"
 PROF_DIR = ROOT / "pipeline" / "data" / "forever_wowhead" / "professions"
+FETCH_DELAY = 1.0
 GENERATED = ROOT / "GearQuest" / "_generated"
 OUT = ROOT / "GearQuest" / "_generated" / "Data.MobDrops.generated.lua"
 CLASS_FILES = {
@@ -236,6 +244,10 @@ def add_vendor_costs(index: Index) -> None:
 
 def npc_names(cache: dict) -> dict[int, str]:
     found: dict[int, str] = {}
+    for key, rec in (cache.get("npc") or {}).items():
+        name = rec.get("name") if isinstance(rec, dict) else None
+        if isinstance(name, str) and norm(name) and str(key).isdigit():
+            found[int(key)] = " ".join(name.split())
     for key, rows in (cache.get("search") or {}).items():
         if not isinstance(key, str) or not key.startswith("npc\n"):
             continue
@@ -325,6 +337,51 @@ def add_quest_cache(index: Index, sources: dict) -> int:
     return added
 
 
+def giver_ids(cache: dict, sources: dict) -> set[int]:
+    quests = cache.get("quest") or {}
+    item_quest = cache.get("itemQuest") or {}
+    found: set[int] = set()
+    for raw_id, src in sources.items():
+        if not isinstance(src, dict) or src.get("sourceType") != "quest_reward":
+            continue
+        for qid in item_quest.get(str(raw_id)) or []:
+            try:
+                row = quests.get(str(root_quest(int(qid), quests))) or {}
+            except (TypeError, ValueError):
+                continue
+            found.update(n for n in row.get("startNpcs") or [] if isinstance(n, int))
+            for place in row.get("places") or []:
+                if isinstance(place, dict) and place.get("point") == "start" and isinstance(place.get("npc"), int):
+                    found.add(place["npc"])
+    return found
+
+
+def fetch_giver_names(sources: dict) -> None:
+    """Store the Wowhead Forever name of every quest giver the cache only knows by id."""
+    cache = json.loads(CACHE.read_text(encoding="utf-8"))
+    named = npc_names(cache)
+    todo = sorted(n for n in giver_ids(cache, sources) if n not in named)
+    print(f"quest givers without a name: {len(todo)}", flush=True)
+    for n, npc_id in enumerate(todo, 1):
+        url = f"https://nether.wowhead.com/tooltip/npc/{npc_id}?dataEnv=16"
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 GearQuestForever"})
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                name = json.loads(resp.read().decode("utf-8")).get("name")
+        except (urllib.error.URLError, ValueError) as e:
+            print(f"  npc {npc_id}: {e}", flush=True)
+            name = None
+        if isinstance(name, str) and norm(name):
+            rec = cache["npc"].setdefault(str(npc_id), {"spots": [], "faction": None})
+            rec["name"] = " ".join(name.split())
+        if n % 25 == 0:
+            print(f"  {n}/{len(todo)}", flush=True)
+        time.sleep(FETCH_DELAY)
+    tmp = CACHE.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(cache, ensure_ascii=True, separators=(",", ":")), encoding="utf-8")
+    tmp.replace(CACHE)
+
+
 def place_faction(row: dict, npc_id: int) -> int:
     for place in row.get("places") or []:
         if isinstance(place, dict) and place.get("npc") == npc_id:
@@ -388,6 +445,8 @@ def profession_tables(sources: dict) -> tuple[dict[str, list[int]], dict[str, li
 
 def main() -> None:
     sources = json.loads(SOURCES.read_text(encoding="utf-8"))
+    if "--fetch-names" in sys.argv:
+        fetch_giver_names(sources)
     index = Index()
     add_sources(index, sources)
     add_coordinates(index)

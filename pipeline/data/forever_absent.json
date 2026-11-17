@@ -1,0 +1,44 @@
+{
+  "_note": "Content the Forever client has rows for that players cannot reach yet. apply_forever_absent.py sets obtainable false on those sources, and puts them back when a raid leaves absentRaids. raidContent zones and worldBosses feed Hunt settings > Hide raid hunts.",
+  "absentRaids": [
+    "Molten Core",
+    "Blackwing Lair",
+    "Zul'Gurub",
+    "Ruins of Ahn'Qiraj",
+    "Temple of Ahn'Qiraj",
+    "Ahn'Qiraj",
+    "Naxxramas"
+  ],
+  "openRaids": [
+    "Onyxia's Lair",
+    "Hyjal Summit",
+    "Barrow Deeps"
+  ],
+  "worldBosses": [
+    "Azuregos",
+    "Lord Kazzak",
+    "Emeriss",
+    "Lethon",
+    "Taerar",
+    "Ysondre"
+  ],
+  "absentFactions": [
+    "Brood of Nozdormu",
+    "Zandalar Tribe"
+  ],
+  "items": {
+    "19106": "Korrak the Bloodrager (quest 7202) is not offered in WoW: Forever. The Alterac Valley victory quests give reputation only.",
+    "19107": "Korrak the Bloodrager (quest 7202) is not offered in WoW: Forever. The Alterac Valley victory quests give reputation only.",
+    "19108": "Korrak the Bloodrager (quest 7202) is not offered in WoW: Forever. The Alterac Valley victory quests give reputation only.",
+    "22383": "The Sageblade plan drops only in Molten Core, Blackwing Lair, Ahn'Qiraj, and Naxxramas.",
+    "22384": "The Persuader plan drops only in Zul'Gurub and Ahn'Qiraj.",
+    "19019": "Thunderfury needs the Bindings of the Windseeker from Molten Core.",
+    "21520": "Treasure of the Timeless One needs the Eye of C'Thun from Ahn'Qiraj.",
+    "21521": "Treasure of the Timeless One needs the Eye of C'Thun from Ahn'Qiraj.",
+    "21522": "Treasure of the Timeless One needs the Eye of C'Thun from Ahn'Qiraj.",
+    "21523": "Treasure of the Timeless One needs the Eye of C'Thun from Ahn'Qiraj.",
+    "21517": "The Only Prescription needs the Draconic for Dummies chapters from Blackwing Lair.",
+    "240132": "Test item.",
+    "240994": "Test item."
+  }
+}

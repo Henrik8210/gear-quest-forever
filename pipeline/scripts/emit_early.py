@@ -3,7 +3,8 @@
 Alliance,Horde writes Data.<Class>.Early.1to9.generated.lua. Nothing at level 10 or above.
 """
 import json, os
-from gq_paths import G, OUT
+from gq_paths import G, OUT, forever_missing_ids
+FOREVER_MISSING = forever_missing_ids()
 CLS=os.environ.get("GQ_CLASS","PALADIN"); LC=CLS.lower()
 gen=json.load(open(os.path.join(OUT, os.environ.get("GQ_OUT","paladin.json")))); items=json.load(open(G+"items.json"))
 srcs=json.load(open(G+"sources.json"))
@@ -39,6 +40,12 @@ for sp, blob in gen.items():
         seen=set()
         for p in b["picks"]:
             if p["id"] in seen or p.get("name") in seen:
+                continue
+            # The same filters as payload.unique_picks.
+            if p["id"] in FOREVER_MISSING:
+                continue
+            lname=(p.get("name") or "").lower()
+            if "test copy" in lname or "animation as" in lname:
                 continue
             seen.add(p["id"]); seen.add(p.get("name"))
             shipped.append(p)

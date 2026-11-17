@@ -84,7 +84,7 @@ def main():
         print(f"{iid} {item.get('name')}: {old} -> {level}")
     tmp_items = ITEMS.with_suffix(".json.tmp")
     tmp_src = SOURCES.with_suffix(".json.tmp")
-    tmp_items.write_text(json.dumps(items, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
+    tmp_items.write_text(json.dumps(items, separators=(",", ":"), ensure_ascii=True), encoding="utf-8")
     tmp_src.write_text(json.dumps(sources, separators=(",", ":"), ensure_ascii=True), encoding="utf-8")
     tmp_items.replace(ITEMS)
     tmp_src.replace(SOURCES)

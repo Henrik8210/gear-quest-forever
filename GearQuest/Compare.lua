@@ -254,10 +254,6 @@ function GQ.Compare:GetStatWeight(statName)
             if classFile == "HUNTER" and key == "ap" then
                 return math.max(profile.ap or 0, profile.rap or 0)
             end
-            -- Pet-tank DPS classes: stamina is QoL, not BiS rank fuel.
-            if (classFile == "HUNTER" or classFile == "WARLOCK") and key == "sta" then
-                return 0
-            end
             return profile[key]
         end
     end
@@ -647,9 +643,7 @@ local function WeaponDpsWeight(slotName)
     if slotName == "Ranged" then
         return dpsRanged
     end
-    if slotName == "SecondaryHand" then
-        return dps * 0.5
-    end
+    -- The hunt prices the printed damage the same in either hand.
     return dps
 end
 
@@ -668,7 +662,7 @@ end
 
 -- The worn random-suffix link, scored the way the hunt scores stats.
 -- Spell power counts as healing and as spell damage. Weapon damage uses
--- this spec's weapon weight, and an off-hand weapon is half of that.
+-- this spec's weapon weight in either hand.
 -- A zero means the item is not loaded yet.
 function GQ.Compare:ScoreItemLinkStats(itemLink, slotName)
     if not itemLink or itemLink == "" then
@@ -842,13 +836,17 @@ function GQ.Compare:RankEntries(entries, slotName, maxResults)
     local equippedIlvl = self:GetEquippedItemLevel(slotName)
     local classFile = GQ:GetEffectiveClass()
     local playerLevel = GQ:GetEffectiveLevel()
-    local maxPreferredIlvl = 0
     local equip = GQ.Equip
-    local prevSuppress = equip and equip._suppressItemPrime
-    if equip then
-        equip._suppressItemPrime = true
+    if equip and equip.WithoutItemPrime then
+        return equip:WithoutItemPrime(function()
+            return self:RankEntriesBody(entries, slotName, maxResults, equippedIlvl, classFile, playerLevel)
+        end)
     end
+    return self:RankEntriesBody(entries, slotName, maxResults, equippedIlvl, classFile, playerLevel)
+end
 
+function GQ.Compare:RankEntriesBody(entries, slotName, maxResults, equippedIlvl, classFile, playerLevel)
+    local maxPreferredIlvl = 0
     if GQ.Equip and GQ.Equip.MeetsArmorPreference then
         for _, entry in ipairs(entries) do
             if (not GQ.Equip.MeetsRequiredLevel or GQ.Equip:MeetsRequiredLevel(entry.itemId, playerLevel))
@@ -907,10 +905,6 @@ function GQ.Compare:RankEntries(entries, slotName, maxResults)
             end
             results[#results + 1] = entry
         end
-    end
-
-    if equip then
-        equip._suppressItemPrime = prevSuppress
     end
 
     return results, equippedIlvl

@@ -121,7 +121,9 @@ def read_source(name: str, origin: str) -> str:
         )
     except subprocess.CalledProcessError as exc:
         raise SystemExit(
-            f"git show {REF}:{rel} failed. The other languages live on the local ref {REF}."
+            f"{rel} is not on disk, and git show {REF}:{rel} failed. "
+            f"{REF} is a local ref only; origin has just main, so a fresh clone "
+            f"does not have it. Put {name} back in GearQuest/Locales/ and stage again."
         ) from exc
     return data.decode("utf-8")
 

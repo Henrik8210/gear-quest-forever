@@ -1290,8 +1290,15 @@ function GQ.Data:GetClassSlotEntryList(slotName)
     if specMap then
         local spec = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec()
         local cacheKey = tostring(spec or "")
-        if specMap._lookup and specMap._lookupKey == cacheKey then
-            return specMap._lookup
+        -- One list per spec. The other-spec tooltip ranks ask for several
+        -- specs in a row, and one shared slot rebuilt the copy on each ask.
+        local lookups = specMap._lookups
+        if not lookups then
+            lookups = {}
+            specMap._lookups = lookups
+        end
+        if lookups[cacheKey] then
+            return lookups[cacheKey]
         end
         local specList = spec and specMap[spec]
         local anyList = specMap._any
@@ -1307,8 +1314,7 @@ function GQ.Data:GetClassSlotEntryList(slotName)
         else
             lookup = specList or anyList or {}
         end
-        specMap._lookup = lookup
-        specMap._lookupKey = cacheKey
+        lookups[cacheKey] = lookup
         return lookup
     end
     if classFile and self.byClassSlot and self.byClassSlot[classFile] then
@@ -1449,13 +1455,7 @@ function GQ.Data:GetItemDisplayName(itemId)
 
     local prof = PROFESSION_ITEM_NAMES[itemId]
     if prof and not self:IsPlaceholderItemName(prof, itemId) then
-    local clientName
-    if GetItemInfo then
-        local ok, name = pcall(GetItemInfo, itemId)
-        if ok then
-            clientName = name
-        end
-    end
+        return GQ.TN("item", prof)
     end
 
     return nil
@@ -2619,7 +2619,7 @@ function GQ.Data:ShowForeverItemTooltip(tooltip, entry)
     local suffixHint = self:GetSuffixHint(entry)
     if suffixHint then
         tooltip:AddLine(" ")
-        tooltip:AddLine(L["Target random enchant: "] .. suffixHint, 0.7, 0.9, 1)
+        tooltip:AddLine(L["Target random enchant: "] .. suffixHint, 0.7, 0.9, 1, true)
     end
     self:AppendDatamineNotice(tooltip, entry)
     self:ApplyImbueTooltipLines(tooltip, entry.itemId)
@@ -3432,6 +3432,7 @@ function GQ.Data:NoteCompletedQuestChange(log)
         end
         self._doneQuestCount = count
         self._doneQuestTries = 0
+        self._questCountArmedUntil = nil
     end
     self._doneQuestIds = nil
     self._doneQuestTitles = nil
@@ -4051,7 +4052,8 @@ function GQ.Data:ProfessionMaterialsLine(entry)
     return line
 end
 
-function GQ.Data:GetProfessionInstructions(entry)
+-- withoutMaterials: the caller already shows the recipe, whose tooltip lists them.
+function GQ.Data:GetProfessionInstructions(entry, withoutMaterials)
     if not entry or entry.sourceType ~= "profession" then
         return entry and entry.instructions
     end
@@ -4069,7 +4071,7 @@ function GQ.Data:GetProfessionInstructions(entry)
         rest = instructions
     end
 
-    local materials = self:ProfessionMaterialsLine(entry)
+    local materials = not withoutMaterials and self:ProfessionMaterialsLine(entry)
     if materials and rest then
         return materials .. "\n" .. rest
     end
@@ -4614,6 +4616,7 @@ function GQ.Data:RefreshPendingTooltip(tooltip, entry, forceFallback)
     end
     self:AppendAuctionatorTooltip(tooltip, entry)
     self:AppendGearScoreLine(tooltip, entry)
+    self:AppendOtherSpecRanksForEntry(tooltip, entry)
     if tooltip.Show then
         tooltip:Show()
     end
@@ -4746,7 +4749,7 @@ function GQ.Data:ShowSuffixFallbackTooltip(tooltip, entry)
     local suffixHint = self:GetSuffixHint(entry)
     if suffixHint then
         tooltip:AddLine(" ")
-        tooltip:AddLine(L["Target random enchant: "] .. suffixHint, 0.7, 0.9, 1)
+        tooltip:AddLine(L["Target random enchant: "] .. suffixHint, 0.7, 0.9, 1, true)
     end
     self:AppendDatamineNotice(tooltip, entry)
 
@@ -4799,7 +4802,7 @@ function GQ.Data:AppendRandomEnchantLine(tooltip, entry)
         return
     end
     tooltip:AddLine(" ")
-    tooltip:AddLine(L["Target random enchant: "] .. suffixHint, 0.7, 0.9, 1)
+    tooltip:AddLine(L["Target random enchant: "] .. suffixHint, 0.7, 0.9, 1, true)
 end
 
 function GQ.Data:EntryUsesRebuiltTooltip(entry)
@@ -5037,6 +5040,7 @@ function GQ.Data:ShowEntryItemTooltip(tooltip, owner, entry, anchor, ...)
     self:ApplyImbueTooltipLines(tooltip, entry.itemId)
     self:AppendAuctionatorTooltip(tooltip, entry)
     self:AppendGearScoreLine(tooltip, entry)
+    self:AppendOtherSpecRanksForEntry(tooltip, entry)
     tooltip:Show()
     self:SolidItemTooltip(tooltip)
     tooltip.gqSkipScoreHook = nil
@@ -5284,9 +5288,14 @@ function GQ.Data:InvalidateQueryCache()
     self._gearScoreCache = nil
     self._linkEntryCache = nil
     self._scoreMissCache = nil
+    self._unitGearCache = nil
     if GQ.Log then
         GQ.Log._slotRankCache = nil
         GQ.Log._slotRankBand = nil
+        GQ.Log._specProbeStore = nil
+        GQ.Log._otherSpecRankCache = nil
+        GQ.Log._otherSpecWarmBand = nil
+        GQ.Log._otherSpecWarmGen = (GQ.Log._otherSpecWarmGen or 0) + 1
     end
     if GQ.Log and GQ.Log.InvalidateSourceFilterCache then
         GQ.Log:InvalidateSourceFilterCache()
@@ -5295,7 +5304,7 @@ end
 
 function GQ.Data:ScheduleQueryRefresh()
     self:InvalidateQueryCache()
-    if GQ.Log and GQ.Log.GetItTodayEnabled and GQ.Log:GetItTodayEnabled() and GQ.Log.InvalidateSourceFilterCache then
+    if GQ.Log and GQ.Log.PlayStyleWatchesProfessions and GQ.Log:PlayStyleWatchesProfessions() and GQ.Log.InvalidateSourceFilterCache then
         GQ.Log:InvalidateSourceFilterCache()
     end
     if self._queryRefreshScheduled then
@@ -5896,32 +5905,31 @@ function GQ.Data:BuildCandidatesForSlot(slotName)
     local results = {}
     local seen = {}
     local equip = GQ.Equip
-    local prevSuppress = equip and equip._suppressItemPrime
-    if equip then
-        equip._suppressItemPrime = true
-    end
 
     -- Level is a number compare. The class-set name check is not, and most
     -- rows are other bands. Skip those before ShouldShowEntry.
     local playerLevel = GQ:GetEffectiveLevel() or 1
     local grace = (equip and equip.LEVEL_GRACE) or 0
 
-    for _, key in ipairs(self:GetCandidateSlotKeys(slotName)) do
-        for _, entry in ipairs(self:GetClassSlotEntryList(key) or {}) do
-            if not seen[entry.id]
-                and playerLevel >= (entry.minLevel or 1)
-                and playerLevel <= (entry.maxLevel or playerLevel) + grace
-                and self:ShouldShowEntry(entry)
-                and self:EntryMatchesPlayer(entry)
-                and (not equip or not equip.EntryArmorIsWearable or equip:EntryArmorIsWearable(entry, slotName)) then
-                seen[entry.id] = true
-                table.insert(results, entry)
+    local function walk()
+        for _, key in ipairs(self:GetCandidateSlotKeys(slotName)) do
+            for _, entry in ipairs(self:GetClassSlotEntryList(key) or {}) do
+                if not seen[entry.id]
+                    and playerLevel >= (entry.minLevel or 1)
+                    and playerLevel <= (entry.maxLevel or playerLevel) + grace
+                    and self:ShouldShowEntry(entry)
+                    and self:EntryMatchesPlayer(entry)
+                    and (not equip or not equip.EntryArmorIsWearable or equip:EntryArmorIsWearable(entry, slotName)) then
+                    seen[entry.id] = true
+                    table.insert(results, entry)
+                end
             end
         end
     end
-
     if equip then
-        equip._suppressItemPrime = prevSuppress
+        equip:WithoutItemPrime(walk)
+    else
+        walk()
     end
 
     local allMatching = results
@@ -6238,10 +6246,8 @@ function GQ.Data:WornHandScore(invSlot, slotName)
     if type(score) == "number" then
         return score
     end
-    -- The hunt prices the printed damage in either hand, so the off-hand
-    -- link uses the main-hand weight instead of the half off-hand weight.
     if GQ.Compare and GQ.Compare.ScoreItemLinkStats then
-        local linkScore = GQ.Compare:ScoreItemLinkStats(link, "MainHand")
+        local linkScore = GQ.Compare:ScoreItemLinkStats(link, slotName)
         if type(linkScore) == "number" and linkScore > 0 then
             return linkScore
         end
@@ -7115,6 +7121,47 @@ function GQ.Data:GearScoreTooltipEnabled()
     return true
 end
 
+function GQ.Data:OtherSpecRanksEnabled()
+    local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+    return not (settings and settings.showOtherSpecRanks == false)
+end
+
+-- Simulation still gets these lines. A rank does not depend on worn gear.
+function GQ.Data:AppendOtherSpecRanks(tooltip, link, entry)
+    if not (link or entry) or not self:OtherSpecRanksEnabled() or not (GQ.Log and GQ.Log.OtherSpecRankLines) then
+        return
+    end
+    local ok, lines = pcall(GQ.Log.OtherSpecRankLines, GQ.Log, link, entry)
+    if not ok or not lines then
+        return
+    end
+    if not tooltip.gqScoreLineAdded then
+        tooltip.gqScoreLineAdded = true
+        tooltip:AddLine(" ")
+    end
+    for i = 1, #lines do
+        tooltip:AddLine("|cffd9bf73" .. lines[i] .. "|r", 1, 1, 1)
+    end
+end
+
+-- Hunt, Lookup, and rank-list hovers skip the item hook, so they add these here.
+-- A random green shows the base piece, so its link has no suffix. The hunt
+-- entry names the suffix the other specs are matched on.
+function GQ.Data:AppendOtherSpecRanksForEntry(tooltip, entry)
+    if not tooltip or not entry then
+        return
+    end
+    local link
+    if tooltip.GetItem then
+        local _, shown = tooltip:GetItem()
+        link = shown
+    end
+    if not link and self.GetEntryItemHyperlink then
+        link = self:GetEntryItemHyperlink(entry)
+    end
+    self:AppendOtherSpecRanks(tooltip, link, entry)
+end
+
 function GQ.Data:AppendGearScoreLine(tooltip, entry)
     if not tooltip or not tooltip.AddLine or not entry or tooltip.gqScoreLineAdded then
         return
@@ -7225,6 +7272,7 @@ function GQ.Data:AddGearScoreToItemTooltip(tooltip)
                 tooltip:AddLine(enchant, 1, 1, 1)
             end
         end
+        self:AppendOtherSpecRanks(tooltip, link)
         return
     end
     tooltip.gqScoreBusy = true
@@ -7233,6 +7281,7 @@ function GQ.Data:AddGearScoreToItemTooltip(tooltip)
         local miss = self:GearScoreMissText(link)
         local enchant = GQ.Enchant and GQ.Enchant.Text and not tooltip.gqEnchantAdded and GQ.Enchant:Text(link, nil)
         if not miss and not enchant then
+            self:AppendOtherSpecRanks(tooltip, link)
             tooltip.gqScoreBusy = nil
             return
         end
@@ -7245,6 +7294,7 @@ function GQ.Data:AddGearScoreToItemTooltip(tooltip)
         if miss then
             tooltip:AddLine(miss, 0.69, 0.69, 0.69)
         end
+        self:AppendOtherSpecRanks(tooltip, link)
         tooltip.gqScoreBusy = nil
         return
     end
@@ -7264,6 +7314,7 @@ function GQ.Data:AddGearScoreToItemTooltip(tooltip)
             end
         end
     end
+    self:AppendOtherSpecRanks(tooltip, link)
     tooltip.gqScoreBusy = nil
 end
 
@@ -7320,7 +7371,7 @@ function GQ.Data:GearScoreMissText(link)
     -- Only one faction is expanded. The other faction's rows still count here.
     local hidden = self.UnexpandedRowSpecs and self:UnexpandedRowSpecs(itemId)
     if #rows == 0 and not hidden then
-        return remember(L["GearQuest has no score for this item."])
+        return remember(L["GearQuest is not scoring this item for your class."])
     end
 
     local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
@@ -7820,6 +7871,9 @@ function GQ.Data:WarmQueryCacheAsync(onComplete, gapFrames)
                 geterrorhandler()(err)
             end
         end
+        if GQ.Log and GQ.Log.WarmOtherSpecRanksAsync then
+            pcall(GQ.Log.WarmOtherSpecRanksAsync, GQ.Log)
+        end
     end
     local function step()
         if gapLeft > 0 then
@@ -8287,6 +8341,69 @@ local RANGED_TYPE_MARKS = {
     { "Bow", "Bow" },
     { "Gun", "Gun" },
 }
+
+-- Weapon subclass -> the spell that teaches it. A priest starts with maces
+-- and buys daggers and staves from a weapon master.
+GQ.Data.WEAPON_SKILL_SPELLS = {
+    [0] = { 196, "One-Handed Axes" },
+    [1] = { 197, "Two-Handed Axes" },
+    [2] = { 264, "Bows" },
+    [3] = { 266, "Guns" },
+    [4] = { 198, "One-Handed Maces" },
+    [5] = { 199, "Two-Handed Maces" },
+    [6] = { 200, "Polearms" },
+    [7] = { 201, "One-Handed Swords" },
+    [8] = { 202, "Two-Handed Swords" },
+    [10] = { 227, "Staves" },
+    [13] = { 15590, "Fist Weapons" },
+    [15] = { 1180, "Daggers" },
+    [16] = { 2567, "Thrown" },
+    [18] = { 5011, "Crossbows" },
+    [19] = { 5009, "Wands" },
+}
+
+-- The character on screen has not learned this weapon type. A simulated
+-- character is not this one. When none of the weapon skills reads as known,
+-- the spell check is not working, and every weapon would turn red.
+function GQ.Data:WeaponSkillLine(entry)
+    if not entry or not entry.itemId or not GetItemInfoInstant or not IsPlayerSpell then
+        return nil
+    end
+    if GQ.IsPreviewEnabled and GQ:IsPreviewEnabled() then
+        return nil
+    end
+    local _, _, _, _, _, classID, subclassID = GetItemInfoInstant(entry.itemId)
+    if classID ~= 2 then
+        return nil
+    end
+    local skill = self.WEAPON_SKILL_SPELLS[subclassID]
+    if not skill then
+        return nil
+    end
+    local ok, known = pcall(IsPlayerSpell, skill[1])
+    if not ok or known then
+        return nil
+    end
+    local anyKnown = false
+    for _, other in pairs(self.WEAPON_SKILL_SPELLS) do
+        local okOther, has = pcall(IsPlayerSpell, other[1])
+        if okOther and has then
+            anyKnown = true
+            break
+        end
+    end
+    if not anyKnown then
+        return nil
+    end
+    local name = L[skill[2]] or skill[2]
+    if GQ.ActiveLocale == GQ.LOCALE and GetSpellInfo then
+        local okName, clientName = pcall(GetSpellInfo, skill[1])
+        if okName and type(clientName) == "string" and clientName ~= "" then
+            name = clientName
+        end
+    end
+    return string.format(L["|cff6e1212You haven't learned to use %s yet.|r"], name)
+end
 
 function GQ.Data:RangedTypeOf(entry)
     if not entry or not entry.itemId then

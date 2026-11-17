@@ -352,7 +352,7 @@
     ]
   },
   "describedOnly": {
-    "Krol'dok Stronghold": "Riverglades",
+    "Krol'dok Stronghold": "northern Riverglades",
     "Shaper's Terrace": "northern Un'Goro Crater"
   },
   "bossNpcs": {
@@ -370,7 +370,7 @@
     "Kirtonos the Herald": "Scholomance",
     "Kormok": "Scholomance",
     "Mutanus the Devourer": "Wailing Caverns",
-    "Hedrum the Creeper": "Wailing Caverns",
+    "Hedrum the Creeper": "Blackrock Depths",
     "Shadowpriest Sezz'ziz": "Zul'Farrak",
     "Gahz'rilla": "Zul'Farrak",
     "Gyth": "Blackrock Spire",
@@ -449,6 +449,12 @@
     "Saltspine": "Excavation Site",
     "Shadetooth": "Excavation Site",
     "War Master Voone": "Blackrock Spire",
-    "Blazeroar": "Alcaz Prison"
+    "Blazeroar": "Alcaz Prison",
+    "Bossman Toof": "Krol'dok Stronghold",
+    "Nar'gurk": "Krol'dok Stronghold",
+    "Overlord Mugg": "Krol'dok Stronghold",
+    "Slavecrusher Grox": "Krol'dok Stronghold",
+    "Twilight Commander Zarmok": "Krol'dok Stronghold",
+    "War Handler Ashka": "Krol'dok Stronghold"
   }
 }

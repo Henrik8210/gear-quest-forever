@@ -111,6 +111,21 @@ function GQ.Equip:PrimeItem(itemId)
     self:RequestItemInfo(itemId)
 end
 
+-- Runs fn with item priming off. The previous state comes back even when fn
+-- errors, or every later hover would stop loading items.
+function GQ.Equip:WithoutItemPrime(fn, ...)
+    local prev = self._suppressItemPrime
+    self._suppressItemPrime = true
+    local function finish(ok, ...)
+        self._suppressItemPrime = prev
+        if not ok then
+            error((...), 0)
+        end
+        return ...
+    end
+    return finish(pcall(fn, ...))
+end
+
 function GQ.Equip:IsItemDataCached(itemId)
     if not itemId then
         return false

@@ -2,54 +2,119 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.2.1
+## v1.2.2
 
-The window title reads **GearQuest Forever v1.2.1**. This version is about memory. GearQuest Forever now uses about half the memory it used in v1.2.0, and nothing you see has changed. The hunts, the rank numbers, the scores, the green arrows, the map pins, the filters, the play styles, the Simulator, and every window are the same as in v1.2.0. Your Completed, Removed, and Tracked hunts are kept, and your custom specs and settings are untouched.
+The window title reads **GearQuest Forever v1.2.2**. Item tooltips now show the rank for every spec of your class, so you can gear two specs at once. Play style has a second page with **No crafted BoP!**, and crafted hunts show their recipe. The hunt lists now only hold gear that is actually in WoW: Forever and in your game client. Creature and quest giver tooltips find more of your upgrades and no longer freeze the game on hover. The log is smoother and easier to use with a gamepad. Your Completed, Removed, and Tracked hunts, your custom specs, and your settings are kept.
 
-**About half the memory**
+**Ranks for your other specs on item tooltips**
 
-The memory GearQuest Forever holds once your class's hunts are loaded at login went down like this:
+Under your own rank line, the item tooltip now lists the rank the item has at your level for each other spec of your class, for example **Restoration: Rank #3 for your level**. You can gear Enhancement and Restoration, or Shadow and Holy, without tracking hunts for both. The lines show on items in your bags, on your character panel, in chat links, on the hunt list, in Lookup, and on the (i) rank list. They also show while you simulate another class.
 
-- **Mage:** 99.8 MB to 50.1 MB.
-- **Warrior:** 81.6 MB to 41.5 MB.
-- **Priest:** 68.7 MB to 32.5 MB.
+- **Random-enchant greens.** Each spec ranks its own best roll, and the line names that roll. For a level 47 Beast Mastery hunter, the **Fire Opal Necklace of Agility** hunt reads **Marksmanship: Rank #1 for your level (of the Falcon)** and **Survival: Rank #1 for your level (of the Tiger)**.
+- **Not ranked.** A spec that does not rank the item at your level gets a grey line, such as **Holy: Not ranked for your level**. **Netherpearl Shoulders** only add Shadow damage, so a level 47 Shadow priest sees Shadow #2 and Discipline and Holy not ranked. An item no spec of your class ranks, like plate on a mage, gets no lines.
+- **Setting.** **General settings → Ranks for your other specs** is on by default. Turn it off to see only the spec you are playing or simulating.
+- **Quick first hover.** The other specs' lists are built in the background after your own list is ready.
 
-Those are the three classes that were measured. The other six classes use the same new layout and save memory the same way.
+**Settings are grouped**
 
-**Only the faction on screen is loaded**
+Both settings pages have headings now. **General** has **Interface** (language, minimap icon, window size, background art, hide chat messages) and **Tooltips and score** (score on tooltips, ranks for your other specs, score bar). **Hunt settings** has **Hunt list** (hide lower ranks, obtain popup), **Tooltips** (recommended enchantment, unit gear tips), and **Arrows, map and tracker** (upgrade arrows, guide arrow, map pins, map pin size, hide tracker). Every setting keeps its saved value.
 
-Each class used to keep its Alliance and Horde hunts in memory at the same time, even though a character only ever sees one side. Now only the faction on screen is unpacked. The other faction stays stored in a compact form.
+**New play style: No crafted BoP!**
 
-- Playing your own character, that is your faction.
-- In the Simulator, switching to the other faction unpacks that side and frees the one you left. Switching class does the same for the class you pick.
-- Turning simulation off goes back to your own class and faction.
-- A class you simulated and then left is freed from the hunt list. WoW keeps that class's addon loaded until you `/reload`, because the game cannot unload an addon, but its hunts no longer take room.
+The Play style panel has a second page. Use the arrows and **Page 1 / 2** just above Close to switch. **No crafted BoP!** hides crafted gear that binds when picked up until you have the profession and the skill its recipe needs.
 
-**Lookup still searches both factions**
+- It works no matter where the hunt is filed. That covers the crafts whose recipe a vendor sells, such as the Jim'bek tailoring pieces, and the leather and mail helms whose pattern drops from dungeon bosses. The source filter could not separate those.
+- **Stalker's Mail Shoulders** need Leatherworking 210, so a leatherworker at 195 does not see them. They come back by themselves at 210, without turning the style off.
+- Crafted gear that binds when equipped stays, because another player can make it for you. Fishing, skinning, mining, and herbalism are not crafts.
+- Rank numbers do not change.
+- Turning **No Zephras!** on or off now refreshes the list at once. Before, it could show the old list.
 
-The **Lookup** tab still lists both factions for the class you are viewing, in the same order as before. **Track** works on a hunt you found there, including one for the other faction. While Lookup is open, it reads the other faction's hunts. That costs about as much as one faction's list, about 34 MB for a mage, and leaving the tab frees it again.
+**Recipes on crafted hunts**
 
-The item tooltip still says **Not ranked for your faction.** for a piece only the other faction hunts. Dismissing a hunt on the Completed tab also dismisses the other faction's copy of it, the same as before.
+896 of the 1,087 crafted hunts show their recipe just above the **Requires Leatherworking (210) to craft** line. The row has the recipe's icon and its name in its quality color. Hovering it shows the game's own item tooltip, and Shift-click links it in chat. **Stalker's Mail Shoulders** show **Pattern: Stalker's Mail Shoulders**. A craft the trainer teaches has no recipe row and lists its materials instead.
 
-**Item stats for custom specs load when you need them**
+**Cleaner hunt descriptions**
 
-The item stats that **+ custom stat weights** scores from are now their own addon, **GearQuest Forever: Item Stats**. You will see it as a new row in the addon list. It no longer loads at login, which saves about 6 MB for everyone who does not use a custom spec. It loads by itself the first time a custom spec is scored, and **Save and score items!** works the same as before.
+The description no longer repeats what another line already says:
 
-Keep **GearQuest Forever: Item Stats** enabled if you use custom specs. If it is disabled, chat says the item stats for custom specs could not be loaded and asks you to enable it in the addon list and `/reload`. That message is in every GearQuest language. The premade specs do not need this addon.
+- "Pick it over the other reward choices", "Indexed from Wowhead Forever", and "Source not listed yet" are gone.
+- A description that only said "Quest reward." or "Bought from a vendor." is gone, because Source says the same.
+- A reputation requirement shows once, on the standing line with your own standing.
+- Set bonus sentences are gone, because the item tooltip lists them.
+- A craft with a recipe row drops its materials, because the recipe tooltip lists them. The tracker still shows the materials.
 
-The CurseForge app installs the new folder with the rest. If you install by hand, copy every `GearQuestForever` folder from the zip, including `GearQuestForever_ItemStats`.
+**Weapons you have not learned yet**
 
-**Map pins take less memory**
+A hunt for a weapon type your character has not learned adds a red line, such as **You haven't learned to use Daggers yet.** It uses the skill name the weapon master trains, like Daggers, Staves, or One-Handed Maces. A priest starts with maces and buys Daggers and Staves, so a dagger or a staff hunt says so. The piece stays on the list and keeps its rank. Simulation adds no such line.
 
-Many items share the same place: the same camp, the same vendor, the same dungeon entrance. Each of those spots used to be stored again for every item. Now a spot is stored once and every item that uses it points at it. The map data went from 18.8 MB to 6.0 MB. All 7,415 items with a place keep every spot they had, so every pin, **Show on map**, the guide arrow, and Focus Zone point at the same places as before. Unsourced hunts still have no pin.
+**Click (i) to open the rank list in Lookup**
 
-**Class hunt lists are packed**
+Clicking a slot's (i) on the hunt list, or the open rank panel, switches to Lookup with that whole list in rank order. Each row starts with its #N, and clicking a row opens its description, so you no longer have to type item names. The search box reads **Head rank list**, and typing a search replaces it. Lookup now scrolls and shows up to 100 results, up from 10.
 
-The hunt lists inside each class addon are stored as compact text and unpacked when you play or simulate that class. For a mage, those files went from 32.2 MB to 6.2 MB. When the addon is built, every packed row is unpacked again and compared with the original. The build stops on any difference, so a rank, a score, a level band, or a random-enchant suffix cannot change in the packing.
+**Only gear that is in WoW: Forever**
 
-**The GearQuest Community**
+- **Raids that are not in the game.** Molten Core, Blackwing Lair, Zul'Gurub, both Ahn'Qiraj raids, and Naxxramas are not hunts anymore. Neither are the Brood of Nozdormu and Zandalar Tribe reputation rewards, the Thunderfury, Sageblade, and Persuader parts, or the C'Thun quest rewards. That is 880 items, 357 of them on hunt lists. Onyxia's Lair stays, and so do world drops such as Onyx Shredder Plate. These come back when a raid opens.
+- **Ice Barbed Spear, Bloodseeker, and Wand of Biting Cold** are off the lists. Korrak the Bloodrager is not offered, and the Alterac Valley victory quests give reputation only.
+- **Gear your game client does not have.** 684 hunts were items Wowhead Forever lists but the game cannot load. Their hover could only say this game client does not have it yet. Most are level 60 Season of Discovery PvP rank gear from the rank quartermasters, plus the Inquisition, Fireleaf, and Waywatcher sets. Only 2 were below level 20. They are kept aside and come back when a client patch adds them.
+- **Unsourced.** Items Wowhead Forever marks Unconfirmed or "This item may not be in WoW: Forever", such as the Rune Broker librams, idols, and totems, are listed under **Unsourced** (the orange circle), which starts hidden.
+- **(Set piece).** Every piece of a Wowhead item set now has the (Set piece) label. Only Embrace of the Viper, Defias, Scarlet, and Rotmender's Raiment count a set bonus in the score.
 
-Settings → **The GearQuest Community** adds **kaeldrin**.
+**Krol'dok Stronghold**
+
+The dungeon in northern Riverglades is now a dungeon in GearQuest. Its six bosses are Slavecrusher Grox, Twilight Commander Zarmok, War Handler Ashka, Nar'gurk, Bossman Toof, and Overlord Mugg. Their 19 pieces are **Boss drop** in Krol'dok Stronghold, not world drops. The nine pieces from the Krol'dok elites, all dropped by Krol'dok Brute, are **Dungeon & Raid trash**. Krol'dok is on the Boss drop and trash flyouts. The three Eye of Mugg quest rewards are pinned at their quest givers in Riverglades. The door has no pin until a coordinate is published. The zone name is translated in every language, including Traditional Chinese.
+
+**More map pins and fixed places**
+
+- 174 more world-drop hunts have real spawn pins, from the creatures Wowhead lists as droppers. 152 world drops have no published spawn and stay unpinned.
+- A pin can no longer land on a whole-continent map. Three Stranglethorn Vale world drops are no longer counted as Zul'Gurub.
+- **Silkweb Gloves** are filed under Blackrock Depths, pinned at its doors in Searing Gorge and Burning Steppes, not Wailing Caverns.
+- **A Tale Spun Around the Fire** (Horde, level 30) shows its five-step Drowned City chain, pinned at the first step in Stranglethorn Vale (32.2, 27.8). It rewards **Ceremonial Mallet**, **Sacrificial Sword**, and **I'lalai Flayer**.
+
+**Creature, vendor, trainer, and quest giver tooltips**
+
+- **Quest givers.** 832 quest-reward items gained their quest giver. **Chief Engineer Bilgewhizzle** in Gadgetzan now lists **Masons Fraternity Ring** for a level 47 hunter.
+- **World drops on mobs.** A mob you can attack adds a second header, **Your top world drops from this mob:**, with up to three world drops that beat what you wear. Each world drop's level range has to include the mob's level. Friendly units, players, and pets get none.
+- **No freeze on hover.** Hovering a blacksmith trainer used to freeze the game for a moment while 355 crafts were checked. The answer is now remembered until your level, spec, or gear changes.
+- **Looted pieces leave at once.** A piece you obtained, or a hunt you removed, leaves those tooltips on the next hover.
+- **Inside dungeons** the game still hides a creature's name, so those tooltips add no lines there, and they do not error.
+- **Hunt settings → Hide unit gear tips** hides both headers.
+
+**Tooltip score fixes**
+
+- "GearQuest has no score for this item" now reads **GearQuest is not scoring this item for your class.**, because the item is known.
+- The **Target random enchant** line wraps, so the tooltip no longer gets very wide.
+- **Hunters and warlocks.** Stamina now counts when a worn item is scored from its link, the same as on the hunt list. Before, an upgrade could look bigger than it was.
+- **Off-hand weapons.** A worn off-hand weapon scored from its link now counts its full weapon damage, the same as the hunt list. A rogue's or a fury warrior's off-hand row on the score bar read low before.
+
+**Enhancement shaman weights**
+
+Enhancement agility is now **0.65** (was 1.0) and intellect **0.75** (was 0.7). All five Embrace of the Viper pieces stay rank 1 through level 27, and at 28 the whole set leaves the list. **Kodohide Legguards** drop from rank 4 to rank 10 for Horde at 25–27 (rank 9 for Alliance). No other class or spec changed.
+
+**Smoother play**
+
+- The hunt list no longer checks every bag slot for every piece. It reads what you own once, after a bag or gear change.
+- Quest log updates only count your completed quests right after a turn-in.
+- The memory clean-up after closing the guide, logging in, or switching class in the Simulator runs in small steps instead of one long frame.
+- Weapon sorts for casters score each weapon once.
+- Bag updates are handled once per frame, and an equipment-set swap updates the score bar once.
+
+**Gamepad**
+
+- On Settings, Lookup, and the Simulator, up and down stay in the column. Down from Language goes to Minimap icon.
+- A page never opens on the close button, so A does not close the log by accident.
+- The language menu takes the pad, and B closes the menu instead of the log.
+- The source filter opens on the first source. Moving onto Boss drop, Trash, Vendor, Quest reward, or Profession opens its list, and it stays open while you are in it. Before, it closed after a fraction of a second.
+- Y now also reaches each slot header's (i), Hunts per gear slot, the spec name, and Turn off simulation.
+
+**Languages and other fixes**
+
+- In Russian, Korean, and Chinese, the guide arrow's zone name and the source filter rows no longer draw as empty boxes.
+- Dismissing a hunt on the Completed tab removes it at once, and that piece can show on Active again.
+- Every new line is translated in all eight GearQuest languages.
+
+### v1.2.1
+
+The window title reads **GearQuest Forever v1.2.1**. GearQuest Forever uses about half the memory of v1.2.0 (a mage went from 99.8 MB to 50.1 MB), with no change to hunts, ranks, pins, or windows. Only the faction on screen is unpacked, and Lookup still searches both. Item stats for custom specs moved to their own addon, **GearQuest Forever: Item Stats**, which loads the first time a custom spec is scored; keep it enabled if you use custom specs. Map pins and the class hunt lists are stored more compactly. Settings → **The GearQuest Community** adds **kaeldrin**.
 
 ### v1.2.0
 

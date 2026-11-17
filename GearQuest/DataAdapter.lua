@@ -542,8 +542,8 @@ function GQ.Data:ReleaseIdleHuntClasses(keepGarbage)
             end
         end
     end
-    if removed and not keepGarbage and collectgarbage then
-        collectgarbage("collect")
+    if removed and not keepGarbage then
+        GQ:CollectGarbageSoon()
     end
     return removed
 end
@@ -584,9 +584,7 @@ function GQ.Data:SyncEffectiveHuntData()
     if self.InvalidateClassCache then
         self:InvalidateClassCache()
     end
-    if collectgarbage then
-        collectgarbage("collect")
-    end
+    GQ:CollectGarbageSoon()
     return true
 end
 
@@ -607,9 +605,7 @@ function GQ.Data:EnsureActiveHuntClasses()
     end
     self:ReleaseIdleHuntClasses(true)
     self._huntDataReady = true
-    if collectgarbage then
-        collectgarbage("collect")
-    end
+    GQ:CollectGarbageSoon()
 end
 
 -- Rows of a loaded class that are not expanded: the other faction. Lookup

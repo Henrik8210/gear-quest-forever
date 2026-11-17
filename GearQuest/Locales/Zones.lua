@@ -53,6 +53,7 @@ GQ.ZONE_IDS = {
     ["Ironforge"] = -1455,
     ["Kalimdor"] = -1414,
     ["Kargath"] = 340,
+    ["Krol'dok Stronghold"] = 16842,
     ["Loch Modan"] = -1432,
     ["Maraudon"] = 2100,
     ["Menethil Harbor"] = 150,

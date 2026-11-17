@@ -42,8 +42,8 @@ VIPER_WHY = {
         "A druid in all five turns into a serpent. The color follows your race, and Prowl or Stealth slithers."
     ),
     "SHAMAN": _VIPER_BONUS + (
-        "Enhancement: all five pieces are BiS together from 18 through 28. "
-        "At 29 the chest falls off and the other four remain. "
+        "Enhancement: all five pieces are BiS together from 18 through 27. "
+        "At 28 the whole set leaves the list. "
         "Collect 4 pieces for the heal and mana, and all 5 for Dream Venom. "
         "The 2-piece intellect is a large part of why the set lasts into the high 20s. "
         "The chest and the belt become BiS with the set. "
@@ -173,7 +173,9 @@ def is_labeled_set_piece(iid):
         return True
     if iid in ROTMENDER_IDS:
         return True
-    return False
+    # Any piece of a client item set (Deathbone, The Five Thunders, Soulforge)
+    # gets the (Set piece) label. Only the sets above carry bonus text.
+    return bool((items.get(str(iid)) or {}).get("itemset"))
 
 
 KEEP=set()

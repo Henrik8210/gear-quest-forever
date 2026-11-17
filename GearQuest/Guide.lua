@@ -596,9 +596,7 @@ local function HideGuide(frame)
     frame.crossingTo = nil
     -- Once, on the close. The map objects from this session are already
     -- unhooked. This is what lets that memory fall instead of sitting there.
-    if collectgarbage then
-        collectgarbage("collect")
-    end
+    GQ:CollectGarbageSoon()
 end
 
 function GQ.Guide:Apply()
@@ -873,9 +871,9 @@ function GQ.Guide:Init()
     end)
 
     local distance = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    local font, _, flags = GameFontNormal:GetFont()
+    local font = GameFontNormal:GetFont()
     if font then
-        distance:SetFont(font, 16, "OUTLINE")
+        GQ:SetLocaleFont(distance, font, 16, "OUTLINE")
     end
     distance:SetTextColor(GOLD_R, GOLD_G, GOLD_B)
     distance:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, 0)

@@ -1,4 +1,8 @@
-"""Parse wowhead TBC tooltips + cmangos item_template into one normalized item table."""
+"""LEGACY (TBC Anniversary). Do not run for Forever: it reads a TBC tbc.db that is not
+in this repo and would overwrite items.json. Forever facts come from
+ingest_forever_wowhead.py and refresh_forever_tips.py (dataEnv 16).
+
+Parse wowhead TBC tooltips + cmangos item_template into one normalized item table."""
 import json, re, html, sqlite3, sys, os
 
 TIP="/tmp/wowsims-tbc/assets/item_data/all_item_tooltips.csv"

@@ -6,9 +6,16 @@ map, so their pin is the entrance in pipeline/data/dungeon_entrances.json
 
 Resume-safe. The cache is pipeline/data/forever_wowhead/coord_cache.json.
 
-  python pipeline/scripts/index_coordinates.py
+The bare run and --emit-only rewrite the whole file. A scrape patches rows
+with --ids or --places instead. Every patch also rebuilds coordinate_gaps.json.
+
+  python pipeline/scripts/index_coordinates.py --ids ids.json [--cache-only]
+  python pipeline/scripts/index_coordinates.py --places [--cache-only]
+  python pipeline/scripts/index_coordinates.py --gaps
   python pipeline/scripts/index_coordinates.py --smoke
-  python pipeline/scripts/index_coordinates.py --emit-only
+
+--cache-only makes no request. Pages it still needs are written to
+forever_wowhead/coord_fetch_todo.json (url -> hunt ids).
 """
 from __future__ import annotations
 
@@ -114,10 +121,18 @@ NOTE_OBJECT = "one of the spots to farm it"
 NOTE_BOSS = "where this boss spawns"
 
 _last = 0.0
+# --cache-only: a page that is not in coord_cache.json is a miss, not a fetch.
+CACHE_ONLY = "--cache-only" in sys.argv
+
+
+class CacheMiss(Exception):
+    """The page is not cached and --cache-only forbids the request."""
 
 
 def fetch(url: str) -> str:
     global _last
+    if CACHE_ONLY:
+        raise CacheMiss(url)
     wait = DELAY - (time.time() - _last)
     if wait > 0:
         time.sleep(wait)
@@ -273,6 +288,8 @@ def search_rows(kind: str, name: str, cache: dict) -> list[dict]:
     url = "https://www.wowhead.com/forever/search?q=" + urllib.parse.quote(name)
     try:
         html = fetch(url)
+    except CacheMiss:
+        raise
     except Exception as e:
         print("  search fail", kind, name, e, flush=True)
         return []
@@ -306,6 +323,8 @@ def npc_record(npc_id: int, cache: dict, hint_faction: str | None = None) -> dic
         return row
     try:
         html = fetch(f"https://www.wowhead.com/forever/npc={npc_id}?power")
+    except CacheMiss:
+        raise
     except Exception as e:
         print("  npc fail", npc_id, e, flush=True)
         return {"spots": [], "faction": hint_faction}
@@ -320,6 +339,8 @@ def object_record(object_id: int, cache: dict) -> dict:
         return cache["object"][key]
     try:
         html = fetch(f"https://www.wowhead.com/forever/object={object_id}?power")
+    except CacheMiss:
+        raise
     except Exception as e:
         print("  object fail", object_id, e, flush=True)
         return {"spots": []}
@@ -512,6 +533,8 @@ def quest_record(quest_id: int, cache: dict) -> dict:
         return cached
     try:
         html = fetch(f"https://www.wowhead.com/forever/quest={quest_id}?power")
+    except CacheMiss:
+        raise
     except Exception as e:
         print("  quest fail", quest_id, e, flush=True)
         if cached:
@@ -574,6 +597,8 @@ def quest_ids_for_item(item_id: int, quest_name: str, cache: dict, xml_cache: di
     if not row:
         try:
             row = parse_item_xml(fetch(f"https://www.wowhead.com/forever/item={item_id}&xml")) or {}
+        except CacheMiss:
+            raise
         except Exception as e:
             print("  item xml fail", item_id, e, flush=True)
             row = {}
@@ -1134,7 +1159,11 @@ def resolve_item(item_id: int, src: dict, cache: dict, xml_cache: dict) -> tuple
         if not npc:
             return None, "rare npc is not named"
         spots = shared_drop_spots(spots_for_npc_name(npc, cache))
-        spots = [spot for spot in spots if not is_capital_farm(spot)]
+        spots = [
+            spot
+            for spot in spots
+            if not is_capital_farm(spot) and (spot.get("map") or "") not in CONTINENT_MAPS
+        ]
         if spots:
             return {"note": NOTE_RARE, "spots": spots, "more": len(spots) > 1}, None
         return None, "rare npc has no map pin"
@@ -1157,6 +1186,7 @@ def resolve_item(item_id: int, src: dict, cache: dict, xml_cache: dict) -> tuple
                 return {"note": NOTE_FARM, "spots": spots, "more": False}, None
             return None, "world drop names no creature"
         spots = shared_drop_spots(spots_for_npc_name(npc, cache))
+        spots = [spot for spot in spots if (spot.get("map") or "") not in CONTINENT_MAPS]
         alts = [
             a.get("npc")
             for a in (src.get("alts") or [])
@@ -1256,8 +1286,9 @@ def lua_spot(spot: dict) -> str:
     parts = [
         f'map="{spot["map"].replace(chr(92), "").replace(chr(34), "")}"',
     ]
-    if spot.get("mapId"):
-        parts.append(f'mapId={int(spot["mapId"])}')
+    map_id = spot.get("mapId") or MAP_IDS.get(spot["map"])
+    if map_id:
+        parts.append(f'mapId={int(map_id)}')
     parts.extend([
         f'x={spot["x"]}',
         f'y={spot["y"]}',
@@ -1403,6 +1434,60 @@ def repair_quests(cache: dict) -> None:
     patch_coordinate_rows(updates)
     write_quest_faction(exclusive)
     print(f"quest pins rewritten {len(updates)} sides {counts}", flush=True)
+    refresh_gaps({})
+
+
+FETCH_TODO = Path(DATA) / "forever_wowhead" / "coord_fetch_todo.json"
+NOT_CACHED = "Wowhead page not cached yet"
+
+
+def refresh_gaps(reasons: dict[int, str]) -> None:
+    """Rebuild coordinate_gaps.json from the hunt list and the pins on disk.
+
+    A pinned hunt leaves the report. A reason found in this run replaces the
+    stored one. A stored reason stays only while the source type is the same.
+    """
+    sources = json.loads(SOURCES.read_text(encoding="utf-8"))
+    items = json.loads(ITEMS.read_text(encoding="utf-8"))
+    text = LUA_PATH.read_text(encoding="utf-8")
+    pinned = {int(n) for n in re.findall(r"^\s*\[(\d+)\]=\{note=", text, re.M)}
+    old = {}
+    if GAPS_PATH.exists():
+        for gap in json.loads(GAPS_PATH.read_text(encoding="utf-8")).get("gaps") or []:
+            if isinstance(gap, dict) and isinstance(gap.get("id"), int):
+                old[gap["id"]] = gap
+    gaps = []
+    by_type: dict[str, Counter] = {}
+    for iid in hunt_ids():
+        src = sources.get(str(iid)) or {}
+        kind = src.get("sourceType") or "?"
+        ctr = by_type.setdefault(kind, Counter())
+        if iid in pinned:
+            ctr["ok"] += 1
+            continue
+        reason = reasons.get(iid)
+        if not reason:
+            prev = old.get(iid) or {}
+            if prev.get("sourceType") == kind and prev.get("reason"):
+                reason = prev["reason"]
+            else:
+                reason = "not indexed since the source changed" if prev else "not indexed yet"
+        ctr["gap"] += 1
+        ctr["gap:" + reason] += 1
+        gaps.append(
+            {
+                "id": iid,
+                "name": (items.get(str(iid)) or {}).get("name"),
+                "sourceType": kind,
+                "reason": reason,
+                "zone": src.get("zone"),
+                "npc": src.get("npc"),
+                "questName": src.get("questName"),
+            }
+        )
+    write_gaps(gaps, {k: dict(v) for k, v in by_type.items()})
+    total_ok = sum(c.get("ok", 0) for c in by_type.values())
+    print(f"gap report: pinned {total_ok} gaps {len(gaps)} -> {GAPS_PATH}", flush=True)
 
 
 def index_item_ids(cache: dict, only: list[int]) -> None:
@@ -1410,18 +1495,24 @@ def index_item_ids(cache: dict, only: list[int]) -> None:
     sources = json.loads(SOURCES.read_text(encoding="utf-8"))
     xml_cache = json.loads(QUEST_XML.read_text(encoding="utf-8")) if QUEST_XML.exists() else {}
     updates = {}
+    reasons: dict[int, str] = {}
+    todo: dict[str, list[int]] = {}
     missed = 0
     for n, iid in enumerate(only, 1):
         src = sources.get(str(iid)) or {}
         try:
-            row, _reason = resolve_item(iid, src, cache, xml_cache)
+            row, reason = resolve_item(iid, src, cache, xml_cache)
+        except CacheMiss as e:
+            row, reason = None, NOT_CACHED
+            todo.setdefault(str(e), []).append(iid)
         except Exception as e:
             print("  fail", iid, e, flush=True)
-            row = None
+            row, reason = None, "lookup failed: " + str(e)[:80]
         if row and row.get("spots"):
             updates[iid] = lua_row(iid, row)
         else:
             missed += 1
+            reasons[iid] = reason or "unknown"
         if n % 25 == 0:
             save_cache(cache)
             if updates:
@@ -1431,6 +1522,18 @@ def index_item_ids(cache: dict, only: list[int]) -> None:
     if updates:
         patch_coordinate_rows(updates)
     print(f"patched {len(updates)} left without a pin {missed}", flush=True)
+    if CACHE_ONLY:
+        # A run over a few ids keeps the pages other hunts still wait on.
+        ran = {int(i) for i in only}
+        if FETCH_TODO.exists():
+            for url, ids in json.loads(FETCH_TODO.read_text(encoding="utf-8")).items():
+                rest = [i for i in ids if int(i) not in ran]
+                if rest:
+                    todo.setdefault(url, [])
+                    todo[url].extend(i for i in rest if i not in todo[url])
+        FETCH_TODO.write_text(json.dumps(todo, indent=1), encoding="utf-8")
+        print(f"pages to fetch {len(todo)} for {sum(len(v) for v in todo.values())} hunts -> {FETCH_TODO}", flush=True)
+    refresh_gaps(reasons)
 
 
 _SPOT_BLOB = re.compile(r'\{map="[^"]+"[^{}]*\}')
@@ -1506,6 +1609,10 @@ def main() -> None:
         return
     if "--strip-city-farms" in sys.argv:
         strip_capital_farm_rows()
+        refresh_gaps({})
+        return
+    if "--gaps" in sys.argv:
+        refresh_gaps({})
         return
     if "--places" in sys.argv:
         ids = hunt_ids()

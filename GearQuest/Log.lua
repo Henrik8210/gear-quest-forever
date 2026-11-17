@@ -651,6 +651,7 @@ local function ShowItemTooltipForRow(row)
     end
     if GQ.Data.AppendGearScoreLine then
         GQ.Data:AppendGearScoreLine(GameTooltip, row.entry)
+        GQ.Data:AppendOtherSpecRanksForEntry(GameTooltip, row.entry)
     end
     GameTooltip:Show()
     if GQ.Data.SolidItemTooltip then
@@ -2886,6 +2887,17 @@ function GQ.Log:NoZephrasEnabled()
     return ui and ui.playNoZephras and true or false
 end
 
+function GQ.Log:NoCraftedBoPEnabled()
+    local ui = GearQuestForeverDB and GearQuestForeverDB.ui
+    return ui and ui.playNoCraftedBoP and true or false
+end
+
+-- Both styles read the character's professions, so a skill-up or a new
+-- profession has to rebuild the list.
+function GQ.Log:PlayStyleWatchesProfessions()
+    return self:GetItTodayEnabled() or self:NoCraftedBoPEnabled()
+end
+
 -- Zephras Isle is the Skyborne island. A hunt is only there when its zone is
 -- the island and none of its spots are somewhere else. A vendor or a world
 -- drop that also exists on the mainland stays.
@@ -2919,6 +2931,7 @@ function GQ.Log:PlayStyleActive()
     return self:NoDungeonsEnabled() or self:DungeonEnjoyerEnabled() or self:GetItTodayEnabled()
         or self:ManageableDungeonsEnabled() or self:BuyItEnabled() or self:ManageableQuestsEnabled()
         or self:FocusZoneEnabled() or self:TheirCitiesEnabled() or self:NoZephrasEnabled()
+        or self:NoCraftedBoPEnabled()
 end
 
 function GQ.Log:PlayerZoneName()
@@ -3801,7 +3814,7 @@ function GQ.Log:SameRankMap(previous, current)
 end
 
 function GQ.Log:NoteObtainabilityChanged()
-    if not self:GetItTodayEnabled() then
+    if not self:PlayStyleWatchesProfessions() then
         self._repSnapshot = nil
         self._profSnapshot = nil
         return
@@ -3945,6 +3958,57 @@ function GQ.Log:EntryBlockedToday(entry)
     return false
 end
 
+GQ.Log.GATHERING_PROFESSIONS = { Fishing = true, Skinning = true, Mining = true, Herbalism = true }
+
+-- A recipe can be bought, looted from a boss, or come from a quest, and the
+-- hunt is filed under that source. CraftSkills knows the item is made.
+function GQ.Log:CraftedProfession(entry)
+    if not entry or not entry.itemId then
+        return nil
+    end
+    local known = GQ.CraftSkills and GQ.CraftSkills[entry.itemId]
+    local prof = known and known.profession
+    if not prof then
+        local src = GQ.NormalizeSourceType and GQ:NormalizeSourceType(entry.sourceType or "") or (entry.sourceType or "")
+        if src ~= "profession" then
+            return nil
+        end
+        prof = entry.profession or ""
+    end
+    prof = self:EnglishProfession(prof)
+    if self.GATHERING_PROFESSIONS[prof] then
+        return nil
+    end
+    return prof
+end
+
+function GQ.Log:CraftSkillNeeded(entry)
+    local known = GQ.CraftSkills and entry.itemId and GQ.CraftSkills[entry.itemId]
+    local need = known and known.skill
+    if (not need or need <= 0) and GQ.Data and GQ.Data.ProfessionCraftRequirement then
+        local _, craftSkill = GQ.Data:ProfessionCraftRequirement(entry)
+        need = craftSkill
+    end
+    if not need or need <= 1 then
+        local stated = entry.instructions and entry.instructions:match("requires skill (%d+)")
+        need = stated and tonumber(stated) or need
+    end
+    return need or 1
+end
+
+-- The recipe can be bought or traded. The skill to make the piece cannot,
+-- so a bind-on-pickup craft stays only once this character can make it.
+function GQ.Log:EntryIsForeignBoPCraft(entry)
+    local prof = self:CraftedProfession(entry)
+    if not prof or not self:CraftBindsOnPickup(entry) then
+        return false
+    end
+    if prof == "" then
+        return true
+    end
+    return (self:PlayerProfessionRanks()[prof] or 0) < self:CraftSkillNeeded(entry)
+end
+
 function GQ.Log:EntryMatchesPlayStyle(entry)
     if self:NoDungeonsEnabled() and self:EntryRequiresInstance(entry) then
         return false
@@ -3971,6 +4035,9 @@ function GQ.Log:EntryMatchesPlayStyle(entry)
         return false
     end
     if self:NoZephrasEnabled() and self:EntryOnlyOnZephras(entry) then
+        return false
+    end
+    if self:NoCraftedBoPEnabled() and self:EntryIsForeignBoPCraft(entry) then
         return false
     end
     return true
@@ -4335,6 +4402,8 @@ function GQ.Log:GetActiveListCacheContextKey()
         self:BuyItEnabled() and "buy" or "",
         self:FocusZoneEnabled() and ("zone:" .. self:PlayerZoneName()) or "",
         self:TheirCitiesEnabled() and "theircities" or "",
+        self:NoZephrasEnabled() and "nozephras" or "",
+        self:NoCraftedBoPEnabled() and "nocraftbop" or "",
     }, "|")
 end
 
@@ -4440,46 +4509,71 @@ function GQ.Log:EnsureActiveListCaches()
     for itemKey in pairs(progress.obtainedItems or {}) do
         markItemId(tonumber(itemKey) or itemKey)
     end
-    for id in pairs(progress.obtained or {}) do
+    -- A saved id of the faction that is not expanded has no entry. Its item
+    -- id is the third field of the hunt id.
+    local function markHuntId(id)
         local entry = GQ.Data:GetEntryById(id)
         if entry then
             markItemId(entry.itemId)
+        elseif type(id) == "string" and GQ.Data.IsUnexpandedHuntId and GQ.Data:IsUnexpandedHuntId(id) then
+            markItemId(id:match("^gen:%a+:(%d+):"))
         end
+    end
+    for id in pairs(progress.obtained or {}) do
+        markHuntId(id)
     end
     for id, record in pairs(progress.hunts or {}) do
         if NormalizeHuntStatus(record.status) == "completed" then
-            local entry = GQ.Data:GetEntryById(id)
-            if entry then
-                markItemId(entry.itemId)
-            end
+            markHuntId(id)
         end
     end
-    local owned = {}
-    local function markOwned(itemId)
-        if not itemId then
-            return
-        end
-        local key = tostring(itemId)
-        owned[key] = true
-        obtained[key] = true
-    end
-
-    pcall(function()
-        for invSlot = 1, 19 do
-            markOwned(ItemLinkToId(GetInventoryItemLink("player", invSlot)))
-        end
-        local numBags = NUM_BAG_SLOTS or 4
-        for bag = 0, numBags do
-            local numSlots = GetBagSlotCount(bag)
-            for slot = 1, numSlots do
-                markOwned(ItemLinkToId(GetBagItemLink(bag, slot)))
-            end
-        end
-    end)
     self._obtainedItemIdSet = obtained
-    self._ownedItemIdSet = owned
+    self:EnsureOwnedItemSets()
 
     self._activeListCachesReady = true
+end
+
+-- Worn and bagged items, read once per bag or equipment change. The active
+-- list checks every candidate against these instead of walking the bags.
+function GQ.Log:EnsureOwnedItemSets()
+    if self._ownedItemIdSet and not self._ownedItemsDirty then
+        return
+    end
+    self._ownedItemsDirty = nil
+    local owned, links = {}, {}
+    self:ForEachOwnedItemLink(function(link)
+        local itemId = ItemLinkToId(link)
+        if itemId then
+            owned[tostring(itemId)] = true
+            links[#links + 1] = link
+        end
+    end)
+    self._ownedItemIdSet = owned
+    self._ownedItemLinks = links
+end
+
+function GQ.Log:MarkOwnedItemsDirty()
+    self._ownedItemsDirty = true
+end
+
+function GQ.Log:EntryOwnedOrObtainedFast(entry)
+    if GetObtainedTimestamp(entry.id) then
+        return true
+    end
+    local record = GetHuntRecord(entry.id)
+    if record and NormalizeHuntStatus(record.status) == "completed" then
+        return true
+    end
+    if PlayerHasProducedProfessionItem(entry) then
+        return true
+    end
+    self:EnsureOwnedItemSets()
+    if entry.suffix and entry.suffix ~= "" then
+        return self:EntrySuffixOwned(entry, self._ownedItemLinks or {})
+    end
+    local key = entry.itemId and tostring(entry.itemId)
+    return key ~= nil and ((self._obtainedItemIdSet and self._obtainedItemIdSet[key])
+        or (self._ownedItemIdSet and self._ownedItemIdSet[key])) and true or false
 end
 
 function GQ.Log:EntryHiddenFromActiveFast(entry, slotName)
@@ -4494,8 +4588,13 @@ function GQ.Log:EntryHiddenFromActiveFast(entry, slotName)
     if itemKey and completedKeys and completedKeys[itemKey] then
         return true
     end
-    if entry.itemId and self._obtainedItemIdSet and self._obtainedItemIdSet[tostring(entry.itemId)] then
-        return true
+    if entry.itemId then
+        self:EnsureOwnedItemSets()
+        local key = tostring(entry.itemId)
+        if (self._obtainedItemIdSet and self._obtainedItemIdSet[key])
+            or (self._ownedItemIdSet and self._ownedItemIdSet[key]) then
+            return true
+        end
     end
     if self:IsHuntRemoved(entry) then
         return true
@@ -4649,11 +4748,7 @@ function GQ.Log:ShouldHideFromActiveList(entry, slotName, completedItemKeys)
         return true
     end
 
-    if entry.itemId and self._ownedItemIdSet and self._ownedItemIdSet[tostring(entry.itemId)] then
-        return true
-    end
-
-    if self:IsEntryObtained(entry.id) or PlayerHasObtainedEntryItem(entry) then
+    if self:EntryOwnedOrObtainedFast(entry) then
         return true
     end
 
@@ -5595,6 +5690,7 @@ function GQ.Log:CompleteHunt(id)
     else
         local record = GetHuntRecord(id)
         if record then
+            self:InvalidateActiveListCaches()
             record.status = "completed"
             record.completedAt = time()
             CharProgress().obtained[id] = record.completedAt
@@ -5667,7 +5763,6 @@ function GQ.Log:UntrackHunt(id)
         if not dismissedSibling then
             GearQuestForeverDB.dismissedCompleted[id] = true
         end
-        local entry = GQ.Data:GetEntryById(id)
         if entry and entry.itemId then
             local itemKey = tostring(entry.itemId)
             GearQuestForeverDB.dismissedItems = GearQuestForeverDB.dismissedItems or {}
@@ -5678,13 +5773,14 @@ function GQ.Log:UntrackHunt(id)
                 GearQuestForeverDB.settings.completedItemBackup[itemKey] = nil
             end
         end
+        self:InvalidateActiveListCaches()
     end
 
     CharProgress().hunts[id] = nil
 
     if self.selectedHuntId == id and (willDisappear or onCompletedTab or self:GetListTab() == "tracked") then
         self.selectedHuntId = nil
-    self.selectedEntry = nil
+        self.selectedEntry = nil
         self:ClearDetail()
     end
 
@@ -6362,6 +6458,12 @@ function GQ.Log:MeasureDetailContentHeight()
     if self.frame.detailBody and self.frame.detailBody:IsShown() then
         height = height + (self.frame.detailBody:GetStringHeight() or 0) + 4
     end
+    if self.frame.detailRecipe and self.frame.detailRecipe:IsShown() then
+        height = height + (self.frame.detailRecipe:GetHeight() or 22) + 8
+    end
+    if self.frame.detailBodyTail and self.frame.detailBodyTail:IsShown() then
+        height = height + (self.frame.detailBodyTail:GetStringHeight() or 0) + 8
+    end
     if self.frame.detailCoords and self.frame.detailCoords:IsShown() then
         height = height + (self.frame.detailCoords:GetStringHeight() or 0) + 16
     end
@@ -6492,6 +6594,12 @@ function GQ.Log:CreateListRow(index)
         local parent = self:GetParent()
         if parent and parent.rowType == "header" then
             GQ.Log:ShowSlotRankTooltip(parent)
+        end
+    end)
+    row.info:SetScript("OnClick", function(self)
+        local parent = self:GetParent()
+        if parent and parent.rowType == "header" then
+            GQ.Log:OpenSlotRankInLookup(parent)
         end
     end)
     row.info:EnableMouseWheel(true)
@@ -6643,13 +6751,18 @@ function GQ.Log:EnsureTrackerEvents()
             log._weaponFiltered = nil
             log._heldOffHand = nil
             log._heldOffBand = nil
+            log:MarkOwnedItemsDirty()
             local function refreshWorn()
+                log._wornRefreshPending = nil
                 if log.UpdateGearScoreBar then
                     log:UpdateGearScoreBar()
                 end
             end
             if C_Timer and C_Timer.After then
-                C_Timer.After(0.05, refreshWorn)
+                if not log._wornRefreshPending then
+                    log._wornRefreshPending = true
+                    C_Timer.After(0.05, refreshWorn)
+                end
             else
                 refreshWorn()
             end
@@ -6659,8 +6772,21 @@ function GQ.Log:EnsureTrackerEvents()
         end
 
         if event == "BAG_UPDATE" then
-            if GQ.Data and GQ.Data.CacheContainerItemLinks then
-                GQ.Data:CacheContainerItemLinks()
+            log:MarkOwnedItemsDirty()
+            -- One bag event per bag, often several in one frame while looting.
+            local function cacheBags()
+                log._bagCachePending = nil
+                if GQ.Data and GQ.Data.CacheContainerItemLinks then
+                    GQ.Data:CacheContainerItemLinks()
+                end
+            end
+            if C_Timer and C_Timer.After then
+                if not log._bagCachePending then
+                    log._bagCachePending = true
+                    C_Timer.After(0, cacheBags)
+                end
+            else
+                cacheBags()
             end
             if not log.obtainToastsEnabled then
                 log:UnionOwnedAtLogin()
@@ -7143,6 +7269,7 @@ function GQ.Log:EnsureSpecControl(frame)
     end)
 
     local nameHit = CreateFrame("Button", nil, control)
+    nameHit.gqPadFilter = true
     nameHit:SetPoint("LEFT", control, "LEFT", 0, 0)
     nameHit:SetPoint("RIGHT", iconFrame, "LEFT", -SPEC_CONTROL_GAP, 0)
     nameHit:SetHeight(SPEC_CONTROL_HEIGHT)
@@ -8358,7 +8485,7 @@ function GQ.Log:EnsurePlayStyle(frame)
     panel:SetFrameStrata("FULLSCREEN_DIALOG")
     panel:SetFrameLevel(300)
     panel:EnableMouse(true)
-    panel:SetSize(640, 560)
+    panel:SetSize(640, 600)
     if panel.SetClampedToScreen then
         panel:SetClampedToScreen(true)
     end
@@ -8562,6 +8689,30 @@ function GQ.Log:EnsurePlayStyle(frame)
             end
         end
     )
+    panel.noCraftedBoPCard = makeCard(
+        L["No crafted BoP!"],
+        art .. "GQ-Play-NoCraftedBoP.png",
+        intro, -190, -32,
+        L["Hides crafted gear that binds when picked up until you can make it yourself, with that profession and the skill the recipe needs. That covers a craft whose recipe is bought from a vendor or drops from a boss. Crafted gear that binds when equipped stays, because you can buy it from another player."],
+        function()
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if log then
+                log:SetNoCraftedBoP(not log:NoCraftedBoPEnabled())
+            end
+        end
+    )
+
+    -- Nine cards fit on a page: three rows of three.
+    panel.cardPages = {
+        {
+            panel.noDungeonsCard, panel.dungeonEnjoyerCard, panel.getItTodayCard,
+            panel.manageableDungeonsCard, panel.manageableCard, panel.buyItCard,
+            panel.focusZoneCard, panel.theirCitiesCard, panel.noZephrasCard,
+        },
+        {
+            panel.noCraftedBoPCard,
+        },
+    }
 
     local closeBtn = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
     closeBtn:SetSize(100, 22)
@@ -8570,7 +8721,34 @@ function GQ.Log:EnsurePlayStyle(frame)
     closeBtn:SetScript("OnClick", function()
         panel:Hide()
     end)
+
+    local pageText = panel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    pageText:SetPoint("BOTTOM", closeBtn, "TOP", 0, 14)
+    pageText:SetWidth(120)
+    pageText:SetJustifyH("CENTER")
+    pageText:SetTextColor(GOLD[1], GOLD[2], GOLD[3])
+    panel.pageText = pageText
+
+    local function makePageButton(prefix, point, dx, step)
+        local pageBtn = CreateFrame("Button", nil, panel)
+        pageBtn:SetSize(28, 28)
+        pageBtn:SetPoint(point, pageText, point == "RIGHT" and "LEFT" or "RIGHT", dx, 0)
+        pageBtn:SetNormalTexture("Interface\\Buttons\\UI-SpellbookIcon-" .. prefix .. "Page-Up")
+        pageBtn:SetPushedTexture("Interface\\Buttons\\UI-SpellbookIcon-" .. prefix .. "Page-Down")
+        pageBtn:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight", "ADD")
+        pageBtn:SetScript("OnClick", function()
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if log then
+                log:ShowPlayStylePage((panel.cardPage or 1) + step)
+            end
+        end)
+        return pageBtn
+    end
+    panel.prevPageBtn = makePageButton("Prev", "RIGHT", -4, -1)
+    panel.nextPageBtn = makePageButton("Next", "LEFT", 4, 1)
+
     frame.playStylePanel = panel
+    self:ShowPlayStylePage(1)
     self:SetSimulatorChoiceHighlight(panel.noDungeonsCard, false, 0.35)
     self:SetSimulatorChoiceHighlight(panel.dungeonEnjoyerCard, false, 0.35)
     self:SetSimulatorChoiceHighlight(panel.getItTodayCard, false, 0.35)
@@ -8580,7 +8758,34 @@ function GQ.Log:EnsurePlayStyle(frame)
     self:SetSimulatorChoiceHighlight(panel.focusZoneCard, false, 0.35)
     self:SetSimulatorChoiceHighlight(panel.theirCitiesCard, false, 0.35)
     self:SetSimulatorChoiceHighlight(panel.noZephrasCard, false, 0.35)
+    self:SetSimulatorChoiceHighlight(panel.noCraftedBoPCard, false, 0.35)
     self:StartPlayStyleIntro(btn)
+end
+
+-- The arrows wrap, so the gamepad never lands on a disabled button.
+function GQ.Log:ShowPlayStylePage(page)
+    local panel = self.frame and self.frame.playStylePanel
+    local pages = panel and panel.cardPages
+    if not pages then
+        return
+    end
+    local count = #pages
+    page = ((math.floor(tonumber(page) or 1) - 1) % count) + 1
+    panel.cardPage = page
+    for i = 1, count do
+        local cards = pages[i]
+        for j = 1, #cards do
+            local card = cards[j]
+            card:SetShown(i == page)
+            if card.title then
+                card.title:SetShown(i == page)
+            end
+        end
+    end
+    if panel.pageText then
+        panel.pageText:SetText(string.format(L["Page %d / %d"], page, count))
+    end
+    GameTooltip:Hide()
 end
 
 function GQ.Log:StartPlayStyleIntro(btn)
@@ -8735,6 +8940,14 @@ function GQ.Log:SetNoZephras(enabled)
     self:SetPlayStyleFlag("playNoZephras", enabled)
 end
 
+function GQ.Log:SetNoCraftedBoP(enabled)
+    self._profSnapshot = nil
+    self:SetPlayStyleFlag("playNoCraftedBoP", enabled)
+    if enabled then
+        self:NoteObtainabilityChanged()
+    end
+end
+
 function GQ.Log:SetFocusZone(enabled)
     self._focusZoneSeen = self:PlayerZoneName()
     self._focusZoneMatch = nil
@@ -8808,6 +9021,10 @@ function GQ.Log:RefreshPlayStylePanel()
     local zephras = panel and panel.noZephrasCard
     if zephras then
         self:SetSimulatorChoiceHighlight(zephras, self:NoZephrasEnabled(), 0.35)
+    end
+    local craftedBoP = panel and panel.noCraftedBoPCard
+    if craftedBoP then
+        self:SetSimulatorChoiceHighlight(craftedBoP, self:NoCraftedBoPEnabled(), 0.35)
     end
     self:UpdatePlayStyleButton()
 end
@@ -9073,8 +9290,28 @@ local function ApplyFilterButtonFont(fs)
         font, size, flags = _G.GameFontHighlight:GetFont()
     end
     if font and size then
-        fs:SetFont(font, size, flags)
+        GQ:SetLocaleFont(fs, font, size, flags)
     end
+end
+
+-- The pad does not move the mouse. While it owns the log, its focus on a
+-- filter row or inside that row's flyout counts as hovering there.
+function GQ.Log:PadFocusWithin(row, flyout)
+    local focus = self._padNavOwned and self._padFocus
+    if not focus then
+        return false
+    end
+    if focus == row then
+        return true
+    end
+    local node = focus
+    while node do
+        if node == flyout then
+            return true
+        end
+        node = node.GetParent and node:GetParent()
+    end
+    return false
 end
 
 local function MouseOverFilterRow(check)
@@ -9555,7 +9792,7 @@ function GQ.Log:EnsureSourceFilter(frame)
                 return
             end
             local overBranch = flyout.IsMouseOver and flyout:IsMouseOver(10, 10, 10, 10)
-            if MouseOverFilterRow(row) or overBranch then
+            if MouseOverFilterRow(row) or overBranch or log:PadFocusWithin(row, flyout) then
                 log[leaveKey] = nil
                 log[rowHotKey] = true
                 return
@@ -11341,6 +11578,7 @@ function GQ.Log:CreateLanguageDropdown(frame, detail)
         menu:SetBackdropBorderColor(0.78, 0.72, 0.58, 1)
     end
     menu:SetPoint("TOPRIGHT", btn, "BOTTOMRIGHT", 4, -2)
+    frame.settingsLanguageMenu = menu
     local catcher = CreateFrame("Frame", nil, UIParent)
     catcher:SetAllPoints(UIParent)
     catcher:SetFrameStrata("FULLSCREEN_DIALOG")
@@ -11567,6 +11805,100 @@ function GQ.Log:CreateGearScoreSetting(frame, detail, anchor)
     barHint:SetText(L["Shows the score bar in the log header. Off restores the viewing-upgrades line."])
     barHint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
     frame.settingsScoreBarHint = barHint
+
+    local specLabel = CreateFontStringWithFallback(detail, QUEST_DETAIL_TITLE_FONTS)
+    specLabel:SetJustifyH("LEFT")
+    specLabel:SetText(L["Ranks for your other specs"])
+    specLabel:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    frame.settingsOtherSpecLabel = specLabel
+
+    local specHit = CreateFrame("Button", nil, detail)
+    specHit:SetPoint("TOPLEFT", barHint, "BOTTOMLEFT", 0, -16)
+    specHit:SetSize(math.max(specLabel:GetStringWidth() or 0, 1) + 4, math.max(specLabel:GetStringHeight() or 0, 18))
+    specLabel:SetParent(specHit)
+    specLabel:ClearAllPoints()
+    specLabel:SetPoint("LEFT", specHit, "LEFT", 0, 0)
+    frame.settingsOtherSpecLabelHit = specHit
+
+    local function ApplySpecCheck(checked)
+        GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+        GearQuestForeverDB.settings.showOtherSpecRanks = checked and true or false
+    end
+
+    local specCheck = CreateSettingsCheck(detail, "")
+    specCheck:SetPoint("RIGHT", specHit, "LEFT", -6, 0)
+    specCheck:SetChecked(true)
+    if specCheck.text then
+        specCheck.text:SetText("")
+        specCheck.text:Hide()
+    end
+    specCheck:SetScript("OnClick", function(self)
+        ApplySpecCheck(self:GetChecked())
+    end)
+    specHit:SetScript("OnClick", function()
+        local checked = not specCheck:GetChecked()
+        specCheck:SetChecked(checked)
+        ApplySpecCheck(checked)
+    end)
+    frame.settingsOtherSpecCheck = specCheck
+
+    local specHint = CreateFontStringWithFallback(detail, {
+        "QuestFontNormalSmall",
+        "SystemFont_Small",
+        "SystemFont_Shadow_Small",
+        "QuestFont",
+    })
+    specHint:SetPoint("TOPLEFT", specHit, "BOTTOMLEFT", 0, -4)
+    specHint:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
+    specHint:SetJustifyH("LEFT")
+    specHint:SetWordWrap(true)
+    specHint:SetText(L["Adds the rank each of your class's other specs gives the item at your level, for gearing two specs at once. Off shows only the spec you are playing or simulating."])
+    specHint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
+    frame.settingsOtherSpecHint = specHint
+end
+
+-- One heading per group. Each row is { top, bottom }: the widget that starts
+-- the setting and the one it ends with. Rows sit 28 pixels in from the heading.
+function GQ.Log:StackSettingsSections(child, sections)
+    child.gqSectionHeaders = child.gqSectionHeaders or {}
+    local prev
+    for s = 1, #sections do
+        local section = sections[s]
+        local header = child.gqSectionHeaders[s]
+        if not header then
+            header = CreateFontStringWithFallback(child, QUEST_DETAIL_HEADER_FONTS)
+            header:SetJustifyH("LEFT")
+            header:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+            local rule = child:CreateTexture(nil, "ARTWORK")
+            rule:SetColorTexture(0, 0, 0, 0.3)
+            rule:SetHeight(1)
+            rule:SetPoint("TOPLEFT", header, "BOTTOMLEFT", 0, -3)
+            rule:SetPoint("RIGHT", child, "RIGHT", -8, 0)
+            header.rule = rule
+            child.gqSectionHeaders[s] = header
+        end
+        header:SetText(section.title)
+        header:ClearAllPoints()
+        if prev then
+            header:SetPoint("TOPLEFT", prev, "BOTTOMLEFT", -28, -26)
+        else
+            header:SetPoint("TOPLEFT", child, "TOPLEFT", 4, -4)
+        end
+        local anchor, dx, dy = header.rule, 28, -12
+        for r = 1, #section.rows do
+            local row = section.rows[r]
+            if row[1] and row[2] then
+                row[1]:ClearAllPoints()
+                row[1]:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", dx, dy)
+                if row.stretch then
+                    row[1]:SetPoint("RIGHT", child, "RIGHT", -8, 0)
+                end
+                anchor, dx, dy = row[2], 0, -16
+                prev = row[2]
+            end
+        end
+    end
+    return prev
 end
 
 function GQ.Log:CreateChatSetting(frame, detail, anchor)
@@ -12906,6 +13238,7 @@ function GQ.Log:MountSettingsGeneral(frame, detail)
         frame.settingsArtLabelHit, frame.settingsArtCheck, frame.settingsArtHint,
         frame.settingsScoreLabelHit, frame.settingsScoreCheck, frame.settingsScoreHint,
         frame.settingsScoreBarLabelHit, frame.settingsScoreBarCheck, frame.settingsScoreBarHint,
+        frame.settingsOtherSpecLabelHit, frame.settingsOtherSpecCheck, frame.settingsOtherSpecHint,
         frame.settingsChatLabelHit, frame.settingsChatCheck, frame.settingsChatHint,
     }
     for i = 1, #widgets do
@@ -12913,22 +13246,29 @@ function GQ.Log:MountSettingsGeneral(frame, detail)
             widgets[i]:SetParent(child)
         end
     end
-    if frame.settingsLanguageRow then
-        frame.settingsLanguageRow:ClearAllPoints()
-        frame.settingsLanguageRow:SetPoint("TOPLEFT", child, "TOPLEFT", 32, -4)
-        frame.settingsLanguageRow:SetPoint("RIGHT", child, "RIGHT", -8, 0)
-    end
-    if frame.settingsMinimapLabelHit then
-        frame.settingsMinimapLabelHit:ClearAllPoints()
-        if frame.settingsLanguageRow then
-            frame.settingsMinimapLabelHit:SetPoint("TOPLEFT", frame.settingsLanguageRow, "BOTTOMLEFT", 0, -16)
-        else
-            frame.settingsMinimapLabelHit:SetPoint("TOPLEFT", child, "TOPLEFT", 32, -4)
-        end
-    end
+    frame.settingsGeneralLast = self:StackSettingsSections(child, {
+        {
+            title = L["INTERFACE"],
+            rows = {
+                { frame.settingsLanguageRow, frame.settingsLanguageRow, stretch = true },
+                { frame.settingsMinimapLabelHit, frame.settingsHint },
+                { frame.settingsLargeLabelHit, frame.settingsLargeHint },
+                { frame.settingsArtLabelHit, frame.settingsArtHint },
+                { frame.settingsChatLabelHit, frame.settingsChatHint },
+            },
+        },
+        {
+            title = L["TOOLTIPS AND SCORE"],
+            rows = {
+                { frame.settingsScoreLabelHit, frame.settingsScoreHint },
+                { frame.settingsOtherSpecLabelHit, frame.settingsOtherSpecHint },
+                { frame.settingsScoreBarLabelHit, frame.settingsScoreBarHint },
+            },
+        },
+    })
     local hints = {
         frame.settingsHint, frame.settingsLargeHint, frame.settingsArtHint, frame.settingsScoreHint,
-        frame.settingsScoreBarHint, frame.settingsChatHint,
+        frame.settingsScoreBarHint, frame.settingsOtherSpecHint, frame.settingsChatHint,
     }
     for i = 1, #hints do
         if hints[i] then
@@ -12983,10 +13323,32 @@ function GQ.Log:MountSettingsHunts(frame, detail)
             widgets[i]:SetParent(child)
         end
     end
-    if frame.settingsLowerLabelHit then
-        frame.settingsLowerLabelHit:ClearAllPoints()
-        frame.settingsLowerLabelHit:SetPoint("TOPLEFT", child, "TOPLEFT", 32, -4)
-    end
+    frame.settingsHuntsLast = self:StackSettingsSections(child, {
+        {
+            title = L["HUNT LIST"],
+            rows = {
+                { frame.settingsLowerLabelHit, frame.settingsLowerHint },
+                { frame.settingsToastLabelHit, frame.settingsToastHint },
+            },
+        },
+        {
+            title = L["TOOLTIPS"],
+            rows = {
+                { frame.settingsEnchantLabelHit, frame.settingsEnchantHint },
+                { frame.settingsUnitGearLabelHit, frame.settingsUnitGearHint },
+            },
+        },
+        {
+            title = L["ARROWS, MAP AND TRACKER"],
+            rows = {
+                { frame.settingsArrowLabelHit, frame.settingsArrowHint },
+                { frame.settingsGuideLabelHit, frame.settingsGuideHint },
+                { frame.settingsMapPinLabelHit, frame.settingsMapPinHint },
+                { frame.settingsMapPinSizeHit, frame.settingsMapPinSizeHint },
+                { frame.settingsTrackerLabelHit, frame.settingsTrackerHint },
+            },
+        },
+    })
     local hints = {
         frame.settingsLowerHint, frame.settingsToastHint, frame.settingsArrowHint,
         frame.settingsGuideHint, frame.settingsEnchantHint, frame.settingsMapPinHint,
@@ -13025,7 +13387,7 @@ function GQ.Log:LayoutSettingsHunts(frame)
     child:SetWidth(math.max(width, 40))
 
     local top = child:GetTop()
-    local hint = frame.settingsTrackerHint or frame.settingsEnchantHint
+    local hint = frame.settingsHuntsLast or frame.settingsTrackerHint
     local bottom = hint and hint.GetBottom and hint:GetBottom()
     local height = 640
     if top and bottom and top > bottom then
@@ -13088,7 +13450,7 @@ function GQ.Log:LayoutSettingsGeneral(frame)
     child:SetWidth(math.max(width, 40))
 
     local top = child:GetTop()
-    local hint = frame.settingsChatHint
+    local hint = frame.settingsGeneralLast or frame.settingsChatHint
     local bottom = hint and hint.GetBottom and hint:GetBottom()
     local height = 520
     if top and bottom and top > bottom then
@@ -13281,6 +13643,9 @@ function GQ.Log:SetSettingsSection(section)
         frame.settingsScoreBarLabelHit,
         frame.settingsScoreBarCheck,
         frame.settingsScoreBarHint,
+        frame.settingsOtherSpecLabelHit,
+        frame.settingsOtherSpecCheck,
+        frame.settingsOtherSpecHint,
         frame.settingsChatLabelHit,
         frame.settingsChatCheck,
         frame.settingsChatHint,
@@ -13580,6 +13945,11 @@ function GQ.Log:RefreshSettings()
         local settings = GearQuestForeverDB and GearQuestForeverDB.settings
         barCheck:SetChecked(not settings or settings.showGearScoreBar ~= false)
     end
+    local specCheck = frame.settingsOtherSpecCheck
+    if specCheck then
+        local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+        specCheck:SetChecked(not settings or settings.showOtherSpecRanks ~= false)
+    end
     local chatCheck = frame.settingsChatCheck
     if chatCheck then
         local settings = GearQuestForeverDB and GearQuestForeverDB.settings
@@ -13662,6 +14032,18 @@ function GQ.Log:RefreshSettings()
         end
         if height and height > 1 then
             barHit:SetHeight(height)
+        end
+    end
+    local specLabel = frame.settingsOtherSpecLabel
+    local specHit = frame.settingsOtherSpecLabelHit
+    if specLabel and specHit and specLabel.GetStringWidth then
+        local width = specLabel:GetStringWidth()
+        local height = specLabel.GetStringHeight and specLabel:GetStringHeight()
+        if width and width > 1 then
+            specHit:SetWidth(width + 4)
+        end
+        if height and height > 1 then
+            specHit:SetHeight(height)
         end
     end
     local scoreLabel = frame.settingsScoreLabel
@@ -14084,8 +14466,12 @@ function GQ.Log:ApplySimulator()
     end
 
     local function run()
-        local ok, err = GQ.Preview:ApplySimulation(classFile, levelText, specId, faction)
+        local called, ok, err = pcall(GQ.Preview.ApplySimulation, GQ.Preview, classFile, levelText, specId, faction)
         self._simApplyPending = nil
+        local thrown = not called and ok
+        if thrown then
+            ok, err = false, nil
+        end
         if not ok then
             if GQ.Custom then
                 if not GQ.Custom._job then
@@ -14096,6 +14482,9 @@ function GQ.Log:ApplySimulator()
                 end
             end
             GQ:Chat("|cff66ccffGearQuest|r: " .. (err or L["Could not simulate."]))
+            if thrown then
+                error(thrown, 0)
+            end
             return
         end
         self:SetPageTab("log")
@@ -14641,6 +15030,12 @@ function GQ.Log:SetDetailEmpty(empty)
             self.frame.detailLore:Hide()
         end
         self.frame.detailBody:Hide()
+        if self.frame.detailRecipe then
+            self.frame.detailRecipe:Hide()
+        end
+        if self.frame.detailBodyTail then
+            self.frame.detailBodyTail:Hide()
+        end
         if self.frame.detailCoords then
             self.frame.detailCoords:Hide()
         end
@@ -14680,6 +15075,7 @@ function GQ.Log:ClearDetail()
         self.frame.detailRankClosed:Hide()
     end
     self.frame.detailBody:SetText("")
+    self:LayoutDetailRecipe(nil)
     if self.frame.detailCoords then
         self.frame.detailCoords:SetText("")
         self.frame.detailCoords:Hide()
@@ -15507,6 +15903,40 @@ function GQ.Log:ProfessionSkillLine(profession, skill)
     return string.format(L["Requires %s (%d) to craft.%s"], shown, skill, yours)
 end
 
+GQ.Log.REP_STANDING_WORDS = {
+    Neutral = true, Friendly = true, Honored = true, Revered = true, Exalted = true,
+}
+GQ.Log.BARE_SOURCE_INTROS = { ["Quest reward."] = true, ["Bought from a vendor."] = true }
+
+-- The stored how-to text repeats lines the parchment or the item tooltip
+-- already shows: the Source line, the reputation line, and the set bonuses.
+function GQ.Log:CleanDetailIntro(entry, intro)
+    if type(intro) ~= "string" or intro == "" then
+        return intro
+    end
+    intro = intro:gsub("%s*Pick it over the other reward choices%.", "")
+    intro = intro:gsub("%s*Indexed from Wowhead Forever%.", "")
+    intro = intro:gsub("%s*Source not listed yet%.", "")
+    if entry and type(entry.reqRep) == "table" and #entry.reqRep > 0 then
+        intro = intro:gsub("%s*Requires ([^.]-) %- (%a+)%.", function(_, standing)
+            if self.REP_STANDING_WORDS[standing] then
+                return ""
+            end
+        end)
+    end
+    if intro:find("Set piece of ", 1, true) then
+        intro = intro:gsub("%s*%(%d%) [^.]*%.", "")
+        intro = intro:gsub("%s*Twice as much mana in Haunted and Wasteland%.", "")
+        intro = intro:gsub("%s*A druid in all five turns into a serpent%.[^.]*%.", "")
+    end
+    intro = intro:gsub("  +", " ")
+    intro = intro:gsub("%s+$", ""):gsub("^%s+", "")
+    if self.BARE_SOURCE_INTROS[intro] then
+        return ""
+    end
+    return intro
+end
+
 function GQ.Log:BuildDetailLines(entry)
     if entry and entry.sourceType == "profession" and GQ.Data and GQ.Data.EnrichProfessionEntry then
         GQ.Data:EnrichProfessionEntry(entry)
@@ -15514,8 +15944,9 @@ function GQ.Log:BuildDetailLines(entry)
 
     local intro
     local vendorLine
+    local recipe = entry and entry.itemId and GQ.CraftRecipes and GQ.CraftRecipes[entry.itemId]
     if entry and entry.sourceType == "profession" and GQ.Data and GQ.Data.GetProfessionInstructions then
-        intro = GQ.Data:GetProfessionInstructions(entry) or ""
+        intro = GQ.Data:GetProfessionInstructions(entry, recipe and true) or ""
     else
         vendorLine = GQ.Data and GQ.Data.VendorBoughtLine and GQ.Data:VendorBoughtLine(entry)
         if vendorLine and vendorLine ~= "" then
@@ -15542,8 +15973,7 @@ function GQ.Log:BuildDetailLines(entry)
     end
     if intro and intro ~= "" then
         intro = intro:gsub(" ?Provided item:%.", "")
-        intro = intro:gsub("%s+$", "")
-        intro = intro:gsub("^%s+", "")
+        intro = self:CleanDetailIntro(entry, intro)
     end
     local lines = {}
     if intro and intro ~= "" then
@@ -15559,6 +15989,9 @@ function GQ.Log:BuildDetailLines(entry)
 
     if entry.itemId and GQ.Data and GQ.Data.IsClientItemMissing and GQ.Data:IsClientItemMissing(entry.itemId) then
         table.insert(lines, L["\nWowhead Forever lists this item. This game client does not have it yet."])
+    end
+    if entry.itemId and GQ.Data and GQ.Data.unconfirmed and GQ.Data.unconfirmed[entry.itemId] then
+        table.insert(lines, L["\nWowhead Forever marks this item as unconfirmed. It may not be in WoW: Forever yet."])
     end
 
     local suffixHint = GQ.Data:GetSuffixHint(entry)
@@ -15650,12 +16083,15 @@ function GQ.Log:BuildDetailLines(entry)
             craftSkill = known.skill
         end
     end
-    if craftProf and entry and entry.sourceType ~= "profession" and not patternProf
+    if craftProf and entry and entry.sourceType ~= "profession" and not patternProf and not recipe
         and GQ.Data.ProfessionMaterialsLine then
         local materials = GQ.Data:ProfessionMaterialsLine(entry)
         if materials and materials ~= "" then
             table.insert(lines, "\n" .. materials)
         end
+    end
+    if recipe then
+        lines.recipeAt = #lines + 1
     end
     local skillLine = self:ProfessionSkillLine(craftProf, craftSkill)
     if skillLine then
@@ -15725,6 +16161,11 @@ function GQ.Log:BuildDetailLines(entry)
                 table.insert(lines, self:ReputationRequirementLine(faction, standing))
             end
         end
+    end
+
+    local weaponSkill = GQ.Data and GQ.Data.WeaponSkillLine and GQ.Data:WeaponSkillLine(entry)
+    if weaponSkill then
+        table.insert(lines, "\n" .. weaponSkill)
     end
 
     if src == "quest_reward" and entry.itemId and GQ.Data and GQ.Data.GetItemFact then
@@ -15851,6 +16292,7 @@ function GQ.Log:EnsureItemInfoListener()
             GQ.Data:NoteClientItemMissing(itemId)
         end
         log:RefreshLookupRowName(itemId)
+        log:RefreshDetailRecipeName(itemId)
         if success ~= false and itemId and GetInventoryItemLink and log.UpdateGearScoreBar then
             for slot = 1, 19 do
                 local worn = GetInventoryItemLink("player", slot)
@@ -15900,6 +16342,291 @@ function GQ.Log:VisibleSlotRank(entry)
         end
     end
     return nil
+end
+
+GQ.Log.SPEC_PROBE_LOG_FIELDS = {
+    "_slotRankBand", "_slotRankCache", "_weaponPool", "_weaponPoolBand",
+    "_weaponTrueList", "_weaponTrueBand", "_casterOffBand", "_casterOffHand",
+    "_heldOffHand", "_heldOffBand",
+}
+GQ.Log.SPEC_PROBE_DATA_FIELDS = {
+    "_queryCache", "_activeBandCache", "_linkEntryCache",
+    "_offPartnerBand", "_offPartnerKind", "_offPartnerEntry",
+    "_onePartnerBand", "_onePartnerEntry", "_loadoutBand", "_loadoutBest",
+}
+
+-- Runs fn as if this character were in another spec of the same class.
+-- Those caches hold one spec at a time, so the active spec's set is put
+-- aside and each probed spec keeps its own between hovers.
+function GQ.Log:WithSpecProbe(spec, fn)
+    local store = self._specProbeStore
+    if not store then
+        store = {}
+        self._specProbeStore = store
+    end
+    local mine = store[spec]
+    if not mine then
+        mine = { log = {}, data = {} }
+        store[spec] = mine
+    end
+    local data = GQ.Data
+    local logFields, dataFields = self.SPEC_PROBE_LOG_FIELDS, self.SPEC_PROBE_DATA_FIELDS
+    local savedLog, savedData = {}, {}
+    for i = 1, #logFields do
+        local k = logFields[i]
+        savedLog[k] = self[k]
+        self[k] = mine.log[k]
+    end
+    for i = 1, #dataFields do
+        local k = dataFields[i]
+        savedData[k] = data[k]
+        data[k] = mine.data[k]
+    end
+    local savedCtx = GQ._ctx
+    GQ._ctx = { spec = spec }
+    local ok, result = pcall(fn)
+    GQ._ctx = savedCtx
+    for i = 1, #logFields do
+        local k = logFields[i]
+        mine.log[k] = self[k]
+        self[k] = savedLog[k]
+    end
+    for i = 1, #dataFields do
+        local k = dataFields[i]
+        mine.data[k] = data[k]
+        data[k] = savedData[k]
+    end
+    if ok then
+        return result
+    end
+    return nil
+end
+
+function GQ.Log:ItemHasSpecRow(itemId, classFile, spec)
+    local rows = GQ.Data:GetEntriesByItemId(itemId)
+    for i = 1, #rows do
+        local entry = rows[i]
+        if (not entry.classes or entry.classes[classFile])
+            and entry.specs and entry.specs[spec]
+            and type(entry.pipelineScore) == "number" then
+            return true
+        end
+    end
+    return false
+end
+
+-- The other spec's row of a random green on the band for this level. With a
+-- suffix only that roll counts, without one any roll. Called inside
+-- WithSpecProbe, so the spec is the probed one.
+function GQ.Log:SuffixEntryForSpec(itemId, suffix)
+    local data = GQ.Data
+    local want = suffix and suffix:lower()
+    local pool = {}
+    for _, row in ipairs(data:GetEntriesByItemId(itemId)) do
+        if type(row.pipelineScore) == "number" and row.suffix
+            and (not want or row.suffix:lower() == want)
+            and data:EntryMatchesPlayerBand(row) then
+            pool[#pool + 1] = row
+        end
+    end
+    local active = data:FilterToActiveBand(pool)
+    if active and #active > 0 then
+        pool = active
+    end
+    local best
+    for i = 1, #pool do
+        local row = pool[i]
+        local rankA = best and (best.curatedRank or 99)
+        local rankB = row.curatedRank or 99
+        if not best or rankB < rankA
+            or (rankB == rankA and (row.pipelineScore or 0) > (best.pipelineScore or 0)) then
+            best = row
+        end
+    end
+    return best
+end
+
+-- "Restoration: Rank #3 for your level" for every other spec of this class
+-- that ranks the linked piece at this level, and a grey "not ranked" line for
+-- the rest. Nil when no spec of this class ranks the piece at any level. A hunt
+-- entry with a suffix is matched on that suffix, not on the link. Each spec
+-- ranks its own jackpot roll, so a spec without that roll shows the rank of
+-- the roll it does rank, named in the line.
+function GQ.Log:OtherSpecRankLines(link, baseEntry)
+    if not GQ.Spec or not GQ.Spec.IsActive or not GQ.Spec:IsActive() then
+        return nil
+    end
+    local data = GQ.Data
+    local itemId = (baseEntry and baseEntry.itemId) or (link and data:ItemLinkToId(link))
+    if not itemId or #data:GetEntriesByItemId(itemId) == 0 then
+        return nil
+    end
+    local suffix = baseEntry and baseEntry.suffix
+    if suffix == "" then
+        suffix = nil
+    end
+    if not suffix and not link then
+        return nil
+    end
+    local classFile = GQ:GetEffectiveClass()
+    local options = classFile and GQ.Spec:GetOptions(classFile)
+    if not options then
+        return nil
+    end
+    local band = data:GetActiveBandCacheKey()
+    local cache = self._otherSpecRankCache
+    if not cache or cache.band ~= band then
+        cache = { band = band, lines = {} }
+        self._otherSpecRankCache = cache
+    end
+    local linkKey
+    if suffix then
+        linkKey = itemId .. ":sfx:" .. suffix:lower()
+    else
+        local fullName = data:ItemLinkFullName(link)
+        linkKey = itemId .. ":" .. (data:SuffixIdFromLink(link) or 0) .. ":" .. (fullName and fullName:lower() or "")
+    end
+    local hit = cache.lines[linkKey]
+    if hit ~= nil then
+        return hit or nil
+    end
+    local current = GQ:GetEffectiveSpec()
+    local currentRule = GQ.Spec.GetRuleSpec and GQ.Spec:GetRuleSpec(current) or current
+    local level = GQ:GetEffectiveLevel() or 1
+    local lines = {}
+    local classRanks = self:ItemHasSpecRow(itemId, classFile, current)
+        or (currentRule ~= current and self:ItemHasSpecRow(itemId, classFile, currentRule))
+    for i = 1, #options do
+        local spec = options[i].id
+        local label = L[options[i].label] or options[i].label
+        local hasRow = spec ~= current and spec ~= currentRule and self:ItemHasSpecRow(itemId, classFile, spec)
+        if hasRow then
+            classRanks = true
+        end
+        local rank, rolled
+        if hasRow then
+            rank = self:WithSpecProbe(spec, function()
+                local entry
+                if suffix then
+                    entry = self:SuffixEntryForSpec(itemId, suffix) or self:SuffixEntryForSpec(itemId, nil)
+                else
+                    entry = data:EntryForItemLink(link)
+                end
+                if not entry then
+                    return nil
+                end
+                rolled = entry.suffix
+                local visible = self:VisibleSlotRank(entry)
+                if visible then
+                    return visible
+                end
+                if level >= (entry.minLevel or 1) and level <= (entry.maxLevel or level) then
+                    return entry.curatedRank
+                end
+                return nil
+            end)
+        end
+        if rank then
+            if suffix and rolled and rolled:lower() ~= suffix:lower() then
+                lines[#lines + 1] = string.format(L["%s: Rank #%d for your level (%s)"], label, rank, L[rolled] or rolled)
+            else
+                lines[#lines + 1] = string.format(L["%s: Rank #%d for your level"], label, rank)
+            end
+        elseif spec ~= current and spec ~= currentRule then
+            lines[#lines + 1] = "|cff9d9d9d" .. string.format(L["%s: Not ranked for your level"], label) .. "|r"
+        end
+    end
+    if not classRanks then
+        lines = {}
+    end
+    local result = #lines > 0 and lines or false
+    cache.lines[linkKey] = result
+    return result or nil
+end
+
+-- After the active spec is warm, build the other specs' rank lists one slot
+-- at a time with an idle frame between, so the first hover finds them built.
+function GQ.Log:WarmOtherSpecRanksAsync()
+    local data = GQ.Data
+    if self._otherSpecWarmRunning or not (C_Timer and C_Timer.After)
+        or not (data and data.OtherSpecRanksEnabled and data:OtherSpecRanksEnabled())
+        or not (GQ.Spec and GQ.Spec.IsActive and GQ.Spec:IsActive()) then
+        return
+    end
+    local band = data:GetActiveBandCacheKey()
+    if self._otherSpecWarmBand == band then
+        return
+    end
+    local classFile = GQ:GetEffectiveClass()
+    local options = classFile and GQ.Spec:GetOptions(classFile)
+    local bySlot = classFile and data.byClassSlotSpec and data.byClassSlotSpec[classFile]
+    if not options or not bySlot then
+        return
+    end
+    local function hasRows(slotName, spec)
+        for _, key in ipairs(data:GetCandidateSlotKeys(slotName) or {}) do
+            local map = bySlot[data:NormalizeSlotName(key)]
+            if map and ((map[spec] and map[spec][1]) or (map._any and map._any[1])) then
+                return true
+            end
+        end
+        return false
+    end
+    local current = GQ:GetEffectiveSpec()
+    local currentRule = GQ.Spec.GetRuleSpec and GQ.Spec:GetRuleSpec(current) or current
+    local slots = {}
+    for _, slotName in ipairs(data.BASE_SLOTS) do
+        slots[#slots + 1] = data:NormalizeSlotName(slotName)
+    end
+    if data.CLASS_RANGED and data.CLASS_RANGED[classFile] then
+        slots[#slots + 1] = "Ranged"
+    end
+    local jobs = {}
+    for i = 1, #options do
+        local spec = options[i].id
+        if spec ~= current and spec ~= currentRule then
+            if hasRows("MainHand", spec) or hasRows("SecondaryHand", spec) then
+                jobs[#jobs + 1] = { spec = spec, weapons = true }
+            end
+            for s = 1, #slots do
+                if slots[s] ~= "MainHand" and hasRows(slots[s], spec) then
+                    jobs[#jobs + 1] = { spec = spec, slot = slots[s] }
+                end
+            end
+        end
+    end
+    self._otherSpecWarmRunning = true
+    local gen = self._otherSpecWarmGen
+    local index = 0
+    local idle = false
+    local function step()
+        if data:GetActiveBandCacheKey() ~= band or self._otherSpecWarmGen ~= gen then
+            self._otherSpecWarmRunning = nil
+            return
+        end
+        if idle then
+            idle = false
+            C_Timer.After(0, step)
+            return
+        end
+        index = index + 1
+        local job = jobs[index]
+        if not job then
+            self._otherSpecWarmRunning = nil
+            self._otherSpecWarmBand = band
+            return
+        end
+        self:WithSpecProbe(job.spec, function()
+            if job.weapons then
+                self:UnfilteredWeaponList()
+            else
+                self:GetSlotRankList(job.slot, nil)
+            end
+        end)
+        idle = true
+        C_Timer.After(0, step)
+    end
+    C_Timer.After(0, step)
 end
 
 function GQ.Log:HuntDisplayRank(entry)
@@ -16042,53 +16769,54 @@ function GQ.Log:GetSlotRankList(slotName, handKind)
     local pool = {}
     local seen = {}
     local equip = GQ.Equip
-    local prevSuppress = equip and equip._suppressItemPrime
-    if equip then
-        equip._suppressItemPrime = true
-    end
     local loadSlots = { dataSlot }
     if handKind == "both" and dataSlot == "MainHand" then
         -- The weapons (i) list is both hands. The index uses that same list.
         loadSlots[2] = "SecondaryHand"
     end
-    for s = 1, #loadSlots do
-        local loadSlot = loadSlots[s]
-        local slotPool = {}
-        for _, key in ipairs(GQ.Data:GetCandidateSlotKeys(loadSlot)) do
-            for _, entry in ipairs(GQ.Data:GetClassSlotEntryList(key) or {}) do
-                if entry and entry.id
-                    and GQ.Data:ShouldShowEntry(entry)
-                    and GQ.Data:EntryMatchesPlayerBand(entry)
-                    and (not equip or not equip.EntryArmorIsWearable or equip:EntryArmorIsWearable(entry, loadSlot))
-                    and (not handKind or self:EntryInWeaponHand(entry, loadSlot, handKind)) then
-                    local fact = GQ.Data:GetItemFact(entry.itemId)
-                    local req = fact and fact.reqLevel
-                    if not (type(req) == "number" and req > 1 and req > level) then
-                        slotPool[#slotPool + 1] = entry
+    local function collect()
+        for s = 1, #loadSlots do
+            local loadSlot = loadSlots[s]
+            local slotPool = {}
+            for _, key in ipairs(GQ.Data:GetCandidateSlotKeys(loadSlot)) do
+                for _, entry in ipairs(GQ.Data:GetClassSlotEntryList(key) or {}) do
+                    if entry and entry.id
+                        and GQ.Data:ShouldShowEntry(entry)
+                        and GQ.Data:EntryMatchesPlayerBand(entry)
+                        and (not equip or not equip.EntryArmorIsWearable or equip:EntryArmorIsWearable(entry, loadSlot))
+                        and (not handKind or self:EntryInWeaponHand(entry, loadSlot, handKind)) then
+                        local fact = GQ.Data:GetItemFact(entry.itemId)
+                        local req = fact and fact.reqLevel
+                        if not (type(req) == "number" and req > 1 and req > level) then
+                            slotPool[#slotPool + 1] = entry
+                        end
                     end
                 end
             end
-        end
-        slotPool = GQ.Data:FilterToActiveBand(slotPool) or slotPool
-        for i = 1, #slotPool do
-            local entry = slotPool[i]
-            if entry.id and not seen[entry.id] then
-                seen[entry.id] = true
-                pool[#pool + 1] = entry
+            slotPool = GQ.Data:FilterToActiveBand(slotPool) or slotPool
+            for i = 1, #slotPool do
+                local entry = slotPool[i]
+                if entry.id and not seen[entry.id] then
+                    seen[entry.id] = true
+                    pool[#pool + 1] = entry
+                end
             end
         end
     end
     if equip then
-        equip._suppressItemPrime = prevSuppress
+        equip:WithoutItemPrime(collect)
+    else
+        collect()
     end
     pool = GQ.Data:DeduplicateEntriesByItem(pool)
+    local scores = self:WeaponCompareScoreMap(pool)
     table.sort(pool, function(a, b)
         -- A later band start is not a better weapon. The off hand can be on
         -- 44-44 while the two-handers are on 43-46. Score order is the rank.
         -- One-handers that pair with an off hand use that combined score.
         if handKind == "both" then
-            local scoreA = (self.WeaponCompareScore and self:WeaponCompareScore(a)) or (a.pipelineScore or 0)
-            local scoreB = (self.WeaponCompareScore and self:WeaponCompareScore(b)) or (b.pipelineScore or 0)
+            local scoreA = scores[a]
+            local scoreB = scores[b]
             if scoreA ~= scoreB then
                 return scoreA > scoreB
             end
@@ -16099,8 +16827,8 @@ function GQ.Log:GetSlotRankList(slotName, handKind)
         if rankA ~= rankB then
             return rankA < rankB
         end
-        local scoreA = (self.WeaponCompareScore and self:WeaponCompareScore(a)) or (a.pipelineScore or 0)
-        local scoreB = (self.WeaponCompareScore and self:WeaponCompareScore(b)) or (b.pipelineScore or 0)
+        local scoreA = scores[a]
+        local scoreB = scores[b]
         if scoreA ~= scoreB then
             return scoreA > scoreB
         end
@@ -16183,6 +16911,12 @@ function GQ.Log:EnsureSlotRankPanel()
         self.scroll:SetVerticalScroll(nextScroll)
         self:UpdateBar()
     end)
+    panel:SetScript("OnMouseUp", function(self, button)
+        local owner = self.owner
+        if button == "LeftButton" and owner and owner.rowType == "header" and GQ.Log then
+            GQ.Log:OpenSlotRankInLookup(owner)
+        end
+    end)
 
     panel.watch = CreateFrame("Frame", nil, panel)
     panel.watch:Hide()
@@ -16236,10 +16970,7 @@ function GQ.Log:EntryIsEquippedInSlots(entry, invSlots)
     return false
 end
 
-function GQ.Log:ShowSlotRankTooltip(row)
-    if not row or not GQ.Data then
-        return
-    end
+function GQ.Log:SlotRankListEntries(row)
     local slotName = row.slotName
     local handKind = row.handKind
     local weaponList = (slotName == "MainHand" or slotName == "WeaponPair") and self:IsWeaponHandKind(handKind)
@@ -16254,6 +16985,16 @@ function GQ.Log:ShowSlotRankTooltip(row)
     if not title or title == "" then
         title = (GQ.Data.SlotHeaderLabel and GQ.Data:SlotHeaderLabel(slotName)) or slotName or L["Slot"]
     end
+    return entries or {}, weaponList, title
+end
+
+function GQ.Log:ShowSlotRankTooltip(row)
+    if not row or not GQ.Data then
+        return
+    end
+    local slotName = row.slotName
+    local handKind = row.handKind
+    local entries, weaponList, title = self:SlotRankListEntries(row)
 
     local scoreOn = GQ.Data.GearScoreTooltipEnabled and GQ.Data:GearScoreTooltipEnabled()
     local scoreSim = scoreOn and GQ.IsPreviewEnabled and GQ:IsPreviewEnabled()
@@ -16322,7 +17063,11 @@ function GQ.Log:ShowSlotRankTooltip(row)
     panel.owner = row
     panel.title:SetText(title)
     panel.sub:SetWordWrap(true)
-    panel.sub:SetText(scoreSim and L["Turn off simulation mode to see your GearQuest Score for this item"] or L["Ranked for your level."])
+    local sub = scoreSim and L["Turn off simulation mode to see your GearQuest Score for this item"] or L["Ranked for your level."]
+    if #entries > 0 then
+        sub = sub .. "\n" .. L["Click to open this list in Lookup."]
+    end
+    panel.sub:SetText(sub)
     panel.probe:SetText(title)
     local width = panel.probe:GetStringWidth() or 160
     panel.probe:SetText(L["Ranked for your level."])
@@ -16619,7 +17364,7 @@ function GQ.Log:WrapCoordLines(text, width)
     if drawn and drawn.GetFont and probe.SetFont then
         local font, size, flags = drawn:GetFont()
         if font and size then
-            probe:SetFont(font, size, flags)
+            GQ:SetLocaleFont(probe, font, size, flags)
         end
     end
     probe:SetWordWrap(false)
@@ -16699,6 +17444,146 @@ function GQ.Log:FitCoordLine(fs, text)
     fs:SetWidth(math.ceil(width))
 end
 
+-- The client names the recipe and answers the hover. The stored English
+-- name stands in until the client has the item, or when English is chosen
+-- on a client in another language.
+function GQ.Log:DetailRecipeName(recipe)
+    local recipeId = recipe[1]
+    local active = GQ.ActiveLocale
+    local english = active ~= GQ.LOCALE and (not active or active == "enUS" or active == "enGB")
+    local name, quality
+    if not english and GetItemInfo and (not (GQ.Equip and GQ.Equip.IsItemDataCached) or GQ.Equip:IsItemDataCached(recipeId)) then
+        local clientName, _, clientQuality = GetItemInfo(recipeId)
+        if type(clientName) == "string" and clientName ~= "" then
+            name, quality = clientName, clientQuality
+        end
+    end
+    if not name and not english and C_Item and C_Item.RequestLoadItemDataByID then
+        pcall(C_Item.RequestLoadItemDataByID, recipeId)
+    end
+    return name or recipe[2], quality or recipe[4]
+end
+
+function GQ.Log:PaintDetailRecipe()
+    local button = self.frame and self.frame.detailRecipe
+    local recipe = button and button.recipe
+    if not recipe then
+        return
+    end
+    local name, quality = self:DetailRecipeName(recipe)
+    local icon = GetItemInfoInstant and select(5, GetItemInfoInstant(recipe[1]))
+    button.icon:SetTexture(icon or recipe[3] or "Interface\\Icons\\INV_Misc_QuestionMark")
+    button.name:SetText(name or "")
+    local c = ITEM_QUALITY_COLORS and ITEM_QUALITY_COLORS[quality or 1]
+    if c then
+        button.name:SetTextColor(c.r, c.g, c.b)
+    else
+        button.name:SetTextColor(1, 1, 1)
+    end
+    local maxWidth = self.frame.detailBody:GetWidth() or 0
+    if maxWidth < 80 then
+        maxWidth = RIGHT_COLUMN_WIDTH - 28
+    end
+    local width = 22 + 8 + (button.name.GetUnboundedStringWidth and button.name:GetUnboundedStringWidth() or button.name:GetStringWidth() or 120) + 10
+    button:SetWidth(math.min(maxWidth, width))
+end
+
+function GQ.Log:RefreshDetailRecipeName(itemId)
+    local button = self.frame and self.frame.detailRecipe
+    if button and button:IsShown() and button.recipe and button.recipe[1] == itemId then
+        self:PaintDetailRecipe()
+    end
+end
+
+function GQ.Log:LayoutDetailRecipe(recipe, tailBody)
+    local frame = self.frame
+    if not frame or not frame.detailBody then
+        return
+    end
+    local button = frame.detailRecipe
+    if recipe and not button then
+        button = CreateFrame("Button", nil, frame.detailChild)
+        button:SetHeight(22)
+        button:RegisterForClicks("LeftButtonUp")
+        button.icon = button:CreateTexture(nil, "ARTWORK")
+        button.icon:SetSize(22, 22)
+        button.icon:SetPoint("LEFT", button, "LEFT", 0, 0)
+        button.nameBg = button:CreateTexture(nil, "BACKGROUND")
+        button.nameBg:SetPoint("TOPLEFT", button.icon, "TOPRIGHT", 0, 0)
+        button.nameBg:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", 0, 0)
+        button.nameBg:SetColorTexture(0, 0, 0, 0.68)
+        button.name = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        button.name:SetPoint("LEFT", button.icon, "RIGHT", 8, 0)
+        button.name:SetPoint("RIGHT", button, "RIGHT", -6, 0)
+        button.name:SetJustifyH("LEFT")
+        button.name:SetWordWrap(false)
+        button:SetScript("OnEnter", function(self)
+            local id = self.recipe and self.recipe[1]
+            if not id then
+                return
+            end
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            GameTooltip.gqSkipScoreHook = true
+            if GetItemInfoInstant and GetItemInfoInstant(id) then
+                GameTooltip:SetItemByID(id)
+            else
+                local name, quality = GQ.Log:DetailRecipeName(self.recipe)
+                local c = ITEM_QUALITY_COLORS and ITEM_QUALITY_COLORS[quality or 1]
+                GameTooltip:SetText(name or "", c and c.r or 1, c and c.g or 1, c and c.b or 1)
+            end
+            GameTooltip:Show()
+            GameTooltip.gqSkipScoreHook = nil
+        end)
+        button:SetScript("OnLeave", function()
+            GameTooltip:Hide()
+        end)
+        button:SetScript("OnClick", function(self)
+            local id = self.recipe and self.recipe[1]
+            if id and TryHandleModifiedItemClick({ itemId = id }) then
+                GameTooltip:Hide()
+            end
+        end)
+        frame.detailRecipe = button
+    end
+    local tailFs = frame.detailBodyTail
+    if recipe and not tailFs then
+        tailFs = CreateFontStringWithFallback(frame.detailChild, QUEST_DETAIL_BODY_FONTS)
+        tailFs:SetJustifyH("LEFT")
+        tailFs:SetWordWrap(true)
+        tailFs:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
+        frame.detailBodyTail = tailFs
+    end
+    frame.detailBodyEnd = nil
+    if not recipe then
+        if button then
+            button.recipe = nil
+            button:Hide()
+        end
+        if tailFs then
+            tailFs:SetText("")
+            tailFs:Hide()
+        end
+        return
+    end
+    button.recipe = recipe
+    button:ClearAllPoints()
+    button:SetPoint("TOPLEFT", frame.detailBody, "BOTTOMLEFT", 0, -8)
+    button:Show()
+    self:PaintDetailRecipe()
+    frame.detailBodyEnd = button
+    if tailBody and tailBody ~= "" then
+        tailFs:ClearAllPoints()
+        tailFs:SetPoint("TOPLEFT", button, "BOTTOMLEFT", 0, -8)
+        tailFs:SetPoint("RIGHT", frame.detailChild, "RIGHT", -8, 0)
+        tailFs:SetText(tailBody)
+        tailFs:Show()
+        frame.detailBodyEnd = tailFs
+    else
+        tailFs:SetText("")
+        tailFs:Hide()
+    end
+end
+
 function GQ.Log:LayoutDetailCoords(entry, completedLine)
     local frame = self.frame
     if not frame or not frame.detailCoords or not frame.detailBody then
@@ -16710,7 +17595,8 @@ function GQ.Log:LayoutDetailCoords(entry, completedLine)
     end
     local done = frame.detailDone
     local reward = frame.detailRewardHeader
-    local anchor = frame.detailBody
+    local bodyEnd = frame.detailBodyEnd or frame.detailBody
+    local anchor = bodyEnd
     if not line or line == "" then
         frame.detailCoords:Hide()
         if frame.detailCoordsTail then
@@ -16724,7 +17610,7 @@ function GQ.Log:LayoutDetailCoords(entry, completedLine)
         self._nearestSpotKey = nil
     else
         frame.detailCoords:ClearAllPoints()
-        frame.detailCoords:SetPoint("TOPLEFT", frame.detailBody, "BOTTOMLEFT", 0, -16)
+        frame.detailCoords:SetPoint("TOPLEFT", bodyEnd, "BOTTOMLEFT", 0, -16)
         local maxWidth = frame.detailBody:GetWidth() or 0
         if maxWidth < 40 then
             maxWidth = (frame.detailChild and frame.detailChild:GetWidth() or 0) - 16
@@ -16885,8 +17771,19 @@ function GQ.Log:EnsureCoordinateWatch()
     watch:SetScript("OnEvent", function(_, event)
         local log = _G.GearQuest and _G.GearQuest.Log
         if event == "QUEST_TURNED_IN" or event == "QUEST_LOG_UPDATE" then
-            if GQ.Data and GQ.Data.NoteCompletedQuestChange then
-                GQ.Data:NoteCompletedQuestChange(log)
+            -- QUEST_LOG_UPDATE fires on every objective tick, and the completed
+            -- list is thousands of ids. Only a turn-in changes that count, and
+            -- the client can finish writing it a few updates later.
+            local data = GQ.Data
+            if data and data.NoteCompletedQuestChange then
+                local now = GetTime and GetTime() or 0
+                if event == "QUEST_TURNED_IN" then
+                    data._questCountArmedUntil = now + 10
+                    data:NoteCompletedQuestChange(log)
+                elseif data._doneQuestTitlesWeak or data._doneQuestCount == nil
+                    or (data._questCountArmedUntil and now <= data._questCountArmedUntil) then
+                    data:NoteCompletedQuestChange(log)
+                end
             end
             return
         end
@@ -16952,11 +17849,31 @@ function GQ.Log:ApplyEntryDetail(entry)
     if lines[1] then
         lines[1] = GQ.TL(lines[1])
     end
-    local body = table.concat(lines, "\n")
+    -- The recipe row sits between the text before the craft skill line and
+    -- the text from that line on.
+    local recipeAt = lines.recipeAt
+    local head, tail = lines, nil
+    if recipeAt then
+        head, tail = {}, {}
+        for i = 1, #lines do
+            if i < recipeAt then
+                head[#head + 1] = lines[i]
+            else
+                tail[#tail + 1] = lines[i]
+            end
+        end
+        if tail[1] then
+            tail[1] = tail[1]:gsub("^\n+", "")
+        end
+    end
+    local body = table.concat(head, "\n"):gsub("^\n+", "")
+    local tailBody = tail and table.concat(tail, "\n") or ""
     if GQ.Data and GQ.Data.SanitizeText then
         body = GQ.Data:SanitizeText(body) or body
+        tailBody = GQ.Data:SanitizeText(tailBody) or tailBody
     end
     self.frame.detailBody:SetText(body)
+    self:LayoutDetailRecipe(recipeAt and entry.itemId and GQ.CraftRecipes[entry.itemId], tailBody)
 
     self:UpdateDetailReward(entry)
     self:LayoutDetailCoords(entry, completedLine)
@@ -17128,7 +18045,8 @@ function GQ.Log:CasterBisOffHand()
     return best
 end
 
-function GQ.Log:WeaponCompareScore(entry)
+-- off is the partner already looked up for a whole pool; false means none.
+function GQ.Log:WeaponCompareScore(entry, off)
     local score = entry and entry.pipelineScore or 0
     if not entry or not GQ.Data or not GQ.Data.PairsWeaponWithOffHand or not GQ.Data:PairsWeaponWithOffHand() then
         return score
@@ -17136,11 +18054,25 @@ function GQ.Log:WeaponCompareScore(entry)
     if not GQ.Data:EntryIsDamagingWeapon(entry) or GQ.Data:EntryIsTwoHand(entry) or GQ.Data:EntryIsOffHandOnly(entry) then
         return score
     end
-    local off = self:CasterBisOffHand()
+    if off == nil then
+        off = self:CasterBisOffHand()
+    end
     if not off or off.itemId == entry.itemId then
         return score
     end
     return score + (off.pipelineScore or 0)
+end
+
+-- A sort compares each weapon many times. Score each one once.
+function GQ.Log:WeaponCompareScoreMap(pool)
+    local scores = {}
+    local paired = GQ.Data and GQ.Data.PairsWeaponWithOffHand and GQ.Data:PairsWeaponWithOffHand()
+    local off = paired and self:CasterBisOffHand() or false
+    for i = 1, #pool do
+        local entry = pool[i]
+        scores[entry] = self:WeaponCompareScore(entry, off)
+    end
+    return scores
 end
 
 function GQ.Log:OffHandPairNote(entry)
@@ -17197,48 +18129,49 @@ function GQ.Log:BuildCollectWeaponPool()
     local seen = {}
     local playerLevel = GQ:GetEffectiveLevel() or 1
     local equip = GQ.Equip
-    local prevSuppress = equip and equip._suppressItemPrime
-    if equip then
-        equip._suppressItemPrime = true
-    end
     local slots = { "MainHand", "SecondaryHand" }
-    for s = 1, #slots do
-        local slotName = slots[s]
-        -- Each hand keeps the band that contains this level. The off hand
-        -- often spans fewer levels than the two-handers. Filtering the two
-        -- hands together kept the shorter band and dropped Two-hand.
-        local slotPool = {}
-        for _, key in ipairs(GQ.Data:GetCandidateSlotKeys(slotName) or {}) do
-            for _, entry in ipairs(GQ.Data:GetClassSlotEntryList(key) or {}) do
-                if entry and entry.id
-                    and not entry.healOnly
-                    and GQ.Data:ShouldShowEntry(entry)
-                    and GQ.Data:EntryMatchesPlayer(entry)
-                    and GQ.Data:EntryIsDamagingWeapon(entry)
-                    and (not equip or not equip.EntryMatchesSpec or equip:EntryMatchesSpec(entry))
-                    and (not equip or not equip.MeetsRequiredLevel or equip:MeetsRequiredLevel(entry.itemId, playerLevel))
-                then
-                    slotPool[#slotPool + 1] = entry
+    local function collect()
+        for s = 1, #slots do
+            local slotName = slots[s]
+            -- Each hand keeps the band that contains this level. The off hand
+            -- often spans fewer levels than the two-handers. Filtering the two
+            -- hands together kept the shorter band and dropped Two-hand.
+            local slotPool = {}
+            for _, key in ipairs(GQ.Data:GetCandidateSlotKeys(slotName) or {}) do
+                for _, entry in ipairs(GQ.Data:GetClassSlotEntryList(key) or {}) do
+                    if entry and entry.id
+                        and not entry.healOnly
+                        and GQ.Data:ShouldShowEntry(entry)
+                        and GQ.Data:EntryMatchesPlayer(entry)
+                        and GQ.Data:EntryIsDamagingWeapon(entry)
+                        and (not equip or not equip.EntryMatchesSpec or equip:EntryMatchesSpec(entry))
+                        and (not equip or not equip.MeetsRequiredLevel or equip:MeetsRequiredLevel(entry.itemId, playerLevel))
+                    then
+                        slotPool[#slotPool + 1] = entry
+                    end
+                end
+            end
+            slotPool = GQ.Data:FilterToActiveBand(slotPool) or slotPool
+            for i = 1, #slotPool do
+                local entry = slotPool[i]
+                if entry.id and not seen[entry.id] then
+                    seen[entry.id] = true
+                    pool[#pool + 1] = entry
                 end
             end
         end
-        slotPool = GQ.Data:FilterToActiveBand(slotPool) or slotPool
-        for i = 1, #slotPool do
-            local entry = slotPool[i]
-            if entry.id and not seen[entry.id] then
-                seen[entry.id] = true
-                pool[#pool + 1] = entry
-            end
-        end
     end
     if equip then
-        equip._suppressItemPrime = prevSuppress
+        equip:WithoutItemPrime(collect)
+    else
+        collect()
     end
     -- Both hands are already on the band that contains this level. A band
     -- that starts one level later does not outrank a higher score.
+    local scores = self:WeaponCompareScoreMap(pool)
     table.sort(pool, function(a, b)
-        local scoreA = self:WeaponCompareScore(a)
-        local scoreB = self:WeaponCompareScore(b)
+        local scoreA = scores[a]
+        local scoreB = scores[b]
         if scoreA ~= scoreB then
             return scoreA > scoreB
         end
@@ -18958,6 +19891,96 @@ function GQ.Log:ShowLookupDetail(item)
     self:PaintLookupRows()
 end
 
+-- Rows are made on demand, so a long list scrolls instead of stopping at ten.
+function GQ.Log:EnsureLookupRow(frame, i)
+    local existing = frame.lookupRows[i]
+    if existing then
+        return existing
+    end
+    local row = CreateFrame("Button", nil, frame.lookupScrollChild)
+    row:SetHeight(18)
+    row:RegisterForClicks("LeftButtonUp")
+    row.highlight = row:CreateTexture(nil, "BACKGROUND")
+    row.highlight:SetAllPoints()
+    row.highlight:SetColorTexture(0.28, 0.22, 0.08, 0.55)
+    row.highlight:Hide()
+    row.icon = row:CreateTexture(nil, "ARTWORK")
+    row.icon:SetSize(16, 16)
+    row.icon:SetPoint("LEFT", row, "LEFT", 4, 0)
+    row.text = row:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    row.text:SetPoint("LEFT", row.icon, "RIGHT", 4, 0)
+    row.text:SetPoint("RIGHT", row, "RIGHT", -22, 0)
+    row.text:SetJustifyH("LEFT")
+    row.text:SetWordWrap(false)
+    row.info = CreateFrame("Button", nil, row)
+    row.info:SetSize(13, 13)
+    row.info:SetPoint("RIGHT", row, "RIGHT", -4, 0)
+    row.info:SetFrameLevel(row:GetFrameLevel() + 5)
+    row.info.icon = row.info:CreateTexture(nil, "OVERLAY")
+    row.info.icon:SetAllPoints()
+    row.info.icon:SetTexture("Interface\\FriendsFrame\\InformationIcon")
+    row.info:SetScript("OnEnter", function(self)
+        local parent = self:GetParent()
+        HideItemTooltip()
+        if parent and parent.lookupItem and GQ.Log then
+            GQ.Log:ShowLookupRankTooltip(self, parent.lookupItem)
+        end
+    end)
+    row.info:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+    row.info:SetScript("OnClick", function()
+    end)
+    row:SetScript("OnEnter", function(self)
+        if self.entry then
+            ShowItemTooltipForRow(self)
+        end
+        if self.highlight and self.lookupItem then
+            self.highlight:Show()
+        end
+    end)
+    row:SetScript("OnLeave", function(self)
+        if self.info and self.info:IsMouseOver() then
+            return
+        end
+        HideItemTooltip()
+        local selected = GQ.Log and self.lookupItem and self.lookupItem.key == GQ.Log.lookupItemKey
+        if self.highlight then
+            if selected then
+                self.highlight:Show()
+            else
+                self.highlight:Hide()
+            end
+        end
+    end)
+    row:SetScript("OnClick", function(self)
+        HideItemTooltip()
+        if self.lookupItem and GQ.Log then
+            GQ.Log:ShowLookupDetail(self.lookupItem)
+        end
+    end)
+    if frame.lookupScroll then
+        WireMouseWheel(row, frame.lookupScroll)
+        WireMouseWheel(row.info, frame.lookupScroll)
+    end
+    row:Hide()
+    frame.lookupRows[i] = row
+    self:PlaceLookupRow(frame, i)
+    return row
+end
+
+function GQ.Log:PlaceLookupRow(frame, i)
+    local row = frame.lookupRows and frame.lookupRows[i]
+    local child = frame.lookupScrollChild
+    if not row or not child then
+        return
+    end
+    row:ClearAllPoints()
+    row:SetPoint("TOPLEFT", child, "TOPLEFT", 2, -((i - 1) * 20))
+    row:SetPoint("RIGHT", child, "RIGHT", -4, 0)
+    row:SetHeight(18)
+end
+
 function GQ.Log:EnsureLookupWidgets(frame)
     if not frame or frame.lookupInset then
         return
@@ -19011,6 +20034,21 @@ function GQ.Log:EnsureLookupWidgets(frame)
     box:SetScript("OnEscapePressed", function(self)
         self:ClearFocus()
     end)
+    box:HookScript("OnEditFocusGained", function(self)
+        local log = GQ.Log
+        if not (log and log._lookupListText and self:GetText() == log._lookupListText) then
+            return
+        end
+        if C_Timer and C_Timer.After then
+            C_Timer.After(0, function()
+                if self:HasFocus() then
+                    self:HighlightText()
+                end
+            end)
+        else
+            self:HighlightText()
+        end
+    end)
     frame.lookupBox = box
 
     local search = CreateFrame("Button", "GearQuestLookupSearch", inset, "UIPanelButtonTemplate")
@@ -19046,70 +20084,7 @@ function GQ.Log:EnsureLookupWidgets(frame)
 
     frame.lookupRows = {}
     for i = 1, 10 do
-        local row = CreateFrame("Button", nil, resultsChild)
-        row:SetHeight(18)
-        row:RegisterForClicks("LeftButtonUp")
-        row.highlight = row:CreateTexture(nil, "BACKGROUND")
-        row.highlight:SetAllPoints()
-        row.highlight:SetColorTexture(0.28, 0.22, 0.08, 0.55)
-        row.highlight:Hide()
-        row.icon = row:CreateTexture(nil, "ARTWORK")
-        row.icon:SetSize(16, 16)
-        row.icon:SetPoint("LEFT", row, "LEFT", 4, 0)
-        row.text = row:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        row.text:SetPoint("LEFT", row.icon, "RIGHT", 4, 0)
-        row.text:SetPoint("RIGHT", row, "RIGHT", -22, 0)
-        row.text:SetJustifyH("LEFT")
-        row.text:SetWordWrap(false)
-        row.info = CreateFrame("Button", nil, row)
-        row.info:SetSize(13, 13)
-        row.info:SetPoint("RIGHT", row, "RIGHT", -4, 0)
-        row.info:SetFrameLevel(row:GetFrameLevel() + 5)
-        row.info.icon = row.info:CreateTexture(nil, "OVERLAY")
-        row.info.icon:SetAllPoints()
-        row.info.icon:SetTexture("Interface\\FriendsFrame\\InformationIcon")
-        row.info:SetScript("OnEnter", function(self)
-            local parent = self:GetParent()
-            HideItemTooltip()
-            if parent and parent.lookupItem and GQ.Log then
-                GQ.Log:ShowLookupRankTooltip(self, parent.lookupItem)
-            end
-        end)
-        row.info:SetScript("OnLeave", function()
-            GameTooltip:Hide()
-        end)
-        row.info:SetScript("OnClick", function()
-        end)
-        row:SetScript("OnEnter", function(self)
-            if self.entry then
-                ShowItemTooltipForRow(self)
-            end
-            if self.highlight and self.lookupItem then
-                self.highlight:Show()
-            end
-        end)
-        row:SetScript("OnLeave", function(self)
-            if self.info and self.info:IsMouseOver() then
-                return
-            end
-            HideItemTooltip()
-            local selected = GQ.Log and self.lookupItem and self.lookupItem.key == GQ.Log.lookupItemKey
-            if self.highlight then
-                if selected then
-                    self.highlight:Show()
-                else
-                    self.highlight:Hide()
-                end
-            end
-        end)
-        row:SetScript("OnClick", function(self)
-            HideItemTooltip()
-            if self.lookupItem and GQ.Log then
-                GQ.Log:ShowLookupDetail(self.lookupItem)
-            end
-        end)
-        row:Hide()
-        frame.lookupRows[i] = row
+        self:EnsureLookupRow(frame, i)
     end
 
     local wait = CreateFrame("Frame", nil, resultsScroll)
@@ -19184,12 +20159,8 @@ function GQ.Log:LayoutLookupPage(frame)
             scrollWidth = width
         end
         child:SetWidth(math.max(scrollWidth, 40))
-        for i = 1, 10 do
-            local row = frame.lookupRows[i]
-            row:ClearAllPoints()
-            row:SetPoint("TOPLEFT", child, "TOPLEFT", 2, -((i - 1) * 20))
-            row:SetPoint("RIGHT", child, "RIGHT", -4, 0)
-            row:SetHeight(18)
+        for i = 1, #frame.lookupRows do
+            self:PlaceLookupRow(frame, i)
         end
         if frame.lookupEmpty then
             frame.lookupEmpty:SetParent(child)
@@ -19306,9 +20277,11 @@ function GQ.Log:PaintLookupRows()
             frame.lookupEmpty:Hide()
         end
     end
-    for i = 1, 10 do
-        local row = frame.lookupRows[i]
+    local places = self._lookupPlaces
+    local shown = searched and count or 0
+    for i = 1, math.max(#frame.lookupRows, shown) do
         local item = searched and results and results[i]
+        local row = item and self:EnsureLookupRow(frame, i) or frame.lookupRows[i]
         if item then
             row.lookupItem = item
             row.entry = self:LookupDetailEntry(item)
@@ -19326,7 +20299,12 @@ function GQ.Log:PaintLookupRows()
                 item.nameLower = GQ.FoldText(item.name)
                 item.clientNamed = true
             end
-            row.text:SetText(item.name or "")
+            local place = places and places[i]
+            if place then
+                row.text:SetText("|cffffd100#" .. tostring(place) .. "|r " .. (item.name or ""))
+            else
+                row.text:SetText(item.name or "")
+            end
             row.text:SetTextColor(r, g, b)
             if item.key == self.lookupItemKey then
                 row.highlight:Show()
@@ -19385,12 +20363,20 @@ function GQ.Log:ApplyLookupHits(classFile, query)
     end
     local results = {}
     local limit = #hits
-    if limit > 10 then
-        limit = 10
+    if limit > self.LOOKUP_RESULT_LIMIT then
+        limit = self.LOOKUP_RESULT_LIMIT
     end
     for i = 1, limit do
         results[i] = hits[i].item
     end
+    self._lookupPlaces = nil
+    self._lookupListText = nil
+    self:ShowLookupResults(results)
+end
+
+GQ.Log.LOOKUP_RESULT_LIMIT = 100
+
+function GQ.Log:ShowLookupResults(results)
     self._lookupResults = results
     local still = false
     for i = 1, #results do
@@ -19405,8 +20391,91 @@ function GQ.Log:ApplyLookupHits(classFile, query)
         self:ClearDetail()
     end
     self:HideLookupSearchWait()
+    if self.frame and self.frame.lookupScroll then
+        self.frame.lookupScroll:SetVerticalScroll(0)
+    end
     self:PaintLookupRows()
     self:UpdateFooterButtons()
+end
+
+-- The (i) list of a slot, in its rank order. Typing in the box replaces it
+-- with a normal search.
+function GQ.Log:OpenSlotRankInLookup(row)
+    if not row or not self.frame or not GQ.Data then
+        return
+    end
+    local entries, weaponList, title = self:SlotRankListEntries(row)
+    if #entries == 0 then
+        return
+    end
+    local places = {}
+    for i = 1, #entries do
+        places[i] = weaponList and self.WeaponTrueRank and self:WeaponTrueRank(entries[i]) or i
+    end
+    title = tostring(title or ""):gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", ""):gsub("%*+$", "")
+    local label = string.format(L["%s rank list"], title)
+    self:HideSlotRankPanel()
+    if self:GetPageTab() ~= "lookup" then
+        self:SetPageTab("lookup")
+    end
+    local frame = self.frame
+    if not frame.lookupBox then
+        return
+    end
+    local _, classFile = self:LookupClassName()
+    self._lookupSerial = (self._lookupSerial or 0) + 1
+    local serial = self._lookupSerial
+    self._lookupListText = label
+    frame.lookupBox:SetText(label)
+    frame.lookupBox:ClearFocus()
+    local indexReady = self._lookupIndex and self._lookupIndexClass == classFile and not self._lookupBuild
+    if not indexReady then
+        self:ShowLookupSearchWait()
+    end
+    self:EnsureLookupIndex(classFile, function()
+        local log = GQ.Log
+        if log and log._lookupSerial == serial then
+            log:ApplyLookupList(classFile, entries, places, label)
+        end
+    end)
+end
+
+function GQ.Log:ApplyLookupList(classFile, entries, places, label)
+    if not self.frame or self._lookupIndexClass ~= classFile or self._lookupBuild then
+        return
+    end
+    local byKey = {}
+    local index = self._lookupIndex or {}
+    for i = 1, #index do
+        byKey[index[i].key] = index[i]
+    end
+    local results, shownPlaces, seen = {}, {}, {}
+    for i = 1, #entries do
+        local entry = entries[i]
+        local key = tostring(entry.itemId) .. "\0" .. tostring(entry.suffix or "")
+        if not seen[key] then
+            seen[key] = true
+            local item = byKey[key]
+            if not item then
+                local name = self:LookupDisplayName(entry)
+                item = {
+                    key = key,
+                    itemId = entry.itemId,
+                    name = name,
+                    nameLower = GQ.FoldText(name),
+                    englishLower = self:LookupEnglishName(entry),
+                    entries = { entry },
+                }
+            end
+            results[#results + 1] = item
+            shownPlaces[#results] = places[i]
+        end
+    end
+    self._lookupSearched = true
+    self._lookupClass = classFile
+    self._lookupPlaces = shownPlaces
+    self._lookupListText = label
+    self:ShowLookupResults(results)
 end
 
 function GQ.Log:RunLookup()
@@ -19415,6 +20484,9 @@ function GQ.Log:RunLookup()
     end
     local _, classFile = self:LookupClassName()
     local query = self.frame.lookupBox:GetText() or ""
+    if self._lookupPlaces and self._lookupListText and query == self._lookupListText then
+        return
+    end
     query = GQ.FoldText((strtrim and strtrim(query)) or query:gsub("^%s+", ""):gsub("%s+$", ""))
     self._lookupSerial = (self._lookupSerial or 0) + 1
     local serial = self._lookupSerial
@@ -19447,6 +20519,8 @@ function GQ.Log:ReleaseLookupIndex()
     self._lookupSerial = (self._lookupSerial or 0) + 1
     self:HideLookupSearchWait()
     self._lookupResults = nil
+    self._lookupPlaces = nil
+    self._lookupListText = nil
     self._lookupSearched = false
     self._lookupClass = nil
     self.lookupItemKey = nil
@@ -19505,6 +20579,8 @@ function GQ.Log:RefreshLookup()
         self._lookupSerial = (self._lookupSerial or 0) + 1
         self:HideLookupSearchWait()
         self._lookupResults = nil
+        self._lookupPlaces = nil
+        self._lookupListText = nil
         self._lookupSearched = false
         self.lookupItemKey = nil
         self.lookupEntry = nil

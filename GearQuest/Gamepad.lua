@@ -389,6 +389,7 @@ function GQ.Log:GamepadOverlay()
         frame and frame.sourceFilterMenu,
         frame and frame.playStylePanel,
         frame and frame.specPicker,
+        frame and frame.settingsLanguageMenu,
         self.weaponMenu,
     }
     local best, bestLevel
@@ -448,13 +449,25 @@ function GQ.Log:GamepadIsListTab(widget)
         or widget == frame.tabRemoved or widget == frame.tabTracked) or false
 end
 
+-- Y reaches the controls around the hunts: the filters, the header arrow
+-- and (i), Hunts per gear slot, the spec name, and Turn off simulation.
 function GQ.Log:GamepadIsFilterTarget(widget)
     local frame = self.frame
-    if frame and (widget == frame.sourceFilterBtn or widget == frame.playStyleBtn) then
+    if frame and (widget == frame.sourceFilterBtn or widget == frame.playStyleBtn
+        or widget == frame.huntsPerSlotSlider or widget == frame.simHeaderOffBtn) then
+        return true
+    end
+    if widget.gqPadFilter then
         return true
     end
     local parent = widget.GetParent and widget:GetParent()
-    return parent and parent.weaponArrow == widget or false
+    if not parent then
+        return false
+    end
+    if parent.weaponArrow == widget then
+        return true
+    end
+    return parent.rowType == "header" and parent.info == widget
 end
 
 function GQ.Log:GamepadCandidates()
@@ -510,13 +523,32 @@ local function CallHandler(widget, name)
     end
 end
 
--- Mouse OnLeave closes filter flyouts. Only hunt rows and their (i) buttons
--- use those handlers, so a pad move can show the same tooltip a hover would.
+-- Hunt rows and their (i) buttons get the hover handlers, so a pad move can
+-- show the same tooltip a hover would. Inside the source filter menu a source
+-- row opens its flyout on hover, and the flyout rows keep it open, the same as
+-- the mouse. A click there only toggles the source.
+local function InSourceFilterMenu(widget)
+    local log = GQ.Log
+    local menu = log and log.frame and log.frame.sourceFilterMenu
+    local node = widget
+    while menu and node do
+        if node == menu then
+            return true
+        end
+        node = node.GetParent and node:GetParent()
+    end
+    return false
+end
+
 local function HoverWidget(widget)
     if not widget then
         return false
     end
     if widget.rowType or widget.entry or widget.lookupItem then
+        return true
+    end
+    local frame = GQ.Log and GQ.Log.frame
+    if (frame and widget == frame.detailRecipe) or InSourceFilterMenu(widget) then
         return true
     end
     local parent = widget.GetParent and widget:GetParent()
@@ -706,6 +738,20 @@ function GQ.Log:GamepadSetFocus(widget)
     end
 end
 
+-- The window close button sits above everything else. A first pick there
+-- turned the next A into closing the log.
+function GQ.Log:GamepadIsWindowClose(widget)
+    local frame = self.frame
+    if not frame or not widget then
+        return false
+    end
+    if widget == frame.CloseButton then
+        return true
+    end
+    local name = frame.GetName and frame:GetName()
+    return name ~= nil and widget == _G[name .. "CloseButton"]
+end
+
 function GQ.Log:GamepadPickInitial(list)
     local bubble = self:GamepadGuideBubble()
     if bubble and self:GamepadOverlay() == bubble and Usable(bubble.yes) then
@@ -716,11 +762,27 @@ function GQ.Log:GamepadPickInitial(list)
     end
     local best, bestY, bestX
     local rowBest, rowY, rowX
-    local preferRow = not self._padFilterMode and not self:GamepadOverlay()
+    local overlay = self:GamepadOverlay()
+    local preferRow = not self._padFilterMode and not overlay
         and (self.GetPageTab and self:GetPageTab() or "log") == "log"
+    -- Select all and Deselect all sit above the sources. Opening there made
+    -- one A clear every source.
+    if overlay and self.frame and overlay == self.frame.sourceFilterMenu then
+        local first, firstY
+        for i = 1, #list do
+            local widget = list[i]
+            local _, y = widget:GetCenter()
+            if widget.sourceId and y and (not first or y > firstY) then
+                first, firstY = widget, y
+            end
+        end
+        if first then
+            return first
+        end
+    end
     for i = 1, #list do
         local widget = list[i]
-        if not self:GamepadIsPageTab(widget) then
+        if not self:GamepadIsPageTab(widget) and not (#list > 1 and self:GamepadIsWindowClose(widget)) then
             local x, y = widget:GetCenter()
             if y then
                 if not best or y > bestY + 4 or (math.abs(y - bestY) <= 4 and x < bestX) then
@@ -986,14 +1048,39 @@ function GQ.Log:GamepadListStep(direction, focus, list)
     return best or focus, true
 end
 
--- Up and down walk the next control in that direction. The nearest row wins,
--- and a control in the same column wins over one far to the side.
+-- Up and down walk the next control in that column. A control whose left and
+-- right edges overlap the focus is in the column. Settings, Lookup, and the
+-- Simulator keep a list beside the page, 24 pixels a row, and the nearest
+-- row overall jumped into it. Only when the column has nothing left does a
+-- control close to the side count, and past that the move stops.
+GQ.Log.PAD_COLUMN_SLACK = 8
+GQ.Log.PAD_SIDE_REACH = 140
+
 function GQ.Log:GamepadVerticalStep(direction, focus, list)
     local ox, oy = focus:GetCenter()
     if not oy then
         return nil, false
     end
+    local slack = self.PAD_COLUMN_SLACK
+    local fl = focus.GetLeft and focus:GetLeft()
+    local fr = focus.GetRight and focus:GetRight()
+    -- The log's filter controls are scattered over the window. Those keep
+    -- the nearest control in that direction.
+    local scattered = self._padFilterMode and not self:GamepadOverlay()
+        and (self.GetPageTab and self:GetPageTab() or "log") == "log"
+    local function inColumn(widget)
+        if scattered then
+            return true
+        end
+        if not fl or not fr then
+            return false
+        end
+        local l = widget.GetLeft and widget:GetLeft()
+        local r = widget.GetRight and widget:GetRight()
+        return l ~= nil and r ~= nil and l <= fr + slack and r >= fl - slack
+    end
     local best, bestDy, bestDx
+    local side, sideDy, sideDx
     for i = 1, #list do
         local widget = list[i]
         if widget ~= focus then
@@ -1002,16 +1089,20 @@ function GQ.Log:GamepadVerticalStep(direction, focus, list)
                 local dy = (direction == "down") and (oy - y) or (y - oy)
                 if dy > 4 then
                     local dx = math.abs((x or 0) - (ox or 0))
-                    local nearer = not best or dy < bestDy - 4 or (math.abs(dy - bestDy) <= 4 and dx < bestDx)
-                    if nearer then
-                        best = widget
-                        bestDy = dy
-                        bestDx = dx
+                    if inColumn(widget) then
+                        if not best or dy < bestDy - 4 or (math.abs(dy - bestDy) <= 4 and dx < bestDx) then
+                            best, bestDy, bestDx = widget, dy, dx
+                        end
+                    elseif dx <= self.PAD_SIDE_REACH then
+                        if not side or dy < sideDy - 4 or (math.abs(dy - sideDy) <= 4 and dx < sideDx) then
+                            side, sideDy, sideDx = widget, dy, dx
+                        end
                     end
                 end
             end
         end
     end
+    best = best or side
     if not best then
         return focus, true
     end
@@ -1388,7 +1479,7 @@ function GQ.Log:GamepadIsOurFrame(widget)
     while node do
         if node == frame or node == frame.sideTabRail or node == self.weaponMenu
             or node == frame.sourceFilterMenu or node == frame.playStylePanel
-            or node == frame.specPicker then
+            or node == frame.specPicker or node == frame.settingsLanguageMenu then
             return true
         end
         node = node.GetParent and node:GetParent()
@@ -2094,20 +2185,6 @@ local NINE_EDGE = {
     "TopLeftCorner", "TopRightCorner", "BottomLeftCorner", "BottomRightCorner",
     "TopEdge", "BottomEdge", "LeftEdge", "RightEdge",
 }
-
-function GQ.Log:GamepadPanelRoot(widget)
-    local node = widget
-    local root = widget
-    while node and node.GetParent do
-        local parent = node:GetParent()
-        if not parent or parent == UIParent or parent == WorldFrame then
-            root = node
-            break
-        end
-        node = parent
-    end
-    return root
-end
 
 function GQ.Log:GamepadRestoreForeign()
     local list = self._padMuted

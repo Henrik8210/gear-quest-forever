@@ -1,4 +1,8 @@
 """
+LEGACY (TBC Anniversary). Do not run for Forever: it reads a TBC tbc.db that is not
+in this repo and would overwrite sources.json. Forever sources come from
+ingest_forever_wowhead.py and the Wowhead Forever listviews.
+
 Drop chances are deliberately NOT recorded or shown. The loot-table percentages in
 this world DB are per-row group weights, not the "chance this boss drops this item"
 figure a player sees on Wowhead -- Kel'Thuzad's Might of Menethil came out as

@@ -15,7 +15,8 @@ Does not touch client-pinned items or Greater Magic Wand 11288. A stated
 Requires Level wins over item level. Quality is taken from the live tooltip.
 
 One request at a time. GQ_TIP_DELAY seconds between items (default 1.5).
-`--ids 870,10657` refreshes only those rows.
+`--ids 870,10657` refreshes only those rows. Add `--refetch` to ask Wowhead
+again for those ids instead of reading them from the cache.
 """
 from __future__ import annotations
 
@@ -226,6 +227,11 @@ def main():
         tmp.write_text(json.dumps(obj, **kwargs), encoding="utf-8")
         tmp.replace(path)
 
+    # --refetch with --ids asks Wowhead again for those rows even when the
+    # cache has them, so a tooltip that changed after the last pass is read.
+    if "--refetch" in sys.argv and only is not None:
+        for iid in ids:
+            cache.pop(str(iid), None)
     pending = [i for i in ids if str(i) not in cache or retryable(cache[str(i)])]
     print(f"kind fixes {fixed_kind}; refresh {len(pending)} of {len(ids)}; delay {DELAY}s", flush=True)
 
@@ -316,7 +322,7 @@ def main():
         })
         sources[GRAVE] = src
 
-    dump(ITEMS, items, separators=(",", ":"), ensure_ascii=False)
+    dump(ITEMS, items, separators=(",", ":"), ensure_ascii=True)
     dump(SOURCES, sources, separators=(",", ":"), ensure_ascii=True)
     dump(HUNT, hunt, ensure_ascii=False)
     dump(TIPS, tips, ensure_ascii=False)
