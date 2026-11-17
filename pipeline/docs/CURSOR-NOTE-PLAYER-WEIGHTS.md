@@ -10,7 +10,7 @@ A typed Spell power weight scores the Spell Power stat only. The Equip line "Inc
 
 **Save and score items!** reorders that spec's existing hunts. It does not pull in a piece the base spec never ranked. The portrait spins on the GearQuest window until the hunt list is painted and can scroll. Weights are account-wide (`GearQuestForeverDB.customSpecs`). The selected spec stays on the character. Right-click edits. Delete removes it.
 
-Weapon style, pins, and the item pool stay the base spec's. Stats, weapon damage, armor class, the best suffix, Embrace of the Viper, and Rotmender's Raiment are scored again. A proc such as Thunderfury ranks on the printed stats. Stat rows are `GearQuest/_generated/Data.ItemStats.generated.lua`, written by `pipeline/scripts/emit_item_stats.py`.
+Weapon style, pins, and the item pool stay the base spec's. Stats, weapon damage, armor class, the best suffix, Embrace of the Viper, and Rotmender's Raiment are scored again. A proc such as Thunderfury ranks on the printed stats. Stat rows are `GearQuest/_generated/Data.ItemStats.generated.lua`, written by `pipeline/scripts/emit_item_stats.py`. Staging ships that file as the load-on-demand addon `GearQuestForever_ItemStats`, loaded by `GQ.Data:EnsureItemStats()` the first time a custom spec is scored.
 
 Simulating another class scores that class's custom spec after the class hunts are indexed. Turning simulation off scores the character's saved custom spec. A left click on a custom spec selects it after a reload.
 

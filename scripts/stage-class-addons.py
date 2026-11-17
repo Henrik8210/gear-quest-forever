@@ -5,6 +5,12 @@ The repo keeps every class file under GearQuest/_generated. At login only the
 player's class should be parsed. This copies each class into
 GearQuestForever_<CLASS> and moves that class's Wowhead tooltip text out of
 the main foreverAudit into AuditTips.lua, which loads with the class.
+
+The staged class files carry packed pick rows (stage_pack.py), so the game
+expands only the faction on screen. Item stats for custom specs go into
+GearQuestForever_ItemStats, which loads the first time a custom spec is
+scored. The staged coordinate file shares repeated spots. The repo files stay
+as they are.
 """
 
 from __future__ import annotations
@@ -13,9 +19,14 @@ import argparse
 import re
 from pathlib import Path
 
+import stage_pack
+
 ROOT = Path(__file__).resolve().parents[1]
 GENERATED = ROOT / "GearQuest" / "_generated"
 AUDIT_NAME = "Data.ForeverAudit.generated.lua"
+ITEM_STATS_NAME = "Data.ItemStats.generated.lua"
+ITEM_STATS_ADDON = "GearQuestForever_ItemStats"
+COORDINATES_NAME = "Data.Coordinates.generated.lua"
 
 CLASSES = {
     "PALADIN": (
@@ -140,16 +151,81 @@ def item_ids(path: Path) -> set[int]:
     return ids
 
 
-def copy_class_lua(src: Path, dest: Path) -> None:
-    raw = src.read_bytes()
-    old_crlf = (HEADER_OLD.replace("\n", "\r\n")).encode("ascii")
-    old_lf = HEADER_OLD.encode("ascii")
-    if raw.startswith(old_crlf):
-        raw = HEADER_NEW.replace("\n", "\r\n").encode("ascii") + raw[len(old_crlf) :]
-    elif raw.startswith(old_lf):
-        raw = HEADER_NEW.encode("ascii") + raw[len(old_lf) :]
+def swap_header(text: str) -> str:
+    """A load-on-demand file reads the main addon's table from _G."""
+    for old in (HEADER_OLD.replace("\n", "\r\n"), HEADER_OLD):
+        at = text.find(old)
+        if at == 0 or (at > 0 and text[at - 1] == "\n"):
+            new = HEADER_NEW.replace("\n", "\r\n") if old.endswith("\r\n") else HEADER_NEW
+            return text[:at] + new + text[at + len(old):]
+    return text
+
+
+def pick_names_for(name: str, title: str) -> set[str]:
+    if ".Early.1to9." in name:
+        return {f"{title.lower()}Early1to9"}
+    return {f"{title.lower()}Picks"}
+
+
+def copy_class_lua(src: Path, dest: Path, title: str) -> dict[str, int]:
+    # Class files are not all valid UTF-8. latin-1 keeps every byte.
+    text = swap_header(src.read_bytes().decode("latin-1"))
+    try:
+        text, counts = stage_pack.pack_class_text(text, pick_names_for(src.name, title), src.name)
+    except stage_pack.PackError as err:
+        raise SystemExit(f"stage-class-addons: {err}")
     dest.parent.mkdir(parents=True, exist_ok=True)
-    dest.write_bytes(raw)
+    dest.write_bytes(text.encode("latin-1"))
+    return counts
+
+
+def stage_item_stats(dest: Path, main_addon: Path) -> None:
+    src = GENERATED / ITEM_STATS_NAME
+    if not src.is_file():
+        raise SystemExit(f"missing {src}")
+    folder = dest / ITEM_STATS_ADDON
+    folder.mkdir(parents=True, exist_ok=True)
+    text = swap_header(src.read_bytes().decode("latin-1"))
+    if HEADER_NEW not in text and HEADER_NEW.replace("\n", "\r\n") not in text:
+        raise SystemExit(f"stage-class-addons: {ITEM_STATS_NAME} has no 'local _, GQ = ...' line")
+    (folder / ITEM_STATS_NAME).write_bytes(text.encode("latin-1"))
+    staged_main = main_addon / "_generated" / ITEM_STATS_NAME
+    if staged_main.is_file():
+        staged_main.unlink()
+    lines = [
+        "## Interface: 16001",
+        "## Title: GearQuest Forever: Item Stats",
+        "## Notes: Item stats for custom specs. GearQuest Forever loads this the first time a custom spec is scored.",
+        "## Author: Henrik8210",
+        f"## Version: {addon_version()}",
+        "## IconTexture: Interface\\AddOns\\GearQuestForever\\Art\\GearQuest-Icon",
+        "## LoadOnDemand: 1",
+        "## Dependencies: GearQuestForever",
+        "## RequiredDeps: GearQuestForever",
+        "",
+        ITEM_STATS_NAME,
+        "",
+    ]
+    (folder / f"{ITEM_STATS_ADDON}.toc").write_text("\n".join(lines), encoding="utf-8", newline="\n")
+    print(f"{ITEM_STATS_ADDON}: {ITEM_STATS_NAME}")
+
+
+def stage_coordinates(main_addon: Path) -> None:
+    src = GENERATED / COORDINATES_NAME
+    if not src.is_file():
+        raise SystemExit(f"missing {src}")
+    text = src.read_bytes().decode("latin-1")
+    try:
+        shared, report = stage_pack.share_coordinates(text)
+    except stage_pack.PackError as err:
+        raise SystemExit(f"stage-class-addons: {err}")
+    dest = main_addon / "_generated" / COORDINATES_NAME
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    dest.write_bytes(shared.encode("latin-1"))
+    print(
+        f"coordinates: {report['rows']} items, {report['rowsWithSpots']} with spots, "
+        f"{report['spots']} distinct spots, {report['lists']} distinct spot lists"
+    )
 
 
 def addon_version() -> str:
@@ -247,15 +323,18 @@ def main() -> None:
     for class_file, (title, files) in CLASSES.items():
         folder = dest / f"GearQuestForever_{class_file}"
         folder.mkdir(parents=True, exist_ok=True)
+        rows = 0
         for name in files:
-            copy_class_lua(GENERATED / name, folder / name)
+            rows += sum(copy_class_lua(GENERATED / name, folder / name, title).values())
             staged_main = main_addon / "_generated" / name
             if staged_main.is_file():
                 staged_main.unlink()
         write_audit_tips(folder / "AuditTips.lua", tips_by_class[class_file])
         write_toc(folder, title, files)
-        print(f"{folder.name}: {len(tips_by_class[class_file])} tooltip texts")
+        print(f"{folder.name}: {rows} pick rows packed, {len(tips_by_class[class_file])} tooltip texts")
 
+    stage_item_stats(dest, main_addon)
+    stage_coordinates(main_addon)
     print(f"stripped audit -> {audit_dest}")
 
 

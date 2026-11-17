@@ -58,7 +58,7 @@ A vendor line names the standing this character has. **Ratchet Wristwraps** says
 
 If Auctionator is enabled, a hunt hover adds Auctionator's price lines under the item tooltip. The GearQuest score stays underneath. Nothing is added when Auctionator is off.
 
-Eight starter drops that used to be white are green, and all nine classes were scored again. **Wispy Cloak** requires level 5. **Wendigo Fur Cloak** is +1 Strength. **Ratty Old Belt** drops from Narg the Taskmaster. **The GearQuest Community** lists Eao, MainWon, Stikmyre, Click, Vaniron, Thrayne, Alteredigor, Deadlybrew, TheWawan, Bart2137, and moosetraxftw.
+Eight starter drops that used to be white are green, and all nine classes were scored again. **Wispy Cloak** requires level 5. **Wendigo Fur Cloak** is +1 Strength. **Ratty Old Belt** drops from Narg the Taskmaster. **The GearQuest Community** lists Eao, MainWon, Stikmyre, Click, Vaniron, Thrayne, Alteredigor, Deadlybrew, TheWawan, Bart2137, moosetraxftw, and kaeldrin.
 
 ## GearQuest score
 
@@ -92,7 +92,7 @@ A vendor with a required standing gets its own line just before Source. The stan
 
 With the gamepad UI on, the log takes the pad while it is open and GearQuest is the window you are using. A gold arrow, a smaller chevron inside a larger one, sits beside the focused control and eases toward it. A blue highlight marks the control, and clicking a hunt moves that arrow onto the row. The window gets a soft gold glow that follows the portrait ring. LB sits above the side handles and RB below them. A bar under the window reads A Select, Y Filters, Navigate, and B Close. An open menu gets a smaller bar that reads A Select, Navigate, and B Close. Those marks hide while another window has the pad. Opening a Blizzard window gives that window the pad. A click anywhere on GearQuest takes the pad back. Closing Play Style, the source filter, or the weapon menu clears the highlight, so the blue square does not stay on the hunt list. On the hunt list the arrows and the left stick move through the hunts and skip the filters. Down moves to the next hunt and stops at the last one. Up from the top hunt reaches Active, Completed, and Removed. Left and right move among those tabs, and down from a tab returns to the first hunt. On Settings and the other pages, up and down walk the next control in that column and stop at the ends. Left and right move only when a control is there. One press does one thing. A direction does not also confirm or close. Y moves the arrow onto the filter controls and does not change the list. A second Y returns to the hunts. A on a filter control opens it. The bottom face button confirms a checkbox, a button, or the highlighted hunt, and moving onto a control does not change it. A on a hunt moves the arrow to Track. The d-pad and the left stick then move among Track, Show on map, and Remove, and back to the hunts. The right stick scrolls the text. While the paper doll is open and the log is not using the pad, clicking the right stick opens the upgrade list for the focused slot, or the slot you last hovered. The same click closes that list. The bumpers do not change Active, Completed, or Removed. The left bumper goes to the previous page, up the side tabs, and the right bumper goes to the next, down the side tabs. From Log the left bumper wraps to Settings, and from Settings the right bumper wraps to Log. The level box and the search box open the on-screen keyboard, and B leaves that box. The right face button closes a menu, then the filters, then the log. The highlight stops when the log closes. Mouse mode does not start it. The world map still gets no GearQuest pin frames in gamepad UI. Show on map and the guide still set the waypoint.
 
-**The GearQuest Community**, on the Settings page, lists Eao, MainWon, Stikmyre, Click, Vaniron, Thrayne, Alteredigor, Deadlybrew, TheWawan, Bart2137, and moosetraxftw.
+**The GearQuest Community**, on the Settings page, lists Eao, MainWon, Stikmyre, Click, Vaniron, Thrayne, Alteredigor, Deadlybrew, TheWawan, Bart2137, moosetraxftw, and kaeldrin.
 
 **Donations** is the Settings button under that page. It says donations help build GearQuest, and **Copy** puts `https://buymeacoffee.com/weber8210` on the clipboard the same way the Discord box does. The page is translated with the rest of the window.
 
@@ -143,7 +143,7 @@ A generic world drop through level 15 is pinned on a published mob, not the ques
 
 **Minimap:** any click opens GearQuest. Use the **Simulator** handle tab (class, faction, spec, level 1–60). **Turn off simulation** = `/gq set me`.
 
-The AddOn List, on the character selection screen, shows the loot sack on **GearQuest Forever**, the same picture as the minimap button. Each class row shows that class's icon: Druid, Hunter, Mage, Paladin, Priest, Rogue, Shaman, Warlock, and Warrior. Those rows stay load-on-demand. The pictures do not change the hunts.
+The AddOn List, on the character selection screen, shows the loot sack on **GearQuest Forever**, the same picture as the minimap button. Each class row shows that class's icon: Druid, Hunter, Mage, Paladin, Priest, Rogue, Shaman, Warlock, and Warrior. **GearQuest Forever: Item Stats** shows the loot sack too. It holds the stat rows custom specs score from and loads the first time a custom spec is scored. Those rows stay load-on-demand. The pictures do not change the hunts.
 
 ## Local WoW install
 
@@ -153,7 +153,7 @@ After **every** edit under `GearQuest/` (Lua, `_generated/`, art), sync to the l
 .\scripts\sync-addon.ps1
 ```
 
-That copies into `C:\Program Files (x86)\World of Warcraft\_forever_\Interface\AddOns` and nowhere else.
+That copies into `C:\Program Files (x86)\World of Warcraft\_forever_\Interface\AddOns` and nowhere else. It then stages the load-on-demand addons beside the main folder: one `GearQuestForever_<CLASS>` per class, `GearQuestForever_ItemStats`, and `GearQuestForever_Languages`. Staging packs the class hunt rows and shares repeated map spots, and it stops if the packed copy differs from the repo files in any way. The repo files are not changed. See [docs/ADDON-DATA-LAYOUT.md](docs/ADDON-DATA-LAYOUT.md).
 
 The log shows a line under the **GearQuest** title: **simulation mode** (level, spec, class, faction) or **live character** + spec picker hint.
 
@@ -176,6 +176,7 @@ When a hunt or an item is added, or its name, description, or story changes, tha
 - Interface: `## Interface: 16001` (CurseForge **WoW Forever 1.60.1**)
 - Project brief: [docs/PROJECT_BRIEF.md](docs/PROJECT_BRIEF.md)
 - Data rules: [docs/DATA_RULES.md](docs/DATA_RULES.md)
+- Addon data layout, staging, and memory: [docs/ADDON-DATA-LAYOUT.md](docs/ADDON-DATA-LAYOUT.md)
 - Changelog: [CHANGELOG.md](CHANGELOG.md)
 - BiS scorer (authors only, not in CurseForge zip): [pipeline/README.md](pipeline/README.md) — adding Forever items: [pipeline/docs/FOREVER-SCORING.md](pipeline/docs/FOREVER-SCORING.md)
 - CurseForge: [RELEASE.md](RELEASE.md)

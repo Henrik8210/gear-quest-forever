@@ -2,127 +2,70 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.2.0
+## v1.2.1
 
-The window title reads **GearQuest Forever v1.2.0**.
+The window title reads **GearQuest Forever v1.2.1**. This version is about memory. GearQuest Forever now uses about half the memory it used in v1.2.0, and nothing you see has changed. The hunts, the rank numbers, the scores, the green arrows, the map pins, the filters, the play styles, the Simulator, and every window are the same as in v1.2.0. Your Completed, Removed, and Tracked hunts are kept, and your custom specs and settings are untouched.
 
-**Untrack from the list**
+**About half the memory**
 
-On the Tracked tab, each hunt has a checkbox at the left of the row. It starts checked. Clear it and that hunt is untracked. You do not have to open the parchment and press Untrack. Hovering the box says Untrack. The Untrack button on a selected hunt still works.
+The memory GearQuest Forever holds once your class's hunts are loaded at login went down like this:
 
-**Wear the piece before it is recommended**
+- **Mage:** 99.8 MB to 50.1 MB.
+- **Warrior:** 81.6 MB to 41.5 MB.
+- **Priest:** 68.7 MB to 32.5 MB.
 
-Get it now hides a piece whose tooltip says you need a profession to equip it. **Flying Tiger Goggles** require Engineering (100). A character with Tailoring and Enchanting, and no Engineering, no longer sees them as the Head recommendation. Unchecking Engineering in the Profession filter hides them as well. A bind-on-equip craft with no wear line, such as linen armor, stays. **Spellpower Goggles Xtreme** need Engineering 215 to wear. The recipe is 225. Once you can equip them, the hunt can show.
+Those are the three classes that were measured. The other six classes use the same new layout and save memory the same way.
 
-**Replica Crescent Necklace is Alliance**
+**Only the faction on screen is loaded**
 
-**Replica Crescent Necklace** is the reward from Gleaming Crescent Necklace, turned in to Maliynn in Astranaar. Horde no longer has that hunt, on any class. Alliance keeps it. Beast Mastery lists it from level 25. The parchment recommends picking the quest up at 25, because it cannot be taken earlier.
+Each class used to keep its Alliance and Horde hunts in memory at the same time, even though a character only ever sees one side. Now only the faction on screen is unpacked. The other faction stays stored in a compact form.
 
-**A two-hander is compared with both hands**
+- Playing your own character, that is your faction.
+- In the Simulator, switching to the other faction unpacks that side and frees the one you left. Switching class does the same for the class you pick.
+- Turning simulation off goes back to your own class and faction.
+- A class you simulated and then left is freed from the hunt list. WoW keeps that class's addon loaded until you `/reload`, because the game cannot unload an addon, but its hunts no longer take room.
 
-The green or red arrow on a two-hander counts the main hand and the off hand you would replace, including a shield. A one-hander compared with a two-hander you are wearing counts that one-hander plus the off-hand it pairs with. A one-hander compared with the one-hander you already wear uses the white score on the weapon list. The score bar still scores each slot on its own.
+**Lookup still searches both factions**
 
-**School spell power and armor count**
+The **Lookup** tab still lists both factions for the class you are viewing, in the same order as before. **Track** works on a hunt you found there, including one for the other faction. While Lookup is open, it reads the other faction's hunts. That costs about as much as one faction's list, about 34 MB for a mage, and leaving the tab frees it again.
 
-A worn piece that is not on your hunt list is scored from its tooltip. A line that increases Shadow, Fire, Frost, Nature, Arcane, or Holy spell damage is that school's spell power. The armor number on the piece counts as armor. **Scaled Cloak of Shadow Wrath** is +9 shadow spell power and reads about 74 for a shadow priest, the same place as Sage's Cloak of Shadow Wrath. The score bar no longer prints 0 for that cloak.
+The item tooltip still says **Not ranked for your faction.** for a piece only the other faction hunts. Dismissing a hunt on the Completed tab also dismisses the other faction's copy of it, the same as before.
 
-**New Forever hunts**
+**Item stats for custom specs load when you need them**
 
-These pieces are on the lists. Eight of them have no source on Wowhead Forever yet, so the hunt says the source is not listed and there is no map pin.
+The item stats that **+ custom stat weights** scores from are now their own addon, **GearQuest Forever: Item Stats**. You will see it as a new row in the addon list. It no longer loads at login, which saves about 6 MB for everyone who does not use a custom spec. It loads by itself the first time a custom spec is scored, and **Save and score items!** works the same as before.
 
-**Gravetoll Gavel** is a two-hander, required 54, for Druid, Paladin, and Shaman. **Soulwoven Drape** is a back, required 56, for Druid, Mage, Paladin, Priest, Shaman, and Warlock. **Band of the Damned** is a ring, required 56, for the same classes. **Wit's Edge** is a main hand, required 57, for Mage. **Scales of the Devourer** is a chest, required 57, for Hunter and Shaman. **Silithid Queen's Husk** is a chest, required 56, for Paladin and Warrior. **Predaceous Band** is a ring, required 55, for Hunter, Druid, Paladin, Rogue, Shaman, and Warrior. **Pylon Poker** is a two-hander, required 56, for Hunter, Druid, Mage, Priest, Shaman, Warlock, and Warrior.
+Keep **GearQuest Forever: Item Stats** enabled if you use custom specs. If it is disabled, chat says the item stats for custom specs could not be loaded and asks you to enable it in the addon list and `/reload`. That message is in every GearQuest language. The premade specs do not need this addon.
 
-**Predator's Shroud** is a back, required 55, and drops from Stegodon Young. Hunter lists it. **Ancient Mattock** is a one-hander, required 56, and drops from Ravasaur Juvenile. Hunter, Paladin, Rogue, Shaman, and Warrior list it.
+The CurseForge app installs the new folder with the rest. If you install by hand, copy every `GearQuestForever` folder from the zip, including `GearQuestForever_ItemStats`.
 
-**Hunts that joined a class**
+**Map pins take less memory**
 
-**Scaled Cloak** and **Cutthroat's Cape** are world drops, and every class now hunts the jackpot suffix. **Green Iron Bracers** joined Shaman. The craft is Blacksmithing 140. **Medal of Courage** joined Rogue. It is Saving Yenniku, from Kin'weelay in Stranglethorn Vale, required 35. **Pratt's Handcrafted Gloves** joined Warrior. The Mark of Quality starts with Jangdor Swiftstrider in Feralas. **Ringtail Girdle** joined Paladin. Clam Bait starts with Mai'Lahii in Desolace. **Soft Willow Cape** joined Hunter. Je'neu of the Earthen Ring starts with Mastok Wrilehiss in Ashenvale. **Warsong Gauntlets** joined Shaman. Warsong Supplies starts with Locke Okarr in Ashenvale. **Boorguard Tunic** joined Paladin. King of the Foulweald starts with Karang Amakkar in Ashenvale. **Thorn Protecting Girdle** joined Hunter, from A Green Sample, and it gained attack power against beasts. **Essene's Hope** joined Hunter, from Sentiments of the Lost.
+Many items share the same place: the same camp, the same vendor, the same dungeon entrance. Each of those spots used to be stored again for every item. Now a spot is stored once and every item that uses it points at it. The map data went from 18.8 MB to 6.0 MB. All 7,415 items with a place keep every spot they had, so every pin, **Show on map**, the guide arrow, and Focus Zone point at the same places as before. Unsourced hunts still have no pin.
 
-**Defender's Leather Pants** require level 20, down from 25. Paladin, Rogue, and Warrior gained the hunt. Hunters have it for Horde as well as Alliance. It is still the Leatherworking craft whose pattern drops in the Deadmines, Wailing Caverns, Shadowfang Keep, the Stockade, and Blackfathom Deeps.
+**Class hunt lists are packed**
 
-**Dreamer's Chestguard is rare**
+The hunt lists inside each class addon are stored as compact text and unpacked when you play or simulate that class. For a mage, those files went from 32.2 MB to 6.2 MB. When the addon is built, every packed row is unpacked again and compared with the original. The build stops on any difference, so a rank, a score, a level band, or a random-enchant suffix cannot change in the packing.
 
-**Dreamer's Chestguard**, from Baron Aquanis, is rare. It was uncommon. Spirit is 11, strength is 10, and stamina is 5. Hunter, Druid, Paladin, Rogue, Shaman, and Warrior still list it.
+**The GearQuest Community**
 
-**Less armor on the Forever tooltip**
+Settings → **The GearQuest Community** adds **kaeldrin**.
 
-These pieces have less armor, and the ranks moved with that number. **Desperate Barrier** dropped from 1257 armor to 711. The others are Violet Sash, Gravewalker Boots, Undead Knight's Bracers, Staghide Armguards, Tanned Shoulderpads, Bronzed Shoulderguards, Silvered Gauntlets, Town Clerk's Mittens, Tattered Mittens, Technician's Bracers, Operator's Gloves, Sentinel's Boots, Cultist's Chestguard, Charged Leather Bracers, Restorer's Fine Gloves, Excavator Gauntlets, Doomcaller's Pants, Fists of Impending Doom, Songblade Stabilizer, Vine Pruner's Cloak, Thorn Protecting Girdle, Construct Cloak, and Runebound Gloves.
+### v1.2.0
 
-**Hunts that left a class**
-
-These fell off the class that had been listing them. The way you get the piece is unchanged.
-
-**Ribbed Breastplate** left Druid, Shaman, and Warrior. It is still Humbert's Sword. **Crusader Belt** left Shaman. Syndicate Assassins. **Cloak of Rot** left Hunter. Lord Malathrom. **Grimsteel Cape** left Mage. Vorrel's Revenge. **Blackforge Cape** left Priest. **Twilight Cape** left Hunter. **Ivycloth Pants** and **Pagan Britches** left Rogue. **Resilient Cape** left Paladin. The Priest list still has the Horde row. **Dark Iron Reaver** left Mage. **The Shadowfoot Stabber** left Druid. **Silvered Gauntlets** left Warrior. Twilight Falls. **Cultist's Chestguard** left Hunter. An Unholy Alliance. **Excavator Gauntlets** left Shaman. Agmond's Fate. **Premier High Warlord's Pig Sticker** left Paladin. **Drape of Shifting Energy** left Hunter. Arcanic Enigma. **Well-Weathered Cloak** left Mage. Terror of the Desert Skies. **Unerring Purpose**, **Tracker's Signet of Resolve**, **Watcher's Signet of Brilliance**, **Warden's Signet of Resolve**, **Lightcrest Hammer**, **Horseman's Unyielding Shroud**, **Blade of Senseless Slaughter**, and **Ranger Lord's Longsword** left the one class that had them. Those last eight are still unsourced.
-
-**One faction's list moved**
-
-**Blocking Targe** gained a Horde hunt on Shaman. **Feathered Cape** gained Horde on Hunter and Rogue. **Sage's Cloak** gained Horde on Hunter. **Runed Gauntlets** gained Alliance on Shaman. **Shadowforge Shield** gained Alliance on Warrior. **Reverence** lost Alliance on Mage. **Thick Ogre's Belt** lost Alliance on Paladin. **Sergeant's Cloak** lost Horde on Warlock. **Premier Sergeant's Cape** lost Horde on Priest. **Construct Cloak** lost Alliance on Warrior.
-
-**Level-30 Molten Core copies are not listed**
-
-The addon does not hunt the level-30 copies of Arcanist, Felheart, Prophecy, Nightslayer, Cenarion, Earthfury, Giantstalker, Lawbringer, or Might, or the level-30 Spinal Reaper, Bonereaver's Edge, Perdition's Blade, Band of Accuria, and the other pieces from that beta. Those items were spawned during the level-30 beta, including from level-1 wolves, and they do not drop on live servers. The level-60 pieces are the ones that drop. **Invisible Dagger**, the QA spell-damage ring, and the two test swords are not hunts.
+The window title reads **GearQuest Forever v1.2.0**. Each hunt on the Tracked tab has a checkbox that untracks it. Get it now hides a piece you need a profession to wear, such as **Flying Tiger Goggles** without Engineering. **Replica Crescent Necklace** is Alliance only and recommends 25. A two-hander's arrow counts both hands you would replace, including a shield. A worn piece's school spell power and armor count, so **Scaled Cloak of Shadow Wrath** reads about 74 for a shadow priest. Ten new Forever hunts are on the lists, including **Gravetoll Gavel**, **Soulwoven Drape**, and **Predator's Shroud**, and several hunts joined or left a class. **Dreamer's Chestguard** is rare. **Desperate Barrier** and 23 other pieces have less armor. The level-30 Molten Core beta copies, **Invisible Dagger**, and the test items are not hunts.
 
 ### v1.1.9
 
-The window title reads **GearQuest Forever v1.1.9**. This is a hotfix.
-
-**Mouseover in a dungeon no longer errors**
-
-Mousing over a creature in Wailing Caverns, or any other dungeon, was throwing a Lua error. The client hands that tooltip a hidden unit token, and GearQuest was passing it to `UnitExists`. The error is gone.
-
-The tooltip still adds up to three lines when the creature's name can be read. A line appears only when the piece is on this level's hunt list and it beats what you are wearing, or the slot is empty. A downgrade stays off. The line is the rank, the item, the slot, the white score, the green arrow, and the green comparison number, the same +N as the item tooltip. When the client hides the name as well, the tooltip stays quiet and does not error. Hunt settings **Hide unit gear tips** still hides the lines.
-
-**The knight's face pulses once**
-
-The first time you open the log, the portrait pulses gold, the same highlight as the **Play style** button. It keeps pulsing until the guide opens. That is a click on the portrait, or leaving the window up so he speaks on his own. After that the pulse stays off. Hovering the portrait still lights his face.
+The window title reads **GearQuest Forever v1.1.9**. This is a hotfix. Mousing over a creature in a dungeon no longer throws a Lua error, and the upgrade lines still show when the creature's name can be read. The knight's face pulses gold the first time you open the log, until the guide opens.
 
 ### v1.1.8
 
-The window title reads **GearQuest Forever v1.1.8**.
-
-**A target lists upgrades only**
-
-Mouse over a creature, a vendor, a trainer, or a quest giver. The tooltip adds up to three pieces from that unit. A line appears only when the piece is on this level's hunt list and it beats what you are wearing, or the slot is empty. A downgrade stays off, even when that piece is on the hunt list and it is not the item you have on.
-
-The line is the rank, the item, the slot, the white score, the green arrow, and the green comparison number. That number is the same +N the item tooltip prints. The arrow is not shown without it. The three lines are the biggest upgrades.
-
-Rings and trinkets compare to the weaker piece when both slots are filled. One empty ring slot, or one empty trinket slot, counts as an upgrade. A piece from an earlier level band stays off.
-
-**Disengagement Ring** is the case that was wrong. Friz Frazzlespark in Powderfuse Port sells it. For a hunter at 44 it is finger rank #8, and it beats Seal of Sylvanas and Monkey Ring. His tooltip now lists that ring with the green comparison number. A piece he sells that scores worse than what you are wearing does not appear. The same test is used for every creature, vendor, trainer, and quest giver, and for every slot.
-
-Hunt settings still has **Hide unit gear tips**. The lines show until you check that box.
+The window title reads **GearQuest Forever v1.1.8**. A creature, vendor, trainer, or quest giver tooltip lists only pieces that beat what you are wearing, each with the green comparison number. **Disengagement Ring** now shows on Friz Frazzlespark for a hunter at 44.
 
 ### v1.1.7
 
-The window title reads **GearQuest Forever v1.1.7**.
-
-**Weapon rank is the score you see**
-
-Rank #1 on Weapons is the piece that reads 100. A weapon band that starts one level later no longer jumps ahead of a higher score.
-
-Beast Mastery Horde at 44 keeps the off hand on 44 and the two-handers on 43–46. **Eyegouger** is rank #1, score 25.09. **Nordic Longshank** stays down the list. The off-hand band was putting those one-handers at #1 through #21.
-
-A priest, a mage, a warlock, a balance or restoration druid, and an elemental or restoration shaman count the best off hand in a one-hander's number. A two-hander is the weapon alone. A shield does not set that 100. **Crest of Darkshire** was pulling **Blade of Silverlaine** down to about 9 on one shared scale. The green arrow and the score bar still compare a two-hander with the main hand plus the off hand, and the shield still counts in that comparison. Other slots stay one band. A set piece can still be rank 1 when you wear the set, even when another piece in the slot scores higher on its own.
-
-**Items Forever already listed**
-
-751 items the addon had marked missing now use the current Forever tooltip, and all nine classes were scored again. 661 items are still missing from Forever.
-
-**Dragon's Eye** is a priest neck from Shade of Eranikus in the Sunken Temple. It requires 51. The tooltip is 15 spirit, 13 healing, and 4 spell damage. Holy ranks it 1st at 51–54, score 33.7, on both factions. Discipline ranks it 3rd at 51–54, score 30.7. A recovered piece that still does not beat the slot stays off the hunt list.
-
-**Quest rewards name the earlier steps**
-
-Recovered quest hunts now list the chain, or say there are no prequests. **Medal of Courage** (Saving Yenniku, required 35) lists The Fate of Yenniku, The Singing Crystals, The Mind's Eye, then Saving Yenniku. **Dwarven Charge** (The Hidden Chamber, required 35) lists The Lost Dwarves, then The Hidden Chamber. **Lightforged Blade** (Forging the Mightstone, required 47) lists Chillwind Point, Dispelling Evil, Inert Scourgestones, then Forging the Mightstone. Lethtendris's Web lists Feathermoon Stronghold, then Lethtendris's Web, for Alliance, and Camp Mojache, then Lethtendris's Web, for Horde. 31 of these quests say there are no prequests.
-
-A step uses the quest title from the game client. On an English client those names stay English, including when GearQuest is set to German. The item name on the hunt still follows the language you picked.
-
-**Hover a creature, a vendor, a trainer, or a quest giver**
-
-The tooltip adds up to three hunt pieces from that unit. A line appears only when the piece is on this level's hunt list and it beats what you are wearing, or the slot is empty. The line is the rank, the item, the slot, and the score, with a green arrow when it is an upgrade. Hunt settings has **Hide unit gear tips**. The lines show until you check that box.
-
-**Map pin size**
-
-The 50% and 150% labels under Map pin size no longer sit on the sentence under the slider.
+The window title reads **GearQuest Forever v1.1.7**. Weapon rank #1 is the piece that reads 100. **Eyegouger** is Beast Mastery Horde rank #1 at 44. Casters count the best off hand in a one-hander's number. 751 items Forever already listed use the current tooltip, including **Dragon's Eye**, and all nine classes were scored again. Recovered quest hunts list their chains. Hovering a creature, a vendor, a trainer, or a quest giver adds up to three hunt pieces. The Map pin size labels no longer overlap.
 
 ### v1.1.6
 

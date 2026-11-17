@@ -52,5 +52,6 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host "Synced GearQuest Forever -> $target"
 Write-Host "Class hunt data is a separate addon per class (loaded when you play or simulate that class)."
+Write-Host "Item stats for custom specs are GearQuest Forever: Item Stats, loaded the first time a custom spec is scored."
 Write-Host "Languages other than English are one addon, GearQuest Forever: Languages, loaded only when a language is selected."
 Write-Host "In-game addon list: GearQuest Forever (folder $addonName)."

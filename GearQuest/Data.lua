@@ -5255,7 +5255,11 @@ function GQ.Data:GetEntryById(id)
     -- Walking self.entries here scans every generated row (about 467k) and
     -- the Completed tab does that once per slot, which trips "script ran too long".
     if self.byId then
-        return self.byId[id]
+        local entry = self.byId[id]
+        if entry == nil and self._detachedById then
+            entry = self._detachedById[id]
+        end
+        return entry
     end
     for _, entry in ipairs(self.entries or {}) do
         if entry.id == id then
@@ -7267,6 +7271,9 @@ function GQ.Data:LinkIsGear(link, itemId)
     if itemId and #(self:GetEntriesByItemId(itemId) or {}) > 0 then
         return true
     end
+    if itemId and self.UnexpandedRowSpecs and self:UnexpandedRowSpecs(itemId) then
+        return true
+    end
     -- Instant does not request the tooltip. Food, reagents, and quest items
     -- are not gear, so they get no "no score" line.
     if not GetItemInfoInstant then
@@ -7310,7 +7317,9 @@ function GQ.Data:GearScoreMissText(link)
         return text
     end
     local rows = self:GetEntriesByItemId(itemId)
-    if #rows == 0 then
+    -- Only one faction is expanded. The other faction's rows still count here.
+    local hidden = self.UnexpandedRowSpecs and self:UnexpandedRowSpecs(itemId)
+    if #rows == 0 and not hidden then
         return remember(L["GearQuest has no score for this item."])
     end
 
@@ -7351,6 +7360,13 @@ function GQ.Data:GearScoreMissText(link)
                     end
                 end
             end
+        end
+    end
+    local hiddenSpecs = hidden and classFile and hidden[string.upper(classFile)]
+    if hiddenSpecs then
+        forClass = forClass + 1
+        if hiddenSpecs._any or (spec and hiddenSpecs[spec]) then
+            forSpec = forSpec + 1
         end
     end
 

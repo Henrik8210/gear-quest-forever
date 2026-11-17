@@ -114,13 +114,10 @@ function GQ.Preview:SetEnabled(enabled)
             GQ.Indicator:ApplyArrowVisibility()
         end
     end
-    if not enabled and GQ.Data and GQ.Data.ReleaseIdleHuntClasses then
-        if GQ.Data:ReleaseIdleHuntClasses() and GQ.Data.BuildIndex then
-            GQ.Data:BuildIndex()
-            if GQ.Data.InvalidateClassCache then
-                GQ.Data:InvalidateClassCache()
-            end
-        end
+    -- Only the faction on screen is expanded. Turning simulation on or off
+    -- can change the class or the faction, so the rows follow here.
+    if GQ.Data and GQ.Data.SyncEffectiveHuntData then
+        GQ.Data:SyncEffectiveHuntData()
     end
     -- Same class at another level still has its hunt data loaded, so the
     -- filtered list has to drop here too. Otherwise a profession filter
@@ -144,18 +141,9 @@ function GQ.Preview:SetClass(classFile)
     if not normalized then
         return false, L["Unknown class. Use: warrior, paladin, hunter, rogue, priest, shaman, mage, warlock, druid."]
     end
-    local wasExpanded = GQ.Data and GQ.Data.IsClassExpanded and GQ.Data:IsClassExpanded(normalized)
     self:GetSettings().class = normalized
     self:SetEnabled(true)
     if GQ.Data and GQ.Data.EnsureClassLoaded then
-        local loaded = GQ.Data:EnsureClassLoaded(normalized)
-        local removed = GQ.Data.ReleaseIdleHuntClasses and GQ.Data:ReleaseIdleHuntClasses()
-        if loaded and ((not wasExpanded) or removed) and GQ.Data.BuildIndex then
-            GQ.Data:BuildIndex()
-            if collectgarbage then
-                collectgarbage("collect")
-            end
-        end
         if GQ.Custom and GQ.Custom.EnsureBuilt and GQ.GetEffectiveSpec then
             local specId = GQ:GetEffectiveSpec()
             if specId then
@@ -206,6 +194,7 @@ function GQ.Preview:SetFaction(faction)
     if not normalized then
         return false, L["Unknown faction. Use: alliance or horde."]
     end
+    local changed = self:GetSettings().faction ~= normalized or not self:IsEnabled()
     self:GetSettings().faction = normalized
     self:SetEnabled(true)
     if GQ.Data and GQ.Data.InvalidatePlayerBandCache then
@@ -213,6 +202,15 @@ function GQ.Preview:SetFaction(faction)
     end
     if GQ.Log and GQ.Log.InvalidateActiveListCaches then
         GQ.Log:InvalidateActiveListCaches()
+    end
+    -- The other faction's rows were just expanded. A custom spec on this
+    -- class is scored again for them.
+    if changed and GQ.Custom and GQ.Custom.EnsureBuilt and GQ.GetEffectiveClass and GQ.GetEffectiveSpec then
+        local classFile = GQ:GetEffectiveClass()
+        local specId = GQ:GetEffectiveSpec()
+        if classFile and specId and GQ.Custom:Get(classFile, specId) then
+            GQ.Custom:EnsureBuilt(classFile, specId)
+        end
     end
     return true
 end
@@ -226,6 +224,10 @@ function GQ.Preview:ApplyCurrentCharacter()
     preview.class = classFile
     preview.level = GQ:ClampPlayerLevel(level)
     preview.faction = faction
+    if GQ.Data and GQ.Data.SyncEffectiveHuntData and GQ.Data:SyncEffectiveHuntData()
+        and GQ.Log and GQ.Log.InvalidateActiveListCaches then
+        GQ.Log:InvalidateActiveListCaches()
+    end
 end
 
 function GQ.Preview:GetLoginCharacterKey()
@@ -654,6 +656,17 @@ function GQ.Preview:RefreshDialogSpecDropdown()
 end
 
 function GQ.Preview:ApplySimulation(classFile, level, specId, faction)
+    -- Store the faction first, so the class is expanded once, for that side.
+    if faction then
+        local normalized = NormalizeFaction(faction)
+        if not normalized then
+            return false, L["Unknown faction. Use: alliance or horde."]
+        end
+        if NormalizeClass(classFile) then
+            self:GetSettings().faction = normalized
+        end
+    end
+
     local okClass, errClass = self:SetClass(classFile)
     if not okClass then
         return false, errClass

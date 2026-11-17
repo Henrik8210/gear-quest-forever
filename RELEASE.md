@@ -19,11 +19,11 @@ Publishing uses **GitHub Actions**, not the CurseForge webhook. Keep any CurseFo
 
 Only when explicitly publishing:
 
-1. Bump `## Version:` in `GearQuest/GearQuestForever.toc` and `GearQuest/Core.lua` (`GQ.VERSION`) to **`X.Y.Z`** (the current release is `1.2.0`). The language addon version comes from that same TOC line when `scripts/stage-locale-addons.py` runs. The release workflow runs that stager, so a new player-facing sentence is already in `GearQuest/Locales/` before the tag. A beta tag is `X.Y.Z-beta` only when that upload should stay on the beta channel. The log window header is **`GearQuest Forever v`** plus `GQ.VERSION` (`GearQuest/Log.lua`, `GearQuestWindowTitle`). It must stay that string — do not hardcode a different version in the header. Bumping `GQ.VERSION` is what updates the band on every release.
+1. Bump `## Version:` in `GearQuest/GearQuestForever.toc` and `GearQuest/Core.lua` (`GQ.VERSION`) to **`X.Y.Z`** (the current release is `1.2.1`). The language addon version comes from that same TOC line when `scripts/stage-locale-addons.py` runs. The release workflow runs that stager, so a new player-facing sentence is already in `GearQuest/Locales/` before the tag. A beta tag is `X.Y.Z-beta` only when that upload should stay on the beta channel. The log window header is **`GearQuest Forever v`** plus `GQ.VERSION` (`GearQuest/Log.lua`, `GearQuestWindowTitle`). It must stay that string — do not hardcode a different version in the header. Bumping `GQ.VERSION` is what updates the band on every release.
 2. Add a `## vX.Y.Z` section at the top of `CHANGELOG.md` and demote the previous `## ` heading to `###`. `scripts/upload-curseforge-forever.py` sends markdown from that first `## ` line through the end of the file. Older versions stay as `###` so there is only one level-2 heading. Write the new section for players: a short lead, then a subsection per change, with the classes, specs, levels, and what they will see. A one-line summary is not enough.
 3. Commit and push to `main`.
 4. Tag and push: `git tag vX.Y.Z` then `git push origin vX.Y.Z`. CurseForge **Files** shows that tag (keep the `v`). A tag that does not end in `-beta` uploads on the **release** channel. A tag that ends in `-beta` uploads on the **beta** channel. `.github/workflows/release.yml` sets `CF_RELEASE_TYPE` from the tag name.
-5. Verify **GitHub Actions → Release** succeeds.
+5. Verify **GitHub Actions → Release** succeeds. The job copies `GearQuest/` as `GearQuestForever`, runs `scripts/stage-class-addons.py` and `scripts/stage-locale-addons.py`, and zips `GearQuestForever` plus every `GearQuestForever_*` folder (the nine classes, `GearQuestForever_ItemStats`, and `GearQuestForever_Languages`). The class stager fails the job if a packed pick table or the shared coordinate file does not read back the same as the repo file. Fix the data, then bump the patch version. Do not retag. Run `scripts/sync-addon.ps1` before tagging, because it runs the same stagers locally. Layout details: [docs/ADDON-DATA-LAYOUT.md](docs/ADDON-DATA-LAYOUT.md).
 6. Check CurseForge → **Files** — new file appears as Processing, then Approved.
 
 ## Rules
@@ -35,6 +35,6 @@ Only when explicitly publishing:
 
 ## Next upload
 
-`v1.0.0` is the first file on the CurseForge **release** channel. `v1.2.0` is the current file on that channel. The next version is the next `X.Y.Z` unless a beta was asked for.
+`v1.0.0` is the first file on the CurseForge **release** channel. `v1.2.1` is the current file on that channel. The next version is the next `X.Y.Z` unless a beta was asked for.
 
 After a tag exists, bump the version rather than deleting the tag.

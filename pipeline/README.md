@@ -1,7 +1,14 @@
 # GearQuest BiS pipeline (developer asset)
 
 This folder **rebuilds** the generated BiS Lua. It is **not** shipped on CurseForge
-(`.pkgmeta` ignores `pipeline/`). Players only get `GearQuest/_generated/*.lua`.
+(`.pkgmeta` ignores `pipeline/`). Players only get `GearQuest/_generated/*.lua`,
+and only in the form staging writes: `scripts/stage-class-addons.py` packs the
+class pick rows, moves item stats into `GearQuestForever_ItemStats`, and shares
+repeated coordinate spots. The pipeline keeps writing the readable repo files,
+and every check below reads those. A new pick-row field must also be added to
+`EXTRA_KEYS` in `scripts/stage_pack.py` and `OPTIONAL_ROW_FIELDS` in
+`GearQuest/DataAdapter.lua`, or staging stops. See
+[../docs/ADDON-DATA-LAYOUT.md](../docs/ADDON-DATA-LAYOUT.md).
 
 When Forever shows a new or retuned item, follow
 [docs/FOREVER-SCORING.md](docs/FOREVER-SCORING.md): add facts to `data/items.json`
@@ -121,6 +128,11 @@ missed a parallel one — suffix ids (picks vs notables vs the 1-9 emitters), an
 school-specific spell damage (base items vs random suffixes). Several checks
 therefore assert **per file** rather than on a global aggregate, because a 1%
 dip in a global coverage number hid a bug that had broken 137 of 137 rows.
+
+`luatest.py` is from the archive. Despite the description above, it loads
+`DataAdapter.all9-test.lua`, an old copy, not the live adapter, and it
+predates the packed rows. To test the live adapter, follow the checklist in
+[../docs/ADDON-DATA-LAYOUT.md](../docs/ADDON-DATA-LAYOUT.md).
 
 `rebuild_bench.py` re-splices a class's current payload into its bench HTML page,
 so a bench page cannot silently go stale.

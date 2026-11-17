@@ -1,0 +1,19 @@
+---
+description: Staged data layout, one-faction expansion, and memory guardrails for GearQuest Forever
+globs: GearQuest/DataAdapter.lua,GearQuest/Preview.lua,GearQuest/CustomSpec.lua,GearQuest/GearQuestForever.toc,scripts/stage-class-addons.py,scripts/stage_pack.py,scripts/sync-addon.ps1,.github/workflows/release.yml
+alwaysApply: false
+---
+
+# Addon data layout
+
+Read [docs/ADDON-DATA-LAYOUT.md](../../docs/ADDON-DATA-LAYOUT.md) before changing these files.
+
+- The repo `GearQuest/_generated/` files stay readable. Staging (`scripts/stage-class-addons.py` with `scripts/stage_pack.py`) packs class pick rows, ships `GearQuestForever_ItemStats` as a load-on-demand addon, and shares repeated coordinate spots. It checks every pack against the repo file and stops on a difference. Do not loosen those checks.
+- A new pick-row field goes into `EXTRA_KEYS` (`stage_pack.py`) and `OPTIONAL_ROW_FIELDS` (`DataAdapter.lua`) in the same change.
+- Only the class on screen is expanded, and only for the faction on screen (`HuntFactionFor`). Every Simulator change ends in `GQ.Data:SyncEffectiveHuntData()`. Do not expand both factions.
+- Code that must see the other faction uses `OtherFactionReader`, `UnexpandedRowSpecs`, `UnexpandedItemEntries`, or `IsUnexpandedHuntId`. Do not assume `GetEntriesByItemId` or `GetEntryById` covers both factions.
+- Hunt ids stay `gen:<class>:<itemId>:<slot>:<minLevel>:<spec>:<faction>`. Saved progress is keyed by them.
+- Lookup merges both factions by `FileBlockKey`, which depends on the emitter's sort order (spec, then faction, then slot, level, rank).
+- Do not add class files, `Data.ItemStats.generated.lua`, or the load-on-demand addons to the main TOC or `## OptionalDeps`.
+- Coordinate spots are shared tables in the staged copy. Never write into a spot or a spot list at runtime, and do not intern coordinates at runtime.
+- After a change: stage into a temporary folder, compile under Lua 5.1, run `scripts/sync-addon.ps1`, and check the hunt list, the Simulator faction switch, Lookup with Track, a custom spec, and map pins in game.

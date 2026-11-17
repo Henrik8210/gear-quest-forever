@@ -980,6 +980,9 @@ function GQ.Custom:Prepare(classFile, specId)
     if not record or not GQ.Data or not GQ.Data.entries then
         return nil
     end
+    if GQ.Data.EnsureItemStats and not GQ.Data:EnsureItemStats() then
+        return nil
+    end
     self:Strip(specId)
     local armorTables = GQ.StatWeightsArmorClass and GQ.StatWeightsArmorClass[classFile]
     local armorClass = armorTables and (armorTables[record.base] or armorTables.default)

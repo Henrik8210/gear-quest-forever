@@ -4977,16 +4977,23 @@ function GQ.Log:CollectCompletedBySlot()
     end
 
     local progress = CharProgress()
-    if not self._prunedStaleObtained then
+    -- A custom spec still scoring has no rows yet. Its saved ids are not stale.
+    if not self._prunedStaleObtained and not (GQ.Custom and GQ.Custom._job) then
         self._prunedStaleObtained = true
         local dropObtained, dropHunts = {}, {}
+        -- Only one faction is expanded. The other faction's saved ids still
+        -- have rows, and simulating that faction shows them again.
+        local function stale(id)
+            return not GQ.Data:GetEntryById(id)
+                and not (GQ.Data.IsUnexpandedHuntId and GQ.Data:IsUnexpandedHuntId(id))
+        end
         for id in pairs(progress.obtained or {}) do
-            if not GQ.Data:GetEntryById(id) then
+            if stale(id) then
                 dropObtained[#dropObtained + 1] = id
             end
         end
         for id, record in pairs(progress.hunts or {}) do
-            if NormalizeHuntStatus(record.status) == "completed" and not GQ.Data:GetEntryById(id) then
+            if NormalizeHuntStatus(record.status) == "completed" and stale(id) then
                 dropHunts[#dropHunts + 1] = id
             end
         end
@@ -5368,19 +5375,28 @@ function GQ.Log:IsItemIdObtained(itemId)
     local needle = tostring(itemId)
     local progress = CharProgress()
 
-    local function entryItemMatches(entry)
-        return entry and entry.itemId and tostring(entry.itemId) == needle
+    -- A saved id of the faction that is not expanded has no entry. Its item
+    -- id is the third field of the hunt id.
+    local function idItemMatches(id)
+        local entry = GQ.Data:GetEntryById(id)
+        if entry then
+            return entry.itemId and tostring(entry.itemId) == needle
+        end
+        if GQ.Data.IsUnexpandedHuntId and GQ.Data:IsUnexpandedHuntId(id) then
+            return id:match("^gen:%a+:(%d+):") == needle
+        end
+        return false
     end
 
     for id, _ in pairs(progress.obtained or {}) do
-        if entryItemMatches(GQ.Data:GetEntryById(id)) then
+        if idItemMatches(id) then
             return true
         end
     end
 
     for id, record in pairs(progress.hunts or {}) do
         if NormalizeHuntStatus(record.status) == "completed"
-            and entryItemMatches(GQ.Data:GetEntryById(id)) then
+            and idItemMatches(id) then
             return true
         end
     end
@@ -5637,6 +5653,14 @@ function GQ.Log:UntrackHunt(id)
                 if sibling and sibling.id and GQ.Data:EntryListKey(sibling) == itemKey then
                     GearQuestForeverDB.dismissedCompleted[sibling.id] = true
                     dismissedSibling = true
+                end
+            end
+            -- The other faction's rows are not expanded. Their ids are dismissed too.
+            if GQ.Data.UnexpandedItemEntries then
+                for _, sibling in ipairs(GQ.Data:UnexpandedItemEntries(entry.itemId)) do
+                    if sibling.id and GQ.Data:EntryListKey(sibling) == itemKey then
+                        GearQuestForeverDB.dismissedCompleted[sibling.id] = true
+                    end
                 end
             end
         end
@@ -12597,7 +12621,7 @@ function GQ.Log:EnsureSettingsPage(frame)
     creditsBody:SetPoint("TOPLEFT", creditsTitle, "BOTTOMLEFT", 0, -6)
     creditsBody:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
     creditsBody:SetJustifyH("LEFT")
-    creditsBody:SetText("Eao\nMainWon\nStikmyre\nClick\nVaniron\nThrayne\nAlteredigor\nDeadlybrew\nTheWawan\nBart2137\nmoosetraxftw")
+    creditsBody:SetText("Eao\nMainWon\nStikmyre\nClick\nVaniron\nThrayne\nAlteredigor\nDeadlybrew\nTheWawan\nBart2137\nmoosetraxftw\nkaeldrin")
     creditsBody:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
     creditsBody:Hide()
     frame.settingsCreditsBody = creditsBody
@@ -18604,7 +18628,9 @@ end
 -- The catalog is every level band for the class. Walking it on the search
 -- click froze the frame. Two thousand rows a frame stays inside the budget.
 function GQ.Log:EnsureLookupIndex(classFile, onReady)
-    if self._lookupIndex and self._lookupIndexClass == classFile and not self._lookupBuild then
+    local generation = GQ.Data and GQ.Data._entryGeneration or 0
+    if self._lookupIndex and self._lookupIndexClass == classFile and not self._lookupBuild
+        and self._lookupIndexGeneration == generation then
         if onReady then
             onReady()
         end
@@ -18633,17 +18659,56 @@ function GQ.Log:EnsureLookupIndex(classFile, onReady)
     end
     self._lookupIndex = {}
     self._lookupIndexClass = classFile
+    self._lookupIndexGeneration = GQ.Data and GQ.Data._entryGeneration or 0
+    -- Only the faction on screen is expanded. Lookup still lists both: the
+    -- other faction's rows are read first, then both are walked in file order.
+    if GQ.Data and GQ.Data.ReleaseDetachedEntries then
+        GQ.Data:ReleaseDetachedEntries()
+    end
     self._lookupBuild = {
         classFile = classFile,
         i = first,
         last = last,
         items = {},
-        generation = GQ.Data and GQ.Data._entryGeneration or 0,
+        generation = self._lookupIndexGeneration,
+        other = GQ.Data and GQ.Data.OtherFactionReader and GQ.Data:OtherFactionReader(classFile) or nil,
+        otherEntries = {},
+        j = 1,
     }
     self:StepLookupIndex()
 end
 
+function GQ.Log:AddLookupIndexEntry(build, entry)
+    local classFile = build.classFile
+    if not (entry and entry.classes and classFile and entry.classes[classFile] and entry.itemId) then
+        return
+    end
+    local items = build.items
+    local suffix = entry.suffix or ""
+    local key = tostring(entry.itemId) .. "\0" .. tostring(suffix)
+    local row = items[key]
+    if not row then
+        local name = self:LookupDisplayName(entry)
+        row = {
+            key = key,
+            itemId = entry.itemId,
+            name = name,
+            nameLower = GQ.FoldText(name),
+            englishLower = self:LookupEnglishName(entry),
+            entries = {},
+        }
+        items[key] = row
+        local order = self._lookupIndex
+        order[#order + 1] = row
+    end
+    row.entries[#row.entries + 1] = entry
+end
+
 function GQ.Log:FinishLookupIndex()
+    local build = self._lookupBuild
+    if build and build.otherEntries and GQ.Data and GQ.Data.HoldDetachedEntries then
+        GQ.Data:HoldDetachedEntries(build.otherEntries)
+    end
     self._lookupBuild = nil
     local ready = self._lookupReady
     self._lookupReady = nil
@@ -18669,41 +18734,33 @@ function GQ.Log:StepLookupIndex()
         self:EnsureLookupIndex(classFile)
         return
     end
-    local entries = GQ.Data and GQ.Data.entries
-    local classFile = build.classFile
-    local items = build.items
-    local order = self._lookupIndex
-    local stop = build.i + 1999
-    if stop > build.last then
-        stop = build.last
-    end
-    for i = build.i, stop do
-        local entry = entries and entries[i]
-        if entry and entry.classes and classFile and entry.classes[classFile] and entry.itemId then
-            local suffix = entry.suffix or ""
-            local key = tostring(entry.itemId) .. "\0" .. tostring(suffix)
-            local row = items[key]
-            if not row then
-                local name = self:LookupDisplayName(entry)
-                row = {
-                    key = key,
-                    itemId = entry.itemId,
-                    name = name,
-                    nameLower = GQ.FoldText(name),
-                    englishLower = self:LookupEnglishName(entry),
-                    entries = {},
-                }
-                items[key] = row
-                order[#order + 1] = row
+    local data = GQ.Data
+    local entries = data and data.entries
+    if build.other then
+        if build.other(2000, build.otherEntries) then
+            build.other = nil
+        end
+    else
+        local other = build.otherEntries
+        for _ = 1, 2000 do
+            local own = build.i <= build.last and entries and entries[build.i] or nil
+            local nextOther = other[build.j]
+            if not own and not nextOther then
+                break
             end
-            row.entries[#row.entries + 1] = entry
+            if own and (not nextOther or data:FileBlockKey(own) <= data:FileBlockKey(nextOther)) then
+                self:AddLookupIndexEntry(build, own)
+                build.i = build.i + 1
+            else
+                self:AddLookupIndexEntry(build, nextOther)
+                build.j = build.j + 1
+            end
+        end
+        if build.i > build.last and other[build.j] == nil then
+            self:FinishLookupIndex()
+            return
         end
     end
-    if stop >= build.last then
-        self:FinishLookupIndex()
-        return
-    end
-    build.i = stop + 1
     if C_Timer and C_Timer.After then
         C_Timer.After(0, function()
             if GQ.Log then
@@ -19381,8 +19438,12 @@ end
 function GQ.Log:ReleaseLookupIndex()
     self._lookupIndex = nil
     self._lookupIndexClass = nil
+    self._lookupIndexGeneration = nil
     self._lookupBuild = nil
     self._lookupReady = nil
+    if GQ.Data and GQ.Data.ReleaseDetachedEntries then
+        GQ.Data:ReleaseDetachedEntries()
+    end
     self._lookupSerial = (self._lookupSerial or 0) + 1
     self:HideLookupSearchWait()
     self._lookupResults = nil

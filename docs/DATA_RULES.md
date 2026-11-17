@@ -15,7 +15,7 @@ GearQuest uses **two different pipelines**. Do not apply one pipeline’s rules 
 
 **Forever max level is 60** (`GQ.MAX_PLAYER_LEVEL` in `Core.lua`). TBC **level 70** curated data was removed; do not re-import Phase 3 AtlasLoot into this repo. Generated bands are capped at **60**. Migration phases: [FOREVER-DATA-MIGRATION.md](./FOREVER-DATA-MIGRATION.md).
 
-**Paladin and warrior 1–9** come from the same scorer as every other class (`paladinEarly1to9`, `warriorEarly1to9`), both factions, per spec. Do not put a hand-written Alliance mail list back into `Data.lua`, and do not emit a Horde-only `Horde.1to9` file. **10–60** is `paladinPicks` and `warriorPicks`. All nine classes merge into `GQ.Data.entries` at load time via `DataAdapter.lua`. Sanity check:
+**Paladin and warrior 1–9** come from the same scorer as every other class (`paladinEarly1to9`, `warriorEarly1to9`), both factions, per spec. Do not put a hand-written Alliance mail list back into `Data.lua`, and do not emit a Horde-only `Horde.1to9` file. **10–60** is `paladinPicks` and `warriorPicks`. All nine classes merge into `GQ.Data.entries` through `DataAdapter.lua` when that class is played or simulated. Only the class on screen is expanded, and only for the faction on screen. The other faction is read on demand. See [ADDON-DATA-LAYOUT.md](./ADDON-DATA-LAYOUT.md). Sanity check:
 
 ```powershell
 node scripts/verify-generated-bis.mjs
@@ -42,6 +42,15 @@ At **runtime**, a generated hunt with `curatedRank` keeps that pipeline order. `
 - The knight's 13 pages live in `GQ.LocaleGuidePages` for every language. Apply them when the parchment is shown. The language pack can load after `PortraitGuide.lua`.
 - `Log.lua` is at 191 of 200 file-scope locals. One more file-scope `local` can stop the file compiling, and then the minimap button does nothing.
 
+**17 Nov 2026 (v1.2.1, memory) — do not undo these:** Full details in [ADDON-DATA-LAYOUT.md](./ADDON-DATA-LAYOUT.md).
+
+- Staging packs each class pick table into `GQ.Data.<name>Packed` (`scripts/stage_pack.py`). The repo files stay readable, and the pipeline keeps writing them. Staging reads every pack back and stops on any difference. Do not loosen that check. A new pick-row field goes into `EXTRA_KEYS` (`stage_pack.py`) and `OPTIONAL_ROW_FIELDS` (`DataAdapter.lua`) together.
+- Only the class on screen is expanded, and only for the faction on screen (`HuntFactionFor`). Your own class keeps your faction while another class is simulated. Every Simulator change ends in `SyncEffectiveHuntData`. Do not expand both factions again.
+- Hunt ids are unchanged (`gen:<class>:<itemId>:<slot>:<minLevel>:<spec>:<faction>`). The Completed prune keeps a saved id of the faction that is not expanded (`IsUnexpandedHuntId`) and waits while a custom spec is scoring.
+- Lookup reads the other faction while its tab is open, merges it in file order (`FileBlockKey`), and holds those entries so Track works. The tooltip's Not ranked for your faction uses `UnexpandedRowSpecs`. Dismissing a completed hunt dismisses the other faction's ids (`UnexpandedItemEntries`).
+- `Data.ItemStats.generated.lua` is not in the main TOC. It ships as `GearQuestForever_ItemStats` and loads when a custom spec is scored (`EnsureItemStats`).
+- The staged coordinate file shares repeated spots and spot lists. The repo file does not. Never write into a spot at runtime, and do not intern coordinates at runtime.
+
 **15 Nov 2026 (v1.2.0) — do not undo these:**
 
 - The 96 level-30 Molten Core copies in `pipeline/data/forever_beta_copies.json` (288823–288925, skipping 288895–288900 and 288912) are not hunts. They spawned in the level-30 beta and do not drop on live servers. The level-60 ids are the ones that drop. A rescrape skips that list in the item scrape, tooltip refresh, ingest, the new-item scan, and scoring. Do not index one again because Forever still has the client row.
@@ -61,7 +70,7 @@ At **runtime**, a generated hunt with `curatedRank` keeps that pipeline order. `
 - Coordinates were patched for recovered ids that already had a place in the local cache. Do not full-emit. **Guise of Battle** (287011) still has no creature and no pin. Do not invent one.
 - **Target tooltip, do not break this.** `MobDrop.lua` lists up to three pieces from that creature, vendor, trainer, or quest giver. A line appears only when the piece is on this level's hunt list and it beats what is worn, or the slot is empty. A downgrade stays off. Being on the list is not enough. "Not the item you are wearing" is not enough. That test put downgrades on the tooltip. Do not put it back. The comparison is `GearScoreArrowDelta`, the same number as the item tooltip. Do not write a second comparison. Do not drop a real upgrade because the worn piece has no stored hunt score. Score the worn link the same way the item tooltip does. Rings and trinkets compare to the weaker piece when both slots are filled. One empty ring or trinket slot is an upgrade. An older band stays off. The line prints the rank, the item, the slot, the white index, the green arrow, and the green comparison number (`GearScoreDeltaText`). Never the arrow without that number. The three lines are the biggest upgrades. **Disengagement Ring** (276202) is finger rank #8 for a hunter at 44 and beats Seal of Sylvanas and Monkey Ring, so Friz Frazzlespark lists it with the green number. A piece he sells that scores worse does not appear. Hunts settings **Hide unit gear tips** hides the lines. The unit token from a world-cursor tooltip (a dungeon nameplate, a mouseover inside Wailing Caverns) is a secret string. Do not pass it to `UnitExists`, `UnitIsPlayer`, `UnitGUID`, or `UnitName`. Read the name with `GQ.PublicText` from `GetUnit` or the tooltip's first line. When that text is secret too, add no lines and do not error.
 - Weapon rank is the comparison score, highest first, on every class. `CollectWeaponPool` must not sort by `minLevel`. Rank #1 is the weapon that reads 100. A one-hander on a pairing spec includes its best off hand. A two-hander is the piece alone. A shield stays off that scale. Beast Mastery Horde at 44: the off hand is 44–44 and the two-handers are 43–46, and Eyegouger is rank #1, not #22. Other slots keep one band. Do not merge those bands. A set piece can still be rank 1 inside its own band with a lower raw score.
-- Hunt rows share item facts. The logged-in class drops its pick arrays after expand. Simulated classes keep theirs. `byClass` is not built. `byClassSlot` stays. Weights were not changed.
+- Hunt rows share item facts. `byClass` is not built. `byClassSlot` stays. Weights were not changed. (The pick-array drop described here in v1.1.7 was removed after v1.2.0. The packed rows now stay in memory so the other faction can be read again. See the 17 Nov 2026 entry.)
 - The notable shelf is gone from the addon. Do not put `GetNotableForSlot` back.
 - The other-camps (i) hangs on the last coordinate line. Lookup stays empty until a result is clicked. A completed quest whose reward was not taken stays on Active in red.
 
@@ -454,7 +463,8 @@ Do **not** mention Holy/Protection availability in the message — the picker al
 | File | Role |
 |------|------|
 | `GearQuest/Data.lua` | Curated entries |
-| `GearQuest/DataAdapter.lua` | Merges generated class tables into `entries` at load; suffix lookup/enrichment |
+| `GearQuest/DataAdapter.lua` | Expands the class on screen for the faction on screen into `entries` (packed or raw rows); reads the other faction on demand; suffix lookup/enrichment; loads Item Stats ([ADDON-DATA-LAYOUT.md](./ADDON-DATA-LAYOUT.md)) |
+| `scripts/stage-class-addons.py`, `scripts/stage_pack.py` | Build the load-on-demand class and Item Stats addons, pack pick rows, share coordinate spots, and check every pack against the repo files |
 | `GearQuest/_generated/*.generated.lua` | Generated picks + item facts + notables (1–60, nine classes) |
 | `pipeline/docs/FOREVER-SCORING.md` | Forever scoring model: weights, sets, tooltips, coordinates |
 | `docs/SUFFIX-RANDOM-ENCHANT.md` | **Random enchant addon rules** — suffixId matching, negative ids, notables, tooltips |

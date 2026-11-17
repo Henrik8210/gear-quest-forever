@@ -162,7 +162,7 @@ After `/reload` in-game:
 | file | role |
 |---|---|
 | `GearQuest/Data.lua` | `MakeSuffixTargetLink`, `EntrySuffixMatchesLink`, `BuildNotableEntry`, tooltip paths |
-| `GearQuest/DataAdapter.lua` | `BuildSuffixLookup`, `EnrichEntrySuffix`, passes `suffixId` from generated rows |
+| `GearQuest/DataAdapter.lua` | `BuildSuffixLookup`, `EnrichEntrySuffix`, passes `suffixId` from generated rows. In a staged class file, `BuildSuffixLookup` reads `suffixRows` from the packed table, which covers both factions, so the lookup is the same as when both factions were expanded |
 | `GearQuest/Log.lua` | list quality colors, tooltip hover |
 | `GearQuest/Core.lua` | clears legacy `GearQuestDB.suffixLinks` cache on login |
 

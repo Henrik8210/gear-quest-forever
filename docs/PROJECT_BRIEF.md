@@ -60,6 +60,7 @@ WoW Forever is **1–60**. The addon uses `GQ.MAX_PLAYER_LEVEL = 60`. TBC level-
 - Hook `PaperDollFrame` / `CharacterFrame` slot buttons
 - Reuse Blizzard item tooltips (`GameTooltip:SetHyperlink`)
 - Repo source folder `GearQuest/`; install/CurseForge package **`GearQuestForever`** (`GearQuestForever.toc`); Lua global `GearQuest` / `GQ`
+- Class hunt data, item stats, and languages ship as separate load-on-demand addons built at staging time. Only the class and faction on screen are expanded in memory. How that works, and what not to break: [ADDON-DATA-LAYOUT.md](./ADDON-DATA-LAYOUT.md)
 
 ## CurseForge
 
