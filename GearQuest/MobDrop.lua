@@ -680,20 +680,28 @@ function GQ.Data:AddUnitGearLines(tooltip, unit, hintedName, dataGuid)
     end
     tooltip.gqUnitGear = guid
     local picks = self:TopUnitGear(name, 3)
+    local drops
+    local kind = GQ.PublicText and GQ.PublicText(dataGuid) or guid
+    if not (string.find(kind, "^Player%-") or string.find(kind, "^Pet%-")) and MobIsHostile(tooltip, token) then
+        local skip = {}
+        local key = MobKey(name)
+        local rows = key and self.mobDrops and self.mobDrops[key]
+        for i = 1, #(rows or {}) do
+            skip[rows[i][1]] = true
+        end
+        drops = self:TopWorldDrops(MobLevel(tooltip, token), skip, 3, key)
+    end
+    if not picks and not drops then
+        return
+    end
+    tooltip.gqUnitShiftHint = true
+    if not (IsShiftKeyDown and IsShiftKeyDown()) then
+        tooltip:AddLine(L["Hold Shift to see BiS items from this NPC"], 0.6, 0.6, 0.6, true)
+        return
+    end
     if picks then
         AddLines(tooltip, picks)
     end
-    local kind = GQ.PublicText and GQ.PublicText(dataGuid) or guid
-    if string.find(kind, "^Player%-") or string.find(kind, "^Pet%-") or not MobIsHostile(tooltip, token) then
-        return
-    end
-    local skip = {}
-    local key = MobKey(name)
-    local rows = key and self.mobDrops and self.mobDrops[key]
-    for i = 1, #(rows or {}) do
-        skip[rows[i][1]] = true
-    end
-    local drops = self:TopWorldDrops(MobLevel(tooltip, token), skip, 3, key)
     if drops then
         AddLines(tooltip, drops, "Your top world drops from this mob:")
     end
@@ -701,6 +709,25 @@ end
 
 local function ClearUnitGear(tooltip)
     tooltip.gqUnitGear = nil
+    tooltip.gqUnitShiftHint = nil
+end
+
+-- Shift down or up while a unit tooltip waits on it draws that tooltip again.
+local function RefreshShiftTip(tip)
+    if not tip or not tip.gqUnitShiftHint or not tip.IsShown or not tip:IsShown() then
+        return
+    end
+    tip.gqUnitGear = nil
+    if tip.RefreshData then
+        pcall(tip.RefreshData, tip)
+        return
+    end
+    if tip.SetUnit and UnitExists then
+        local ok, exists = pcall(UnitExists, "mouseover")
+        if ok and exists == true then
+            pcall(tip.SetUnit, tip, "mouseover")
+        end
+    end
 end
 
 local hooked
@@ -721,6 +748,15 @@ function GQ.Data:InstallUnitGearTips()
     local hasUnit = TooltipDataProcessor and TooltipDataProcessor.AddTooltipPostCall
         and Enum and Enum.TooltipDataType and Enum.TooltipDataType.Unit
     HookTip(GameTooltip)
+    if CreateFrame then
+        local shiftWatch = CreateFrame("Frame")
+        shiftWatch:RegisterEvent("MODIFIER_STATE_CHANGED")
+        shiftWatch:SetScript("OnEvent", function(_, _, key)
+            if key == "LSHIFT" or key == "RSHIFT" then
+                RefreshShiftTip(GameTooltip)
+            end
+        end)
+    end
     if hasUnit then
         TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function(tooltip, data)
             local name, unit
