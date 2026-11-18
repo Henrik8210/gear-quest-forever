@@ -1240,7 +1240,18 @@ function GQ.Data:BuildIndex()
     self:PruneMissingForever()
     self.bySlot = {}
     self.byItemId = {}
-    self.byId = {}
+    -- Curated/custom IDs are indexed directly. Generated IDs are resolved from
+    -- the existing item bucket when first used, then cached until the rebuild.
+    -- This keeps legacy saved hunt IDs without storing every generated string.
+    self.byId = setmetatable({}, {
+        __index = function(index, id)
+            local entry = self:ResolveGeneratedEntryId(id)
+            if entry then
+                rawset(index, id, entry)
+            end
+            return entry
+        end,
+    })
     self.byClassSlot = {}
     self.byClassSlotSpec = {}
     for _, entry in ipairs(self.entries) do
@@ -1249,7 +1260,8 @@ function GQ.Data:BuildIndex()
         table.insert(self.bySlot[slot], entry)
         self.byItemId[entry.itemId] = self.byItemId[entry.itemId] or {}
         table.insert(self.byItemId[entry.itemId], entry)
-        if entry.id then
+        local mt = getmetatable(entry)
+        if not (mt and mt.__gqCompact) and entry.id then
             self.byId[entry.id] = entry
         end
         if entry.classes then
@@ -2863,20 +2875,9 @@ function GQ.Data:EntryMatchesPlayerFaction(entry)
     end
 
     -- A quest whose every pin is the other faction's city is not this side's quest.
-    if entry.sourceType == "quest_reward" and entry.itemId and self.coordinates then
-        local row = self.coordinates[entry.itemId]
-        if row and row.spots and #row.spots > 0 then
-            local any = false
-            for i = 1, #row.spots do
-                if self:SpotVisible(row.spots[i], faction) then
-                    any = true
-                    break
-                end
-            end
-            if not any then
-                return false
-            end
-        end
+    if entry.sourceType == "quest_reward" and entry.itemId
+        and not self:CoordinateAllowsFaction(entry.itemId, faction) then
+        return false
     end
 
     return true
@@ -5251,13 +5252,40 @@ function GQ.Data:PlayerOwnsEntryItem(entry)
     return ok and owned or false
 end
 
+function GQ.Data:ResolveGeneratedEntryId(id)
+    if type(id) ~= "string" then
+        return nil
+    end
+    local classFile, itemId, slot, minLevel, spec, faction = id:match(
+        "^gen:([^:]+):(%d+):([^:]+):(%d+):([^:]+):([^:]+)$"
+    )
+    if not classFile then
+        return nil
+    end
+    classFile = string.upper(classFile)
+    itemId, minLevel = tonumber(itemId), tonumber(minLevel)
+    local list = self.byItemId and self.byItemId[itemId]
+    -- BuildIndex previously kept the last entry when generated IDs collided.
+    -- Preserve that ordering and match the exact old ID before returning.
+    for i = list and #list or 0, 1, -1 do
+        local entry = list[i]
+        if entry.classes and entry.classes[classFile]
+            and entry.slot == slot and entry.minLevel == minLevel
+            and ((spec == "nil" and not entry.specs) or (entry.specs and entry.specs[spec]))
+            and ((faction == "nil" and not entry.factions) or (entry.factions and entry.factions[faction]))
+            and entry.id == id then
+            return entry
+        end
+    end
+    return nil
+end
+
 function GQ.Data:GetEntryById(id)
     if not id then
         return nil
     end
-    -- byId is built once login finishes. A miss is a stale saved hunt id.
-    -- Walking self.entries here scans every generated row (about 467k) and
-    -- the Completed tab does that once per slot, which trips "script ran too long".
+    -- Generated IDs use a small item bucket on first access, then the byId
+    -- cache. Never scan the whole catalog after indexes have been built.
     if self.byId then
         local entry = self.byId[id]
         if entry == nil and self._detachedById then
@@ -5913,7 +5941,7 @@ function GQ.Data:BuildCandidatesForSlot(slotName)
 
     local function walk()
         for _, key in ipairs(self:GetCandidateSlotKeys(slotName)) do
-            for _, entry in ipairs(self:GetClassSlotEntryList(key) or {}) do
+            for _, entry in ipairs(self:GetClassSlotEntryList(key, true) or {}) do
                 if not seen[entry.id]
                     and playerLevel >= (entry.minLevel or 1)
                     and playerLevel <= (entry.maxLevel or playerLevel) + grace
@@ -7753,7 +7781,7 @@ function GQ.Data:WarmWeaponSlotAsync(slotName, onDone)
             if not listed then
                 listed = true
                 for _, slotKey in ipairs(self:GetCandidateSlotKeys(slotName)) do
-                    lists[#lists + 1] = self:GetClassSlotEntryList(slotKey) or {}
+                    lists[#lists + 1] = self:GetClassSlotEntryList(slotKey, true) or {}
                 end
             end
             while listIndex <= #lists do
@@ -7765,9 +7793,9 @@ function GQ.Data:WarmWeaponSlotAsync(slotName, onDone)
                     rowIndex = 0
                 else
                     walked = walked + 1
-                    if not seen[entry.id]
-                        and playerLevel >= (entry.minLevel or 1)
+                    if playerLevel >= (entry.minLevel or 1)
                         and playerLevel <= (entry.maxLevel or playerLevel) + grace
+                        and not seen[entry.id]
                         and self:ShouldShowEntry(entry)
                         and self:EntryMatchesPlayer(entry)
                         and (not equip or not equip.EntryArmorIsWearable or equip:EntryArmorIsWearable(entry, slotName)) then

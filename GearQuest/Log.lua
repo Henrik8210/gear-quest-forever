@@ -511,7 +511,7 @@ local function ExtractItemIdFromChatMessage(msg)
 
         itemName = strtrim(itemName)
 
-        for _, entry in ipairs(GQ.Data.entries) do
+        for _, entry in GQ.Data:IterCatalog() do
             if entry.sourceType == "profession" and entry.itemId then
                 local name = (GQ.Data.GetItemDisplayName and GQ.Data:GetItemDisplayName(entry.itemId))
                     or GetItemInfo(entry.itemId)
@@ -2763,7 +2763,7 @@ function GQ.Log:ReachableBossDungeons()
     end
     slots[#slots + 1] = "Ranged"
     for i = 1, #slots do
-        local list = GQ.Data and GQ.Data.GetClassSlotEntryList and GQ.Data:GetClassSlotEntryList(slots[i])
+        local list = GQ.Data and GQ.Data.GetClassSlotEntryList and GQ.Data:GetClassSlotEntryList(slots[i], true)
         if list then
             for j = 1, #list do
                 local entry = list[j]
@@ -2803,7 +2803,7 @@ function GQ.Log:ReachableTrashDungeons()
     end
     slots[#slots + 1] = "Ranged"
     for i = 1, #slots do
-        local list = GQ.Data and GQ.Data.GetClassSlotEntryList and GQ.Data:GetClassSlotEntryList(slots[i])
+        local list = GQ.Data and GQ.Data.GetClassSlotEntryList and GQ.Data:GetClassSlotEntryList(slots[i], true)
         if list then
             for j = 1, #list do
                 local entry = list[j]
@@ -4675,7 +4675,7 @@ function GQ.Log:GetFilteredTopForSlot(slotName)
     local equip = GQ.Equip
 
     for _, key in ipairs(GQ.Data:GetCandidateSlotKeys(slotName)) do
-        for _, entry in ipairs(GQ.Data:GetClassSlotEntryList(key) or {}) do
+        for _, entry in ipairs(GQ.Data:GetClassSlotEntryList(key, true) or {}) do
             if entry and entry.id and not seen[entry.id]
                 and not entry.healOnly
                 and playerLevel >= (entry.minLevel or 1)
@@ -5034,6 +5034,8 @@ function GQ.Log:DisplayEntryForObtainedItem(itemId, slotName)
 end
 
 function GQ.Log:CollectCompletedBySlot()
+    -- A failed text index cannot establish whether saved IDs are stale.
+    if GQ.Data._textIndexErrors and next(GQ.Data._textIndexErrors) then return {} end
     if self._completedBySlot then
         return self._completedBySlot
     end
@@ -16559,14 +16561,12 @@ function GQ.Log:WarmOtherSpecRanksAsync()
     end
     local classFile = GQ:GetEffectiveClass()
     local options = classFile and GQ.Spec:GetOptions(classFile)
-    local bySlot = classFile and data.byClassSlotSpec and data.byClassSlotSpec[classFile]
-    if not options or not bySlot then
+    if not options then
         return
     end
     local function hasRows(slotName, spec)
         for _, key in ipairs(data:GetCandidateSlotKeys(slotName) or {}) do
-            local map = bySlot[data:NormalizeSlotName(key)]
-            if map and ((map[spec] and map[spec][1]) or (map._any and map._any[1])) then
+            if data:HasCatalogSlotSpec(classFile,key,spec) then
                 return true
             end
         end
@@ -16779,7 +16779,7 @@ function GQ.Log:GetSlotRankList(slotName, handKind)
             local loadSlot = loadSlots[s]
             local slotPool = {}
             for _, key in ipairs(GQ.Data:GetCandidateSlotKeys(loadSlot)) do
-                for _, entry in ipairs(GQ.Data:GetClassSlotEntryList(key) or {}) do
+                for _, entry in ipairs(GQ.Data:GetClassSlotEntryList(key, true) or {}) do
                     if entry and entry.id
                         and GQ.Data:ShouldShowEntry(entry)
                         and GQ.Data:EntryMatchesPlayerBand(entry)
@@ -18011,7 +18011,7 @@ function GQ.Log:CasterBisOffHand()
     local seen = {}
     local playerLevel = GQ:GetEffectiveLevel() or 1
     for _, key in ipairs(GQ.Data:GetCandidateSlotKeys("SecondaryHand") or {}) do
-        for _, entry in ipairs(GQ.Data:GetClassSlotEntryList(key) or {}) do
+        for _, entry in ipairs(GQ.Data:GetClassSlotEntryList(key, true) or {}) do
             if entry and entry.id and not seen[entry.id]
                 and not entry.healOnly
                 and playerLevel >= (entry.minLevel or 1)
@@ -18138,7 +18138,7 @@ function GQ.Log:BuildCollectWeaponPool()
             -- hands together kept the shorter band and dropped Two-hand.
             local slotPool = {}
             for _, key in ipairs(GQ.Data:GetCandidateSlotKeys(slotName) or {}) do
-                for _, entry in ipairs(GQ.Data:GetClassSlotEntryList(key) or {}) do
+                for _, entry in ipairs(GQ.Data:GetClassSlotEntryList(key, true) or {}) do
                     if entry and entry.id
                         and not entry.healOnly
                         and GQ.Data:ShouldShowEntry(entry)
@@ -18641,7 +18641,7 @@ function GQ.Log:HeldOffHandEntries()
     local seen = {}
     local playerLevel = GQ:GetEffectiveLevel() or 1
     for _, key in ipairs(GQ.Data:GetCandidateSlotKeys("SecondaryHand") or {}) do
-        for _, entry in ipairs(GQ.Data:GetClassSlotEntryList(key) or {}) do
+        for _, entry in ipairs(GQ.Data:GetClassSlotEntryList(key, true) or {}) do
             if entry and entry.id and not seen[entry.id]
                 and not entry.healOnly
                 and playerLevel >= (entry.minLevel or 1)
@@ -19561,9 +19561,14 @@ end
 -- The catalog is every level band for the class. Walking it on the search
 -- click froze the frame. Two thousand rows a frame stays inside the budget.
 function GQ.Log:EnsureLookupIndex(classFile, onReady)
-    local generation = GQ.Data and GQ.Data._entryGeneration or 0
-    if self._lookupIndex and self._lookupIndexClass == classFile and not self._lookupBuild
-        and self._lookupIndexGeneration == generation then
+    local data = GQ.Data
+    local generation = data._entryGeneration or 0
+    if
+        self._lookupIndex
+        and self._lookupIndexClass == classFile
+        and not self._lookupBuild
+        and self._lookupIndexGeneration == generation
+    then
         if onReady then
             onReady()
         end
@@ -19576,50 +19581,32 @@ function GQ.Log:EnsureLookupIndex(classFile, onReady)
     if self._lookupBuild and self._lookupBuild.classFile == classFile then
         return
     end
-    if GQ.Data and GQ.Data.EnsureClassLoaded and classFile then
-        GQ.Data:EnsureClassLoaded(classFile)
-    end
-    local first, last = 1, 0
-    local span = GQ.Data and GQ.Data._classEntrySpan and GQ.Data._classEntrySpan[classFile]
-    local entries = GQ.Data and GQ.Data.entries
-    if span then
-        first, last = span[1], span[2]
-    elseif entries then
-        last = #entries
-    end
-    if last < first then
-        last = first - 1
-    end
+    data:EnsureClassLoaded(classFile)
+    data:ReleaseDetachedEntries()
+    data:SetCatalogLookupClass(classFile)
+    local own = data:NewCatalogCursor(classFile, nil, data._lookupHasSpan[classFile])
+    local other = data:NewCatalogCursor(classFile, nil, true, true)
     self._lookupIndex = {}
     self._lookupIndexClass = classFile
-    self._lookupIndexGeneration = GQ.Data and GQ.Data._entryGeneration or 0
-    -- Only the faction on screen is expanded. Lookup still lists both: the
-    -- other faction's rows are read first, then both are walked in file order.
-    if GQ.Data and GQ.Data.ReleaseDetachedEntries then
-        GQ.Data:ReleaseDetachedEntries()
-    end
+    self._lookupIndexGeneration = data._entryGeneration or 0
     self._lookupBuild = {
         classFile = classFile,
-        i = first,
-        last = last,
         items = {},
         generation = self._lookupIndexGeneration,
-        other = GQ.Data and GQ.Data.OtherFactionReader and GQ.Data:OtherFactionReader(classFile) or nil,
-        otherEntries = {},
+        own = own,
+        other = other,
+        i = 1,
         j = 1,
     }
     self:StepLookupIndex()
 end
 
-function GQ.Log:AddLookupIndexEntry(build, entry)
-    local classFile = build.classFile
-    if not (entry and entry.classes and classFile and entry.classes[classFile] and entry.itemId) then
+function GQ.Log:AddLookupIndexEntry(build, entry, reference)
+    if not (entry and entry.classes and entry.classes[build.classFile] and entry.itemId) then
         return
     end
-    local items = build.items
-    local suffix = entry.suffix or ""
-    local key = tostring(entry.itemId) .. "\0" .. tostring(suffix)
-    local row = items[key]
+    local key = tostring(entry.itemId) .. "\0" .. tostring(entry.suffix or "")
+    local row = build.items[key]
     if not row then
         local name = self:LookupDisplayName(entry)
         row = {
@@ -19630,26 +19617,22 @@ function GQ.Log:AddLookupIndexEntry(build, entry)
             englishLower = self:LookupEnglishName(entry),
             entries = {},
         }
-        items[key] = row
-        local order = self._lookupIndex
-        order[#order + 1] = row
+        build.items[key] = row
+        self._lookupIndex[#self._lookupIndex + 1] = row
     end
-    row.entries[#row.entries + 1] = entry
+    row.entries[#row.entries + 1] = reference or entry
 end
 
 function GQ.Log:FinishLookupIndex()
-    local build = self._lookupBuild
-    if build and build.otherEntries and GQ.Data and GQ.Data.HoldDetachedEntries then
-        GQ.Data:HoldDetachedEntries(build.otherEntries)
+    local other = self._lookupBuild and self._lookupBuild.other
+    if other and other.rawEntries then
+        GQ.Data:HoldDetachedEntries(other.rawEntries)
     end
     self._lookupBuild = nil
     local ready = self._lookupReady
     self._lookupReady = nil
-    if not ready then
-        return
-    end
-    for i = 1, #ready do
-        ready[i]()
+    for _, fn in ipairs(ready or {}) do
+        fn()
     end
 end
 
@@ -19658,41 +19641,49 @@ function GQ.Log:StepLookupIndex()
     if not build then
         return
     end
-    local generation = GQ.Data and GQ.Data._entryGeneration or 0
-    if build.generation ~= generation then
-        local classFile = build.classFile
-        self._lookupBuild = nil
-        self._lookupIndex = nil
-        self._lookupIndexClass = nil
-        self:EnsureLookupIndex(classFile)
+    local data = GQ.Data
+    if build.generation ~= (data._entryGeneration or 0) then
+        local class = build.classFile
+        self._lookupBuild, self._lookupIndex, self._lookupIndexClass = nil, nil, nil
+        self:EnsureLookupIndex(class)
         return
     end
-    local data = GQ.Data
-    local entries = data and data.entries
-    if build.other then
-        if build.other(2000, build.otherEntries) then
-            build.other = nil
+    local otherCursor = build.other
+    if otherCursor.reader then
+        local done = otherCursor.reader(2000, otherCursor.rawEntries)
+        if done then
+            otherCursor.reader = nil
+            otherCursor.count = #otherCursor.rawEntries
+            otherCursor.segments = { { regular = otherCursor.rawEntries, count = otherCursor.count } }
         end
-    else
-        local other = build.otherEntries
-        for _ = 1, 2000 do
-            local own = build.i <= build.last and entries and entries[build.i] or nil
-            local nextOther = other[build.j]
-            if not own and not nextOther then
-                break
-            end
-            if own and (not nextOther or data:FileBlockKey(own) <= data:FileBlockKey(nextOther)) then
-                self:AddLookupIndexEntry(build, own)
-                build.i = build.i + 1
-            else
-                self:AddLookupIndexEntry(build, nextOther)
-                build.j = build.j + 1
-            end
+        if C_Timer and C_Timer.After then
+            C_Timer.After(0, function()
+                if GQ.Log then
+                    GQ.Log:StepLookupIndex()
+                end
+            end)
+        else
+            self:StepLookupIndex()
         end
-        if build.i > build.last and other[build.j] == nil then
-            self:FinishLookupIndex()
-            return
+        return
+    end
+    for _ = 1, 2000 do
+        local own, ownRef = data:GetCursorLookupEntry(build.own, build.i)
+        local other, otherRef = data:GetCursorLookupEntry(build.other, build.j)
+        if not own and not other then
+            break
         end
+        if own and (not other or data:FileBlockKey(own) <= data:FileBlockKey(other)) then
+            self:AddLookupIndexEntry(build, own, ownRef)
+            build.i = build.i + 1
+        else
+            self:AddLookupIndexEntry(build, other, otherRef)
+            build.j = build.j + 1
+        end
+    end
+    if build.i > build.own.count and build.j > build.other.count then
+        self:FinishLookupIndex()
+        return
     end
     if C_Timer and C_Timer.After then
         C_Timer.After(0, function()
@@ -19711,9 +19702,12 @@ function GQ.Log:LookupDetailEntry(item)
         return nil
     end
     local faction = GQ.GetEffectiveFaction and GQ:GetEffectiveFaction()
-    local best = entries[1]
+    local best = GQ.Data:ResolveCatalogReference(entries[1])
+    if not best then
+        return nil
+    end
     for i = 2, #entries do
-        local entry = entries[i]
+        local entry = GQ.Data:ResolveCatalogReference(entries[i]) or best
         local bestSide = best.factions and faction and best.factions[faction]
         local side = entry.factions and faction and entry.factions[faction]
         local take = false
@@ -19739,19 +19733,21 @@ function GQ.Log:LookupRankLines(item, classFile)
     local groups = {}
     local entries = item.entries or {}
     for i = 1, #entries do
-        local entry = entries[i]
-        local spec = self:LookupSpecLabel(entry, classFile)
-        local faction = self:LookupFactionLabel(entry)
-        local rank = entry.curatedRank or 0
-        local key = spec .. "\0" .. faction .. "\0" .. tostring(rank)
-        local group = groups[key]
-        if not group then
-            group = { spec = spec, faction = faction, rank = rank, ranges = {} }
-            groups[key] = group
+        local entry = GQ.Data:ResolveCatalogReference(entries[i])
+        if entry then
+            local spec = self:LookupSpecLabel(entry, classFile)
+            local faction = self:LookupFactionLabel(entry)
+            local rank = entry.curatedRank or 0
+            local key = spec .. "\0" .. faction .. "\0" .. tostring(rank)
+            local group = groups[key]
+            if not group then
+                group = { spec = spec, faction = faction, rank = rank, ranges = {} }
+                groups[key] = group
+            end
+            local minLevel = entry.minLevel or 0
+            local maxLevel = entry.maxLevel or minLevel
+            group.ranges[#group.ranges + 1] = { minLevel, maxLevel }
         end
-        local minLevel = entry.minLevel or 0
-        local maxLevel = entry.maxLevel or minLevel
-        group.ranges[#group.ranges + 1] = { minLevel, maxLevel }
     end
 
     local merged = {}
@@ -19794,7 +19790,8 @@ function GQ.Log:LookupRankLines(item, classFile)
         local id = row.spec .. "\0" .. tostring(row.rank) .. "\0" .. rangeKey(row.ranges)
         local bucket = seen[id]
         if not bucket then
-            bucket = { spec = row.spec, rank = row.rank, ranges = row.ranges, alliance = false, horde = false }
+            bucket =
+                { spec = row.spec, rank = row.rank, ranges = row.ranges, alliance = false, horde = false }
             seen[id] = bucket
             combined[#combined + 1] = bucket
         end
@@ -19840,15 +19837,11 @@ function GQ.Log:LookupRankLines(item, classFile)
             side = L["Alliance and Horde"]
         end
         local rank = row.rank
-        local rankText = (type(rank) == "number" and rank > 0) and string.format(L["rank %s"], tostring(rank)) or L["ranked"]
+        local rankText = (type(rank) == "number" and rank > 0) and string.format(L["rank %s"], tostring(rank))
+            or L["ranked"]
 
-        lines[#lines + 1] = string.format(
-            "|cffe6bf47%s|r, %s, %s. %s.",
-            row.spec,
-            rankText,
-            table.concat(parts, ", "),
-            side
-        )
+        lines[#lines + 1] =
+            string.format("|cffe6bf47%s|r, %s, %s. %s.", row.spec, rankText, table.concat(parts, ", "), side)
     end
     return lines
 end
@@ -19862,7 +19855,7 @@ function GQ.Log:ShowLookupRankTooltip(button, item)
     GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
     GameTooltip:ClearLines()
     GameTooltip:SetText(item.name or L["Item"], 1, 0.82, 0)
-    local entry = item.entries and item.entries[1]
+    local entry = item.entries and GQ.Data:ResolveCatalogReference(item.entries[1])
     if entry and entry.slot and GQ.Data and GQ.Data.SlotHeaderLabel then
         GameTooltip:AddLine(GQ.Data:SlotHeaderLabel(entry.slot), 0.8, 0.8, 0.8, true)
     end
@@ -20508,6 +20501,7 @@ function GQ.Log:RunLookup()
 end
 
 function GQ.Log:ReleaseLookupIndex()
+    GQ.Data:SetCatalogLookupClass(nil)
     self._lookupIndex = nil
     self._lookupIndexClass = nil
     self._lookupIndexGeneration = nil

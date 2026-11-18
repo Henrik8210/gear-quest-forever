@@ -1,9 +1,9 @@
 local _, GQ = ...
 local L = GQ.L
 
--- Expands the generated BiS tables into GQ.Data.entries, the array that
--- Indicator.lua, Log.lua and Tracker.lua already iterate. Nothing in those files
--- needs to change: generated rows arrive in exactly the shape curated ones use.
+-- Shared entry construction and the legacy row-array adapter. Catalog.lua
+-- indexes staged text without expanding every row; unstaged development data
+-- still uses this adapter's one-faction expansion.
 --
 -- Per class, levels 1-9 and 10-60 both come from the scorer.
 --   1-9            <class>Early1to9, both factions, one row per spec
@@ -207,6 +207,40 @@ local OPTIONAL_ROW_FIELDS = {
 }
 local SHARED_MT = setmetatable({}, { __mode = "k" })
 
+-- Dense records avoid a hash node for every field on every level-band row.
+-- The metatable preserves normal field reads/writes for all consumers. Copies
+-- are materialized as ordinary named-field tables for custom-spec scoring.
+local ENTRY_FIELDS = {
+    slot = 1, minLevel = 2, maxLevel = 3, curatedRank = 4,
+    pipelineScore = 5, specs = 6, factions = 7,
+}
+
+local function CompactIndex(entry, key)
+    local index = ENTRY_FIELDS[key]
+    if index then return rawget(entry, index) end
+    local mt = getmetatable(entry)
+    if key == "id" then
+        local specs, factions = entry.specs, entry.factions
+        local id = mt.__gqPrefix .. entry.slot .. ":" .. entry.minLevel .. ":"
+            .. tostring(specs and next(specs) or nil) .. ":" .. tostring(factions and next(factions) or nil)
+        return id
+    end
+    return mt.__gqShared[key]
+end
+
+local function CompactNewIndex(entry, key, value)
+    rawset(entry, ENTRY_FIELDS[key] or key, value)
+end
+
+local function PackedMetatable(shared, base, classFile, itemId, sourceIx)
+    return {
+        __gqCompact = true, __gqSource = sourceIx,
+        __gqShared = shared, __gqBase = base,
+        __gqPrefix = "gen:" .. classFile:lower() .. ":" .. itemId .. ":",
+        __index = CompactIndex, __newindex = CompactNewIndex,
+    }
+end
+
 local function SharedMetatable(classFile, classes, itemId, f, r, sourceIx)
     local byClass = SHARED_MT[f]
     if not byClass then
@@ -256,6 +290,7 @@ local function SharedMetatable(classFile, classes, itemId, f, r, sourceIx)
     end
     mt = { __index = shared, __gqShared = shared, __gqSource = sourceIx }
     mt.__gqBase = hasExtra and base or mt
+    mt.__gqPacked = PackedMetatable(shared, mt.__gqBase, classFile, itemId, sourceIx)
     byClass[variant] = mt
     return mt
 end
@@ -265,10 +300,23 @@ function GQ.Data:CopyEntry(entry)
     if not entry then
         return copy
     end
-    for key, value in pairs(entry) do
-        copy[key] = value
-    end
     local mt = getmetatable(entry)
+    if mt and mt.__gqCompact then
+        for key in pairs(ENTRY_FIELDS) do
+            copy[key] = entry[key]
+        end
+        copy.id = entry.id
+        -- Preserve per-row enrichment and future named-field annotations.
+        for key, value in pairs(entry) do
+            if key ~= "_gqCatalogOrder" and (type(key) ~= "number" or key < 1 or key > 7) then
+                copy[key] = value
+            end
+        end
+    else
+        for key, value in pairs(entry) do
+            if key ~= "_gqCatalogOrder" then copy[key] = value end
+        end
+    end
     if mt and mt.__gqShared then
         local shared = mt.__gqShared
         for i = 1, #OPTIONAL_ROW_FIELDS do
@@ -280,6 +328,34 @@ function GQ.Data:CopyEntry(entry)
         setmetatable(copy, mt.__gqBase or mt)
     end
     return copy
+end
+
+GQ.Data.catalogSources = SOURCES
+GQ.Data.catalogClassAddons = CLASS_ADDONS
+function GQ.Data:MakeCatalogEntry(src, variant, slot, minLevel, maxLevel, rank, spec, faction, score)
+    local facts = self[src.facts]
+    local itemId = variant[1]
+    local f = facts and facts[itemId]
+    if not f or self:IsForeverMissing(itemId) then return nil end
+    CLASSTBL[src.class] = CLASSTBL[src.class] or { [src.class] = true }
+    -- Only requested entries exist, so keep hot fields directly accessible.
+    -- Cache each immutable variant's metadata instead of rebuilding its key
+    -- whenever the same record is decoded for a later UI query.
+    local mt = variant._gqEntryMetatable
+    if not mt then
+        mt = SharedMetatable(src.class, CLASSTBL[src.class], itemId, f, variant, src.ix).__gqPacked
+        variant._gqEntryMetatable = mt
+    end
+    local entry = {
+        slot = slot, minLevel = minLevel, maxLevel = maxLevel,
+        curatedRank = rank, pipelineScore = score,
+        specs = spec and src.specs and src.specs[spec] or nil,
+        factions = faction and FACTION[faction] or nil,
+    }
+    setmetatable(entry, mt)
+    self:EnrichEntrySuffix(entry)
+    self:EnrichBossChestEntry(entry)
+    return entry
 end
 
 -- The staged class addon packs each pick table as <picks>Packed: one text
@@ -374,24 +450,17 @@ local function RowAdder(src, data, out)
     CLASSTBL[src.class] = CLASSTBL[src.class] or { [src.class] = true }
     local classes = CLASSTBL[src.class]
     local classFile = src.class
-    local prefix = "gen:" .. src.class:lower() .. ":"
     local state = { added = 0 }
     local n = #out
     local function add(itemId, slot, minLevel, maxLevel, rank, spec, faction, score, extra)
         local f = facts[itemId]
         if f and not (data.IsForeverMissing and data:IsForeverMissing(itemId)) then
             local entry = {
-                id           = prefix .. itemId .. ":" .. slot .. ":" .. minLevel
-                                 .. ":" .. tostring(spec) .. ":" .. tostring(faction),
-                slot         = slot,
-                minLevel     = minLevel,
-                maxLevel     = maxLevel,
-                curatedRank  = rank,
-                pipelineScore = score,
-                specs        = spec and src.specs and src.specs[spec] or nil,
-                factions     = faction and FACTION[faction] or nil,
+                slot, minLevel, maxLevel, rank, score,
+                spec and src.specs and src.specs[spec] or nil,
+                faction and FACTION[faction] or nil,
             }
-            setmetatable(entry, SharedMetatable(classFile, classes, itemId, f, extra, src.ix))
+            setmetatable(entry, SharedMetatable(classFile, classes, itemId, f, extra, src.ix).__gqPacked)
             n = n + 1
             out[n] = entry
             state.added = state.added + 1

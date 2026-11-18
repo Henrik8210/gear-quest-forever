@@ -613,3 +613,5 @@ L["Hides hunts you can only get on Zephras Isle, the Skyborne island. Quests, ve
 L["No crafted BoP!"] = "Pas d'artisanat lié !"
 L["Hides crafted gear that binds when picked up until you can make it yourself, with that profession and the skill the recipe needs. That covers a craft whose recipe is bought from a vendor or drops from a boss. Crafted gear that binds when equipped stays, because you can buy it from another player."] = "Masque l'équipement fabriqué qui est lié quand il est ramassé, jusqu'à ce que vous puissiez le fabriquer vous-même, avec ce métier et la compétence demandée par la recette. Cela couvre aussi une recette achetée chez un marchand ou lâchée par un boss. L'équipement fabriqué lié quand il est équipé reste, car vous pouvez l'acheter à un autre joueur."
 L["Page %d / %d"] = "Page %d / %d"
+
+L["could not index %s hunt data (%s). Please /reload."] = "impossible d’indexer les données de traque de %s (%s). Veuillez utiliser /reload."

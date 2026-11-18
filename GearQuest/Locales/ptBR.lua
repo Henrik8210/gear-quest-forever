@@ -612,3 +612,5 @@ GQ.LocaleGuidePages = {
     "Certo, última coisa. Quero falar das {b}configurações{/b}, porque alguns aventureiros não gostam daquele {b}ícone do minimapa{/b}, outros querem ver o {b}encantamento de equipamento recomendado{/b} na dica do equipamento, e há mais.\n\nEntão dê uma olhada nas configurações para a jornada ficar mais agradável.\n\nAh, e um oi para a incrível comunidade do GearQuest no Discord? Não sei o que aquela última frase quer dizer, o sujeito só me pediu para ler.",
     "Então…… o que você está esperando?\n\nVamos começar a {b}caça de equipamento…… para sempre!{/b}",
 }
+
+L["could not index %s hunt data (%s). Please /reload."] = "não foi possível indexar os dados de caça de %s (%s). Use /reload."

@@ -998,6 +998,7 @@ function GQ.Custom:Prepare(classFile, specId)
     end
 
     local entries = GQ.Data.entries
+    local cursor = GQ.Data.NewCatalogCursor and GQ.Data:NewCatalogCursor(classFile, record.base)
     return {
         classFile = classFile,
         specId = specId,
@@ -1007,7 +1008,9 @@ function GQ.Custom:Prepare(classFile, specId)
         bands = {},
         stats = GQ.Data.itemStats,
         entries = entries,
-        count = #entries,
+        count = cursor and cursor.count or #entries,
+        catalogCursor = cursor,
+        catalogGeneration = GQ.Data._entryGeneration,
     }
 end
 
@@ -1328,7 +1331,15 @@ function GQ.Custom:Pump()
         return
     end
     local live = GQ.Data and GQ.Data.entries
-    if live and live ~= job.entries then
+    if job.catalogCursor then
+        if job.catalogGeneration ~= GQ.Data._entryGeneration then
+            local replacement = self:Prepare(job.classFile, job.specId)
+            if not replacement then self:CancelJob(job.classFile) return end
+            replacement.onDone, replacement.modal, replacement.retried = job.onDone, job.modal, job.retried
+            replacement.i = 1
+            job, self._job = replacement, replacement
+        end
+    elseif live and live ~= job.entries then
         -- Class load replaced the table. Score the new one from the start.
         job.entries = live
         job.count = #live
@@ -1344,7 +1355,8 @@ function GQ.Custom:Pump()
     local limit = debugprofilestop and (debugprofilestop() + 12) or nil
     local entries = job.entries
     while job.i <= job.count do
-        local ok, err = pcall(self.Consume, self, job, entries[job.i])
+        local entry = job.catalogCursor and GQ.Data:GetCursorEntry(job.catalogCursor, job.i) or entries[job.i]
+        local ok, err = pcall(self.Consume, self, job, entry)
         if not ok and not job.consumeError then
             job.consumeError = err
             if GQ.Chat then
