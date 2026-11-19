@@ -34,6 +34,7 @@ _generated/Data.MobDrops.generated.lua
 Map.lua
 Pins.lua
 DataAdapter.lua
+Catalog.lua
 Compare.lua
 Indicator.lua
 Log.lua

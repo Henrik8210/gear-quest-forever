@@ -320,7 +320,7 @@ local function WorldDropRanges(data)
         return worldDrops
     end
     local ranges = {}
-    for itemId in pairs(data.byItemId or {}) do
+    for itemId in data:IterCatalogItemIds() do
         local fact = data:GetItemFact(itemId)
         if fact and fact.sourceType == "world_drop" and not fact.npc then
             local lo, hi = string.match(fact.instructions or "", "^World drop around level (%d+)%-(%d+)%.")

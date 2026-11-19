@@ -21,12 +21,14 @@ had its own coordinate spot tables.
   item stats into their own addon, and shares repeated coordinate spots.
   Every packed form is read back and compared with the repo file, and staging
   stops on any difference.
-- In game, only the class on screen is expanded, and only for the faction on
-  screen. The other faction's rows stay as packed text. Code that needs them
-  reads them on demand.
+- In a staged build, Catalog.lua indexes each requested class's original text.
+  It creates detailed entries only for queries and selected hunts. Faction and
+  level filters run before entry allocation. The readable development row arrays
+  still use the adapter's one-faction expansion.
 - Hunt ids did not change, so saved progress keeps working.
-- Measured Lua heap at login (old layout, then new): Mage 99.8 MB to 50.1 MB,
-  Warrior 81.6 MB to 41.5 MB, Priest 68.7 MB to 32.5 MB.
+- The text-lazy prototype was observed at 36-45 MiB in a player's Warrior
+  session versus 75-80 MiB with official v1.2.2. This is an observation, not
+  a promise for every class, loaded addon set, or client.
 
 ## The addon folders
 
@@ -132,97 +134,85 @@ drift from what they were.
 
 ## Runtime flow
 
-### Login
+### Staged class catalogs
 
-`Core.lua` PLAYER_LOGIN calls `GQ.Data:EnsureActiveHuntClasses()`, then
-`BuildIndex()`. `EnsureActiveHuntClasses` loads and expands your class and,
-if the Simulator is on, the simulated class. It then drops idle classes and
-sets `_huntDataReady`.
+`Catalog.lua` loads after `DataAdapter.lua`. `EnsureClassLoaded(class)` loads
+that class's addon and builds position/selection indexes for its two sources.
+The existing `slots`, `specs`, `extras`, `rows`, `specMask`, and `suffixRows`
+remain unchanged. There is no additional release encoder, saved conversion
+cache, or new data format. Rank and score are parsed from the original text
+only when a detailed entry is requested.
 
-`EnsureClassLoaded(classFile)` loads the class addon if needed, then expands
-each of the class's two sources (`SOURCES` in `DataAdapter.lua`: picks first,
-then Early 1-9) for one faction:
+Each indexed row has 10 bytes of selection metadata (item, extra, slot, level
+bounds, spec), a 5-byte source-text location/faction, and 3-byte ordinals in
+item and slot/spec indexes. Contiguous faction/spec ranges avoid another
+per-row list. Invalid input fails once, leaves the class inactive, and prevents
+Completed from pruning progress while its data cannot be checked.
 
-- `HuntFactionFor(classFile)`: for the class on screen, the Simulator faction
-  (`GQ:GetEffectiveFaction()`). For your own class while another class is
-  simulated, your real faction.
-- It records `_expandedClasses[class]`, `_expandedFaction[class]`, and
-  `_classEntrySpan[class]`, bumps `_entryGeneration`, builds the suffix
-  lookup, and enriches the new entries.
-- The packed text stays in memory. Nothing is dropped after expansion, so a
-  class can be released and expanded again for the other faction.
+Indexing is synchronous when a class first loads in a session. It reuses the
+index after faction switches or class reactivation; `/reload` builds it again.
+The prototype's isolated Lua 5.1 harness measured about 243 ms for Warrior and
+375 ms for Mage. Actual client timing needs in-game testing.
 
-### Simulator changes
+`Data.entries` now holds curated and custom entries. Generated built-in rows
+are accessed through `NewCatalogCursor`, `IterCatalog`, `GetEntriesByItemId`,
+`GetClassSlotEntryList`, and `GetEntryById`. Do not assume `pairs(byItemId)` or
+`ipairs(entries)` enumerates the generated catalog. `IterCatalogItemIds` is the
+complete active item enumeration used by world-drop ranges.
 
-Every Simulator transition (`Preview:SetEnabled`, `SetClass`, `SetFaction`,
-`ApplySimulation`, `ApplyCurrentCharacter`) ends in
-`GQ.Data:SyncEffectiveHuntData()`:
+`GetClassSlotEntryList(slot, true)` filters level, grace, and faction before
+allocating entries. Omitting the second argument preserves the full history
+for removal/history tools. Other-spec rank warming uses `HasCatalogSlotSpec`
+without materializing every band.
 
-1. If the class on screen is expanded for the wrong faction, release it
-   (`ReleaseExpandedClass`).
-2. Expand the class on screen for the right faction.
-3. Release idle classes: anything that is not your class and not the class
-   on screen (`ReleaseIdleHuntClasses`). Their addons stay loaded until
-   `/reload`, because WoW cannot unload an addon.
-4. If `_entryGeneration` changed, run `BuildIndex`, `InvalidateClassCache`,
-   and a full garbage collection, then return true.
+### Entry objects and caches
 
-`ApplySimulation` stores the faction before it calls `SetClass`, so a
-simulated class is expanded once, for the right side. `SetFaction` rebuilds
-the custom spec on screen when the faction changed. Custom-spec copies are
-removed with the rows they came from (`Custom:OnClassReleased`), and
-`Custom:EnsureBuilt` scores them again for the expanded rows.
+Detailed entries preserve ordinary field access through shared metatables.
+`CopyEntry` returns an ordinary copy for the unchanged custom-spec scorer.
+Generated IDs retain exactly this form:
+`gen:<class lower>:<itemId>:<slot>:<minLevel>:<spec>:<faction>`.
+They are assembled on request; last-row resolution of duplicate IDs is preserved.
 
-### Entries
+Caches are bounded: 1,024 detailed objects, 64 item histories, 512 resolved IDs,
+24 active slot lists and four full slot histories. UI-held objects can outlive
+cache eviction. Closing Lookup releases its index and opposite-faction ID scope.
+Garbage collection determines when temporary allocations disappear from memory
+meters; this code does not force collection on every query.
 
-Each row becomes one entry table with `id`, `slot`, `minLevel`, `maxLevel`,
-`curatedRank`, `pipelineScore`, `specs`, and `factions`. Everything else
-(`itemId`, `classes`, `generated`, the item facts, and the named row fields)
-comes through a shared metatable (`SharedMetatable`):
+### Lookup and the other faction
 
-- `__index` / `__gqShared` is the shared field table.
-- `__gqBase` is the variant without named fields (`CopyEntry` uses it).
-- `__gqSource` is the `SOURCES` index the row came from (`FileBlockKey`
-  uses it). It is a metatable field, so it is not visible as `entry.__gqSource`.
+Lookup merges active and other-faction cursors by the unchanged `FileBlockKey`
+(spec order, then faction, within each source). It builds in slices of 2,000
+rows. A lightweight stub supplies names and grouping fields; index rows hold
+numeric references rather than detailed gear tables. Selecting an item resolves
+its details and ranks. Generation changes restart an unfinished build;
+`ReleaseLookupIndex` cancels pending work.
 
-The id is unchanged from v1.2.0:
-`gen:<class lower>:<itemId>:<slot>:<minLevel>:<spec>:<faction>`. A custom-spec
-copy adds `:<customSpecId>`.
+`OtherFactionReader`, `UnexpandedRowSpecs`, `UnexpandedItemEntries`, and
+`IsUnexpandedHuntId` retain their original APIs and text readers. Normal item
+and ID queries see only the active faction. While Lookup is open,
+`SetCatalogLookupClass` also allows its opposite-faction IDs to resolve, so
+Track can use the original saved IDs.
 
-## Code that reads the other faction
+### Simulator and custom specs
 
-Only one faction is in `GQ.Data.entries`, `byId`, and `byItemId`. These read
-the other faction's packed rows, so behavior matches the old layout:
+Every Simulator transition still ends in `SyncEffectiveHuntData`. The class on
+screen uses the simulated faction; your own class keeps the real faction when
+another class is simulated. Releasing a class deactivates its catalog, removes
+custom entries, clears object/slot caches, and invalidates the entry generation.
+Its addon files and source indexes remain loaded until `/reload`.
 
-| Function (`DataAdapter.lua` unless noted) | Used by | What it gives |
-|---|---|---|
-| `OtherFactionReader(class)` | Lookup index build (`Log.lua`) | A stepping reader: `read(limit, out)` appends up to `limit` new entries and returns true when done |
-| `HoldDetachedEntries(list)` / `ReleaseDetachedEntries()` | Lookup | Makes Lookup's other-faction entries findable by `GetEntryById` (`Data.lua`) while the Lookup index exists, so Track works from Lookup |
-| `UnexpandedRowSpecs(itemId)` | `GearScoreMissText`, `LinkIsGear` (`Data.lua`) | `{ [CLASS] = { [spec] = true, _any = true? } }` from the spec masks, so the tooltip still says Not ranked for your faction |
-| `UnexpandedItemEntries(itemId)` | `Log:UntrackHunt` on the Completed tab | Fresh entries for that item's other-faction rows, so dismissing a completed hunt dismisses those ids too |
-| `IsUnexpandedHuntId(id)` | Completed prune, `Log:IsItemIdObtained` | True for a saved id of a loaded class whose faction is not expanded |
-| `FileBlockKey(entry)`, `SpecFileOrder(src)` | Lookup merge | The file-order key described above |
+Custom scoring streams a base-spec cursor through the existing scorer. It
+restarts if the catalog generation changes mid-job, and class release still
+cancels the associated job. Item Stats remains load on demand.
 
-Everything else filters to the player's faction already (`EntryMatchesPlayer`,
-`EntryMatchesPlayerBand`, `EntryMatchesTrackedHunt`, the tracker), so it only
-ever used the expanded faction anyway. If you add code that walks
-`GetEntriesByItemId` or `GetEntryById` and must see both factions, use one of
-the functions above. Do not expand both factions again.
+### Readable development data
 
-### Lookup
-
-`Log:EnsureLookupIndex(class)` builds the index in slices of 2000 rows per frame:
-
-1. Read the whole other faction through `OtherFactionReader`.
-2. Walk the expanded span (`_classEntrySpan`) and the other-faction list
-   together, taking whichever entry has the lower `FileBlockKey`, and index
-   each one (`Log:AddLookupIndexEntry`).
-3. `FinishLookupIndex` holds the other-faction entries for `GetEntryById`.
-
-The index rebuilds when `_entryGeneration` changes. `ReleaseLookupIndex`
-(leaving the tab) drops the index and the held entries. While the Lookup tab
-is open, the other faction costs about as much memory as the expanded faction
-(about 34 MB for Mage).
+When a class has unstaged row arrays, `Catalog.lua` delegates activation and
+release to the original adapter. Lookup uses the original stepping reader for
+its other-faction entries, holds their IDs while open, and drops them on close.
+This fallback preserves the development workflow; release memory savings should
+be measured on a staged build. Mixed staged/raw classes follow the same fallback.
 
 ### Saved progress
 
@@ -287,7 +277,14 @@ spec is not scored. The file is still written by
      faction, and the Lookup merge order with the old entry order.
    The v1.2.0 to packed change passed all of this for all nine classes, both
    factions, packed and raw, with zero differences.
-4. Run `scripts/sync-addon.ps1`, `/reload`, and check in game:
+4. The portable regression suite is `python tests/lazy_catalog/run.py` (Python
+   3.10+ and `pip install lupa==2.8`; local `v1.2.3` git tag required). It stages
+   current data with the existing stager, compiles every staged Lua file with
+   Lua 5.1, and compares current/baseline runtime behavior across all nine classes
+   and both factions, including the readable-array fallback. JSON results and
+   staged trees can be retained with `--output <new directory>`. Client equipment
+   rules and UI APIs are stubbed; this does not replace the in-game checks.
+5. Run `scripts/sync-addon.ps1`, `/reload`, and check in game:
    - the hunt list;
    - the Simulator on the other faction and another class, then turning it off;
    - Lookup, including Track from Lookup;
@@ -296,11 +293,11 @@ spec is not scored. The file is still written by
 
 ## Do not
 
-- Do not expand both factions, or keep the other faction's entries outside
-  the Lookup tab.
+- Do not eagerly expand staged rows. Do not keep other-faction detail entries
+  outside the Lookup tab. Unstaged development data retains its legacy adapter.
 - Do not change the hunt id format. Saved progress is keyed by it.
-- Do not drop the packed text after expansion. A faction switch and Lookup
-  read it again.
+- Do not drop or mutate the packed text after indexing. Position indexes,
+  faction switches, and Lookup read it again.
 - Do not hand-edit staged files or commit them. They are rebuilt on every sync.
 - Do not add class files, `Data.ItemStats.generated.lua`, or the
   load-on-demand addons to the main TOC or `## OptionalDeps`.
