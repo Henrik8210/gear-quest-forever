@@ -6,10 +6,10 @@ this before you touch `GearQuest/DataAdapter.lua`, `scripts/stage-class-addons.p
 `scripts/stage_pack.py`, the main TOC, or any code that looks up hunt entries
 by id or by item.
 
-This layout shipped in v1.2.1. The last commit with the old layout is
-`ed63083` (v1.2.0). In that layout both factions were expanded at login, the
-class files held plain row arrays, item stats loaded at login, and every item
-had its own coordinate spot tables.
+Packed staging shipped in **v1.2.1** (`ed63083` was the last v1.2.0 tree). Lazy
+runtime loading through **Catalog.lua** shipped in **v1.2.4**. Before v1.2.1,
+both factions expanded at login, class files held plain row arrays, item stats
+loaded at login, and every item had its own coordinate spot tables.
 
 ## Short version
 
@@ -26,9 +26,10 @@ had its own coordinate spot tables.
   level filters run before entry allocation. The readable development row arrays
   still use the adapter's one-faction expansion.
 - Hunt ids did not change, so saved progress keeps working.
-- The text-lazy prototype was observed at 36-45 MiB in a player's Warrior
-  session versus 75-80 MiB with official v1.2.2. This is an observation, not
-  a promise for every class, loaded addon set, or client.
+- v1.2.4 on live builds: a level 50 hunter often reports ~40 MiB in the Game
+  Menu addon list, with a small bump when opening Lookup from a slot **(i)**.
+  Earlier prototype figures were 36–45 MiB (Warrior) versus 75–80 MiB on
+  v1.2.2. Totals vary by class, other addons, and session. Not a guarantee.
 
 ## The addon folders
 

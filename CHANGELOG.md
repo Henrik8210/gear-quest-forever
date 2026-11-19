@@ -4,121 +4,150 @@ Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3
 
 ## v1.2.4
 
-The window title reads **GearQuest Forever v1.2.4**. Hunt lists, ranks, filters, play styles, map pins, unit tooltips, and **Hold Shift** BiS lines are the same as v1.2.3. This release loads class hunt data from a compact on-disk catalog and builds each row only when the log, Lookup, or a tooltip needs it, so the addon uses less memory while you play.
+The window title reads **GearQuest Forever v1.2.4**. Your hunts, rank order, scores, filters, play styles, map pins, parchment text, **Hold Shift** unit tooltips, GearQuest score, and saved progress match v1.2.3. What changed is how class hunt data is loaded: **Catalog.lua** indexes the staged class files and builds a row only when the log, Lookup, a tooltip, or the simulator asks for it, which cuts resident memory on a real character.
 
-**Lower memory on the same hunts**
+**First restart after updating**
 
-- **What you see is unchanged.** A level 50 Horde **Beast Mastery** hunter still gets the same chest, weapon, and ring ranks as v1.2.3. Opening a slot's **(i)** rank list in Lookup still shows the same order and scores.
-- **Memory drops on real characters.** On a mid-level hunter with the log closed, GearQuest Forever typically sits near **40 MB** instead of holding a much larger eager copy of every hunt row for your class. Opening Lookup adds a small bump while that slot's list is built, then stays stable.
-- **Other-spec ranks stay smooth.** With **General settings → Ranks for your other specs** on, item tooltips still list each spec's rank at your level. Hovering many hunts in a row should not hitch the frame the way an older lazy build did.
-- **Simulation, Completed, Removed, custom specs, and languages** behave as in v1.2.3. Class data still loads when you play or simulate that class; non-English text still comes from **GearQuest Forever: Languages**.
+- This release adds **Catalog.lua** to **GearQuestForever.toc**. A **`/reload` is not enough** the first time you install v1.2.4. Quit to the character screen or desktop and log in again so the client loads the new file.
+- The nine **GearQuestForever_*** class folders on disk are unchanged. You do not need to wipe saved variables.
+
+**Memory on a leveling character**
+
+- v1.2.3 already cut memory versus v1.2.0 by unpacking one faction and packing coordinates. v1.2.4 avoids materializing every hunt row for your class at once.
+- On a **level 50 Horde Beast Mastery** hunter, GearQuest Forever often sits near **40 MB** in the Game Menu addon list while Questie and the database addons use their own memory. Opening **Lookup** from a slot's **(i)** may add about **2 MB** while that slot's rank list is built, then stay flat.
+- Totals depend on your other addons, how long you have played that class, and whether you have opened the log or simulated another class.
+- CPU while standing in town should stay negligible. Building a slot list costs work once; it should not run every frame.
+
+**Same hunts, ranks, and ids**
+
+- Every class, spec, levels 1–60, and both factions use the same scored lists as v1.2.3.
+- Saved hunts, **Completed**, **Removed**, and tracked pins use the same hunt **id** strings. Progress is not reset.
+- **Lookup** from **(i)** stays in rank order with the same scores. **Hunts per gear slot**, filters, and play styles hide rows the same way; **#N** on visible hunts stays the unfiltered rank.
+
+**Log, parchment, and simulation**
+
+- **Active**, **Tracked**, obtain toasts, the GearQuest score bar, **Recommended**, and **Rank #1 BiS acquired** behave as in v1.2.3.
+- Quest chains, vendor prices, craft materials, and **Show on map** pins are unchanged.
+- **Simulation** still loads one class at a time and keeps upgrade arrows off while simulating.
+
+**Tooltips and other specs**
+
+- Hunt hovers still prefer the **client item tooltip**, then rank, score, and optional enchant and other-spec lines.
+- With **General settings → Ranks for your other specs** **on**, quick hovers across many hunts should stay smooth: each spec keeps its own cached slot lists.
+- With that setting **off**, only the active or simulated spec gets a rank line, as in v1.2.3.
+
+**Unit tooltips (unchanged from v1.2.3)**
+
+- BiS lines on vendors, trainers, quest givers, and attackable mobs still appear only while **Shift** is held. **Hide unit gear tips** still removes them.
+
+**Custom specs, languages, load order**
+
+- **GearQuest Forever: Item Stats** still loads the first time a **custom spec** is scored.
+- **GearQuest Forever: Languages** still loads only when you pick a non-English language.
+- Class addons still load when you play or simulate that class.
+
+**What did not change**
+
+- No rescore, no weight retune, and no new hunts in this version.
+- Repository CI checks are for developers; they are not shipped in the zip.
+
+Thanks to **kaeldrin-gh** for the lazy catalog work merged in this release.
 
 ### v1.2.3
 
-The window title reads **GearQuest Forever v1.2.3**. This version quiets the tooltips on creatures, vendors, trainers, and quest givers. The upgrade lines stay out of the way until you hold Shift. Your hunts, ranks, filters, play styles, and settings are unchanged.
-
-**Hold Shift to see the upgrades on a unit**
-
-Mousing over a creature, a vendor, a profession trainer, or a quest giver used to add up to six lines to its tooltip: the unit's top pieces for you, and **Your top world drops from this mob:**. Those lines now only show while you hold **Shift**.
-
-- **Without Shift**, the tooltip ends with one grey line, **Hold Shift to see BiS items from this NPC**. That line only appears when the unit has an upgrade for you, so a unit with nothing for you keeps its normal tooltip.
-- **Hold Shift** while you hover, and the lines appear right away, without moving the mouse. Release Shift, and the tooltip goes back to the single grey line.
-- **What is listed has not changed.** The lines are the same pieces as before: on your hunt list for your level, an upgrade over what you wear or for an empty slot, with the rank, the slot, the score, and the green comparison number. **Chief Engineer Bilgewhizzle** in Gadgetzan still lists **Masons Fraternity Ring** for a level 47 hunter, now with Shift held.
-- **This works for every player.** There is no setting to show the lines without Shift.
-- **Hunt settings → Hide unit gear tips** still removes everything, including the grey line.
-- The grey line is translated in all eight GearQuest languages.
+**GearQuest Forever v1.2.3** — Unit BiS lines need **Shift**; grey hint when upgrades exist. Hunts unchanged.
 
 ### v1.2.2
 
-The window title reads **GearQuest Forever v1.2.2**. Item tooltips list the rank for each of your class's other specs (each spec's own roll on random greens, a grey line when a spec does not rank the piece), with **General settings → Ranks for your other specs**, and both settings pages are grouped under headings. Play style page 2 adds **No crafted BoP!**, crafted hunts show their recipe, descriptions drop repeated lines, and unlearned weapon types get a red line. Clicking a slot's (i) opens that rank list in Lookup, which now scrolls to 100 results. Raids not in the game, 684 hunts the client cannot load, and unconfirmed items left the lists. **Krol'dok Stronghold** got its bosses and trash, 174 more world drops got pins, quest givers list 832 more rewards, and mobs list world drops, without the hover freeze. Enhancement agility is 0.65 and intellect 0.75. Frame time, the gamepad, and the Russian, Korean, and Chinese fonts were fixed.
+**GearQuest Forever v1.2.2** — Other-spec tooltip ranks, **No crafted BoP!**, craft recipes, Lookup **(i)**, removed absent raids and client-missing hunts, **Krol'dok**, pins and unit-tip performance, gamepad and font fixes.
 
 ### v1.2.1
 
-The window title reads **GearQuest Forever v1.2.1**. GearQuest Forever uses about half the memory of v1.2.0 (a mage went from 99.8 MB to 50.1 MB), with no change to hunts, ranks, pins, or windows. Only the faction on screen is unpacked, and Lookup still searches both. Item stats for custom specs moved to their own addon, **GearQuest Forever: Item Stats**, which loads the first time a custom spec is scored; keep it enabled if you use custom specs. Map pins and the class hunt lists are stored more compactly. Settings → **The GearQuest Community** adds **kaeldrin**.
+**GearQuest Forever v1.2.1** — Roughly half the memory of v1.2.0; one faction unpacked; **Item Stats** addon split; compact staging.
 
 ### v1.2.0
 
-The window title reads **GearQuest Forever v1.2.0**. Each hunt on the Tracked tab has a checkbox that untracks it. Get it now hides a piece you need a profession to wear, such as **Flying Tiger Goggles** without Engineering. **Replica Crescent Necklace** is Alliance only and recommends 25. A two-hander's arrow counts both hands you would replace, including a shield. A worn piece's school spell power and armor count, so **Scaled Cloak of Shadow Wrath** reads about 74 for a shadow priest. Ten new Forever hunts are on the lists, including **Gravetoll Gavel**, **Soulwoven Drape**, and **Predator's Shroud**, and several hunts joined or left a class. **Dreamer's Chestguard** is rare. **Desperate Barrier** and 23 other pieces have less armor. The level-30 Molten Core beta copies, **Invisible Dagger**, and the test items are not hunts.
+**GearQuest Forever v1.2.0** — Track untrack boxes, **Get it now** profession wear, scoring and hunt fixes, new Forever pieces.
 
 ### v1.1.9
 
-The window title reads **GearQuest Forever v1.1.9**. This is a hotfix. Mousing over a creature in a dungeon no longer throws a Lua error, and the upgrade lines still show when the creature's name can be read. The knight's face pulses gold the first time you open the log, until the guide opens.
+**GearQuest Forever v1.1.9** — Dungeon unit-tooltip error hotfix; knight pulse on first open.
 
 ### v1.1.8
 
-The window title reads **GearQuest Forever v1.1.8**. A creature, vendor, trainer, or quest giver tooltip lists only pieces that beat what you are wearing, each with the green comparison number. **Disengagement Ring** now shows on Friz Frazzlespark for a hunter at 44.
+**GearQuest Forever v1.1.8** — Unit tips show real upgrades only; **Disengagement Ring** on vendors.
 
 ### v1.1.7
 
-The window title reads **GearQuest Forever v1.1.7**. Weapon rank #1 is the piece that reads 100. **Eyegouger** is Beast Mastery Horde rank #1 at 44. Casters count the best off hand in a one-hander's number. 751 items Forever already listed use the current tooltip, including **Dragon's Eye**, and all nine classes were scored again. Recovered quest hunts list their chains. Hovering a creature, a vendor, a trainer, or a quest giver adds up to three hunt pieces. The Map pin size labels no longer overlap.
+**GearQuest Forever v1.1.7** — GearQuest score on tooltips, tooltip rescore, quest chains, unit BiS lines.
 
 ### v1.1.6
 
-The window title reads **GearQuest Forever v1.1.6**. A worn piece that is not on your hunt list is scored from its tooltip, so the score bar no longer prints 0 for gear you are wearing. An empty slot is still 0. Hunt names use the tooltip color. The Twisted Evils rewards are the green pieces: Sprightring Helm is rank 5 for Combat at 40–43, Hulkstone Pauldrons are rank 6 for Arms at 40–41, Acumen Robes are rank 9 for Holy at 40–41, and Relentless Chain leaves the Beast Mastery chest list. No Dungeons hides a quest that enters a dungeon. Crafts both factions can make stay on both lists, including Brawler's Leather Hood. Bear prices weapon damage at 4.9, the same as cat. Map pins keep the size you pick when the map zooms. GearQuest adds a launcher for minimap-button collectors. The weight tooltip says Melee weapon DPS and Ranged weapon DPS. On a ding, the weapon lists are walked a few milliseconds at a time.
+**GearQuest Forever v1.1.6** — Worn gear scoring on the bar; Twisted Evils greens; ding weapon warm.
 
 ### v1.1.5
 
-The window title reads **GearQuest Forever v1.1.5**. Crafted hunts Forever names are sourced again: 409 vendors, 101 boss drops, and 20 named creatures. Merchant's Favor leather from Pawani and Daniel Stitchsong, including Brawler's Leather Hood, is a vendor hunt. Veteran's Chain Helm lists the Stockade bosses. Veteran's Silvered Chain Helm is the camp recipe. Guise of Battle is a world drop at 40. Whitemane's Chapeau and Jumanza Grips use the current tooltips. Cat prices weapon damage at 4.9 and bear at 2.52, and an on-hit proc does not fire in form. Scout's Medallion and Sentinel's Medallion require Honored. Settings has a Donations page.
+**GearQuest Forever v1.1.5** — Craft and drop sourcing refresh; vendor hunts; Donations page.
 
 ### v1.1.4
 
-The window title reads **GearQuest Forever v1.1.4**. The knight's 13 pages are translated. Guild chat says once when a guild mate runs a newer version. The (i) list writes Equipped and the raw score. Show on map uses TomTom when it is installed and leaves the earlier TomTom pins. Enhancement intellect is 0.7 and is not doubled. Rage of the Storm and the other Tempest's Weapons are shaman only. A crafted hunt with no named seller is Unsourced, with no pin. 37 new Forever pieces are on the lists.
+**GearQuest Forever v1.1.4** — Translated knight guide; TomTom pins; 37 new hunts.
 
 ### v1.1.3
 
-The window title reads **GearQuest Forever v1.1.3**. **Save and score items!** scores a custom spec with the numbers you typed, including the classic damage-and-healing line. An off-hand weapon uses the full weapon-damage weight. Healing stays 0 on a damage spec unless you type a number. For a priest, a mage, a warlock, a non-feral druid, and Elemental or Restoration, a one-hander is ranked with the best off-hand. Horde **Brutal Legguards**, **Brutal Gauntlets**, and **Brutal Hauberk** list the Speak with Ruga chain. The pin is the closest of Torm Ragetotem, Sorek, and Baltus Fowler. Brutal Legguards requires 20.
+**GearQuest Forever v1.1.3** — Custom spec scoring; caster one-hand pairs; Brutal mail chain.
 
 ### v1.1.2
 
-The window title reads **GearQuest Forever v1.1.2**. Quest reward adds **Quest chain** and **Single quest**. The parchment header, quest names, chain steps, and story use the selected language. **Stopping the Cycle** and **The Wrath of Rath'mael** keep their real chains. Hunt settings adds **Hide lower ranks** and **Hide map pins**. **No Zephras!** hides Skyborne-only hunts. A worn piece that is not on the list is not an empty slot. Beast Mastery 26–28 keeps the two-handers.
+**GearQuest Forever v1.1.2** — Quest chain filters; localized parchment; **No Zephras!**; hide lower ranks and map pins.
 
 ### v1.1.1
 
-The window title reads **GearQuest Forever v1.1.1**. Settings has a Language menu, and GearQuest Forever: Languages carries French, German, Spanish, Latin American Spanish, Portuguese, Russian, Korean, Simplified Chinese, and Traditional Chinese. A fury warrior's off hand is a one-hand weapon from level 20, not a shield. Dungeon and raid trash and each profession use their own picture. Dropped plans point at the drop, not the capital trainer. Lookup stays inside the parchment. The GearQuest Community lists TheWawan.
+**GearQuest Forever v1.1.1** — Languages addon; fury off-hand weapons; Lookup layout.
 
 ### v1.1.0
 
-The window title reads **GearQuest Forever v1.1.0**. Their Cities hides the other faction's city dungeons. Quest reward splits into Regular quest and Dungeon quest. 196 new Forever hunts were added, 33 of them quest rewards. Stopping the Cycle lists its eight steps, starting at the Tattered Spellbook in the Wetlands. Lookup, Removed, and tooltips were fixed.
+**GearQuest Forever v1.1.0** — **Their Cities**; 196 hunts; dungeon quest filter.
 
 ### v1.0.9
 
-The window title reads **GearQuest Forever v1.0.9**. Each hunt shows a small source picture. Horde hides The Stockade and Hall of Thanes. Alliance hides Ragefire Chasm and Ruins of Lordaeron. Hovers use the client tooltip, and the Wowhead Forever tip only when the client has no such item.
+**GearQuest Forever v1.0.9** — Hunt source icons; client-first hovers.
 
 ### v1.0.8
 
-The window title reads **GearQuest Forever v1.0.8**. Hunt rows are two lines tall, and the parchment shows the full reward name. A quest chain lists every step, and a quest with no earlier step says there are no prequests. **Deviate Scale Belt** is the pattern from Deviate Eradication. A hunter ranks a one-hander in the main hand until Dual Wield at 20. A caster's one-hand rank names the off-hand it is worn with. The right stick opens a paper-doll slot. **Bladewhisper's Namesake** is a new thrown weapon, the Watcher's Signets were renamed, and 140 pieces left the lists.
+**GearQuest Forever v1.0.8** — Two-line hunts; full parchment names; hunter dual-wield ranks.
 
 ### v1.0.7
 
-The window title reads **GearQuest Forever v1.0.7**. Settings → The GearQuest Community now shows the current Discord invite, `https://discord.gg/gQSVunBsR`. That is the same link as on the CurseForge addon description. The old invite had expired.
+**GearQuest Forever v1.0.7** — Discord invite update on Community page.
 
 ### v1.0.6
 
-The window title reads **GearQuest Forever v1.0.6**. The AddOn List shows the loot sack on GearQuest Forever, the same picture as the minimap button. Druid, Hunter, Mage, Paladin, Priest, Rogue, Shaman, Warlock, and Warrior each use that class's icon.
+**GearQuest Forever v1.0.6** — Class icons in the AddOn list.
 
 ### v1.0.5
 
-The window title reads **GearQuest Forever v1.0.5**. The **Hunts per gear slot** bar matches the hunt list, and a hovered hunt fades out to the right. **Play style** lines up with the parchment. The knight's bubble has no border, the speaker shows one, two, or three lines, and the tail stays on the portrait when the window is larger. Page 4 glows the Weapons filter. Deadlybrew is on **The GearQuest Community**.
+**GearQuest Forever v1.0.5** — Hunts-per-slot layout; knight speaker UI.
 
 ### v1.0.4
 
-The window title reads **GearQuest Forever v1.0.4**. **Hunts per gear slot** runs from 3 to 10 at the lower left of the log. The first time you open GearQuest, The GearQuest Knight speaks through 12 pages, with **Yes!** on the first page, a speaker and three volumes, and a gold glow on what he is explaining.
+**GearQuest Forever v1.0.4** — Hunts-per-slot slider 3–10; 12-page knight intro.
 
 ### v1.0.3
 
-The window title reads **GearQuest Forever v1.0.3**. The reward name uses the item's rarity color. A flyout can select or clear every box on that list. A boss drop says **Recommended dungeon entry at level N.** The guide still finds the ship when the client is not English. **Garb of Florid Feathers**, **Raptorclaw Greaves**, **Raptor's Gaze**, **Glinteye Slippers**, **Saltscale Girdle**, and **Supple Bellyskin Leggings** drop in Excavation Site. **Pendulum of Doom** and **Annealed Blade** come from Uldaman. **Axe of Inevitable Ruin**, **Cloudkeeper Legplates**, **Changuk Smasher**, and **Rog'mar Trainee Shoulderpads** are on the lists.
+**GearQuest Forever v1.0.3** — Rarity-colored rewards; flyout select all; dungeon entry line.
 
 ### v1.0.2
 
-The window title reads **GearQuest Forever v1.0.2**. While the log is open in gamepad UI, a gold chevron eases toward the focused control, a blue highlight marks it, and the window gets a soft gold glow. The d-pad and the left stick move through the hunts, the tabs, and Track, Show on map, and Remove. Y opens the filters without applying one. The bumpers change pages. A dark bar under the window names the buttons. The level box and the search box open the on-screen keyboard. Opening a Blizzard window gives that window the pad. **The GearQuest Community** lists Alteredigor.
+**GearQuest Forever v1.0.2** — Gamepad log navigation and filter focus.
 
 ### v1.0.1
 
-The window title reads **GearQuest Forever v1.0.1**. **Hunts → Recommended gear enchantment** is off until you turn it on. The tooltip then says **Recommended enchantment** in yellow, then the formula and the effect in white, just above the rank line. A quest reward says **Recommended to pick this quest up at level M.** A rogue hunts every one-hand type in both hands. The log could already be opened with a controller.
+**GearQuest Forever v1.0.1** — Optional recommended enchantment line; controller log.
 
 ### v1.0.0
 
-This is the first release. The window title reads **GearQuest Forever v1.0.0**. The score bar says **Your GearQuest Index Score is N Rank**. Off-hand shields follow the source filter. City of Dalaran and the Ruins of Lordaeron name the attunement and the entrance. New Forever hunts include **Serrated Knife**.
+**GearQuest Forever v1.0.0** — First release-channel build; GearQuest Index score bar.
 
 ### v0.6.1-beta
 

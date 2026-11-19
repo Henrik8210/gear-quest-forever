@@ -177,7 +177,7 @@ When a hunt or an item is added, or its name, description, or story changes, tha
 - Project brief: [docs/PROJECT_BRIEF.md](docs/PROJECT_BRIEF.md)
 - Data rules: [docs/DATA_RULES.md](docs/DATA_RULES.md)
 - Addon data layout, staging, and memory: [docs/ADDON-DATA-LAYOUT.md](docs/ADDON-DATA-LAYOUT.md)
-- Changelog: [CHANGELOG.md](CHANGELOG.md)
+- Changelog: [CHANGELOG.md](CHANGELOG.md) (current release **v1.2.4** — lazy hunt catalog via `Catalog.lua`; full client restart after first update)
 - BiS scorer (authors only, not in CurseForge zip): [pipeline/README.md](pipeline/README.md) — adding Forever items: [pipeline/docs/FOREVER-SCORING.md](pipeline/docs/FOREVER-SCORING.md)
 - CurseForge: [RELEASE.md](RELEASE.md)
 
