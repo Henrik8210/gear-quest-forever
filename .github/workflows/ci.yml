@@ -1,0 +1,108 @@
+# Checks every push to main and every pull request (forks included; the
+# workflow gets a read-only token and no secrets). The release workflow runs
+# the same release metadata check on the tag.
+#
+# Run any step locally with the same command. lupa is the only dependency:
+#   pip install lupa
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+  workflow_dispatch:
+    inputs:
+      catalog_suite:
+        description: "Also run tests/lazy_catalog (about 50 minutes) when it exists"
+        type: boolean
+        default: false
+      baseline:
+        description: "Baseline tag for tests/lazy_catalog"
+        type: string
+        default: "v1.2.3"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Addon checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install lupa (Lua 5.1)
+        run: pip install lupa
+
+      - name: Protected files (weights, seen-item notebook)
+        if: github.event_name == 'pull_request'
+        env:
+          GQ_PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+        run: python scripts/ci/check_protected.py --base "origin/${{ github.base_ref }}"
+
+      - name: Release metadata
+        run: python scripts/ci/check_release.py
+
+      - name: Code rules
+        run: python scripts/ci/check_rules.py
+
+      - name: Translations
+        run: python scripts/ci/check_locales.py
+
+      - name: Gear lists
+        run: python scripts/ci/check_gear.py
+
+      - name: Scorer tests
+        run: python -m unittest discover -s tests/pipeline -v
+
+      - name: Stage the addons like a release
+        run: |
+          set -euo pipefail
+          mkdir -p .ci-stage/GearQuestForever
+          rsync -a \
+            --exclude '_generated/*.json' \
+            --exclude '_generated/*.md' \
+            GearQuest/ .ci-stage/GearQuestForever/
+          python3 scripts/stage-class-addons.py --dest .ci-stage --main .ci-stage/GearQuestForever
+          python3 scripts/stage-locale-addons.py --dest .ci-stage --main .ci-stage/GearQuestForever
+
+      - name: Lua 5.1 compile and toc files
+        run: python scripts/ci/check_lua.py GearQuest .ci-stage
+
+  catalog-suite:
+    name: Lazy catalog comparison
+    if: github.event_name == 'workflow_dispatch' && inputs.catalog_suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install lupa (Lua 5.1)
+        run: pip install lupa
+
+      - name: Compare with the baseline release
+        run: |
+          if [ ! -f tests/lazy_catalog/run.py ]; then
+            echo "tests/lazy_catalog is not on this branch; nothing to run."
+            exit 0
+          fi
+          python tests/lazy_catalog/run.py --baseline "${{ inputs.baseline }}"
