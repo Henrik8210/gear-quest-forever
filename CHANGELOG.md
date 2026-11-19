@@ -2,7 +2,18 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.2.3
+## v1.2.4
+
+The window title reads **GearQuest Forever v1.2.4**. Hunt lists, ranks, filters, play styles, map pins, unit tooltips, and **Hold Shift** BiS lines are the same as v1.2.3. This release loads class hunt data from a compact on-disk catalog and builds each row only when the log, Lookup, or a tooltip needs it, so the addon uses less memory while you play.
+
+**Lower memory on the same hunts**
+
+- **What you see is unchanged.** A level 50 Horde **Beast Mastery** hunter still gets the same chest, weapon, and ring ranks as v1.2.3. Opening a slot's **(i)** rank list in Lookup still shows the same order and scores.
+- **Memory drops on real characters.** On a mid-level hunter with the log closed, GearQuest Forever typically sits near **40 MB** instead of holding a much larger eager copy of every hunt row for your class. Opening Lookup adds a small bump while that slot's list is built, then stays stable.
+- **Other-spec ranks stay smooth.** With **General settings → Ranks for your other specs** on, item tooltips still list each spec's rank at your level. Hovering many hunts in a row should not hitch the frame the way an older lazy build did.
+- **Simulation, Completed, Removed, custom specs, and languages** behave as in v1.2.3. Class data still loads when you play or simulate that class; non-English text still comes from **GearQuest Forever: Languages**.
+
+### v1.2.3
 
 The window title reads **GearQuest Forever v1.2.3**. This version quiets the tooltips on creatures, vendors, trainers, and quest givers. The upgrade lines stay out of the way until you hold Shift. Your hunts, ranks, filters, play styles, and settings are unchanged.
 
