@@ -223,6 +223,7 @@ local function CompactIndex(entry, key)
         local specs, factions = entry.specs, entry.factions
         local id = mt.__gqPrefix .. entry.slot .. ":" .. entry.minLevel .. ":"
             .. tostring(specs and next(specs) or nil) .. ":" .. tostring(factions and next(factions) or nil)
+        rawset(entry, "id", id)
         return id
     end
     return mt.__gqShared[key]

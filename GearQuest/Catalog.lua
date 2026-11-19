@@ -657,18 +657,25 @@ function Data:GetClassSlotEntryList(slotName, activeOnly)
     local level = GQ.GetEffectiveLevel and GQ:GetEffectiveLevel() or 1
     local faction = GQ.GetEffectiveFaction and GQ:GetEffectiveFaction() or ""
     local grace = GQ.Equip and GQ.Equip.LEVEL_GRACE or 0
+    -- Other-spec tooltip ranks probe every spec of the class in turn, so each
+    -- spec keeps its own lists instead of evicting the active spec's.
     local key = table.concat({
         class or "",
-        tostring(spec),
         tostring(level),
         faction,
         tostring(grace),
         tostring(self._entryGeneration),
     }, ":")
     if not self._catalogSlots or self._catalogSlots.key ~= key then
-        self._catalogSlots = { key = key, full = NewCache(), active = NewCache() }
+        self._catalogSlots = { key = key, specs = {} }
     end
-    local cache = activeOnly and self._catalogSlots.active or self._catalogSlots.full
+    local specKey = tostring(spec)
+    local slots = self._catalogSlots.specs[specKey]
+    if not slots then
+        slots = { full = NewCache(), active = NewCache() }
+        self._catalogSlots.specs[specKey] = slots
+    end
+    local cache = activeOnly and slots.active or slots.full
     if cache.values[slotName] then
         return cache.values[slotName]
     end
