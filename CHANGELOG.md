@@ -2,49 +2,31 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.2.8
+## v1.2.9
 
-The log header reads **GearQuest Forever v1.2.8**. This release focuses on **smoother NPC tooltips**, **clearer stat-weight tooltips**, and **Druid Bear** plus **Shaman** hunt lists tuned to the Forever grid. **`/reload`** after updating. Class hunt data reloads when you open the log or simulate that class.
+The log header reads **GearQuest Forever v1.2.9**. Showing the full unit-gear tooltip no longer hitches. Hunt lists are unchanged. **`/reload`** after updating.
 
-### Unit BiS lines on NPC tooltips — less hitch
+### World-drop lines on mob tooltips
 
-**Who:** Every class and spec, levels **1–60**, Alliance and Horde, when **Hunt settings → Tooltips → Hide unit gear tips** is off (default).
+**Who:** Every class and spec, levels **1–60**, Alliance and Horde, when **Hide unit gear tips** is off.
 
-**What you see:** Same rules as before — hold **Shift** for upgrade lines (or turn on **always show**). The grey **Hold Shift to see BiS items from this NPC** hint still appears only when that NPC could list upgrades. Named mob drops, trainer crafts, and **Your top world drops from this mob:** behave the same; drop **%**, source filters, and minimum drop **%** sliders still apply.
+**What you see:** Hold **Shift**, or turn on **Show unit gear without holding Shift**. Named drops, vendors, trainers, and quest givers still list up to three upgrades immediately. On a mob you can attack, **Your top world drops from this mob:** can take about **6 seconds** the first time tips are on for this level, class, faction, and spec. The lines are the same as before: up to three generic world drops that beat what you are wearing. Drop **%**, the minimum **%** slider, and the source filters still apply.
 
-**What changed under the hood:** Hovering without **Shift** no longer scores hundreds of world drops or rebuilds upgrade math on that frame. Heavy work runs on the next frame (or from cache on the second hover). Generic world-drop candidates are capped before scoring so hostile open-world mobs are cheaper to mouse over.
+Changing zone does not start that wait again. A ding, a spec change, or switching the simulated class does. If you are still hovering that mob when the pass finishes, the lines appear without moving the mouse.
 
-### Hunt settings → Tooltips scroll wheel
+**Hide unit gear tips** still shows nothing, and that pass does not run until you turn tips back on.
 
-**Who:** Anyone using the footer **Tooltips** preview window.
+**What changed:** v1.2.8 kept the grey hint cheap. Showing the lines still scored every world drop for that mob's level on one frame, and that was the hitch. Those rows are now scored in the background, 12 at a time. The tooltip only reads the short list.
 
-**Fix:** The mouse wheel on **Hunt settings → Tooltips** (unit and item columns) scrolls again. A bad handler argument stopped wheel events from reaching the scroll frames.
+### Shift still reveals the lines
 
-### Spec icon tooltip matches the Google Sheet
+**Who:** The same tooltips, when **Show unit gear without holding Shift** is off. That is the default.
 
-**Who:** All nine classes, every premade spec, and custom specs on the log header spec picker.
+**What you see:** Without Shift, one grey line, **Hold Shift to see BiS items from this NPC**, and only when that NPC could list an upgrade. Holding Shift replaces it with the gear lines. Releasing Shift puts the grey line back. The redraw waits one frame so the key press is the one the tooltip sees. An open tooltip also updates when the world-drop pass finishes.
 
-**What you see:** Hover the **spec name** or icon. The table lists **raw grid weights** — the same numbers as the [GearQuest Forever stat weights sheet](https://docs.google.com/spreadsheets/d/1jMC89KgzHpPZHYgcjOq6ef7lENhh8OGgypG2rC2m0Ok/edit), not stamina ×3 or intellect ×2 from leveling. **Healing** and **spell power from healing** show **0** on damage specs; Holy, Discipline, and Restoration still show their heal weights. Hunt scoring is unchanged: leveling survivability and endurance multipliers still apply in the lists.
+### v1.2.8
 
-**Developers:** **`/gq weights`** prints **`GQ.SCORING_WEIGHTS_REVISION`**, addon version, class, spec, level, and the first stat rows. CI adds **`scripts/ci/check_scoring_weights_parity.py`**.
-
-### Druid — Bear (feral tank) weights and hunts
-
-**Who:** **Feral** spec while leveling in **bear** form, both factions, all level bands rescored.
-
-**Grid changes:** **Hit** **0.88**, **crit** **0.58**, **stamina** **0.72** (was **0.4** / **0.25** / **1.0** on the sheet row). Cat form hunts use the unchanged cat row.
-
-**What you may notice:** Bear lists rank **hit**, **crit**, and weapon upgrades a bit higher relative to pure stamina leather. **Armor of the Fang** and other set windows move only where the new weights change order — no change to the Fang stun pricing rule.
-
-### Shaman — Enhancement and Enhancement Tank
-
-**Who:** **Enhancement** and **Enhancement Tank**, Alliance and Horde, levels **1–60**.
-
-**Enhancement:** **Agility** **0.6** on the grid (was **0.65**). Intellect stays **0.75** with no endurance double on Enhancement intellect.
-
-**Enhancement Tank:** **Strength** **1.0** (was **0.35**) so mail and plate with strength and stamina compete correctly with cloth spell-power pieces.
-
-**What you may notice:** Enhancement weapon and mail ranks shift toward agility melee pieces; Enhancement Tank off-hand shields and one-hand weapons with strength rise on the hunt list.
+**GearQuest Forever v1.2.8** — NPC tooltips stay cheap until Shift. The Tooltips window wheel scrolls again. The spec hover shows raw sheet weights. Druid Bear hit **0.88**, crit **0.58**, stamina **0.72**. Shaman Enhancement agility **0.6**. Enhancement Tank strength **1.0**.
 
 ### v1.2.7
 

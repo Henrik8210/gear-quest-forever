@@ -134,7 +134,7 @@ Footer **Tooltips** sits beside **Play style**. The window shows a sample mob to
 
 **Hide unit gear tips** removes BiS lines on creatures, vendors, trainers, and quest givers. Otherwise hold **Shift** to see them, or turn on **Always show unit gear tips**. **Show drop chance** adds a grey **%** when GearQuest knows it. Named mob drops use Wowhead rates. Generic world drops use an averaged outdoor sample. A slider can hide lines below a minimum **%**. **Unit gear sources** filters which kinds of drop can appear.
 
-On attackable mobs you can see both **Your top items from this mob** and **Your top world drops from this mob**. Opposite-faction NPCs get no GearQuest lines.
+On attackable mobs you can see both **Your top items from this mob** and **Your top world drops from this mob**. World-drop lines can take about six seconds to fill in the first time tips are on for your level, class, faction, and spec. Zoning does not start that wait again. Opposite-faction NPCs get no GearQuest lines.
 
 On the right: **Recommended gear enchantment**, **GearQuest score on tooltips**, and **Ranks for your other specs**, with the same behavior as in General settings.
 
