@@ -456,6 +456,7 @@ function GQ.Log:GamepadIsFilterTarget(widget)
     local frame = self.frame
     if frame and (widget == frame.sourceFilterBtn or widget == frame.playStyleBtn
         or widget == frame.tooltipsBtn or widget == frame.huntsPerSlotSlider
+        or widget == frame.huntsPerSlotInfo
         or (widget == frame.armorTypeBtn and widget:IsShown()) or widget == frame.simHeaderOffBtn) then
         return true
     end

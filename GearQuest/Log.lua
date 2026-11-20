@@ -8625,19 +8625,27 @@ function GQ.Log:EnsureHuntsPerSlot(frame)
         fill:SetColorTexture(PANEL_BG[1], PANEL_BG[2], PANEL_BG[3], PANEL_BG[4] or 1)
     end
 
-    local labelClip = CreateFrame("Frame", nil, host)
-    labelClip:SetHeight(18)
-    if labelClip.SetClipsChildren then
-        labelClip:SetClipsChildren(true)
+    local info = CreateFrame("Button", nil, host)
+    info:SetSize(16, 16)
+    info:SetPoint("LEFT", host, "LEFT", 4, 0)
+    info:SetFrameLevel((host:GetFrameLevel() or 1) + 5)
+    info.icon = info:CreateTexture(nil, "OVERLAY")
+    info.icon:SetAllPoints()
+    info.icon:SetTexture("Interface\\FriendsFrame\\InformationIcon")
+    host.info = info
+
+    local function ShowHuntsTip(owner)
+        GameTooltip:SetOwner(owner, "ANCHOR_TOP")
+        GameTooltip:SetText(L["Hunts per gear slot"])
+        GameTooltip:AddLine(L["The list updates when you let go. Rank 1, 2, and 3 stay the best in slot."], 1, 1, 1, true)
+        GameTooltip:Show()
     end
-    local label = labelClip:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    label:SetPoint("LEFT", labelClip, "LEFT", 0, 0)
-    label:SetJustifyH("LEFT")
-    label:SetWordWrap(false)
-    label:SetText(L["Hunts per gear slot"])
-    label:SetTextColor(1, 0.82, 0)
-    host.label = label
-    host.labelClip = labelClip
+    info:SetScript("OnEnter", function(self)
+        ShowHuntsTip(self)
+    end)
+    info:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
 
     local slider
     local createdOk, created = pcall(CreateFrame, "Slider", "GearQuestHuntsPerSlotSlider", host, "OptionsSliderTemplate")
@@ -8681,22 +8689,12 @@ function GQ.Log:EnsureHuntsPerSlot(frame)
     host.slider = slider
     local function Reflow()
         local width = host:GetWidth() or 0
-        local textW = label:GetStringWidth() or 0
-        local sliderW = width - 8 - textW - 6 - 6 - 22 - 8
-        local labelW = textW
+        local sliderW = width - 4 - 16 - 6 - 6 - 22 - 8
         if sliderW < 36 then
             sliderW = 36
-            labelW = width - 8 - 8 - 22 - sliderW - 6 - 6
-            if labelW < 24 then
-                labelW = 24
-            end
         end
-        labelClip:ClearAllPoints()
-        labelClip:SetPoint("LEFT", host, "LEFT", 8, 0)
-        labelClip:SetSize(labelW, 18)
-        label:SetWidth(labelW)
         slider:ClearAllPoints()
-        slider:SetPoint("LEFT", labelClip, "RIGHT", 6, 0)
+        slider:SetPoint("LEFT", info, "RIGHT", 6, 0)
         slider:SetWidth(sliderW)
     end
     host:SetScript("OnSizeChanged", Reflow)
@@ -8736,22 +8734,9 @@ function GQ.Log:EnsureHuntsPerSlot(frame)
         end
     end)
     slider:HookScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_TOP")
-        GameTooltip:SetText(L["Hunts per gear slot"])
-        GameTooltip:AddLine(L["The list updates when you let go. Rank 1, 2, and 3 stay the best in slot."], 1, 1, 1, true)
-        GameTooltip:Show()
+        ShowHuntsTip(self)
     end)
     slider:HookScript("OnLeave", function()
-        GameTooltip:Hide()
-    end)
-    labelClip:EnableMouse(true)
-    labelClip:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_TOP")
-        GameTooltip:SetText(L["Hunts per gear slot"])
-        GameTooltip:AddLine(L["The list updates when you let go. Rank 1, 2, and 3 stay the best in slot."], 1, 1, 1, true)
-        GameTooltip:Show()
-    end)
-    labelClip:SetScript("OnLeave", function()
         GameTooltip:Hide()
     end)
 
@@ -8767,6 +8752,7 @@ function GQ.Log:EnsureHuntsPerSlot(frame)
     host:SetWidth(self:HuntsFooterWidth())
     frame.huntsPerSlot = host
     frame.huntsPerSlotSlider = slider
+    frame.huntsPerSlotInfo = info
 end
 
 function GQ.Log:EnsureArmorTypeButton(frame)
