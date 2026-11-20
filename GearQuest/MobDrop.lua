@@ -10,8 +10,166 @@ local MOB_KINDS = {
     t = true,
 }
 
+local KIND_SOURCE = {
+    b = "boss_drop",
+    t = "raid_trash",
+    r = "rare_npc",
+    w = "world_drop",
+    v = "vendor",
+    p = "profession",
+    q = "quest_reward",
+}
+
 local UnitGearScore
 local KeepUpgrades
+
+local function UnitGearSettings()
+    return GearQuestForeverDB and GearQuestForeverDB.settings
+end
+
+local function UnitGearAlwaysShow()
+    local settings = UnitGearSettings()
+    return settings and settings.unitGearAlwaysShow == true
+end
+
+local function UnitGearShowDropChance()
+    local settings = UnitGearSettings()
+    return not settings or settings.unitGearShowDropChance ~= false
+end
+
+local function UnitGearMinDropPercent()
+    local settings = UnitGearSettings()
+    return math.max(0, tonumber(settings and settings.unitGearMinDropPercent) or 0)
+end
+
+local function UnitGearSourceId(pick)
+    if not pick then
+        return nil
+    end
+    local kind = pick.kind
+    if kind and KIND_SOURCE[kind] then
+        return KIND_SOURCE[kind]
+    end
+    local entry = pick.entry
+    if entry and GQ.NormalizeSourceType then
+        return GQ:NormalizeSourceType(entry.sourceType or "")
+    end
+    if entry and entry.sourceType and entry.sourceType ~= "" then
+        return entry.sourceType
+    end
+    return nil
+end
+
+local function UnitGearSourceHidden(pick)
+    local settings = UnitGearSettings()
+    local hidden = settings and settings.unitGearHiddenSources
+    if not hidden then
+        return false
+    end
+    local src = UnitGearSourceId(pick)
+    return src and hidden[src] == true
+end
+
+local function UnitGearPassesMinDrop(pick)
+    local minPct = UnitGearMinDropPercent()
+    if minPct <= 0 then
+        return true
+    end
+    local chance = tonumber(pick and pick.chance) or 0
+    if chance <= 0 then
+        return true
+    end
+    return chance >= minPct
+end
+
+local function FilterUnitGearPicks(picks, minOverride)
+    if not picks or #picks == 0 then
+        return nil, nil
+    end
+    local minPct = minOverride
+    if minPct == nil then
+        minPct = UnitGearMinDropPercent()
+    end
+    local filtered = {}
+    local blockedByMin = 0
+    local hadUpgradeSource = false
+    for i = 1, #picks do
+        local pick = picks[i]
+        if not UnitGearSourceHidden(pick) then
+            hadUpgradeSource = true
+            if UnitGearPassesMinDrop(pick) then
+                filtered[#filtered + 1] = pick
+            elseif minPct > 0 and (tonumber(pick.chance) or 0) > 0 then
+                blockedByMin = blockedByMin + 1
+            end
+        end
+    end
+    local meta
+    if #filtered == 0 and blockedByMin > 0 and hadUpgradeSource then
+        meta = { minDropEmpty = true }
+    end
+    return #filtered > 0 and filtered or nil, meta
+end
+
+local function FormatDropPercent(chance)
+    chance = tonumber(chance)
+    if not chance or chance <= 0 then
+        return nil
+    end
+    if math.abs(chance - math.floor(chance + 0.0001)) < 0.001 then
+        return string.format("%.0f", chance)
+    end
+    return string.format("%.2f", chance)
+end
+
+local function MobIndexedDropChance(data, mobKey, itemId)
+    if not mobKey or not itemId then
+        return 0
+    end
+    local rows = data.mobDrops and data.mobDrops[mobKey]
+    if type(rows) ~= "table" then
+        return 0
+    end
+    for i = 1, #rows do
+        local row = rows[i]
+        if row and row[1] == itemId then
+            return tonumber(row[2]) or 0
+        end
+    end
+    return 0
+end
+
+local openWorldChanceById
+
+local function OpenWorldDropChance(data, itemId)
+    if not itemId or not UnitGearShowDropChance() then
+        return 0
+    end
+    if type(data.worldDropOpenChance) == "table" then
+        return tonumber(data.worldDropOpenChance[itemId]) or 0
+    end
+    if openWorldChanceById == nil then
+        local packed = data.worldDropOpenChancePacked
+        if type(packed) ~= "string" or packed == "" then
+            openWorldChanceById = false
+        else
+            openWorldChanceById = {}
+            for part in string.gmatch(packed, "[^,]+") do
+                local id, cent = string.match(part, "^(%d+):(%d+)$")
+                id = tonumber(id)
+                cent = tonumber(cent)
+                if id and cent then
+                    openWorldChanceById[id] = cent * 0.01
+                end
+            end
+            data.worldDropOpenChancePacked = nil
+        end
+    end
+    if openWorldChanceById == false then
+        return 0
+    end
+    return tonumber(openWorldChanceById[itemId]) or 0
+end
 
 local function MobKey(name)
     if type(name) ~= "string" or name == "" then
@@ -48,6 +206,41 @@ local function FactionAllows(code)
         return true
     end
     return code == player
+end
+
+local function UnitNpcFactionCode(token)
+    if not token or not UnitFactionGroup then
+        return nil
+    end
+    local ok, group = pcall(UnitFactionGroup, token)
+    if not ok or not group then
+        return nil
+    end
+    group = GQ.PublicText and GQ.PublicText(group) or group
+    if group == "Alliance" then
+        return 1
+    end
+    if group == "Horde" then
+        return 2
+    end
+    return 0
+end
+
+-- An Alliance vendor or quest giver offers nothing to a Horde character, and
+-- the other way around. They are not a world-drop table either.
+local function OppositeFactionNpc(token)
+    if not token then
+        return false
+    end
+    local npcFac = UnitNpcFactionCode(token)
+    if not npcFac or npcFac == 0 then
+        return false
+    end
+    local player = PlayerFactionCode()
+    if player == 0 then
+        return false
+    end
+    return npcFac ~= player
 end
 
 local function BandContainsLevel(entry, level)
@@ -178,33 +371,45 @@ local function StillHunted(entry)
     return true
 end
 
-local function CachedLines(cache, key, picks, limit)
-    local kept = cache.lines[key]
+local function CachedLines(cache, key, picks, limit, minOverride)
+    local lineKey = key
+    if minOverride ~= nil then
+        lineKey = key .. ":gqmin" .. tostring(minOverride)
+    end
+    local kept = cache.lines[lineKey]
     if kept == nil then
         local unsure
         kept, unsure = KeepUpgrades(picks)
         -- A worn piece the client has not loaded yet cannot be compared. Ask
         -- again on the next hover instead of keeping the empty answer.
         if not unsure then
-            cache.lines[key] = kept or false
+            cache.lines[lineKey] = kept or false
         end
     end
     if not kept then
         return nil
     end
-    local shown = {}
+    local candidates = {}
     for i = 1, #kept do
+        if StillHunted(kept[i].entry) then
+            candidates[#candidates + 1] = kept[i]
+        end
+    end
+    local filtered, meta = FilterUnitGearPicks(candidates, minOverride)
+    if not filtered then
+        return nil, meta
+    end
+    local shown = {}
+    for i = 1, #filtered do
         if #shown >= limit then
             break
         end
-        if StillHunted(kept[i].entry) then
-            shown[#shown + 1] = kept[i]
-        end
+        shown[#shown + 1] = filtered[i]
     end
-    return #shown > 0 and shown or nil
+    return #shown > 0 and shown or nil, meta
 end
 
-function GQ.Data:TopUnitGear(name, limit)
+function GQ.Data:TopUnitGear(name, limit, minOverride)
     limit = limit or 3
     local key = MobKey(name)
     local index = key and self.mobDrops
@@ -256,7 +461,7 @@ function GQ.Data:TopUnitGear(name, limit)
         end
         cache.picks[key] = picks
     end
-    return CachedLines(cache, "unit:" .. key, picks, limit)
+    return CachedLines(cache, "unit:" .. key, picks, limit, minOverride)
 end
 
 function KeepUpgrades(picks)
@@ -274,7 +479,7 @@ function KeepUpgrades(picks)
         -- empty. A downgrade stays off. The arrow is that same comparison.
         if scored and place and not WearingEntry(scored, slotName) then
             local scoreText, index, arrow, pending = UnitGearScore(scored, slotName, handKind)
-            if scoreText and index then
+            if scoreText and index and arrow and arrow > 0 then
                 kept[#kept + 1] = {
                     entry = scored,
                     chance = pick.chance,
@@ -288,6 +493,23 @@ function KeepUpgrades(picks)
                 unsure = true
             end
         end
+    end
+    if #kept == 0 then
+        return nil, unsure
+    end
+    local bestPerSlot = {}
+    for i = 1, #kept do
+        local pick = kept[i]
+        local slotName, handKind = TooltipSlot(pick.entry)
+        local slotKey = (slotName or "?") .. "\0" .. (handKind or "")
+        local prev = bestPerSlot[slotKey]
+        if not prev or (pick.arrow or 0) > (prev.arrow or 0) then
+            bestPerSlot[slotKey] = pick
+        end
+    end
+    kept = {}
+    for _, pick in pairs(bestPerSlot) do
+        kept[#kept + 1] = pick
     end
     if #kept == 0 then
         return nil, unsure
@@ -308,6 +530,14 @@ function KeepUpgrades(picks)
     return kept, unsure
 end
 
+function GQ.Data:DemoUnitGearLines(name, limit)
+    return self:TopUnitGear(name, limit or 3, 0)
+end
+
+function GQ.Data:DemoWorldDropLines(mobLevel, skip, limit, skipKey)
+    return self:TopWorldDrops(mobLevel, skip, limit or 3, skipKey)
+end
+
 -- A generic world drop names no creature. Its stored range is the mob
 -- levels that can drop it ("World drop around level 42-52."), so any mob
 -- inside that range answers for it. A world drop with a named dropper is
@@ -319,16 +549,9 @@ local function WorldDropRanges(data)
     if worldDrops.ranges and worldDrops.class == classFile then
         return worldDrops
     end
-    local ranges = {}
-    for itemId in data:IterCatalogItemIds() do
-        local fact = data:GetItemFact(itemId)
-        if fact and fact.sourceType == "world_drop" and not fact.npc then
-            local lo, hi = string.match(fact.instructions or "", "^World drop around level (%d+)%-(%d+)%.")
-            lo, hi = tonumber(lo), tonumber(hi)
-            if lo and hi then
-                ranges[itemId] = { lo, hi }
-            end
-        end
+    local ranges = data.genericWorldDropRanges
+    if type(ranges) ~= "table" then
+        ranges = {}
     end
     worldDrops.class = classFile
     worldDrops.ranges = ranges
@@ -347,10 +570,14 @@ function GQ.Data:TopWorldDrops(mobLevel, skip, limit, skipKey)
     local cache = WorldDropRanges(self)
     local ids = cache.byLevel[mobLevel]
     if not ids then
-        ids = {}
-        for itemId, range in pairs(cache.ranges) do
-            if mobLevel >= range[1] and mobLevel <= range[2] then
-                ids[#ids + 1] = itemId
+        if type(self.worldDropIdsByLevel) == "table" and self.worldDropIdsByLevel[mobLevel] then
+            ids = self.worldDropIdsByLevel[mobLevel]
+        else
+            ids = {}
+            for itemId, range in pairs(cache.ranges) do
+                if mobLevel >= range[1] and mobLevel <= range[2] then
+                    ids[#ids + 1] = itemId
+                end
             end
         end
         cache.byLevel[mobLevel] = ids
@@ -365,7 +592,14 @@ function GQ.Data:TopWorldDrops(mobLevel, skip, limit, skipKey)
         for i = 1, #ids do
             local entry = BestHuntEntry(ids[i])
             if entry and BandContainsLevel(entry, level) then
-                picks[#picks + 1] = { entry = entry, chance = 0, kind = "w" }
+                local chance = 0
+                if skipKey then
+                    chance = MobIndexedDropChance(self, skipKey, ids[i])
+                end
+                if chance <= 0 then
+                    chance = OpenWorldDropChance(self, ids[i])
+                end
+                picks[#picks + 1] = { entry = entry, chance = chance, kind = "w" }
             end
         end
         unitCache.picks[pickKey] = picks
@@ -443,12 +677,6 @@ function UnitGearScore(entry, slotName, handKind)
     if not ctx then
         return nil
     end
-    -- The item tooltip's green number. A downgrade, a tie, and a piece we
-    -- cannot compare stay off. An empty slot is an upgrade.
-    local arrow = GQ.Data:GearScoreArrowDelta(entry, ctx)
-    if not ctx.empty and (not arrow or arrow <= 0) then
-        return nil, nil, nil, arrow == nil and #(ctx.unscoredWorn or {}) > 0
-    end
     local indexScore = entry.pipelineScore
     if GQ.Data.EntryIsDamagingWeapon and GQ.Data:EntryIsDamagingWeapon(entry) then
         local shown = GQ.Data:DisplayedWeaponScore(entry)
@@ -460,11 +688,66 @@ function UnitGearScore(entry, slotName, handKind)
     if not score then
         score = math.floor(entry.pipelineScore + 0.5)
     end
+    -- The item tooltip's green number. A downgrade, a tie, and a piece we
+    -- cannot compare stay off. An empty slot is an upgrade on that index.
+    local arrow = GQ.Data:GearScoreArrowDelta(entry, ctx)
+    if (not arrow or arrow <= 0) and ctx.empty then
+        arrow = score
+    end
+    if not arrow or arrow <= 0 then
+        return nil, nil, nil, arrow == nil and #(ctx.unscoredWorn or {}) > 0
+    end
     local text = "|cffffffff" .. score .. "|r"
-    if arrow and arrow > 0 and GQ.Data.GearScoreDeltaText then
+    if GQ.Data.GearScoreDeltaText then
         text = text .. GQ.Data:GearScoreDeltaText(arrow, 0)
     end
     return text, score, arrow
+end
+
+function GQ.Data:UnitGearPreviewHeaderKey(picks)
+    if not picks or not picks[1] then
+        return nil
+    end
+    if MOB_KINDS[picks[1].kind] then
+        return "Your top items from this mob:"
+    end
+    return "Your top items from this npc:"
+end
+
+function GQ.Data:FormatUnitGearPreviewLine(pick, lineNum)
+    if not pick or not pick.entry then
+        return nil
+    end
+    local entry = pick.entry
+    local name = DropItemName(entry)
+    if not name or name == "" then
+        return nil
+    end
+    lineNum = lineNum or 1
+    local line = tostring(lineNum) .. ". "
+    local rank = pick.rank
+    if rank then
+        line = line .. string.format(L["Rank #%d"], rank) .. ". "
+    end
+    line = line .. "|cff" .. QualityHex(entry.itemId) .. name .. "|r"
+    local slotName = entry.slot
+    if GQ.Data.NormalizeSlotName then
+        slotName = GQ.Data:NormalizeSlotName(slotName) or slotName
+    end
+    local slotLabel = GQ.Data.SlotLabel and GQ.Data:SlotLabel(slotName)
+    if slotLabel and slotLabel ~= "" then
+        line = line .. " |cffc8c0b0(" .. slotLabel .. ")|r"
+    end
+    if pick.scoreText and pick.scoreText ~= "" then
+        line = line .. "  " .. pick.scoreText
+    end
+    if UnitGearShowDropChance() then
+        local pct = FormatDropPercent(pick.chance)
+        if pct then
+            line = line .. string.format(" |cff888888(%s%%)|r", pct)
+        end
+    end
+    return line
 end
 
 local function AddLines(tooltip, picks, header)
@@ -492,6 +775,12 @@ local function AddLines(tooltip, picks, header)
             end
             if picks[i].scoreText and picks[i].scoreText ~= "" then
                 line = line .. "  " .. picks[i].scoreText
+            end
+            if UnitGearShowDropChance() then
+                local pct = FormatDropPercent(picks[i].chance)
+                if pct then
+                    line = line .. string.format(" |cff888888(%s%%)|r", pct)
+                end
             end
             tooltip:AddLine(line, 1, 1, 1, true)
         end
@@ -674,13 +963,16 @@ function GQ.Data:AddUnitGearLines(tooltip, unit, hintedName, dataGuid)
     if not name then
         return
     end
+    if token and OppositeFactionNpc(token) then
+        return
+    end
     guid = guid or ("name:" .. string.lower(name))
     if tooltip.gqUnitGear == guid then
         return
     end
     tooltip.gqUnitGear = guid
-    local picks = self:TopUnitGear(name, 3)
-    local drops
+    local picks, pickMeta = self:TopUnitGear(name, 3)
+    local drops, dropMeta
     local kind = GQ.PublicText and GQ.PublicText(dataGuid) or guid
     if not (string.find(kind, "^Player%-") or string.find(kind, "^Pet%-")) and MobIsHostile(tooltip, token) then
         local skip = {}
@@ -689,13 +981,23 @@ function GQ.Data:AddUnitGearLines(tooltip, unit, hintedName, dataGuid)
         for i = 1, #(rows or {}) do
             skip[rows[i][1]] = true
         end
-        drops = self:TopWorldDrops(MobLevel(tooltip, token), skip, 3, key)
+        drops, dropMeta = self:TopWorldDrops(MobLevel(tooltip, token), skip, 3, key)
     end
+    local minDropEmpty = (pickMeta and pickMeta.minDropEmpty) or (dropMeta and dropMeta.minDropEmpty)
     if not picks and not drops then
+        if minDropEmpty then
+            tooltip:AddLine(
+                L["Your minimum drop chance hid every upgrade line. Lower the slider in Hunt settings → Tooltips."],
+                0.6,
+                0.6,
+                0.6,
+                true
+            )
+        end
         return
     end
-    tooltip.gqUnitShiftHint = true
-    if not (IsShiftKeyDown and IsShiftKeyDown()) then
+    tooltip.gqUnitShiftHint = not UnitGearAlwaysShow()
+    if not UnitGearAlwaysShow() and not (IsShiftKeyDown and IsShiftKeyDown()) then
         tooltip:AddLine(L["Hold Shift to see BiS items from this NPC"], 0.6, 0.6, 0.6, true)
         return
     end
@@ -730,6 +1032,10 @@ local function RefreshShiftTip(tip)
     end
 end
 
+function GQ.Data:RefreshUnitGearTips()
+    RefreshShiftTip(GameTooltip)
+end
+
 local hooked
 
 local function HookTip(tip)
@@ -738,6 +1044,32 @@ local function HookTip(tip)
     end
     tip.gqUnitGearHook = true
     tip:HookScript("OnTooltipCleared", ClearUnitGear)
+end
+
+-- Build world-drop picks for the current level once class data is loaded so the
+-- first hostile mob tooltip does not scan the whole catalog on the hover frame.
+function GQ.Data:WarmUnitGearTooltipCache()
+    if self._unitGearWarmDone then
+        return
+    end
+    if not C_Timer or not C_Timer.After then
+        return
+    end
+    C_Timer.After(0, function()
+        if self._unitGearWarmDone then
+            return
+        end
+        if self.EnsureClassLoaded and GQ.GetEffectiveClass then
+            self:EnsureClassLoaded(GQ:GetEffectiveClass())
+        end
+        WorldDropRanges(self)
+        local level = (GQ.GetEffectiveLevel and GQ:GetEffectiveLevel()) or 1
+        level = tonumber(level) or 1
+        if level > 0 then
+            self:TopWorldDrops(level, nil, 3, "__warm__")
+        end
+        self._unitGearWarmDone = true
+    end)
 end
 
 function GQ.Data:InstallUnitGearTips()

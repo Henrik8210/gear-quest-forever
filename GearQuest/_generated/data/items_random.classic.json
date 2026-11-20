@@ -12543,6 +12543,84 @@
     ],
     "chanceSum": 100
   },
+  "9831": {
+    "itemId": 9831,
+    "era": "classic",
+    "scrapedAt": "2026-11-19T12:15:46.965Z",
+    "enchants": [
+      {
+        "suffix": "of the Monkey",
+        "chance": 18.3,
+        "statsText": "+(3 - 4) Agility , +(3 - 4) Stamina"
+      },
+      {
+        "suffix": "of the Owl",
+        "chance": 11.6,
+        "statsText": "+(3 - 4) Intellect , +(3 - 4) Spirit"
+      },
+      {
+        "suffix": "of the Eagle",
+        "chance": 10.6,
+        "statsText": "+(3 - 4) Intellect , +(3 - 4) Stamina"
+      },
+      {
+        "suffix": "of the Whale",
+        "chance": 9.6,
+        "statsText": "+(3 - 4) Spirit , +(3 - 4) Stamina"
+      },
+      {
+        "suffix": "of Agility",
+        "chance": 9.2,
+        "statsText": "+6 Agility"
+      },
+      {
+        "suffix": "of Stamina",
+        "chance": 9.2,
+        "statsText": "+6 Stamina"
+      },
+      {
+        "suffix": "of Defense",
+        "chance": 6.9,
+        "statsText": "+4 Defense"
+      },
+      {
+        "suffix": "of Intellect",
+        "chance": 6.2,
+        "statsText": "+6 Intellect"
+      },
+      {
+        "suffix": "of Spirit",
+        "chance": 5.7,
+        "statsText": "+6 Spirit"
+      },
+      {
+        "suffix": "of the Wolf",
+        "chance": 4.2,
+        "statsText": "+(3 - 4) Agility , +(3 - 4) Spirit"
+      },
+      {
+        "suffix": "of the Falcon",
+        "chance": 4.1,
+        "statsText": "+(3 - 4) Agility , +(3 - 4) Intellect"
+      },
+      {
+        "suffix": "of Nature's Wrath",
+        "chance": 2.4,
+        "statsText": "+9 Nature Spell Damage"
+      },
+      {
+        "suffix": "of Healing",
+        "chance": 1.2,
+        "statsText": "+13 Healing Spells"
+      },
+      {
+        "suffix": "of Arcane Wrath",
+        "chance": 0.9,
+        "statsText": "+9 Arcane Spell Damage"
+      }
+    ],
+    "chanceSum": 100.1
+  },
   "9832": {
     "itemId": 9832,
     "era": "classic",
@@ -28842,6 +28920,84 @@
       }
     ],
     "chanceSum": 99.9
+  },
+  "15135": {
+    "itemId": 15135,
+    "era": "classic",
+    "scrapedAt": "2026-11-19T12:15:49.882Z",
+    "enchants": [
+      {
+        "suffix": "of the Monkey",
+        "chance": 18.3,
+        "statsText": "+(3 - 4) Agility , +(3 - 4) Stamina"
+      },
+      {
+        "suffix": "of the Owl",
+        "chance": 11.6,
+        "statsText": "+(3 - 4) Intellect , +(3 - 4) Spirit"
+      },
+      {
+        "suffix": "of the Eagle",
+        "chance": 10.6,
+        "statsText": "+(3 - 4) Intellect , +(3 - 4) Stamina"
+      },
+      {
+        "suffix": "of the Whale",
+        "chance": 9.6,
+        "statsText": "+(3 - 4) Spirit , +(3 - 4) Stamina"
+      },
+      {
+        "suffix": "of Agility",
+        "chance": 9.2,
+        "statsText": "+6 Agility"
+      },
+      {
+        "suffix": "of Stamina",
+        "chance": 9.2,
+        "statsText": "+6 Stamina"
+      },
+      {
+        "suffix": "of Defense",
+        "chance": 6.9,
+        "statsText": "+4 Defense"
+      },
+      {
+        "suffix": "of Intellect",
+        "chance": 6.2,
+        "statsText": "+6 Intellect"
+      },
+      {
+        "suffix": "of Spirit",
+        "chance": 5.7,
+        "statsText": "+6 Spirit"
+      },
+      {
+        "suffix": "of the Wolf",
+        "chance": 4.2,
+        "statsText": "+(3 - 4) Agility , +(3 - 4) Spirit"
+      },
+      {
+        "suffix": "of the Falcon",
+        "chance": 4.1,
+        "statsText": "+(3 - 4) Agility , +(3 - 4) Intellect"
+      },
+      {
+        "suffix": "of Nature's Wrath",
+        "chance": 2.4,
+        "statsText": "+9 Nature Spell Damage"
+      },
+      {
+        "suffix": "of Healing",
+        "chance": 1.2,
+        "statsText": "+13 Healing Spells"
+      },
+      {
+        "suffix": "of Arcane Wrath",
+        "chance": 0.9,
+        "statsText": "+9 Arcane Spell Damage"
+      }
+    ],
+    "chanceSum": 100.1
   },
   "15136": {
     "itemId": 15136,

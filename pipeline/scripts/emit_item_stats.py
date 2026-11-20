@@ -32,7 +32,7 @@ UNIFIED = {
     "critRanged": "crit",
     "spellHaste": "haste",
 }
-DEAD = ("expertise", "armorPen", "resilience")
+DEAD = ("armorPen", "resilience")
 ARMOR_KIND = {"Cloth", "Leather", "Mail", "Plate"}
 RELIC_KIND = {"Totem", "Idol", "Libram"}
 LABEL = {
@@ -55,6 +55,7 @@ LABEL = {
     "crit": "Critical Strike",
     "hit": "Hit",
     "haste": "Haste",
+    "expertise": "Expertise",
     "defense": "Defense",
     "dodge": "Dodge",
     "parry": "Parry",

@@ -62,7 +62,7 @@ class ForeverStats(unittest.TestCase):
         out = score.forever_stats({"spellHit": 1, "hitRanged": 2, "spellCrit": 3, "expertise": 9})
         self.assertEqual(out["hit"], 3)
         self.assertEqual(out["crit"], 3)
-        self.assertEqual(out["expertise"], 0)
+        self.assertEqual(out["expertise"], 9)
 
 
 class JackpotRoll(unittest.TestCase):
@@ -99,6 +99,24 @@ class JackpotRoll(unittest.TestCase):
         item = {"id": int(self.ITEM), "stats": {"agi": 3}}
         result = score.best_variant(item, {"int": 1.0}, 22, None)
         self.assertIsNone(result[1])
+
+
+class HunterWeaponRoute(unittest.TestCase):
+    def test_dual_wield_pair_uses_off_hand_list(self):
+        """After Dual Wield, hunter one-handers live on SecondaryHand only."""
+        mh_only_2h = [(20.0, {"id": 1, "inv": 17})]
+        oh_swords = [
+            (12.0, {"id": 2, "inv": 13}),
+            (11.0, {"id": 3, "inv": 13}),
+        ]
+        per = {
+            ("Alliance", 30, "MainHand"): mh_only_2h,
+            ("Alliance", 30, "SecondaryHand"): oh_swords,
+        }
+        rt = score.route_for(per, "Alliance", 30, "HUNTER", 20)
+        self.assertEqual(rt[0], "onehand")
+        self.assertEqual(rt[1], 20.0)
+        self.assertEqual(rt[2], 23.0)
 
 
 if __name__ == "__main__":

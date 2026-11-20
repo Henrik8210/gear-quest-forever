@@ -3,11 +3,36 @@ local L = GQ.L
 
 GQ.Minimap = GQ.Minimap or {}
 
+local LIBDBICON_NAME = "GearQuest"
 local MINIMAP_TEXTURE = "Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Art\\GearQuest-Icon"
 local MINIMAP_ICON_SIZE = 20
 local BUTTON_SIZE = 31
 -- Center sits on the rim, the same offset Questie uses (half the minimap, plus 5).
 local MINIMAP_BORDER_OUTSET = 5
+
+local function GetMinimapDB()
+    GearQuestForeverDB.minimap = GearQuestForeverDB.minimap or {}
+    local db = GearQuestForeverDB.minimap
+    if db.minimapPos == nil then
+        GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+        local angle = GearQuestForeverDB.settings.minimapAngle
+        if type(angle) == "number" then
+            db.minimapPos = angle
+        end
+    end
+    return db
+end
+
+local function LibDBIconLib()
+    if not LibStub then
+        return nil
+    end
+    local ok, lib = pcall(LibStub, "LibDBIcon-1.0", true)
+    if ok and lib and lib.Register then
+        return lib
+    end
+    return nil
+end
 
 local function GetRadius()
     if not Minimap then
@@ -45,6 +70,10 @@ end
 local function SetAngle(angle)
     GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
     GearQuestForeverDB.settings.minimapAngle = angle
+    local db = GearQuestForeverDB.minimap
+    if db then
+        db.minimapPos = angle
+    end
 end
 
 local function UpdatePosition(button)
@@ -101,7 +130,33 @@ function GQ.Minimap:IsHidden()
         or false
 end
 
+function GQ.Minimap:SyncLibDBHide()
+    if not self.libDBIconRegistered then
+        return
+    end
+    local db = GetMinimapDB()
+    db.hide = self:IsHidden() and true or false
+    if self.libDBIcon then
+        if db.hide then
+            self.libDBIcon:Hide(LIBDBICON_NAME)
+        else
+            self.libDBIcon:Show(LIBDBICON_NAME)
+        end
+    end
+end
+
 function GQ.Minimap:ApplyVisibility()
+    if self.libDBIconRegistered and self.libDBIcon then
+        self:SyncLibDBHide()
+        local button = self.libDBIcon.GetMinimapButton and self.libDBIcon:GetMinimapButton(LIBDBICON_NAME)
+        if button and GameTooltip and GameTooltip.GetOwner and GameTooltip:GetOwner() == button then
+            if self:IsHidden() then
+                GameTooltip:Hide()
+            end
+        end
+        return
+    end
+
     local button = self.button
     if not button then
         return
@@ -161,22 +216,76 @@ function GQ.Minimap:RegisterLauncher()
         if RegisterLauncher() then
             frame:UnregisterAllEvents()
             frame:SetScript("OnEvent", nil)
+            GQ.Minimap:TryLibDBIcon()
         end
     end)
 end
 
-function GQ.Minimap:Init()
-    self:RegisterLauncher()
-    if self.initialized then
+function GQ.Minimap:HideCustomButton()
+    local button = self.button
+    if not button or button == (self.libDBIcon and self.libDBIcon.GetMinimapButton and self.libDBIcon:GetMinimapButton(LIBDBICON_NAME)) then
         return
     end
-    self.initialized = true
+    button:SetScript("OnUpdate", nil)
+    button:Hide()
+    button:SetParent(UIParent)
+end
 
-    if self.button or _G.GearQuestMinimapButton then
+function GQ.Minimap:TryLibDBIcon()
+    if self.libDBIconRegistered then
+        return true
+    end
+    if not RegisterLauncher() then
+        return false
+    end
+    local lib = LibDBIconLib()
+    if not lib then
+        return false
+    end
+    if lib.IsRegistered and lib:IsRegistered(LIBDBICON_NAME) then
+        self.libDBIconRegistered = true
+        self.libDBIcon = lib
+        self.button = lib:GetMinimapButton(LIBDBICON_NAME)
+        self:HideCustomButton()
+        self:ApplyVisibility()
+        return true
+    end
+    local db = GetMinimapDB()
+    db.hide = self:IsHidden() and true or false
+    lib:Register(LIBDBICON_NAME, self.launcher, db)
+    self.libDBIconRegistered = true
+    self.libDBIcon = lib
+    self.button = lib.GetMinimapButton and lib:GetMinimapButton(LIBDBICON_NAME) or self.button
+    self:HideCustomButton()
+    self:ApplyVisibility()
+    return true
+end
+
+function GQ.Minimap:WatchLibDBIcon()
+    if self.libDBIconWatch or self.libDBIconRegistered then
+        return
+    end
+    local watch = CreateFrame("Frame")
+    self.libDBIconWatch = watch
+    watch:RegisterEvent("ADDON_LOADED")
+    watch:SetScript("OnEvent", function(frame, _, addonName)
+        if addonName == ADDON_NAME then
+            return
+        end
+        if GQ.Minimap:TryLibDBIcon() then
+            frame:UnregisterAllEvents()
+            frame:SetScript("OnEvent", nil)
+        end
+    end)
+end
+
+local function InitCustomButton(self)
+    if self.button or self.customButton or _G.GearQuestMinimapButton then
         self.button = self.button or _G.GearQuestMinimapButton
         if self.button then
             WireMinimapButton(self.button)
             UpdatePosition(self.button)
+            self.customButton = true
             self:ApplyVisibility()
         end
         return
@@ -200,9 +309,9 @@ function GQ.Minimap:Init()
     WireMinimapButton(button)
     button:RegisterForDrag("LeftButton")
 
-    button:SetScript("OnDragStart", function(self)
-        self:LockHighlight()
-        self:SetScript("OnUpdate", function(s)
+    button:SetScript("OnDragStart", function(btn)
+        btn:LockHighlight()
+        btn:SetScript("OnUpdate", function(s)
             local mx, my = Minimap:GetCenter()
             local px, py = GetCursorPosition()
             local scale = Minimap:GetEffectiveScale()
@@ -212,22 +321,39 @@ function GQ.Minimap:Init()
         end)
     end)
 
-    button:SetScript("OnDragStop", function(self)
-        self:UnlockHighlight()
-        self:SetScript("OnUpdate", nil)
+    button:SetScript("OnDragStop", function(btn)
+        btn:UnlockHighlight()
+        btn:SetScript("OnUpdate", nil)
     end)
 
     UpdatePosition(button)
     self.button = button
+    self.customButton = true
     self:ApplyVisibility()
 
     if Minimap.HookScript then
         pcall(function()
             Minimap:HookScript("OnSizeChanged", function()
-                if GQ.Minimap.button then
-                    UpdatePosition(GQ.Minimap.button)
+                local minimap = GQ.Minimap
+                if minimap and minimap.customButton and minimap.button then
+                    UpdatePosition(minimap.button)
                 end
             end)
         end)
     end
+end
+
+function GQ.Minimap:Init()
+    self:RegisterLauncher()
+    if self:TryLibDBIcon() then
+        return
+    end
+    if self.initialized then
+        self:WatchLibDBIcon()
+        return
+    end
+    self.initialized = true
+
+    InitCustomButton(self)
+    self:WatchLibDBIcon()
 end

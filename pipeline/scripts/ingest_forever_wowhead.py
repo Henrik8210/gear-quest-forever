@@ -12,6 +12,10 @@ facts. Re-score after this, one class at a time (score, emit, copy to the
 addon, with GQ_NO_GUIDES=1):
 
   python pipeline/scripts/rescore_hunter_shaman.py SHAMAN
+
+If a new item is wearable gear on an enchantable slot, `GearQuest/Enchant.lua`
+must already cover that slot at the item's level. After ingest and rescore run
+`python scripts/ci/check_enchants.py` before you commit.
 """
 from __future__ import annotations
 

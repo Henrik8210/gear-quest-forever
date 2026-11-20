@@ -23,6 +23,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
+from collections import defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -403,6 +404,30 @@ def hunt_item_ids() -> set[int]:
     return found
 
 
+def generic_world_drop_tables(sources: dict) -> tuple[dict[int, tuple[int, int]], dict[int, list[int]]]:
+    ranges: dict[int, tuple[int, int]] = {}
+    pat = re.compile(r"^World drop around level (\d+)-(\d+)\.")
+    for raw_id, src in sources.items():
+        if not isinstance(src, dict) or src.get("sourceType") != "world_drop" or src.get("npc"):
+            continue
+        m = pat.match((src.get("instructions") or "").strip())
+        if not m:
+            continue
+        lo, hi = int(m.group(1)), int(m.group(2))
+        if lo > hi:
+            lo, hi = hi, lo
+        item_id = _item_id(raw_id)
+        if item_id is not None:
+            ranges[item_id] = (lo, hi)
+    by_level: dict[int, list[int]] = defaultdict(list)
+    for item_id, (lo, hi) in ranges.items():
+        for level in range(lo, hi + 1):
+            by_level[level].append(item_id)
+    for level in by_level:
+        by_level[level] = sorted(set(by_level[level]))
+    return ranges, dict(by_level)
+
+
 def profession_tables(sources: dict) -> tuple[dict[str, list[int]], dict[str, list]]:
     hunted = hunt_item_ids()
     gear: dict[str, list[int]] = {name: [] for name in GEAR_PROFESSIONS.values()}
@@ -453,6 +478,7 @@ def main() -> None:
     add_vendor_costs(index)
     quest_names = add_quest_cache(index, sources)
     gear, trainers = profession_tables(sources)
+    world_ranges, world_by_level = generic_world_drop_tables(sources)
     lines = [
         "local _, GQ = ...",
         "GQ.Data = GQ.Data or {}",
@@ -502,11 +528,30 @@ def main() -> None:
         profession, faction, _display = trainers[key]
         lines.append("[" + lua_string(key) + "]={" + lua_string(profession) + "," + str(faction) + "},")
     lines.append("}")
+    lines.append("-- Generic world drops: item id -> { minLevel, maxLevel }.")
+    lines.append("GQ.Data.genericWorldDropRanges = {")
+    for item_id in sorted(world_ranges):
+        lo, hi = world_ranges[item_id]
+        lines.append(f"[{item_id}]={{{lo},{hi}}},")
+    lines.append("}")
+    lines.append("-- Preindexed ids per mob level for unit tooltip world-drop lines.")
+    lines.append("GQ.Data.worldDropIdsByLevel = {")
+    for level in sorted(world_by_level):
+        ids = world_by_level[level]
+        lines.append(f"[{level}]={{{','.join(str(i) for i in ids)}}},")
+    lines.append("}")
     lines.append("")
     OUT.write_text("\n".join(lines), encoding="utf-8", newline="\n")
+    open_path = ROOT / "pipeline" / "data" / "world_drop_open_chance.json"
+    if open_path.exists():
+        import subprocess
+
+        script = ROOT / "pipeline" / "scripts" / "build_world_drop_open_chance.py"
+        subprocess.run([sys.executable, str(script), "--emit-only"], check=False)
     print(
         f"names {named} rows {rows} with chance {with_chance} "
         f"quest names added {quest_names} kinds {kinds} "
+        f"world_drop_ranges {len(world_ranges)} world_drop_levels {len(world_by_level)} "
         f"trainers {len(trainers)} gear "
         + " ".join(f"{name}:{len(ids)}" for name, ids in sorted(gear.items()))
         + f" -> {OUT}"

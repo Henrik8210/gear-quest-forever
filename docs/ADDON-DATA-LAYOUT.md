@@ -35,7 +35,7 @@ loaded at login, and every item had its own coordinate spot tables.
 
 | Folder (in AddOns or the zip) | Built from | Loads |
 |---|---|---|
-| `GearQuestForever` | `GearQuest/` copied as is, then staging rewrites `_generated/Data.ForeverAudit.generated.lua` (class tips stripped) and `_generated/Data.Coordinates.generated.lua` (shared spots), and deletes the class files and `Data.ItemStats.generated.lua` from the copy | At login |
+| `GearQuestForever` | `GearQuest/` copied as is, then staging rewrites `_generated/Data.ForeverAudit.generated.lua` (class tips stripped) and `_generated/Data.Coordinates.generated.lua` (shared spots), and deletes the class files and `Data.ItemStats.generated.lua` from the copy. The main TOC also loads `Data.MobDrops.generated.lua`, `Data.WorldDropOpenChance.generated.lua`, and `TooltipsPanel.lua` at login. | At login |
 | `GearQuestForever_<CLASS>` (9 folders) | `Data.<Class>.generated.lua` and `Data.<Class>.Early.1to9.generated.lua` with packed picks, plus `AuditTips.lua` (that class's Wowhead tooltip text) | Load on demand, when you play or simulate the class (`EnsureClassLoaded`) |
 | `GearQuestForever_ItemStats` | `Data.ItemStats.generated.lua`, unchanged except the header | Load on demand, the first time a custom spec is scored (`GQ.Data:EnsureItemStats`) |
 | `GearQuestForever_Languages` | `GearQuest/Locales/*` (built by `scripts/stage-locale-addons.py`) | Load on demand, when a language other than English is chosen |

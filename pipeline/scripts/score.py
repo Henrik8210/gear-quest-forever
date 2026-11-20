@@ -615,13 +615,13 @@ def weights_at_level(base_w, level):
     return w
 
 # Forever combat: one Hit, one Crit, one Haste. TBC leftover keys on classic
-# item rows fold in. Expertise / armor pen / resilience do not exist.
+# item rows fold in. Warrior hunts score expertise; armour pen / resilience do not.
 # Heal-only tooltips still grant SP at 1/3 (Blizzard rule); combined
 # "healing + damage" lines already carry sp_from_heal -- take the larger.
 UNIFIED_STAT={"spellHit":"hit","hitRanged":"hit",
               "spellCrit":"crit","critRanged":"crit",
               "spellHaste":"haste"}
-DEAD_STATS=("expertise","armorPen","resilience")
+DEAD_STATS=("armorPen", "resilience")
 
 def forever_stats(st):
     out=dict(st or {})
@@ -1633,23 +1633,54 @@ def unique_name_pairs(picks, origins, n=3):
 # apply instead of showing an impossible combination.
 AMBIGUOUS_STYLES = {"twohand_or_onehand"}
 
-def route_for(per, faction, level):
+def best_distinct_weapon_pair_score(rows):
+    """Two best one-handed weapons for a dual-wield loadout (distinct ids)."""
+    seen_ids = set()
+    picked = []
+    for r in sorted(rows, key=lambda x: (-x[0], x[1]["id"])):
+        rid = r[1]["id"]
+        if rid in seen_ids:
+            continue
+        seen_ids.add(rid)
+        picked.append(r)
+        if len(picked) >= 2:
+            break
+    if not picked:
+        return None
+    if len(picked) == 1:
+        return round(picked[0][0], 2)
+    return round(picked[0][0] + picked[1][0], 2)
+
+def route_for(per, faction, level, cls=None, dw_level=None):
     """-> (route, twoHandScore, pairScore) or None when the question does not arise."""
     mh = per.get((faction, level, "MainHand")) or []
     oh = per.get((faction, level, "SecondaryHand")) or []
     if not mh:
         return None
-    two = max([r[0] for r in mh if r[1]["inv"] == 17], default=None)
-    one = max([r[0] for r in mh if r[1]["inv"] != 17], default=None)
+    two = max([r[0] for r in mh if is_two_hand_item(r[1])], default=None)
+    one = max([r[0] for r in mh if not is_two_hand_item(r[1])], default=None)
     off = max([r[0] for r in oh], default=0.0)
+    pair = None
+    if cls == "HUNTER" and dw_level is not None and level >= dw_level:
+        # After Dual Wield, either-hand one-handers rank on SecondaryHand only,
+        # so main-hand non-two-hand picks are rare; the dual-wield route is the
+        # best pair of one-handers, not one plus a held item.
+        dw_pool = [r for r in oh if is_either_hand(r[1])]
+        dw_pool += [r for r in mh if not is_two_hand_item(r[1]) and is_mainhand_only(r[1])]
+        pair = best_distinct_weapon_pair_score(dw_pool)
+        one = None
+    if pair is None and one is not None:
+        pair = round(one + off, 2)
     # If only one route appears among the candidates at all, that IS the answer -- it
     # means nothing of the other kind scores well enough to reach the list. Returning
     # "no opinion" here left priest holy without a route for thirteen straight levels.
-    if two is None and one is None: return None
-    if one is None: return "twohand", round(two,2), None
-    if two is None: return "onehand", None, round(one+off,2)
-    pair = one + off
-    return ("twohand" if two >= pair else "onehand"), round(two, 2), round(pair, 2)
+    if two is None and pair is None:
+        return None
+    if pair is None:
+        return "twohand", round(two, 2), None
+    if two is None:
+        return "onehand", None, pair
+    return ("twohand" if two >= pair else "onehand"), round(two, 2), pair
 
 def style_band_key(rows):
     """Packed two-hand then main-hand-only lists change identity when either group does."""
@@ -1857,7 +1888,7 @@ if __name__=="__main__":
                     p["alt"]=True
                 if origins: out[_spec]["bands"][-1]["origins"]=origins
                 if sl in ("MainHand","SecondaryHand") and cfg["weaponStyle"] in AMBIGUOUS_STYLES:
-                    rt=route_for(per,faction,hi)
+                    rt=route_for(per,faction,hi,cls,dual_wield_level(cls,spec))
                     if rt:
                         out[_spec]["bands"][-1]["route"]=rt[0]
                         out[_spec]["bands"][-1]["routeTwoHand"]=rt[1]

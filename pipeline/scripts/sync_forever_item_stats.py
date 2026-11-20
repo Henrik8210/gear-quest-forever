@@ -71,7 +71,7 @@ BONUS_ARMOR = re.compile(r"\+(\d+)\s+Bonus Armor", re.I)
 SET_CUT = re.compile(
     r"(?:Classes:\s*[A-Za-z, ]+)?[A-Z][A-Za-z' :-]{1,50}\(\d+/\d+\)"
 )
-DEAD = ("expertise", "armorPen", "resilience", "spellHit", "spellCrit", "spellHaste",
+DEAD = ("armorPen", "resilience", "spellHit", "spellCrit", "spellHaste",
         "hitRanged", "critRanged")
 
 

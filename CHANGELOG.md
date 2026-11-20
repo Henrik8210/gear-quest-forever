@@ -2,56 +2,82 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.2.4
+## v1.2.5
 
-The window title reads **GearQuest Forever v1.2.4**. Your hunts, rank order, scores, filters, play styles, map pins, parchment text, **Hold Shift** unit tooltips, GearQuest score, and saved progress match v1.2.3. What changed is how class hunt data is loaded: **Catalog.lua** indexes the staged class files and builds a row only when the log, Lookup, a tooltip, or the simulator asks for it, which cuts resident memory on a real character.
+The log header reads **GearQuest Forever v1.2.5**. Saved hunts, **Completed**, **Removed**, tracked pins, and hunt **id** strings are unchanged. Your progress is not reset.
 
 **First restart after updating**
 
-- This release adds **Catalog.lua** to **GearQuestForever.toc**. A **`/reload` is not enough** the first time you install v1.2.4. Quit to the character screen or desktop and log in again so the client loads the new file.
-- The nine **GearQuestForever_*** class folders on disk are unchanged. You do not need to wipe saved variables.
+- This release adds **TooltipsPanel.lua**, **Data.MobDrops.generated.lua**, and **Data.WorldDropOpenChance.generated.lua** to **GearQuestForever.toc**. A **/reload is not enough** the first time you install v1.2.5 on a machine that only had v1.2.4 or older. Quit to the character screen or desktop and log in again so the client loads the new files.
 
-**Memory on a leveling character**
+### Tooltips window
 
-- v1.2.3 already cut memory versus v1.2.0 by unpacking one faction and packing coordinates. v1.2.4 avoids materializing every hunt row for your class at once.
-- On a **level 50 Horde Beast Mastery** hunter, GearQuest Forever often sits near **40 MB** in the Game Menu addon list while Questie and the database addons use their own memory. Opening **Lookup** from a slot's **(i)** may add about **2 MB** while that slot's rank list is built, then stay flat.
-- Totals depend on your other addons, how long you have played that class, and whether you have opened the log or simulated another class.
-- CPU while standing in town should stay negligible. Building a slot list costs work once; it should not run every frame.
+A **Tooltips** button sits on the log footer beside **Play style**. The first time you open it on an account, the button pulses gold like Play style until you click it.
 
-**Same hunts, ranks, and ids**
+The window has live previews: a sample **target tooltip** on the left and a sample **item tooltip** on the right. Changing a checkbox, slider, or source filter updates the previews immediately, so you can see what you are turning on before you mouse over a mob in the world.
 
-- Every class, spec, levels 1–60, and both factions use the same scored lists as v1.2.3.
-- Saved hunts, **Completed**, **Removed**, and tracked pins use the same hunt **id** strings. Progress is not reset.
-- **Lookup** from **(i)** stays in rank order with the same scores. **Hunts per gear slot**, filters, and play styles hide rows the same way; **#N** on visible hunts stays the unfiltered rank.
+Unit settings moved here from Hunt settings:
 
-**Log, parchment, and simulation**
+- **Hide unit gear tips** — removes every GearQuest line on creatures, vendors, trainers, and quest givers.
+- **Always show unit gear tips** — lists upgrades without holding **Shift**.
+- **Show drop chance on unit tooltip lines** — adds a grey **(N%)** when GearQuest knows the rate.
+- **Unit gear sources on tooltips** — filters boss, trash, rare, world, vendor, profession, and quest lines (outside instances only; inside dungeons Blizzard often hides the creature name from addons, so those filters do not apply there).
+- **Minimum drop chance** — slider from 0% upward; when every line is below the cutoff, the tooltip shows a grey hint to lower the slider.
 
-- **Active**, **Tracked**, obtain toasts, the GearQuest score bar, **Recommended**, and **Rank #1 BiS acquired** behave as in v1.2.3.
-- Quest chains, vendor prices, craft materials, and **Show on map** pins are unchanged.
-- **Simulation** still loads one class at a time and keeps upgrade arrows off while simulating.
+Item settings in the same window:
 
-**Tooltips and other specs**
+- **Recommended gear enchantment** (off until you turn it on).
+- **GearQuest score on tooltips** and **Ranks for your other specs** (same behavior as **General settings**).
 
-- Hunt hovers still prefer the **client item tooltip**, then rank, score, and optional enchant and other-spec lines.
-- With **General settings → Ranks for your other specs** **on**, quick hovers across many hunts should stay smooth: each spec keeps its own cached slot lists.
-- With that setting **off**, only the active or simulated spec gets a rank line, as in v1.2.3.
+### Unit BiS lines on NPCs
 
-**Unit tooltips (unchanged from v1.2.3)**
+Mousing over a creature, vendor, trainer, or quest giver still lists up to three upgrades that beat what you wear (or fill an empty slot). Downgrades stay off. Rings and trinkets compare to the weaker worn piece. The line still includes rank, slot, the white GearQuest index, the green arrow, and the green comparison number.
 
-- BiS lines on vendors, trainers, quest givers, and attackable mobs still appear only while **Shift** is held. **Hide unit gear tips** still removes them.
+**Shift** still gates the lines unless **Always show** is on. Without Shift, when GearQuest has lines to show, the tooltip ends with **Hold Shift to see BiS items from this NPC**.
 
-**Custom specs, languages, load order**
+**Attackable mobs** can show **two** blocks: named drops or sells on that creature, and **Your top world drops from this mob** for generic world drops whose level band fits the mob's level. Both blocks use the same upgrade test.
 
-- **GearQuest Forever: Item Stats** still loads the first time a **custom spec** is scored.
-- **GearQuest Forever: Languages** still loads only when you pick a non-English language.
-- Class addons still load when you play or simulate that class.
+**Opposite-faction NPCs** get no GearQuest lines. You cannot farm their drops on your hunt list, so friendly guards and town NPCs on the wrong faction no longer show misleading upgrades.
 
-**What did not change**
+Obtained or removed hunts drop off on the next hover without waiting for a cache rebuild.
 
-- No rescore, no weight retune, and no new hunts in this version.
-- Repository CI checks are for developers; they are not shipped in the zip.
+### Drop chance percentages
 
-Thanks to **kaeldrin-gh** for the lazy catalog work merged in this release.
+For **named** droppers, the grey **%** comes from the mob-drop index when Wowhead stored a rate for that creature and item.
+
+For **generic** world drops (no named creature on the hunt), GearQuest uses an **averaged outdoor sample rate** from Wowhead classic **Dropped By** data (uild_world_drop_open_chance.py). This release ships about **1,845** of those averages. Items with no average yet show no grey **%**; hunts and ranks are unchanged.
+
+Turn **Show drop chance** off to hide every **%**. The minimum-drop slider filters lines that have a known positive chance below your cutoff.
+
+### Hunter weapons from level 20
+
+Hunters learn **Dual Wield** at 20. Forever ranks either-hand one-handers on the **off-hand** weapon list. v1.2.5 scores the **best two distinct one-handers** as a pair against the best two-hander, in the hunt lists, the Weapons filter, upgrade arrows, GearQuest score, and paper-doll logic — not a phantom main-hand one-hander plus a trinket-style off-hand.
+
+After rescoring, **Main Hand** hunt rows still favor two-handers where the model says so; **Off Hand** rows use the combined dual-wield score. If you wear a two-hander, comparisons still treat the off-hand slot correctly.
+
+All three hunter specs were rescored from the current Forever tooltips. Expect rank shuffles on one-hand and two-hand bands from level 20 upward, especially Marksmanship and Survival.
+
+### Data, mob drops, and coordinates
+
+The mob-drop table and vendor or trainer maps were rebuilt from the Forever ingest pass (Data.MobDrops.generated.lua). More creatures and vendors can answer on unit tooltips when their drops or wares are on your hunt list.
+
+Quest faction gates, coordinates, and item stats were refreshed where the pipeline found new sources. Class hunt files for all nine classes were re-emitted from the current scored JSON.
+
+**Weights were not retuned** for player specs in this release. Custom stat weights you saved on your account are unchanged.
+
+### Languages and settings layout
+
+New player-facing sentences for the Tooltips window and unit-tooltip controls were added to every **GearQuest/Locales/** file in this release.
+
+**Hunt settings** no longer duplicates unit-tooltip or enchant controls; use the **Tooltips** window or **General settings** for item score lines.
+
+### For developers
+
+CI gains **Recommended enchants** (scripts/ci/check_enchants.py) so enchantable hunt rows keep a formula at the item's level. Hunter dual-wield pairing is covered in 	ests/pipeline/test_score.py.
+
+### v1.2.4
+
+**GearQuest Forever v1.2.4** — **Catalog.lua** lazy-loads hunt rows per query instead of materializing the whole class at login; same hunts, ranks, and saved ids. First install needs a full restart (not /reload alone). Thanks **kaeldrin-gh**.
 
 ### v1.2.3
 

@@ -1,4 +1,5 @@
 -- Recommended enchant on a gear tooltip. Wowhead Forever is the source.
+-- After new hunt gear is indexed, run scripts/ci/check_enchants.py in CI.
 -- A formula is shown for every character when the piece can be taken to
 -- someone who makes it. It is skipped only when the spell says this
 -- character cannot wear it. Armor on an enchant counts for a tank. Every
@@ -177,6 +178,19 @@ local ROWS = {
     { slots = { "chest", "hands", "feet", "legs" }, skill = 235, level = 50, minIlvl = 35, name = "Mystic Rugged Armor Kit", effect = "+6 Spell Power and +40 Armor", stats = { sp = 6, armor = 40 } },
     { slots = { "chest", "hands", "feet", "legs" }, skill = 300, level = 50, name = "Core Armor Kit", effect = "+3 Defense", stats = { defense = 3 } },
     { slots = { "chest", "hands", "feet", "legs" }, skill = 300, level = 60, name = "Wild Leather Armor Kit", effect = "+10 Stamina and +4 Defense", stats = { sta = 10, defense = 4 } },
+
+    -- Head and legs: arcanums from quests, not Enchanting formulas.
+    { slots = { "head", "legs" }, level = 40, skill = 1, name = "Lesser Arcanum of Voracity", effect = "+8 Agility", stats = { agi = 8 } },
+    { slots = { "head", "legs" }, level = 40, skill = 1, name = "Lesser Arcanum of Voracity", effect = "+8 Strength", stats = { str = 8 } },
+    { slots = { "head", "legs" }, level = 40, skill = 1, name = "Lesser Arcanum of Voracity", effect = "+8 Stamina", stats = { sta = 8 } },
+    { slots = { "head", "legs" }, level = 40, skill = 1, name = "Lesser Arcanum of Voracity", effect = "+8 Intellect", stats = { int = 8 } },
+    { slots = { "head", "legs" }, level = 40, skill = 1, name = "Lesser Arcanum of Voracity", effect = "+8 Spirit", stats = { spi = 8 } },
+    { slots = { "head", "legs" }, level = 40, skill = 1, name = "Lesser Arcanum of Constitution", effect = "+100 Health", stats = { health = 100 } },
+    { slots = { "head", "legs" }, level = 40, skill = 1, name = "Lesser Arcanum of Rumination", effect = "+150 Mana", stats = { mana = 150 } },
+    { slots = { "head", "legs" }, level = 40, skill = 1, name = "Lesser Arcanum of Tenacity", effect = "+125 Armor", stats = { armor = 125 } },
+    { slots = { "head", "legs" }, level = 55, skill = 1, name = "Arcanum of Rapidity", effect = "+1% Haste", stats = { haste = 1 } },
+    { slots = { "head", "legs" }, level = 55, skill = 1, name = "Arcanum of Focus", effect = "+12 Spell Damage and Healing", stats = { sp = 12, heal = 12 } },
+    { slots = { "head", "legs" }, level = 55, skill = 1, name = "Arcanum of Protection", effect = "+1% Dodge", stats = { dodge = 1 } },
 
     { slots = "ranged", skill = 30, level = 5, name = "Crude Scope", effect = "+1 Ranged Weapon Damage", rng = 1 },
     { slots = "ranged", skill = 90, level = 10, name = "Standard Scope", effect = "+2 Ranged Weapon Damage", rng = 2 },
@@ -397,6 +411,7 @@ function GQ.Enchant:SlotKey(entry, link)
     if IsBareWeapon(subType, classID, subClassID) or equipLoc == "INVTYPE_THROWN" then
         return nil
     end
+    if equipLoc == "INVTYPE_HEAD" then return "head" end
     if equipLoc == "INVTYPE_WRIST" then return "wrist" end
     if equipLoc == "INVTYPE_CHEST" or equipLoc == "INVTYPE_ROBE" then return "chest" end
     if equipLoc == "INVTYPE_HAND" then return "hands" end
@@ -443,6 +458,7 @@ function GQ.Enchant:SlotKey(entry, link)
         end
         return "offhand"
     end
+    if slot == "Head" then return "head" end
     if slot == "Wrist" then return "wrist" end
     if slot == "Chest" then return "chest" end
     if slot == "Hands" then return "hands" end

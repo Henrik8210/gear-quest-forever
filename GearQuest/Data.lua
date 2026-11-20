@@ -5317,6 +5317,7 @@ function GQ.Data:InvalidateQueryCache()
     self._linkEntryCache = nil
     self._scoreMissCache = nil
     self._unitGearCache = nil
+    self._unitGearWarmDone = nil
     if GQ.Log then
         GQ.Log._slotRankCache = nil
         GQ.Log._slotRankBand = nil
@@ -6351,10 +6352,68 @@ function GQ.Data:BestOffHandPartner()
     return best
 end
 
+function GQ.Data:BestDualWieldPartnerFor(excludeEntry)
+    local excludeId = excludeEntry and excludeEntry.itemId
+    local best
+    local second
+    for _, entry in ipairs(self:GetCandidatesForSlot("SecondaryHand") or {}) do
+        if type(entry.pipelineScore) == "number" and self:EntryIsDamagingWeapon(entry)
+            and not self:EntryIsTwoHand(entry)
+            and (not excludeId or entry.itemId ~= excludeId)
+        then
+            if not best or entry.pipelineScore > best.pipelineScore then
+                second = best
+                best = entry
+            elseif not second or entry.pipelineScore > second.pipelineScore then
+                second = entry
+            end
+        end
+    end
+    if excludeId and best and best.itemId == excludeId then
+        return second
+    end
+    return best
+end
+
+function GQ.Data:HunterDualWieldPairScore()
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    if classFile ~= "HUNTER" or not self:DualWieldReady() then
+        return nil
+    end
+    local first
+    local second
+    for _, entry in ipairs(self:GetCandidatesForSlot("SecondaryHand") or {}) do
+        if type(entry.pipelineScore) == "number" and self:EntryIsDamagingWeapon(entry)
+            and not self:EntryIsTwoHand(entry)
+        then
+            if not first or entry.pipelineScore > first.pipelineScore then
+                second = first
+                first = entry
+            elseif not second or entry.pipelineScore > second.pipelineScore then
+                second = entry
+            end
+        end
+    end
+    if not first then
+        return 0
+    end
+    if not second then
+        return first.pipelineScore or 0
+    end
+    return (first.pipelineScore or 0) + (second.pipelineScore or 0)
+end
+
 function GQ.Data:BestOneHandPartner()
     local ctx = self.GetActiveBandCacheKey and self:GetActiveBandCacheKey() or ""
     if self._onePartnerBand == ctx then
         return self._onePartnerEntry
+    end
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    if classFile == "HUNTER" and self:DualWieldReady() then
+        local hunterBest = self:BestDualWieldPartnerFor(nil)
+        self._onePartnerBand = ctx
+        self._onePartnerEntry = hunterBest
+        return hunterBest
     end
     local list = self:GetCandidatesForSlot("MainHand") or {}
     if #list == 0 then
@@ -6391,8 +6450,14 @@ function GQ.Data:BestWeaponLoadoutScore()
             end
         end
     end
-    local partner = self:BestOffHandPartner()
-    local pair = bestOne + ((partner and partner.pipelineScore) or 0)
+    local pair
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    if classFile == "HUNTER" and self:DualWieldReady() then
+        pair = self:HunterDualWieldPairScore() or 0
+    else
+        local partner = self:BestOffHandPartner()
+        pair = bestOne + ((partner and partner.pipelineScore) or 0)
+    end
     local best = bestTwo > pair and bestTwo or pair
     self._loadoutBand = ctx
     self._loadoutBest = best
@@ -6425,7 +6490,7 @@ function GQ.Data:WeaponLoadoutPipelineDelta(entry)
     if isTwo then
         candidate = entry.pipelineScore
     elseif mainIsTwo and slot == "SecondaryHand" then
-        local one = self:BestOneHandPartner()
+        local one = self:BestDualWieldPartnerFor(entry)
         candidate = entry.pipelineScore + ((one and one.pipelineScore) or 0)
     elseif mainIsTwo then
         local off = self:BestOffHandPartner()
@@ -7082,7 +7147,7 @@ function GQ.Data:GearScoreTrail(entry, ctx)
 end
 
 function GQ.Data:GearScoreTooltipLine(entry)
-    if GQ.IsPreviewEnabled and GQ:IsPreviewEnabled() then
+    if not GQ._tooltipsPanelPreview and GQ.IsPreviewEnabled and GQ:IsPreviewEnabled() then
         return L["|cffb0b0b0Turn off simulation mode to see your GearQuest Score for this item|r"]
     end
     if not entry then

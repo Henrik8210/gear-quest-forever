@@ -560,6 +560,9 @@ function GQ.Data:EnsureClassLoaded(classFile)
     if GQ.Custom and GQ.Custom.OnClassExpanded then
         GQ.Custom:OnClassExpanded(classFile)
     end
+    if self.WarmUnitGearTooltipCache then
+        self:WarmUnitGearTooltipCache()
+    end
     return true
 end
 

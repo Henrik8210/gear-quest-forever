@@ -67,7 +67,24 @@ QUEST_START_DOOR = {
 # take the wrong Side. --repair-quests rebuilds quest_faction from quest
 # rewards, then these sides replace whatever that pass parsed.
 # Malignant Root: Rotheap Inards to Rethiel the Greenwarden, who is hostile to the Horde.
+# Forever offers these rewards to both factions; Wowhead reward quest Side is still one-sided.
+BOTH_FACTION_QUEST_ITEMS = {
+    # Rig Wars (Forever: both factions)
+    9623,
+    9624,
+    9625,
+    # Corruption of Earth and Seed (Forever: both factions)
+    17705,
+    17743,
+    17753,
+}
+
 HAND_FACTION = {
+    # Forever faction trinket/neck copies (Wowhead reward Side is wrong or shared).
+    270275: "Alliance",  # Cleansed Vilebranch Medallion (Saving Sharpbeak)
+    270276: "Alliance",  # Cleansed Vilebranch Icon (Saving Sharpbeak)
+    279850: "Alliance",  # Curio-Adorned Necklace (Curios of Curiosity)
+    270225: "Horde",  # Jewel of the Guard Captain (Revantusk guard captain chain)
     # Heart of Disruption is two quests with one name. Alliance 92458 chooses
     # Spellguard Pauldrons, Renewing Footpads, or Defender of Dalaran. Horde
     # 96984 chooses Battle Spaulders, Enchanted Sandals, or Striking Staff.
@@ -1416,11 +1433,12 @@ def repair_quests(cache: dict) -> None:
     for iid in ids:
         src = sources.get(str(iid)) or {}
         side = None
-        for hit in item_hits.get(iid) or []:
-            rec = quest_record(int(hit["id"]), cache)
-            if rec.get("faction") in ("Alliance", "Horde"):
-                side = rec["faction"]
-                break
+        if iid not in BOTH_FACTION_QUEST_ITEMS:
+            for hit in item_hits.get(iid) or []:
+                rec = quest_record(int(hit["id"]), cache)
+                if rec.get("faction") in ("Alliance", "Horde"):
+                    side = rec["faction"]
+                    break
         counts[side or "Both"] = counts.get(side or "Both", 0) + 1
         if side:
             exclusive[iid] = side

@@ -126,6 +126,20 @@ Hide a source, a profession, or one dungeon. Boss drop and Dungeon & Raid trash 
 
 ---
 
+### Tooltips settings
+
+*Screenshot — the Tooltips window with live previews.*
+
+Footer **Tooltips** sits beside **Play style**. The window shows a sample mob tooltip on the left and a sample gear tooltip on the right. The previews update as you change the settings.
+
+**Hide unit gear tips** removes BiS lines on creatures, vendors, trainers, and quest givers. Otherwise hold **Shift** to see them, or turn on **Always show unit gear tips**. **Show drop chance** adds a grey **%** when GearQuest knows it. Named mob drops use Wowhead rates. Generic world drops use an averaged outdoor sample. A slider can hide lines below a minimum **%**. **Unit gear sources** filters which kinds of drop can appear.
+
+On attackable mobs you can see both **Your top items from this mob** and **Your top world drops from this mob**. Opposite-faction NPCs get no GearQuest lines.
+
+On the right: **Recommended gear enchantment**, **GearQuest score on tooltips**, and **Ranks for your other specs**, with the same behavior as in General settings.
+
+---
+
 ### Is this an upgrade?
 
 *Screenshot 6 — an item tooltip with the GearQuest score.*

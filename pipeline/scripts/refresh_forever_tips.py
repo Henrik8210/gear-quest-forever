@@ -192,6 +192,16 @@ def main():
             for part in sys.argv[sys.argv.index("--ids") + 1].split(",")
             if part.strip()
         }
+    if "--generic-world-drops" in sys.argv:
+        pat = re.compile(r"^World drop around level (\d+)-(\d+)\.")
+        generic = set()
+        for raw_id, src in sources.items():
+            if not isinstance(src, dict) or src.get("sourceType") != "world_drop" or src.get("npc"):
+                continue
+            if pat.match((src.get("instructions") or "").strip()):
+                generic.add(int(raw_id))
+        hunted = set(hunt_ids_from_addon())
+        only = (generic & hunted) if only is None else (only & generic)
 
     if "--missing" in sys.argv:
         ids = [i for i in missing_ids() if str(i) in items and str(i) not in pins and i != WAND]

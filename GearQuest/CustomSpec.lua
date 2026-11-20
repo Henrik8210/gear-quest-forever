@@ -15,7 +15,7 @@ local FOLD_INTO = {
     spellCrit = "crit", critRanged = "crit",
     spellHaste = "haste",
 }
-local DEAD_STAT = { expertise = true, armorPen = true, resilience = true }
+local DEAD_STAT = { armorPen = true, resilience = true }
 
 local FIELDS = {
     { key = "dpsWeight", label = "Weapon DPS", weapon = true },

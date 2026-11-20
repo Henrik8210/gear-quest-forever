@@ -302,6 +302,13 @@ local QUEST_DETAIL_BODY_FONTS = {
     "QuestFont", "QuestFontNormalSmall", "QuestFont_Large",
 }
 
+local SETTINGS_NOTE_FONTS = {
+    "QuestFontNormalSmall",
+    "SystemFont_Small",
+    "SystemFont_Shadow_Small",
+    "QuestFont",
+}
+
 local function CopyProgressMap(src)
     local out = {}
     if type(src) ~= "table" then
@@ -812,6 +819,45 @@ local function CreateFontStringWithFallback(parent, candidates)
         created = parent:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     end
     return GQ:CalmFont(created)
+end
+
+local function CreateSettingTitle(parent, detail)
+    local fs
+    if detail and detail._gqTooltipsPanel then
+        fs = parent:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+        if GQ.CalmFont then
+            GQ:CalmFont(fs)
+        end
+        fs:SetTextColor(1, 0.95, 0.85)
+    else
+        fs = CreateFontStringWithFallback(parent, QUEST_DETAIL_TITLE_FONTS)
+        fs:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    end
+    if fs.SetJustifyH then
+        fs:SetJustifyH("LEFT")
+    end
+    return fs
+end
+
+local function CreateSettingHint(parent, detail)
+    local fs
+    if detail and detail._gqTooltipsPanel then
+        fs = parent:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
+        if GQ.CalmFont then
+            GQ:CalmFont(fs)
+        end
+        fs:SetTextColor(0.78, 0.75, 0.7)
+    else
+        fs = CreateFontStringWithFallback(parent, SETTINGS_NOTE_FONTS)
+        fs:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
+    end
+    if fs.SetJustifyH then
+        fs:SetJustifyH("LEFT")
+    end
+    if fs.SetWordWrap then
+        fs:SetWordWrap(true)
+    end
+    return fs
 end
 
 local PARCHMENT_TEXTURE = "Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Textures\\GQ-Parchment.png"
@@ -1598,6 +1644,23 @@ local function ApplyScrollBarVisibility(scroll)
     end
 end
 
+function GQ.Log:ApplyTooltipsScrollBars(panel)
+    if not panel then
+        return
+    end
+    if self.UpdateTooltipsSlimScrollBar then
+        self:UpdateTooltipsSlimScrollBar(panel.leftScroll)
+        self:UpdateTooltipsSlimScrollBar(panel.rightScroll)
+        return
+    end
+    ApplyScrollBarVisibility(panel.leftScroll)
+    ApplyScrollBarVisibility(panel.rightScroll)
+    if self.StyleTooltipsSlimScrollBar then
+        self:StyleTooltipsSlimScrollBar(panel.leftScroll)
+        self:StyleTooltipsSlimScrollBar(panel.rightScroll)
+    end
+end
+
 local function WireLogWindowMouseWheel(frame)
     if not frame or not frame.EnableMouseWheel then
         return
@@ -2277,6 +2340,16 @@ local SOURCE_FILTERS = GQ.LocaleTable({
     { id = "unsourced", label = L["Unsourced"] },
     { id = "vendor", label = L["Vendor"] },
     { id = "world_drop", label = L["World drop"] },
+})
+
+GQ.Log.UNIT_GEAR_SOURCE_FILTERS = GQ.LocaleTable({
+    { id = "world_drop", label = L["World drop"] },
+    { id = "quest_reward", label = L["Quest reward"] },
+    { id = "rare_npc", label = L["Rare NPC"] },
+    { id = "vendor", label = L["Vendor"] },
+    { id = "profession", label = L["Profession"] },
+    { id = "boss_drop", label = L["Boss drop"], disabled = true },
+    { id = "raid_trash", label = L["Dungeon & Raid trash"], disabled = true },
 })
 
 -- Every profession that has a hunt item, at any level and for any class.
@@ -8824,6 +8897,42 @@ function GQ.Log:DismissPlayStyleIntro()
     end
 end
 
+function GQ.Log:StartTooltipsIntro(btn)
+    local ui = GearQuestForeverDB and GearQuestForeverDB.ui
+    if not btn or (ui and ui.tooltipsBtnSeen) or btn.introWash then
+        return
+    end
+
+    local wash = btn:CreateTexture(nil, "OVERLAY")
+    wash:SetPoint("TOPLEFT", btn, "TOPLEFT", 5, -4)
+    wash:SetPoint("BOTTOMRIGHT", btn, "BOTTOMRIGHT", -5, 4)
+    wash:SetColorTexture(1, 0.82, 0.28, 1)
+    wash:SetBlendMode("ADD")
+    wash:SetAlpha(0)
+    btn.introWash = wash
+    btn._pulseT = 0
+    btn:SetScript("OnUpdate", function(self, elapsed)
+        self._pulseT = (self._pulseT or 0) + (elapsed or 0)
+        local wave = 0.5 - 0.5 * math.cos(self._pulseT * 1.4)
+        wash:SetAlpha(wave * 0.28)
+    end)
+end
+
+function GQ.Log:DismissTooltipsIntro()
+    if GearQuestForeverDB then
+        GearQuestForeverDB.ui = GearQuestForeverDB.ui or {}
+        GearQuestForeverDB.ui.tooltipsBtnSeen = true
+    end
+    local btn = self.frame and self.frame.tooltipsBtn
+    if not btn then
+        return
+    end
+    btn:SetScript("OnUpdate", nil)
+    if btn.introWash then
+        btn.introWash:Hide()
+    end
+end
+
 function GQ.Log:StartTrackIntro(btn)
     local ui = GearQuestForeverDB and GearQuestForeverDB.ui
     if not btn or (ui and ui.trackSeen) then
@@ -9098,6 +9207,17 @@ function GQ.Log:LayoutFooterButtons(frame)
         frame.playStyleBtn:ClearAllPoints()
         frame.playStyleBtn:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", CONTENT_LEFT + LEFT_COLUMN_WIDTH + COLUMN_GAP, FOOTER_BUTTON_Y)
     end
+    self:EnsureTooltipsPanel(frame)
+    if frame.tooltipsBtn then
+        frame.tooltipsBtn:ClearAllPoints()
+        if frame.playStyleBtn then
+            frame.tooltipsBtn:SetPoint("LEFT", frame.playStyleBtn, "RIGHT", 8, 0)
+        elseif frame.exitBtn then
+            frame.tooltipsBtn:SetPoint("RIGHT", frame.exitBtn, "LEFT", -8, 0)
+        else
+            frame.tooltipsBtn:SetPoint("BOTTOM", frame, "BOTTOM", 0, FOOTER_BUTTON_Y)
+        end
+    end
     self:EnsureHuntsPerSlot(frame)
     if frame.huntsPerSlot then
         frame.huntsPerSlot:ClearAllPoints()
@@ -9183,6 +9303,16 @@ function GQ.Log:ApplyPageTab()
             self.frame.playStyleBtn:Hide()
             if self.frame.playStylePanel then
                 self.frame.playStylePanel:Hide()
+            end
+        end
+    end
+    if self.frame.tooltipsBtn then
+        if page == "log" then
+            self.frame.tooltipsBtn:Show()
+        else
+            self.frame.tooltipsBtn:Hide()
+            if self.frame.tooltipsPanel then
+                self.frame.tooltipsPanel:Hide()
             end
         end
     end
@@ -9278,7 +9408,7 @@ function GQ.Log:EnsureTabBar(frame)
     self:UpdateTabVisuals()
 end
 
-local function ApplyFilterButtonFont(fs)
+function GQ.Log.GQ.Log.ApplyFilterButtonFont(fs)
     if not fs then
         return
     end
@@ -9316,7 +9446,7 @@ function GQ.Log:PadFocusWithin(row, flyout)
     return false
 end
 
-local function MouseOverFilterRow(check)
+function GQ.Log.GQ.Log.MouseOverFilterRow(check)
     if not check or not check.IsShown or not check:IsShown() or not check.IsMouseOver then
         return false
     end
@@ -9455,7 +9585,7 @@ function GQ.Log:EnsureSourceFilter(frame)
     branch:Hide()
     branch.rows = {}
     branch.empty = branch:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    ApplyFilterButtonFont(branch.empty)
+    GQ.Log.ApplyFilterButtonFont(branch.empty)
     branch.empty:SetPoint("LEFT", branch, "LEFT", 12, 0)
     branch.empty:SetText(L["No profession hunts"])
     branch:SetScript("OnEnter", function()
@@ -9559,7 +9689,7 @@ function GQ.Log:EnsureSourceFilter(frame)
             GQ.Pins:ApplyIcon(icon, opt.id)
         end
         local label = check:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-        ApplyFilterButtonFont(label)
+        GQ.Log.ApplyFilterButtonFont(label)
         label:SetPoint("LEFT", icon, "RIGHT", 3, 0)
         label:SetText(L[opt.label] or opt.label)
         check.label = label
@@ -9794,7 +9924,7 @@ function GQ.Log:EnsureSourceFilter(frame)
                 return
             end
             local overBranch = flyout.IsMouseOver and flyout:IsMouseOver(10, 10, 10, 10)
-            if MouseOverFilterRow(row) or overBranch or log:PadFocusWithin(row, flyout) then
+            if GQ.Log.MouseOverFilterRow(row) or overBranch or log:PadFocusWithin(row, flyout) then
                 log[leaveKey] = nil
                 log[rowHotKey] = true
                 return
@@ -10137,7 +10267,7 @@ function GQ.Log:PopulateProfessionBranch(menu)
             icon:SetPoint("LEFT", row, "RIGHT", 2, 0)
             row.kindIcon = icon
             local label = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-            ApplyFilterButtonFont(label)
+            GQ.Log.ApplyFilterButtonFont(label)
             label:SetPoint("LEFT", icon, "RIGHT", 2, 0)
             row.label = label
             row:SetScript("OnEnter", function()
@@ -10328,7 +10458,7 @@ function GQ.Log:PopulateVendorBranch(menu)
             row = CreateFrame("CheckButton", nil, branch, "UICheckButtonTemplate")
             row:SetSize(22, 22)
             local label = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-            ApplyFilterButtonFont(label)
+            GQ.Log.ApplyFilterButtonFont(label)
             label:SetPoint("LEFT", row, "RIGHT", 2, 0)
             row.label = label
             row:SetScript("OnEnter", function()
@@ -10504,7 +10634,7 @@ function GQ.Log:PopulateQuestBranch(menu)
             icon:SetPoint("LEFT", row, "RIGHT", 2, 0)
             row.kindIcon = icon
             local label = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-            ApplyFilterButtonFont(label)
+            GQ.Log.ApplyFilterButtonFont(label)
             label:SetPoint("LEFT", icon, "RIGHT", 2, 0)
             row.label = label
             row:SetScript("OnEnter", function()
@@ -10634,7 +10764,7 @@ function GQ.Log:CreateDungeonFilterBranch(menu)
     branch:Hide()
     branch.rows = {}
     branch.empty = branch:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    ApplyFilterButtonFont(branch.empty)
+    GQ.Log.ApplyFilterButtonFont(branch.empty)
     branch.empty:SetPoint("LEFT", branch, "LEFT", 12, 0)
     branch.empty:SetText(L["No boss hunts at this level"])
     branch.empty:Hide()
@@ -10672,7 +10802,7 @@ function GQ.Log:PopulateDungeonBranch(menu)
             row = CreateFrame("CheckButton", nil, branch, "UICheckButtonTemplate")
             row:SetSize(22, 22)
             local label = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-            ApplyFilterButtonFont(label)
+            GQ.Log.ApplyFilterButtonFont(label)
             label:SetPoint("LEFT", row, "RIGHT", 2, 0)
             row.label = label
             row:SetScript("OnEnter", function()
@@ -10819,7 +10949,7 @@ function GQ.Log:CreateTrashFilterBranch(menu)
     branch:Hide()
     branch.rows = {}
     branch.empty = branch:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    ApplyFilterButtonFont(branch.empty)
+    GQ.Log.ApplyFilterButtonFont(branch.empty)
     branch.empty:SetPoint("LEFT", branch, "LEFT", 12, 0)
     branch.empty:SetText(L["No trash hunts at this level"])
     branch.empty:Hide()
@@ -10857,7 +10987,7 @@ function GQ.Log:PopulateTrashBranch(menu)
             row = CreateFrame("CheckButton", nil, branch, "UICheckButtonTemplate")
             row:SetSize(22, 22)
             local label = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-            ApplyFilterButtonFont(label)
+            GQ.Log.ApplyFilterButtonFont(label)
             label:SetPoint("LEFT", row, "RIGHT", 2, 0)
             row.label = label
             row:SetScript("OnEnter", function()
@@ -11678,7 +11808,7 @@ function GQ.Log:CreateLanguageDropdown(frame, detail)
     end)
 end
 
-local function CreateSettingsCheck(parent, label, frameName)
+function GQ.Log.GQ.Log.CreateSettingsCheck(parent, label, frameName)
     local ok, btn = pcall(CreateFrame, "CheckButton", frameName or "GearQuestHideMinimapCheck", parent, "UICheckButtonTemplate")
     if not ok or not btn then
         btn = CreateFrame("CheckButton", nil, parent)
@@ -11703,57 +11833,107 @@ local function CreateSettingsCheck(parent, label, frameName)
     return btn
 end
 
-function GQ.Log:CreateGearScoreSetting(frame, detail, anchor)
-    local label = CreateFontStringWithFallback(detail, QUEST_DETAIL_TITLE_FONTS)
-    label:SetJustifyH("LEFT")
-    label:SetText(L["GearQuest score on tooltips"])
-    label:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
-    frame.settingsScoreLabel = label
+function GQ.Log:CreateGearScoreTooltipSettings(frame, detail, anchor)
+    anchor = anchor or detail
+    local scoreHit = frame.settingsScoreLabelHit
+    local scoreReady = scoreHit and scoreHit.GetParent and scoreHit:GetParent() == detail
 
-    local hit = CreateFrame("Button", nil, detail)
-    hit:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 0, -16)
-    hit:SetSize(math.max(label:GetStringWidth() or 0, 1) + 4, math.max(label:GetStringHeight() or 0, 18))
-    label:SetParent(hit)
-    label:ClearAllPoints()
-    label:SetPoint("LEFT", hit, "LEFT", 0, 0)
-    frame.settingsScoreLabelHit = hit
+    if not scoreReady then
+        local label = CreateSettingTitle(detail, detail)
+        label:SetText(L["GearQuest score on tooltips"])
+        frame.settingsScoreLabel = label
 
-    local function ApplyScoreCheck(checked)
+        local hit = CreateFrame("Button", nil, detail)
+        hit:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 0, -16)
+        hit:SetSize(math.max(label:GetStringWidth() or 0, 1) + 4, math.max(label:GetStringHeight() or 0, 18))
+        label:SetParent(hit)
+        label:ClearAllPoints()
+        label:SetPoint("LEFT", hit, "LEFT", 0, 0)
+        frame.settingsScoreLabelHit = hit
+
+        local function ApplyScoreCheck(checked)
+            GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+            GearQuestForeverDB.settings.showGearScore = checked and true or false
+            GQ.Log:NotifyTooltipsPreview()
+        end
+
+        local check = GQ.Log.CreateSettingsCheck(detail, "")
+        check:SetPoint("RIGHT", hit, "LEFT", -6, 0)
+        check:SetChecked(true)
+        if check.text then
+            check.text:SetText("")
+            check.text:Hide()
+        end
+        check:SetScript("OnClick", function(self)
+            ApplyScoreCheck(self:GetChecked())
+        end)
+        hit:SetScript("OnClick", function()
+            local checked = not check:GetChecked()
+            check:SetChecked(checked)
+            ApplyScoreCheck(checked)
+        end)
+        frame.settingsScoreCheck = check
+
+        local hint = CreateSettingHint(detail, detail)
+        hint:SetPoint("TOPLEFT", hit, "BOTTOMLEFT", 0, -4)
+        hint:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
+        hint:SetText(L["Shows the rank, score, and comparison to your equipped gear on gear tooltips."])
+        frame.settingsScoreHint = hint
+    end
+
+    local specHitExisting = frame.settingsOtherSpecLabelHit
+    if specHitExisting and specHitExisting.GetParent and specHitExisting:GetParent() == detail then
+        return
+    end
+
+    local specAnchor = frame.settingsScoreHint
+    if not specAnchor or specAnchor.GetParent and specAnchor:GetParent() ~= detail then
+        specAnchor = anchor
+    end
+
+    local specLabel = CreateSettingTitle(detail, detail)
+    specLabel:SetText(L["Ranks for your other specs"])
+    frame.settingsOtherSpecLabel = specLabel
+
+    local specHit = CreateFrame("Button", nil, detail)
+    specHit:SetPoint("TOPLEFT", specAnchor, "BOTTOMLEFT", 0, -16)
+    specHit:SetSize(math.max(specLabel:GetStringWidth() or 0, 1) + 4, math.max(specLabel:GetStringHeight() or 0, 18))
+    specLabel:SetParent(specHit)
+    specLabel:ClearAllPoints()
+    specLabel:SetPoint("LEFT", specHit, "LEFT", 0, 0)
+    frame.settingsOtherSpecLabelHit = specHit
+
+    local function ApplySpecCheck(checked)
         GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
-        GearQuestForeverDB.settings.showGearScore = checked and true or false
+        GearQuestForeverDB.settings.showOtherSpecRanks = checked and true or false
+        GQ.Log:NotifyTooltipsPreview()
     end
 
-    local check = CreateSettingsCheck(detail, "")
-    check:SetPoint("RIGHT", hit, "LEFT", -6, 0)
-    check:SetChecked(true)
-    if check.text then
-        check.text:SetText("")
-        check.text:Hide()
+    local specCheck = GQ.Log.CreateSettingsCheck(detail, "")
+    specCheck:SetPoint("RIGHT", specHit, "LEFT", -6, 0)
+    specCheck:SetChecked(true)
+    if specCheck.text then
+        specCheck.text:SetText("")
+        specCheck.text:Hide()
     end
-    check:SetScript("OnClick", function(self)
-        ApplyScoreCheck(self:GetChecked())
+    specCheck:SetScript("OnClick", function(self)
+        ApplySpecCheck(self:GetChecked())
     end)
-    hit:SetScript("OnClick", function()
-        local checked = not check:GetChecked()
-        check:SetChecked(checked)
-        ApplyScoreCheck(checked)
+    specHit:SetScript("OnClick", function()
+        local checked = not specCheck:GetChecked()
+        specCheck:SetChecked(checked)
+        ApplySpecCheck(checked)
     end)
-    frame.settingsScoreCheck = check
+    frame.settingsOtherSpecCheck = specCheck
 
-    local hint = CreateFontStringWithFallback(detail, {
-        "QuestFontNormalSmall",
-        "SystemFont_Small",
-        "SystemFont_Shadow_Small",
-        "QuestFont",
-    })
-    hint:SetPoint("TOPLEFT", hit, "BOTTOMLEFT", 0, -4)
-    hint:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
-    hint:SetJustifyH("LEFT")
-    hint:SetWordWrap(true)
-    hint:SetText(L["Shows the rank, score, and comparison to your equipped gear on gear tooltips."])
-    hint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
-    frame.settingsScoreHint = hint
+    local specHint = CreateSettingHint(detail, detail)
+    specHint:SetPoint("TOPLEFT", specHit, "BOTTOMLEFT", 0, -4)
+    specHint:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
+    specHint:SetText(L["Adds the rank each of your class's other specs gives the item at your level, for gearing two specs at once. Off shows only the spec you are playing or simulating."])
+    frame.settingsOtherSpecHint = specHint
+end
 
+function GQ.Log:CreateGearScoreBarSetting(frame, detail, anchor)
     local barLabel = CreateFontStringWithFallback(detail, QUEST_DETAIL_TITLE_FONTS)
     barLabel:SetJustifyH("LEFT")
     barLabel:SetText(L["GearQuest score bar"])
@@ -11761,7 +11941,7 @@ function GQ.Log:CreateGearScoreSetting(frame, detail, anchor)
     frame.settingsScoreBarLabel = barLabel
 
     local barHit = CreateFrame("Button", nil, detail)
-    barHit:SetPoint("TOPLEFT", hint, "BOTTOMLEFT", 0, -16)
+    barHit:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 0, -16)
     barHit:SetSize(math.max(barLabel:GetStringWidth() or 0, 1) + 4, math.max(barLabel:GetStringHeight() or 0, 18))
     barLabel:SetParent(barHit)
     barLabel:ClearAllPoints()
@@ -11777,7 +11957,7 @@ function GQ.Log:CreateGearScoreSetting(frame, detail, anchor)
         end
     end
 
-    local barCheck = CreateSettingsCheck(detail, "")
+    local barCheck = GQ.Log.CreateSettingsCheck(detail, "")
     barCheck:SetPoint("RIGHT", barHit, "LEFT", -6, 0)
     barCheck:SetChecked(true)
     if barCheck.text then
@@ -11807,56 +11987,6 @@ function GQ.Log:CreateGearScoreSetting(frame, detail, anchor)
     barHint:SetText(L["Shows the score bar in the log header. Off restores the viewing-upgrades line."])
     barHint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
     frame.settingsScoreBarHint = barHint
-
-    local specLabel = CreateFontStringWithFallback(detail, QUEST_DETAIL_TITLE_FONTS)
-    specLabel:SetJustifyH("LEFT")
-    specLabel:SetText(L["Ranks for your other specs"])
-    specLabel:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
-    frame.settingsOtherSpecLabel = specLabel
-
-    local specHit = CreateFrame("Button", nil, detail)
-    specHit:SetPoint("TOPLEFT", barHint, "BOTTOMLEFT", 0, -16)
-    specHit:SetSize(math.max(specLabel:GetStringWidth() or 0, 1) + 4, math.max(specLabel:GetStringHeight() or 0, 18))
-    specLabel:SetParent(specHit)
-    specLabel:ClearAllPoints()
-    specLabel:SetPoint("LEFT", specHit, "LEFT", 0, 0)
-    frame.settingsOtherSpecLabelHit = specHit
-
-    local function ApplySpecCheck(checked)
-        GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
-        GearQuestForeverDB.settings.showOtherSpecRanks = checked and true or false
-    end
-
-    local specCheck = CreateSettingsCheck(detail, "")
-    specCheck:SetPoint("RIGHT", specHit, "LEFT", -6, 0)
-    specCheck:SetChecked(true)
-    if specCheck.text then
-        specCheck.text:SetText("")
-        specCheck.text:Hide()
-    end
-    specCheck:SetScript("OnClick", function(self)
-        ApplySpecCheck(self:GetChecked())
-    end)
-    specHit:SetScript("OnClick", function()
-        local checked = not specCheck:GetChecked()
-        specCheck:SetChecked(checked)
-        ApplySpecCheck(checked)
-    end)
-    frame.settingsOtherSpecCheck = specCheck
-
-    local specHint = CreateFontStringWithFallback(detail, {
-        "QuestFontNormalSmall",
-        "SystemFont_Small",
-        "SystemFont_Shadow_Small",
-        "QuestFont",
-    })
-    specHint:SetPoint("TOPLEFT", specHit, "BOTTOMLEFT", 0, -4)
-    specHint:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
-    specHint:SetJustifyH("LEFT")
-    specHint:SetWordWrap(true)
-    specHint:SetText(L["Adds the rank each of your class's other specs gives the item at your level, for gearing two specs at once. Off shows only the spec you are playing or simulating."])
-    specHint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
-    frame.settingsOtherSpecHint = specHint
 end
 
 -- One heading per group. Each row is { top, bottom }: the widget that starts
@@ -11923,7 +12053,7 @@ function GQ.Log:CreateChatSetting(frame, detail, anchor)
         GearQuestForeverDB.settings.hideChat = checked and true or false
     end
 
-    local check = CreateSettingsCheck(detail, "", "GearQuestHideChatCheck")
+    local check = GQ.Log.CreateSettingsCheck(detail, "", "GearQuestHideChatCheck")
     check:SetPoint("RIGHT", hit, "LEFT", -6, 0)
     local saved = GearQuestForeverDB and GearQuestForeverDB.settings
     check:SetChecked(saved and saved.hideChat and true or false)
@@ -11964,11 +12094,71 @@ function GQ.Log:CreateChatSetting(frame, detail, anchor)
     frame.settingsChatHint = hint
 end
 
+function GQ.Log:CreateEnchantSetting(frame, detail, anchor)
+    local existingHit = frame.settingsEnchantLabelHit
+    if existingHit and existingHit.GetParent and existingHit:GetParent() == detail then
+        return
+    end
+
+    local enchantLabel = CreateSettingTitle(detail, detail)
+    enchantLabel:SetText(L["Recommended gear enchantment"])
+    frame.settingsEnchantLabel = enchantLabel
+
+    local enchantHit = CreateFrame("Button", nil, detail)
+    enchantHit:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 0, -16)
+    enchantHit:SetSize(math.max(enchantLabel:GetStringWidth() or 0, 1) + 4, math.max(enchantLabel:GetStringHeight() or 0, 18))
+    enchantLabel:SetParent(enchantHit)
+    enchantLabel:ClearAllPoints()
+    enchantLabel:SetPoint("LEFT", enchantHit, "LEFT", 0, 0)
+    frame.settingsEnchantLabelHit = enchantHit
+
+    local function ApplyEnchantCheck(checked)
+        GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+        GearQuestForeverDB.settings.showGearEnchant = checked and true or false
+        GQ.Log:NotifyTooltipsPreview()
+    end
+
+    local enchantCheck = GQ.Log.CreateSettingsCheck(detail, "")
+    enchantCheck:SetPoint("RIGHT", enchantHit, "LEFT", -6, 0)
+    if enchantCheck.text then
+        enchantCheck.text:SetText("")
+        enchantCheck.text:Hide()
+    end
+    enchantCheck:SetScript("OnClick", function(self)
+        ApplyEnchantCheck(self:GetChecked())
+    end)
+    enchantHit:SetScript("OnClick", function()
+        local checked = not enchantCheck:GetChecked()
+        enchantCheck:SetChecked(checked)
+        ApplyEnchantCheck(checked)
+    end)
+    frame.settingsEnchantCheck = enchantCheck
+    do
+        local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+        enchantCheck:SetChecked(settings and settings.showGearEnchant and true or false)
+    end
+
+    local enchantHint = CreateSettingHint(detail, detail)
+    enchantHint:SetPoint("TOPLEFT", enchantHit, "BOTTOMLEFT", 0, -4)
+    enchantHint:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
+    enchantHint:SetText(L["Enable the recommended enchantment line on gear tooltips"])
+    frame.settingsEnchantHint = enchantHint
+end
+
+function GQ.Log.RefreshUnitGearTooltipSetting()
+    if GQ.Data and GQ.Data.RefreshUnitGearTips then
+        GQ.Data:RefreshUnitGearTips()
+    end
+end
+
 function GQ.Log:CreateUnitGearSetting(frame, detail, anchor)
-    local label = CreateFontStringWithFallback(detail, QUEST_DETAIL_TITLE_FONTS)
-    label:SetJustifyH("LEFT")
+    local existingHit = frame.settingsUnitGearLabelHit
+    if existingHit and existingHit.GetParent and existingHit:GetParent() == detail then
+        return
+    end
+
+    local label = CreateSettingTitle(detail, detail)
     label:SetText(L["Hide unit gear tips"])
-    label:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
     frame.settingsUnitGearLabel = label
 
     local hit = CreateFrame("Button", nil, detail)
@@ -11982,9 +12172,11 @@ function GQ.Log:CreateUnitGearSetting(frame, detail, anchor)
     local function ApplyUnitGearCheck(checked)
         GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
         GearQuestForeverDB.settings.hideUnitGearTips = checked and true or false
+        GQ.Log.RefreshUnitGearTooltipSetting()
+        GQ.Log:NotifyTooltipsPreview()
     end
 
-    local check = CreateSettingsCheck(detail, "")
+    local check = GQ.Log.CreateSettingsCheck(detail, "")
     check:SetPoint("RIGHT", hit, "LEFT", -6, 0)
     local saved = GearQuestForeverDB and GearQuestForeverDB.settings
     check:SetChecked(saved and saved.hideUnitGearTips and true or false)
@@ -12002,19 +12194,483 @@ function GQ.Log:CreateUnitGearSetting(frame, detail, anchor)
     end)
     frame.settingsUnitGearCheck = check
 
-    local hint = CreateFontStringWithFallback(detail, {
-        "QuestFontNormalSmall",
-        "SystemFont_Small",
-        "SystemFont_Shadow_Small",
-        "QuestFont",
-    })
+    local hint = CreateSettingHint(detail, detail)
     hint:SetPoint("TOPLEFT", hit, "BOTTOMLEFT", 0, -4)
     hint:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
-    hint:SetJustifyH("LEFT")
-    hint:SetWordWrap(true)
     hint:SetText(L["Hides the hunt pieces GearQuest adds when you mouse over a creature, a vendor, a profession trainer, or a quest giver."])
-    hint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
     frame.settingsUnitGearHint = hint
+end
+
+function GQ.Log:UnitGearTooltipOptionsComplete(frame, detail)
+    if not frame or not detail then
+        return false
+    end
+    local slider = frame.settingsUnitGearMinDropSlider
+    if not slider or slider:GetParent() ~= detail then
+        return false
+    end
+    local row = frame.settingsUnitGearSourcesRow
+    if not row or row:GetParent() ~= detail then
+        return false
+    end
+    local btn = frame.settingsUnitGearSourcesBtn
+    if not btn or btn:GetParent() ~= row then
+        return false
+    end
+    local alwaysHit = frame.settingsUnitGearAlwaysLabelHit
+    if not alwaysHit or alwaysHit:GetParent() ~= detail then
+        return false
+    end
+    return true
+end
+
+function GQ.Log:ShowUnitGearSourceNote(owner, text, menu)
+    if not owner or not text or not GameTooltip then
+        return
+    end
+    GameTooltip:SetOwner(owner, "ANCHOR_RIGHT")
+    if GameTooltip.ClearLines then
+        GameTooltip:ClearLines()
+    end
+    if GameTooltip.SetMaximumWidth then
+        GameTooltip:SetMaximumWidth(380)
+    end
+    GameTooltip:SetText(text, 1, 0.82, 0, 1, true)
+    GameTooltip:SetFrameStrata("TOOLTIP")
+    local level = 560
+    if menu and menu.GetFrameLevel then
+        level = math.max(level, menu:GetFrameLevel() + 40)
+    end
+    GameTooltip:SetFrameLevel(level)
+    GameTooltip:Show()
+end
+
+function GQ.Log:LayoutUnitGearSourcesMenu(menu, instanceNote)
+    if not menu or not menu.checks or not instanceNote then
+        return
+    end
+    local optById = {}
+    for i = 1, #GQ.Log.UNIT_GEAR_SOURCE_FILTERS do
+        local opt = GQ.Log.UNIT_GEAR_SOURCE_FILTERS[i]
+        optById[opt.id] = opt
+    end
+
+    local maxW = 180
+    for i = 1, #menu.checks do
+        local check = menu.checks[i]
+        local label = check.label
+        if label then
+            local opt = optById[check.sourceId]
+            if opt then
+                label:SetText(L[opt.label] or opt.label)
+            end
+            local w = label:GetStringWidth() or 0
+            if w > maxW then
+                maxW = w
+            end
+            if check.disabled then
+                label:EnableMouse(true)
+                label:SetScript("OnEnter", function(self)
+                    GQ.Log:ShowUnitGearSourceNote(self, instanceNote, menu)
+                end)
+                label:SetScript("OnLeave", function()
+                    GameTooltip:Hide()
+                end)
+            end
+        end
+    end
+
+    local menuW = math.min(math.max(maxW + 44, 248), 368)
+    local yOff = -10
+    local totalH = 14
+    for i = 1, #menu.checks do
+        local check = menu.checks[i]
+        local label = check.label
+        check:ClearAllPoints()
+        check:SetPoint("TOPLEFT", menu, "TOPLEFT", 8, yOff)
+        if label then
+            label:ClearAllPoints()
+            label:SetPoint("TOPLEFT", check, "TOPRIGHT", 2, 0)
+            label:SetWidth(menuW - 38)
+            label:SetWordWrap(true)
+            label:SetJustifyH("LEFT")
+            local rowH = math.max(label:GetStringHeight() or 18, 18)
+            yOff = yOff - rowH - 4
+            totalH = totalH + rowH + 4
+        else
+            yOff = yOff - 22
+            totalH = totalH + 22
+        end
+    end
+    menu:SetSize(menuW, totalH)
+end
+
+function GQ.Log:CreateUnitGearTooltipOptions(frame, detail, anchor)
+    if self:UnitGearTooltipOptionsComplete(frame, detail) then
+        return
+    end
+
+    local function MinDropSliderValue()
+        local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+        local pct = tonumber(settings and settings.unitGearMinDropPercent) or 0
+        if pct < 0 then
+            pct = 0
+        elseif pct > 5 then
+            pct = 5
+        end
+        return math.floor(pct * 20 + 0.5)
+    end
+
+    local function MinDropPercentText(sliderValue)
+        local pct = (tonumber(sliderValue) or 0) / 20
+        if pct <= 0 then
+            return "0"
+        end
+        if math.abs(pct - math.floor(pct + 0.0001)) < 0.001 then
+            return string.format("%.0f", pct)
+        end
+        return string.format("%.2f", pct)
+    end
+
+    local function UnitGearSourceShown(id)
+        local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+        local hidden = settings and settings.unitGearHiddenSources
+        return not (hidden and hidden[id])
+    end
+
+    local function SetUnitGearSourceShown(id, shown)
+        GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+        local hidden = GearQuestForeverDB.settings.unitGearHiddenSources
+        if not hidden then
+            hidden = {}
+            GearQuestForeverDB.settings.unitGearHiddenSources = hidden
+        end
+        if shown then
+            hidden[id] = nil
+        else
+            hidden[id] = true
+        end
+        GQ.Log.RefreshUnitGearTooltipSetting()
+        GQ.Log:NotifyTooltipsPreview()
+    end
+
+    local alwaysLabel = CreateSettingTitle(detail, detail)
+    alwaysLabel:SetText(L["Show unit gear without holding Shift"])
+    frame.settingsUnitGearAlwaysLabel = alwaysLabel
+
+    local alwaysHit = CreateFrame("Button", nil, detail)
+    alwaysHit:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 0, -16)
+    alwaysHit:SetSize(math.max(alwaysLabel:GetStringWidth() or 0, 1) + 4, math.max(alwaysLabel:GetStringHeight() or 0, 18))
+    alwaysLabel:SetParent(alwaysHit)
+    alwaysLabel:ClearAllPoints()
+    alwaysLabel:SetPoint("LEFT", alwaysHit, "LEFT", 0, 0)
+    frame.settingsUnitGearAlwaysLabelHit = alwaysHit
+
+    local function ApplyAlwaysShow(checked)
+        GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+        GearQuestForeverDB.settings.unitGearAlwaysShow = checked and true or false
+        GQ.Log.RefreshUnitGearTooltipSetting()
+        GQ.Log:NotifyTooltipsPreview()
+    end
+
+    local alwaysCheck = GQ.Log.CreateSettingsCheck(detail, "")
+    alwaysCheck:SetPoint("RIGHT", alwaysHit, "LEFT", -6, 0)
+    local saved = GearQuestForeverDB and GearQuestForeverDB.settings
+    alwaysCheck:SetChecked(saved and saved.unitGearAlwaysShow and true or false)
+    if alwaysCheck.text then
+        alwaysCheck.text:SetText("")
+        alwaysCheck.text:Hide()
+    end
+    alwaysCheck:SetScript("OnClick", function(self)
+        ApplyAlwaysShow(self:GetChecked())
+    end)
+    alwaysHit:SetScript("OnClick", function()
+        local checked = not alwaysCheck:GetChecked()
+        alwaysCheck:SetChecked(checked)
+        ApplyAlwaysShow(checked)
+    end)
+    frame.settingsUnitGearAlwaysCheck = alwaysCheck
+
+    local alwaysHint = CreateSettingHint(detail, detail)
+    alwaysHint:SetPoint("TOPLEFT", alwaysHit, "BOTTOMLEFT", 0, -4)
+    alwaysHint:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
+    alwaysHint:SetText(L["Lists upgrades on creature, vendor, trainer, and quest giver tooltips without pressing Shift."])
+    frame.settingsUnitGearAlwaysHint = alwaysHint
+
+    local chanceLabel = CreateSettingTitle(detail, detail)
+    chanceLabel:SetText(L["Show drop chance on unit gear lines"])
+    frame.settingsUnitGearChanceLabel = chanceLabel
+
+    local chanceHit = CreateFrame("Button", nil, detail)
+    chanceHit:SetPoint("TOPLEFT", alwaysHint, "BOTTOMLEFT", 0, -16)
+    chanceHit:SetSize(math.max(chanceLabel:GetStringWidth() or 0, 1) + 4, math.max(chanceLabel:GetStringHeight() or 0, 18))
+    chanceLabel:SetParent(chanceHit)
+    chanceLabel:ClearAllPoints()
+    chanceLabel:SetPoint("LEFT", chanceHit, "LEFT", 0, 0)
+    frame.settingsUnitGearChanceLabelHit = chanceHit
+
+    local function ApplyDropChance(checked)
+        GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+        GearQuestForeverDB.settings.unitGearShowDropChance = checked and true or false
+        GQ.Log.RefreshUnitGearTooltipSetting()
+        GQ.Log:NotifyTooltipsPreview()
+    end
+
+    local chanceCheck = GQ.Log.CreateSettingsCheck(detail, "")
+    chanceCheck:SetPoint("RIGHT", chanceHit, "LEFT", -6, 0)
+    chanceCheck:SetChecked(not saved or saved.unitGearShowDropChance ~= false)
+    if chanceCheck.text then
+        chanceCheck.text:SetText("")
+        chanceCheck.text:Hide()
+    end
+    chanceCheck:SetScript("OnClick", function(self)
+        ApplyDropChance(self:GetChecked())
+    end)
+    chanceHit:SetScript("OnClick", function()
+        local checked = not chanceCheck:GetChecked()
+        chanceCheck:SetChecked(checked)
+        ApplyDropChance(checked)
+    end)
+    frame.settingsUnitGearChanceCheck = chanceCheck
+
+    local chanceHint = CreateSettingHint(detail, detail)
+    chanceHint:SetPoint("TOPLEFT", chanceHit, "BOTTOMLEFT", 0, -4)
+    chanceHint:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
+    chanceHint:SetText(L["Adds the loot chance in grey when GearQuest knows it, for mob drops and rare loot."])
+    frame.settingsUnitGearChanceHint = chanceHint
+
+    local sourcesLabel = CreateSettingTitle(detail, detail)
+    sourcesLabel:SetText(L["Unit gear sources on tooltips"])
+    frame.settingsUnitGearSourcesLabel = sourcesLabel
+
+    local sourcesRow = CreateFrame("Frame", nil, detail)
+    sourcesRow:SetPoint("TOPLEFT", chanceHint, "BOTTOMLEFT", 0, -16)
+    sourcesRow:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
+    sourcesRow:SetHeight(20)
+    sourcesLabel:SetParent(sourcesRow)
+    sourcesLabel:ClearAllPoints()
+    sourcesLabel:SetPoint("TOPLEFT", sourcesRow, "TOPLEFT", 0, 0)
+    sourcesLabel:SetPoint("RIGHT", sourcesRow, "RIGHT", 0, 0)
+    frame.settingsUnitGearSourcesRow = sourcesRow
+
+    local sourcesHint = CreateSettingHint(detail, detail)
+    sourcesHint:SetPoint("TOPLEFT", sourcesRow, "BOTTOMLEFT", 0, -4)
+    sourcesHint:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
+    sourcesHint:SetText(L["Choose which sources can appear in unit tooltip upgrade lines."])
+    frame.settingsUnitGearSourcesHint = sourcesHint
+
+    local sourcesBtn = CreateFrame("Button", nil, detail, "UIPanelButtonTemplate")
+    sourcesBtn:SetHeight(22)
+    sourcesBtn:SetPoint("TOPLEFT", sourcesHint, "BOTTOMLEFT", 0, -8)
+    sourcesBtn:SetText(L["Choose sources…"])
+    frame.settingsUnitGearSourcesBtn = sourcesBtn
+
+    local instanceNote = L["Inside dungeons and raids, Blizzard hides the creature's name and unit on the tooltip from addons. GearQuest cannot tell which mob you are targeting, so it cannot add boss or trash loot lines there. These filters only affect tooltips outside instances."]
+
+    local menu = frame.settingsUnitGearSourcesMenu
+    if not menu then
+        menu = CreateFrame("Frame", "GearQuestUnitGearSourcesMenu", UIParent, "BackdropTemplate")
+        menu:SetFrameStrata("TOOLTIP")
+        menu:SetFrameLevel(400)
+        menu:EnableMouse(true)
+        menu:SetBackdrop({
+            bgFile = "Interface\\Buttons\\WHITE8X8",
+            edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+            tile = true, tileSize = 16, edgeSize = 16,
+            insets = { left = 4, right = 4, top = 4, bottom = 4 },
+        })
+        if menu.SetBackdropColor then
+            menu:SetBackdropColor(0.07, 0.06, 0.05, 1)
+        end
+        if menu.SetBackdropBorderColor then
+            menu:SetBackdropBorderColor(0.78, 0.72, 0.58, 1)
+        end
+        menu:Hide()
+        frame.settingsUnitGearSourcesMenu = menu
+        local menuCatcher = CreateFrame("Frame", nil, UIParent)
+        menuCatcher:SetAllPoints(UIParent)
+        menuCatcher:SetFrameStrata("FULLSCREEN_DIALOG")
+        menuCatcher:SetFrameLevel(348)
+        menuCatcher:EnableMouse(true)
+        menuCatcher:Hide()
+        menuCatcher:SetScript("OnMouseDown", function()
+            menu:Hide()
+        end)
+        menu.catcher = menuCatcher
+        menu:SetScript("OnShow", function(self)
+            self:SetFrameStrata("TOOLTIP")
+            self:SetFrameLevel(500)
+            if self.catcher then
+                self.catcher:SetFrameLevel(348)
+                self.catcher:Show()
+            end
+            if self.sync then
+                self.sync()
+            end
+            if GQ.Log.LayoutUnitGearSourcesMenu then
+                GQ.Log:LayoutUnitGearSourcesMenu(self, instanceNote)
+            end
+        end)
+        menu:SetScript("OnHide", function(self)
+            if self.catcher then
+                self.catcher:Hide()
+            end
+            GameTooltip:Hide()
+        end)
+
+        menu.checks = {}
+        for i = 1, #GQ.Log.UNIT_GEAR_SOURCE_FILTERS do
+            local opt = GQ.Log.UNIT_GEAR_SOURCE_FILTERS[i]
+            local check = CreateFrame("CheckButton", nil, menu, "UICheckButtonTemplate")
+            check:SetSize(22, 22)
+            check.sourceId = opt.id
+            check.disabled = opt.disabled and true or false
+            local label = check:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+            label:SetText(L[opt.label] or opt.label)
+            check.label = label
+            if opt.disabled then
+                check:Disable()
+                check:SetChecked(false)
+                label:SetTextColor(0.45, 0.45, 0.45)
+            else
+                check:SetScript("OnClick", function(self)
+                    SetUnitGearSourceShown(self.sourceId, self:GetChecked() and true or false)
+                end)
+            end
+            menu.checks[#menu.checks + 1] = check
+        end
+
+        function menu.sync()
+            for j = 1, #menu.checks do
+                local check = menu.checks[j]
+                if not check.disabled then
+                    check:SetChecked(UnitGearSourceShown(check.sourceId))
+                end
+            end
+        end
+    end
+
+    self:LayoutUnitGearSourcesMenu(menu, instanceNote)
+
+    sourcesBtn:SetScript("OnClick", function(self)
+        if menu:IsShown() then
+            menu:Hide()
+            return
+        end
+        menu:ClearAllPoints()
+        menu:SetPoint("TOPLEFT", self, "BOTTOMLEFT", -4, -4)
+        menu:Show()
+    end)
+
+    local minLabel = CreateSettingTitle(detail, detail)
+    minLabel:SetText(L["Minimum drop chance on unit gear"])
+    frame.settingsUnitGearMinDropLabel = minLabel
+
+    local minHit = CreateFrame("Button", nil, detail)
+    minHit:SetPoint("TOPLEFT", sourcesBtn, "BOTTOMLEFT", 0, -14)
+    minHit:SetSize(math.max(minLabel:GetStringWidth() or 0, 1) + 4, math.max(minLabel:GetStringHeight() or 0, 18))
+    minLabel:SetParent(minHit)
+    minLabel:ClearAllPoints()
+    minLabel:SetPoint("LEFT", minHit, "LEFT", 0, 0)
+    frame.settingsUnitGearMinDropLabelHit = minHit
+
+    local minValue = CreateSettingTitle(detail, detail)
+    minValue:SetPoint("LEFT", minHit, "RIGHT", 8, 0)
+    frame.settingsUnitGearMinDropValue = minValue
+
+    local minSlider
+    local createdOk, created = pcall(CreateFrame, "Slider", "GearQuestUnitGearMinDropSlider", detail, "OptionsSliderTemplate")
+    if createdOk and created then
+        minSlider = created
+    else
+        minSlider = CreateFrame("Slider", "GearQuestUnitGearMinDropSlider", detail)
+        minSlider:SetOrientation("HORIZONTAL")
+        local thumb = minSlider:CreateTexture(nil, "ARTWORK")
+        thumb:SetTexture("Interface\\Buttons\\UI-SliderBar-Button-Horizontal")
+        thumb:SetSize(32, 32)
+        minSlider:SetThumbTexture(thumb)
+    end
+    if minSlider and minSlider.SetParent then
+        minSlider:SetParent(detail)
+    end
+    if minSlider and minSlider.Show then
+        minSlider:Show()
+    end
+    minSlider:SetPoint("TOPLEFT", minHit, "BOTTOMLEFT", 0, -6)
+    minSlider:SetWidth(220)
+    minSlider:SetHeight(17)
+    minSlider:SetMinMaxValues(0, 100)
+    minSlider:SetValueStep(1)
+    if minSlider.SetObeyStepOnDrag then
+        minSlider:SetObeyStepOnDrag(true)
+    end
+    local sliderName = minSlider:GetName()
+    local lowText = minSlider.Low or (sliderName and _G[sliderName .. "Low"])
+    local highText = minSlider.High or (sliderName and _G[sliderName .. "High"])
+    local titleText = minSlider.Text or (sliderName and _G[sliderName .. "Text"])
+    local tooltipsPanel = detail._gqTooltipsPanel
+    local lowColor = tooltipsPanel and { 1, 0.95, 0.85 } or DETAIL_TEXT_COLOR
+    if lowText then
+        lowText:SetText("0")
+        lowText:SetTextColor(lowColor[1], lowColor[2], lowColor[3])
+    end
+    if highText then
+        highText:SetText("5%")
+        highText:SetTextColor(lowColor[1], lowColor[2], lowColor[3])
+    end
+    if titleText then
+        titleText:SetText("")
+        titleText:Hide()
+    end
+    if tooltipsPanel and GQ.Log and GQ.Log.StyleTooltipsPanelMinDropSlider then
+        GQ.Log:StyleTooltipsPanelMinDropSlider(minSlider)
+    end
+
+    local function ApplyMinDrop(sliderValue)
+        local pct = (tonumber(sliderValue) or 0) / 20
+        GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+        GearQuestForeverDB.settings.unitGearMinDropPercent = pct
+        GQ.Log.RefreshUnitGearTooltipSetting()
+        GQ.Log:NotifyTooltipsPreview()
+    end
+
+    minSlider:SetScript("OnValueChanged", function(self, value)
+        local text = MinDropPercentText(value)
+        if tonumber(text) and tonumber(text) > 0 then
+            minValue:SetText(text .. "%")
+        else
+            minValue:SetText("0")
+        end
+        if self._gqQuiet then
+            return
+        end
+        if IsMouseButtonDown and IsMouseButtonDown("LeftButton") then
+            return
+        end
+        ApplyMinDrop(value)
+    end)
+    minSlider:SetScript("OnMouseUp", function(self)
+        if self._gqQuiet then
+            return
+        end
+        ApplyMinDrop(self:GetValue())
+    end)
+    minSlider._gqQuiet = true
+    minSlider:SetValue(MinDropSliderValue())
+    minSlider._gqQuiet = nil
+    if MinDropSliderValue() <= 0 then
+        minValue:SetText("0")
+    else
+        minValue:SetText(MinDropPercentText(minSlider:GetValue()) .. "%")
+    end
+    frame.settingsUnitGearMinDropSlider = minSlider
+
+    local minHint = CreateSettingHint(detail, detail)
+    minHint:SetPoint("TOPLEFT", minSlider, "BOTTOMLEFT", 0, -16)
+    minHint:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
+    minHint:SetText(L["Only lines with a known drop chance are filtered. 0 shows every upgrade."])
+    frame.settingsUnitGearMinDropHint = minHint
+
 end
 
 function GQ.Log:CreateTrackerSetting(frame, detail, anchor)
@@ -12040,7 +12696,7 @@ function GQ.Log:CreateTrackerSetting(frame, detail, anchor)
         end
     end
 
-    local check = CreateSettingsCheck(detail, "")
+    local check = GQ.Log.CreateSettingsCheck(detail, "")
     check:SetPoint("RIGHT", hit, "LEFT", -6, 0)
     local saved = GearQuestForeverDB and GearQuestForeverDB.settings
     check:SetChecked(saved and saved.hideTracker and true or false)
@@ -12096,7 +12752,7 @@ function GQ.Log:CreateMapPinSetting(frame, detail, anchor)
         end
     end
 
-    local check = CreateSettingsCheck(detail, "")
+    local check = GQ.Log.CreateSettingsCheck(detail, "")
     check:SetPoint("RIGHT", hit, "LEFT", -6, 0)
     local saved = GearQuestForeverDB and GearQuestForeverDB.settings
     check:SetChecked(saved and saved.hideMapPins and true or false)
@@ -12439,7 +13095,7 @@ function GQ.Log:EnsureSettingsPage(frame)
         end
     end
 
-    local check = CreateSettingsCheck(detail, "")
+    local check = GQ.Log.CreateSettingsCheck(detail, "")
     check:SetPoint("RIGHT", labelHit, "LEFT", -6, 0)
     if check.text then
         check.text:SetText("")
@@ -12612,7 +13268,7 @@ function GQ.Log:EnsureSettingsPage(frame)
         end
     end
 
-    local artCheck = CreateSettingsCheck(detail, "")
+    local artCheck = GQ.Log.CreateSettingsCheck(detail, "")
     artCheck:SetPoint("RIGHT", artHit, "LEFT", -6, 0)
     if artCheck.text then
         artCheck.text:SetText("")
@@ -12637,7 +13293,7 @@ function GQ.Log:EnsureSettingsPage(frame)
     artHint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
     frame.settingsArtHint = artHint
 
-    self:CreateGearScoreSetting(frame, detail, artHint)
+    self:CreateGearScoreBarSetting(frame, detail, artHint)
     self:CreateChatSetting(frame, detail, frame.settingsScoreBarHint)
 
     local lowerLabel = CreateFontStringWithFallback(detail, QUEST_DETAIL_TITLE_FONTS)
@@ -12670,7 +13326,7 @@ function GQ.Log:EnsureSettingsPage(frame)
         end
     end
 
-    local lowerCheck = CreateSettingsCheck(detail, "")
+    local lowerCheck = GQ.Log.CreateSettingsCheck(detail, "")
     lowerCheck:SetPoint("RIGHT", lowerHit, "LEFT", -6, 0)
     if lowerCheck.text then
         lowerCheck.text:SetText("")
@@ -12720,7 +13376,7 @@ function GQ.Log:EnsureSettingsPage(frame)
         end
     end
 
-    local toastCheck = CreateSettingsCheck(detail, "")
+    local toastCheck = GQ.Log.CreateSettingsCheck(detail, "")
     toastCheck:SetPoint("RIGHT", toastHit, "LEFT", -6, 0)
     if toastCheck.text then
         toastCheck.text:SetText("")
@@ -12770,7 +13426,7 @@ function GQ.Log:EnsureSettingsPage(frame)
         end
     end
 
-    local arrowCheck = CreateSettingsCheck(detail, "")
+    local arrowCheck = GQ.Log.CreateSettingsCheck(detail, "")
     arrowCheck:SetPoint("RIGHT", arrowHit, "LEFT", -6, 0)
     if arrowCheck.text then
         arrowCheck.text:SetText("")
@@ -12820,7 +13476,7 @@ function GQ.Log:EnsureSettingsPage(frame)
         end
     end
 
-    local guideCheck = CreateSettingsCheck(detail, "")
+    local guideCheck = GQ.Log.CreateSettingsCheck(detail, "")
     guideCheck:SetPoint("RIGHT", guideHit, "LEFT", -6, 0)
     if guideCheck.text then
         guideCheck.text:SetText("")
@@ -12847,56 +13503,12 @@ function GQ.Log:EnsureSettingsPage(frame)
     guideHint:Hide()
     frame.settingsGuideHint = guideHint
 
-    local enchantLabel = CreateFontStringWithFallback(detail, QUEST_DETAIL_TITLE_FONTS)
-    enchantLabel:SetJustifyH("LEFT")
-    enchantLabel:SetText(L["Recommended gear enchantment"])
-    enchantLabel:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
-    frame.settingsEnchantLabel = enchantLabel
-
-    local enchantHit = CreateFrame("Button", nil, detail)
-    enchantHit:SetPoint("TOPLEFT", guideHint, "BOTTOMLEFT", 0, -16)
-    enchantHit:SetSize(math.max(enchantLabel:GetStringWidth() or 0, 1) + 4, math.max(enchantLabel:GetStringHeight() or 0, 18))
-    enchantLabel:SetParent(enchantHit)
-    enchantLabel:ClearAllPoints()
-    enchantLabel:SetPoint("LEFT", enchantHit, "LEFT", 0, 0)
-    enchantHit:Hide()
-    frame.settingsEnchantLabelHit = enchantHit
-
-    local function ApplyEnchantCheck(checked)
-        GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
-        GearQuestForeverDB.settings.showGearEnchant = checked and true or false
-    end
-
-    local enchantCheck = CreateSettingsCheck(detail, "")
-    enchantCheck:SetPoint("RIGHT", enchantHit, "LEFT", -6, 0)
-    if enchantCheck.text then
-        enchantCheck.text:SetText("")
-        enchantCheck.text:Hide()
-    end
-    enchantCheck:SetScript("OnClick", function(self)
-        ApplyEnchantCheck(self:GetChecked())
-    end)
-    enchantHit:SetScript("OnClick", function()
-        local checked = not enchantCheck:GetChecked()
-        enchantCheck:SetChecked(checked)
-        ApplyEnchantCheck(checked)
-    end)
-    enchantCheck:Hide()
-    frame.settingsEnchantCheck = enchantCheck
-
-    local enchantHint = CreateFontStringWithFallback(detail, SETTINGS_NOTE_FONTS)
-    enchantHint:SetPoint("TOPLEFT", enchantHit, "BOTTOMLEFT", 0, -4)
-    enchantHint:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
-    enchantHint:SetJustifyH("LEFT")
-    enchantHint:SetWordWrap(true)
-    enchantHint:SetText(L["Enable the recommended enchantment line on gear tooltips"])
-    enchantHint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
-    enchantHint:Hide()
-    frame.settingsEnchantHint = enchantHint
-
-    self:CreateMapPinSetting(frame, detail, enchantHint)
-    self:CreateUnitGearSetting(frame, detail, frame.settingsMapPinSizeHint or frame.settingsMapPinHint or enchantHint)
-    self:CreateTrackerSetting(frame, detail, frame.settingsUnitGearHint or frame.settingsMapPinSizeHint or frame.settingsMapPinHint or enchantHint)
+    self:CreateMapPinSetting(frame, detail, guideHint)
+    self:CreateTrackerSetting(
+        frame,
+        detail,
+        frame.settingsMapPinSizeHint or frame.settingsMapPinHint or guideHint
+    )
     if frame.settingsMapPinLabelHit then
         frame.settingsMapPinLabelHit:Hide()
     end
@@ -12917,15 +13529,6 @@ function GQ.Log:EnsureSettingsPage(frame)
     end
     if frame.settingsMapPinSizeHint then
         frame.settingsMapPinSizeHint:Hide()
-    end
-    if frame.settingsUnitGearLabelHit then
-        frame.settingsUnitGearLabelHit:Hide()
-    end
-    if frame.settingsUnitGearCheck then
-        frame.settingsUnitGearCheck:Hide()
-    end
-    if frame.settingsUnitGearHint then
-        frame.settingsUnitGearHint:Hide()
     end
     if frame.settingsTrackerLabelHit then
         frame.settingsTrackerLabelHit:Hide()
@@ -13238,9 +13841,7 @@ function GQ.Log:MountSettingsGeneral(frame, detail)
         frame.settingsMinimapLabelHit, frame.settingsMinimapCheck, frame.settingsHint,
         frame.settingsLargeLabelHit, frame.settingsLargeValue, frame.settingsLargeSlider, frame.settingsLargeHint,
         frame.settingsArtLabelHit, frame.settingsArtCheck, frame.settingsArtHint,
-        frame.settingsScoreLabelHit, frame.settingsScoreCheck, frame.settingsScoreHint,
         frame.settingsScoreBarLabelHit, frame.settingsScoreBarCheck, frame.settingsScoreBarHint,
-        frame.settingsOtherSpecLabelHit, frame.settingsOtherSpecCheck, frame.settingsOtherSpecHint,
         frame.settingsChatLabelHit, frame.settingsChatCheck, frame.settingsChatHint,
     }
     for i = 1, #widgets do
@@ -13262,15 +13863,13 @@ function GQ.Log:MountSettingsGeneral(frame, detail)
         {
             title = L["TOOLTIPS AND SCORE"],
             rows = {
-                { frame.settingsScoreLabelHit, frame.settingsScoreHint },
-                { frame.settingsOtherSpecLabelHit, frame.settingsOtherSpecHint },
                 { frame.settingsScoreBarLabelHit, frame.settingsScoreBarHint },
             },
         },
     })
     local hints = {
-        frame.settingsHint, frame.settingsLargeHint, frame.settingsArtHint, frame.settingsScoreHint,
-        frame.settingsScoreBarHint, frame.settingsOtherSpecHint, frame.settingsChatHint,
+        frame.settingsHint, frame.settingsLargeHint, frame.settingsArtHint,
+        frame.settingsScoreBarHint, frame.settingsChatHint,
     }
     for i = 1, #hints do
         if hints[i] then
@@ -13314,10 +13913,8 @@ function GQ.Log:MountSettingsHunts(frame, detail)
         frame.settingsToastLabelHit, frame.settingsToastCheck, frame.settingsToastHint,
         frame.settingsArrowLabelHit, frame.settingsArrowCheck, frame.settingsArrowHint,
         frame.settingsGuideLabelHit, frame.settingsGuideCheck, frame.settingsGuideHint,
-        frame.settingsEnchantLabelHit, frame.settingsEnchantCheck, frame.settingsEnchantHint,
         frame.settingsMapPinLabelHit, frame.settingsMapPinCheck, frame.settingsMapPinHint,
         frame.settingsMapPinSizeHit, frame.settingsMapPinSizeValue, frame.settingsMapPinSizeSlider, frame.settingsMapPinSizeHint,
-        frame.settingsUnitGearLabelHit, frame.settingsUnitGearCheck, frame.settingsUnitGearHint,
         frame.settingsTrackerLabelHit, frame.settingsTrackerCheck, frame.settingsTrackerHint,
     }
     for i = 1, #widgets do
@@ -13334,13 +13931,6 @@ function GQ.Log:MountSettingsHunts(frame, detail)
             },
         },
         {
-            title = L["TOOLTIPS"],
-            rows = {
-                { frame.settingsEnchantLabelHit, frame.settingsEnchantHint },
-                { frame.settingsUnitGearLabelHit, frame.settingsUnitGearHint },
-            },
-        },
-        {
             title = L["ARROWS, MAP AND TRACKER"],
             rows = {
                 { frame.settingsArrowLabelHit, frame.settingsArrowHint },
@@ -13353,8 +13943,8 @@ function GQ.Log:MountSettingsHunts(frame, detail)
     })
     local hints = {
         frame.settingsLowerHint, frame.settingsToastHint, frame.settingsArrowHint,
-        frame.settingsGuideHint, frame.settingsEnchantHint, frame.settingsMapPinHint,
-        frame.settingsMapPinSizeHint, frame.settingsUnitGearHint, frame.settingsTrackerHint,
+        frame.settingsGuideHint, frame.settingsMapPinHint,
+        frame.settingsMapPinSizeHint, frame.settingsTrackerHint,
     }
     for i = 1, #hints do
         if hints[i] then
@@ -13639,15 +14229,9 @@ function GQ.Log:SetSettingsSection(section)
         frame.settingsArtLabelHit,
         frame.settingsArtCheck,
         frame.settingsArtHint,
-        frame.settingsScoreLabelHit,
-        frame.settingsScoreCheck,
-        frame.settingsScoreHint,
         frame.settingsScoreBarLabelHit,
         frame.settingsScoreBarCheck,
         frame.settingsScoreBarHint,
-        frame.settingsOtherSpecLabelHit,
-        frame.settingsOtherSpecCheck,
-        frame.settingsOtherSpecHint,
         frame.settingsChatLabelHit,
         frame.settingsChatCheck,
         frame.settingsChatHint,
@@ -13668,9 +14252,6 @@ function GQ.Log:SetSettingsSection(section)
         frame.settingsGuideLabelHit,
         frame.settingsGuideCheck,
         frame.settingsGuideHint,
-        frame.settingsEnchantLabelHit,
-        frame.settingsEnchantCheck,
-        frame.settingsEnchantHint,
         frame.settingsMapPinLabelHit,
         frame.settingsMapPinCheck,
         frame.settingsMapPinHint,
@@ -13678,9 +14259,6 @@ function GQ.Log:SetSettingsSection(section)
         frame.settingsMapPinSizeValue,
         frame.settingsMapPinSizeSlider,
         frame.settingsMapPinSizeHint,
-        frame.settingsUnitGearLabelHit,
-        frame.settingsUnitGearCheck,
-        frame.settingsUnitGearHint,
         frame.settingsTrackerLabelHit,
         frame.settingsTrackerCheck,
         frame.settingsTrackerHint,
@@ -13971,6 +14549,44 @@ function GQ.Log:RefreshSettings()
     if unitGearCheck then
         local settings = GearQuestForeverDB and GearQuestForeverDB.settings
         unitGearCheck:SetChecked(settings and settings.hideUnitGearTips and true or false)
+    end
+    local unitAlways = frame.settingsUnitGearAlwaysCheck
+    if unitAlways then
+        local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+        unitAlways:SetChecked(settings and settings.unitGearAlwaysShow and true or false)
+    end
+    local unitChance = frame.settingsUnitGearChanceCheck
+    if unitChance then
+        local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+        unitChance:SetChecked(not settings or settings.unitGearShowDropChance ~= false)
+    end
+    local unitMinSlider = frame.settingsUnitGearMinDropSlider
+    if unitMinSlider and not unitMinSlider._gqQuiet then
+        local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+        local pct = tonumber(settings and settings.unitGearMinDropPercent) or 0
+        if pct < 0 then
+            pct = 0
+        elseif pct > 5 then
+            pct = 5
+        end
+        local sliderVal = math.floor(pct * 20 + 0.5)
+        unitMinSlider._gqQuiet = true
+        unitMinSlider:SetValue(sliderVal)
+        unitMinSlider._gqQuiet = nil
+        if frame.settingsUnitGearMinDropValue then
+            if sliderVal <= 0 then
+                frame.settingsUnitGearMinDropValue:SetText("0")
+            else
+                local text = string.format("%.2f", pct)
+                text = string.gsub(text, "0+$", "")
+                text = string.gsub(text, "%.$", "")
+                frame.settingsUnitGearMinDropValue:SetText(text .. "%")
+            end
+        end
+    end
+    local unitSourcesMenu = frame.settingsUnitGearSourcesMenu
+    if unitSourcesMenu and unitSourcesMenu.sync then
+        unitSourcesMenu:sync()
     end
     local mapPinSlider = frame.settingsMapPinSizeSlider
     if mapPinSlider and not mapPinSlider._gqQuiet then
@@ -18048,7 +18664,20 @@ end
 -- off is the partner already looked up for a whole pool; false means none.
 function GQ.Log:WeaponCompareScore(entry, off)
     local score = entry and entry.pipelineScore or 0
-    if not entry or not GQ.Data or not GQ.Data.PairsWeaponWithOffHand or not GQ.Data:PairsWeaponWithOffHand() then
+    if not entry or not GQ.Data then
+        return score
+    end
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    if classFile == "HUNTER" and GQ.Data.DualWieldReady and GQ.Data:DualWieldReady()
+        and GQ.Data:EntryIsDamagingWeapon(entry) and not GQ.Data:EntryIsTwoHand(entry)
+    then
+        local partner = GQ.Data.BestDualWieldPartnerFor and GQ.Data:BestDualWieldPartnerFor(entry)
+        if partner and partner.itemId ~= entry.itemId then
+            return score + (partner.pipelineScore or 0)
+        end
+        return score
+    end
+    if not GQ.Data.PairsWeaponWithOffHand or not GQ.Data:PairsWeaponWithOffHand() then
         return score
     end
     if not GQ.Data:EntryIsDamagingWeapon(entry) or GQ.Data:EntryIsTwoHand(entry) or GQ.Data:EntryIsOffHandOnly(entry) then
@@ -18098,6 +18727,18 @@ function GQ.Log:OffHandPairNote(entry)
                     or L["the best off-hand"]
                 return string.format(L["(only when combined with %s)"], name)
             end
+        end
+    end
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    if classFile == "HUNTER" and GQ.Data.DualWieldReady and GQ.Data:DualWieldReady()
+        and GQ.Data:EntryIsDamagingWeapon(entry) and not GQ.Data:EntryIsTwoHand(entry)
+    then
+        local partner = GQ.Data:BestDualWieldPartnerFor(entry)
+        if partner and partner.itemId ~= entry.itemId then
+            local name = (GQ.Data.ShownEntryName and GQ.Data:ShownEntryName(partner))
+                or (GQ.Data.GetEntryDisplayName and GQ.Data:GetEntryDisplayName(partner))
+                or L["the best off-hand"]
+            return string.format(L["(only when combined with %s)"], name)
         end
     end
     if not GQ.Data or not GQ.Data.PairsWeaponWithOffHand or not GQ.Data:PairsWeaponWithOffHand() then

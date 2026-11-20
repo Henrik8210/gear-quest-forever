@@ -29,8 +29,8 @@
    "knownIssue": "Marksmanship Horde ranks Armor of the Fang 1 at 18-20 (score 6.33, set piece) above Trapper's Leather Armor (11.28); the rules keep it off the Marksmanship chest list"},
   {"name": "Kodohide Legguards", "class": "Shaman", "specs": ["enhancement"], "factions": ["Horde"], "slot": "Legs", "levels": [25, 27], "item": 285338, "rank": 10,
    "why": "Kodohide Legguards is rank 10 for Enhancement Horde at 25-27"},
-  {"name": "Kodohide Legguards", "class": "Shaman", "specs": ["enhancement"], "factions": ["Alliance"], "slot": "Legs", "levels": [25, 27], "item": 285338, "rank": 9,
-   "why": "Kodohide Legguards is rank 9 for Enhancement Alliance at 25-27"},
+  {"name": "Kodohide Legguards", "class": "Shaman", "specs": ["enhancement"], "factions": ["Alliance"], "slot": "Legs", "levels": [25, 27], "item": 285338, "rank": 10,
+   "why": "Kodohide Legguards is rank 10 for Enhancement Alliance at 25-27 after full rescore"},
   {"name": "Sprightring Helm", "class": "Rogue", "specs": ["combat"], "factions": ["Alliance"], "slot": "Head", "levels": [40, 43], "item": 17776, "rank": 5,
    "why": "the green Twisted Evils stats put Sprightring Helm at Combat rank 5 from 40 to 43"}
  ],

@@ -237,6 +237,7 @@ const SCORING_LABELS = {
   hit: "Hit",
   crit: "Critical strike",
   haste: "Haste",
+  expertise: "Expertise",
   armor: "Armor",
   health: "Health",
   hp5: "Health per 5",

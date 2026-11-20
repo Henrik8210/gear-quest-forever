@@ -65,6 +65,9 @@ jobs:
       - name: Gear lists
         run: python scripts/ci/check_gear.py
 
+      - name: Recommended enchants
+        run: python scripts/ci/check_enchants.py
+
       - name: Scorer tests
         run: python -m unittest discover -s tests/pipeline -v
 
