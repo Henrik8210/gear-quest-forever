@@ -15,6 +15,7 @@ L["Unknown command. Try |cff00ff00/gq help|r, |cff00ff00/gq set|r, or |cff00ff00
 L["Specialization"] = "전문화"
 L["Click to change specialization."] = "클릭하여 전문화를 변경합니다."
 L["How GearQuest ranks gear for this spec."] = "GearQuest가 이 전문화의 장비 순위를 매기는 방식입니다."
+L["Scoring weights %s · addon v%s."] = "점수 가중치 %s · 애드온 v%s."
 L["World drop"] = "필드 드롭"
 L["Unsourced"] = "출처 없음"
 L["Rare NPC"] = "희귀 NPC"

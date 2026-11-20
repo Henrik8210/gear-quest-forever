@@ -46,7 +46,7 @@ The minimap button sits on the rim of the minimap.
 
 **General settings → Window size** runs from 100% to 150%, one percent at a time. 100% is the normal log. 150% is half again as tall and wide. The window changes when you let go of the slider. The hunt list, the parchment, the filter, Play style, and the spec menu follow that size. The **100%** and **150%** labels are black, the same as the rest of that page. The knight's bubble grows with the window, and the tail stays on the portrait. The tracker, the guide arrow, the toast, the map pins, and item tooltips stay the normal size.
 
-The spec menu ends with **+ custom stat weights**. Name it (20 characters), pick the premade spec it starts from, and type over any weight. An empty box shows the weight that spec uses, including the leveling multipliers through 60. A number you type replaces it, including 0, and is not multiplied again. **Save and score items!** reorders that spec's hunts. The portrait spins on the GearQuest window, not over the whole screen, and stays until the list is on screen and can scroll. The weights are saved on the account. The selected spec stays on the character. Right-click a custom spec to edit it. Delete removes it. The list only reorders pieces that spec already hunts. Weapon style and pins stay the base spec's. Embrace of the Viper and Rotmender's Raiment still count when the base spec uses them. A proc such as Thunderfury stays on the printed stats.
+The spec menu ends with **+ custom stat weights**. Name it (20 characters), pick the premade spec it starts from, and type over any weight. Hovering a **premade** spec shows the raw grid (same as the Google Sheet). In the **custom** editor, an empty box shows the leveled baseline that spec uses when rescoring hunts through 60. A number you type replaces it, including 0, and is not multiplied again. **Save and score items!** reorders that spec's hunts. The portrait spins on the GearQuest window, not over the whole screen, and stays until the list is on screen and can scroll. The weights are saved on the account. The selected spec stays on the character. Right-click a custom spec to edit it. Delete removes it. The list only reorders pieces that spec already hunts. Weapon style and pins stay the base spec's. Embrace of the Viper and Rotmender's Raiment still count when the base spec uses them. A proc such as Thunderfury stays on the printed stats.
 
 A Spell power number you type scores the Spell Power stat. The Equip line **Increases damage and healing done by magical spells and effects by up to N** stays on Healing. Leave Spell power empty and that line's damage half still counts as spell power, the same as the premade list. **Healing as spell power** is the box for a heal-only line.
 
@@ -139,6 +139,7 @@ A generic world drop through level 15 is pinned on a published mob, not the ques
 | `/gq set on` / `/gq set off` | Enable or disable preview mode |
 | `/gq set me` | Copy your real character into preview (Reset on the Simulator tab) |
 | `/gq help` | List commands |
+| `/gq weights` | Print the scoring-weight revision and a sample of the rows the spec tooltip uses (developers) |
 | `/gq seen` | The seen-item notebook is retired. Item facts come from Wowhead Forever. |
 
 **Minimap:** any click opens GearQuest. Use the **Simulator** handle tab (class, faction, spec, level 1–60). **Turn off simulation** = `/gq set me`.
@@ -177,7 +178,7 @@ When a hunt or an item is added, or its name, description, or story changes, tha
 - Project brief: [docs/PROJECT_BRIEF.md](docs/PROJECT_BRIEF.md)
 - Data rules: [docs/DATA_RULES.md](docs/DATA_RULES.md)
 - Addon data layout, staging, and memory: [docs/ADDON-DATA-LAYOUT.md](docs/ADDON-DATA-LAYOUT.md)
-- Changelog: [CHANGELOG.md](CHANGELOG.md) (current release **v1.2.4** — lazy hunt catalog via `Catalog.lua`; full client restart after first update)
+- Changelog: [CHANGELOG.md](CHANGELOG.md) (current release **v1.2.8** — unit tooltip performance, spec-weight tooltip fix, Druid Bear and Shaman rescoring)
 - BiS scorer (authors only, not in CurseForge zip): [pipeline/README.md](pipeline/README.md) — adding Forever items: [pipeline/docs/FOREVER-SCORING.md](pipeline/docs/FOREVER-SCORING.md)
 - CurseForge: [RELEASE.md](RELEASE.md)
 

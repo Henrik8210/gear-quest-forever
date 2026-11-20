@@ -2,45 +2,57 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.2.7
+## v1.2.8
 
-The log header reads **GearQuest Forever v1.2.7**. This release carries the **v1.2.5 → v1.2.6** log-open hotfix plus player-facing release notes and CI guardrails. If you already installed **v1.2.6** from GitHub or a manual `Log.lua` patch, behavior is the same; update for the version string and CurseForge notes. **`/reload`** after updating.
+The log header reads **GearQuest Forever v1.2.8**. This release focuses on **smoother NPC tooltips**, **clearer stat-weight tooltips**, and **Druid Bear** plus **Shaman** hunt lists tuned to the Forever grid. **`/reload`** after updating. Class hunt data reloads when you open the log or simulate that class.
 
-### v1.2.5 broke the log or minimap (fixed)
+### Unit BiS lines on NPC tooltips — less hitch
 
-**Symptoms**
+**Who:** Every class and spec, levels **1–60**, Alliance and Horde, when **Hunt settings → Tooltips → Hide unit gear tips** is off (default).
 
-- Login chat: **`Log failed:`** … **`Core.lua:531`** (`attempt to call a nil value`).
-- **`/gq`**, the minimap icon, or the paper doll do nothing.
-- BugSack may show **`Log.lua:9411`** (`attempt to index field '?'`) and **`Log.lua:4993`** in **`RankedHuntEntries`** (`attempt to call a nil value`).
-- The addon list still shows **v1.2.5**.
+**What you see:** Same rules as before — hold **Shift** for upgrade lines (or turn on **always show**). The grey **Hold Shift to see BiS items from this NPC** hint still appears only when that NPC could list upgrades. Named mob drops, trainer crafts, and **Your top world drops from this mob:** behave the same; drop **%**, source filters, and minimum drop **%** sliders still apply.
 
-**Cause**
+**What changed under the hood:** Hovering without **Shift** no longer scores hundreds of world drops or rebuilds upgrade math on that frame. Heavy work runs on the next frame (or from cache on the second hover). Generic world-drop candidates are capped before scoring so hostile open-world mobs are cheaper to mouse over.
 
-Three helpers in **`Log.lua`** were accidentally defined as **`GQ.Log.GQ.Log.*`** instead of **`GQ.Log.*`**, while the rest of the code called **`GQ.Log.*`**. Those functions were **nil**, so the main window (filters, settings checkboxes) could not build and **Indicator** paper-doll work could error.
+### Hunt settings → Tooltips scroll wheel
 
-| Line (v1.2.5) | Wrong | Correct |
-| --- | --- | --- |
-| 9411 | `function GQ.Log.GQ.Log.ApplyFilterButtonFont(fs)` | `function GQ.Log.ApplyFilterButtonFont(fs)` |
-| 9449 | `function GQ.Log.GQ.Log.MouseOverFilterRow(check)` | `function GQ.Log.MouseOverFilterRow(check)` |
-| 11811 | `function GQ.Log.GQ.Log.CreateSettingsCheck(...)` | `function GQ.Log.CreateSettingsCheck(...)` |
+**Who:** Anyone using the footer **Tooltips** preview window.
 
-**This release**
+**Fix:** The mouse wheel on **Hunt settings → Tooltips** (unit and item columns) scrolls again. A bad handler argument stopped wheel events from reaching the scroll frames.
 
-- Those three definitions are fixed (**v1.2.6** introduced the fix; **v1.2.7** keeps it).
-- **Hunt data, scores, saved hunts, and settings are unchanged.** **`/reload`** after updating is enough (no full restart required for this hotfix).
+### Spec icon tooltip matches the Google Sheet
 
-**Manual patch (only if you are stuck on v1.2.5)**
+**Who:** All nine classes, every premade spec, and custom specs on the log header spec picker.
 
-Edit `Interface/AddOns/GearQuestForever/Log.lua` as in the table above, save, **`/reload`**.
+**What you see:** Hover the **spec name** or icon. The table lists **raw grid weights** — the same numbers as the [GearQuest Forever stat weights sheet](https://docs.google.com/spreadsheets/d/1jMC89KgzHpPZHYgcjOq6ef7lENhh8OGgypG2rC2m0Ok/edit), not stamina ×3 or intellect ×2 from leveling. **Healing** and **spell power from healing** show **0** on damage specs; Holy, Discipline, and Restoration still show their heal weights. Hunt scoring is unchanged: leveling survivability and endurance multipliers still apply in the lists.
 
-### For developers
+**Developers:** **`/gq weights`** prints **`GQ.SCORING_WEIGHTS_REVISION`**, addon version, class, spec, level, and the first stat rows. CI adds **`scripts/ci/check_scoring_weights_parity.py`**.
 
-CI and unit tests reject a doubled **`GQ.Log.GQ.Log.`** prefix in **`Log.lua`** (`scripts/ci/check_rules.py`, `tests/addon/test_log_lua.py`).
+### Druid — Bear (feral tank) weights and hunts
+
+**Who:** **Feral** spec while leveling in **bear** form, both factions, all level bands rescored.
+
+**Grid changes:** **Hit** **0.88**, **crit** **0.58**, **stamina** **0.72** (was **0.4** / **0.25** / **1.0** on the sheet row). Cat form hunts use the unchanged cat row.
+
+**What you may notice:** Bear lists rank **hit**, **crit**, and weapon upgrades a bit higher relative to pure stamina leather. **Armor of the Fang** and other set windows move only where the new weights change order — no change to the Fang stun pricing rule.
+
+### Shaman — Enhancement and Enhancement Tank
+
+**Who:** **Enhancement** and **Enhancement Tank**, Alliance and Horde, levels **1–60**.
+
+**Enhancement:** **Agility** **0.6** on the grid (was **0.65**). Intellect stays **0.75** with no endurance double on Enhancement intellect.
+
+**Enhancement Tank:** **Strength** **1.0** (was **0.35**) so mail and plate with strength and stamina compete correctly with cloth spell-power pieces.
+
+**What you may notice:** Enhancement weapon and mail ranks shift toward agility melee pieces; Enhancement Tank off-hand shields and one-hand weapons with strength rise on the hunt list.
+
+### v1.2.7
+
+**GearQuest Forever v1.2.7** — **v1.2.5 → v1.2.6** log-open hotfix shipped on CurseForge (`GQ.Log.GQ.Log.*` typos in `Log.lua`); CI guards the doubled prefix. Same hunts as **v1.2.6** if you already patched manually.
 
 ### v1.2.5
 
-**GearQuest Forever v1.2.5** — Footer **Tooltips** window (live NPC and item previews); unit tooltip settings (hide, always show, drop **%**, source filters, minimum drop **%**); generic world-drop **%** data (~1,845 averages); opposite-faction NPC guard; hunter **Dual Wield (20+)** weapon pairing rescored; mob-drop index refresh. **Do not stay on v1.2.5** — use **v1.2.6** or newer. First install from v1.2.4 or older needs a **full client restart** once so new TOC files load.
+**GearQuest Forever v1.2.5** — Footer **Tooltips** window; unit tooltip settings; world-drop **%** data; opposite-faction NPC guard; hunter **Dual Wield (20+)** rescoring. **Do not stay on v1.2.5** — the log will not open until **v1.2.6+**.
 
 ### v1.2.4
 

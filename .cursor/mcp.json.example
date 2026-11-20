@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "discord": {
+      "command": "npx",
+      "args": ["-y", "mcp-discord", "--config", "PASTE_BOT_TOKEN_HERE"],
+      "env": {
+        "DISCORD_TOKEN": "PASTE_BOT_TOKEN_HERE"
+      }
+    }
+  }
+}

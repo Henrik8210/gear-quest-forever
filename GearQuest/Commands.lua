@@ -59,6 +59,36 @@ function GQ.Commands:Init()
             else
                 GQ:Chat("|cff66ccffGearQuest|r: " .. L["No upgrade selected."])
             end
+        elseif lower == "weights" then
+            local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass() or "?"
+            local specId = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec() or "?"
+            local level = GQ.GetEffectiveLevel and GQ:GetEffectiveLevel() or 1
+            local rev = GQ.SCORING_WEIGHTS_REVISION or "?"
+            GQ:Chat(string.format(
+                "|cff66ccffGearQuest|r weights rev |cff00ff00%s|r · addon v%s · %s/%s L%s",
+                rev,
+                GQ.VERSION or "?",
+                classFile,
+                specId,
+                tostring(level)
+            ))
+            if GQ.Compare and GQ.Compare.GetEffectiveScoringRows then
+                local effectiveRows = GQ.Compare:GetEffectiveScoringRows(classFile, specId, level)
+                if effectiveRows then
+                    for i = 1, math.min(6, #effectiveRows) do
+                        local val = effectiveRows[i].value
+                        local text = (val == math.floor(val)) and tostring(val) or string.format("%.2f", val)
+                        GQ:Chat(string.format(
+                            "  |cffaaaaaa%s|r |cffffffff%s|r",
+                            effectiveRows[i].label,
+                            text
+                        ))
+                    end
+                    if #effectiveRows > 6 then
+                        GQ:Chat(string.format("  |cffaaaaaa… %d more (hover the spec icon)|r", #effectiveRows - 6))
+                    end
+                end
+            end
         elseif lower == "help" then
             GQ.Preview:PrintHelp()
         elseif lower == "wipe data" then

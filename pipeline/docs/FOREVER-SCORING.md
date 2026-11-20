@@ -38,11 +38,15 @@ Forever guides exist.
 The same multipliers live in the addon as `GQ.ScoringLeveling` in
 `GearQuest/_generated/ScoringWeights.generated.lua` (from
 `pipeline/data/weights.json` via `scripts/generate-stat-weights-lua.mjs`).
-Hovering the spec name or icon in the log shows the **effective** weights
-for the current level: through 60 the tooltip already includes ×3 / ×2.
-If you change `LEVELING_*` in `score.py`, change `GQ.ScoringLeveling` to
-match and regenerate that file. `GQ.StatWeights` is still the Compare.lua
-reorder table; the tooltip does not read it.
+Hunt scoring and custom-spec rescoring apply them (`score.py`
+`weights_at_level()`, and `GQ.Custom:Weights` for empty override boxes).
+**Hovering the spec name or icon shows the raw `weights.json` row** — the
+same numbers as the Google Sheet live grid. Do not multiply stamina,
+intellect, armor, and the rest on that tooltip. If you change
+`LEVELING_*` in `score.py`, change `GQ.ScoringLeveling` to match and
+regenerate that file. `GQ.StatWeights` is still the Compare.lua reorder
+table; the spec tooltip does not read it. CI:
+`scripts/ci/check_scoring_weights_parity.py`.
 
 **Jackpot greens are BiS, not an average.** Rank a random-enchant on the
 **best suffix it can roll** (top of that suffix’s range). Superior Shoulders
@@ -135,10 +139,12 @@ that class. Do not retune from the sheet unless asked.
 **Custom spec.** The spec menu has a divider, then any custom specs for this
 class, then **+ custom stat weights**. The window sits on the log. The name
 is at most 20 characters. The player picks which premade spec it is based on,
-and the right side lists that spec's weights. The grey number in an empty box,
-and the number beside it, is the weight that spec uses through level 60,
-including the leveling multipliers. A typed number replaces it, including 0,
-with no extra multiplier. A typed Spell power weight scores the Spell Power
+and the right side lists that spec's weights. The grey number in an empty box
+is the **leveled** baseline that spec uses when rescoring hunts below 61
+(same multipliers as the scorer). That placeholder is **not** the premade
+spec weight tooltip, which stays the raw grid. A typed number replaces the
+grey baseline, including 0, with no extra multiplier. A typed Spell power
+weight scores the Spell Power
 stat only. The line "Increases damage and healing done" stays on Healing.
 An empty Spell power box still counts that line's damage half as spell power,
 which is how the premade list scores it.
@@ -374,7 +380,7 @@ Ret and Enhance stay hybrids.
 
 **Wolfsbane (267369)** is the Horde paladin two-hander from the Diplomatic Incident chain (Danitha Morr, Bandarion Keep, Tirisfal). The quest can be finished at level 20. Wowhead has no Requires Level; the stored level 26 was inferred from item level 31. `client_item_overrides.json` pins required level 20 and Classes: Paladin, so Alliance and other classes do not get it. 25.59 weapon damage is why it is rank 1 for Horde Retribution at 20.
 
-**Enhancement intellect is 0.75 raw, and it is not doubled.** Mental Quickness is 100% of intellect as attack power (it was 150%). The scorer does not convert intellect into attack power on its own. `weights_at_level()` still doubles intellect for every other spec through 60. Enhancement forces the raw **0.75** after that multiply, in `score.py`, and the tooltip does the same in `Compare.lua`, `Enchant.lua`, and `CustomSpec.lua`. The weight hover shows **0.75**, not 1.5. Strength stays **1.1**, agility **0.65** (17 Nov 2026 retune from agility 1.0 and intellect 0.7), attack power **0.55**, spell power **0.2**, healing **0.05**, spell power from a healing line **0.2**, weapon damage **18**. Do not put intellect back above strength. Enhancement Tank is unchanged and still stamina-first. Its intellect stays on the leveling double.
+**Enhancement intellect is 0.75 raw, and it is not doubled.** Mental Quickness is 100% of intellect as attack power (it was 150%). The scorer does not convert intellect into attack power on its own. `weights_at_level()` still doubles intellect for every other spec through 60. Enhancement forces the raw **0.75** after that multiply in `score.py` only. The spec weight tooltip shows **0.75**, not 1.5. `Enchant.lua` and custom hunt rescoring follow the scorer rules. Strength stays **1.1**, agility **0.65** (17 Nov 2026 retune from agility 1.0 and intellect 0.7), attack power **0.55**, spell power **0.2**, healing **0.05**, spell power from a healing line **0.2**, weapon damage **18**. Do not put intellect back above strength. Enhancement Tank is unchanged and still stamina-first. Its intellect stays on the leveling double in the scorer.
 
 **Shaman Enhancement Tank is a hybrid**, like paladin Protection: 1h + shield,
 stamina / armor / defense first, then Rockbiter melee threat, then Earth Shock /
@@ -1247,7 +1253,7 @@ Retribution Alliance main hand: **Northshire Hammer** (248005) is rank 1 from 1 
 
 ## v0.6.1 facts
 
-Premade spec hover uses `playerLevel <= untilLevel`, the same test custom specs already used. Level 60 shows the ×3 / ×2 weights. Do not retune so the hover matches an old raw row.
+Premade spec hover shows the raw `weights.json` row (Google Sheet grid). Hunt lists still use `weights_at_level()` through 60. Do not pre-multiply the sheet or the tooltip to “match” leveling.
 
 `drop_faction.json` keeps a drop on the side that can attack the dropper when every Wowhead reaction is friendly to one faction and hostile to the other. Dun Garok Rifle (282710), Humbert's Helm, Humbert's Chestpiece, and Circlet of the Order are Horde only. Opportunistic Education is Horde, so Solid Gold Band (279845) and Larcenist's Belt (279846) stay off the Alliance list. Friend of the Library is 10 books and Greater Friend of the Library is 20. Both factions turn them in: Garion Wendell in Stormwind, Owen Thadd in Undercity.
 
@@ -1355,7 +1361,7 @@ Hunt-id probe (`pipeline/scripts/probe_forever_hunt_tooltips.py`) labels 200 vs 
 
 **28 Sep 2026 (v0.2.17-beta).**
 
-- **Spec weight tooltip.** Hover the spec name or icon. `GQ.Compare:ShowScoringWeightTooltip` reads `GQ.ScoringWeights` (pipeline `weights.json`) and applies `GQ.ScoringLeveling` when the level is 60 or below (`playerLevel <= untilLevel` for premade and custom). Level 60 shows the multiplied weights. Do not treat 60 as the raw row. Do not show `GQ.StatWeights` (Compare.lua reorder table). Weapon `dpsWeight` / `dpsWeightRanged` are extra rows. Regenerate with `node scripts/generate-stat-weights-lua.mjs` after a weight edit. `sources.json` must stay ASCII JSON (`ensure_ascii=True`); `score.py` opens it with the Windows default encoding and rejects raw UTF-8.
+- **Spec weight tooltip.** Hover the spec name or icon. `GQ.Compare:GetEffectiveScoringRows` reads `GQ.ScoringWeights` (pipeline `weights.json`) **without** `GQ.ScoringLeveling` — raw grid only, same as the sheet. Custom specs on the tooltip use `GQ.Custom:SheetWeights`. Do not show `GQ.StatWeights` (Compare.lua reorder table). Weapon `dpsWeight` / `dpsWeightRanged` are extra rows. Regenerate with `node scripts/generate-stat-weights-lua.mjs` after a weight edit. `sources.json` must stay ASCII JSON (`ensure_ascii=True`); `score.py` opens it with the Windows default encoding and rejects raw UTF-8.
 - **Enhancement intellect.** `weights.json` Enhancement `int` is **0.6**. `weights_at_level` doubles intellect below 60, so those bands score it at **1.2**, above agility **1.0**. Level 60 keeps the same ×2, so those bands still score it at 1.2. The scorer does not turn intellect into attack power; Mental Dexterity lives only in this weight. Enhancement Tank `int` stays 0.4. Shaman was re-scored and `Data.Shaman.generated.lua` plus the early 1–9 file were copied. Do not `reemit_all.py` for this. Superseded 11 Nov 2026: intellect is **0.7** and is not doubled. See v1.1.4.
 - **Wolfsbane (267369).** Horde Retribution main hand rank 1 from level **20 through 26** (score 124 vs Hammerbone 103 at 20). Pin in `client_item_overrides.json`: `rlvl` 20, `tipClasses` Paladin, Holystorm proc text. Source is Diplomatic Incident, Danitha Morr, Bandarion Keep, Tirisfal Glades (`sources.json` `gateLevel` 20). Tirisfal is a Horde zone, so Alliance never sees it. Warrior was re-scored after the class lock so Arms/Fury/Protection no longer list it. The paladin hunt file is `Data.Paladin.generated.lua`. Levels 1–9 are `Data.Paladin.Early.1to9.generated.lua` and do not include Wolfsbane.
 - **Memory.** The full layout, the packed format, the functions that read the other faction, and a change checklist are in [docs/ADDON-DATA-LAYOUT.md](../../docs/ADDON-DATA-LAYOUT.md). Do not list class hunt files in `GearQuestForever.toc`, and do not put those class addons in `## OptionalDeps` (that loads every class before `Core.lua` sets `_G.GearQuest`, so each file errors and the hunt list stays empty). Each class is a load-on-demand addon `GearQuestForever_<CLASS>` (`scripts/stage-class-addons.py` copies the lua and writes `AuditTips.lua`). Login loads the player's class only. `Preview:SetClass` expands the simulated class. Your class and the class on screen keep their expanded rows. Switching to another sim class drops the previous one's expanded rows (`ReleaseIdleHuntClasses`). The addon stays in the memory list until `/reload` (WoW cannot unload it). The repo class files keep the row arrays. Staging (`scripts/stage_pack.py`) writes each pick table as `<picks>Packed`: one text line per row, grouped by faction, with the slot, spec, and named fields as indexes into small shared tables. The score token is copied as written, so it reads back as the same number. Staging fails if unpacking does not give back every row exactly. The adapter still reads a raw row array, so an unstaged copy works. Only the faction on screen is expanded (`HuntFactionFor`): the class on screen uses the Simulator faction, and your own class, while another class is simulated, keeps your faction. Every Simulator change calls `SyncEffectiveHuntData`, which expands the class on screen for that faction, drops the other faction's rows, drops idle classes, and rebuilds the index. Custom-spec copies follow the rows they were made from. Hunt ids stay `gen:<class>:<item>:<slot>:<minLevel>:<spec>:<faction>`, so saved progress keeps its ids. Code that needs the other faction reads the packed text: Lookup reads it in 2000-row slices while its tab is open and holds those entries for `GetEntryById` (`HoldDetachedEntries`), so Track works from Lookup; `GearScoreMissText` still says Not ranked for your faction (`UnexpandedRowSpecs`); `LinkIsGear` counts those rows; dismissing a completed hunt also dismisses the other faction's ids (`UnexpandedItemEntries`); `IsItemIdObtained` reads the item id from a saved id of that faction. The Completed prune does not delete a saved id of the faction that is not expanded (`IsUnexpandedHuntId`), and it waits while a custom spec is still scoring. The generated files are sorted by spec, then faction, then slot, level, and rank, so Lookup's item rows list the same pieces as before and its slot header is the same. Hunt rows share one fact table per item (`CopyEntry` copies the fields a later write must clear). `Expand` does not fill a second pipeline-score table, and `BuildIndex` does not build `byClass`. `byClassSlot` stays. Custom spec weights and `ScorePiece` were not changed. The repo `Data.Coordinates.generated.lua` stays one spot list per item. Only the staged copy shares them: identical spots become one table and identical spot lists one list (`share_coordinates`), and staging fails if any item's spots read back different from the repo file. Every reader of a spot list is read-only. Do not write into a spot or a spot list at runtime, because another item shares it. Do not intern coordinates at runtime. That pass was tried and removed after world-drop pins looked gone. The main `foreverAudit` keeps `status` / `name` / `quality` for every item. The long Wowhead `tip` for a class item ships in that class's `AuditTips.lua` and is applied when the class loads, so hunt tooltips stay the Forever text. Curated Data.lua items that are not in a class file keep their tip on the main audit.
@@ -1872,24 +1878,24 @@ above crit on all three.
 
 ### Holy paladin
 
-Holy levels in melee, then wears mail and, from 40, plate. The scored row
-in `weights.json` is what the tooltip and the hunt use. Through 60 the
-leveling multipliers still apply (stamina, health, and health per 5 ×3,
-armor ×2, intellect, spirit, mana per 5, and mana ×2). The tooltip prints
-two decimals, so a product of 0.008 shows as 0.01.
+Holy levels in melee, then wears mail and, from 40, plate. The row in
+`weights.json` is what the **spec weight tooltip** and the Google Sheet
+show. Hunt scoring applies `weights_at_level()` through 60 (stamina, health,
+and health per 5 ×3, armor ×2, intellect, spirit, mana per 5, and mana
+×2). Do not multiply those stats on the tooltip.
 
-| Stat | Raw weight | Shown through 60 |
-|---|---|---|
-| Healing | 1.3 | 1.3 |
-| Spell power | 1.35 | 1.35 |
-| Holy spell power | 1.8 | 1.8 |
-| Intellect | 0.85 | 1.7 |
-| Spirit | 0.3 | 0.6 |
-| Mana per 5 | 1.1 | 2.2 |
-| Mana | 0.04 | 0.08 |
-| Crit | 0.8 | 0.8 |
-| Stamina | 0.3 | 0.9 |
-| Armor | 0.004 | 0.01 on the tooltip (0.008 before rounding) |
+| Stat | Weight (`weights.json` / tooltip / sheet) |
+|---|---|
+| Healing | 1.3 |
+| Spell power | 1.35 |
+| Holy spell power | 1.8 |
+| Intellect | 0.85 |
+| Spirit | 0.3 |
+| Mana per 5 | 1.1 |
+| Mana | 0.04 |
+| Crit | 0.8 |
+| Stamina | 0.3 |
+| Armor | 0.004 |
 
 A note written in v0.3.6 said healing, spell power, and holy spell power
 were **1.8**, intellect **1.2** (raw 0.60), spirit **1.5** (raw 0.75), and
@@ -1902,11 +1908,11 @@ healing pays for the missing armor. Blacksmithing healing mail and plate
 (Acolyte's, Prefect's, and the later plate sets) outrank tailoring cloth
 of the same band.
 
-Protection paladin armor is **0.2**, shown as **0.4** through 60. Its
-`armorClass` is plate 1.0, mail 0.55, leather 0.35, cloth 0.18. The ×2
-line on the spec tooltip is the leveling armor stat. It is not an armor
-budget, and it is not why cloth loses. Generic spell power is **0.9**.
-`spHoly` is **0.05**. Mana per 5 is **0.2** (shown **0.4**). Ranged attack
+Protection paladin armor is **0.2** on the grid and tooltip (×2 in the
+scorer through 60). Its `armorClass` is plate 1.0, mail 0.55, leather 0.35,
+cloth 0.18. That armor weight is not why cloth loses on hunts — survivability
+comes from the scored stats on the piece. Generic spell power is **0.9**.
+`spHoly` is **0.05**. Mana per 5 is **0.2**. Ranged attack
 power is **0** on every paladin spec, including levels 1–9. Do not copy
 Holy's equality rule onto Protection. `speedWeight` is **-2**: points per
 second of weapon speed. A 2 second weapon loses 4 points and a 3 second
@@ -1925,24 +1931,25 @@ It is spell Retribution: you swing, and the spell is what you are hunting.
 It is not a healer. `HEALER_SPECS` does not include it.
 
 The order is spell power, then holy spell power, then intellect, then crit.
-The raw row keeps that order after the endurance multiplier:
+The row below is what the sheet and spec tooltip show; the scorer applies
+leveling multipliers through 60 on hunts only:
 
-| Stat | Raw weight | Shown through 60 |
-|---|---|---|
-| Spell power | 1.0 | 1.0 |
-| Holy spell power | 0.85 | 0.85 |
-| Intellect | 0.4 | 0.8 |
-| Crit | 0.55 | 0.55 |
-| Hit | 0.4 | 0.4 |
-| Haste | 0.3 | 0.3 |
-| Strength | 0.2 | 0.2 |
-| Stamina | 0.15 | 0.45 |
-| Attack power | 0.1 | 0.1 |
-| Spirit | 0.1 | 0.2 |
-| Mana per 5 | 0.2 | 0.4 |
-| Mana | 0.03 | 0.06 |
-| Armor | 0.004 | 0.01 |
-| Healing | 0 | 0 |
+| Stat | Weight (`weights.json` / tooltip / sheet) |
+|---|---|
+| Spell power | 1.0 |
+| Holy spell power | 0.85 |
+| Intellect | 0.4 |
+| Crit | 0.55 |
+| Hit | 0.4 |
+| Haste | 0.3 |
+| Strength | 0.2 |
+| Stamina | 0.15 |
+| Attack power | 0.1 |
+| Spirit | 0.1 |
+| Mana per 5 | 0.2 |
+| Mana | 0.03 |
+| Armor | 0.004 |
+| Healing | 0 |
 
 Weapon `dpsWeight` is **0.4**, so a swing still counts and a spell-power
 weapon stays ahead. `speedWeight` is **-2**, the same weapon-speed penalty as

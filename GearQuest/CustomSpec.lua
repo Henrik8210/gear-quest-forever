@@ -262,6 +262,45 @@ function GQ.Custom:Weights(classFile, record, level)
     return weights, dps, dpsRanged, speed
 end
 
+-- Raw grid weights for the spec tooltip (matches pipeline / Google Sheet).
+function GQ.Custom:SheetWeights(classFile, record)
+    local shipped = self:Shipped(classFile, record.base)
+    if not shipped then
+        return {}, 0, 0, 0
+    end
+    local weights = {}
+    for key, value in pairs(shipped.weights) do
+        weights[key] = value
+    end
+    local dps = shipped.dpsWeight
+    local dpsRanged = shipped.dpsWeightRanged
+    local speed = shipped.speedWeight
+    local overrides = record.overrides or {}
+    local typed = {}
+    for key, value in pairs(overrides) do
+        if key == "dpsWeight" then
+            dps = value
+        elseif key == "dpsWeightRanged" then
+            dpsRanged = value
+        elseif key == "speedWeight" then
+            speed = value
+        elseif type(value) == "number" then
+            weights[key] = value
+            typed[key] = true
+        end
+    end
+    local healers = HEALER_SPEC[classFile]
+    if not (healers and healers[record.base]) then
+        if not typed.heal then
+            weights.heal = 0
+        end
+        if not typed.sp_from_heal then
+            weights.sp_from_heal = 0
+        end
+    end
+    return weights, dps, dpsRanged, speed
+end
+
 -- "Increases damage and healing by up to N" is stored as heal and damageDone.
 -- Damage Done always folds into spell power, including when that weight was
 -- typed. Leaving it off made a typed spell power ignore the classic line and

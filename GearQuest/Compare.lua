@@ -3,6 +3,14 @@ local L = GQ.L
 
 GQ.Compare = GQ.Compare or {}
 
+-- Damage specs ignore Healing Done at score time (pipeline score.py and CustomSpec.lua).
+local HEALER_SPEC = {
+    PALADIN = { holy = true },
+    DRUID = { restoration = true },
+    SHAMAN = { restoration = true },
+    PRIEST = { holy = true, discipline = true },
+}
+
 local function GetItemLevel(itemLinkOrId, entry)
     if type(entry) == "table" and entry.minLevel then
         local itemId = entry.itemId or itemLinkOrId
@@ -953,11 +961,10 @@ function GQ.Compare:GetEffectiveScoringRows(classFile, specId, playerLevel)
     playerLevel = playerLevel or 1
     local custom = GQ.Custom and classFile and specId and GQ.Custom.Get and GQ.Custom:Get(classFile, specId)
     if custom then
-        local weights, dpsWeight, dpsRanged, speedWeight = GQ.Custom:Weights(classFile, custom, playerLevel)
-        local leveling = GQ.ScoringLeveling
-        local useLeveling = leveling and playerLevel <= (leveling.untilLevel or 60)
+        local weights, dpsWeight, dpsRanged, speedWeight =
+            GQ.Custom:SheetWeights(classFile, custom)
         local rows = ScoringRowsFromWeights(weights, dpsWeight, dpsRanged, speedWeight)
-        return rows, custom.name, useLeveling, true
+        return rows, custom.name, false, true
     end
 
     local classTable = GQ.ScoringWeights and GQ.ScoringWeights[classFile]
@@ -966,30 +973,19 @@ function GQ.Compare:GetEffectiveScoringRows(classFile, specId, playerLevel)
         return nil
     end
 
-    local leveling = GQ.ScoringLeveling
-    local useLeveling = leveling and playerLevel <= (leveling.untilLevel or 60)
     local weights = {}
     for key, raw in pairs(specRow.weights) do
-        local mult = 1
-        if useLeveling and leveling[key] and not (specId == "enhancement" and key == "int") then
-            mult = leveling[key]
-        end
-        local value = raw * mult
-        -- Enhancement tank: 1 agility is also 2 armor, plus 1% dodge and
-        -- 1% crit per 20. Show that in the same number the scorer uses.
-        if specId == "enhancement_tank" and key == "agi" then
-            local armorMult = 1
-            if useLeveling and leveling.armor then
-                armorMult = leveling.armor
-            end
-            local armorW = (specRow.weights.armor or 0) * armorMult
-            value = value + 2 * armorW + (specRow.weights.dodge or 0) / 20 + (specRow.weights.crit or 0) / 20
-        end
-        weights[key] = value
+        weights[key] = raw
+    end
+
+    local healers = HEALER_SPEC[classFile]
+    if not (healers and healers[specId]) then
+        weights.heal = 0
+        weights.sp_from_heal = 0
     end
 
     local rows = ScoringRowsFromWeights(weights, specRow.dpsWeight, specRow.dpsWeightRanged, specRow.speedWeight)
-    return rows, specRow.label, useLeveling, false
+    return rows, specRow.label, false, false
 end
 
 function GQ.Compare:ShowScoringWeightTooltip(owner)

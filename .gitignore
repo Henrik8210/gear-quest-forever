@@ -7,6 +7,11 @@ Desktop.ini
 *.bak
 .env
 .env.*
+# Cursor MCP (Discord bot token lives in mcp.json — never commit)
+.cursor/mcp.json
+# Google Sheets OAuth (GearQuest stat-weight sync)
+scripts/.google/client_secret.json
+scripts/.google/authorized_user.json
 .vscode/
 node_modules/
 scripts/output/

@@ -103,8 +103,16 @@ local RIGHT_SETTING_KEYS = {
     "settingsOtherSpecLabel", "settingsOtherSpecLabelHit", "settingsOtherSpecCheck", "settingsOtherSpecHint",
 }
 
-local function wheelScroll(scroll, _, delta)
+local function wheelScroll(scroll, arg2, arg3)
     if not scroll or not scroll.GetVerticalScrollRange then
+        return
+    end
+    -- OnMouseWheel calls this as (scroll, delta). Child handlers call (scroll, nil, delta).
+    local delta = arg3
+    if delta == nil then
+        delta = arg2
+    end
+    if not delta or delta == 0 then
         return
     end
     local range = scroll:GetVerticalScrollRange() or 0

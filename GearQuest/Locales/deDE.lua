@@ -16,6 +16,7 @@ L["Unknown command. Try |cff00ff00/gq help|r, |cff00ff00/gq set|r, or |cff00ff00
 L["Specialization"] = "Spezialisierung"
 L["Click to change specialization."] = "Klicken, um die Spezialisierung zu wechseln."
 L["How GearQuest ranks gear for this spec."] = "So bewertet GearQuest Ausrüstung für diese Spezialisierung."
+L["Scoring weights %s · addon v%s."] = "Wertungsgewichte %s · Add-on v%s."
 L["World drop"] = "Weltdrop"
 L["Unsourced"] = "Ohne Quelle"
 L["Rare NPC"] = "Seltener NPC"

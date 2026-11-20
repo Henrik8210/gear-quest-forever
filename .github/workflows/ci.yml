@@ -65,6 +65,9 @@ jobs:
       - name: Gear lists
         run: python scripts/ci/check_gear.py
 
+      - name: Scoring vs tooltip weights
+        run: python scripts/ci/check_scoring_weights_parity.py
+
       - name: Recommended enchants
         run: python scripts/ci/check_enchants.py
 

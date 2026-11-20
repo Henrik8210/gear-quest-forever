@@ -23,6 +23,10 @@ local KIND_SOURCE = {
 local UnitGearScore
 local KeepUpgrades
 
+-- World-drop bands can list hundreds of ids. Upgrade filtering only needs a
+-- small shortlist scored from the hunt tables.
+local WORLD_DROP_CANDIDATE_CAP = 24
+
 local function UnitGearSettings()
     return GearQuestForeverDB and GearQuestForeverDB.settings
 end
@@ -371,13 +375,38 @@ local function StillHunted(entry)
     return true
 end
 
-local function CachedLines(cache, key, picks, limit, minOverride)
+local function CapPicksByPipelineScore(picks, cap)
+    if not picks or cap <= 0 or #picks <= cap then
+        return picks
+    end
+    table.sort(picks, function(a, b)
+        local sa = (a.entry and a.entry.pipelineScore) or 0
+        local sb = (b.entry and b.entry.pipelineScore) or 0
+        if sa ~= sb then
+            return sa > sb
+        end
+        return (a.entry.itemId or 0) < (b.entry.itemId or 0)
+    end)
+    local trimmed = {}
+    for i = 1, cap do
+        trimmed[i] = picks[i]
+    end
+    return trimmed
+end
+
+local function CachedLines(cache, key, picks, limit, minOverride, allowHeavy)
+    if allowHeavy == nil then
+        allowHeavy = true
+    end
     local lineKey = key
     if minOverride ~= nil then
         lineKey = key .. ":gqmin" .. tostring(minOverride)
     end
     local kept = cache.lines[lineKey]
     if kept == nil then
+        if not allowHeavy then
+            return nil, nil, true
+        end
         local unsure
         kept, unsure = KeepUpgrades(picks)
         -- A worn piece the client has not loaded yet cannot be compared. Ask
@@ -387,7 +416,7 @@ local function CachedLines(cache, key, picks, limit, minOverride)
         end
     end
     if not kept then
-        return nil
+        return nil, nil, false
     end
     local candidates = {}
     for i = 1, #kept do
@@ -397,7 +426,7 @@ local function CachedLines(cache, key, picks, limit, minOverride)
     end
     local filtered, meta = FilterUnitGearPicks(candidates, minOverride)
     if not filtered then
-        return nil, meta
+        return nil, meta, false
     end
     local shown = {}
     for i = 1, #filtered do
@@ -406,17 +435,17 @@ local function CachedLines(cache, key, picks, limit, minOverride)
         end
         shown[#shown + 1] = filtered[i]
     end
-    return #shown > 0 and shown or nil, meta
+    return #shown > 0 and shown or nil, meta, false
 end
 
-function GQ.Data:TopUnitGear(name, limit, minOverride)
+function GQ.Data:TopUnitGear(name, limit, minOverride, allowHeavy)
     limit = limit or 3
     local key = MobKey(name)
     local index = key and self.mobDrops
     local rows = index and index[key]
     local trainer = key and self.professionTrainers and self.professionTrainers[key]
     if not rows and not trainer then
-        return nil
+        return nil, nil, false
     end
     if self.EnsureClassLoaded and GQ.GetEffectiveClass then
         self:EnsureClassLoaded(GQ:GetEffectiveClass())
@@ -461,7 +490,7 @@ function GQ.Data:TopUnitGear(name, limit, minOverride)
         end
         cache.picks[key] = picks
     end
-    return CachedLines(cache, "unit:" .. key, picks, limit, minOverride)
+    return CachedLines(cache, "unit:" .. key, picks, limit, minOverride, allowHeavy)
 end
 
 function KeepUpgrades(picks)
@@ -470,6 +499,7 @@ function KeepUpgrades(picks)
     end
     local kept = {}
     local unsure = false
+    local ctxBySlot = {}
     for i = 1, #picks do
         local pick = picks[i]
         local slotName, handKind = TooltipSlot(pick.entry)
@@ -478,7 +508,7 @@ function KeepUpgrades(picks)
         -- On this level's list, and it beats what is worn, or the slot is
         -- empty. A downgrade stays off. The arrow is that same comparison.
         if scored and place and not WearingEntry(scored, slotName) then
-            local scoreText, index, arrow, pending = UnitGearScore(scored, slotName, handKind)
+            local scoreText, index, arrow, pending = UnitGearScore(scored, slotName, handKind, ctxBySlot)
             if scoreText and index and arrow and arrow > 0 then
                 kept[#kept + 1] = {
                     entry = scored,
@@ -559,10 +589,10 @@ local function WorldDropRanges(data)
     return worldDrops
 end
 
-function GQ.Data:TopWorldDrops(mobLevel, skip, limit, skipKey)
+function GQ.Data:TopWorldDrops(mobLevel, skip, limit, skipKey, allowHeavy)
     mobLevel = tonumber(mobLevel)
     if not mobLevel or mobLevel < 1 then
-        return nil
+        return nil, nil, false
     end
     if self.EnsureClassLoaded and GQ.GetEffectiveClass then
         self:EnsureClassLoaded(GQ:GetEffectiveClass())
@@ -602,6 +632,7 @@ function GQ.Data:TopWorldDrops(mobLevel, skip, limit, skipKey)
                 picks[#picks + 1] = { entry = entry, chance = chance, kind = "w" }
             end
         end
+        picks = CapPicksByPipelineScore(picks, WORLD_DROP_CANDIDATE_CAP)
         unitCache.picks[pickKey] = picks
     end
     local shown = picks
@@ -613,7 +644,7 @@ function GQ.Data:TopWorldDrops(mobLevel, skip, limit, skipKey)
             end
         end
     end
-    return CachedLines(unitCache, pickKey .. ":" .. (skipKey or ""), shown, limit)
+    return CachedLines(unitCache, pickKey .. ":" .. (skipKey or ""), shown, limit, nil, allowHeavy)
 end
 
 local function ClientKnowsItem(itemId)
@@ -663,7 +694,7 @@ local function QualityHex(itemId)
     )
 end
 
-function UnitGearScore(entry, slotName, handKind)
+function UnitGearScore(entry, slotName, handKind, ctxBySlot)
     if not entry or type(entry.pipelineScore) ~= "number" then
         return nil
     end
@@ -673,7 +704,14 @@ function UnitGearScore(entry, slotName, handKind)
             slotName = GQ.Data:NormalizeSlotName(slotName) or slotName
         end
     end
-    local ctx = GQ.Data:GearScoreContext(slotName, handKind)
+    local ctxKey = (slotName or "?") .. "\0" .. (handKind or "")
+    local ctx = ctxBySlot and ctxBySlot[ctxKey]
+    if not ctx then
+        ctx = GQ.Data:GearScoreContext(slotName, handKind)
+        if ctxBySlot then
+            ctxBySlot[ctxKey] = ctx
+        end
+    end
     if not ctx then
         return nil
     end
@@ -896,6 +934,165 @@ end
 -- A mob the player can fight. A friendly name is green. Inside a dungeon
 -- the token and the name color can both be secret, and the units there are
 -- nearly all hostile.
+function GQ.Data:MobHasIndexedGearCandidates(mobKey, charLevel)
+    if not mobKey then
+        return false
+    end
+    local rows = self.mobDrops and self.mobDrops[mobKey]
+    local trainer = self.professionTrainers and self.professionTrainers[mobKey]
+    if not rows and not trainer then
+        return false
+    end
+    charLevel = charLevel or (GQ.GetEffectiveLevel and GQ:GetEffectiveLevel()) or 1
+    if rows then
+        for i = 1, #rows do
+            local row = rows[i]
+            if row and FactionAllows(row[4]) then
+                local entry = BestHuntEntry(row[1])
+                if entry and BandContainsLevel(entry, charLevel) then
+                    return true
+                end
+            end
+        end
+    end
+    if trainer and FactionAllows(trainer[2]) then
+        local gear = self.professionGear and self.professionGear[trainer[1]]
+        if gear then
+            for i = 1, #gear do
+                local entry = BestHuntEntry(gear[i])
+                if entry and BandContainsLevel(entry, charLevel) then
+                    return true
+                end
+            end
+        end
+    end
+    return false
+end
+
+function GQ.Data:MobHasWorldDropCandidates(mobLevel, charLevel, skip)
+    mobLevel = tonumber(mobLevel)
+    if not mobLevel or mobLevel < 1 then
+        return false
+    end
+    charLevel = charLevel or (GQ.GetEffectiveLevel and GQ:GetEffectiveLevel()) or 1
+    if self.EnsureClassLoaded and GQ.GetEffectiveClass then
+        self:EnsureClassLoaded(GQ:GetEffectiveClass())
+    end
+    local cache = WorldDropRanges(self)
+    local ids = cache.byLevel[mobLevel]
+    if not ids then
+        if type(self.worldDropIdsByLevel) == "table" and self.worldDropIdsByLevel[mobLevel] then
+            ids = self.worldDropIdsByLevel[mobLevel]
+        else
+            ids = {}
+            for itemId, range in pairs(cache.ranges) do
+                if mobLevel >= range[1] and mobLevel <= range[2] then
+                    ids[#ids + 1] = itemId
+                end
+            end
+        end
+        cache.byLevel[mobLevel] = ids
+    end
+    local checked = 0
+    for i = 1, #ids do
+        local itemId = ids[i]
+        if not (skip and skip[itemId]) then
+            local entry = BestHuntEntry(itemId)
+            if entry and BandContainsLevel(entry, charLevel) then
+                return true
+            end
+            checked = checked + 1
+            if checked >= WORLD_DROP_CANDIDATE_CAP then
+                break
+            end
+        end
+    end
+    return false
+end
+
+function GQ.Data:UnitMayHaveGearLines(name, hostile, mobLevel, mobKey, skip)
+    if self.EnsureClassLoaded and GQ.GetEffectiveClass then
+        self:EnsureClassLoaded(GQ:GetEffectiveClass())
+    end
+    local charLevel = (GQ.GetEffectiveLevel and GQ:GetEffectiveLevel()) or 1
+    local cache = UnitGearCache(self)
+    if mobKey then
+        local lineKey = "unit:" .. mobKey
+        local cached = cache.lines[lineKey]
+        if cached and cached ~= false then
+            return true
+        end
+        if self:MobHasIndexedGearCandidates(mobKey, charLevel) then
+            return true
+        end
+    end
+    if hostile and mobLevel and self:MobHasWorldDropCandidates(mobLevel, charLevel, skip) then
+        return true
+    end
+    if mobKey and hostile and mobLevel then
+        local wkey = "world:" .. mobLevel .. ":" .. mobKey
+        local cached = cache.lines[wkey]
+        if cached and cached ~= false then
+            return true
+        end
+    end
+    return false
+end
+
+function GQ.Data:EnqueueUnitGearBuild(job)
+    self._unitGearBuildQueue = self._unitGearBuildQueue or {}
+    local queue = self._unitGearBuildQueue
+    for i = 1, #queue do
+        local existing = queue[i]
+        if existing.tooltip == job.tooltip and existing.guid == job.guid then
+            return
+        end
+    end
+    queue[#queue + 1] = job
+    if self._unitGearPumpScheduled or not C_Timer or not C_Timer.After then
+        return
+    end
+    self._unitGearPumpScheduled = true
+    C_Timer.After(0, function()
+        self._unitGearPumpScheduled = false
+        self:PumpUnitGearBuildQueue()
+    end)
+end
+
+function GQ.Data:PumpUnitGearBuildQueue()
+    local queue = self._unitGearBuildQueue
+    if not queue or #queue == 0 then
+        return
+    end
+    local job = table.remove(queue, 1)
+    if job.name then
+        self:TopUnitGear(job.name, 3, nil, true)
+    end
+    if job.hostile and job.mobLevel then
+        self:TopWorldDrops(job.mobLevel, job.skip, 3, job.mobKey, true)
+    end
+    local tip = job.tooltip
+    if tip and tip.IsShown and tip:IsShown() and tip.gqUnitGear == job.guid then
+        tip.gqUnitGearPending = nil
+        tip.gqUnitGear = nil
+        if tip.RefreshData then
+            pcall(tip.RefreshData, tip)
+        elseif tip.SetUnit and UnitExists then
+            local ok, exists = pcall(UnitExists, "mouseover")
+            if ok and exists == true then
+                pcall(tip.SetUnit, tip, "mouseover")
+            end
+        end
+    end
+    if #queue > 0 and C_Timer and C_Timer.After then
+        self._unitGearPumpScheduled = true
+        C_Timer.After(0, function()
+            self._unitGearPumpScheduled = false
+            self:PumpUnitGearBuildQueue()
+        end)
+    end
+end
+
 local function MobIsHostile(tooltip, token)
     if token and UnitCanAttack then
         local ok, attack = pcall(UnitCanAttack, "player", token)
@@ -967,25 +1164,70 @@ function GQ.Data:AddUnitGearLines(tooltip, unit, hintedName, dataGuid)
         return
     end
     guid = guid or ("name:" .. string.lower(name))
-    if tooltip.gqUnitGear == guid then
+    if tooltip.gqUnitGear == guid and not tooltip.gqUnitGearPending then
         return
     end
-    tooltip.gqUnitGear = guid
-    local picks, pickMeta = self:TopUnitGear(name, 3)
-    local drops, dropMeta
     local kind = GQ.PublicText and GQ.PublicText(dataGuid) or guid
-    if not (string.find(kind, "^Player%-") or string.find(kind, "^Pet%-")) and MobIsHostile(tooltip, token) then
-        local skip = {}
-        local key = MobKey(name)
-        local rows = key and self.mobDrops and self.mobDrops[key]
-        for i = 1, #(rows or {}) do
-            skip[rows[i][1]] = true
+    local hostile = not (string.find(kind, "^Player%-") or string.find(kind, "^Pet%-"))
+        and MobIsHostile(tooltip, token)
+    local key = MobKey(name)
+    local mobLevel = hostile and MobLevel(tooltip, token) or nil
+    local skip
+    if hostile and key then
+        local rows = self.mobDrops and self.mobDrops[key]
+        if rows and #rows > 0 then
+            skip = {}
+            for i = 1, #rows do
+                skip[rows[i][1]] = true
+            end
         end
-        drops, dropMeta = self:TopWorldDrops(MobLevel(tooltip, token), skip, 3, key)
+    end
+    local showContent = UnitGearAlwaysShow() or (IsShiftKeyDown and IsShiftKeyDown())
+    if not showContent then
+        if not self:UnitMayHaveGearLines(name, hostile, mobLevel, key, skip) then
+            return
+        end
+        if tooltip.gqUnitGear == guid then
+            return
+        end
+        tooltip.gqUnitGear = guid
+        tooltip.gqUnitShiftHint = true
+        tooltip:AddLine(L["Hold Shift to see BiS items from this NPC"], 0.6, 0.6, 0.6, true)
+        return
+    end
+    local picks, pickMeta, pendingUnit = self:TopUnitGear(name, 3, nil, false)
+    local drops, dropMeta, pendingWorld
+    if hostile and mobLevel then
+        drops, dropMeta, pendingWorld = self:TopWorldDrops(mobLevel, skip, 3, key, false)
+    end
+    if pendingUnit or pendingWorld then
+        if not C_Timer or not C_Timer.After then
+            picks, pickMeta = self:TopUnitGear(name, 3, nil, true)
+            if hostile and mobLevel then
+                drops, dropMeta = self:TopWorldDrops(mobLevel, skip, 3, key, true)
+            else
+                drops, dropMeta = nil, nil
+            end
+            pendingUnit, pendingWorld = nil, nil
+        else
+            tooltip.gqUnitGear = guid
+            tooltip.gqUnitGearPending = true
+            self:EnqueueUnitGearBuild({
+                tooltip = tooltip,
+                guid = guid,
+                name = name,
+                hostile = hostile,
+                mobLevel = mobLevel,
+                skip = skip,
+                mobKey = key,
+            })
+            return
+        end
     end
     local minDropEmpty = (pickMeta and pickMeta.minDropEmpty) or (dropMeta and dropMeta.minDropEmpty)
     if not picks and not drops then
         if minDropEmpty then
+            tooltip.gqUnitGear = guid
             tooltip:AddLine(
                 L["Your minimum drop chance hid every upgrade line. Lower the slider in Hunt settings → Tooltips."],
                 0.6,
@@ -996,11 +1238,8 @@ function GQ.Data:AddUnitGearLines(tooltip, unit, hintedName, dataGuid)
         end
         return
     end
-    tooltip.gqUnitShiftHint = not UnitGearAlwaysShow()
-    if not UnitGearAlwaysShow() and not (IsShiftKeyDown and IsShiftKeyDown()) then
-        tooltip:AddLine(L["Hold Shift to see BiS items from this NPC"], 0.6, 0.6, 0.6, true)
-        return
-    end
+    tooltip.gqUnitGear = guid
+    tooltip.gqUnitShiftHint = false
     if picks then
         AddLines(tooltip, picks)
     end
@@ -1012,6 +1251,7 @@ end
 local function ClearUnitGear(tooltip)
     tooltip.gqUnitGear = nil
     tooltip.gqUnitShiftHint = nil
+    tooltip.gqUnitGearPending = nil
 end
 
 -- Shift down or up while a unit tooltip waits on it draws that tooltip again.
