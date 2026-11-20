@@ -40,7 +40,9 @@ Each row is a piece for that slot, two lines tall, with a larger icon and a gap 
 
 A piece you already have leaves the list on that character only. Another character still sees it.
 
-**Hunts per gear slot** is the bar at the lower left of the log, as wide as the hunt list above it. The words sit on the left, the number on the right, and the slider fills the space between. It runs from 3 to 10. 3 is the default. The number shows while you drag, and the list updates when you let go. The choice is saved on the account, including while you are simulating. That number is how many hunts a slot still shows after the filter and the play style. Rank numbers stay the real ones. The character panel, the obtain toast, and **Recommended** stay on rank 1, 2, and 3. A green arrow is on a hunt that beats what you are wearing, including a later rank the slider put on the list. Hovering a hunt fades the gold out toward the right of the row.
+**Hunts per gear slot** is the bar at the lower left of the log. **Armor types** sits to its right, and the bar takes the rest of the hunt list's width. Mage, warlock, and priest wear cloth only, so those classes, including while you simulate one, keep the full bar and no button. The words sit on the left, the number on the right, and the slider fills the space between. It runs from 3 to 10. 3 is the default. The number shows while you drag, and the list updates when you let go. The choice is saved on the account, including while you are simulating. That number is how many hunts a slot still shows after the filter, the play style, and the armor boxes. Rank numbers stay the real ones. The character panel, the obtain toast, and **Recommended** stay on rank 1, 2, and 3. A green arrow is on a hunt that beats what you are wearing, including a later rank the slider put on the list. Hovering a hunt fades the gold out toward the right of the row.
+
+**Armor types** opens Cloth, Leather, Mail, and Plate, and only a type already on the hunt list. Unchecking one hides those pieces on Head, Shoulder, Chest, Wrist, Hands, Waist, Legs, and Feet. Rings, trinkets, back, weapons, shields, and ranged stay. The box stays in the menu so you can turn that type back on. The button reads **Armor types*** while a type is off. An armor slot with nothing left is not listed. The choice is remembered for that class and spec. Switching the simulated class updates the button immediately. The paper doll and the score bar do not follow this filter.
 
 ---
 
@@ -132,9 +134,11 @@ Hide a source, a profession, or one dungeon. Boss drop and Dungeon & Raid trash 
 
 Footer **Tooltips** sits beside **Play style**. The window shows a sample mob tooltip on the left and a sample gear tooltip on the right. The previews update as you change the settings.
 
-**Hide unit gear tips** removes BiS lines on creatures, vendors, trainers, and quest givers. Otherwise hold **Shift** to see them, or turn on **Always show unit gear tips**. **Show drop chance** adds a grey **%** when GearQuest knows it. Named mob drops use Wowhead rates. Generic world drops use an averaged outdoor sample. A slider can hide lines below a minimum **%**. **Unit gear sources** filters which kinds of drop can appear.
+**Hide unit gear tips** removes BiS lines on creatures, vendors, trainers, and quest givers, and it drops a world-drop list that was already built. Otherwise hold **Shift** to see them, or turn on **Always show unit gear tips**. **Show drop chance** adds a grey **%** when GearQuest knows it. Named mob drops use Wowhead rates. Generic world drops use an averaged outdoor sample. A slider can hide lines below a minimum **%**. When that slider hides every line, the grey sentence names the Tooltips page and **Minimum drop chance on unit gear**. **Unit gear sources** filters which kinds of drop can appear.
 
-On attackable mobs you can see both **Your top items from this mob** and **Your top world drops from this mob**. World-drop lines can take about six seconds to fill in the first time tips are on for your level, class, faction, and spec. Zoning does not start that wait again. Opposite-faction NPCs get no GearQuest lines.
+The left preview is a sample, **Elder Crag Coyote**, with **Icemail Jerkin**, **Blackforge Cowl**, and **Blackforge Bracers**. It stays on screen when real mobs still need Shift, and it is not the gear you are wearing.
+
+On attackable mobs you can see both **Your top items from this mob** and **Your top world drops from this mob**. World-drop lines use this level's hunt lists, at most ten generic world drops a slot. That list is built once. Zoning does not build it again. A ding, a spec change, or a simulated class does. Opposite-faction NPCs get no GearQuest lines.
 
 On the right: **Recommended gear enchantment**, **GearQuest score on tooltips**, and **Ranks for your other specs**, with the same behavior as in General settings.
 

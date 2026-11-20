@@ -2,7 +2,41 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.2.9
+## v1.3.0
+
+The log header reads **GearQuest Forever v1.3.0**. Hunt ranks are unchanged. **Armor types** is on the hunt list, and mob tooltips ask for a short world-drop list instead of walking every outdoor drop. **`/reload`** after updating.
+
+### Armor types
+
+**Who:** Every class that can wear more than cloth, levels **1–60**, Alliance and Horde, including while you simulate that class. Mage, warlock, and priest keep the full **Hunts per gear slot** bar and no button, because those classes only wear cloth. Simulating a mage hides the button. Leaving that simulation, or simulating a hunter, puts it back without another reload.
+
+**What you see:** **Armor types** sits to the right of **Hunts per gear slot**. The bar keeps the rest of the width, so the label stays whole, and the button's right edge lines up with the hunt list. Clicking it opens a checklist above the button: Cloth, Leather, Mail, and Plate, and only a type that is already on the list. Unchecking one hides those pieces on Head, Shoulder, Chest, Wrist, Hands, Waist, Legs, and Feet. Rings, trinkets, back, weapons, shields, and ranged stay. The box stays in the menu, so you can turn that type back on. The button reads **Armor types*** while a type is off. A slot with nothing left is not listed.
+
+The source filter, the play styles, and **Hunts per gear slot** still apply. Leaving only Mail still shows up to that many mail pieces. Rank numbers and the (i) list stay the full order. The paper doll and the score bar do not follow this filter. The choice is remembered for that class and spec. A filter you set while simulating stays on that simulated spec.
+
+The button, the checklist, and the empty line are in every language.
+
+### World-drop lines stay a short list
+
+**Who:** Every class and spec, levels **1–60**, Alliance and Horde, when **Hide unit gear tips** is off.
+
+**What you see:** Hold **Shift**, or turn on **Show unit gear without holding Shift**. Named drops, vendors, trainers, and quest givers still list up to three upgrades immediately. On a mob you can attack, **Your top world drops from this mob:** is at most ten generic world drops per slot for this level, class, faction, and spec. Drop **%**, the minimum **%** slider, and the source filters still apply.
+
+That list is built once. Changing zone does not build it again. A ding, a spec change, or switching the simulated class does. If you are still hovering that mob when the pass finishes, the lines appear without moving the mouse.
+
+**Hide unit gear tips** still shows nothing. Turning it on also drops a world-drop list that was already built. Turning it off lets the next mob tooltip build the list once. The Tooltips preview, and **Show unit gear without holding Shift**, do not start that build.
+
+**What changed:** v1.2.9 scored world drops in the background, about six seconds the first time, across the whole outdoor range. The tooltip now reads the short list for the level you are on.
+
+### The Tooltips example stays a sample
+
+**Who:** The **Tooltips** window on the log footer, every class.
+
+**What you see:** The left box is **Elder Crag Coyote**, a sample, not that coyote's live drops and not the gear you are wearing. It lists **Icemail Jerkin**, **Blackforge Cowl**, and **Blackforge Bracers**, with their drop chances. The sample stays on screen when real mobs still need Shift. Opening the window does not build your hunt lists or the world-drop pass.
+
+When the minimum drop chance hides every upgrade line, the grey sentence names the Tooltips page and the slider **Minimum drop chance on unit gear**. The missing-character box from the old sentence is gone. That sentence is in every language.
+
+### v1.2.9
 
 The log header reads **GearQuest Forever v1.2.9**. Showing the full unit-gear tooltip no longer hitches. Hunt lists are unchanged. **`/reload`** after updating.
 

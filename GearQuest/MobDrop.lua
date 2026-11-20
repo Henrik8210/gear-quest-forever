@@ -25,7 +25,10 @@ local KeepUpgrades
 
 -- World-drop bands can list hundreds of ids. Upgrade filtering only needs a
 -- small shortlist scored from the hunt tables.
-local WORLD_DROP_CANDIDATE_CAP = 24
+-- Ten generic world drops per slot, and about sixteen slots. The per-level
+-- list keeps those, so a high score in one slot cannot crowd out another.
+local WORLD_DROP_CANDIDATE_CAP = 160
+local WORLD_SLOT_CAP = 10
 
 local function UnitGearSettings()
     return GearQuestForeverDB and GearQuestForeverDB.settings
@@ -661,10 +664,9 @@ local function WorldDropRanges(data)
     return worldDrops
 end
 
--- Twelve catalog rows per frame. The full list is about 4,200 ids, so the
--- pass is about 6 seconds. World-drop tooltip lines stay blank until the
--- pass for this level, class, faction, and spec finishes.
-local WORLD_BUILD_STEP = 12
+-- One gear slot per frame. Each slot asks for at most ten generic world
+-- drops on this level's list. World-drop tooltip lines stay blank until
+-- that short pass finishes.
 
 local function PushWorldTop(top, mobLevel, pick)
     local list = top[mobLevel]
@@ -691,8 +693,73 @@ local function UnitGearTipsHidden()
     return settings and settings.hideUnitGearTips and true or false
 end
 
+local function WorldDropSlotList(data)
+    local slots = {}
+    local base = data.BASE_SLOTS
+    if base then
+        for i = 1, #base do
+            slots[#slots + 1] = base[i]
+        end
+    end
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    if classFile and data.CLASS_RANGED and data.CLASS_RANGED[classFile] then
+        slots[#slots + 1] = "Ranged"
+    end
+    return slots
+end
+
+local function CollectReleasedTipGarbage()
+    if not collectgarbage or not (C_Timer and C_Timer.NewTicker) then
+        return
+    end
+    if GQ._tipGcTicker then
+        GQ._tipGcTicker:Cancel()
+        GQ._tipGcTicker = nil
+    end
+    local ticks = 0
+    local ticker
+    ticker = C_Timer.NewTicker(0, function()
+        ticks = ticks + 1
+        local finished = false
+        for _ = 1, 80 do
+            local ok, done = pcall(collectgarbage, "step")
+            if not ok or done then
+                finished = true
+                break
+            end
+        end
+        if finished or ticks >= 40 then
+            ticker:Cancel()
+            if GQ._tipGcTicker == ticker then
+                GQ._tipGcTicker = nil
+            end
+        end
+    end)
+    GQ._tipGcTicker = ticker
+end
+
+function GQ.Data:ReleaseUnitGearTipData()
+    self._worldDropBuild = nil
+    self._unitGearCache = nil
+    worldDrops.class = nil
+    worldDrops.ranges = nil
+    worldDrops.byLevel = {}
+    if GQ.Log then
+        GQ.Log._tooltipsPreviewData = nil
+        GQ.Log._tooltipsPreviewSample = nil
+        GQ.Log._tooltipsPreviewPaint = nil
+        GQ.Log._tooltipsPreviewBuilding = nil
+    end
+    CollectReleasedTipGarbage()
+end
+
+function GQ.Data:CollectReleasedTipGarbage()
+    CollectReleasedTipGarbage()
+end
+
 function GQ.Data:StartWorldDropBuild()
     if UnitGearTipsHidden() then
+        self._worldDropBuild = nil
         return
     end
     local band = self:GetActiveBandCacheKey()
@@ -708,11 +775,14 @@ function GQ.Data:StartWorldDropBuild()
         end)
         return
     end
-    local ranges = self.genericWorldDropRanges
-    if type(ranges) ~= "table" then
-        ranges = {}
-    end
-    build = { band = band, ranges = ranges, top = {}, cursor = nil, done = false, started = false }
+    build = {
+        band = band,
+        slots = WorldDropSlotList(self),
+        index = 1,
+        top = {},
+        done = false,
+        started = false,
+    }
     self._worldDropBuild = build
     if not (C_Timer and C_Timer.After) then
         return
@@ -732,27 +802,32 @@ function GQ.Data:StepWorldDropBuild(build)
         return
     end
     if UnitGearTipsHidden() then
-        build.started = false
+        if self._worldDropBuild == build then
+            self._worldDropBuild = nil
+        end
+        return
+    end
+    local slot = build.slots and build.slots[build.index]
+    if not slot then
+        build.done = true
+        if RefreshShiftTip then
+            RefreshShiftTip(GameTooltip, true)
+        end
         return
     end
     local level = (GQ.GetEffectiveLevel and GQ:GetEffectiveLevel()) or 1
-    local n = 0
-    local id = build.cursor
-    local range
-    while n < WORLD_BUILD_STEP do
-        id, range = next(build.ranges, id)
-        if not id then
-            build.done = true
-            build.cursor = nil
-            if RefreshShiftTip then
-                RefreshShiftTip(GameTooltip, true)
-            end
-            return
-        end
-        n = n + 1
-        local entry = BestHuntEntry(id)
+    local ranges = self.genericWorldDropRanges
+    local ok, entries = pcall(function()
+        return self:WorldDropSlotEntries(slot, WORLD_SLOT_CAP)
+    end)
+    if not ok or type(entries) ~= "table" then
+        entries = {}
+    end
+    for i = 1, #entries do
+        local entry = entries[i]
+        local range = ranges and entry.itemId and ranges[entry.itemId]
         if entry and BandContainsLevel(entry, level) and type(range) == "table" then
-            local pick = { entry = entry, chance = OpenWorldDropChance(self, id), kind = "w" }
+            local pick = { entry = entry, chance = OpenWorldDropChance(self, entry.itemId), kind = "w" }
             local lo = tonumber(range[1]) or level
             local hi = tonumber(range[2]) or lo
             if hi < lo then
@@ -763,7 +838,14 @@ function GQ.Data:StepWorldDropBuild(build)
             end
         end
     end
-    build.cursor = id
+    build.index = build.index + 1
+    if not build.slots[build.index] then
+        build.done = true
+        if RefreshShiftTip then
+            RefreshShiftTip(GameTooltip, true)
+        end
+        return
+    end
     if C_Timer and C_Timer.After then
         local this = build
         C_Timer.After(0, function()
@@ -777,11 +859,17 @@ function GQ.Data:TopWorldDrops(mobLevel, skip, limit, skipKey, allowHeavy)
     if not mobLevel or mobLevel < 1 then
         return nil, nil, false
     end
+    if UnitGearTipsHidden() then
+        return nil, nil, false
+    end
     local build = self._worldDropBuild
     local band = self:GetActiveBandCacheKey()
     -- Never walk the raw id list from a tooltip. The background pass fills top.
+    -- The tooltips preview must not start that pass under a stand-in hunter.
     if not build or build.band ~= band or not build.done then
-        self:StartWorldDropBuild()
+        if not GQ._tooltipsPanelPreview then
+            self:StartWorldDropBuild()
+        end
         return nil, nil, false
     end
     local picks = build.top[mobLevel]
@@ -1584,7 +1672,7 @@ function GQ.Data:AddUnitGearLines(tooltip, unit, hintedName, dataGuid, data)
         if minDropEmpty then
             tooltip.gqUnitGear = guid
             tooltip:AddLine(
-                L["Your minimum drop chance hid every upgrade line. Lower the slider in Hunt settings → Tooltips."],
+                L["Your minimum drop chance hid every upgrade line. Lower it on the Tooltips page, under Minimum drop chance on unit gear."],
                 0.6,
                 0.6,
                 0.6,
@@ -1641,9 +1729,8 @@ function RefreshShiftTip(tip, force)
 end
 
 function GQ.Data:RefreshUnitGearTips()
-    if not UnitGearTipsHidden() then
-        self:StartWorldDropBuild()
-    end
+    -- A checkbox only changes when the lines are drawn. It does not build
+    -- the world-drop list. That list starts when a mob tooltip asks for it.
     RefreshShiftTip(GameTooltip, true)
 end
 

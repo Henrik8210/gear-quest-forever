@@ -15,13 +15,14 @@ local SETTINGS_LEFT_PAD = 34
 local SETTINGS_CHECK_COLUMN = 30
 local SLIM_SCROLL_W = 6
 local SCROLL_GOLD = { 0.9, 0.75, 0.28 }
-local PREVIEW_DATA_REV = 11
-local PREVIEW_SAMPLE_ITEM_ID = 19120
+local PREVIEW_DATA_REV = 12
+local PREVIEW_SAMPLE_ITEM_ID = 1981
 local PREVIEW_CREATURE_FALLBACK = "Elder Crag Coyote"
 local PREVIEW_MOB_LEVEL = 40
 local PREVIEW_HUNTER_LEVEL = 50
 local PREVIEW_HUNTER_SPEC = "beast_mastery"
-local PREVIEW_ITEM_FALLBACK = "Rune of the Guard Captain"
+local PREVIEW_ITEM_FALLBACK = "Icemail Jerkin"
+local PREVIEW_ITEM_ENTRY = { itemId = PREVIEW_SAMPLE_ITEM_ID, slot = "Chest" }
 
 local function localeText(key, english)
     local t = L[key]
@@ -420,6 +421,8 @@ function GQ.Log:TooltipsPreviewWithHunterDemo(fn)
         return nil
     end
     local data = GQ.Data
+    local savedPreview = GQ._tooltipsPanelPreview
+    GQ._tooltipsPanelPreview = true
     local savedCtx = GQ._ctx
     local faction = GQ.GetEffectiveFaction and GQ:GetEffectiveFaction() or "Alliance"
     GQ._ctx = {
@@ -430,26 +433,28 @@ function GQ.Log:TooltipsPreviewWithHunterDemo(fn)
     }
     local savedBand = self._slotRankBand
     local savedRanks = self._slotRankCache
+    local savedSlots = data and data._catalogSlots
+    local savedQuery = data and data._queryCache
+    local savedUnit = data and data._unitGearCache
+    local savedProbe = self._specProbeStore
+    local savedOther = self._otherSpecRankCache
     self._slotRankBand = nil
     self._slotRankCache = nil
-    if data then
-        data._unitGearCache = nil
-        data._queryCache = nil
-        if data.EnsureClassLoaded then
-            data:EnsureClassLoaded("HUNTER")
-        end
-    end
-    local warm = { "Wrist", "Chest", "Back", "Ranged", "Hands", "Neck" }
-    for i = 1, #warm do
-        self:GetSlotRankList(warm[i])
+    self._specProbeStore = nil
+    if data and data.EnsureClassLoaded then
+        data:EnsureClassLoaded("HUNTER")
     end
     local ok, a, b, c, d, e, f = pcall(fn)
     GQ._ctx = savedCtx
+    GQ._tooltipsPanelPreview = savedPreview
     self._slotRankBand = savedBand
     self._slotRankCache = savedRanks
+    self._specProbeStore = savedProbe
+    self._otherSpecRankCache = savedOther
     if data then
-        data._unitGearCache = nil
-        data._queryCache = nil
+        data._catalogSlots = savedSlots
+        data._queryCache = savedQuery
+        data._unitGearCache = savedUnit
     end
     if ok then
         return a, b, c, d, e, f
@@ -471,32 +476,14 @@ function GQ.Log:TooltipsPreviewMobDropSkip(mobName)
 end
 
 function GQ.Log:EnsureTooltipsPreviewData()
-    local faction = GQ.GetEffectiveFaction and GQ:GetEffectiveFaction() or "Alliance"
-    local band = "tooltips:" .. faction .. ":" .. tostring(PREVIEW_DATA_REV)
-    local cache = self._tooltipsPreviewData
-    if cache and cache.band == band and cache.rev == PREVIEW_DATA_REV then
-        return cache
+    if self._tooltipsPreviewPaint then
+        return self._tooltipsPreviewPaint
     end
-    cache = { band = band, rev = PREVIEW_DATA_REV }
-    cache.mobName, cache.mobLevel, cache.unitPicks, cache.worldPicks, cache.pick, cache.picks
-        = self:TooltipsPreviewWithHunterDemo(function()
-            return self:PickTooltipsPreviewMobAndPick()
-        end)
-    cache.mobName = cache.mobName or PREVIEW_CREATURE_FALLBACK
-    cache.mobLevel = cache.mobLevel or PREVIEW_MOB_LEVEL
-    if cache.pick and cache.pick.entry then
-        cache.entry = cache.pick.entry
-    else
-        cache.entry = self:TooltipsPreviewWithHunterDemo(function()
-            return self:PickTooltipsPreviewItemEntry()
-        end)
+    local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+    if settings and settings.hideUnitGearTips then
+        return nil
     end
-    cache.itemId = cache.entry and cache.entry.itemId or PREVIEW_SAMPLE_ITEM_ID
-    if cache.itemId and C_Item and C_Item.RequestLoadItemDataByID then
-        C_Item.RequestLoadItemDataByID(cache.itemId)
-    end
-    self._tooltipsPreviewData = cache
-    return cache
+    return self:BuildTooltipsPreviewPaint()
 end
 
 function GQ.Log:TooltipsPreviewMobNormKey(name)
@@ -562,6 +549,218 @@ function GQ.Log:TooltipsPreviewMobLines(mobName, mobLevel)
         local worldPicks, worldMeta, levelUsed = TooltipsPreviewWorldDropsAtLevel(data, mobLevel, skip, mobKey)
         return unitPicks, worldPicks, unitMeta, worldMeta, levelUsed
     end)
+end
+
+-- Fixed sample for the coyote box. Elder Crag Coyote is not in the named-drop
+-- index, and a geared character would hide level-40 world drops that do not
+-- beat what is worn. These lines are a level-50 beast mastery hunter's world
+-- drops whose range includes the sample mob. They do not start the world-drop
+-- build and they do not look at worn gear.
+function GQ.Log:CollectTooltipsPreviewSample()
+    local data = GQ.Data
+    if not data or not data.WorldDropSlotEntries then
+        return nil
+    end
+    local ranges = data.genericWorldDropRanges
+    local slots = { "Chest", "Hands", "Wrist" }
+    local picks = {}
+    local seen = {}
+    for s = 1, #slots do
+        local rows = data:WorldDropSlotEntries(slots[s], 10) or {}
+        local chosen
+        for i = 1, #rows do
+            local entry = rows[i]
+            local itemId = entry and entry.itemId
+            local range = itemId and type(ranges) == "table" and ranges[itemId]
+            if itemId and not seen[itemId] and type(range) == "table"
+                and range[1] <= PREVIEW_MOB_LEVEL and PREVIEW_MOB_LEVEL <= range[2] then
+                chosen = entry
+                break
+            end
+        end
+        if not chosen then
+            for i = 1, #rows do
+                local entry = rows[i]
+                local itemId = entry and entry.itemId
+                if itemId and not seen[itemId] then
+                    chosen = entry
+                    break
+                end
+            end
+        end
+        if chosen and chosen.itemId then
+            seen[chosen.itemId] = true
+            picks[#picks + 1] = {
+                entry = chosen,
+                kind = "w",
+                rank = chosen.curatedRank,
+            }
+        end
+    end
+    return #picks > 0 and picks or nil
+end
+
+function GQ.Log:PickTooltipsPreviewSampleEntry()
+    local slots = { "Trinket", "Neck", "Finger0", "Chest" }
+    for s = 1, #slots do
+        local list = self:GetSlotRankList(slots[s])
+        for i = 1, math.min(30, #list) do
+            local entry = list[i]
+            if entry and entry.itemId == PREVIEW_SAMPLE_ITEM_ID then
+                return entry
+            end
+        end
+    end
+    local list = self:GetSlotRankList("Trinket")
+    return (list and list[1]) or { itemId = PREVIEW_SAMPLE_ITEM_ID }
+end
+
+-- Sample lines for the coyote box. Real world drops a level-40 mob can drop.
+-- Names come from the audit. Chances are read from the packed drop table.
+-- Nothing here walks a hunt list or starts the world-drop pass.
+local PREVIEW_SAMPLE_DROPS = {
+    { itemId = 1981, slot = "Chest" },
+    { itemId = 4080, slot = "Head" },
+    { itemId = 6426, slot = "Wrist" },
+}
+
+local function previewQualityHex(quality)
+    local colors = ITEM_QUALITY_COLORS
+    local color = colors and quality and colors[quality]
+    if not color then
+        return "1eff00"
+    end
+    return string.format(
+        "%02x%02x%02x",
+        math.floor((color.r or 1) * 255 + 0.5),
+        math.floor((color.g or 1) * 255 + 0.5),
+        math.floor((color.b or 1) * 255 + 0.5)
+    )
+end
+
+local function previewOpenChance(itemId)
+    local data = GQ.Data
+    if not data or not itemId then
+        return nil
+    end
+    if type(data.worldDropOpenChance) == "table" then
+        local stored = tonumber(data.worldDropOpenChance[itemId])
+        if stored and stored > 0 then
+            return stored
+        end
+    end
+    local packed = data.worldDropOpenChancePacked
+    if type(packed) ~= "string" then
+        return nil
+    end
+    local cent = string.match(packed, "^" .. itemId .. ":(%d+)")
+        or string.match(packed, "," .. itemId .. ":(%d+)")
+    cent = tonumber(cent)
+    if not cent or cent <= 0 then
+        return nil
+    end
+    return cent * 0.01
+end
+
+local function previewDropText(chance)
+    chance = tonumber(chance)
+    if not chance or chance <= 0 then
+        return nil
+    end
+    if math.abs(chance - math.floor(chance + 0.0001)) < 0.001 then
+        return string.format("%.0f", chance)
+    end
+    return string.format("%.2f", chance)
+end
+
+-- Hunter chest enchant for the item example. Uses the loaded weight row.
+-- It does not load a class catalog.
+local function previewEnchantLine(entry)
+    if not (GQ.Enchant and GQ.Enchant.Text and entry) then
+        return nil
+    end
+    local saved = GQ._ctx
+    local faction = (GQ.GetEffectiveFaction and GQ:GetEffectiveFaction()) or "Alliance"
+    GQ._ctx = {
+        class = "HUNTER",
+        spec = PREVIEW_HUNTER_SPEC,
+        level = PREVIEW_HUNTER_LEVEL,
+        faction = faction,
+    }
+    local ok, line = pcall(GQ.Enchant.Text, GQ.Enchant, nil, entry)
+    GQ._ctx = saved
+    if ok and type(line) == "string" and line ~= "" then
+        return line
+    end
+    return nil
+end
+
+-- The item half of the example. Drop lines are painted on each refresh so
+-- the chance checkbox and the minimum slider match the live tooltip.
+function GQ.Log:BuildTooltipsPreviewPaint()
+    if self._tooltipsPreviewPaint then
+        return self._tooltipsPreviewPaint
+    end
+    if self._tooltipsPreviewBuilding then
+        return nil
+    end
+    self._tooltipsPreviewBuilding = true
+    local paint = {
+        entry = PREVIEW_ITEM_ENTRY,
+        stats = self:TooltipsPreviewItemStatLines(PREVIEW_ITEM_ENTRY),
+    }
+    self._tooltipsPreviewPaint = paint
+    self._tooltipsPreviewBuilding = nil
+    return paint
+end
+
+function GQ.Log:TooltipsPreviewDropLines(settings)
+    settings = settings or {}
+    local hidden = settings.unitGearHiddenSources
+    if hidden and hidden.world_drop then
+        return nil, false
+    end
+    local showChance = settings.unitGearShowDropChance ~= false
+    local minPct = tonumber(settings.unitGearMinDropPercent) or 0
+    if minPct < 0 then
+        minPct = 0
+    end
+    local audit = GQ.Data and GQ.Data.foreverAudit
+    local lines = {}
+    local hiddenByMin = 0
+    for i = 1, #PREVIEW_SAMPLE_DROPS do
+        local row = PREVIEW_SAMPLE_DROPS[i]
+        local fact = audit and audit[row.itemId]
+        local name = fact and fact.name
+        local chance = previewOpenChance(row.itemId)
+        if name and name ~= "" then
+            if minPct > 0 and chance and chance < minPct then
+                hiddenByMin = hiddenByMin + 1
+            else
+                local slotLabel = (GQ.Data and GQ.Data.SlotLabel and GQ.Data:SlotLabel(row.slot)) or row.slot
+                local line = string.format(
+                    "%d. |cff%s%s|r |cffc8c0b0(%s)|r",
+                    #lines + 1,
+                    previewQualityHex(fact.quality),
+                    name,
+                    slotLabel
+                )
+                if showChance then
+                    local pct = previewDropText(chance)
+                    if pct then
+                        line = line .. string.format(" |cff888888(%s%%)|r", pct)
+                    end
+                end
+                lines[#lines + 1] = line
+            end
+        end
+    end
+    return lines, hiddenByMin > 0 and #lines == 0
+end
+
+function GQ.Log:TooltipsPreviewSampleLines()
+    local paint = self._tooltipsPreviewPaint
+    return paint and paint.picks or nil
 end
 
 function GQ.Log:PickTooltipsPreviewMobAndPick()
@@ -681,6 +880,10 @@ function GQ.Log:TooltipsPreviewShownItemName(entry)
             return clientName
         end
     end
+    local audit = data and data.foreverAudit and data.foreverAudit[itemId]
+    if audit and audit.name and audit.name ~= "" then
+        return (GQ.TN and GQ.LocaleActive and GQ.TN("item", audit.name)) or audit.name
+    end
     local fact = data and data.GetItemFact and data:GetItemFact(itemId)
     local english = fact and fact.name
     if english and english ~= "" and GQ.TN and GQ.LocaleActive then
@@ -708,9 +911,13 @@ function GQ.Log:TooltipsPreviewItemQuality()
     end
     if GetItemInfo then
         local _, _, quality = GetItemInfo(itemId)
-        if type(quality) == "number" then
+        if type(quality) == "number" and quality > 0 then
             return quality
         end
+    end
+    local audit = GQ.Data and GQ.Data.foreverAudit and GQ.Data.foreverAudit[itemId]
+    if audit and type(audit.quality) == "number" and audit.quality > 0 then
+        return audit.quality
     end
     return 2
 end
@@ -1368,7 +1575,6 @@ function GQ.Log:RefreshTooltipsPanelContent(frame, panel)
     if not frame or not panel then
         return
     end
-    self._tooltipsPreviewData = nil
     self:LayoutTooltipsPanelChrome(panel)
     if self.RefreshSettings then
         self:RefreshSettings()
@@ -1431,60 +1637,43 @@ function GQ.Log:RefreshTooltipsPanelPreview()
     if not panel or not panel:IsShown() then
         return
     end
-    self:EnsureTooltipsPreviewData()
-    self:UpdateTooltipsPanelPreviewLabels(panel)
     local settings = GearQuestForeverDB and GearQuestForeverDB.settings or {}
     local leftText = panel.leftPreview and panel.leftPreview.previewText
     local rightText = panel.rightPreview and panel.rightPreview.previewText
     if not leftText or not rightText then
         return
     end
-
-    local preview = self:EnsureTooltipsPreviewData()
-    local entry = preview and preview.entry
+    if not self._tooltipsPreviewPaint then
+        self:BuildTooltipsPreviewPaint()
+    end
+    self:UpdateTooltipsPanelPreviewLabels(panel)
 
     if settings.hideUnitGearTips then
         leftText:SetText("|cff888888" .. localeText("Unit gear tips are hidden.", "Unit gear tips are hidden.") .. "|r")
     else
         local lines = {}
+        local drops, minHidAll = self:TooltipsPreviewDropLines(settings)
+        if drops and drops[1] then
+            lines[#lines + 1] = "|cffffd200" .. (L["Your top world drops from this mob:"] or "Your top world drops from this mob:") .. "|r"
+            for i = 1, #drops do
+                lines[#lines + 1] = drops[i]
+            end
+        elseif minHidAll then
+            lines[#lines + 1] = "|cff888888"
+                .. (L["Your minimum drop chance hid every upgrade line. Lower it on the Tooltips page, under Minimum drop chance on unit gear."]
+                    or "Your minimum drop chance hid every upgrade line. Lower it on the Tooltips page, under Minimum drop chance on unit gear.")
+                .. "|r"
+        end
         if not settings.unitGearAlwaysShow then
             lines[#lines + 1] = "|cff888888" .. (L["Hold Shift to see BiS items from this NPC"] or "") .. "|r"
-        else
-            local unitPicks, worldPicks, unitMeta, worldMeta = self:TooltipsPreviewMobLines(preview.mobName, preview.mobLevel)
-            local lineNum = 0
-            local function appendPicks(picks, headerKey)
-                if not (picks and picks[1] and GQ.Data and GQ.Data.FormatUnitGearPreviewLine) then
-                    return
-                end
-                lines[#lines + 1] = "|cffffd200" .. (L[headerKey] or headerKey) .. "|r"
-                for i = 1, #picks do
-                    local row = GQ.Data:FormatUnitGearPreviewLine(picks[i], i)
-                    if row then
-                        lineNum = lineNum + 1
-                        lines[#lines + 1] = row:gsub("^%d+%.", tostring(lineNum) .. ".", 1)
-                    end
-                end
-            end
-            if unitPicks and unitPicks[1] then
-                local headerKey = GQ.Data.UnitGearPreviewHeaderKey and GQ.Data:UnitGearPreviewHeaderKey(unitPicks)
-                    or "Your top items from this mob:"
-                appendPicks(unitPicks, headerKey)
-            end
-            if worldPicks and worldPicks[1] then
-                appendPicks(worldPicks, "Your top world drops from this mob:")
-            end
-            if #lines == 0 and ((unitMeta and unitMeta.minDropEmpty) or (worldMeta and worldMeta.minDropEmpty)) then
-                lines[#lines + 1] = "|cff888888"
-                    .. (L["Your minimum drop chance hid every upgrade line. Lower the slider in Hunt settings → Tooltips."]
-                        or "Your minimum drop chance hid every upgrade line. Lower the slider in Hunt settings → Tooltips.")
-                    .. "|r"
-            end
         end
         leftText:SetText(table.concat(lines, "\n"))
     end
 
+    local paint = self._tooltipsPreviewPaint
+    local entry = (paint and paint.entry) or PREVIEW_ITEM_ENTRY
     local rlines = {}
-    local stats = self:TooltipsPreviewItemStatLines(entry)
+    local stats = (paint and paint.stats) or self:TooltipsPreviewItemStatLines(entry)
     for i = 1, #stats do
         rlines[#rlines + 1] = stats[i]
     end
@@ -1494,39 +1683,30 @@ function GQ.Log:RefreshTooltipsPanelPreview()
             rlines[#rlines + 1] = "|cffffffff+" .. tostring(fact.ap) .. " Attack Power|r"
         end
     end
-    self:TooltipsPreviewWithHunterDemo(function()
-        GQ._tooltipsPanelPreview = true
-        local link = self:TooltipsPreviewLinkForEntry(entry)
-        if settings.showGearEnchant == true and GQ.Enchant and GQ.Enchant.Text then
-            local enchant = GQ.Enchant:Text(link, entry)
-            if enchant then
-                rlines[#rlines + 1] = enchant
-            end
+    if settings.showGearEnchant == true then
+        local enchant = previewEnchantLine(entry)
+        if enchant then
+            rlines[#rlines + 1] = enchant
         end
-        if settings.showGearScore ~= false and GQ.Data and GQ.Data.GearScoreTooltipLine then
-            local scoreLine, note = GQ.Data:GearScoreTooltipLine(entry)
-            if scoreLine then
-                rlines[#rlines + 1] = scoreLine
-            end
-            if note then
-                rlines[#rlines + 1] = note
-            end
+    end
+    if paint and not settings.hideUnitGearTips then
+        if settings.showGearScore ~= false and paint.score then
+            rlines[#rlines + 1] = paint.score
         end
-        if settings.showOtherSpecRanks ~= false then
-            local otherLines = self:TooltipsPreviewOtherSpecLines(entry)
-            if otherLines then
-                for i = 1, #otherLines do
-                    local otherLine = otherLines[i]
-                    if otherLine:find("|cff") then
-                        rlines[#rlines + 1] = otherLine
-                    else
-                        rlines[#rlines + 1] = "|cffd9bf73" .. otherLine .. "|r"
-                    end
+        if settings.showGearScore ~= false and paint.note then
+            rlines[#rlines + 1] = paint.note
+        end
+        if settings.showOtherSpecRanks ~= false and paint.other then
+            for i = 1, #paint.other do
+                local otherLine = paint.other[i]
+                if otherLine:find("|cff") then
+                    rlines[#rlines + 1] = otherLine
+                else
+                    rlines[#rlines + 1] = "|cffd9bf73" .. otherLine .. "|r"
                 end
             end
         end
-        GQ._tooltipsPanelPreview = nil
-    end)
+    end
     self:LayoutTooltipsPreviewBoxHeight(panel)
     rightText:SetText(table.concat(rlines, "\n"))
     if self.LayoutTooltipsPanelChrome then
@@ -1535,9 +1715,6 @@ function GQ.Log:RefreshTooltipsPanelPreview()
 end
 
 function GQ.Log:NotifyTooltipsPreview()
-    if GQ.Data then
-        GQ.Data._unitGearCache = nil
-    end
     if self.RefreshTooltipsPanelPreview then
         self:RefreshTooltipsPanelPreview()
     end

@@ -1342,6 +1342,71 @@ function GQ.Data:GetEntriesByItemId(itemId)
     return self.byItemId and self.byItemId[itemId] or {}
 end
 
+-- At most `limit` generic world drops for one slot at this level, class,
+-- faction, and spec. Packed catalogs replace this with a scan that builds
+-- only those rows. This fallback is the already-loaded class arrays.
+function GQ.Data:WorldDropSlotEntries(slotName, limit)
+    limit = limit or 10
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    local spec = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec()
+    local level = (GQ.GetEffectiveLevel and GQ:GetEffectiveLevel()) or 1
+    local ranges = self.genericWorldDropRanges
+    if not classFile or not spec or type(ranges) ~= "table" then
+        return {}
+    end
+    local best = {}
+    local seen = {}
+    local function consider(entry)
+        if not entry or not entry.itemId or seen[entry.itemId] then
+            return
+        end
+        if type(ranges[entry.itemId]) ~= "table" then
+            return
+        end
+        if not self:EntryMatchesPlayer(entry) then
+            return
+        end
+        if level < (entry.minLevel or 1) or level > (entry.maxLevel or level) then
+            return
+        end
+        local fact = self:GetItemFact(entry.itemId)
+        local req = fact and fact.reqLevel
+        if type(req) == "number" and req > 1 and req > level then
+            return
+        end
+        seen[entry.itemId] = true
+        local score = entry.pipelineScore or 0
+        if #best >= limit and score <= (best[#best].pipelineScore or 0) then
+            return
+        end
+        best[#best + 1] = entry
+        table.sort(best, function(a, b)
+            return (a.pipelineScore or 0) > (b.pipelineScore or 0)
+        end)
+        if #best > limit then
+            best[limit + 1] = nil
+        end
+    end
+    local map = self.byClassSlotSpec and self.byClassSlotSpec[classFile]
+    local keys = self:GetCandidateSlotKeys(slotName) or { slotName }
+    for i = 1, #keys do
+        local slotMap = map and map[self:NormalizeSlotName(keys[i])]
+        local rows = slotMap and slotMap[spec]
+        if rows then
+            for r = 1, #rows do
+                consider(rows[r])
+            end
+        end
+        local anyRows = slotMap and slotMap._any
+        if anyRows then
+            for r = 1, #anyRows do
+                consider(anyRows[r])
+            end
+        end
+    end
+    return best
+end
+
 -- Searched in this order. Names, not a table built per call: list building
 -- runs this for every catalog entry. A nil table is skipped so a loaded
 -- class whose facts sit after an unloaded one is still found.

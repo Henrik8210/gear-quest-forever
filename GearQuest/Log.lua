@@ -35,6 +35,11 @@ local LIST_TAB_COUNT = 4
 local LIST_TAB_GAP = 4
 local LIST_TAB_FILTER_GAP = 8
 local FILTER_BUTTON_WIDTH = 72
+GQ.Log.HuntsFooterGap = 6
+GQ.Log.ArmorTypeOrder = { "Cloth", "Leather", "Mail", "Plate" }
+GQ.Log.ArmorTypeSet = { Cloth = true, Leather = true, Mail = true, Plate = true }
+GQ.Log.ClothOnlyClasses = { MAGE = true, WARLOCK = true, PRIEST = true }
+GQ.Log.ArmorSubclassById = { [1] = "Cloth", [2] = "Leather", [3] = "Mail", [4] = "Plate" }
 local FILTER_TAB_WIDTH = math.floor(
     (LEFT_COLUMN_WIDTH - FILTER_TAB_LEFT - 2 - FILTER_BUTTON_WIDTH - LIST_TAB_FILTER_GAP
         - LIST_TAB_GAP * (LIST_TAB_COUNT - 1)) / LIST_TAB_COUNT
@@ -4865,6 +4870,190 @@ function GQ.Log:SetHuntsPerSlot(count)
     end
 end
 
+function GQ.Log:ArmorTypeButtonWidth()
+    return math.floor((LEFT_COLUMN_WIDTH - GQ.Log.HuntsFooterGap) / 4)
+end
+
+function GQ.Log:ArmorTypesOffered()
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    if classFile and GQ.Log.ClothOnlyClasses[classFile] then
+        return false
+    end
+    return true
+end
+
+function GQ.Log:HuntsFooterWidth()
+    if not self:ArmorTypesOffered() then
+        return LEFT_COLUMN_WIDTH
+    end
+    return LEFT_COLUMN_WIDTH - GQ.Log.HuntsFooterGap - self:ArmorTypeButtonWidth()
+end
+
+-- Cloth, leather, mail, or plate from the stored item fact. The client
+-- subclass id is the fallback, and it does not ask for an uncached tooltip.
+function GQ.Log:EntryArmorType(entry)
+    if not entry or not entry.itemId or not GQ.Equip or not GQ.Equip.SlotUsesArmorSubclass then
+        return nil
+    end
+    local slotName = entry.slot and GQ.Data and GQ.Data.NormalizeSlotName and GQ.Data:NormalizeSlotName(entry.slot)
+    if not GQ.Equip:SlotUsesArmorSubclass(slotName) then
+        return nil
+    end
+    local fact = GQ.Data.GetItemFact and GQ.Data:GetItemFact(entry.itemId)
+    local kind = fact and fact.kind
+    if GQ.Log.ArmorTypeSet[kind] then
+        return kind
+    end
+    if not GetItemInfoInstant then
+        return nil
+    end
+    local ok, _, _, _, _, _, classID, subClassID = pcall(GetItemInfoInstant, entry.itemId)
+    if ok and classID == 4 then
+        return GQ.Log.ArmorSubclassById[subClassID]
+    end
+    return nil
+end
+
+function GQ.Log:ArmorFilterRecord()
+    if not GearQuestForeverDB then
+        return nil
+    end
+    GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+    GearQuestForeverDB.settings.armorFilter = GearQuestForeverDB.settings.armorFilter or {}
+    local store = GearQuestForeverDB.settings.armorFilter
+    local classFile = (GQ.GetEffectiveClass and GQ:GetEffectiveClass()) or "?"
+    local spec = (GQ.GetEffectiveSpec and GQ:GetEffectiveSpec()) or "?"
+    local simulating = GQ.IsPreviewEnabled and GQ:IsPreviewEnabled()
+    local key = (simulating and "sim:" or "play:") .. classFile .. ":" .. spec
+    local rec = store[key]
+    if not rec then
+        rec = {}
+        store[key] = rec
+    end
+    return rec
+end
+
+function GQ.Log:ArmorTypeChecked(kind)
+    local rec = self:ArmorFilterRecord()
+    if not rec or rec[kind] == nil then
+        return true
+    end
+    return rec[kind] and true or false
+end
+
+-- Types on the hunt list before this filter. An unchecked type stays listed.
+-- Reads the rank lists already built for the open window. It does not walk
+-- the hunt list again, which was closing the menu on the same click.
+function GQ.Log:ArmorTypesOnList()
+    if self._collectingArmorTypes then
+        return self._armorTypes or {}
+    end
+    local key = (self.GetActiveListCacheContextKey and self:GetActiveListCacheContextKey() or "")
+        .. "|" .. tostring(self:HuntsPerSlot())
+    if self._armorTypesKey == key and self._armorTypes then
+        return self._armorTypes
+    end
+    local found = {}
+    local function note(entry)
+        local kind = self:EntryArmorType(entry)
+        if kind then
+            found[kind] = true
+        end
+    end
+    local rows = self.listRows
+    if rows then
+        for i = 1, #rows do
+            local row = rows[i]
+            if row and row.entry then
+                note(row.entry)
+            end
+        end
+    end
+    local cache = self._slotRankCache
+    if cache then
+        for _, list in pairs(cache) do
+            if type(list) == "table" then
+                for i = 1, #list do
+                    note(list[i])
+                end
+            end
+        end
+    end
+    local order = {}
+    for i = 1, #GQ.Log.ArmorTypeOrder do
+        local kind = GQ.Log.ArmorTypeOrder[i]
+        if found[kind] then
+            order[#order + 1] = kind
+        end
+    end
+    self._armorTypesKey = key
+    self._armorTypes = order
+    return order
+end
+
+function GQ.Log:ArmorFilterNarrowed()
+    local types = self:ArmorTypesOnList()
+    for i = 1, #types do
+        if not self:ArmorTypeChecked(types[i]) then
+            return true
+        end
+    end
+    return false
+end
+
+function GQ.Log:ArmorPassesFilter(entry, slotName)
+    if not self:ArmorTypesOffered() then
+        return true
+    end
+    if self._collectingArmorTypes then
+        return true
+    end
+    if not entry then
+        return true
+    end
+    slotName = slotName or entry.slot
+    if GQ.Data and GQ.Data.NormalizeSlotName then
+        slotName = GQ.Data:NormalizeSlotName(slotName)
+    end
+    if not GQ.Equip or not GQ.Equip.SlotUsesArmorSubclass or not GQ.Equip:SlotUsesArmorSubclass(slotName) then
+        return true
+    end
+    local kind = self:EntryArmorType(entry)
+    if not kind then
+        return not self:ArmorFilterNarrowed()
+    end
+    return self:ArmorTypeChecked(kind)
+end
+
+function GQ.Log:ToggleArmorType(kind)
+    if not GQ.Log.ArmorTypeSet[kind] then
+        return
+    end
+    local rec = self:ArmorFilterRecord()
+    if not rec then
+        return
+    end
+    if rec[kind] == nil then
+        rec[kind] = true
+    end
+    rec[kind] = not rec[kind]
+    self._armorTypesKey = nil
+    self._reopenArmorMenu = true
+    self:Refresh()
+end
+
+function GQ.Log:UpdateArmorTypeButton()
+    local btn = self.frame and self.frame.armorTypeBtn
+    if not btn then
+        return
+    end
+    local text = L["Armor types"]
+    if self:ArmorFilterNarrowed() then
+        text = text .. "*"
+    end
+    btn:SetText(text)
+end
+
 -- A listed piece gets the green arrow only when it beats what is worn.
 -- An empty slot counts. Simulation paints no upgrade arrows.
 function GQ.Log:EntryIsListedUpgrade(entry, slotName)
@@ -5004,7 +5193,7 @@ function GQ.Log:RankedHuntEntries(slotName, applyFilters, limit)
             break
         end
         if entry and not self:ShouldHideFromActiveList(entry, slotName)
-            and (not applyFilters or (self:EntrySourceAllowed(entry) and self:EntryMatchesPlayStyle(entry) and self:RangedPassesFilter(entry, slotName))) then
+            and (not applyFilters or (self:EntrySourceAllowed(entry) and self:EntryMatchesPlayStyle(entry) and self:RangedPassesFilter(entry, slotName) and self:ArmorPassesFilter(entry, slotName))) then
             local name = (GQ.Data.GetEntryDisplayName and GQ.Data:GetEntryDisplayName(entry)) or ""
             if name == "" or not seenName[name] then
                 if name ~= "" then
@@ -5060,7 +5249,8 @@ function GQ.Log:GetActiveSlotListEntries(slotName, plain)
                     and self:EntryMatchesTrackedHunt(entry)
                     and self:EntrySourceAllowed(entry)
                     and self:EntryMatchesPlayStyle(entry)
-                    and self:RangedPassesFilter(entry, slotName) then
+                    and self:RangedPassesFilter(entry, slotName)
+                    and self:ArmorPassesFilter(entry, slotName) then
                     addEntry(entry)
                 end
             end
@@ -5079,7 +5269,8 @@ function GQ.Log:GetActiveSlotListEntries(slotName, plain)
             if entry and GQ.Data:EntryMatchesSlot(entry, slotName)
                 and GQ.Data:EntryMatchesPlayer(entry)
                 and self:EntryMatchesTrackedHunt(entry)
-                and self:RangedPassesFilter(entry, slotName) then
+                and self:RangedPassesFilter(entry, slotName)
+                and self:ArmorPassesFilter(entry, slotName) then
                 addEntry(entry)
             end
         end
@@ -8196,6 +8387,9 @@ function GQ.Log:LayoutSideTabs(frame)
             if GQ.Log and GQ.Log.weaponMenu then
                 GQ.Log.weaponMenu:Hide()
             end
+            if GQ.Log and GQ.Log.armorMenu then
+                GQ.Log.armorMenu:Hide()
+            end
             if prevHide then
                 prevHide(self, ...)
             end
@@ -8431,11 +8625,19 @@ function GQ.Log:EnsureHuntsPerSlot(frame)
         fill:SetColorTexture(PANEL_BG[1], PANEL_BG[2], PANEL_BG[3], PANEL_BG[4] or 1)
     end
 
-    local label = host:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    label:SetPoint("LEFT", host, "LEFT", 8, 0)
+    local labelClip = CreateFrame("Frame", nil, host)
+    labelClip:SetHeight(18)
+    if labelClip.SetClipsChildren then
+        labelClip:SetClipsChildren(true)
+    end
+    local label = labelClip:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    label:SetPoint("LEFT", labelClip, "LEFT", 0, 0)
     label:SetJustifyH("LEFT")
+    label:SetWordWrap(false)
     label:SetText(L["Hunts per gear slot"])
     label:SetTextColor(1, 0.82, 0)
+    host.label = label
+    host.labelClip = labelClip
 
     local slider
     local createdOk, created = pcall(CreateFrame, "Slider", "GearQuestHuntsPerSlotSlider", host, "OptionsSliderTemplate")
@@ -8475,9 +8677,30 @@ function GQ.Log:EnsureHuntsPerSlot(frame)
     valueText:SetJustifyH("RIGHT")
     valueText:SetTextColor(1, 0.82, 0)
     slider:ClearAllPoints()
-    slider:SetPoint("LEFT", label, "RIGHT", 10, 0)
-    slider:SetPoint("RIGHT", valueText, "LEFT", -8, 0)
     slider:SetHeight(17)
+    host.slider = slider
+    local function Reflow()
+        local width = host:GetWidth() or 0
+        local textW = label:GetStringWidth() or 0
+        local sliderW = width - 8 - textW - 6 - 6 - 22 - 8
+        local labelW = textW
+        if sliderW < 36 then
+            sliderW = 36
+            labelW = width - 8 - 8 - 22 - sliderW - 6 - 6
+            if labelW < 24 then
+                labelW = 24
+            end
+        end
+        labelClip:ClearAllPoints()
+        labelClip:SetPoint("LEFT", host, "LEFT", 8, 0)
+        labelClip:SetSize(labelW, 18)
+        label:SetWidth(labelW)
+        slider:ClearAllPoints()
+        slider:SetPoint("LEFT", labelClip, "RIGHT", 6, 0)
+        slider:SetWidth(sliderW)
+    end
+    host:SetScript("OnSizeChanged", Reflow)
+    Reflow()
 
     local function ShowCount(raw)
         local count = math.floor((tonumber(raw) or 3) + 0.5)
@@ -8521,15 +8744,215 @@ function GQ.Log:EnsureHuntsPerSlot(frame)
     slider:HookScript("OnLeave", function()
         GameTooltip:Hide()
     end)
+    labelClip:EnableMouse(true)
+    labelClip:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_TOP")
+        GameTooltip:SetText(L["Hunts per gear slot"])
+        GameTooltip:AddLine(L["The list updates when you let go. Rank 1, 2, and 3 stay the best in slot."], 1, 1, 1, true)
+        GameTooltip:Show()
+    end)
+    labelClip:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
 
     slider._gqQuiet = true
     slider:SetValue(self:HuntsPerSlot())
     slider._gqQuiet = nil
     ShowCount(self:HuntsPerSlot())
 
-    host:SetWidth(LEFT_COLUMN_WIDTH)
+    host:EnableMouse(false)
+    if host.SetClipsChildren then
+        host:SetClipsChildren(true)
+    end
+    host:SetWidth(self:HuntsFooterWidth())
     frame.huntsPerSlot = host
     frame.huntsPerSlotSlider = slider
+end
+
+function GQ.Log:EnsureArmorTypeButton(frame)
+    frame = frame or self.frame
+    if not frame or frame.armorTypeBtn then
+        return
+    end
+    local btn = CreateFrame("Button", "GearQuestArmorTypeButton", frame, "UIPanelButtonTemplate")
+    btn:SetHeight(22)
+    btn:SetText(L["Armor types"])
+    btn:SetScript("OnClick", function(self)
+        GQ.Log:ToggleArmorMenu(self)
+    end)
+    btn:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_TOP")
+        GameTooltip:SetText(L["Armor types"])
+        GameTooltip:AddLine(L["Choose which armor types stay on the hunt list."], 1, 1, 1, true)
+        GameTooltip:AddLine(L["Weapons, shields, cloaks, and jewelry stay."], 1, 1, 1, true)
+        GameTooltip:Show()
+    end)
+    btn:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+    local windowLevel = (frame.gqOuterBorder and frame.gqOuterBorder.GetFrameLevel and frame.gqOuterBorder:GetFrameLevel() or (frame:GetFrameLevel() or 1)) + 20
+    btn:SetFrameLevel(windowLevel)
+    btn:RegisterForClicks("AnyUp")
+    btn:EnableMouse(true)
+    frame.armorTypeBtn = btn
+    self:UpdateArmorTypeButton()
+end
+
+function GQ.Log:EnsureArmorMenu()
+    if self.armorMenu then
+        return self.armorMenu
+    end
+    local parent = self.frame or UIParent
+    local menu = CreateFrame("Frame", "GearQuestArmorMenu", parent, "BackdropTemplate")
+    -- Same layer as Play style, which paints over the portrait log.
+    menu:SetFrameStrata("FULLSCREEN_DIALOG")
+    menu:SetFrameLevel(400)
+    menu:EnableMouse(true)
+    menu:SetClampedToScreen(true)
+    menu:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8X8",
+        edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+        tile = true, tileSize = 16, edgeSize = 16,
+        insets = { left = 4, right = 4, top = 4, bottom = 4 },
+    })
+    if menu.SetBackdropColor then
+        menu:SetBackdropColor(0.07, 0.06, 0.05, 1)
+    end
+    if menu.SetBackdropBorderColor then
+        menu:SetBackdropBorderColor(0.78, 0.72, 0.58, 1)
+    end
+    menu.checks = {}
+    menu.empty = menu:CreateFontString(nil, "OVERLAY", "GameFontDisable")
+    menu.empty:SetPoint("TOPLEFT", menu, "TOPLEFT", 12, -12)
+    menu.empty:SetJustifyH("LEFT")
+    menu.empty:SetText(L["No armor on this list."])
+    menu.empty:Hide()
+    local catcher = CreateFrame("Frame", nil, parent)
+    catcher:SetAllPoints(parent)
+    catcher:SetFrameStrata("FULLSCREEN_DIALOG")
+    catcher:SetFrameLevel(300)
+    catcher:EnableMouse(true)
+    catcher:Hide()
+    catcher:SetScript("OnMouseDown", function()
+        menu:Hide()
+    end)
+    menu.catcher = catcher
+    menu:SetScript("OnShow", function(self)
+        self:SetFrameStrata("FULLSCREEN_DIALOG")
+        self:SetFrameLevel(400)
+        if self.Raise then
+            self:Raise()
+        end
+        local catcherFrame = self.catcher
+        if catcherFrame and C_Timer and C_Timer.After then
+            C_Timer.After(0, function()
+                if self:IsShown() then
+                    catcherFrame:SetFrameStrata("FULLSCREEN_DIALOG")
+                    catcherFrame:SetFrameLevel(300)
+                    catcherFrame:Show()
+                    self:SetFrameLevel(400)
+                    if self.Raise then
+                        self:Raise()
+                    end
+                end
+            end)
+        end
+    end)
+    menu:SetScript("OnHide", function(self)
+        if self.catcher then
+            self.catcher:Hide()
+        end
+    end)
+    menu:Hide()
+    self.armorMenu = menu
+    return menu
+end
+
+function GQ.Log:FillArmorMenu()
+    local menu = self:EnsureArmorMenu()
+    local types = self:ArmorTypesOnList()
+    local width = 140
+    for i = 1, #types do
+        local check = menu.checks[i]
+        if not check then
+            check = CreateFrame("CheckButton", nil, menu, "UICheckButtonTemplate")
+            check:SetSize(22, 22)
+            check.label = check:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+            check.label:SetPoint("LEFT", check, "RIGHT", 2, 0)
+            check.label:SetJustifyH("LEFT")
+            check:SetScript("OnClick", function(self)
+                if self._gqQuiet then
+                    return
+                end
+                local log = _G.GearQuest and _G.GearQuest.Log
+                if log then
+                    log:ToggleArmorType(self.choiceId)
+                end
+            end)
+            menu.checks[i] = check
+        end
+        local kind = types[i]
+        check.choiceId = kind
+        check.label:SetText(L[kind])
+        check.label:SetTextColor(1, 1, 1)
+        check._gqQuiet = true
+        check:SetChecked(self:ArmorTypeChecked(kind))
+        check._gqQuiet = nil
+        check:ClearAllPoints()
+        check:SetPoint("TOPLEFT", menu, "TOPLEFT", 8, -8 - ((i - 1) * 20))
+        local rowWidth = 36 + (check.label:GetStringWidth() or 60)
+        if rowWidth > width then
+            width = rowWidth
+        end
+        check:SetHitRectInsets(0, -((check.label:GetStringWidth() or 60) + 12), -1, -1)
+        check:Show()
+    end
+    for i = #types + 1, #menu.checks do
+        menu.checks[i]:Hide()
+    end
+    if #types == 0 then
+        menu.empty:Show()
+        width = math.max(width, 24 + (menu.empty:GetStringWidth() or 80))
+        menu:SetSize(width + 12, 36)
+    else
+        menu.empty:Hide()
+        menu:SetSize(width + 12, 16 + (#types * 20))
+    end
+end
+
+function GQ.Log:ShowArmorMenu(anchor)
+    if not anchor then
+        return
+    end
+    if self.weaponMenu and self.weaponMenu.Hide then
+        self.weaponMenu:Hide()
+    end
+    local menu = self:EnsureArmorMenu()
+    local parent = self.frame or UIParent
+    if menu:GetParent() ~= parent then
+        menu:SetParent(parent)
+    end
+    menu:SetFrameStrata("FULLSCREEN_DIALOG")
+    menu:SetFrameLevel(400)
+    menu:SetSize(180, 16 + (#GQ.Log.ArmorTypeOrder * 22))
+    menu:ClearAllPoints()
+    menu:SetPoint("BOTTOMRIGHT", anchor, "TOPRIGHT", 0, 6)
+    self:FillArmorMenu()
+    menu:Show()
+    menu:SetFrameStrata("FULLSCREEN_DIALOG")
+    menu:SetFrameLevel(400)
+    if menu.Raise then
+        menu:Raise()
+    end
+end
+
+function GQ.Log:ToggleArmorMenu(anchor)
+    local menu = self:EnsureArmorMenu()
+    if menu:IsShown() then
+        menu:Hide()
+        return
+    end
+    self:ShowArmorMenu(anchor)
 end
 
 function GQ.Log:EnsurePlayStyle(frame)
@@ -9222,10 +9645,42 @@ function GQ.Log:LayoutFooterButtons(frame)
         end
     end
     self:EnsureHuntsPerSlot(frame)
+    self:EnsureArmorTypeButton(frame)
+    local offered = self:ArmorTypesOffered()
+    local huntsWidth = LEFT_COLUMN_WIDTH
     if frame.huntsPerSlot then
         frame.huntsPerSlot:ClearAllPoints()
         frame.huntsPerSlot:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", CONTENT_LEFT, FOOTER_BUTTON_Y)
-        frame.huntsPerSlot:SetWidth(LEFT_COLUMN_WIDTH)
+    end
+    if frame.armorTypeBtn then
+        local btn = frame.armorTypeBtn
+        if offered then
+            btn:Show()
+            btn:SetText(self:ArmorFilterNarrowed() and (L["Armor types"] .. "*") or L["Armor types"])
+            GQ:FitButton(btn, 108, math.floor(LEFT_COLUMN_WIDTH * 0.42))
+            local buttonWidth = btn:GetWidth()
+            if buttonWidth < 108 then
+                buttonWidth = 108
+                btn:SetWidth(buttonWidth)
+            end
+            huntsWidth = LEFT_COLUMN_WIDTH - GQ.Log.HuntsFooterGap - buttonWidth
+            btn:ClearAllPoints()
+            btn:SetHeight(22)
+            btn:SetFrameStrata(LOG_FRAME_STRATA)
+            btn:SetFrameLevel((frame:GetFrameLevel() or 1) + 40)
+            btn:SetPoint("BOTTOMRIGHT", frame, "BOTTOMLEFT", CONTENT_LEFT + LEFT_COLUMN_WIDTH, FOOTER_BUTTON_Y)
+            local textW = btn.GetFontString and btn:GetFontString() and btn:GetFontString():GetStringWidth() or buttonWidth
+            local extra = math.ceil(math.max(0, textW - buttonWidth) / 2) + 8
+            btn:SetHitRectInsets(-extra, -extra, -8, -8)
+        else
+            btn:Hide()
+            if self.armorMenu then
+                self.armorMenu:Hide()
+            end
+        end
+    end
+    if frame.huntsPerSlot then
+        frame.huntsPerSlot:SetWidth(huntsWidth)
     end
 end
 
@@ -9319,11 +9774,25 @@ function GQ.Log:ApplyPageTab()
             end
         end
     end
+    -- Simulation changes the class without opening the window again.
+    -- The hunts bar and Armor types button follow that class here.
+    self:LayoutFooterButtons(self.frame)
     if self.frame.huntsPerSlot then
         if page == "log" then
             self.frame.huntsPerSlot:Show()
         else
             self.frame.huntsPerSlot:Hide()
+        end
+    end
+    if self.frame.armorTypeBtn then
+        if page == "log" and self:ArmorTypesOffered() then
+            self.frame.armorTypeBtn:Show()
+            self:UpdateArmorTypeButton()
+        else
+            self.frame.armorTypeBtn:Hide()
+            if self.armorMenu then
+                self.armorMenu:Hide()
+            end
         end
     end
 
@@ -12175,6 +12644,9 @@ function GQ.Log:CreateUnitGearSetting(frame, detail, anchor)
     local function ApplyUnitGearCheck(checked)
         GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
         GearQuestForeverDB.settings.hideUnitGearTips = checked and true or false
+        if checked and GQ.Data and GQ.Data.ReleaseUnitGearTipData then
+            GQ.Data:ReleaseUnitGearTipData()
+        end
         GQ.Log.RefreshUnitGearTooltipSetting()
         GQ.Log:NotifyTooltipsPreview()
     end
@@ -19706,6 +20178,7 @@ end
 
 function GQ.Log:Refresh()
     self._wornRankFloor = nil
+    self._armorTypesKey = nil
     if self:HideLowerRanksEnabled() then
         self._weaponFiltered = nil
         self._heldOffHand = nil
@@ -19848,12 +20321,15 @@ function GQ.Log:Refresh()
                 end
             else
                 local upgrades = self:GetActiveSlotListEntries(slotName)
+                local armorSlot = GQ.Equip and GQ.Equip.SlotUsesArmorSubclass and GQ.Equip:SlotUsesArmorSubclass(slotName)
+                if #upgrades > 0 or not armorSlot or not self:ArmorFilterNarrowed() then
                 table.insert(layoutRows, { type = "header", slotName = slotName })
 
                 if #upgrades > 0 and not self:IsSlotCollapsed(slotName, upgrades) then
                     for _, entry in ipairs(upgrades) do
                         table.insert(layoutRows, { type = "item", slotName = slotName, entry = entry })
                     end
+                end
                 end
             end
         end
@@ -19912,8 +20388,23 @@ function GQ.Log:Refresh()
                 break
             end
         end
+    elseif self._reopenArmorMenu then
+        self._reopenArmorMenu = nil
+        if self.weaponMenu then
+            self.weaponMenu:Hide()
+        end
+        if self.frame and self.frame.armorTypeBtn then
+            self:ShowArmorMenu(self.frame.armorTypeBtn)
+        end
     elseif self.weaponMenu then
         self.weaponMenu:Hide()
+    end
+    if self.armorMenu and self.armorMenu:IsShown() then
+        self.armorMenu:SetFrameStrata("FULLSCREEN_DIALOG")
+        self.armorMenu:SetFrameLevel(400)
+        if self.armorMenu.Raise then
+            self.armorMenu:Raise()
+        end
     end
 
     self.frame.scrollChild:SetHeight(math.max(yOffset, 1))
@@ -19968,6 +20459,8 @@ function GQ.Log:Refresh()
         elseif tab == "active" and not self:EntrySourceAllowed(entry) then
             clearSelection = true
         elseif tab == "active" and not self:EntryMatchesPlayStyle(entry) then
+            clearSelection = true
+        elseif tab == "active" and not self:ArmorPassesFilter(entry) then
             clearSelection = true
         end
 

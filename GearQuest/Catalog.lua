@@ -730,6 +730,75 @@ function Data:GetClassSlotEntryList(slotName, activeOnly)
     return Remember(cache, slotName, list, activeOnly and 24 or 4)
 end
 
+local OriginalWorldDropSlotEntries = Data.WorldDropSlotEntries
+function Data:WorldDropSlotEntries(slotName, limit)
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    local catalogs = ActiveCatalogs(self, classFile)
+    if not catalogs[1] then
+        return OriginalWorldDropSlotEntries(self, slotName, limit)
+    end
+    limit = limit or 10
+    local spec = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec()
+    local level = (GQ.GetEffectiveLevel and GQ:GetEffectiveLevel()) or 1
+    local faction = (GQ.GetEffectiveFaction and GQ:GetEffectiveFaction()) or ""
+    local grace = (GQ.Equip and GQ.Equip.LEVEL_GRACE) or 0
+    local ranges = self.genericWorldDropRanges
+    if not spec or type(ranges) ~= "table" then
+        return {}
+    end
+    local found = {}
+    local keys = self:GetCandidateSlotKeys(slotName) or { slotName }
+    for c = 1, #catalogs do
+        local catalog = catalogs[c]
+        for k = 1, #keys do
+            local key = self:NormalizeSlotName(keys[k]) .. "|" .. spec
+            local rows = catalog.slotSpecRows[key]
+            if rows then
+                for pos = 1, #rows, 3 do
+                    local row = Ordinal(rows, pos)
+                    local item, _, _, lo, hi, _, side = ReadMeta(catalog, row)
+                    local range = ranges[item]
+                    if type(range) == "table" and (side == 0 or SIDES[side] == faction)
+                        and level >= lo and level <= hi + grace then
+                        local fact = self:GetItemFact(item)
+                        local req = fact and fact.reqLevel
+                        if not (type(req) == "number" and req > 1 and req > level) then
+                            local _, _, _, _, _, _, _, score = ReadTextRecord(catalog, row)
+                            local prev = found[item]
+                            score = score or 0
+                            if not prev or score > prev.score then
+                                found[item] = {
+                                    score = score,
+                                    ref = catalog.code * REF_BASE + row,
+                                }
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    local ranked = {}
+    for _, pick in pairs(found) do
+        ranked[#ranked + 1] = pick
+    end
+    table.sort(ranked, function(a, b)
+        return a.score > b.score
+    end)
+    local out = {}
+    local stop = limit
+    if stop > #ranked then
+        stop = #ranked
+    end
+    for i = 1, stop do
+        local entry = self:ResolveCatalogReference(ranked[i].ref)
+        if entry then
+            out[#out + 1] = entry
+        end
+    end
+    return out
+end
+
 function Data:GetCatalogRecordValues(c, row)
     return ReadTextRecord(c, row)
 end

@@ -391,6 +391,7 @@ function GQ.Log:GamepadOverlay()
         frame and frame.specPicker,
         frame and frame.settingsLanguageMenu,
         self.weaponMenu,
+        self.armorMenu,
     }
     local best, bestLevel
     for i = 1, #panels do
@@ -454,7 +455,8 @@ end
 function GQ.Log:GamepadIsFilterTarget(widget)
     local frame = self.frame
     if frame and (widget == frame.sourceFilterBtn or widget == frame.playStyleBtn
-        or widget == frame.tooltipsBtn or widget == frame.huntsPerSlotSlider or widget == frame.simHeaderOffBtn) then
+        or widget == frame.tooltipsBtn or widget == frame.huntsPerSlotSlider
+        or (widget == frame.armorTypeBtn and widget:IsShown()) or widget == frame.simHeaderOffBtn) then
         return true
     end
     if widget.gqPadFilter then
@@ -1247,7 +1249,8 @@ function GQ.Log:GamepadFilters()
     local overlay = self:GamepadOverlay()
     local frame = self.frame
     local filterOverlay = overlay and frame and (
-        overlay == frame.sourceFilterMenu or overlay == frame.playStylePanel or overlay == self.weaponMenu
+        overlay == frame.sourceFilterMenu or overlay == frame.playStylePanel
+        or overlay == self.weaponMenu or overlay == self.armorMenu
     )
     if overlay and not filterOverlay and not self._padFilterMode then
         self._padReading = false
