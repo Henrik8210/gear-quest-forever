@@ -42,7 +42,10 @@ def extract_section(version: str | None) -> str:
         raise SystemExit("No matching ## v… section in CHANGELOG.md")
     start = m.start()
     rest = text[m.end() :]
-    n = re.search(r"^## v", rest, re.MULTILINE)
+    # CurseForge keeps one ## heading; older releases are ### vX.Y.Z below it.
+    n = re.search(r"^### v[\d.]+\S*\s*$", rest, re.MULTILINE)
+    if not n:
+        n = re.search(r"^## v", rest, re.MULTILINE)
     end = m.end() + n.start() if n else len(text)
     return text[start:end].strip()
 
@@ -60,7 +63,11 @@ def send_chunks(content: str) -> None:
         chunks.append(content[:cut])
         content = content[cut:].lstrip()
 
-    for part in chunks:
+    import time
+
+    for i, part in enumerate(chunks):
+        if i > 0:
+            time.sleep(1.25)
         body = json.dumps({"content": part}).encode("utf-8")
         req = urllib.request.Request(
             f"https://discord.com/api/v10/channels/{CHANNEL_ID}/messages",
