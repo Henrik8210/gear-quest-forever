@@ -2365,6 +2365,12 @@ local PROFESSION_FILTERS = {
     "Tailoring",
 }
 
+-- The last box on the Profession flyout is not a profession. Cleared, it hides
+-- a craft whose recipe is bought with Merchant's Favor at the supply camps
+-- (Durotar Supply and Logistics, Azeroth Commerce Authority). It is saved in
+-- hiddenProfessions under this key, next to the profession names.
+GQ.Log.FAVOR_RECIPE_FILTER = "Merchant's Favor"
+
 -- Dungeons and raids, alphabetical. The flyout only lists the ones that
 -- have a boss-drop hunt in the current level window, including ranks below
 -- the top 3. A cleared box stays cleared.
@@ -4165,6 +4171,9 @@ function GQ.Log:EntrySourceAllowed(entry)
         if name and name ~= "" and self:GetHiddenProfessions()[name] then
             return false
         end
+        if self:GetHiddenProfessions()[self.FAVOR_RECIPE_FILTER] and self:EntryNeedsFavorRecipe(entry) then
+            return false
+        end
     end
     -- A piece that requires the profession to wear leaves when that box is
     -- off, including a craft whose source line and the wear line differ.
@@ -4236,6 +4245,49 @@ function GQ.Log:GetBisProfessionNames()
     return PROFESSION_FILTERS
 end
 
+-- Every box on the Profession flyout: the professions, then Merchant's Favor.
+function GQ.Log:ProfessionFilterKeys()
+    if not GQ.Log._professionFilterKeys then
+        local keys = {}
+        for i = 1, #PROFESSION_FILTERS do
+            keys[i] = PROFESSION_FILTERS[i]
+        end
+        keys[#keys + 1] = GQ.Log.FAVOR_RECIPE_FILTER
+        GQ.Log._professionFilterKeys = keys
+    end
+    return GQ.Log._professionFilterKeys
+end
+
+-- The currency's name and icon from the client, so the box reads in the
+-- player's language. Merchant's Favor is currency 3402.
+function GQ.Log:FavorCurrencyInfo()
+    local name, icon = "Merchant's Favor", "Interface\\Icons\\INV_Misc_Coin_17"
+    if C_CurrencyInfo and C_CurrencyInfo.GetCurrencyInfo then
+        local ok, info = pcall(C_CurrencyInfo.GetCurrencyInfo, 3402)
+        if ok and type(info) == "table" then
+            if type(info.name) == "string" and info.name ~= "" then
+                name = info.name
+            end
+            if info.iconFileID then
+                icon = info.iconFileID
+            end
+        end
+    end
+    return name, icon
+end
+
+-- A craft whose recipe is a Merchant's Favor pattern. The hunt sentence names
+-- the camp, the same test as camp_pins() in pipeline/scripts/commerce_camps.py.
+-- A dye word or a set name is not enough.
+function GQ.Log:EntryNeedsFavorRecipe(entry)
+    local text = entry and entry.instructions
+    if type(text) ~= "string" then
+        return false
+    end
+    return text:find("Durotar Supply", 1, true) ~= nil
+        or text:find("Azeroth Commerce Authority", 1, true) ~= nil
+end
+
 function GQ.Log:CopyFilterDraft()
     local sources = {}
     local hidden = self:GetHiddenSources()
@@ -4246,8 +4298,9 @@ function GQ.Log:CopyFilterDraft()
     end
     local professions = {}
     local hiddenProfs = self:GetHiddenProfessions()
-    for i = 1, #PROFESSION_FILTERS do
-        local name = PROFESSION_FILTERS[i]
+    local profKeys = self:ProfessionFilterKeys()
+    for i = 1, #profKeys do
+        local name = profKeys[i]
         if hiddenProfs[name] then
             professions[name] = true
         end
@@ -9984,8 +10037,9 @@ function GQ.Log:FilterDraftAllOn(draft)
         end
     end
     local profs = draft.professions or {}
-    for i = 1, #PROFESSION_FILTERS do
-        if profs[PROFESSION_FILTERS[i]] then
+    local profKeys = self:ProfessionFilterKeys()
+    for i = 1, #profKeys do
+        if profs[profKeys[i]] then
             return false
         end
     end
@@ -10029,8 +10083,9 @@ function GQ.Log:SetFilterDraftAll(draft, hidden)
         end
     end
     draft.professions = draft.professions or {}
-    for i = 1, #PROFESSION_FILTERS do
-        local name = PROFESSION_FILTERS[i]
+    local profKeys = self:ProfessionFilterKeys()
+    for i = 1, #profKeys do
+        local name = profKeys[i]
         if hidden then
             draft.professions[name] = true
         else
@@ -10256,7 +10311,7 @@ function GQ.Log:PopulateProfessionBranch(menu)
         return
     end
     self:EnsureBranchSelectButton(branch)
-    local names = self:GetBisProfessionNames()
+    local names = self:ProfessionFilterKeys()
     local draft = self._filterDraft or self:CopyFilterDraft()
     local hidden = draft.professions
     local width = 168
@@ -10300,9 +10355,23 @@ function GQ.Log:PopulateProfessionBranch(menu)
         end
         self:AnchorBranchCheck(branch, row, i)
         row.professionName = name
-        row.label:SetText(GQ.TX(name))
-        if row.kindIcon and GQ.Pins and GQ.Pins.ApplyIcon then
-            GQ.Pins:ApplyIcon(row.kindIcon, "profession:" .. name)
+        if name == self.FAVOR_RECIPE_FILTER then
+            local currencyName, currencyIcon = self:FavorCurrencyInfo()
+            row.label:SetText(string.format(L["%s recipes"], currencyName))
+            if row.kindIcon then
+                if row.kindIcon.SetAtlas then
+                    pcall(row.kindIcon.SetAtlas, row.kindIcon, nil)
+                end
+                row.kindIcon:SetTexture(currencyIcon)
+                row.kindIcon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+                row.kindIcon:SetVertexColor(1, 1, 1, 1)
+                row.kindIcon:Show()
+            end
+        else
+            row.label:SetText(GQ.TX(name))
+            if row.kindIcon and GQ.Pins and GQ.Pins.ApplyIcon then
+                GQ.Pins:ApplyIcon(row.kindIcon, "profession:" .. name)
+            end
         end
         row:SetChecked(not hidden[name])
         row:SetHitRectInsets(0, -((row.label:GetStringWidth() or 90) + 28), -2, -2)
