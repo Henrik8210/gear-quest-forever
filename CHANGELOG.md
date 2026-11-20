@@ -2,7 +2,17 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.2.5
+## v1.2.6
+
+**Hotfix for v1.2.5.** The log header reads **GearQuest Forever v1.2.6**.
+
+### Could not open the log (v1.2.5 regression)
+
+v1.2.5 shipped a typo in **Log.lua**: three helpers were registered as `GQ.Log.GQ.Log.*` instead of `GQ.Log.*` (**ApplyFilterButtonFont**, **MouseOverFilterRow**, **CreateSettingsCheck**). Calls used the correct name, so the functions were **nil**. That broke building the main window (filter menus and settings checkboxes) and could stop **RankedHuntEntries** and the minimap **Toggle** from running, which looked like “GearQuest won't open.”
+
+This release fixes those definitions. No hunt data, scores, or saved settings change. **`/reload`** after updating is enough.
+
+### v1.2.5
 
 The log header reads **GearQuest Forever v1.2.5**. Saved hunts, **Completed**, **Removed**, tracked pins, and hunt **id** strings are unchanged. Your progress is not reset.
 

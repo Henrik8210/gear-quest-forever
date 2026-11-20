@@ -36,6 +36,7 @@ BANNED = [
     (r"\bSetUIFocusState\s*\(", "SetUIFocusState changes the gamepad binding stack"),
     (r"FrameControlsManager\s*:\s*\w+\s*\(|FrameControlsManager\s*\.\s*\w+\s*\(",
      "FrameControlsManager methods change the gamepad binding stack; read currentFrame only"),
+    (r"GQ\.Log\.GQ\.Log\.", "double GQ.Log prefix; define as GQ.Log.Something only"),
 ]
 
 BLOCK_COMMENT = re.compile(r"--\[(=*)\[.*?\]\1\]", re.S)

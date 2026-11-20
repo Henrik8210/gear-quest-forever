@@ -4990,6 +4990,9 @@ end
 function GQ.Log:RankedHuntEntries(slotName, applyFilters, limit)
     local results = {}
     local seenName = {}
+    if not self.GetSlotRankList then
+        return results
+    end
     local list = self:GetSlotRankList(slotName)
     limit = limit or self:HuntsPerSlot()
     for i = 1, list and #list or 0 do
@@ -9408,7 +9411,7 @@ function GQ.Log:EnsureTabBar(frame)
     self:UpdateTabVisuals()
 end
 
-function GQ.Log.GQ.Log.ApplyFilterButtonFont(fs)
+function GQ.Log.ApplyFilterButtonFont(fs)
     if not fs then
         return
     end
@@ -9446,7 +9449,7 @@ function GQ.Log:PadFocusWithin(row, flyout)
     return false
 end
 
-function GQ.Log.GQ.Log.MouseOverFilterRow(check)
+function GQ.Log.MouseOverFilterRow(check)
     if not check or not check.IsShown or not check:IsShown() or not check.IsMouseOver then
         return false
     end
@@ -11808,7 +11811,7 @@ function GQ.Log:CreateLanguageDropdown(frame, detail)
     end)
 end
 
-function GQ.Log.GQ.Log.CreateSettingsCheck(parent, label, frameName)
+function GQ.Log.CreateSettingsCheck(parent, label, frameName)
     local ok, btn = pcall(CreateFrame, "CheckButton", frameName or "GearQuestHideMinimapCheck", parent, "UICheckButtonTemplate")
     if not ok or not btn then
         btn = CreateFrame("CheckButton", nil, parent)
