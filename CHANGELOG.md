@@ -2,92 +2,49 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.2.6
+## v1.2.7
 
-**Hotfix for v1.2.5.** The log header reads **GearQuest Forever v1.2.6**.
+The log header reads **GearQuest Forever v1.2.7**. This release carries the **v1.2.5 → v1.2.6** log-open hotfix plus player-facing release notes and CI guardrails. If you already installed **v1.2.6** from GitHub or a manual `Log.lua` patch, behavior is the same; update for the version string and CurseForge notes. **`/reload`** after updating.
 
-### Could not open the log (v1.2.5 regression)
+### v1.2.5 broke the log or minimap (fixed)
 
-v1.2.5 shipped a typo in **Log.lua**: three helpers were registered as `GQ.Log.GQ.Log.*` instead of `GQ.Log.*` (**ApplyFilterButtonFont**, **MouseOverFilterRow**, **CreateSettingsCheck**). Calls used the correct name, so the functions were **nil**. That broke building the main window (filter menus and settings checkboxes) and could stop **RankedHuntEntries** and the minimap **Toggle** from running, which looked like “GearQuest won't open.”
+**Symptoms**
 
-This release fixes those definitions. No hunt data, scores, or saved settings change. **`/reload`** after updating is enough.
+- Login chat: **`Log failed:`** … **`Core.lua:531`** (`attempt to call a nil value`).
+- **`/gq`**, the minimap icon, or the paper doll do nothing.
+- BugSack may show **`Log.lua:9411`** (`attempt to index field '?'`) and **`Log.lua:4993`** in **`RankedHuntEntries`** (`attempt to call a nil value`).
+- The addon list still shows **v1.2.5**.
 
-### v1.2.5
+**Cause**
 
-The log header reads **GearQuest Forever v1.2.5**. Saved hunts, **Completed**, **Removed**, tracked pins, and hunt **id** strings are unchanged. Your progress is not reset.
+Three helpers in **`Log.lua`** were accidentally defined as **`GQ.Log.GQ.Log.*`** instead of **`GQ.Log.*`**, while the rest of the code called **`GQ.Log.*`**. Those functions were **nil**, so the main window (filters, settings checkboxes) could not build and **Indicator** paper-doll work could error.
 
-**First restart after updating**
+| Line (v1.2.5) | Wrong | Correct |
+| --- | --- | --- |
+| 9411 | `function GQ.Log.GQ.Log.ApplyFilterButtonFont(fs)` | `function GQ.Log.ApplyFilterButtonFont(fs)` |
+| 9449 | `function GQ.Log.GQ.Log.MouseOverFilterRow(check)` | `function GQ.Log.MouseOverFilterRow(check)` |
+| 11811 | `function GQ.Log.GQ.Log.CreateSettingsCheck(...)` | `function GQ.Log.CreateSettingsCheck(...)` |
 
-- This release adds **TooltipsPanel.lua**, **Data.MobDrops.generated.lua**, and **Data.WorldDropOpenChance.generated.lua** to **GearQuestForever.toc**. A **/reload is not enough** the first time you install v1.2.5 on a machine that only had v1.2.4 or older. Quit to the character screen or desktop and log in again so the client loads the new files.
+**This release**
 
-### Tooltips window
+- Those three definitions are fixed (**v1.2.6** introduced the fix; **v1.2.7** keeps it).
+- **Hunt data, scores, saved hunts, and settings are unchanged.** **`/reload`** after updating is enough (no full restart required for this hotfix).
 
-A **Tooltips** button sits on the log footer beside **Play style**. The first time you open it on an account, the button pulses gold like Play style until you click it.
+**Manual patch (only if you are stuck on v1.2.5)**
 
-The window has live previews: a sample **target tooltip** on the left and a sample **item tooltip** on the right. Changing a checkbox, slider, or source filter updates the previews immediately, so you can see what you are turning on before you mouse over a mob in the world.
-
-Unit settings moved here from Hunt settings:
-
-- **Hide unit gear tips** — removes every GearQuest line on creatures, vendors, trainers, and quest givers.
-- **Always show unit gear tips** — lists upgrades without holding **Shift**.
-- **Show drop chance on unit tooltip lines** — adds a grey **(N%)** when GearQuest knows the rate.
-- **Unit gear sources on tooltips** — filters boss, trash, rare, world, vendor, profession, and quest lines (outside instances only; inside dungeons Blizzard often hides the creature name from addons, so those filters do not apply there).
-- **Minimum drop chance** — slider from 0% upward; when every line is below the cutoff, the tooltip shows a grey hint to lower the slider.
-
-Item settings in the same window:
-
-- **Recommended gear enchantment** (off until you turn it on).
-- **GearQuest score on tooltips** and **Ranks for your other specs** (same behavior as **General settings**).
-
-### Unit BiS lines on NPCs
-
-Mousing over a creature, vendor, trainer, or quest giver still lists up to three upgrades that beat what you wear (or fill an empty slot). Downgrades stay off. Rings and trinkets compare to the weaker worn piece. The line still includes rank, slot, the white GearQuest index, the green arrow, and the green comparison number.
-
-**Shift** still gates the lines unless **Always show** is on. Without Shift, when GearQuest has lines to show, the tooltip ends with **Hold Shift to see BiS items from this NPC**.
-
-**Attackable mobs** can show **two** blocks: named drops or sells on that creature, and **Your top world drops from this mob** for generic world drops whose level band fits the mob's level. Both blocks use the same upgrade test.
-
-**Opposite-faction NPCs** get no GearQuest lines. You cannot farm their drops on your hunt list, so friendly guards and town NPCs on the wrong faction no longer show misleading upgrades.
-
-Obtained or removed hunts drop off on the next hover without waiting for a cache rebuild.
-
-### Drop chance percentages
-
-For **named** droppers, the grey **%** comes from the mob-drop index when Wowhead stored a rate for that creature and item.
-
-For **generic** world drops (no named creature on the hunt), GearQuest uses an **averaged outdoor sample rate** from Wowhead classic **Dropped By** data (uild_world_drop_open_chance.py). This release ships about **1,845** of those averages. Items with no average yet show no grey **%**; hunts and ranks are unchanged.
-
-Turn **Show drop chance** off to hide every **%**. The minimum-drop slider filters lines that have a known positive chance below your cutoff.
-
-### Hunter weapons from level 20
-
-Hunters learn **Dual Wield** at 20. Forever ranks either-hand one-handers on the **off-hand** weapon list. v1.2.5 scores the **best two distinct one-handers** as a pair against the best two-hander, in the hunt lists, the Weapons filter, upgrade arrows, GearQuest score, and paper-doll logic — not a phantom main-hand one-hander plus a trinket-style off-hand.
-
-After rescoring, **Main Hand** hunt rows still favor two-handers where the model says so; **Off Hand** rows use the combined dual-wield score. If you wear a two-hander, comparisons still treat the off-hand slot correctly.
-
-All three hunter specs were rescored from the current Forever tooltips. Expect rank shuffles on one-hand and two-hand bands from level 20 upward, especially Marksmanship and Survival.
-
-### Data, mob drops, and coordinates
-
-The mob-drop table and vendor or trainer maps were rebuilt from the Forever ingest pass (Data.MobDrops.generated.lua). More creatures and vendors can answer on unit tooltips when their drops or wares are on your hunt list.
-
-Quest faction gates, coordinates, and item stats were refreshed where the pipeline found new sources. Class hunt files for all nine classes were re-emitted from the current scored JSON.
-
-**Weights were not retuned** for player specs in this release. Custom stat weights you saved on your account are unchanged.
-
-### Languages and settings layout
-
-New player-facing sentences for the Tooltips window and unit-tooltip controls were added to every **GearQuest/Locales/** file in this release.
-
-**Hunt settings** no longer duplicates unit-tooltip or enchant controls; use the **Tooltips** window or **General settings** for item score lines.
+Edit `Interface/AddOns/GearQuestForever/Log.lua` as in the table above, save, **`/reload`**.
 
 ### For developers
 
-CI gains **Recommended enchants** (scripts/ci/check_enchants.py) so enchantable hunt rows keep a formula at the item's level. Hunter dual-wield pairing is covered in 	ests/pipeline/test_score.py.
+CI and unit tests reject a doubled **`GQ.Log.GQ.Log.`** prefix in **`Log.lua`** (`scripts/ci/check_rules.py`, `tests/addon/test_log_lua.py`).
+
+### v1.2.5
+
+**GearQuest Forever v1.2.5** — Footer **Tooltips** window (live NPC and item previews); unit tooltip settings (hide, always show, drop **%**, source filters, minimum drop **%**); generic world-drop **%** data (~1,845 averages); opposite-faction NPC guard; hunter **Dual Wield (20+)** weapon pairing rescored; mob-drop index refresh. **Do not stay on v1.2.5** — use **v1.2.6** or newer. First install from v1.2.4 or older needs a **full client restart** once so new TOC files load.
 
 ### v1.2.4
 
-**GearQuest Forever v1.2.4** — **Catalog.lua** lazy-loads hunt rows per query instead of materializing the whole class at login; same hunts, ranks, and saved ids. First install needs a full restart (not /reload alone). Thanks **kaeldrin-gh**.
+**GearQuest Forever v1.2.4** — **Catalog.lua** lazy-loads hunt rows per query; same hunts, ranks, and saved ids. First install needs a full restart (not `/reload` alone). Thanks **kaeldrin-gh**.
 
 ### v1.2.3
 
@@ -103,7 +60,7 @@ CI gains **Recommended enchants** (scripts/ci/check_enchants.py) so enchantable 
 
 ### v1.2.0
 
-**GearQuest Forever v1.2.0** — Track untrack boxes, **Get it now** profession wear, scoring and hunt fixes, new Forever pieces.
+**GearQuest Forever v1.2.0** — Track / untrack boxes, **Get it now** profession wear, scoring and hunt fixes, new Forever pieces.
 
 ### v1.1.9
 

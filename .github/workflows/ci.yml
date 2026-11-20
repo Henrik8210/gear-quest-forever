@@ -71,6 +71,9 @@ jobs:
       - name: Scorer tests
         run: python -m unittest discover -s tests/pipeline -v
 
+      - name: Log.lua guardrails
+        run: python -m unittest discover -s tests/addon -v
+
       - name: Stage the addons like a release
         run: |
           set -euo pipefail
