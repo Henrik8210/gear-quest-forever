@@ -60,7 +60,7 @@ Thanks **CookiesShorts**.
 
 ### Dungeon sources
 
-Boss drops were checked against the Forever dungeon journal. Where our row disagreed and the journal names a boss, the hunt is a boss drop. **White Obsidian Wand** drops from **Obsidian Sentinel**. A set of faction locks from that pass are in as well. Raids that are not in the game stay out. The six leatherworking helms stay the boss patterns, and the crafted helms stay crafted.
+Boss drops were checked against the Forever dungeon journal. Where our row disagreed and the journal names a boss, the hunt is a boss drop. **White Obsidian Wand** drops from **Obsidian Sentinel**. Raids that are not in the game stay out. The six leatherworking helms stay the boss patterns, and the crafted helms stay crafted.
 
 ### v1.3.1
 
