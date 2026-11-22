@@ -51,3 +51,4 @@ Popup.lua
 PaperDoll.lua
 Minimap.lua
 Commands.lua
+EUI.lua
