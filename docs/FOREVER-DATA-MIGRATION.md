@@ -7,7 +7,7 @@ GearQuest Forever targets **WoW Forever 1–60** (Classic+). The fork inherited 
 | Question | Answer |
 |----------|--------|
 | **Is the fork set up correctly?** | **Yes** — separate toc/package/SavedVariables, max level 60, L70 curated removed, migration phases documented. |
-| **Is all BiS data Classic-correct?** | **Mostly** — all nine classes are on the Forever combat scale (jackpot suffixes, leveling survivability + endurance, `GQ_NO_GUIDES=1`). Item facts come from Wowhead Forever hunt tips (`sync_forever_item_stats.py`). Classic ids that 404 still need replacements. |
+| **Is all BiS data Classic-correct?** | **Mostly** — all nine classes are on the Forever combat scale (jackpot suffixes, leveling survivability + endurance). At level 60 a spec with a page in `pipeline/guides/forever_bis.json` uses that hand-entered Wowhead Forever list, in the page's order. Specs with no page stay on the scorer. `GQ_NO_GUIDES=1` only keeps the old Classic guide files out. Item facts come from Wowhead Forever hunt tips (`sync_forever_item_stats.py`). Classic ids that 404 still need replacements. |
 
 **Done:** product split, `GQ.MAX_PLAYER_LEVEL`, phase **2** Classic suffix cache, phase **3** Classic `score.py` regen for all classes. **0** stale TBC +20/@7.9% fingerprint rows.
 
@@ -189,7 +189,7 @@ Keep the pipeline **out of the CurseForge addon zip** (`.pkgmeta` already ignore
 
 ## Stat weights
 
-`pipeline/data/weights.json` is the Forever scale. Damage first, then survivability below 60, then endurance. Level 60 is the raw raid-scale weights. Priest, mage, and warlock `dpsWeightRanged` is **7**. Hunter ranged damage is real, and the ranged weapon is a bow, gun, or crossbow. Do not change a weight unless asked. Proposed changes are looked up in [GearQuest Forever - Class Stat Weights](https://docs.google.com/spreadsheets/d/1jMC89KgzHpPZHYgcjOq6ef7lENhh8OGgypG2rC2m0Ok/edit): the live grid is locked, and suggestions sit at the bottom of each class tab. A suggestion does not change the addon until it is copied into `weights.json`. The rules live in [FOREVER-SCORING.md](../pipeline/docs/FOREVER-SCORING.md).
+`pipeline/data/weights.json` is the Forever scale. Damage first, then survivability through 60, then endurance. Level 60 keeps those same multipliers. A spec with a page in `pipeline/guides/forever_bis.json` uses that hand-entered Wowhead Forever list, in the page's order, instead of the model. Specs with no page (Feral, Battle Mage, Shockadin, Enhancement Tank) stay on the scorer, and so does every level below 60. `GQ_NO_GUIDES=1` only keeps the old Classic guide files out. Priest, mage, and warlock `dpsWeightRanged` is **7**. Hunter ranged damage is real, and the ranged weapon is a bow, gun, or crossbow. Do not change a weight unless asked. Proposed changes are looked up in [GearQuest Forever - Class Stat Weights](https://docs.google.com/spreadsheets/d/1jMC89KgzHpPZHYgcjOq6ef7lENhh8OGgypG2rC2m0Ok/edit): the live grid is locked, and suggestions sit at the bottom of each class tab. A suggestion does not change the addon until it is copied into `weights.json`. The rules live in [FOREVER-SCORING.md](../pipeline/docs/FOREVER-SCORING.md).
 
 Re-score with `python pipeline/scripts/rescore_hunter_shaman.py` and the class name. Do not `reemit_all.py` from stale JSON.
 

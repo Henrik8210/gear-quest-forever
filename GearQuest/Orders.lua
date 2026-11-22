@@ -112,6 +112,9 @@ function Orders:Add(entry)
         if self.page and self.page:IsShown() then
             self:Paint()
         end
+        if GQ.Log and GQ.Log.UpdateOrderButton then
+            GQ.Log:UpdateOrderButton()
+        end
         return "duplicate"
     end
     local name = (GQ.Data and GQ.Data.ShownEntryName and GQ.Data:ShownEntryName(entry))
@@ -134,6 +137,9 @@ function Orders:Add(entry)
     self._picked = true
     if self.page and self.page:IsShown() then
         self:Paint()
+    end
+    if GQ.Log and GQ.Log.UpdateOrderButton then
+        GQ.Log:UpdateOrderButton()
     end
     return "added"
 end
@@ -235,7 +241,12 @@ function Orders:RemoveAt(index)
     if list[index] then
         table.remove(list, index)
     end
-    self:Paint()
+    if self.page then
+        self:Paint()
+    end
+    if GQ.Log and GQ.Log.UpdateOrderButton then
+        GQ.Log:UpdateOrderButton()
+    end
 end
 
 function Orders:Ensure(frame)

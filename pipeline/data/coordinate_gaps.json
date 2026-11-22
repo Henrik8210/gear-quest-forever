@@ -1,10 +1,10 @@
 {
   "summary": {
     "boss_drop": {
-      "ok": 822,
-      "gap": 26,
-      "gap:not indexed yet": 6,
-      "gap:not indexed since the source changed": 1,
+      "ok": 908,
+      "gap": 65,
+      "gap:not indexed yet": 10,
+      "gap:not indexed since the source changed": 36,
       "gap:entrance has no exact coordinate yet (northern Riverglades)": 19
     },
     "container": {
@@ -14,9 +14,8 @@
       "gap:not indexed yet": 1
     },
     "fishing": {
-      "gap": 4,
-      "gap:fished up, with no pool or zone": 3,
-      "gap:not indexed since the source changed": 1
+      "gap": 3,
+      "gap:fished up, with no pool or zone": 3
     },
     "object_drop": {
       "ok": 11,
@@ -25,48 +24,47 @@
       "gap:container is not a named object": 8
     },
     "profession": {
-      "ok": 527,
-      "gap": 558,
-      "gap:not indexed yet": 558
+      "ok": 521,
+      "gap": 556,
+      "gap:not indexed yet": 556
     },
     "quest_reward": {
-      "ok": 1517,
-      "gap": 322,
-      "gap:not indexed yet": 130,
+      "ok": 1619,
+      "gap": 323,
+      "gap:not indexed yet": 133,
       "gap:quest starter has no map pin": 11,
-      "gap:not indexed since the source changed": 181
+      "gap:not indexed since the source changed": 179
     },
     "raid_trash": {
-      "ok": 170,
+      "ok": 135,
       "gap": 9,
       "gap:entrance has no exact coordinate yet (northern Riverglades)": 9
     },
     "rare_npc": {
       "ok": 233,
-      "gap": 29,
-      "gap:not indexed yet": 29
+      "gap": 28,
+      "gap:not indexed yet": 28
     },
     "unsourced": {
-      "gap": 912,
-      "gap:source not listed yet": 19,
-      "gap:not indexed since the source changed": 579,
-      "ok": 83,
-      "gap:not indexed yet": 314
+      "gap": 843,
+      "gap:not indexed yet": 307,
+      "gap:not indexed since the source changed": 521,
+      "gap:source not listed yet": 15,
+      "ok": 26
     },
     "vendor": {
-      "gap": 459,
-      "gap:vendor has no map pin": 339,
-      "ok": 1083,
-      "gap:not indexed yet": 89,
-      "gap:vendor is not named": 3,
+      "gap": 241,
+      "gap:vendor has no map pin": 35,
+      "ok": 789,
+      "gap:not indexed yet": 178,
       "gap:not indexed since the source changed": 28
     },
     "world_drop": {
-      "ok": 2171,
-      "gap": 104,
-      "gap:world drop names no creature": 55,
-      "gap:not indexed yet": 3,
-      "gap:drop creature has no map pin": 46
+      "ok": 2166,
+      "gap": 103,
+      "gap:world drop names no creature": 53,
+      "gap:not indexed yet": 26,
+      "gap:drop creature has no map pin": 24
     }
   },
   "gaps": [
@@ -122,6 +120,15 @@
       "reason": "not indexed yet",
       "zone": "Ratchet",
       "npc": "Vexspindle",
+      "questName": null
+    },
+    {
+      "id": 862,
+      "name": "Runed Ring",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
       "questName": null
     },
     {
@@ -917,15 +924,6 @@
       "questName": null
     },
     {
-      "id": 7051,
-      "name": "Earthen Vest",
-      "sourceType": "profession",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
       "id": 7053,
       "name": "Azure Silk Cloak",
       "sourceType": "profession",
@@ -1331,15 +1329,6 @@
       "questName": null
     },
     {
-      "id": 7946,
-      "name": "Runed Mithril Hammer",
-      "sourceType": "profession",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
       "id": 7947,
       "name": "Ebon Shiv",
       "sourceType": "profession",
@@ -1502,6 +1491,15 @@
       "questName": null
     },
     {
+      "id": 8298,
+      "name": "Traveler's Gloves",
+      "sourceType": "world_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 8307,
       "name": "Hero's Boots",
       "sourceType": "world_drop",
@@ -1648,19 +1646,19 @@
     {
       "id": 9484,
       "name": "Spellshock Leggings",
-      "sourceType": "unsourced",
-      "reason": "source not listed yet",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
-      "npc": null,
+      "npc": "Antu'sul",
       "questName": null
     },
     {
       "id": 9511,
       "name": "Bloodletter Scalpel",
-      "sourceType": "world_drop",
-      "reason": "world drop names no creature",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
-      "npc": null,
+      "npc": "Ruuzlu",
       "questName": null
     },
     {
@@ -1801,6 +1799,159 @@
     {
       "id": 10089,
       "name": "Gothic Sabatons",
+      "sourceType": "world_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 10141,
+      "name": "High Councillor's Pants",
+      "sourceType": "world_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 10217,
+      "name": "Elegant Leggings",
+      "sourceType": "world_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 10246,
+      "name": "Master's Vest",
+      "sourceType": "world_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 10249,
+      "name": "Master's Cloak",
+      "sourceType": "world_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 10250,
+      "name": "Master's Hat",
+      "sourceType": "world_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 10251,
+      "name": "Master's Gloves",
+      "sourceType": "world_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 10252,
+      "name": "Master's Leggings",
+      "sourceType": "world_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 10253,
+      "name": "Master's Mantle",
+      "sourceType": "world_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 10255,
+      "name": "Master's Belt",
+      "sourceType": "world_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 10257,
+      "name": "Adventurer's Boots",
+      "sourceType": "world_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 10260,
+      "name": "Adventurer's Gloves",
+      "sourceType": "world_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 10265,
+      "name": "Masterwork Bracers",
+      "sourceType": "world_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 10266,
+      "name": "Masterwork Breastplate",
+      "sourceType": "world_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 10269,
+      "name": "Masterwork Girdle",
+      "sourceType": "world_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 10270,
+      "name": "Masterwork Boots",
+      "sourceType": "world_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 10273,
+      "name": "Masterwork Legplates",
+      "sourceType": "world_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 10274,
+      "name": "Masterwork Pauldrons",
       "sourceType": "world_drop",
       "reason": "not indexed yet",
       "zone": null,
@@ -2177,15 +2328,6 @@
       "questName": "Operation: Death to Angerforge"
     },
     {
-      "id": 12260,
-      "name": "Searing Golden Blade",
-      "sourceType": "profession",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
       "id": 12405,
       "name": "Thorium Armor",
       "sourceType": "profession",
@@ -2408,6 +2550,15 @@
       "reason": "world drop names no creature",
       "zone": null,
       "npc": null,
+      "questName": null
+    },
+    {
+      "id": 12584,
+      "name": "Grand Marshal's Longsword",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Lieutenant Jackspring",
       "questName": null
     },
     {
@@ -2762,6 +2913,15 @@
       "questName": "The Restless Souls"
     },
     {
+      "id": 13409,
+      "name": "Tearfall Bracers",
+      "sourceType": "boss_drop",
+      "reason": "not indexed yet",
+      "zone": "Stratholme",
+      "npc": "The Unforgiven",
+      "questName": null
+    },
+    {
       "id": 13503,
       "name": "Alchemist's Stone",
       "sourceType": "profession",
@@ -2827,6 +2987,15 @@
     {
       "id": 13866,
       "name": "Runecloth Headband",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 13867,
+      "name": "Runecloth Shoulders",
       "sourceType": "profession",
       "reason": "not indexed yet",
       "zone": null,
@@ -3041,15 +3210,6 @@
       "questName": null
     },
     {
-      "id": 14152,
-      "name": "Robe of the Archmage",
-      "sourceType": "profession",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
       "id": 14555,
       "name": "Alcor's Sunrazor",
       "sourceType": "unsourced",
@@ -3061,15 +3221,6 @@
     {
       "id": 15045,
       "name": "Green Dragonscale Breastplate",
-      "sourceType": "profession",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 15046,
-      "name": "Green Dragonscale Leggings",
       "sourceType": "profession",
       "reason": "not indexed yet",
       "zone": null,
@@ -3122,6 +3273,24 @@
       "questName": null
     },
     {
+      "id": 15054,
+      "name": "Volcanic Leggings",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 15057,
+      "name": "Stormshroud Pants",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 15058,
       "name": "Stormshroud Shoulders",
       "sourceType": "profession",
@@ -3160,6 +3329,15 @@
     {
       "id": 15062,
       "name": "Devilsaur Leggings",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 15063,
+      "name": "Devilsaur Gauntlets",
       "sourceType": "profession",
       "reason": "not indexed yet",
       "zone": null,
@@ -3302,15 +3480,6 @@
       "questName": null
     },
     {
-      "id": 15088,
-      "name": "Wicked Leather Belt",
-      "sourceType": "profession",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
       "id": 15092,
       "name": "Runic Leather Bracers",
       "sourceType": "profession",
@@ -3341,6 +3510,42 @@
       "id": 15141,
       "name": "Onyxia Scale Breastplate",
       "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 15238,
+      "name": "Warlord's Axe",
+      "sourceType": "world_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 15289,
+      "name": "Archstrike Bow",
+      "sourceType": "world_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 15435,
+      "name": "Supreme Shoes",
+      "sourceType": "world_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 15684,
+      "name": "Triumphant Skullcap",
+      "sourceType": "world_drop",
       "reason": "not indexed yet",
       "zone": null,
       "npc": null,
@@ -3410,10 +3615,73 @@
       "questName": null
     },
     {
+      "id": 16345,
+      "name": "High Warlord's Blade",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Stone Guard Zarg",
+      "questName": null
+    },
+    {
+      "id": 16437,
+      "name": "Marshal's Silk Footwraps",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
       "id": 16440,
       "name": "Marshal's Silk Gloves",
       "sourceType": "vendor",
       "reason": "vendor has no map pin",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 16441,
+      "name": "Field Marshal's Coronet",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 16442,
+      "name": "Marshal's Silk Leggings",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 16443,
+      "name": "Field Marshal's Silk Vestments",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 16444,
+      "name": "Field Marshal's Silk Spaulders",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 16446,
+      "name": "Marshal's Leather Footguards",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
       "zone": null,
       "npc": "Sergeant Major Clate",
       "questName": null
@@ -3464,35 +3732,8 @@
       "questName": null
     },
     {
-      "id": 16459,
-      "name": "Marshal's Dragonhide Boots",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Sergeant Major Clate",
-      "questName": null
-    },
-    {
-      "id": 16462,
-      "name": "Marshal's Chain Boots",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Sergeant Major Clate",
-      "questName": null
-    },
-    {
-      "id": 16463,
-      "name": "Marshal's Chain Grips",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Sergeant Major Clate",
-      "questName": null
-    },
-    {
-      "id": 16466,
-      "name": "Field Marshal's Chain Breastplate",
+      "id": 16453,
+      "name": "Field Marshal's Leather Chestpiece",
       "sourceType": "vendor",
       "reason": "not indexed yet",
       "zone": null,
@@ -3500,8 +3741,44 @@
       "questName": null
     },
     {
-      "id": 16468,
-      "name": "Field Marshal's Chain Spaulders",
+      "id": 16454,
+      "name": "Marshal's Leather Handgrips",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 16455,
+      "name": "Field Marshal's Leather Mask",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 16456,
+      "name": "Marshal's Leather Leggings",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 16457,
+      "name": "Field Marshal's Leather Epaulets",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 16459,
+      "name": "Marshal's Dragonhide Boots",
       "sourceType": "vendor",
       "reason": "vendor has no map pin",
       "zone": null,
@@ -3563,10 +3840,163 @@
       "questName": null
     },
     {
+      "id": 16477,
+      "name": "Field Marshal's Plate Armor",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 16478,
+      "name": "Field Marshal's Plate Helm",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 16479,
+      "name": "Marshal's Plate Legguards",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 16480,
+      "name": "Field Marshal's Plate Shoulderguards",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 16483,
+      "name": "Marshal's Plate Boots",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 16484,
+      "name": "Marshal's Plate Gauntlets",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 16533,
+      "name": "Warlord's Silk Cowl",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 16534,
+      "name": "General's Silk Trousers",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 16535,
+      "name": "Warlord's Silk Raiment",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 16536,
+      "name": "Warlord's Silk Amice",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 16539,
+      "name": "General's Silk Boots",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
       "id": 16540,
       "name": "General's Silk Handguards",
       "sourceType": "vendor",
       "reason": "vendor has no map pin",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 16541,
+      "name": "Warlord's Plate Armor",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 16542,
+      "name": "Warlord's Plate Headpiece",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 16543,
+      "name": "General's Plate Leggings",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 16544,
+      "name": "Warlord's Plate Shoulders",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 16545,
+      "name": "General's Plate Boots",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 16548,
+      "name": "General's Plate Gauntlets",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
       "zone": null,
       "npc": "First Sergeant Hola'mahi",
       "questName": null
@@ -3599,6 +4029,15 @@
       "questName": null
     },
     {
+      "id": 16552,
+      "name": "General's Dragonhide Leggings",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
       "id": 16554,
       "name": "General's Dragonhide Boots",
       "sourceType": "vendor",
@@ -3617,8 +4056,8 @@
       "questName": null
     },
     {
-      "id": 16565,
-      "name": "Warlord's Chain Chestpiece",
+      "id": 16558,
+      "name": "General's Leather Treads",
       "sourceType": "vendor",
       "reason": "not indexed yet",
       "zone": null,
@@ -3626,26 +4065,53 @@
       "questName": null
     },
     {
-      "id": 16566,
-      "name": "Warlord's Chain Helmet",
+      "id": 16560,
+      "name": "General's Leather Mitts",
       "sourceType": "vendor",
-      "reason": "vendor has no map pin",
+      "reason": "not indexed yet",
       "zone": null,
       "npc": "First Sergeant Hola'mahi",
       "questName": null
     },
     {
-      "id": 16569,
-      "name": "General's Chain Sabatons",
+      "id": 16561,
+      "name": "Warlord's Leather Helm",
       "sourceType": "vendor",
-      "reason": "vendor has no map pin",
+      "reason": "not indexed yet",
       "zone": null,
       "npc": "First Sergeant Hola'mahi",
       "questName": null
     },
     {
-      "id": 16571,
-      "name": "General's Chain Gloves",
+      "id": 16562,
+      "name": "Warlord's Leather Spaulders",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 16563,
+      "name": "Warlord's Leather Breastplate",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 16564,
+      "name": "General's Leather Legguards",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 16573,
+      "name": "General's Mail Boots",
       "sourceType": "vendor",
       "reason": "not indexed yet",
       "zone": null,
@@ -3666,6 +4132,24 @@
       "name": "Warlord's Mail Armor",
       "sourceType": "vendor",
       "reason": "vendor has no map pin",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 16578,
+      "name": "Warlord's Mail Helm",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 16579,
+      "name": "General's Mail Leggings",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
       "zone": null,
       "npc": "First Sergeant Hola'mahi",
       "questName": null
@@ -3806,6 +4290,24 @@
       "questName": null
     },
     {
+      "id": 17581,
+      "name": "Field Marshal's Dreadweave Robe",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 17592,
+      "name": "Warlord's Dreadweave Robe",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
       "id": 17602,
       "name": "Field Marshal's Headdress",
       "sourceType": "vendor",
@@ -3896,6 +4398,24 @@
       "questName": null
     },
     {
+      "id": 17624,
+      "name": "Warlord's Satin Robes",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 17625,
+      "name": "General's Satin Leggings",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
       "id": 17704,
       "name": "Edge of Winter",
       "sourceType": "profession",
@@ -3961,15 +4481,6 @@
     {
       "id": 18263,
       "name": "Flarecore Wraps",
-      "sourceType": "profession",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 18282,
-      "name": "Core Marksman Rifle",
       "sourceType": "profession",
       "reason": "not indexed yet",
       "zone": null,
@@ -4085,6 +4596,15 @@
       "questName": "Codex of Defense"
     },
     {
+      "id": 18467,
+      "name": "Royal Seal of Eldre'Thalas",
+      "sourceType": "quest_reward",
+      "reason": "not indexed yet",
+      "zone": "Dire Maul",
+      "npc": null,
+      "questName": "Harnessing Shadows"
+    },
+    {
       "id": 18468,
       "name": "Royal Seal of Eldre'Thalas",
       "sourceType": "quest_reward",
@@ -4110,6 +4630,15 @@
       "zone": "Dire Maul",
       "npc": null,
       "questName": "The Emerald Dream..."
+    },
+    {
+      "id": 18471,
+      "name": "Royal Seal of Eldre'Thalas",
+      "sourceType": "quest_reward",
+      "reason": "not indexed yet",
+      "zone": "Dire Maul",
+      "npc": null,
+      "questName": "Frost Shock and You"
     },
     {
       "id": 18472,
@@ -4337,15 +4866,6 @@
       "questName": null
     },
     {
-      "id": 18671,
-      "name": "Baron Charr's Sceptre",
-      "sourceType": "rare_npc",
-      "reason": "not indexed yet",
-      "zone": "Kalimdor",
-      "npc": "Baron Charr",
-      "questName": null
-    },
-    {
       "id": 18672,
       "name": "Elemental Ember",
       "sourceType": "rare_npc",
@@ -4465,7 +4985,7 @@
     {
       "id": 18758,
       "name": "Specter's Blade",
-      "sourceType": "unsourced",
+      "sourceType": "boss_drop",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Death Knight Darkreaver",
@@ -4474,7 +4994,7 @@
     {
       "id": 18759,
       "name": "Malicious Axe",
-      "sourceType": "unsourced",
+      "sourceType": "boss_drop",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Death Knight Darkreaver",
@@ -4483,10 +5003,64 @@
     {
       "id": 18761,
       "name": "Oblivion's Touch",
-      "sourceType": "unsourced",
+      "sourceType": "boss_drop",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Death Knight Darkreaver",
+      "questName": null
+    },
+    {
+      "id": 18825,
+      "name": "Grand Marshal's Aegis",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Lieutenant Jackspring",
+      "questName": null
+    },
+    {
+      "id": 18826,
+      "name": "High Warlord's Shield Wall",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Stone Guard Zarg",
+      "questName": null
+    },
+    {
+      "id": 18827,
+      "name": "Grand Marshal's Handaxe",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Lieutenant Jackspring",
+      "questName": null
+    },
+    {
+      "id": 18828,
+      "name": "High Warlord's Cleaver",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Stone Guard Zarg",
+      "questName": null
+    },
+    {
+      "id": 18830,
+      "name": "Grand Marshal's Sunderer",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Lieutenant Jackspring",
+      "questName": null
+    },
+    {
+      "id": 18831,
+      "name": "High Warlord's Battle Axe",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Stone Guard Zarg",
       "questName": null
     },
     {
@@ -4508,8 +5082,8 @@
       "questName": null
     },
     {
-      "id": 18855,
-      "name": "Grand Marshal's Hand Cannon",
+      "id": 18838,
+      "name": "Grand Marshal's Dirk",
       "sourceType": "vendor",
       "reason": "not indexed yet",
       "zone": null,
@@ -4517,8 +5091,134 @@
       "questName": null
     },
     {
-      "id": 18860,
-      "name": "High Warlord's Street Sweeper",
+      "id": 18840,
+      "name": "High Warlord's Razor",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Stone Guard Zarg",
+      "questName": null
+    },
+    {
+      "id": 18843,
+      "name": "Grand Marshal's Right Hand Blade",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Lieutenant Jackspring",
+      "questName": null
+    },
+    {
+      "id": 18844,
+      "name": "High Warlord's Right Claw",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Stone Guard Zarg",
+      "questName": null
+    },
+    {
+      "id": 18847,
+      "name": "Grand Marshal's Left Hand Blade",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Lieutenant Jackspring",
+      "questName": null
+    },
+    {
+      "id": 18848,
+      "name": "High Warlord's Left Claw",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Stone Guard Zarg",
+      "questName": null
+    },
+    {
+      "id": 18865,
+      "name": "Grand Marshal's Punisher",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Lieutenant Jackspring",
+      "questName": null
+    },
+    {
+      "id": 18866,
+      "name": "High Warlord's Bludgeon",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Stone Guard Zarg",
+      "questName": null
+    },
+    {
+      "id": 18867,
+      "name": "Grand Marshal's Battle Hammer",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Lieutenant Jackspring",
+      "questName": null
+    },
+    {
+      "id": 18868,
+      "name": "High Warlord's Pulverizer",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Stone Guard Zarg",
+      "questName": null
+    },
+    {
+      "id": 18869,
+      "name": "Grand Marshal's Glaive",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Lieutenant Jackspring",
+      "questName": null
+    },
+    {
+      "id": 18871,
+      "name": "High Warlord's Pig Sticker",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Stone Guard Zarg",
+      "questName": null
+    },
+    {
+      "id": 18873,
+      "name": "Grand Marshal's Stave",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Lieutenant Jackspring",
+      "questName": null
+    },
+    {
+      "id": 18874,
+      "name": "High Warlord's War Staff",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Stone Guard Zarg",
+      "questName": null
+    },
+    {
+      "id": 18876,
+      "name": "Grand Marshal's Claymore",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Lieutenant Jackspring",
+      "questName": null
+    },
+    {
+      "id": 18877,
+      "name": "High Warlord's Greatsword",
       "sourceType": "vendor",
       "reason": "not indexed yet",
       "zone": null,
@@ -4625,6 +5325,15 @@
       "questName": null
     },
     {
+      "id": 19059,
+      "name": "Argent Shoulders",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 19104,
       "name": "Stormstrike Hammer",
       "sourceType": "vendor",
@@ -4679,8 +5388,8 @@
       "questName": null
     },
     {
-      "id": 19164,
-      "name": "Dark Iron Gauntlets",
+      "id": 19165,
+      "name": "Flarecore Leggings",
       "sourceType": "profession",
       "reason": "not indexed yet",
       "zone": null,
@@ -4688,8 +5397,8 @@
       "questName": null
     },
     {
-      "id": 19165,
-      "name": "Flarecore Leggings",
+      "id": 19166,
+      "name": "Black Amnesty",
       "sourceType": "profession",
       "reason": "not indexed yet",
       "zone": null,
@@ -4796,6 +5505,15 @@
       "questName": null
     },
     {
+      "id": 19690,
+      "name": "Bloodsoul Breastplate",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 19691,
       "name": "Bloodsoul Shoulders",
       "sourceType": "profession",
@@ -4823,15 +5541,6 @@
       "questName": null
     },
     {
-      "id": 19694,
-      "name": "Darksoul Leggings",
-      "sourceType": "profession",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
       "id": 19695,
       "name": "Darksoul Shoulders",
       "sourceType": "profession",
@@ -4847,33 +5556,6 @@
       "reason": "container is not a named object",
       "zone": null,
       "npc": "Wooden Chair",
-      "questName": null
-    },
-    {
-      "id": 19961,
-      "name": "Gri'lek's Grinder",
-      "sourceType": "boss_drop",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Gri'lek",
-      "questName": null
-    },
-    {
-      "id": 19962,
-      "name": "Gri'lek's Carver",
-      "sourceType": "boss_drop",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Gri'lek",
-      "questName": null
-    },
-    {
-      "id": 19968,
-      "name": "Fiery Retributer",
-      "sourceType": "boss_drop",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Hazza'rah",
       "questName": null
     },
     {
@@ -4913,12 +5595,21 @@
       "questName": "Destroy Morphaz"
     },
     {
-      "id": 20039,
-      "name": "Dark Iron Boots",
-      "sourceType": "profession",
+      "id": 20061,
+      "name": "Highlander's Epaulets",
+      "sourceType": "vendor",
       "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
+      "zone": "Refuge Pointe",
+      "npc": "Samuel Hawke",
+      "questName": null
+    },
+    {
+      "id": 20176,
+      "name": "Defiler's Epaulets",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": "Hammerfall",
+      "npc": "Rutherford Twing",
       "questName": null
     },
     {
@@ -5003,15 +5694,6 @@
       "questName": null
     },
     {
-      "id": 20551,
-      "name": "Darkrune Helm",
-      "sourceType": "profession",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
       "id": 20575,
       "name": "Black Whelp Tunic",
       "sourceType": "profession",
@@ -5057,8 +5739,8 @@
       "questName": null
     },
     {
-      "id": 22191,
-      "name": "Obsidian Mail Tunic",
+      "id": 21278,
+      "name": "Stormshroud Gloves",
       "sourceType": "profession",
       "reason": "not indexed yet",
       "zone": null,
@@ -5201,12 +5883,12 @@
       "questName": null
     },
     {
-      "id": 22322,
-      "name": "The Jaw Breaker",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Mor Grayhoof",
+      "id": 22326,
+      "name": "Amalgam's Band",
+      "sourceType": "boss_drop",
+      "reason": "not indexed yet",
+      "zone": "Scholomance",
+      "npc": "Kormok",
       "questName": null
     },
     {
@@ -5223,6 +5905,15 @@
       "name": "Legplates of Vigilance",
       "sourceType": "unsourced",
       "reason": "not indexed since the source changed",
+      "zone": null,
+      "npc": "a container",
+      "questName": null
+    },
+    {
+      "id": 22329,
+      "name": "Scepter of Interminable Focus",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
       "zone": null,
       "npc": "a container",
       "questName": null
@@ -5246,12 +5937,30 @@
       "questName": null
     },
     {
-      "id": 22385,
-      "name": "Titanic Leggings",
-      "sourceType": "profession",
+      "id": 22335,
+      "name": "Lord Valthalak's Staff of Command",
+      "sourceType": "boss_drop",
       "reason": "not indexed yet",
       "zone": null,
-      "npc": null,
+      "npc": "Lord Valthalak",
+      "questName": null
+    },
+    {
+      "id": 22339,
+      "name": "Rune Band of Wizardry",
+      "sourceType": "boss_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Lord Valthalak",
+      "questName": null
+    },
+    {
+      "id": 22342,
+      "name": "Leggings of Torment",
+      "sourceType": "boss_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Lord Valthalak",
       "questName": null
     },
     {
@@ -5291,8 +6000,197 @@
       "questName": null
     },
     {
-      "id": 22843,
-      "name": "Blood Guard's Chain Greaves",
+      "id": 22858,
+      "name": "Blood Guard's Plate Greaves",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 22859,
+      "name": "Blood Guard's Satin Walkers",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 22860,
+      "name": "Blood Guard's Silk Walkers",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 22863,
+      "name": "Blood Guard's Dragonhide Grips",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 22864,
+      "name": "Blood Guard's Leather Grips",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 22867,
+      "name": "Blood Guard's Mail Vices",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 22868,
+      "name": "Blood Guard's Plate Gauntlets",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 22869,
+      "name": "Blood Guard's Satin Handwraps",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 22870,
+      "name": "Blood Guard's Silk Handwraps",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 22872,
+      "name": "Legionnaire's Plate Hauberk",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 22873,
+      "name": "Legionnaire's Plate Leggings",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 22876,
+      "name": "Legionnaire's Mail Hauberk",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 22877,
+      "name": "Legionnaire's Dragonhide Chestpiece",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 22878,
+      "name": "Legionnaire's Dragonhide Leggings",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 22879,
+      "name": "Legionnaire's Leather Chestpiece",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 22880,
+      "name": "Legionnaire's Leather Legguards",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 22882,
+      "name": "Legionnaire's Satin Legguards",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 22883,
+      "name": "Legionnaire's Silk Legguards",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 22884,
+      "name": "Legionnaire's Dreadweave Tunic",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 22885,
+      "name": "Legionnaire's Satin Tunic",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 22886,
+      "name": "Legionnaire's Silk Tunic",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 22887,
+      "name": "Legionnaire's Mail Legguards",
       "sourceType": "vendor",
       "reason": "not indexed yet",
       "zone": null,
@@ -5302,10 +6200,145 @@
     {
       "id": 23198,
       "name": "Idol of Brutality",
-      "sourceType": "world_drop",
-      "reason": "world drop names no creature",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
-      "npc": null,
+      "npc": "Magistrate Barthilas",
+      "questName": null
+    },
+    {
+      "id": 23243,
+      "name": "Champion's Plate Shoulders",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 23244,
+      "name": "Champion's Plate Helm",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 23253,
+      "name": "Champion's Dragonhide Headguard",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 23254,
+      "name": "Champion's Dragonhide Shoulders",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 23257,
+      "name": "Champion's Leather Helm",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 23258,
+      "name": "Champion's Leather Shoulders",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 23259,
+      "name": "Champion's Mail Headguard",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 23260,
+      "name": "Champion's Mail Pauldrons",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 23261,
+      "name": "Champion's Satin Hood",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 23262,
+      "name": "Champion's Satin Mantle",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 23263,
+      "name": "Champion's Silk Cowl",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 23264,
+      "name": "Champion's Silk Mantle",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "First Sergeant Hola'mahi",
+      "questName": null
+    },
+    {
+      "id": 23272,
+      "name": "Knight-Captain's Lamellar Breastplate",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23273,
+      "name": "Knight-Captain's Lamellar Leggings",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23275,
+      "name": "Knight-Lieutenant's Lamellar Sabatons",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
       "questName": null
     },
     {
@@ -5318,12 +6351,282 @@
       "questName": null
     },
     {
-      "id": 23278,
-      "name": "Knight-Lieutenant's Chain Greaves",
+      "id": 23277,
+      "name": "Lieutenant Commander's Lamellar Shoulders",
       "sourceType": "vendor",
       "reason": "not indexed yet",
       "zone": null,
       "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23280,
+      "name": "Knight-Lieutenant's Dragonhide Grips",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23284,
+      "name": "Knight-Lieutenant's Leather Grips",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23286,
+      "name": "Knight-Lieutenant's Plate Gauntlets",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23287,
+      "name": "Knight-Lieutenant's Plate Greaves",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23288,
+      "name": "Knight-Lieutenant's Satin Handwraps",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23290,
+      "name": "Knight-Lieutenant's Silk Handwraps",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23291,
+      "name": "Knight-Lieutenant's Silk Walkers",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23294,
+      "name": "Knight-Captain's Dragonhide Chestpiece",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23295,
+      "name": "Knight-Captain's Dragonhide Leggings",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23297,
+      "name": "Knight-Captain's Dreadweave Tunic",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23298,
+      "name": "Knight-Captain's Leather Chestpiece",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23299,
+      "name": "Knight-Captain's Leather Legguards",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23300,
+      "name": "Knight-Captain's Plate Hauberk",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23301,
+      "name": "Knight-Captain's Plate Leggings",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23302,
+      "name": "Knight-Captain's Satin Legguards",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23303,
+      "name": "Knight-Captain's Satin Tunic",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23304,
+      "name": "Knight-Captain's Silk Legguards",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23305,
+      "name": "Knight-Captain's Silk Tunic",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23308,
+      "name": "Lieutenant Commander's Dragonhide Headguard",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23309,
+      "name": "Lieutenant Commander's Dragonhide Shoulders",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23312,
+      "name": "Lieutenant Commander's Leather Helm",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23313,
+      "name": "Lieutenant Commander's Leather Shoulders",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23314,
+      "name": "Lieutenant Commander's Plate Helmet",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23315,
+      "name": "Lieutenant Commander's Plate Shoulders",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23316,
+      "name": "Lieutenant Commander's Satin Hood",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23317,
+      "name": "Lieutenant Commander's Satin Mantle",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23318,
+      "name": "Lieutenant Commander's Silk Cowl",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23319,
+      "name": "Lieutenant Commander's Silk Mantle",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Sergeant Major Clate",
+      "questName": null
+    },
+    {
+      "id": 23451,
+      "name": "Grand Marshal's Mageblade",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Lieutenant Jackspring",
+      "questName": null
+    },
+    {
+      "id": 23452,
+      "name": "Grand Marshal's Tome of Power",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Lieutenant Jackspring",
       "questName": null
     },
     {
@@ -5354,6 +6657,15 @@
       "questName": null
     },
     {
+      "id": 23456,
+      "name": "Grand Marshal's Swiftblade",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Lieutenant Jackspring",
+      "questName": null
+    },
+    {
       "id": 23464,
       "name": "High Warlord's Battle Mace",
       "sourceType": "vendor",
@@ -5367,6 +6679,33 @@
       "name": "High Warlord's Destroyer",
       "sourceType": "vendor",
       "reason": "vendor has no map pin",
+      "zone": null,
+      "npc": "Stone Guard Zarg",
+      "questName": null
+    },
+    {
+      "id": 23466,
+      "name": "High Warlord's Spellblade",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Stone Guard Zarg",
+      "questName": null
+    },
+    {
+      "id": 23467,
+      "name": "High Warlord's Quickblade",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Stone Guard Zarg",
+      "questName": null
+    },
+    {
+      "id": 23468,
+      "name": "High Warlord's Tome of Destruction",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
       "zone": null,
       "npc": "Stone Guard Zarg",
       "questName": null
@@ -5588,6 +6927,15 @@
       "questName": null
     },
     {
+      "id": 217273,
+      "name": "Golden Scale Gauntlets",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 217287,
       "name": "Greater Mystic Wand",
       "sourceType": "unsourced",
@@ -5615,690 +6963,6 @@
       "questName": "Brought to Heel"
     },
     {
-      "id": 220794,
-      "name": "Knight's Plate Hauberk",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220795,
-      "name": "Knight-Lieutenant's Plate Pauldrons",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220796,
-      "name": "Blood Guard's Plate Pauldrons",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220797,
-      "name": "Knight's Plate Leggings",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220798,
-      "name": "Stone Guard's Plate Leggings",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220801,
-      "name": "Stone Guard's Plate Armor",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220803,
-      "name": "Blood Guard's Plate Helm",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220804,
-      "name": "Knight-Lieutenant's Plate Helm",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220808,
-      "name": "Knight-Lieutenant's Imbued Pauldrons",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220809,
-      "name": "Knight's Imbued Leggings",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220810,
-      "name": "Knight-Lieutenant's Imbued Helmet",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220813,
-      "name": "Knight's Imbued Armor",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220815,
-      "name": "Knight's Lamellar Chestplate",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220816,
-      "name": "Knight's Lamellar Legplates",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220818,
-      "name": "Knight-Lieutenant's Lamellar Pauldrons",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220819,
-      "name": "Knight-Lieutenant's Lamellar Helm",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220820,
-      "name": "Blood Guard's Mail Helmet",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220821,
-      "name": "Blood Guard's Chain Helmet",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220822,
-      "name": "Knight-Lieutenant's Chain Helmet",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220823,
-      "name": "Blood Guard's Mail Epaulets",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220824,
-      "name": "Blood Guard's Chain Epaulets",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220825,
-      "name": "Knight-Lieutenant's Chain Epaulets",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220826,
-      "name": "Stone Guard's Mail Armor",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220827,
-      "name": "Stone Guard's Chain Armor",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220828,
-      "name": "Knight's Chain Armor",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220832,
-      "name": "Knight's Chain Legplates",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220833,
-      "name": "Stone Guard's Chain Legplates",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220834,
-      "name": "Stone Guard's Mail Legplates",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220838,
-      "name": "Stone Guard's Inscribed Chestpiece",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220839,
-      "name": "Stone Guard's Inscribed Legplates",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220841,
-      "name": "Blood Guard's Inscribed Shoulder Pads",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220842,
-      "name": "Blood Guard's Inscribed Skullcap",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220844,
-      "name": "Stone Guard's Pulsing Breastplate",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220847,
-      "name": "Stone Guard's Pulsing Legplates",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220848,
-      "name": "Blood Guard's Pulsing Helmet",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220849,
-      "name": "Blood Guard's Pulsing Shoulders",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220850,
-      "name": "Knight-Lieutenant's Leather Headband",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220851,
-      "name": "Blood Guard's Leather Headband",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220852,
-      "name": "Knight-Lieutenant's Leather Shoulders",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220853,
-      "name": "Blood Guard's Leather Shoulders",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220854,
-      "name": "Knight's Leather Armor",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220855,
-      "name": "Stone Guard's Leather Armor",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220858,
-      "name": "Knight's Leather Pants",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220859,
-      "name": "Stone Guard's Leather Pants",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220864,
-      "name": "Knight's Crackling Leather Leggings",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220865,
-      "name": "Stone Guard's Crackling Leather Leggings",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220868,
-      "name": "Knight's Crackling Leather Tunic",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220869,
-      "name": "Stone Guard's Crackling Leather Tunic",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220870,
-      "name": "Knight-Lieutenant's Crackling Leather Spaulders",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220871,
-      "name": "Blood Guard's Crackling Leather Spaulders",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220872,
-      "name": "Knight-Lieutenant's Crackling Leather Helmet",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220873,
-      "name": "Blood Guard's Crackling Leather Helmet",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220874,
-      "name": "Knight-Lieutenant's Restored Leather Helm",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220875,
-      "name": "Blood Guard's Restored Leather Helm",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220876,
-      "name": "Knight-Lieutenant's Restored Leather Spaulders",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220877,
-      "name": "Blood Guard's Restored Leather Spaulders",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220878,
-      "name": "Knight's Restored Leather Jerkin",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220879,
-      "name": "Stone Guard's Restored Leather Jerkin",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220882,
-      "name": "Knight's Restored Leather Leggings",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220883,
-      "name": "Stone Guard's Restored Leather Leggings",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220886,
-      "name": "Knight's Dreadweave Vest",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220887,
-      "name": "Knight-Lieutenant's Dreadweave Mantle",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220888,
-      "name": "Knight's Dreadweave Leggings",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220889,
-      "name": "Knight-Lieutenant's Dreadweave Hat",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220892,
-      "name": "Knight's Satin Armor",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220893,
-      "name": "Knight's Satin Leggings",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220894,
-      "name": "Knight-Lieutenant's Satin Pads",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220896,
-      "name": "Knight-Lieutenant's Satin Cover",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 220899,
-      "name": "Blood Guard's Satin Cover",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220901,
-      "name": "Blood Guard's Satin Pads",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220902,
-      "name": "Stone Guard's Satin Leggings",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220903,
-      "name": "Stone Guard's Satin Armor",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220904,
-      "name": "Stone Guard's Dreadweave Vest",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220905,
-      "name": "Blood Guard's Dreadweave Mantle",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220906,
-      "name": "Stone Guard's Dreadweave Leggings",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 220907,
-      "name": "Blood Guard's Dreadweave Hat",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
       "id": 221344,
       "name": "Personal Spellbook",
       "sourceType": "quest_reward",
@@ -6306,978 +6970,6 @@
       "zone": null,
       "npc": null,
       "questName": "A Lesson in Literacy"
-    },
-    {
-      "id": 223073,
-      "name": "Knight-Lieutenant's Mail Epaulets",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 223074,
-      "name": "Knight's Mail Legplates",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 223075,
-      "name": "Knight-Lieutenant's Mail Helmet",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 223078,
-      "name": "Knight's Mail Armor",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227042,
-      "name": "Champion's Plate Shoulders",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227043,
-      "name": "Champion's Plate Helm",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227044,
-      "name": "Lieutenant Commander's Plate Helm",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227045,
-      "name": "Lieutenant Commander's Plate Shoulders",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227046,
-      "name": "Knight-Captain's Plate Hauberk",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227048,
-      "name": "Legionnaire's Plate Leggings",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227049,
-      "name": "Legionnaire's Plate Hauberk",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227050,
-      "name": "Blood Guard's Plate Gauntlets",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227051,
-      "name": "Blood Guard's Plate Greaves",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227052,
-      "name": "Knight-Lieutenant's Plate Greaves",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227053,
-      "name": "Knight-Lieutenant's Plate Gauntlets",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227054,
-      "name": "Lieutenant Commander's Leather Shoulders",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227055,
-      "name": "Lieutenant Commander's Leather Helm",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227056,
-      "name": "Champion's Leather Shoulders",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227057,
-      "name": "Champion's Leather Helm",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227058,
-      "name": "Knight-Captain's Leather Chestpiece",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227059,
-      "name": "Legionnaire's Leather Legguards",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227060,
-      "name": "Legionnaire's Leather Chestpiece",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227061,
-      "name": "Knight-Captain's Leather Legguards",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227062,
-      "name": "Blood Guard's Leather Walkers",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227063,
-      "name": "Blood Guard's Leather Grips",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227064,
-      "name": "Knight-Lieutenant's Leather Walkers",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227065,
-      "name": "Knight-Lieutenant's Leather Grips",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227066,
-      "name": "Lieutenant Commander's Chain Helm",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227068,
-      "name": "Lieutenant Commander's Chain Shoulders",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227070,
-      "name": "Knight-Captain's Chain Hauberk",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227072,
-      "name": "Knight-Captain's Chain Legguards",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227074,
-      "name": "Blood Guard's Chain Greaves",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227075,
-      "name": "Blood Guard's Chain Vices",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227076,
-      "name": "Knight-Lieutenant's Chain Greaves",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227077,
-      "name": "Knight-Lieutenant's Chain Vices",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227081,
-      "name": "Blood Guard's Chain Grips",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227082,
-      "name": "Blood Guard's Chain Sabatons",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227084,
-      "name": "Lieutenant Commander's Chain Pauldrons",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227085,
-      "name": "Knight-Captain's Chain Legplates",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227086,
-      "name": "Lieutenant Commander's Chain Greathelm",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227087,
-      "name": "Knight-Lieutenant's Chain Grips",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227088,
-      "name": "Knight-Lieutenant's Chain Sabatons",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227089,
-      "name": "Knight-Captain's Chain Armor",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227094,
-      "name": "Legionnaire's Dreadweave Tunic",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227095,
-      "name": "Knight-Captain's Dreadweave Legguards",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227096,
-      "name": "Knight-Captain's Dreadweave Tunic",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227097,
-      "name": "Legionnaire's Dreadweave Legguards",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227098,
-      "name": "Blood Guard's Dreadweave Walkers",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227101,
-      "name": "Knight-Lieutenant's Dreadweave Walkers",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227103,
-      "name": "Lieutenant Commander's Silk Cowl",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227105,
-      "name": "Champion's Silk Cowl",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227106,
-      "name": "Legionnaire's Silk Tunic",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227107,
-      "name": "Legionnaire's Silk Legguards",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227108,
-      "name": "Knight-Captain's Silk Tunic",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227110,
-      "name": "Blood Guard's Silk Walkers",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227111,
-      "name": "Blood Guard's Silk Handwraps",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227112,
-      "name": "Knight-Lieutenant's Silk Walkers",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227113,
-      "name": "Knight-Lieutenant's Silk Handwraps",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227118,
-      "name": "Champion's Satin Hood",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227119,
-      "name": "Lieutenant Commander's Satin Mantle",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227120,
-      "name": "Champion's Satin Mantle",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227121,
-      "name": "Lieutenant Commander's Satin Hood",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227122,
-      "name": "Knight-Captain's Satin Tunic",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227123,
-      "name": "Legionnaire's Satin Legguards",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227124,
-      "name": "Legionnaire's Satin Tunic",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227125,
-      "name": "Knight-Captain's Satin Legguards",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227127,
-      "name": "Blood Guard's Satin Walkers",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227129,
-      "name": "Knight-Lieutenant's Satin Walkers",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227130,
-      "name": "Champion's Satin Epaulets",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227131,
-      "name": "Legionnaire's Satin Leggings",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227132,
-      "name": "Champion's Satin Crown",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227135,
-      "name": "Legionnaire's Satin Robe",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227136,
-      "name": "Lieutenant Commander's Satin Epaulets",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227137,
-      "name": "Knight-Captain's Satin Leggings",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227138,
-      "name": "Lieutenant Commander's Satin Crown",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227141,
-      "name": "Knight-Captain's Satin Robe",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227142,
-      "name": "Knight-Captain's Lamellar Breastplate",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227144,
-      "name": "Lieutenant Commander's Lamellar Headguard",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227145,
-      "name": "Lieutenant Commander's Lamellar Shoulders",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227148,
-      "name": "Lieutenant Commander's Lamellar Pauldrons",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227149,
-      "name": "Lieutenant Commander's Lamellar Helmet",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227150,
-      "name": "Knight-Captain's Lamellar Legguards",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227151,
-      "name": "Knight-Captain's Lamellar Chestplate",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227152,
-      "name": "Knight-Lieutenant's Lamellar Gloves",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227153,
-      "name": "Knight-Lieutenant's Lamellar Greaves",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227164,
-      "name": "Blood Guard's Mail Sabatons",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227173,
-      "name": "Lieutenant Commander's Dragonhide Headguard",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227174,
-      "name": "Champion's Dragonhide Headguard",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227176,
-      "name": "Knight-Captain's Dragonhide Chestpiece",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227177,
-      "name": "Legionnaire's Dragonhide Leggings",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227178,
-      "name": "Knight-Captain's Dragonhide Leggings",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227179,
-      "name": "Legionnaire's Dragonhide Chestpiece",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227180,
-      "name": "Blood Guard's Dragonhide Grips",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227183,
-      "name": "Knight-Lieutenant's Dragonhide Grips",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227188,
-      "name": "Blood Guard's Dragonhide Boots",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227194,
-      "name": "Knight-Lieutenant's Dragonhide Boots",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227196,
-      "name": "Knight-Captain's Dragonhide Tunic",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227197,
-      "name": "Knight-Lieutenant's Dragonhide Greaves",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227198,
-      "name": "Knight-Lieutenant's Dragonhide Gauntlets",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227199,
-      "name": "Lieutenant Commander's Dragonhide Headdress",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227200,
-      "name": "Knight-Captain's Dragonhide Legguards",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227201,
-      "name": "Lieutenant Commander's Dragonhide Pauldrons",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 227202,
-      "name": "Legionnaire's Dragonhide Tunic",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227203,
-      "name": "Blood Guard's Dragonhide Greaves",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227204,
-      "name": "Blood Guard's Dragonhide Gauntlets",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227205,
-      "name": "Champion's Dragonhide Headdress",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227206,
-      "name": "Legionnaire's Dragonhide Legguards",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 227207,
-      "name": "Champion's Dragonhide Pauldrons",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
     },
     {
       "id": 227947,
@@ -7289,1884 +6981,12 @@
       "questName": null
     },
     {
-      "id": 231530,
-      "name": "Warlord's Plate Armor",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231531,
-      "name": "General's Plate Boots",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231532,
-      "name": "General's Plate Gauntlets",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231533,
-      "name": "General's Plate Leggings",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231534,
-      "name": "Warlord's Plate Shoulders",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231535,
-      "name": "Warlord's Plate Headpiece",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231536,
-      "name": "Field Marshal's Plate Armor",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231537,
-      "name": "Field Marshal's Plate Shoulderguards",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231538,
-      "name": "Field Marshal's Plate Helm",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231539,
-      "name": "Marshal's Plate Boots",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231540,
-      "name": "Marshal's Plate Legguards",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231541,
-      "name": "Marshal's Plate Gauntlets",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231543,
-      "name": "Field Marshal's Leather Chestpiece",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231544,
-      "name": "Marshal's Leather Handgrips",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231545,
-      "name": "Field Marshal's Leather Mask",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231546,
-      "name": "Marshal's Leather Footguards",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231547,
-      "name": "Field Marshal's Leather Epaulets",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231548,
-      "name": "Marshal's Leather Leggings",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231549,
-      "name": "Warlord's Leather Breastplate",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231551,
-      "name": "Warlord's Leather Spaulders",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231552,
-      "name": "General's Leather Treads",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231553,
-      "name": "Warlord's Leather Helm",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231554,
-      "name": "General's Leather Legguards",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231555,
-      "name": "General's Leather Mitts",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231557,
-      "name": "Field Marshal's Chain Pauldrons",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231558,
-      "name": "Marshal's Chain Legplates",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231560,
-      "name": "Marshal's Chain Grips",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231561,
-      "name": "Marshal's Chain Sabatons",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231562,
-      "name": "Field Marshal's Chain Greathelm",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231563,
-      "name": "Field Marshal's Chain Armor",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231564,
-      "name": "General's Chain Sabatons",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231565,
-      "name": "Warlord's Chain Pauldrons",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231566,
-      "name": "Warlord's Chain Armor",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231567,
-      "name": "General's Chain Legplates",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231568,
-      "name": "Warlord's Chain Greathelm",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231569,
-      "name": "General's Chain Grips",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231570,
-      "name": "General's Chain Greaves",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231571,
-      "name": "Warlord's Chain Helm",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231572,
-      "name": "Warlord's Chain Shoulders",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231573,
-      "name": "Warlord's Chain Hauberk",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231574,
-      "name": "General's Chain Legguards",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231575,
-      "name": "General's Chain Vices",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231576,
-      "name": "Field Marshal's Chain Shoulders",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231577,
-      "name": "Marshal's Chain Legguards",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231578,
-      "name": "Marshal's Chain Vices",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231579,
-      "name": "Marshal's Chain Greaves",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231580,
-      "name": "Field Marshal's Chain Helm",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231581,
-      "name": "Field Marshal's Chain Hauberk",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231582,
-      "name": "Field Marshal's Dreadweave Robe",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231583,
-      "name": "Field Marshal's Dreadweave Shoulders",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231584,
-      "name": "Field Marshal's Coronal",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231585,
-      "name": "Marshal's Dreadweave Boots",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231586,
-      "name": "Marshal's Dreadweave Gloves",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231587,
-      "name": "Marshal's Dreadweave Leggings",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231588,
-      "name": "General's Dreadweave Pants",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231589,
-      "name": "General's Dreadweave Gloves",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231590,
-      "name": "Warlord's Dreadweave Hood",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231591,
-      "name": "Warlord's Dreadweave Robe",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231592,
-      "name": "Warlord's Dreadweave Mantle",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231593,
-      "name": "General's Dreadweave Boots",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231594,
-      "name": "Warlord's Silk Amice",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231595,
-      "name": "General's Silk Trousers",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231596,
-      "name": "Warlord's Silk Raiment",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231597,
-      "name": "General's Silk Boots",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231599,
-      "name": "General's Silk Gauntlets",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231600,
-      "name": "General's Silk Handwraps",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231601,
-      "name": "Warlord's Silk Cowl",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231602,
-      "name": "Field Marshal's Silk Spaulders",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231603,
-      "name": "Field Marshal's Silk Vestments",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231604,
-      "name": "Field Marshal's Coronet",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231605,
-      "name": "Marshal's Silk Leggings",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231606,
-      "name": "Marshal's Silk Footwraps",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231608,
-      "name": "Marshal's Silk Gauntlets",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231609,
-      "name": "Marshal's Silk Handwraps",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231610,
-      "name": "General's Satin Treads",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231611,
-      "name": "Warlord's Satin Epaulets",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231612,
-      "name": "Warlord's Satin Robes",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231613,
-      "name": "General's Satin Grips",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231614,
-      "name": "General's Satin Leggings",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231615,
-      "name": "Warlord's Satin Crown",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231616,
-      "name": "Field Marshal's Satin Crown",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231617,
-      "name": "Marshal's Satin Grips",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231618,
-      "name": "Field Marshal's Satin Robe",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231619,
-      "name": "Marshal's Satin Leggings",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231620,
-      "name": "Marshal's Satin Treads",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231621,
-      "name": "Field Marshal's Satin Epaulets",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231622,
-      "name": "Field Marshal's Satin Hood",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231623,
-      "name": "Marshal's Satin Handwraps",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231624,
-      "name": "Field Marshal's Satin Tunic",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231626,
-      "name": "Marshal's Satin Legguards",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231627,
-      "name": "Marshal's Satin Walkers",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231628,
-      "name": "Field Marshal's Satin Mantle",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231630,
-      "name": "General's Satin Walkers",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231631,
-      "name": "Warlord's Satin Mantle",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231632,
-      "name": "Warlord's Satin Tunic",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231633,
-      "name": "General's Satin Handwraps",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231634,
-      "name": "General's Satin Legguards",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231635,
-      "name": "Warlord's Satin Hood",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231639,
-      "name": "Marshal's Lamellar Legguards",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231640,
-      "name": "Field Marshal's Lamellar Helmet",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231641,
-      "name": "Field Marshal's Lamellar Chestplate",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231643,
-      "name": "Marshal's Lamellar Gloves",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231645,
-      "name": "Field Marshal's Lamellar Pauldrons",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231646,
-      "name": "Marshal's Lamellar Greaves",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231647,
-      "name": "Marshal's Lamellar Leggings",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231648,
-      "name": "Field Marshal's Lamellar Headguard",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231649,
-      "name": "Field Marshal's Lamellar Breastplate",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231650,
-      "name": "Marshal's Lamellar Gauntlets",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231651,
-      "name": "Field Marshal's Lamellar Shoulders",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231652,
-      "name": "Marshal's Lamellar Sabatons",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231653,
-      "name": "Warlord's Mail Hauberk",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231654,
-      "name": "Warlord's Mail Pauldrons",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231655,
-      "name": "General's Mail Vices",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231656,
-      "name": "General's Mail Greaves",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231657,
-      "name": "Warlord's Mail Headguard",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231658,
-      "name": "General's Mail Legguards",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231659,
-      "name": "Warlord's Mail Spaulders",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231660,
-      "name": "General's Mail Gauntlets",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231661,
-      "name": "General's Mail Sabatons",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231662,
-      "name": "Warlord's Mail Breastplate",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231663,
-      "name": "Warlord's Mail Helm",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231664,
-      "name": "General's Mail Leggings",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231665,
-      "name": "Warlord's Mail Epaulets",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231666,
-      "name": "General's Mail Gloves",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231667,
-      "name": "General's Mail Boots",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231668,
-      "name": "Warlord's Mail Chestguard",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231669,
-      "name": "Warlord's Mail Skullcap",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231670,
-      "name": "General's Mail Pants",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231671,
-      "name": "General's Dragonhide Greaves",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231672,
-      "name": "Warlord's Dragonhide Pauldrons",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231673,
-      "name": "General's Dragonhide Legguards",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231674,
-      "name": "Warlord's Dragonhide Tunic",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231675,
-      "name": "Warlord's Dragonhide Headdress",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231676,
-      "name": "General's Dragonhide Gauntlets",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231677,
-      "name": "General's Dragonhide Gloves",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231678,
-      "name": "Warlord's Dragonhide Helm",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231679,
-      "name": "Warlord's Dragonhide Armor",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231680,
-      "name": "General's Dragonhide Pants",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231681,
-      "name": "Warlord's Dragonhide Spaulders",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231682,
-      "name": "General's Dragonhide Boots",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231683,
-      "name": "General's Dragonhide Treads",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231684,
-      "name": "Warlord's Dragonhide Shoulders",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231685,
-      "name": "General's Dragonhide Leggings",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231686,
-      "name": "Warlord's Dragonhide Chestpiece",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231687,
-      "name": "Warlord's Dragonhide Headguard",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231688,
-      "name": "General's Dragonhide Grips",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Lady Palanseer",
-      "questName": null
-    },
-    {
-      "id": 231689,
-      "name": "Field Marshal's Dragonhide Headguard",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231690,
-      "name": "Field Marshal's Dragonhide Chestpiece",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231691,
-      "name": "Marshal's Dragonhide Leggings",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231692,
-      "name": "Marshal's Dragonhide Treads",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231693,
-      "name": "Field Marshal's Dragonhide Shoulders",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231694,
-      "name": "Marshal's Dragonhide Grips",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231695,
-      "name": "Field Marshal's Dragonhide Helm",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231696,
-      "name": "Field Marshal's Dragonhide Armor",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231697,
-      "name": "Marshal's Dragonhide Pants",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231698,
-      "name": "Marshal's Dragonhide Boots",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231699,
-      "name": "Field Marshal's Dragonhide Spaulders",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231700,
-      "name": "Marshal's Dragonhide Gloves",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231701,
-      "name": "Field Marshal's Dragonhide Headdress",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231702,
-      "name": "Field Marshal's Dragonhide Tunic",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231703,
-      "name": "Marshal's Dragonhide Legguards",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231704,
-      "name": "Marshal's Dragonhide Greaves",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231705,
-      "name": "Field Marshal's Dragonhide Pauldrons",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
-      "id": 231706,
-      "name": "Marshal's Dragonhide Gauntlets",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Captain Dirgehammer",
-      "questName": null
-    },
-    {
       "id": 231887,
       "name": "Test Dagger",
       "sourceType": "unsourced",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
-      "questName": null
-    },
-    {
-      "id": 234542,
-      "name": "High Warlord's Greatsword",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Sergeant Thunderhorn",
-      "questName": null
-    },
-    {
-      "id": 234543,
-      "name": "High Warlord's Battle Axe",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Sergeant Thunderhorn",
-      "questName": null
-    },
-    {
-      "id": 234545,
-      "name": "High Warlord's Pulverizer",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Sergeant Thunderhorn",
-      "questName": null
-    },
-    {
-      "id": 234546,
-      "name": "High Warlord's Destroyer",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Sergeant Thunderhorn",
-      "questName": null
-    },
-    {
-      "id": 234547,
-      "name": "High Warlord's Pig Sticker",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Sergeant Thunderhorn",
-      "questName": null
-    },
-    {
-      "id": 234548,
-      "name": "High Warlord's Pig Poker",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Sergeant Thunderhorn",
-      "questName": null
-    },
-    {
-      "id": 234549,
-      "name": "High Warlord's War Staff",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Sergeant Thunderhorn",
-      "questName": null
-    },
-    {
-      "id": 234550,
-      "name": "High Warlord's Spellblade",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Sergeant Thunderhorn",
-      "questName": null
-    },
-    {
-      "id": 234551,
-      "name": "High Warlord's Battle Mace",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Sergeant Thunderhorn",
-      "questName": null
-    },
-    {
-      "id": 234552,
-      "name": "High Warlord's Blade",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Sergeant Thunderhorn",
-      "questName": null
-    },
-    {
-      "id": 234553,
-      "name": "High Warlord's Quickblade",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Sergeant Thunderhorn",
-      "questName": null
-    },
-    {
-      "id": 234554,
-      "name": "High Warlord's Cleaver",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Sergeant Thunderhorn",
-      "questName": null
-    },
-    {
-      "id": 234555,
-      "name": "High Warlord's Bludgeon",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Sergeant Thunderhorn",
-      "questName": null
-    },
-    {
-      "id": 234556,
-      "name": "High Warlord's Razor",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Sergeant Thunderhorn",
-      "questName": null
-    },
-    {
-      "id": 234557,
-      "name": "High Warlord's Right Claw",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Sergeant Thunderhorn",
-      "questName": null
-    },
-    {
-      "id": 234558,
-      "name": "High Warlord's Left Claw",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Sergeant Thunderhorn",
-      "questName": null
-    },
-    {
-      "id": 234559,
-      "name": "High Warlord's Recurve",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Sergeant Thunderhorn",
-      "questName": null
-    },
-    {
-      "id": 234560,
-      "name": "High Warlord's Crossbow",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Sergeant Thunderhorn",
-      "questName": null
-    },
-    {
-      "id": 234561,
-      "name": "High Warlord's Street Sweeper",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Sergeant Thunderhorn",
-      "questName": null
-    },
-    {
-      "id": 234562,
-      "name": "High Warlord's Shield Wall",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Sergeant Thunderhorn",
-      "questName": null
-    },
-    {
-      "id": 234563,
-      "name": "High Warlord's Tome of Destruction",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Sergeant Thunderhorn",
-      "questName": null
-    },
-    {
-      "id": 234564,
-      "name": "High Warlord's Tome of Mending",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Sergeant Thunderhorn",
-      "questName": null
-    },
-    {
-      "id": 234565,
-      "name": "Grand Marshal's Claymore",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain O'Neal",
-      "questName": null
-    },
-    {
-      "id": 234566,
-      "name": "Grand Marshal's Sunderer",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain O'Neal",
-      "questName": null
-    },
-    {
-      "id": 234567,
-      "name": "Grand Marshal's Battle Hammer",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain O'Neal",
-      "questName": null
-    },
-    {
-      "id": 234568,
-      "name": "Grand Marshal's Demolisher",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain O'Neal",
-      "questName": null
-    },
-    {
-      "id": 234569,
-      "name": "Grand Marshal's Glaive",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain O'Neal",
-      "questName": null
-    },
-    {
-      "id": 234570,
-      "name": "Grand Marshal's Polearm",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain O'Neal",
-      "questName": null
-    },
-    {
-      "id": 234571,
-      "name": "Grand Marshal's Stave",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain O'Neal",
-      "questName": null
-    },
-    {
-      "id": 234574,
-      "name": "Grand Marshal's Mageblade",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain O'Neal",
-      "questName": null
-    },
-    {
-      "id": 234576,
-      "name": "Grand Marshal's Warhammer",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain O'Neal",
-      "questName": null
-    },
-    {
-      "id": 234578,
-      "name": "Grand Marshal's Longsword",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain O'Neal",
-      "questName": null
-    },
-    {
-      "id": 234579,
-      "name": "Grand Marshal's Swiftblade",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain O'Neal",
-      "questName": null
-    },
-    {
-      "id": 234580,
-      "name": "Grand Marshal's Handaxe",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain O'Neal",
-      "questName": null
-    },
-    {
-      "id": 234581,
-      "name": "Grand Marshal's Punisher",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain O'Neal",
-      "questName": null
-    },
-    {
-      "id": 234582,
-      "name": "Grand Marshal's Dirk",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain O'Neal",
-      "questName": null
-    },
-    {
-      "id": 234583,
-      "name": "Grand Marshal's Right Hand Blade",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain O'Neal",
-      "questName": null
-    },
-    {
-      "id": 234584,
-      "name": "Grand Marshal's Left Hand Blade",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain O'Neal",
-      "questName": null
-    },
-    {
-      "id": 234585,
-      "name": "Grand Marshal's Bullseye",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Captain O'Neal",
-      "questName": null
-    },
-    {
-      "id": 234586,
-      "name": "Grand Marshal's Repeater",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Captain O'Neal",
-      "questName": null
-    },
-    {
-      "id": 234587,
-      "name": "Grand Marshal's Hand Cannon",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Captain O'Neal",
-      "questName": null
-    },
-    {
-      "id": 234588,
-      "name": "Grand Marshal's Aegis",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": "Captain O'Neal",
-      "questName": null
-    },
-    {
-      "id": 234589,
-      "name": "Grand Marshal's Tome of Power",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain O'Neal",
-      "questName": null
-    },
-    {
-      "id": 234590,
-      "name": "Grand Marshal's Tome of Restoration",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain O'Neal",
       "questName": null
     },
     {
@@ -9185,78 +7005,6 @@
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
-      "questName": null
-    },
-    {
-      "id": 235473,
-      "name": "Grand Marshal's Barricade",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain O'Neal",
-      "questName": null
-    },
-    {
-      "id": 235474,
-      "name": "High Warlord's Barricade",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Sergeant Thunderhorn",
-      "questName": null
-    },
-    {
-      "id": 235476,
-      "name": "High Warlord's Hacker",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Sergeant Thunderhorn",
-      "questName": null
-    },
-    {
-      "id": 235477,
-      "name": "High Warlord's Bonecracker",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Sergeant Thunderhorn",
-      "questName": null
-    },
-    {
-      "id": 235478,
-      "name": "High Warlord's Shiv",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Sergeant Thunderhorn",
-      "questName": null
-    },
-    {
-      "id": 235479,
-      "name": "Grand Marshal's Shiv",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain O'Neal",
-      "questName": null
-    },
-    {
-      "id": 235480,
-      "name": "Grand Marshal's Bonecracker",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain O'Neal",
-      "questName": null
-    },
-    {
-      "id": 235481,
-      "name": "Grand Marshal's Hacker",
-      "sourceType": "vendor",
-      "reason": "vendor has no map pin",
-      "zone": null,
-      "npc": "Captain O'Neal",
       "questName": null
     },
     {
@@ -9282,96 +7030,6 @@
       "name": "[TMP] Satyrbane",
       "sourceType": "unsourced",
       "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 237820,
-      "name": "Outrider's Silk Leggings",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 237821,
-      "name": "Outrider's Lizardhide Pants",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 237822,
-      "name": "Outrider's Leather Pants",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 237823,
-      "name": "Outrider's Mail Leggings",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 237824,
-      "name": "Outrider's Chain Leggings",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 237826,
-      "name": "Outrider's Plate Legguards",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 240146,
-      "name": "Heretic Garb",
-      "sourceType": "vendor",
-      "reason": "vendor is not named",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 240147,
-      "name": "Heretic Handguards",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 240149,
-      "name": "Heretic Pants",
-      "sourceType": "vendor",
-      "reason": "vendor is not named",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 240153,
-      "name": "Heretic Boots",
-      "sourceType": "vendor",
-      "reason": "vendor is not named",
       "zone": null,
       "npc": null,
       "questName": null
@@ -9550,6 +7208,15 @@
     {
       "id": 250535,
       "name": "Hard Gold Bracers",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 250536,
+      "name": "Hard Gold Leggings",
       "sourceType": "profession",
       "reason": "not indexed yet",
       "zone": null,
@@ -10637,15 +8304,6 @@
       "questName": null
     },
     {
-      "id": 254696,
-      "name": "Reverence",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
       "id": 254779,
       "name": "A'sharahm, the Roiling Tempest",
       "sourceType": "unsourced",
@@ -10815,15 +8473,6 @@
       "zone": null,
       "npc": null,
       "questName": null
-    },
-    {
-      "id": 259890,
-      "name": "Deep-Sea Waders",
-      "sourceType": "quest_reward",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": "Winter Frontier Fishery"
     },
     {
       "id": 259891,
@@ -11031,33 +8680,6 @@
       "zone": null,
       "npc": null,
       "questName": "The Head of the Serpent"
-    },
-    {
-      "id": 260210,
-      "name": "A Bigger Shield",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 260211,
-      "name": "Panic Hands",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 260212,
-      "name": "Bad Hat",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
     },
     {
       "id": 260213,
@@ -11843,51 +9465,6 @@
       "questName": null
     },
     {
-      "id": 271923,
-      "name": "Expeditionary's Cape",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 271927,
-      "name": "Rebels' Rugged Reaper",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 271931,
-      "name": "Clever Expeditionary's Spellblade",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 271935,
-      "name": "Insurgent's Manifesto",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 271939,
-      "name": "Guerrilla's Jagged Mace",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
       "id": 272179,
       "name": "Greatsword of Great Pasts",
       "sourceType": "quest_reward",
@@ -12329,6 +9906,24 @@
       "questName": null
     },
     {
+      "id": 272499,
+      "name": "Premier General's Magus Trousers",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 272500,
+      "name": "Premier Warlord's Magus Raiment",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 272501,
       "name": "Premier General's Magus Amice",
       "sourceType": "unsourced",
@@ -12351,6 +9946,15 @@
       "name": "Premier Legionnaire's Magus Cuffs",
       "sourceType": "unsourced",
       "reason": "not indexed since the source changed",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 272504,
+      "name": "Premier Centurion's Magus Boots",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
       "zone": null,
       "npc": null,
       "questName": null
@@ -12653,6 +10257,15 @@
       "questName": null
     },
     {
+      "id": 272538,
+      "name": "Premier Centurion's Linked Boots",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 272539,
       "name": "Premier Champion's Linked Gauntlets",
       "sourceType": "unsourced",
@@ -12765,6 +10378,15 @@
       "name": "Premier Felweave Gloves",
       "sourceType": "unsourced",
       "reason": "not indexed since the source changed",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 272554,
+      "name": "Premier Centurion's Felweave Boots",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
       "zone": null,
       "npc": null,
       "questName": null
@@ -13022,6 +10644,15 @@
       "questName": null
     },
     {
+      "id": 272592,
+      "name": "Premier High Warlord's Cleaver",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": "Arathi Basin",
+      "npc": "Sergeant Thunderhorn",
+      "questName": null
+    },
+    {
       "id": 272593,
       "name": "Premier High Warlord's Battle Axe",
       "sourceType": "unsourced",
@@ -13051,6 +10682,15 @@
     {
       "id": 272596,
       "name": "Premier High Warlord's Razor",
+      "sourceType": "vendor",
+      "reason": "not indexed yet",
+      "zone": "Arathi Basin",
+      "npc": "Sergeant Thunderhorn",
+      "questName": null
+    },
+    {
+      "id": 272597,
+      "name": "Premier High Warlord's Right Claw",
       "sourceType": "vendor",
       "reason": "not indexed yet",
       "zone": "Arathi Basin",
@@ -13105,15 +10745,6 @@
     {
       "id": 272603,
       "name": "Premier High Warlord's War Staff",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 272604,
-      "name": "Premier High Warlord's Greatsword",
       "sourceType": "unsourced",
       "reason": "not indexed since the source changed",
       "zone": null,
@@ -13868,6 +11499,15 @@
       "questName": null
     },
     {
+      "id": 272746,
+      "name": "Premier Knight-Champion's Silk Footwraps",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 272747,
       "name": "Premier Knight-Captain's Silk Bracers",
       "sourceType": "unsourced",
@@ -13899,6 +11539,24 @@
       "name": "Premier Field Marshal's Silk Coronet",
       "sourceType": "unsourced",
       "reason": "not indexed since the source changed",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 272751,
+      "name": "Premier Marshal's Silk Leggings",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 272752,
+      "name": "Premier Field Marshal's Silk Vestments",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
       "zone": null,
       "npc": null,
       "questName": null
@@ -14372,6 +12030,15 @@
       "questName": null
     },
     {
+      "id": 272807,
+      "name": "Premier Knight-Champion's Dreadweave Boots",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 272808,
       "name": "Premier Lieutenant Commander's Dreadweave Gloves",
       "sourceType": "unsourced",
@@ -14669,15 +12336,6 @@
       "questName": null
     },
     {
-      "id": 272851,
-      "name": "Premier Grand Marshal's Claymore",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
       "id": 272852,
       "name": "Premier Luminous Breastplate",
       "sourceType": "unsourced",
@@ -14736,15 +12394,6 @@
       "name": "Premier Grand Marshal's Demolisher",
       "sourceType": "unsourced",
       "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 272859,
-      "name": "Premier Grand Marshal's Swiftblade",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
       "zone": null,
       "npc": null,
       "questName": null
@@ -14835,6 +12484,15 @@
       "name": "Premier Marshal's Luminous Pauldrons",
       "sourceType": "unsourced",
       "reason": "not indexed since the source changed",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 273336,
+      "name": "Premier Centurion's Mail Boots",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
       "zone": null,
       "npc": null,
       "questName": null
@@ -14950,6 +12608,15 @@
     {
       "id": 273349,
       "name": "Premier Warlord's Ringmail Helm",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 273350,
+      "name": "Premier General's Ringmail Leggings",
       "sourceType": "unsourced",
       "reason": "not indexed yet",
       "zone": null,
@@ -15182,15 +12849,6 @@
       "questName": null
     },
     {
-      "id": 273381,
-      "name": "Premier Wyrmhide Armguards",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
       "id": 273382,
       "name": "Premier Wyrmhide Gauntlets",
       "sourceType": "unsourced",
@@ -15209,15 +12867,6 @@
       "questName": null
     },
     {
-      "id": 273385,
-      "name": "Premier Wyrmhide Leggings",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
       "id": 273386,
       "name": "Premier Wyrmhide Headguard",
       "sourceType": "unsourced",
@@ -15229,15 +12878,6 @@
     {
       "id": 273387,
       "name": "Premier Wyrmhide Shoulders",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 273388,
-      "name": "Premier Wyrmhide Waistband",
       "sourceType": "unsourced",
       "reason": "not indexed yet",
       "zone": null,
@@ -15263,6 +12903,15 @@
       "questName": null
     },
     {
+      "id": 273391,
+      "name": "Premier Lieutenant Commander's Lunarhide Gauntlets",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 273392,
       "name": "Premier Marshal's Lunarhide Spaulders",
       "sourceType": "unsourced",
@@ -15272,8 +12921,35 @@
       "questName": null
     },
     {
+      "id": 273393,
+      "name": "Premier Marshal's Lunarhide Legguards",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 273394,
       "name": "Premier Field Marshal's Lunarhide Helmet",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 273395,
+      "name": "Premier Field Marshal's Lunarhide Breastplate",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 273396,
+      "name": "Premier Knight-Champion's Lunarhide Boots",
       "sourceType": "unsourced",
       "reason": "not indexed yet",
       "zone": null,
@@ -15344,8 +13020,8 @@
       "questName": null
     },
     {
-      "id": 273404,
-      "name": "Premier Knight-Champion's Dreamhide Boots",
+      "id": 273405,
+      "name": "Premier Warlord's Wyrmhide Hauberk",
       "sourceType": "unsourced",
       "reason": "not indexed yet",
       "zone": null,
@@ -15371,8 +13047,35 @@
       "questName": null
     },
     {
+      "id": 273408,
+      "name": "Premier General's Wyrmhide Leggings",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 273409,
       "name": "Premier Legionnaire's Wyrmhide Bracers",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 273410,
+      "name": "Premier Centurion's Wyrmhide Boots",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 273411,
+      "name": "Premier Champion's Wyrmhide Gloves",
       "sourceType": "unsourced",
       "reason": "not indexed yet",
       "zone": null,
@@ -15427,15 +13130,6 @@
     {
       "id": 273417,
       "name": "Premier Legionnaire's Kodohide Bracers",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 273418,
-      "name": "Premier Centurion's Kodohide Boots",
       "sourceType": "unsourced",
       "reason": "not indexed yet",
       "zone": null,
@@ -15686,6 +13380,42 @@
       "questName": null
     },
     {
+      "id": 273908,
+      "name": "Justice Leggings",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 273909,
+      "name": "Justice Gauntlets",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 273910,
+      "name": "Justice Spaulders",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 273911,
+      "name": "Justice Greaves",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 274078,
       "name": "Boar Signet",
       "sourceType": "quest_reward",
@@ -15744,6 +13474,15 @@
       "name": "Premier Flatmail Wristguards",
       "sourceType": "unsourced",
       "reason": "not indexed since the source changed",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 274183,
+      "name": "Premier Knight-Champion's Flatmail Boots",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
       "zone": null,
       "npc": null,
       "questName": null
@@ -15852,6 +13591,15 @@
       "name": "Premier Scalemail Pauldrons",
       "sourceType": "unsourced",
       "reason": "not indexed since the source changed",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 274198,
+      "name": "Premier Knight-Champion's Scalemail Boots",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
       "zone": null,
       "npc": null,
       "questName": null
@@ -16408,8 +14156,8 @@
     {
       "id": 274380,
       "name": "Decaying Flesh Bands",
-      "sourceType": "world_drop",
-      "reason": "drop creature has no map pin",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Plaguemaw the Rotting",
       "questName": null
@@ -16417,8 +14165,8 @@
     {
       "id": 274381,
       "name": "Coldbringer Spine",
-      "sourceType": "world_drop",
-      "reason": "drop creature has no map pin",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Amnennar the Coldbringer",
       "questName": null
@@ -16444,8 +14192,8 @@
     {
       "id": 274385,
       "name": "Abomination Chain",
-      "sourceType": "world_drop",
-      "reason": "drop creature has no map pin",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Glutton",
       "questName": null
@@ -16878,15 +14626,6 @@
       "name": "Premier Master Sergeant's Insignia",
       "sourceType": "unsourced",
       "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 274978,
-      "name": "Leafre's Ring of Great Resistance",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
       "zone": null,
       "npc": null,
       "questName": null
@@ -17675,6 +15414,15 @@
       "questName": null
     },
     {
+      "id": 275969,
+      "name": "Initiate's Signet of Brilliance",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 275970,
       "name": "Initiate's Signet of Resolve",
       "sourceType": "unsourced",
@@ -17686,6 +15434,15 @@
     {
       "id": 275972,
       "name": "Tracker's Signet of Ferocity",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 275973,
+      "name": "Tracker's Signet of Brilliance",
       "sourceType": "unsourced",
       "reason": "not indexed yet",
       "zone": null,
@@ -17785,37 +15542,37 @@
     {
       "id": 276069,
       "name": "Gravetoll Gavel",
-      "sourceType": "unsourced",
-      "reason": "source not listed yet",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
-      "npc": null,
+      "npc": "Marduk Blackpool",
       "questName": null
     },
     {
       "id": 276071,
       "name": "The Black Helm",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
-      "npc": null,
+      "npc": "Marduk Blackpool",
       "questName": null
     },
     {
       "id": 276072,
       "name": "Soulwoven Drape",
-      "sourceType": "unsourced",
-      "reason": "source not listed yet",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
-      "npc": null,
+      "npc": "Vectus",
       "questName": null
     },
     {
       "id": 276073,
       "name": "Band of the Damned",
-      "sourceType": "unsourced",
-      "reason": "source not listed yet",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
-      "npc": null,
+      "npc": "Vectus",
       "questName": null
     },
     {
@@ -17918,15 +15675,6 @@
       "questName": "Blight No More"
     },
     {
-      "id": 276395,
-      "name": "Grimm's Packing Gloves",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
       "id": 276419,
       "name": "Lightcrest Hammer",
       "sourceType": "unsourced",
@@ -17983,19 +15731,10 @@
     {
       "id": 276740,
       "name": "Sentimental Locket",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 276765,
-      "name": "Leafre's Ring of Precise Spell Power",
-      "sourceType": "fishing",
+      "sourceType": "boss_drop",
       "reason": "not indexed since the source changed",
       "zone": null,
-      "npc": null,
+      "npc": "Katerina the Cleaner",
       "questName": null
     },
     {
@@ -18818,15 +16557,6 @@
       "questName": null
     },
     {
-      "id": 277236,
-      "name": "Pauldrons of Vindication",
-      "sourceType": "quest_reward",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": "Aeonas the Vindicated"
-    },
-    {
       "id": 277237,
       "name": "Inspiring Chestplate",
       "sourceType": "unsourced",
@@ -19097,15 +16827,6 @@
       "questName": null
     },
     {
-      "id": 279249,
-      "name": "Totem of Urgency",
-      "sourceType": "profession",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
       "id": 279250,
       "name": "Idol of Swiftness",
       "sourceType": "profession",
@@ -19124,26 +16845,8 @@
       "questName": null
     },
     {
-      "id": 279252,
-      "name": "Elderwild Waistcord",
-      "sourceType": "profession",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
       "id": 279253,
       "name": "Outlaw's Collar",
-      "sourceType": "profession",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 279254,
-      "name": "Elderwild Pants",
       "sourceType": "profession",
       "reason": "not indexed yet",
       "zone": null,
@@ -19747,19 +17450,10 @@
     {
       "id": 280010,
       "name": "Gargantuan Wristguards",
-      "sourceType": "world_drop",
-      "reason": "drop creature has no map pin",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Titanosaur",
-      "questName": null
-    },
-    {
-      "id": 280011,
-      "name": "Deeproar Cord",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
       "questName": null
     },
     {
@@ -19790,19 +17484,10 @@
       "questName": null
     },
     {
-      "id": 280015,
-      "name": "Venomvessel Ring",
-      "sourceType": "world_drop",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": "Venomridge",
-      "questName": null
-    },
-    {
       "id": 280016,
       "name": "Spiderchitin Wrap",
-      "sourceType": "world_drop",
-      "reason": "drop creature has no map pin",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Venomridge",
       "questName": null
@@ -19810,8 +17495,8 @@
     {
       "id": 280017,
       "name": "Octoclaw Chain Boots",
-      "sourceType": "world_drop",
-      "reason": "drop creature has no map pin",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Venomridge",
       "questName": null
@@ -19819,8 +17504,8 @@
     {
       "id": 280018,
       "name": "Hammer of Thundering Hooves",
-      "sourceType": "world_drop",
-      "reason": "drop creature has no map pin",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Thunderhoof",
       "questName": null
@@ -19828,8 +17513,8 @@
     {
       "id": 280019,
       "name": "Dinofrill Casque",
-      "sourceType": "world_drop",
-      "reason": "drop creature has no map pin",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Thunderhoof",
       "questName": null
@@ -19837,8 +17522,8 @@
     {
       "id": 280020,
       "name": "Deep Jungle Rifle",
-      "sourceType": "world_drop",
-      "reason": "drop creature has no map pin",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Thunderhoof",
       "questName": null
@@ -19846,8 +17531,8 @@
     {
       "id": 280021,
       "name": "Tooth of the Matriarch",
-      "sourceType": "world_drop",
-      "reason": "drop creature has no map pin",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Direhorn Matriarch",
       "questName": null
@@ -19855,8 +17540,8 @@
     {
       "id": 280022,
       "name": "Scaleguard Scimitar",
-      "sourceType": "world_drop",
-      "reason": "drop creature has no map pin",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Direhorn Matriarch",
       "questName": null
@@ -19864,8 +17549,8 @@
     {
       "id": 280023,
       "name": "Nanaya's Control Spire",
-      "sourceType": "world_drop",
-      "reason": "drop creature has no map pin",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Nanaya",
       "questName": null
@@ -19873,8 +17558,8 @@
     {
       "id": 280024,
       "name": "Legplates of Reinforced Crystal",
-      "sourceType": "world_drop",
-      "reason": "drop creature has no map pin",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Nanaya",
       "questName": null
@@ -19882,8 +17567,8 @@
     {
       "id": 280025,
       "name": "Leggings of Curation",
-      "sourceType": "world_drop",
-      "reason": "drop creature has no map pin",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Nanaya",
       "questName": null
@@ -19907,10 +17592,28 @@
       "questName": null
     },
     {
+      "id": 280028,
+      "name": "Heartflame Gauntlets",
+      "sourceType": "boss_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Cinder",
+      "questName": null
+    },
+    {
+      "id": 280029,
+      "name": "Cinderedge Crescent",
+      "sourceType": "boss_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Cinder",
+      "questName": null
+    },
+    {
       "id": 280031,
       "name": "Sparklance Wand",
-      "sourceType": "world_drop",
-      "reason": "drop creature has no map pin",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Bolt",
       "questName": null
@@ -19927,8 +17630,8 @@
     {
       "id": 280045,
       "name": "Regal Direhorn Drape",
-      "sourceType": "world_drop",
-      "reason": "drop creature has no map pin",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Direhorn Matriarch",
       "questName": null
@@ -19936,8 +17639,8 @@
     {
       "id": 280065,
       "name": "Behemoth Bones",
-      "sourceType": "world_drop",
-      "reason": "drop creature has no map pin",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Blackmaw Behemoth",
       "questName": null
@@ -19945,8 +17648,8 @@
     {
       "id": 280066,
       "name": "Trousers of the Ebon Giant",
-      "sourceType": "world_drop",
-      "reason": "drop creature has no map pin",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Blackmaw Behemoth",
       "questName": null
@@ -19954,8 +17657,8 @@
     {
       "id": 280067,
       "name": "Blackmaw Chain Belt",
-      "sourceType": "world_drop",
-      "reason": "drop creature has no map pin",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Blackmaw Behemoth",
       "questName": null
@@ -19963,8 +17666,8 @@
     {
       "id": 280076,
       "name": "Horns of Varrox",
-      "sourceType": "world_drop",
-      "reason": "drop creature has no map pin",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Varrox Bleakhoof",
       "questName": null
@@ -19981,10 +17684,10 @@
     {
       "id": 280078,
       "name": "Apprentice's Protective Treads",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
-      "npc": null,
+      "npc": "Gortek the Apprentice",
       "questName": null
     },
     {
@@ -20008,10 +17711,10 @@
     {
       "id": 280083,
       "name": "Truesight Rifle",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
-      "npc": null,
+      "npc": "Sabella No-Eyes",
       "questName": null
     },
     {
@@ -20143,6 +17846,15 @@
     {
       "id": 281280,
       "name": "Mountain Climbers",
+      "sourceType": "quest_reward",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": "Halt the Hail"
+    },
+    {
+      "id": 281281,
+      "name": "Frost's Whisper Pendant",
       "sourceType": "quest_reward",
       "reason": "not indexed yet",
       "zone": null,
@@ -21113,6 +18825,15 @@
       "questName": null
     },
     {
+      "id": 284158,
+      "name": "Mossflayer Warlord's Girdle",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 284161,
       "name": "Treads of Rotting Flesh",
       "sourceType": "unsourced",
@@ -21563,19 +19284,10 @@
       "questName": null
     },
     {
-      "id": 286640,
-      "name": "High Priestess's Kilt",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
       "id": 286646,
       "name": "Gill's Gills",
-      "sourceType": "world_drop",
-      "reason": "drop creature has no map pin",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Gill",
       "questName": null
@@ -21583,8 +19295,8 @@
     {
       "id": 286649,
       "name": "Tidebound Dagger",
-      "sourceType": "world_drop",
-      "reason": "drop creature has no map pin",
+      "sourceType": "boss_drop",
+      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Gill",
       "questName": null
@@ -22028,6 +19740,24 @@
       "reason": "source not listed yet",
       "zone": null,
       "npc": null,
+      "questName": null
+    },
+    {
+      "id": 287044,
+      "name": "Predator's Shroud",
+      "sourceType": "world_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Stegodon Young",
+      "questName": null
+    },
+    {
+      "id": 287045,
+      "name": "Ancient Mattock",
+      "sourceType": "world_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": "Ravasaur Juvenile",
       "questName": null
     },
     {

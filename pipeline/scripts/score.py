@@ -22,6 +22,11 @@ FOREVER_MISSING = forever_missing_ids()
 TBC_ONLY = tbc_only_ids()
 BETA_COPIES = forever_beta_copy_ids()
 NO_GUIDES = os.environ.get("GQ_NO_GUIDES") == "1"
+# Wowhead Forever level-60 lists. Classic guides_*.json stay behind NO_GUIDES.
+# A spec with no page (feral, battle mage, shockadin, enhancement tank) is absent,
+# so that spec keeps the scored list at 60.
+_FOREVER_BIS_PATH = os.path.join(GUIDES_DIR, "forever_bis.json")
+FOREVER_BIS = json.load(open(_FOREVER_BIS_PATH, encoding="utf-8")) if os.path.exists(_FOREVER_BIS_PATH) else {}
 
 # ilvl -> typical RequiredLevel, median over every item that states one.
 ILVL_FLOOR = json.load(open(G+"ilvl_floor.json"))
@@ -1431,6 +1436,33 @@ def guide_tiers(gl):
         return [n for _,n in gl], {n:t for t,n in gl}
     return list(gl), None
 
+def forever_guide_rows(cls, spec, sl, rows):
+    """Level-60 Wowhead Forever order for this slot, or None when this spec has no list.
+
+    Matched by item id against every item that can be worn at 60, not the top 8.
+    Document order is kept. A name the model scored higher does not move up.
+    An id that is not eligible for this faction stays out.
+    """
+    page = (FOREVER_BIS.get(cls) or {}).get(spec) or {}
+    ids = (page.get("slots") or {}).get(sl)
+    if not ids:
+        return None
+    by = {}
+    for row in rows or []:
+        by.setdefault(row[1]["id"], row)
+    picks = []
+    seen = set()
+    for iid in ids:
+        if iid in seen:
+            continue
+        row = by.get(iid)
+        if not row:
+            continue
+        seen.add(iid)
+        picks.append(row)
+    return picks or None
+
+
 def guide_override(spec, sl, faction, rows, cls):
     """rows = scored candidates at level 60. -> (picks, origins) or None."""
     gl=(GUIDES.get(spec) or {}).get(sl)
@@ -1745,6 +1777,21 @@ def cap_weapon_bands(bands, limit=WEAPON_LIST_CAP):
         key = (band.get("faction"), band.get("lo"), band.get("hi"))
         groups.setdefault(key, []).append(band)
     for blist in groups.values():
+        if blist and all(band.get("guideList") for band in blist):
+            # Wowhead order is the rank. A higher model score does not move a
+            # later option in front of the Best in Slot piece, and the cap
+            # drops the tail of that same order.
+            for band in blist:
+                kept = []
+                weapons = 0
+                for pick in band.get("picks") or []:
+                    if pick_is_ranked_weapon(band["slot"], pick):
+                        if weapons >= limit:
+                            continue
+                        weapons += 1
+                    kept.append(pick)
+                band["picks"] = kept
+            continue
         ranked = []
         for band in blist:
             for index, pick in enumerate(band.get("picks") or []):
@@ -1858,18 +1905,20 @@ if __name__=="__main__":
             slots=sorted({k[2] for k in per})
             bands=collapse(per,("Alliance","Horde"),slots,lv)
             early_band = max(lv)==9
-            def emit(faction,sl,lo,hi,rows,origins=None, _spec=spec, _notable=notable, _alts=source_alts):
+            def emit(faction,sl,lo,hi,rows,origins=None, guide_list=False, _spec=spec, _notable=notable, _alts=source_alts):
                 # Append source alternates after the existing picks. Ranks 1-3
-                # stay the rows this band already chose.
+                # stay the rows this band already chose. A Forever BiS list is
+                # the whole order, so those extras stay off it.
                 base_count=len(rows)
                 have={r[1]["id"] for r in rows}
                 have_names={r[1]["name"] for r in rows}
                 merged=list(rows)
-                for r in (_alts.get((faction,hi,sl)) or []):
-                    if r[1]["id"] in have or r[1]["name"] in have_names:
-                        continue
-                    have.add(r[1]["id"]); have_names.add(r[1]["name"])
-                    merged.append(r)
+                if not guide_list:
+                    for r in (_alts.get((faction,hi,sl)) or []):
+                        if r[1]["id"] in have or r[1]["name"] in have_names:
+                            continue
+                        have.add(r[1]["id"]); have_names.add(r[1]["name"])
+                        merged.append(r)
                 rows=merged
                 out[_spec]["bands"].append({"faction":faction,"slot":sl,"lo":lo,"hi":hi,
                   "picks":[{"id":r[1]["id"],"name":r[1]["name"],"q":r[1]["quality"],
@@ -1887,6 +1936,8 @@ if __name__=="__main__":
                 for p in out[_spec]["bands"][-1]["picks"][base_count:]:
                     p["alt"]=True
                 if origins: out[_spec]["bands"][-1]["origins"]=origins
+                if guide_list:
+                    out[_spec]["bands"][-1]["guideList"]=True
                 if sl in ("MainHand","SecondaryHand") and cfg["weaponStyle"] in AMBIGUOUS_STYLES:
                     rt=route_for(per,faction,hi,cls,dual_wield_level(cls,spec))
                     if rt:
@@ -1894,15 +1945,21 @@ if __name__=="__main__":
                         out[_spec]["bands"][-1]["routeTwoHand"]=rt[1]
                         out[_spec]["bands"][-1]["routeOneHand"]=rt[2]
             for faction,sl,lo,hi,key,rows in bands:
-                if early_band or spec=="levelling_1_9":
+                if early_band or spec=="levelling_1_9" or not (lo<=60<=hi):
                     emit(faction,sl,lo,hi,rows); continue
-                if NO_GUIDES or not (lo<=60<=hi):
+                r60=full60.get((faction,sl)) or []
+                guided=forever_guide_rows(cls, spec, sl, r60)
+                if guided:
+                    if lo<60:
+                        emit(faction,sl,lo,59,per.get((faction,59,sl)) or rows)
+                    emit(faction,sl,60,60,guided,["guide"]*len(guided),guide_list=True)
+                    continue
+                if NO_GUIDES:
                     emit(faction,sl,lo,hi,rows); continue
-                r60=full60.get((faction,sl)) or per.get((faction,60,sl)) or rows
-                ov=guide_override(spec,sl,faction,r60,cls)
+                ov=guide_override(spec,sl,faction,r60 or rows,cls)
                 if lo<60: emit(faction,sl,lo,59,per.get((faction,59,sl)) or rows)
                 if ov: emit(faction,sl,60,60,ov[0],ov[1])
-                else:   emit(faction,sl,60,60,r60[:8])
+                else:   emit(faction,sl,60,60,(r60 or rows)[:8])
         out[spec]["bands"] = cap_weapon_bands(out[spec]["bands"])
         print(f"{spec:<16} slots={len(slots):<3} bands={len(out[spec]['bands'])}")
     if _displaced:

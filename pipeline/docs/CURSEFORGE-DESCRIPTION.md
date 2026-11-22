@@ -162,7 +162,7 @@ While the simulator is on, the tooltip tells you to turn it off before it will s
 
 *Screenshot 8 — the spec weight tooltip.*
 
-Hover the spec name. Those are the weights for this spec. While you level, stamina and armor count for more than a naked +1 of your main stat, and mana counts for less than stamina. Level 60 keeps those same multipliers. The tooltip index is still 0 to 100 for the slot, and the header bar is the average of what you have equipped. An empty slot counts as 0. Filtering weapons does not move the bar.
+Hover the spec name. Those are the weights for this spec. While you level, stamina and armor count for more than a naked +1 of your main stat, and mana counts for less than stamina. Level 60 keeps those same multipliers. At 60, a spec that has a Wowhead Forever Best in Slot page follows that list, in the page's order, marked (Guide). The list is entered by hand. A spec with no page yet stays on the scored list. Those are Feral, Battle Mage, Shockadin, and Enhancement Tank. Levels 1–59 always stay on the scorer. The tooltip index is still 0 to 100 for the slot, and the header bar is the average of what you have equipped. An empty slot counts as 0. Filtering weapons does not move the bar.
 
 A random-enchant green is ranked on its best possible roll. The tooltip says how rare that roll is. A slim chance does not hide the hunt.
 
@@ -210,7 +210,7 @@ Weapons is one header. The arrow before the (i) is the filter. Two-hand and one-
 *Screenshot 11 — a hunter's weapon headers, if you have the room.*
 
 **Why is this the best piece?**
-Hover the spec. Screenshot 8. The hunt follows those weights. While leveling, a piece with stamina beats a naked +1 of your main stat. Level 60 keeps that same stamina, armor, and mana weighting. The tooltip score is still 0 to 100 inside the slot.
+Hover the spec. Screenshot 8. The hunt follows those weights. While leveling, a piece with stamina beats a naked +1 of your main stat. Level 60 keeps that same stamina, armor, and mana weighting. At 60, a spec that has a Wowhead Forever Best in Slot page follows that list, in the page's order. A spec with no page yet stays on the scored list. The tooltip score is still 0 to 100 inside the slot.
 
 **Can I change the stat weights?**
 Not in the addon. Suggest the spec, the stat, and the weight you want on the [stat weight sheet](https://docs.google.com/spreadsheets/d/1jMC89KgzHpPZHYgcjOq6ef7lENhh8OGgypG2rC2m0Ok/edit).

@@ -8268,6 +8268,26 @@ function GQ.Log:AddCraftingOrder(entry)
     end
 end
 
+function GQ.Log:CraftingOrderIndex(entry)
+    if not entry or not entry.itemId or not GQ.Orders or not GQ.Orders.Find then
+        return nil
+    end
+    local _, index = GQ.Orders:Find(entry.itemId, GQ.Orders:PlayerName())
+    return index
+end
+
+function GQ.Log:ToggleCraftingOrder(entry)
+    local index = self:CraftingOrderIndex(entry)
+    if index and GQ.Orders and GQ.Orders.RemoveAt then
+        GQ.Orders:RemoveAt(index)
+        if GQ.Chat then
+            GQ:Chat("|cff00ccffGearQuest|r", L["Removed from your crafting orders."])
+        end
+        return
+    end
+    self:AddCraftingOrder(entry)
+end
+
 function GQ.Log:EntryForCraftingOrder(itemId, entryId)
     local data = GQ.Data
     if not data or not itemId then
@@ -8376,12 +8396,24 @@ function GQ.Log:UpdateOrderButton()
             if not entry and log.DetailEntry then
                 entry = log:DetailEntry()
             end
-            log:AddCraftingOrder(entry)
+            log:ToggleCraftingOrder(entry)
         end)
         btn:SetScript("OnEnter", function(self)
+            local log = GQ.Log
+            local page = log:GetPageTab()
+            local entry = page == "lookup" and log.lookupEntry or log.selectedEntry
+            if not entry and log.DetailEntry then
+                entry = log:DetailEntry()
+            end
+            local ordered = log:CraftingOrderIndex(entry) and true or false
             GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-            GameTooltip:SetText(L["Add order"], 1, 1, 1)
-            GameTooltip:AddLine(L["Saves this craft for any character on the account. Alt-click a crafted hunt does the same."], 1, 0.82, 0, true)
+            if ordered then
+                GameTooltip:SetText(L["Remove order"], 1, 1, 1)
+                GameTooltip:AddLine(L["Takes this craft off your orders."], 1, 0.82, 0, true)
+            else
+                GameTooltip:SetText(L["Add order"], 1, 1, 1)
+                GameTooltip:AddLine(L["Saves this craft for any character on the account. Alt-click a crafted hunt does the same."], 1, 0.82, 0, true)
+            end
             GameTooltip:Show()
         end)
         btn:SetScript("OnLeave", function()
@@ -8406,7 +8438,8 @@ function GQ.Log:UpdateOrderButton()
     if show then
         btn:SetParent(frame.detailChild)
         btn:ClearAllPoints()
-        btn:SetText(L["Add order"])
+        local ordered = self:CraftingOrderIndex(entry) and true or false
+        btn:SetText(ordered and L["Remove order"] or L["Add order"])
         local label = btn:GetFontString()
         local width = (label and label:GetStringWidth() or 70) + 24
         if width < 88 then
@@ -17559,7 +17592,7 @@ function GQ.Log:BuildDetailLines(entry)
     end
 
     if entry.origin == "guide" then
-        table.insert(lines, L["\nRanked from the Wowhead Classic BiS guide."])
+        table.insert(lines, L["\nRanked from the Wowhead Forever Best in Slot list."])
     end
 
     local how = string.lower(lines[1] or "")
@@ -18464,7 +18497,38 @@ function GQ.Log:EnsureSlotRankPanel()
         self.scroll:SetVerticalScroll(nextScroll)
         self:UpdateBar()
     end)
+    panel.bisBody = panel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    panel.bisBody:SetJustifyH("LEFT")
+    panel.bisBody:SetWordWrap(true)
+    panel.bisBody:SetTextColor(0.95, 0.9, 0.78)
+    panel.bisBody:Hide()
+
+    panel.urlBox = CreateFrame("EditBox", nil, panel, "InputBoxTemplate")
+    panel.urlBox:SetAutoFocus(false)
+    panel.urlBox:SetHeight(22)
+    panel.urlBox:Hide()
+    panel.urlBox:SetScript("OnEscapePressed", function(self)
+        self:ClearFocus()
+    end)
+    panel.urlBox:SetScript("OnEditFocusGained", function(self)
+        self:HighlightText()
+    end)
+    panel.urlBox:SetScript("OnTextChanged", function(self)
+        local url = self.keepUrl
+        if url and self:GetText() ~= url then
+            self:SetText(url)
+            self:HighlightText()
+        end
+    end)
+
     panel:SetScript("OnMouseUp", function(self, button)
+        if self.bisUrl then
+            if self.urlBox then
+                self.urlBox:SetFocus()
+                self.urlBox:HighlightText()
+            end
+            return
+        end
         local owner = self.owner
         if button == "LeftButton" and owner and owner.rowType == "header" and GQ.Log then
             GQ.Log:OpenSlotRankInLookup(owner)
@@ -18541,6 +18605,66 @@ function GQ.Log:SlotRankListEntries(row)
     return entries or {}, weaponList, title
 end
 
+function GQ.Log:ForeverBisUrl()
+    -- The level on screen, including a simulated level. 1-59 keeps the scored list.
+    local level = GQ.GetEffectiveLevel and GQ:GetEffectiveLevel() or 0
+    if level ~= 60 then
+        return nil
+    end
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    local spec = GQ.Spec and GQ.Spec.GetDisplaySpec and classFile and GQ.Spec:GetDisplaySpec(classFile)
+    local pages = GQ.Data and GQ.Data.ForeverBisUrl
+    local page = pages and classFile and pages[classFile]
+    local url = page and spec and page[spec]
+    if type(url) == "string" and url ~= "" then
+        return url
+    end
+    return nil
+end
+
+function GQ.Log:ShowForeverBisPanel(row, url, title)
+    if not title then
+        local _, _, found = self:SlotRankListEntries(row)
+        title = found
+    end
+    local panel = self:EnsureSlotRankPanel()
+    panel.owner = row
+    panel.bisUrl = url
+    panel.title:SetText(title or "")
+    panel.sub:SetWordWrap(true)
+    panel.sub:SetText(L["This is the level 60 Best in Slot list. It is entered by hand from this spec's Wowhead Forever Best in Slot list. Select the link and press Ctrl+C."])
+    if panel.scroll then
+        panel.scroll:Hide()
+    end
+    for i = 1, #panel.lines do
+        panel.lines[i]:Hide()
+    end
+    if panel.bar then
+        panel.bar:Hide()
+    end
+    panel.bisBody:Hide()
+    panel.urlBox.keepUrl = url
+    panel.urlBox:SetText(url)
+    panel.urlBox:Show()
+    local width = 420
+    panel:SetSize(width, 40)
+    panel.sub:SetWidth(width - 24)
+    local subH = panel.sub:GetStringHeight() or 36
+    if subH < 28 then
+        subH = 28
+    end
+    local header = 16 + subH
+    panel.urlBox:ClearAllPoints()
+    panel.urlBox:SetPoint("TOPLEFT", panel, "TOPLEFT", 16, -(header + 8))
+    panel.urlBox:SetPoint("RIGHT", panel, "RIGHT", -16, 0)
+    panel:SetHeight(header + 40)
+    panel:ClearAllPoints()
+    panel:SetPoint("TOPLEFT", row, "TOPRIGHT", -2, 0)
+    panel:Show()
+    panel.urlBox:SetFocus()
+    panel.urlBox:HighlightText()
+end
+
 function GQ.Log:ShowSlotRankTooltip(row)
     if not row or not GQ.Data then
         return
@@ -18548,6 +18672,15 @@ function GQ.Log:ShowSlotRankTooltip(row)
     local slotName = row.slotName
     local handKind = row.handKind
     local entries, weaponList, title = self:SlotRankListEntries(row)
+    local bisUrl = self:ForeverBisUrl()
+    if bisUrl then
+        for i = 1, #entries do
+            if entries[i].origin == "guide" then
+                self:ShowForeverBisPanel(row, bisUrl, title)
+                return
+            end
+        end
+    end
 
     local scoreOn = GQ.Data.GearScoreTooltipEnabled and GQ.Data:GearScoreTooltipEnabled()
     local scoreSim = scoreOn and GQ.IsPreviewEnabled and GQ:IsPreviewEnabled()
@@ -18614,6 +18747,17 @@ function GQ.Log:ShowSlotRankTooltip(row)
 
     local panel = self:EnsureSlotRankPanel()
     panel.owner = row
+    panel.bisUrl = nil
+    if panel.bisBody then
+        panel.bisBody:Hide()
+    end
+    if panel.urlBox then
+        panel.urlBox.keepUrl = nil
+        panel.urlBox:Hide()
+    end
+    if panel.scroll then
+        panel.scroll:Show()
+    end
     panel.title:SetText(title)
     panel.sub:SetWordWrap(true)
     local sub = scoreSim and L["Turn off simulation mode to see your GearQuest Score for this item"] or L["Ranked for your level."]
@@ -21236,6 +21380,11 @@ function GQ.Log:FinishLookupIndex()
     for _, fn in ipairs(ready or {}) do
         fn()
     end
+    local again, againClass = self._lookupAgain, self._lookupAgainClass
+    if again and againClass and not self._lookupBuild then
+        self._lookupAgain, self._lookupAgainClass = nil, nil
+        self:ApplyLookupHits(againClass, again)
+    end
 end
 
 function GQ.Log:StepLookupIndex()
@@ -21609,54 +21758,89 @@ function GQ.Log:EnsureLookupWidgets(frame)
     box:SetAutoFocus(false)
     box:SetFontObject(GameFontHighlight)
     box:SetScript("OnEnterPressed", function(self)
+        self:ClearFocus()
         if GQ.Log then
             GQ.Log:RunLookup()
         end
-        local edit = self
-        if C_Timer and C_Timer.After then
-            C_Timer.After(0, function()
-                if edit.ClearFocus then
-                    edit:ClearFocus()
-                end
-            end)
-        else
-            self:ClearFocus()
-        end
-    end)
-    box:SetScript("OnMouseDown", function(self)
-        self:SetFocus()
     end)
     box:SetScript("OnEscapePressed", function(self)
         self:ClearFocus()
     end)
+    -- The template selects the whole query on every focus. A rank list title
+    -- is replaced by typing, so that selection stays. A search the player
+    -- already ran must keep the cursor where they clicked, or a small change
+    -- replaces the text and the next search never sees the edit.
+    box:HookScript("OnMouseDown", function(self)
+        self._gqCursor = self:GetCursorPosition()
+    end)
     box:HookScript("OnEditFocusGained", function(self)
         local log = GQ.Log
-        if not (log and log._lookupListText and self:GetText() == log._lookupListText) then
+        local rankList = log and log._lookupListText and self:GetText() == log._lookupListText
+        if rankList then
+            if C_Timer and C_Timer.After then
+                C_Timer.After(0, function()
+                    if self:HasFocus() and self:GetText() == log._lookupListText then
+                        self:HighlightText()
+                    end
+                end)
+            else
+                self:HighlightText()
+            end
             return
         end
+        local cursor = self._gqCursor or self:GetCursorPosition()
+        local function keepCursor()
+            if not self:HasFocus() then
+                return
+            end
+            if log and log._lookupListText and self:GetText() == log._lookupListText then
+                return
+            end
+            self:HighlightText(0, 0)
+            self:SetCursorPosition(cursor or 0)
+        end
         if C_Timer and C_Timer.After then
-            C_Timer.After(0, function()
-                if self:HasFocus() then
-                    self:HighlightText()
-                end
-            end)
+            C_Timer.After(0, keepCursor)
         else
-            self:HighlightText()
+            keepCursor()
         end
     end)
     frame.lookupBox = box
 
     local search = CreateFrame("Button", "GearQuestLookupSearch", inset, "UIPanelButtonTemplate")
     search:SetText(L["Search"])
-    search:SetScript("OnClick", function()
-        if GQ.Log then
-            GQ.Log:RunLookup()
-        end
+    -- The result list sits in the same column. A search has to read the box
+    -- after focus clears, or the click keeps the previous query.
+    local function queueLookup()
         if frame.lookupBox and frame.lookupBox.ClearFocus then
             frame.lookupBox:ClearFocus()
         end
-    end)
+        if search._gqLookupQueued then
+            return
+        end
+        search._gqLookupQueued = true
+        local function run()
+            search._gqLookupQueued = nil
+            if GQ.Log then
+                GQ.Log:RunLookup()
+            end
+        end
+        if C_Timer and C_Timer.After then
+            C_Timer.After(0, run)
+        else
+            run()
+        end
+    end
+    search:SetScript("OnMouseDown", queueLookup)
+    search:SetScript("OnClick", queueLookup)
     frame.lookupSearch = search
+
+    local searchHost = CreateFrame("Frame", nil, frame.lookupPage)
+    searchHost:EnableMouse(true)
+    searchHost:SetFrameStrata(LOG_FRAME_STRATA)
+    box:SetParent(searchHost)
+    search:SetParent(searchHost)
+    frame.lookupSearchHost = searchHost
 
     local resultsScroll = CreatePanelScrollFrame("GearQuestLookupResultsScroll", inset)
     local resultsChild = CreateFrame("Frame", "GearQuestLookupResultsChild", resultsScroll)
@@ -21729,24 +21913,38 @@ function GQ.Log:LayoutLookupPage(frame)
     frame.lookupPrompt:SetPoint("TOPLEFT", frame.lookupIntro, "BOTTOMLEFT", 0, -8)
     frame.lookupPrompt:SetWidth(width)
 
-    frame.lookupBox:ClearAllPoints()
-    frame.lookupBox:SetPoint("TOPLEFT", frame.lookupPrompt, "BOTTOMLEFT", 8, -8)
-    frame.lookupBox:SetSize(math.max(80, width - 18 - (frame.lookupSearch:GetWidth() or 74)), 22)
+    local host = frame.lookupSearchHost
+    if host then
+        host:ClearAllPoints()
+        host:SetPoint("TOPLEFT", frame.lookupPrompt, "BOTTOMLEFT", 0, -8)
+        host:SetPoint("RIGHT", inset, "RIGHT", -pad, 0)
+        host:SetHeight(26)
+        host:SetFrameStrata(LOG_FRAME_STRATA)
+        host:SetFrameLevel((frame:GetFrameLevel() or 1) + 80)
+    end
     frame.lookupSearch:ClearAllPoints()
-    frame.lookupSearch:SetPoint("LEFT", frame.lookupBox, "RIGHT", 6, 0)
+    frame.lookupSearch:SetPoint("RIGHT", host, "RIGHT", -2, 0)
     GQ:FitButton(frame.lookupSearch, 74, 140)
-    -- The intro wraps a frame after it is set. A fixed offset left the box
-    -- under the results list, so a search with no matches could not be edited
-    -- until the tab was opened again. The list stays under the box.
-    local searchLevel = (inset:GetFrameLevel() or 1) + 20
-    frame.lookupBox:SetFrameLevel(searchLevel)
-    frame.lookupSearch:SetFrameLevel(searchLevel)
+    local buttonWidth = frame.lookupSearch:GetWidth() or 74
+    frame.lookupBox:ClearAllPoints()
+    frame.lookupBox:SetPoint("LEFT", host, "LEFT", 8, 0)
+    frame.lookupBox:SetSize(math.max(80, width - buttonWidth - 16), 22)
+    -- The result rows stay under this strip. A scroll child can take clicks
+    -- outside the scroll, which left the first query stuck until the tab
+    -- was opened again.
 
     local scroll = frame.lookupScroll
     local child = frame.lookupScrollChild
     if scroll and child then
+        if scroll.SetClipsChildren then
+            scroll:SetClipsChildren(true)
+        end
+        scroll:EnableMouse(false)
+        if scroll.EnableMouseWheel then
+            scroll:EnableMouseWheel(true)
+        end
         scroll:ClearAllPoints()
-        scroll:SetPoint("TOPLEFT", frame.lookupBox, "BOTTOMLEFT", -8, -8)
+        scroll:SetPoint("TOPLEFT", host or frame.lookupBox, "BOTTOMLEFT", host and 0 or -8, -8)
         scroll:SetPoint("BOTTOMRIGHT", inset, "BOTTOMRIGHT", -(4 + SCROLLBAR_WIDTH), 8)
         scroll:SetFrameLevel((inset:GetFrameLevel() or 1) + 2)
         local scrollWidth = scroll:GetWidth()
@@ -21758,10 +21956,11 @@ function GQ.Log:LayoutLookupPage(frame)
             self:PlaceLookupRow(frame, i)
         end
         if frame.lookupEmpty then
-            frame.lookupEmpty:SetParent(child)
+            frame.lookupEmpty:SetParent(inset)
             frame.lookupEmpty:ClearAllPoints()
-            frame.lookupEmpty:SetPoint("TOPLEFT", child, "TOPLEFT", 8, -4)
-            frame.lookupEmpty:SetPoint("RIGHT", child, "RIGHT", -8, 0)
+            local anchor = frame.lookupSearchHost or frame.lookupBox
+            frame.lookupEmpty:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 8, -12)
+            frame.lookupEmpty:SetPoint("RIGHT", inset, "RIGHT", -16, 0)
         end
         if frame.lookupWait then
             frame.lookupWait:ClearAllPoints()
@@ -21874,6 +22073,21 @@ function GQ.Log:PaintLookupRows()
     end
     local places = self._lookupPlaces
     local shown = searched and count or 0
+    local emptyShown = searched and count == 0
+    if frame.lookupScroll then
+        if emptyShown then
+            frame.lookupScroll:Hide()
+        else
+            frame.lookupScroll:Show()
+            frame.lookupScroll:EnableMouse(false)
+            if frame.lookupScroll.EnableMouseWheel then
+                frame.lookupScroll:EnableMouseWheel(true)
+            end
+        end
+    end
+    if frame.lookupSearchHost then
+        frame.lookupSearchHost:SetFrameLevel((frame:GetFrameLevel() or 1) + 80)
+    end
     for i = 1, math.max(#frame.lookupRows, shown) do
         local item = searched and results and results[i]
         local row = item and self:EnsureLookupRow(frame, i) or frame.lookupRows[i]
@@ -21922,8 +22136,11 @@ function GQ.Log:ApplyLookupHits(classFile, query)
         return
     end
     if query ~= "" and (self._lookupIndexClass ~= classFile or self._lookupBuild) then
+        self._lookupAgain = query
+        self._lookupAgainClass = classFile
         return
     end
+    self._lookupAgain, self._lookupAgainClass = nil, nil
     self._lookupSearched = true
     self._lookupClass = classFile
     local hits = {}
@@ -22000,6 +22217,15 @@ function GQ.Log:OpenSlotRankInLookup(row)
         return
     end
     local entries, weaponList, title = self:SlotRankListEntries(row)
+    local bisUrl = self:ForeverBisUrl()
+    if bisUrl then
+        for i = 1, #entries do
+            if entries[i].origin == "guide" then
+                self:ShowForeverBisPanel(row, bisUrl, title)
+                return
+            end
+        end
+    end
     if #entries == 0 then
         return
     end
@@ -22083,6 +22309,8 @@ function GQ.Log:RunLookup()
         return
     end
     query = GQ.FoldText((strtrim and strtrim(query)) or query:gsub("^%s+", ""):gsub("%s+$", ""))
+    self._lookupAgain = query
+    self._lookupAgainClass = classFile
     self._lookupSerial = (self._lookupSerial or 0) + 1
     local serial = self._lookupSerial
     if query == "" then
@@ -22097,6 +22325,7 @@ function GQ.Log:RunLookup()
     self:EnsureLookupIndex(classFile, function()
         local log = GQ.Log
         if log and log._lookupSerial == serial then
+            log._lookupAgain, log._lookupAgainClass = nil, nil
             log:ApplyLookupHits(classFile, query)
         end
     end)
@@ -22113,6 +22342,7 @@ function GQ.Log:ReleaseLookupIndex()
         GQ.Data:ReleaseDetachedEntries()
     end
     self._lookupSerial = (self._lookupSerial or 0) + 1
+    self._lookupAgain, self._lookupAgainClass = nil, nil
     self:HideLookupSearchWait()
     self._lookupResults = nil
     self._lookupPlaces = nil

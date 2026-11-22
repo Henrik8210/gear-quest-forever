@@ -1822,6 +1822,18 @@ for k, v in pairs({
     ["War Handler Ashka"] = "전투조련사 아쉬카",
     ["Warleader Krazzilak"] = "부대장 크라질락",
     ["Zaricotl"] = "자리코틀",
+    ["Azurepetal Flayer"] = "[Azurepetal Flayer]",
+    ["Azurepetal Trapper"] = "[Azurepetal Trapper]",
+    ["Bristleback Nomad"] = "뾰족털일족 유목민",
+    ["Bristleback Skullcrusher"] = "뾰족털일족 해골분쇄자",
+    ["Bristleback Thornweaver"] = "뾰족털일족 가시마술사",
+    ["Emberleaf Flayer"] = "[Emberleaf Flayer]",
+    ["Emberleaf Germinator"] = "[Emberleaf Germinator]",
+    ["Emerald Flayer"] = "[Emerald Flayer]",
+    ["Firemane Flamecaller"] = "화염갈기혈족 불꽃소환사",
+    ["Glassweb Spider"] = "유리그물거미",
+    ["Hatecrest Serpent Guard"] = "증오의갈기일족 수호병",
+    ["Quickpetal Flayer"] = "[Quickpetal Flayer]",
 }) do names.npc[k] = v end
 
 for k, v in pairs({

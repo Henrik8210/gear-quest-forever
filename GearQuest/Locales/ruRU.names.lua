@@ -1842,6 +1842,18 @@ for k, v in pairs({
     ["War Handler Ashka"] = "Военачальница Ашка",
     ["Warleader Krazzilak"] = "Военный вождь Краззилак",
     ["Zaricotl"] = "Зарикотль",
+    ["Azurepetal Flayer"] = "[Azurepetal Flayer]",
+    ["Azurepetal Trapper"] = "[Azurepetal Trapper]",
+    ["Bristleback Nomad"] = "Кочевник из племени Дыбогривов",
+    ["Bristleback Skullcrusher"] = "Череполом из племени Дыбогривов",
+    ["Bristleback Thornweaver"] = "Терноплет из племени Дыбогривов",
+    ["Emberleaf Flayer"] = "[Emberleaf Flayer]",
+    ["Emberleaf Germinator"] = "[Emberleaf Germinator]",
+    ["Emerald Flayer"] = "[Emerald Flayer]",
+    ["Firemane Flamecaller"] = "Огнегривая заклинательница пламени",
+    ["Glassweb Spider"] = "Хрустальный паук",
+    ["Hatecrest Serpent Guard"] = "Змеестраж из клана Гребня Ненависти",
+    ["Quickpetal Flayer"] = "[Quickpetal Flayer]",
 }) do names.npc[k] = v end
 
 for k, v in pairs({

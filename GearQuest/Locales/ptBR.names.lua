@@ -1424,6 +1424,18 @@ for k, v in pairs({
     ["Verifonix"] = "Piadonix",
     ["War Handler Ashka"] = "Domadora de Guerra Ashka",
     ["Warleader Krazzilak"] = "Líder Guerreiro Krazzilak",
+    ["Azurepetal Flayer"] = "[Azurepetal Flayer]",
+    ["Azurepetal Trapper"] = "[Azurepetal Trapper]",
+    ["Bristleback Nomad"] = "Nomade Costagulha",
+    ["Bristleback Skullcrusher"] = "Quebra-crânios Costagulha",
+    ["Bristleback Thornweaver"] = "Tecespinho Costagulha",
+    ["Emberleaf Flayer"] = "[Emberleaf Flayer]",
+    ["Emberleaf Germinator"] = "[Emberleaf Germinator]",
+    ["Emerald Flayer"] = "[Emerald Flayer]",
+    ["Firemane Flamecaller"] = "Arauto das Chamas Flamigrenha",
+    ["Glassweb Spider"] = "Aranha Teia-de-vidro",
+    ["Hatecrest Serpent Guard"] = "Serpente Guarda Cristafúria",
+    ["Quickpetal Flayer"] = "[Quickpetal Flayer]",
 }) do names.npc[k] = v end
 
 for k, v in pairs({

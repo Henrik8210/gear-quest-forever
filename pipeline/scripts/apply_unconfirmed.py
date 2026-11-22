@@ -36,13 +36,17 @@ ENV = Path(DATA) / "forever_wowhead" / "env_change.json"
 SOURCES = Path(DATA) / "sources.json"
 ITEMS = Path(DATA) / "items.json"
 LUA = ROOT / "GearQuest" / "_generated" / "Data.Unconfirmed.generated.lua"
+# Ward of the Dead is a level-1 trinket that reveals a grave. It is not gear.
+NOT_GEAR = {217727}
 
 
 def main() -> None:
     env = json.loads(ENV.read_text(encoding="utf-8"))["items"]
     sources = json.loads(SOURCES.read_text(encoding="utf-8"))
     unconfirmed = sorted(
-        int(k) for k, row in env.items() if (row.get("envChange") or {}).get("status") == "unconfirmed"
+        int(k)
+        for k, row in env.items()
+        if (row.get("envChange") or {}).get("status") == "unconfirmed" and int(k) not in NOT_GEAR
     )
     flagged = set(unconfirmed)
     moved = restored = 0

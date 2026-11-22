@@ -956,6 +956,18 @@ for k, v in pairs({
     ["Twilight Forgemaster"] = "Maître-forge du Crépuscule",
     ["War Handler Ashka"] = "Marchande de guerre Ashka",
     ["Warleader Krazzilak"] = "Chef de guerre Krazzilak",
+    ["Azurepetal Flayer"] = "Ecorcheur pétale-azur",
+    ["Azurepetal Trapper"] = "Trappeur pétale-azur",
+    ["Bristleback Nomad"] = "Nomade dos-hirsute",
+    ["Bristleback Skullcrusher"] = "Brise-têtes dos-hirsute",
+    ["Bristleback Thornweaver"] = "Tisseur d'épines dos-hirsute",
+    ["Emberleaf Flayer"] = "Ecorcheur braisefeuille",
+    ["Emberleaf Germinator"] = "Germinateur braisefeuille",
+    ["Emerald Flayer"] = "Ecorcheur émeraude",
+    ["Firemane Flamecaller"] = "Implorateur des flammes Crins-de-feu",
+    ["Glassweb Spider"] = "Araignée verrière",
+    ["Hatecrest Serpent Guard"] = "Garde-serpent Hainecrête",
+    ["Quickpetal Flayer"] = "Ecorcheur prestepétale",
 }) do names.npc[k] = v end
 
 for k, v in pairs({

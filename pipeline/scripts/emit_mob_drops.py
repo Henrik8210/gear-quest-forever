@@ -432,7 +432,11 @@ def profession_tables(sources: dict) -> tuple[dict[str, list[int]], dict[str, li
     hunted = hunt_item_ids()
     gear: dict[str, list[int]] = {name: [] for name in GEAR_PROFESSIONS.values()}
     for raw_id, src in sources.items():
-        if not isinstance(src, dict) or src.get("sourceType") != "profession":
+        if not isinstance(src, dict):
+            continue
+        # A craft whose pattern drops from a boss, trash, or a rare is still
+        # that profession. The trainer lists it. The source filter stays the drop.
+        if src.get("sourceType") != "profession" and src.get("sourceType") not in DROP_KINDS:
             continue
         profession = src.get("profession")
         item_id = _item_id(raw_id)

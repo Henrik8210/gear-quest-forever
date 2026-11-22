@@ -886,6 +886,18 @@ for k, v in pairs({
     ["Twilight Forgemaster"] = "Twilight-Schmiedemeister",
     ["War Handler Ashka"] = "Kriegswärterin Ashka",
     ["Warleader Krazzilak"] = "Kriegsanführer Krazzilak",
+    ["Azurepetal Flayer"] = "Azurblütenschinder",
+    ["Azurepetal Trapper"] = "Azurblütenfalle",
+    ["Bristleback Nomad"] = "Nomade der Borstennacken",
+    ["Bristleback Skullcrusher"] = "Schädelbrecher der Borstennacken",
+    ["Bristleback Thornweaver"] = "Dornenwirker der Borstennacken",
+    ["Emberleaf Flayer"] = "Glutblattschinder",
+    ["Emberleaf Germinator"] = "Glutblattkeimer",
+    ["Emerald Flayer"] = "Smaragdschinder",
+    ["Firemane Flamecaller"] = "Flammenrufer der Feuermähnen",
+    ["Glassweb Spider"] = "Glasnetzspinne",
+    ["Hatecrest Serpent Guard"] = "Schlangenwache der Hasskämme",
+    ["Quickpetal Flayer"] = "Schnellblütenschinder",
 }) do names.npc[k] = v end
 
 for k, v in pairs({

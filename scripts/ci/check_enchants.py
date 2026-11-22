@@ -185,7 +185,7 @@ def main() -> int:
     failures: list[str] = []
     seen: set[tuple[int, str]] = set()
     for cls in CLASSES:
-        for item, slot, lo, hi, _rank, _spec, _faction, _score in cat.rows[cls]:
+        for item, slot, lo, hi, _rank, _spec, _faction, _score in (row[:8] for row in cat.rows[cls]):
             if item in TEST_ITEMS:
                 continue
             fact = cat.item[cls].get(item)

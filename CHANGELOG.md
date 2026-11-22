@@ -2,7 +2,71 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.3.2
+## v1.3.3
+
+The log header reads **GearQuest Forever v1.3.3**. **`/reload`** after updating.
+
+### Level 60 Best in Slot lists
+
+**Who:** Every class at level **60**, Alliance and Horde, including while you simulate. Levels **1–59** stay on the scored list. Feral, Battle Mage, Shockadin, and Enhancement Tank do not have a Wowhead Forever page yet, so they stay on the scored list at 60 as well.
+
+**What you see:** A spec that has a Wowhead Forever Best in Slot page follows that list, in the page's order, marked **(Guide)**. The list is entered by hand. A higher score does not move a later piece in front of it. Raising **Hunts per gear slot** walks further down that same list. The **(i)** on one of those slots opens the Wowhead Forever link for the spec on screen. Select the link and press Ctrl+C. A spec with no page yet keeps the scored hunts.
+
+### Dungeon set quests
+
+**Who:** Every class at level **60**, both factions.
+
+**What you see:** The dungeon-set upgrade is a quest reward. It is not a vendor purchase. The chain is **An Earnest Proposition** (wrists), **Just Compensation** (hands and waist), **Anthion's Parting Words** (feet, legs, and shoulders), then **Saving the Best for Last** (head and chest). Each piece requires level 60. The pin is the start of the chain: **Deliana** in Ironforge, or **Mokvar** in Orgrimmar. The turn-in names the piece you bring from the first set, such as Wildheart, Beaststalker's, Magister's, Lightforge, Devout, Shadowcraft, Dreadmist, Valor, or Elements.
+
+### Where the pattern drops
+
+**Who:** The classes that can wear the piece, at the level the pattern can be used.
+
+**What you see:** A craft whose pattern drops now says who drops it, keeps the profession skill line, and pins the place when Wowhead Forever publishes one.
+
+**Black Dragonscale Helm** (Leatherworking 300, requires 56) — the pattern drops from **Blackhand Assassin** in Blackrock Spire. Both Spire doors are pinned.
+
+**Red Dragonscale Leggings** — **Crimson Battle Mage** in Stratholme. Both Stratholme doors are pinned.
+
+**Red Dragonscale Breastplate** — **General Drakkisath** in Blackrock Spire.
+
+**Blue Dragonscale Helm** — Azurepetal Trapper, Azurepetal Flayer, Emerald Flayer, Emberleaf Flayer, Emberleaf Germinator, and Quickpetal Flayer. Forever lists those elites and publishes no map, so this hunt has no pin.
+
+**Robe of the Archmage** — **Firebrand Pyromancer** in Blackrock Spire, dungeon trash. **Gloves of Spell Mastery** drops in Stratholme. **Pristine Scorpid Leggings** drops from **Spectral Researcher** in Scholomance. Blackrock Depths, the Temple of Atal'Hakkar, and Scarlet Monastery patterns that were only “Crafted with …” now name the trash that drops them.
+
+**Stormcloth Headband** drops from **Firemane Flamecaller** in Dustwallow Marsh. **Stormcloth Shoulders** drop from **Glassweb Spider** in Searing Gorge. **Stormcloth Boots** drop from **Hatecrest Serpent Guard** in Feralas. **Nightscape Cloak** drops from **Bristleback Nomad**, **Bristleback Thornweaver**, and **Bristleback Skullcrusher** in Shen'dralas.
+
+### New hunts
+
+**Who:** The classes that can wear the piece. Each one is **New in Forever**. Wowhead lists no dropper, seller, or quest, so there is no pin.
+
+**Ancient Giant's Gaze**, plate head, requires 51. Warrior and paladin.
+
+**Shadow Scalper**, one-hand axe, requires 37. Hunter, shaman, paladin, warrior, and rogue.
+
+**Cannibal's Cleaver**, two-hand axe, requires 45. Hunter, shaman, paladin, and warrior.
+
+**Reforged Atal'ai Spear**, polearm, requires 45. Hunter, paladin, warrior, and druid.
+
+### Ward of the Dead
+
+**Who:** Every class.
+
+**What you see:** **Ward of the Dead** is gone. It is a level 1 trinket that reveals a grave, and it is not a hunt.
+
+### Lookup
+
+**Who:** Every class.
+
+**What you see:** After a search, including one that finds nothing, you can change the text and search again without leaving the tab.
+
+### Crafting orders
+
+**Who:** Every class, on a crafted hunt, including from Lookup.
+
+**What you see:** Adding an order updates the button. An order that is already on the list says so and the button still updates.
+
+### v1.3.2
 
 The log header reads **GearQuest Forever v1.3.2**. **`/reload`** after updating.
 
@@ -40,7 +104,7 @@ Thanks **CookiesShorts**.
 
 **Swiftrunner Cape.** Finishing an earlier step that is also named **Alliance Relations** no longer marks the cape “No longer obtainable.” The cape closes when the quest that rewards it is done. The same rule applies to any chain whose steps share a name.
 
-**Deadliest Catch.** The chain is **Home on the Range**, then **Winter Frontier Fishery**, then **Deadliest Catch**. The hat quest is not the first step.
+**Deadliest Catch.** The chain is **Home on the Range**, then **Deadliest Catch**. **Winter Frontier Fishery** is a separate quest. You can pick up Deadliest Catch without finishing it. The hat quest is not the first step.
 
 **Mark of the Pack Leader** drops from **Humar the Pridelord**. It is a rare, not a world drop. The filter is Rare NPC.
 
@@ -56,7 +120,7 @@ Thanks **CookiesShorts**.
 
 **Who:** Every class.
 
-**What you see:** General settings, under Tooltips and score, has **Show when GearQuest is not scoring this item**. The line stays until you uncheck it.
+**What you see:** The **Tooltips** window has **Show when GearQuest is not scoring this item**. The line stays until you uncheck it.
 
 ### Dungeon sources
 

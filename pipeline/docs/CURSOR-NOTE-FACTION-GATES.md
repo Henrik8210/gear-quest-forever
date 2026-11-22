@@ -71,6 +71,9 @@ So if a list looks misordered outside level 60, it is the addon's rendering, not
 And at level 60 the score column is *intentionally* non-monotonic — the guide's tier
 order wins, e.g. *Dreadnaught Helmet* scores 130.7 behind *Conqueror's Crown*'s 104.9
 because the guide calls the Crown the plain Best and the Helmet the Best Mitigation.
+The same rule is the Forever guardrail: a spec with a page in
+`pipeline/guides/forever_bis.json` keeps that hand-entered order at level 60.
+A spec with no page stays on the scorer, and so does every level below 60.
 **Never re-sort an `origin="guide"` band by score.** `rank` is authoritative; `score` is
 context.
 

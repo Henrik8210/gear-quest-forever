@@ -315,7 +315,11 @@ for sp,blob in gen.items():
         # This file is levels 10-60. Per-spec 1-9 ships in the Early/Horde 1-9 file.
         if sp=="levelling_1_9": continue
         if b.get("hi", 60) <= 9: continue
-        primary=unique_picks([p for p in b["picks"] if not p.get("alt")], 3)
+        pool=[p for p in b["picks"] if not p.get("alt")]
+        # A Forever BiS band is the whole list, in Wowhead's order. The hunt
+        # slider then shows the next ones. The scored bands still ship three
+        # and keep the rest as reserves for the source filter.
+        primary=pool if b.get("guideList") else unique_picks(pool, 3)
         band_picks=primary
         seen_ids={p["id"] for p in band_picks}
         seen_names={p.get("name") for p in band_picks}
@@ -402,10 +406,9 @@ GQ.Data = GQ.Data or {}
 --   levels 10-60 -> this file
 --   level 70      -> Henrik's curated AtlasLoot Phase 3 entries in Data.lua
 --
--- At exactly level 60 the picks come from Wowhead's Classic BiS guides for all
--- three specs, not from the model. A TBC item may displace a guide entry only if
--- it beats the guide's own top pick by 20% -- rows carrying origin="guide" are the
--- guide's, the rest are the model's.
+-- At level 60, a spec with a Wowhead Forever page in guides/forever_bis.json
+-- uses that list in the page's order. Rows carrying origin="guide" are that
+-- list. A spec with no page, and every level below 60, stays on the model.
 --
 -- Two tables instead of one, on purpose: everything that is a fact about an
 -- ITEM (its name, where it comes from, what to do to get it) is stored once in
@@ -424,7 +427,7 @@ GQ.Data = GQ.Data or {}
 --             the exact tier. MATCH ON suffixId, NEVER ON THE NAME: ItemRandomProperties
 --             has 2,012 rows sharing only 45 names, up to 85 tiers called the same
 --             thing. "of Healing" alone spans +2/+1 to +84/+28.
---   optional: origin="guide"  (level 60, taken from the Classic BiS guide)
+--   optional: origin="guide"  (level 60, taken from the Wowhead Forever BiS list)
 
 GQ.Data."""+FACTS+""" = {
 """+"\n".join(facts)+"""

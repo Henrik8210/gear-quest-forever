@@ -1794,6 +1794,18 @@ for k, v in pairs({
     ["Verifonix"] = "维里弗尼克斯",
     ["Warleader Krazzilak"] = "克莱吉拉克",
     ["Zaricotl"] = "扎里科特",
+    ["Azurepetal Flayer"] = "[Azurepetal Flayer]",
+    ["Azurepetal Trapper"] = "[Azurepetal Trapper]",
+    ["Bristleback Nomad"] = "刺背游荡者",
+    ["Bristleback Skullcrusher"] = "刺背碎颅者",
+    ["Bristleback Thornweaver"] = "刺背织棘者",
+    ["Emberleaf Flayer"] = "[Emberleaf Flayer]",
+    ["Emberleaf Germinator"] = "[Emberleaf Germinator]",
+    ["Emerald Flayer"] = "[Emerald Flayer]",
+    ["Firemane Flamecaller"] = "火鬃招炎者",
+    ["Glassweb Spider"] = "晶网蜘蛛",
+    ["Hatecrest Serpent Guard"] = "憎世毒蛇守卫",
+    ["Quickpetal Flayer"] = "[Quickpetal Flayer]",
 }) do names.npc[k] = v end
 
 for k, v in pairs({

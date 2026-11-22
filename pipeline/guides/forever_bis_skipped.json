@@ -1,0 +1,48 @@
+{
+  "note": "These ids are on a Wowhead Forever BiS page, but https://nether.wowhead.com/tooltip/item/{id}?dataEnv=16 returned 404, so they were not indexed. Recheck them on the next import. When the tooltip exists, index the item with the same source, quest chain, and description as any other hunt, then put it back on the level-60 list.",
+  "checked": "2026-11-22",
+  "items": [
+    {
+      "id": 280930,
+      "class": "PALADIN",
+      "spec": "retribution",
+      "slot": "Head",
+      "reason": "Forever tooltip dataEnv=16 returned 404"
+    },
+    {
+      "id": 280929,
+      "class": "PALADIN",
+      "spec": "retribution",
+      "slot": "Shoulder",
+      "reason": "Forever tooltip dataEnv=16 returned 404"
+    },
+    {
+      "id": 280928,
+      "class": "PALADIN",
+      "spec": "retribution",
+      "slot": "Chest",
+      "reason": "Forever tooltip dataEnv=16 returned 404"
+    },
+    {
+      "id": 280925,
+      "class": "PALADIN",
+      "spec": "retribution",
+      "slot": "Hands",
+      "reason": "Forever tooltip dataEnv=16 returned 404"
+    },
+    {
+      "id": 280927,
+      "class": "PALADIN",
+      "spec": "retribution",
+      "slot": "Legs",
+      "reason": "Forever tooltip dataEnv=16 returned 404"
+    },
+    {
+      "id": 280926,
+      "class": "PALADIN",
+      "spec": "retribution",
+      "slot": "Feet",
+      "reason": "Forever tooltip dataEnv=16 returned 404"
+    }
+  ]
+}

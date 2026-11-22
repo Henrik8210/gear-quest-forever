@@ -32,8 +32,16 @@ order of importance. Do not invert them.
    hunt.
 
 Level **60** uses those same survivability and endurance multipliers. Hit,
-crit, and weapon damage stay on the raw weights. `GQ_NO_GUIDES=1` until
-Forever guides exist.
+crit, and weapon damage stay on the raw weights.
+
+**Level 60 guardrail.** A spec with a page in `guides/forever_bis.json` uses
+that Wowhead Forever Best in Slot list, in the page's order, instead of the
+model. The list is entered by hand. A higher model score does not move a
+later piece in front of the page. Specs with no page stay on the scorer.
+Those specs today are Feral, Battle Mage (frost, fire, and arcane),
+Shockadin, and Enhancement Tank. Levels 1–59 always stay on the scorer.
+`GQ_NO_GUIDES=1` only keeps the old Classic guide files out. It does not
+skip `forever_bis.json`.
 
 The same multipliers live in the addon as `GQ.ScoringLeveling` in
 `GearQuest/_generated/ScoringWeights.generated.lua` (from
@@ -430,7 +438,8 @@ skeleton with that school in front.
 These rules apply to **every class**. Re-score **one class at a time** after
 a rule change. Do not `reemit_all.py` from stale JSON. After a tip sync or
 rule change, run `python pipeline/scripts/rescore_hunter_shaman.py` (all nine
-despite the name; `GQ_NO_GUIDES=1`). Pass a class name to do one.
+despite the name; `GQ_NO_GUIDES=1` keeps the old Classic guide files out and
+still applies `guides/forever_bis.json`). Pass a class name to do one.
 
 **Class lock uses historical set names, then the tip.** Deathmist is warlock,
 Virtuous is priest, even when Forever omits `Classes:`. Names only gate class;
@@ -1202,8 +1211,11 @@ re-score the class, then copy Lua back.
    Era fingerprint: Vice Grips **9640** must stay **+17 Strength @ 9%**.
 
 5. **Re-score** with the Forever model. One class at a time. `GQ_NO_GUIDES=1`
-   is set inside the script. It writes `pipeline/out/` and copies the Lua
-   into `GearQuest/_generated/`.
+   is set inside the script. That flag keeps the old Classic guide files out.
+   A spec with a page in `guides/forever_bis.json` still takes that list at
+   level 60, in the page's order. A spec with no page stays on the model.
+   The script writes `pipeline/out/` and copies the Lua into
+   `GearQuest/_generated/`.
 
    ```powershell
    python pipeline/scripts/rescore_hunter_shaman.py HUNTER
@@ -1845,9 +1857,12 @@ Shaman **relic slot** is stored as pipeline slot **`Ranged`**; the log labels it
 
 `data/weights.json` is the Forever combat scale: no expertise / armour pen /
 resilience, unified Hit/Crit/Haste, hunter 1 Agi = 1 RAP, 14 AP = 1 DPS, no
-Steady Shot, shaman no dual wield. Level 60 is scored from the model
-(`GQ_NO_GUIDES=1`); Classic Wowhead BiS guides stay out until we write
-Forever ones.
+Steady Shot, shaman no dual wield. At level 60, a spec with a page in
+`guides/forever_bis.json` uses that hand-entered Wowhead Forever list in
+the page's order. Specs with no page (Feral, Battle Mage, Shockadin,
+Enhancement Tank) stay on the model, and so does every level below 60.
+`GQ_NO_GUIDES=1` keeps the old Classic guide files out and does not skip
+that Forever list.
 
 `check_roles.py` enforces the role split: casters carry no str/ap/rap;
 physical specs carry no sp/heal except Ret, Enhance, Enhancement Tank,

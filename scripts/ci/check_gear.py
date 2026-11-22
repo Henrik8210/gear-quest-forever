@@ -13,7 +13,8 @@ Structure
 - Every row's item has a facts row with a name and a known source type.
 Order
 - Outside MainHand and SecondaryHand, a higher rank never has a lower score,
-  except a set piece, which may lead for its set bonus. The weapon slots rank
+  except a set piece, which may lead for its set bonus, and a level-60
+  Wowhead Forever list (origin="guide"), which keeps the page's order. The weapon slots rank
   a one-hander with its off-hand partner, so their order is not the stored
   score.
 Banned
@@ -75,7 +76,7 @@ function(t)
     local out = {}
     for i = 1, #t do
         local r = t[i]
-        out[i] = { r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8] or 0 }
+        out[i] = { r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8] or 0, r.origin or false }
     end
     return out
 end
@@ -144,7 +145,7 @@ def check_structure(cat: Catalog, fail) -> None:
         groups: dict[tuple, list[tuple]] = defaultdict(list)
         bands: dict[tuple, set] = defaultdict(set)
         for row in cat.rows[cls]:
-            item, slot, lo, hi, rank, spec, faction, score = row
+            item, slot, lo, hi, rank, spec, faction, score = row[:8]
             groups[(spec, faction, slot, lo, hi)].append(row)
             bands[(spec, faction, slot)].add((lo, hi))
             if not (1 <= lo <= hi <= 60):
@@ -158,7 +159,10 @@ def check_structure(cat: Catalog, fail) -> None:
             ranks = sorted(r[4] for r in group)
             if ranks != list(range(1, len(ranks) + 1)):
                 fail(f"{cls} {spec} {faction} {slot} {lo}-{hi}: ranks {ranks[:15]} do not close up")
-            if slot in WEAPON_PAIR_SLOTS:
+            # A Wowhead Forever list keeps the page's order. Rank 1 can score
+            # below a later option. The model still has to rank by score.
+            guided = any(len(r) > 8 and r[8] == "guide" for r in group)
+            if slot in WEAPON_PAIR_SLOTS or guided:
                 continue
             ordered = sorted(group, key=lambda r: r[4])
             for a, b in zip(ordered, ordered[1:]):
@@ -214,7 +218,7 @@ def check_tooltips(cat: Catalog, fail, warn) -> None:
     leftovers: dict[str, set[int]] = defaultdict(set)
     for cls in CLASSES:
         reported: set[tuple] = set()
-        for item, slot, lo, hi, rank, spec, faction, score in cat.rows[cls]:
+        for item, slot, lo, hi, rank, spec, faction, score, *_ in cat.rows[cls]:
             tip = cat.tips.get(item)
             if not tip or (item, slot) in reported:
                 continue
@@ -246,7 +250,7 @@ def check_factions(cat: Catalog, fail) -> None:
             locks.setdefault(int(item), (side, name))
     for cls in CLASSES:
         reported: set[tuple] = set()
-        for item, slot, lo, hi, rank, spec, faction, score in cat.rows[cls]:
+        for item, slot, lo, hi, rank, spec, faction, score, *_ in cat.rows[cls]:
             lock = locks.get(item)
             if lock and faction and faction != lock[0] and (item, faction) not in reported:
                 reported.add((item, faction))

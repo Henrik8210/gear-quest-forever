@@ -112,9 +112,10 @@ PATS = [(re.compile(p), k) for p, k in PATS]
 rx_tag = re.compile(r"<[^>]+>")
 SKIP_NAME = re.compile(r"\(DNT\)|\AHidden |\AMonster ", re.I)
 # Not hunt gear. The chisel is a Jewelcrafting tool. The shield is a creature model.
+# 217727 Ward of the Dead is a level-1 trinket that reveals a grave.
 # 24358, 19503, and 19504 are QA test items. 280304 is a hidden spell, not a dagger.
 # Beta copies are the level-30 Molten Core sets and weapons. Never index them.
-SKIP_IDS = {271965, 286140, 24358, 19503, 19504, 280304} | forever_beta_copy_ids()
+SKIP_IDS = {271965, 286140, 217727, 24358, 19503, 19504, 280304} | forever_beta_copy_ids()
 UNKNOWN_RTG = {}
 
 
