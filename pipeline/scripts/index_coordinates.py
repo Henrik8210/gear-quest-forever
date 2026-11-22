@@ -21,8 +21,8 @@ from __future__ import annotations
 
 import gzip
 import json
-import os
 import re
+import os
 import sys
 import time
 import urllib.error
@@ -100,6 +100,9 @@ HAND_FACTION = {
     # Gleaming Crescent Necklace (98027) turns in to Maliynn in Astranaar.
     281290: "Alliance",
     282283: "Alliance",
+    # Aeonas the Vindicated is an Alliance paladin quest. The journal and the
+    # Forever tooltip both say Stormwind. Horde must not see the pauldrons.
+    277236: "Alliance",
 }
 
 EXTRA_CHAIN_ROOTS = {
@@ -1318,6 +1321,40 @@ def lua_spot(spot: dict) -> str:
     return "{" + ",".join(parts) + "}"
 
 
+# Valley of Trials camp sits on the tents. The boars are a few hundred yards
+# northeast, outside the camp. One Durotar map unit is about 50 yards.
+NUDGE_SPOTS = {
+    6268: {("Durotar", 42.4, 68.4): (47.4, 63.4)},
+}
+
+
+def nudge_known_spots() -> None:
+    if not LUA_PATH.exists():
+        return
+    text = LUA_PATH.read_text(encoding="utf-8")
+    changed = False
+    for item_id, moves in NUDGE_SPOTS.items():
+        for (zone, x, y), (nx, ny) in moves.items():
+            old = f'[{item_id}]={{'
+            start = text.find(old)
+            if start < 0:
+                continue
+            end = text.find("\n", start)
+            if end < 0:
+                end = len(text)
+            line = text[start:end]
+            src = re.compile(
+                rf'(map="{re.escape(zone)}"[^}}]*?x=){x}(,y=){y}\b'
+            )
+            if not src.search(line):
+                continue
+            line = src.sub(rf"\g<1>{nx}\g<2>{ny}", line, count=1)
+            text = text[:start] + line + text[end:]
+            changed = True
+    if changed:
+        LUA_PATH.write_text(text, encoding="utf-8", newline="\n")
+
+
 def emit(rows: dict[int, dict]) -> None:
     lines = []
     for iid in sorted(rows):
@@ -1339,6 +1376,7 @@ GQ.Data.coordinates = {
 }
 """
     LUA_PATH.write_text(text, encoding="utf-8", newline="\n")
+    nudge_known_spots()
 
 
 def write_gaps(gaps: list[dict], by_type: dict) -> None:
@@ -1606,6 +1644,7 @@ def strip_capital_farm_rows() -> None:
             '    [%d]={note="%s"%s,spots={%s}},' % (item_id, match.group(2), more, spots)
         )
     LUA_PATH.write_text(nl.join(kept_lines) + nl, encoding="utf-8", newline="")
+    nudge_known_spots()
     print(
         f"trimmed {trimmed} removed {removed} city camps dropped {dropped_spots}",
         flush=True,

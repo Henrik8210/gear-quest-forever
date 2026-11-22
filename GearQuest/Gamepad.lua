@@ -46,7 +46,7 @@ local HELD_SCROLL = {
     down = { PADRSTICKDOWN = true },
 }
 
-local PAGES = { "log", "lookup", "simulator", "settings" }
+local PAGES = { "log", "orders", "lookup", "simulator", "settings" }
 
 local function ObjectType(widget)
     if widget and widget.GetObjectType then
@@ -235,6 +235,8 @@ local function PageTab(log, page)
         return frame.tabSimulator
     elseif page == "settings" then
         return frame.tabSettings
+    elseif page == "orders" then
+        return frame.tabOrders
     end
 end
 
@@ -422,6 +424,7 @@ function GQ.Log:GamepadIsPageTab(widget)
     end
     return widget == frame.tabLog or widget == frame.tabLookup
         or widget == frame.tabSimulator or widget == frame.tabSettings
+        or widget == frame.tabOrders
 end
 
 function GQ.Log:GamepadIsListTarget(widget)
@@ -454,7 +457,8 @@ end
 -- and (i), Hunts per gear slot, the spec name, and Turn off simulation.
 function GQ.Log:GamepadIsFilterTarget(widget)
     local frame = self.frame
-    if frame and (widget == frame.sourceFilterBtn or widget == frame.playStyleBtn
+    if frame and (widget == frame.sourceFilterBtn or widget == frame.collapseAllBtn
+        or widget == frame.playStyleBtn
         or widget == frame.tooltipsBtn or widget == frame.huntsPerSlotSlider
         or widget == frame.huntsPerSlotInfo
         or (widget == frame.armorTypeBtn and widget:IsShown()) or widget == frame.simHeaderOffBtn) then

@@ -17,7 +17,7 @@ GQ.ScoringLeveling = {
     mana = 2,
 }
 
-GQ.SCORING_WEIGHTS_REVISION = "5f6772deb6"
+GQ.SCORING_WEIGHTS_REVISION = "9655d1c6eb"
 
 GQ.ScoringWeights = {
     DRUID = {
@@ -429,7 +429,7 @@ GQ.ScoringWeights = {
             label = "Holy - healing",
             dpsWeight = 0.086,
             weights = {
-                sp = 1.35,
+                sp = 1,
                 heal = 1.3,
                 int = 0.85,
                 mp5 = 1.1,
@@ -449,8 +449,8 @@ GQ.ScoringWeights = {
                 mana = 0.04,
                 health = 0.02,
                 hp5 = 0.05,
-                spHoly = 1.8,
-                sp_from_heal = 1.8,
+                spHoly = 1,
+                sp_from_heal = 1,
             },
         },
         levelling_1_9 = {
@@ -495,7 +495,7 @@ GQ.ScoringWeights = {
                 spi = 0.05,
                 ap = 0.15,
                 armor = 0.2,
-                sp = 0.9,
+                sp = 0.85,
                 heal = 0.02,
                 mp5 = 0.2,
                 crit = 0.35,
@@ -510,8 +510,8 @@ GQ.ScoringWeights = {
                 mana = 0.02,
                 health = 0.06,
                 hp5 = 0.1,
-                spHoly = 0.05,
-                sp_from_heal = 0.8,
+                spHoly = 0.85,
+                sp_from_heal = 0.85,
             },
         },
         retribution = {
@@ -525,7 +525,7 @@ GQ.ScoringWeights = {
                 spi = 0.05,
                 ap = 0.5,
                 armor = 0.015,
-                sp = 0.25,
+                sp = 0.45,
                 heal = 0.02,
                 mp5 = 0.35,
                 crit = 0.5700000000000001,
@@ -540,8 +540,8 @@ GQ.ScoringWeights = {
                 mana = 0.02,
                 health = 0.02,
                 hp5 = 0.04,
-                spHoly = 0.02,
-                sp_from_heal = 0.25,
+                spHoly = 0.45,
+                sp_from_heal = 0.45,
             },
         },
         shockadin = {

@@ -343,8 +343,27 @@ local function InitCustomButton(self)
     end
 end
 
+function GQ.Minimap:ScheduleShowRetry()
+    if self._showRetry or not C_Timer or not C_Timer.After then
+        return
+    end
+    self._showRetry = true
+    local delays = { 0, 1, 3 }
+    for i = 1, #delays do
+        C_Timer.After(delays[i], function()
+            local minimap = GQ.Minimap
+            if not minimap or minimap:IsHidden() then
+                return
+            end
+            minimap:TryLibDBIcon()
+            minimap:ApplyVisibility()
+        end)
+    end
+end
+
 function GQ.Minimap:Init()
     self:RegisterLauncher()
+    self:ScheduleShowRetry()
     if self:TryLibDBIcon() then
         return
     end

@@ -1174,9 +1174,10 @@ GQ.Data.questChain[6738] = { {1148, "Parts of the Swarm"}, {1184, "Parts of the 
 GQ.Data.questChain[6739] = { {1195, "The Sacred Flame"}, {1196, "The Sacred Flame"}, {1197, "The Sacred Flame"} }
 GQ.Data.questChain[6740] = { {1195, "The Sacred Flame"}, {1196, "The Sacred Flame"}, {1197, "The Sacred Flame"} }
 GQ.Data.questChain[6743] = 1
-GQ.Data.questChain[6745] = 0
-GQ.Data.questChain[6746] = 0
-GQ.Data.questChain[6747] = 0
+GQ.Data.questChain[6744] = { {1431, "Alliance Relations"}, {1432, "Alliance Relations"}, {1433, "Alliance Relations"}, {1434, "Befouled by Satyr"}, {1480, "The Corrupter"}, {1481, "The Corrupter"}, {1482, "The Corrupter"}, {1484, "The Corrupter"}, {1488, "The Corrupter"}, {1436, "Alliance Relations"} }
+GQ.Data.questChain[6745] = { {1431, "Alliance Relations"}, {1432, "Alliance Relations"}, {1433, "Alliance Relations"}, {1434, "Befouled by Satyr"}, {1480, "The Corrupter"}, {1481, "The Corrupter"}, {1482, "The Corrupter"}, {1484, "The Corrupter"}, {1488, "The Corrupter"}, {1436, "Alliance Relations"} }
+GQ.Data.questChain[6746] = { {1431, "Alliance Relations"}, {1432, "Alliance Relations"}, {1433, "Alliance Relations"}, {1434, "Befouled by Satyr"}, {1480, "The Corrupter"}, {1481, "The Corrupter"}, {1482, "The Corrupter"}, {1484, "The Corrupter"}, {1488, "The Corrupter"} }
+GQ.Data.questChain[6747] = { {1431, "Alliance Relations"}, {1432, "Alliance Relations"}, {1433, "Alliance Relations"}, {1434, "Befouled by Satyr"}, {1480, "The Corrupter"}, {1481, "The Corrupter"}, {1482, "The Corrupter"}, {1484, "The Corrupter"}, {1488, "The Corrupter"} }
 GQ.Data.questChain[6748] = 1
 GQ.Data.questChain[6749] = 1
 GQ.Data.questChain[6750] = 1
@@ -2048,6 +2049,10 @@ GQ.Data.questChain[257345] = 1
 GQ.Data.questChain[257346] = 1
 GQ.Data.questChain[257943] = 1
 GQ.Data.questChain[258882] = { {92464, "Elemental Unrest"}, {92465, "Agitators"}, {92469, "Return to Rorian"}, {92470, "Foul Matriarch"} }
+GQ.Data.questChain[259890] = { Alliance = { {89001, "Home on the Range"}, {89228, "Winter Frontier Fishery"} }, Horde = { {91488, "Home on the Range"}, {91610, "Winter Frontier Fishery"} } }
+GQ.Data.questChain[260210] = { Alliance = { {89001, "Home on the Range"}, {89228, "Winter Frontier Fishery"}, {89015, "Deadliest Catch"} }, Horde = { {91488, "Home on the Range"}, {91610, "Winter Frontier Fishery"}, {91611, "Deadliest Catch"} } }
+GQ.Data.questChain[260211] = { Alliance = { {89001, "Home on the Range"}, {89228, "Winter Frontier Fishery"}, {89015, "Deadliest Catch"} }, Horde = { {91488, "Home on the Range"}, {91610, "Winter Frontier Fishery"}, {91611, "Deadliest Catch"} } }
+GQ.Data.questChain[260212] = { Alliance = { {89001, "Home on the Range"}, {89228, "Winter Frontier Fishery"}, {89015, "Deadliest Catch"} }, Horde = { {91488, "Home on the Range"}, {91610, "Winter Frontier Fishery"}, {91611, "Deadliest Catch"} } }
 GQ.Data.questChain[260216] = { {86777, "Master Feardred"}, {86792, "Thinning Their Forces"}, {86796, "Later, Satyr"}, {86797, "Return to Rageroar"}, {86798, "Timbermaw Reinforcements"}, {87346, "Chieftain Bloodmaw"}, {86814, "Blackmaw Counter-Offensive"}, {92065, "Blackmaw Reclamation"} }
 GQ.Data.questChain[260217] = { {86777, "Master Feardred"}, {86792, "Thinning Their Forces"}, {86796, "Later, Satyr"}, {86797, "Return to Rageroar"}, {86798, "Timbermaw Reinforcements"}, {87346, "Chieftain Bloodmaw"}, {86814, "Blackmaw Counter-Offensive"}, {92065, "Blackmaw Reclamation"} }
 GQ.Data.questChain[260218] = { {86777, "Master Feardred"}, {86792, "Thinning Their Forces"}, {86796, "Later, Satyr"}, {86797, "Return to Rageroar"}, {86798, "Timbermaw Reinforcements"}, {87346, "Chieftain Bloodmaw"}, {86814, "Blackmaw Counter-Offensive"}, {92065, "Blackmaw Reclamation"} }
@@ -2233,6 +2238,7 @@ GQ.Data.questChain[277226] = 1
 GQ.Data.questChain[277232] = 1
 GQ.Data.questChain[277234] = 1
 GQ.Data.questChain[277235] = 1
+GQ.Data.questChain[277236] = { {78088, "A Strange Artifact"}, {78089, "Advice From Stormwind"}, {78090, "A Second Opinion"}, {78091, "Earning Your Salt"}, {78092, "It Must Be Destroyed"}, {78093, "Return to Delgren"}, {96438, "Battle at the Mannoroc Coven"}, {79939, "The Broken Hammer"}, {79940, "A Lost Brother"}, {79945, "Orders from the Grand Crusader"}, {79946, "A Brother In Need"}, {79963, "By The Light's Grace"}, {79970, "Aeonas the Vindicated"} }
 GQ.Data.questChain[277246] = 0
 GQ.Data.questChain[277247] = { {96899, "Bandarion Keep"}, {96896, "A Righteous Cause"}, {98545, "Leonid's Letter"} }
 GQ.Data.questChain[277254] = 0

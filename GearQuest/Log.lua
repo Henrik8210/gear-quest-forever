@@ -30,18 +30,18 @@ local RIGHT_COLUMN_WIDTH = USABLE_WIDTH - COLUMN_GAP - LEFT_COLUMN_WIDTH
 local PANEL_INSET = 4
 local FILTER_TAB_OVERLAP = 3
 local FILTER_TAB_LEFT = 12
--- Four list tabs share the row and stop short of the Filter button.
+-- Four list tabs share their row. Collapse and Filter sit on the row above it.
 local LIST_TAB_COUNT = 4
 local LIST_TAB_GAP = 4
-local LIST_TAB_FILTER_GAP = 8
 local FILTER_BUTTON_WIDTH = 72
+local FILTER_ROW_HEIGHT = 28
 GQ.Log.HuntsFooterGap = 6
 GQ.Log.ArmorTypeOrder = { "Cloth", "Leather", "Mail", "Plate" }
 GQ.Log.ArmorTypeSet = { Cloth = true, Leather = true, Mail = true, Plate = true }
 GQ.Log.ClothOnlyClasses = { MAGE = true, WARLOCK = true, PRIEST = true }
 GQ.Log.ArmorSubclassById = { [1] = "Cloth", [2] = "Leather", [3] = "Mail", [4] = "Plate" }
 local FILTER_TAB_WIDTH = math.floor(
-    (LEFT_COLUMN_WIDTH - FILTER_TAB_LEFT - 2 - FILTER_BUTTON_WIDTH - LIST_TAB_FILTER_GAP
+    (LEFT_COLUMN_WIDTH - FILTER_TAB_LEFT - 2
         - LIST_TAB_GAP * (LIST_TAB_COUNT - 1)) / LIST_TAB_COUNT
 )
 -- Status band lives on the main frame above logPage; tabs still sit on the list edge.
@@ -51,7 +51,8 @@ local SIDE_TAB_WIDTH = 53
 local SIDE_TAB_OVERLAP = 8
 local SIDE_TAB_GAP = 10
 local SIDE_TAB_ICON_SIZE = 36
-local SIDE_TAB_TOP = -(TAB_TOP_OFFSET - LOG_SECTION_TOP)
+-- Just under the title, in line with the Professions book's first side tab.
+local SIDE_TAB_TOP = -48
 local TAB_BORDER_EDGE = 12
 local FILTER_BORDER_EDGE = 8
 local HANDLE_ART = {
@@ -59,6 +60,7 @@ local HANDLE_ART = {
     simulator = "Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Art\\GQ-Handle-Simulator.png",
     settings = "Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Art\\GQ-Handle-Settings.png",
     lookup = "Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Art\\GQ-Handle-Lookup.png",
+    orders = "Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Art\\GQ-Handle-Orders.png",
     glow = "Interface\\AddOns\\" .. tostring(ADDON_NAME) .. "\\Art\\GQ-Handle-InnerGlow.png",
 }
 local SECTION_DIVIDER_HEIGHT = 3
@@ -730,6 +732,11 @@ local function OnListRowItemClick(entry)
     end
 
     local log = _G.GearQuest and _G.GearQuest.Log
+    if log and IsAltKeyDown and IsAltKeyDown()
+        and not (IsShiftKeyDown and IsShiftKeyDown())
+        and not (IsControlKeyDown and IsControlKeyDown()) then
+        log:AddCraftingOrder(entry)
+    end
     if log then
         log:SelectHunt(entry.id, false, entry)
     end
@@ -747,6 +754,13 @@ local function CreateRewardItemButton(parent, name)
 
     button.icon = iconFrame:CreateTexture(nil, "ARTWORK")
     button.icon:SetAllPoints(iconFrame)
+
+    -- The quest log keeps the reward name white and paints rarity on the icon.
+    local iconBorder = iconFrame:CreateTexture(nil, "OVERLAY")
+    iconBorder:SetTexture("Interface\\Common\\WhiteIconFrame")
+    iconBorder:SetAllPoints(iconFrame)
+    iconBorder:Hide()
+    button.iconBorder = iconBorder
 
     local foreverMark = CreateFrame("Frame", nil, button)
     foreverMark:SetSize(REWARD_ICON_SIZE, REWARD_ICON_SIZE)
@@ -2258,7 +2272,7 @@ function GQ.Log:SetPageTab(tab)
         self:RefreshSettings()
     elseif self:GetPageTab() == "lookup" then
         self:RefreshLookup()
-    else
+    elseif self:GetPageTab() ~= "orders" then
         self:Refresh()
     end
 end
@@ -2342,9 +2356,9 @@ local SOURCE_FILTERS = GQ.LocaleTable({
     { id = "profession", label = L["Profession"] },
     { id = "quest_reward", label = L["Quest reward"] },
     { id = "rare_npc", label = L["Rare NPC"] },
-    { id = "unsourced", label = L["Unsourced"] },
     { id = "vendor", label = L["Vendor"] },
     { id = "world_drop", label = L["World drop"] },
+    { id = "unsourced", label = L["Unsourced"] },
 })
 
 GQ.Log.UNIT_GEAR_SOURCE_FILTERS = GQ.LocaleTable({
@@ -6632,12 +6646,17 @@ function GQ.Log:UpdateDetailReward(entryOrItemId)
         or (GQ.Data and GQ.Data.LocaleItemName and GQ.Data:LocaleItemName(itemId))
         or (GQ.Data and GQ.Data.GetItemDisplayName and GQ.Data:GetItemDisplayName(itemId))
         or ("Item " .. itemId)
-    local nameR, nameG, nameB = 1, 1, 1
+    icon.name:SetTextColor(1, 1, 1)
     local quality = GQ.Data and GQ.Data.GetItemQualityForDisplay and GQ.Data:GetItemQualityForDisplay(itemId)
-    if quality then
-        nameR, nameG, nameB = GetListItemQualityColor(itemId)
+    if icon.iconBorder then
+        if quality then
+            local borderR, borderG, borderB = GetListItemQualityColor(itemId)
+            icon.iconBorder:SetVertexColor(borderR, borderG, borderB)
+            icon.iconBorder:Show()
+        else
+            icon.iconBorder:Hide()
+        end
     end
-    icon.name:SetTextColor(nameR, nameG, nameB)
     if icon.foreverMark then
         local foreverNew = GQ.Data and GQ.Data.foreverNew and GQ.Data.foreverNew[itemId]
         icon.foreverMark:SetShown(not not foreverNew)
@@ -6704,6 +6723,18 @@ function GQ.Log:MeasureDetailContentHeight()
     end
     if self.frame.detailRankBox and self.frame.detailRankBox:IsShown() then
         height = height + (self.frame.detailRankBox:GetHeight() or 0) + 8
+    elseif self.frame.orderBtn and self.frame.orderBtn:IsShown() then
+        local btnH = self.frame.orderBtn:GetHeight() or 22
+        local noteH = 0
+        if self.frame.detailRankClosed and self.frame.detailRankClosed:IsShown() then
+            noteH = self.frame.detailRankClosed:GetStringHeight() or 0
+        end
+        if btnH > noteH then
+            height = height + (btnH - noteH)
+        end
+        if noteH == 0 then
+            height = height + 8
+        end
     end
     if self.frame.detailRankClosed and self.frame.detailRankClosed:IsShown() then
         local noteH = self.frame.detailRankClosed:GetStringHeight() or 0
@@ -7605,20 +7636,22 @@ function GQ.Log:RepositionSpecButton(frame)
         control:SetFrameLevel(logPage:GetFrameLevel() + 8)
     end
 
-    if frame.sourceFilterBtn then
-        local listEdge = frame.listInset or logPage
+    if frame.collapseAllBtn then
+        if frame.collapseAllBtn:GetParent() ~= logPage then
+            frame.collapseAllBtn:SetParent(logPage)
+        end
+        frame.collapseAllBtn:ClearAllPoints()
+        -- Own row above the hunt tabs, flush with the list's left edge.
+        frame.collapseAllBtn:SetPoint("TOPLEFT", logPage, "TOPLEFT", FILTER_TAB_LEFT, -2)
+        frame.collapseAllBtn:SetFrameLevel(logPage:GetFrameLevel() + 12)
+    end
+    if frame.sourceFilterBtn and frame.collapseAllBtn then
         if frame.sourceFilterBtn:GetParent() ~= logPage then
             frame.sourceFilterBtn:SetParent(logPage)
         end
         frame.sourceFilterBtn:ClearAllPoints()
-        -- Same row as the spec picker, flush with the gear list's right edge.
-        local rowCenter = 4 + (SPEC_CONTROL_HEIGHT / 2)
-        if frame.listInset then
-            frame.sourceFilterBtn:SetPoint("RIGHT", frame.listInset, "TOPRIGHT", -2, rowCenter)
-        else
-            frame.sourceFilterBtn:SetPoint("TOPRIGHT", logPage, "TOPLEFT", LEFT_COLUMN_WIDTH - 2, 0)
-        end
-        frame.sourceFilterBtn:SetFrameLevel((listEdge:GetFrameLevel() or 1) + 12)
+        frame.sourceFilterBtn:SetPoint("LEFT", frame.collapseAllBtn, "RIGHT", 4, 0)
+        frame.sourceFilterBtn:SetFrameLevel(frame.collapseAllBtn:GetFrameLevel() or 1)
     end
 end
 
@@ -8166,6 +8199,7 @@ function GQ.Log:UpdateFooterButtons()
         if self.frame.restoreBtn then
             self.frame.restoreBtn:Hide()
         end
+        self:UpdateOrderButton()
         self:StartTrackIntro(track)
         return
     end
@@ -8224,7 +8258,215 @@ function GQ.Log:UpdateFooterButtons()
             self.frame.restoreBtn:Hide()
         end
     end
+    self:UpdateOrderButton()
     self:StartTrackIntro(track)
+end
+
+function GQ.Log:AddCraftingOrder(entry)
+    if GQ.Orders and GQ.Orders.Add then
+        return GQ.Orders:Add(entry)
+    end
+end
+
+function GQ.Log:EntryForCraftingOrder(itemId, entryId)
+    local data = GQ.Data
+    if not data or not itemId then
+        return nil
+    end
+    if entryId and data.GetEntryById then
+        local stored = data:GetEntryById(entryId)
+        if stored and stored.itemId == itemId and data.EntryMatchesPlayer and data:EntryMatchesPlayer(stored) then
+            return stored
+        end
+    end
+    local rows = data.GetEntriesByItemId and data:GetEntriesByItemId(itemId) or {}
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    local faction = GQ.GetEffectiveFaction and GQ:GetEffectiveFaction()
+    local level = (GQ.GetEffectiveLevel and GQ:GetEffectiveLevel()) or 1
+    local best, bestScore
+    local near, nearDist, nearScore
+    for i = 1, #rows do
+        local entry = rows[i]
+        local skip = false
+        if entry.classes and classFile and not entry.classes[classFile] then
+            skip = true
+        elseif entry.factions and faction and not entry.factions[faction] then
+            skip = true
+        elseif GQ.Equip and GQ.Equip.EntryMatchesSpec and not GQ.Equip:EntryMatchesSpec(entry) then
+            skip = true
+        end
+        if not skip and data.EntryMatchesPlayer and data:EntryMatchesPlayer(entry) then
+            local score = entry.pipelineScore or 0
+            if not best or score > bestScore then
+                best = entry
+                bestScore = score
+            end
+        elseif not skip then
+            local minL = entry.minLevel or 1
+            local maxL = entry.maxLevel or minL
+            local dist = 0
+            if level < minL then
+                dist = minL - level
+            elseif level > maxL then
+                dist = level - maxL
+            end
+            local score = entry.pipelineScore or 0
+            if not near or dist < nearDist or (dist == nearDist and score > nearScore) then
+                near = entry
+                nearDist = dist
+                nearScore = score
+            end
+        end
+    end
+    if best then
+        return best
+    end
+    if near then
+        return near
+    end
+    if entryId and data.GetEntryById then
+        local stored = data:GetEntryById(entryId)
+        if stored and stored.itemId == itemId then
+            return stored
+        end
+    end
+    return nil
+end
+
+function GQ.Log:OpenCraftingOrder(itemId, entryId)
+    local entry = self:EntryForCraftingOrder(itemId, entryId)
+    if not entry then
+        if GQ.Chat then
+            GQ:Chat("|cff00ccffGearQuest|r", L["This hunt is not on the list for the class you are viewing."])
+        end
+        return
+    end
+    if self.frame and not self.frame:IsShown() then
+        self:Show()
+    end
+    self:SelectHunt(entry.id, true, entry)
+    if self.selectedHuntId ~= entry.id then
+        self.selectedHuntId = entry.id
+        self.selectedEntry = entry
+        if self:GetPageTab() ~= "log" then
+            GearQuestForeverDB.ui = GearQuestForeverDB.ui or {}
+            GearQuestForeverDB.ui.pageTab = "log"
+            if self.ApplyPageTab then
+                self:ApplyPageTab()
+            end
+        end
+        self:ApplyEntryDetail(entry)
+        self:UpdateFooterButtons()
+    end
+end
+
+function GQ.Log:UpdateOrderButton()
+    local frame = self.frame
+    if not frame or not frame.detailChild then
+        return
+    end
+    if not frame.orderBtn then
+        local btn = CreateFrame("Button", "GearQuestAddOrderButton", frame.detailChild, "UIPanelButtonTemplate")
+        btn:SetHeight(22)
+        btn:SetText(L["Add order"])
+        btn:SetScript("OnClick", function()
+            local log = GQ.Log
+            local page = log:GetPageTab()
+            local entry = page == "lookup" and log.lookupEntry or log.selectedEntry
+            if not entry and log.DetailEntry then
+                entry = log:DetailEntry()
+            end
+            log:AddCraftingOrder(entry)
+        end)
+        btn:SetScript("OnEnter", function(self)
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            GameTooltip:SetText(L["Add order"], 1, 1, 1)
+            GameTooltip:AddLine(L["Saves this craft for any character on the account. Alt-click a crafted hunt does the same."], 1, 0.82, 0, true)
+            GameTooltip:Show()
+        end)
+        btn:SetScript("OnLeave", function()
+            GameTooltip:Hide()
+        end)
+        frame.orderBtn = btn
+    end
+    local page = self:GetPageTab()
+    local entry
+    if page == "lookup" then
+        entry = self.lookupEntry
+    elseif page == "log" then
+        entry = self.selectedEntry
+        if not entry and self.DetailEntry then
+            entry = self:DetailEntry()
+        end
+    end
+    local prof = entry and self.CraftedProfession and self:CraftedProfession(entry)
+    local show = prof and true or false
+    local btn = frame.orderBtn
+    local box = frame.detailRankBox
+    if show then
+        btn:SetParent(frame.detailChild)
+        btn:ClearAllPoints()
+        btn:SetText(L["Add order"])
+        local label = btn:GetFontString()
+        local width = (label and label:GetStringWidth() or 70) + 24
+        if width < 88 then
+            width = 88
+        end
+        if width > 200 then
+            width = 200
+        end
+        btn:SetWidth(width)
+        if box and box:IsShown() then
+            local boxH = box:GetHeight() or 22
+            if boxH < 20 then
+                boxH = 20
+            end
+            btn:SetHeight(boxH)
+            btn:SetPoint("TOPLEFT", box, "TOPRIGHT", 8, 0)
+        else
+            btn:SetHeight(22)
+            btn:SetPoint("TOPLEFT", frame.detailChild, "TOPLEFT", 8, -8)
+        end
+        btn:SetFrameLevel((frame.detailChild:GetFrameLevel() or 1) + 8)
+        btn:Show()
+        local note = frame.detailRankClosed
+        if note and note:IsShown() then
+            local used = btn:GetWidth() + 24
+            if box and box:IsShown() then
+                used = used + (box:GetWidth() or 0)
+            end
+            local noteW = (frame.detailChild:GetWidth() or 0) - used
+            if noteW < 40 then
+                noteW = 40
+            end
+            note:SetWidth(noteW)
+            note:ClearAllPoints()
+            note:SetPoint("TOPLEFT", btn, "TOPRIGHT", 8, 0)
+            note:SetPoint("RIGHT", frame.detailChild, "RIGHT", -8, 0)
+            if box and box:IsShown() and frame.detailTitle then
+                local noteH = note:GetStringHeight() or 0
+                local boxH = box:GetHeight() or 0
+                if noteH > boxH + 1 then
+                    frame.detailTitle:ClearAllPoints()
+                    frame.detailTitle:SetPoint("TOPLEFT", box, "BOTTOMLEFT", self:DetailTitleIconPad(entry), -(8 + noteH - boxH))
+                    frame.detailTitle:SetPoint("RIGHT", frame.detailChild, "RIGHT", -8, 0)
+                    self:PlaceDetailTitleIcon(entry)
+                end
+            end
+        end
+        if not (box and box:IsShown()) and frame.detailTitle then
+            frame.detailTitle:ClearAllPoints()
+            frame.detailTitle:SetPoint("TOPLEFT", btn, "BOTTOMLEFT", self:DetailTitleIconPad(entry), -8)
+            frame.detailTitle:SetPoint("RIGHT", frame.detailChild, "RIGHT", -8, 0)
+            self:PlaceDetailTitleIcon(entry)
+        end
+    else
+        btn:Hide()
+    end
+    if frame.detailScroll and frame._orderBand ~= DETAIL_BUTTON_BAND then
+        frame._orderBand = DETAIL_BUTTON_BAND
+        LayoutColumnScroll(frame.detailScroll, frame.detailBg, DETAIL_BUTTON_BAND)
+    end
 end
 
 function GQ.Log:EnsurePageBar(frame)
@@ -8244,7 +8486,9 @@ local function SideTabStride()
 end
 
 local function SideTabRailHeight()
-    return (SIDE_TAB_HEIGHT * 4) + (SIDE_TAB_GAP * 3)
+    -- Log, Orders, Lookup, Simulator, Settings. The guide highlights each
+    -- handle by the button itself, so this order does not move those marks.
+    return (SIDE_TAB_HEIGHT * 5) + (SIDE_TAB_GAP * 4)
 end
 
 function GQ.Log:EnsureSideTabs(frame)
@@ -8347,6 +8591,29 @@ function GQ.Log:EnsureSideTabs(frame)
         end
     end
 
+    if not frame.tabOrders then
+        frame.tabOrders = CreateHandleTab(rail, "GearQuestPageTabOrders", L["Orders"], HANDLE_ART.orders)
+        frame.tabOrders:SetScript("OnClick", function()
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if log then
+                log:SetPageTab("orders")
+            end
+        end)
+    else
+        frame.tabOrders:SetParent(rail)
+        frame.tabOrders.gqLabel = frame.tabOrders.gqLabel or L["Orders"]
+        frame.tabOrders.gqIconPath = HANDLE_ART.orders
+        frame.tabOrders:SetSize(SIDE_TAB_WIDTH, SIDE_TAB_HEIGHT)
+        if not frame.tabOrders:GetScript("OnClick") then
+            frame.tabOrders:SetScript("OnClick", function()
+                local log = _G.GearQuest and _G.GearQuest.Log
+                if log then
+                    log:SetPageTab("orders")
+                end
+            end)
+        end
+    end
+
     return rail
 end
 
@@ -8399,12 +8666,17 @@ function GQ.Log:LayoutSideTabs(frame)
     local page = self:GetPageTab()
     frame.tabLog:ClearAllPoints()
     frame.tabLog:SetPoint("TOPLEFT", rail, "TOPLEFT", 0, 0)
+    if frame.tabOrders then
+        frame.tabOrders:ClearAllPoints()
+        frame.tabOrders:SetPoint("TOPLEFT", rail, "TOPLEFT", 0, -SideTabStride())
+        frame.tabOrders:Show()
+    end
     frame.tabLookup:ClearAllPoints()
-    frame.tabLookup:SetPoint("TOPLEFT", rail, "TOPLEFT", 0, -SideTabStride())
+    frame.tabLookup:SetPoint("TOPLEFT", rail, "TOPLEFT", 0, -(SideTabStride() * 2))
     frame.tabSimulator:ClearAllPoints()
-    frame.tabSimulator:SetPoint("TOPLEFT", rail, "TOPLEFT", 0, -(SideTabStride() * 2))
+    frame.tabSimulator:SetPoint("TOPLEFT", rail, "TOPLEFT", 0, -(SideTabStride() * 3))
     frame.tabSettings:ClearAllPoints()
-    frame.tabSettings:SetPoint("TOPLEFT", rail, "TOPLEFT", 0, -(SideTabStride() * 3))
+    frame.tabSettings:SetPoint("TOPLEFT", rail, "TOPLEFT", 0, -(SideTabStride() * 4))
     frame.tabLog:Show()
     frame.tabLookup:Show()
     frame.tabSimulator:Show()
@@ -8413,10 +8685,16 @@ function GQ.Log:LayoutSideTabs(frame)
     frame.tabLookup:SetFrameLevel(page == "lookup" and frontLevel or backLevel)
     frame.tabSimulator:SetFrameLevel(page == "simulator" and frontLevel or backLevel)
     frame.tabSettings:SetFrameLevel(page == "settings" and frontLevel or backLevel)
+    if frame.tabOrders then
+        frame.tabOrders:SetFrameLevel(page == "orders" and frontLevel or backLevel)
+    end
     StyleHandleTab(frame.tabLog, page == "log")
     StyleHandleTab(frame.tabLookup, page == "lookup")
     StyleHandleTab(frame.tabSimulator, page == "simulator")
     StyleHandleTab(frame.tabSettings, page == "settings")
+    if frame.tabOrders then
+        StyleHandleTab(frame.tabOrders, page == "orders")
+    end
 end
 
 function GQ.Log:EnsureLogPages(frame)
@@ -8470,7 +8748,7 @@ function GQ.Log:LayoutMainWindow(frame)
     end
     pageBar:SetHeight(TAB_HEIGHT)
     pageBar:ClearAllPoints()
-    pageBar:SetPoint("TOPLEFT", logPage, "TOPLEFT", 0, 0)
+    pageBar:SetPoint("TOPLEFT", logPage, "TOPLEFT", 0, -FILTER_ROW_HEIGHT)
     pageBar:SetWidth(LEFT_COLUMN_WIDTH)
     pageBar:Show()
 
@@ -8493,8 +8771,7 @@ function GQ.Log:LayoutLogColumns(frame)
         return
     end
 
-    local filterHeight = math.max(TAB_HEIGHT, SPEC_CONTROL_HEIGHT)
-    local listTop = LOG_SECTION_TOP
+    local listTop = LOG_SECTION_TOP - FILTER_ROW_HEIGHT
 
     if frame.listInset then
         if frame.listInset:GetParent() ~= logPage then
@@ -9739,6 +10016,9 @@ function GQ.Log:ApplyPageTab()
             self.frame.settingsPage:Hide()
         end
     end
+    if GQ.Orders and GQ.Orders.ApplyPage then
+        GQ.Orders:ApplyPage(self.frame, page)
+    end
 
     if self.frame.playStyleBtn then
         if page == "log" then
@@ -9924,6 +10204,52 @@ function GQ.Log.MouseOverFilterRow(check)
     return check:IsMouseOver() and true or false
 end
 
+function GQ.Log:AnySlotExpanded()
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    local slots = classFile and GQ.Data and GQ.Data.GetSlotsForClass and GQ.Data:GetSlotsForClass(classFile)
+    if not slots then
+        return false
+    end
+    for _, slotName in ipairs(slots) do
+        if not self:IsSlotCollapsed(slotName) then
+            return true
+        end
+    end
+    return false
+end
+
+function GQ.Log:UpdateCollapseAllButton()
+    local btn = self.frame and self.frame.collapseAllBtn
+    if not btn then
+        return
+    end
+    if self:AnySlotExpanded() then
+        btn:SetText(L["Collapse"])
+    else
+        btn:SetText(L["Expand"])
+    end
+    local label = btn.GetFontString and btn:GetFontString()
+    local textWidth = label and label.GetStringWidth and label:GetStringWidth() or 0
+    local width = math.ceil(textWidth + 24)
+    if width < 58 then
+        width = 58
+    end
+    btn:SetWidth(width)
+end
+
+function GQ.Log:ToggleAllSlotsCollapsed()
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    local slots = classFile and GQ.Data and GQ.Data.GetSlotsForClass and GQ.Data:GetSlotsForClass(classFile)
+    if not slots then
+        return
+    end
+    local collapse = self:AnySlotExpanded()
+    for _, slotName in ipairs(slots) do
+        self:SetSlotCollapsed(slotName, collapse)
+    end
+    self:Refresh()
+end
+
 function GQ.Log:UpdateSourceFilterButton()
     local btn = self.frame and self.frame.sourceFilterBtn
     if not btn then
@@ -9944,7 +10270,7 @@ function GQ.Log:EnsureSourceFilter(frame)
 
     if not frame.sourceFilterBtn then
         local btn = CreateFrame("Button", "GearQuestSourceFilterButton", frame.logPage or pageBar, "UIPanelButtonTemplate")
-        btn:SetSize(72, 22)
+        btn:SetSize(FILTER_BUTTON_WIDTH, 22)
         btn:SetText(L["Filter"])
         btn:SetScript("OnClick", function()
             local log = _G.GearQuest and _G.GearQuest.Log
@@ -9954,6 +10280,20 @@ function GQ.Log:EnsureSourceFilter(frame)
         end)
         frame.sourceFilterBtn = btn
     else
+        self:RepositionSpecButton(frame)
+    end
+
+    if not frame.collapseAllBtn then
+        local collapse = CreateFrame("Button", "GearQuestCollapseAllButton", frame.logPage or pageBar, "UIPanelButtonTemplate")
+        collapse:SetSize(78, 22)
+        collapse:SetText(L["Collapse"])
+        collapse:SetScript("OnClick", function()
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if log then
+                log:ToggleAllSlotsCollapsed()
+            end
+        end)
+        frame.collapseAllBtn = collapse
         self:RepositionSpecButton(frame)
     end
 
@@ -9967,7 +10307,8 @@ function GQ.Log:EnsureSourceFilter(frame)
     menu:SetFrameLevel(50)
     menu:EnableMouse(true)
     menu:EnableMouseWheel(true)
-    menu:SetSize(200, 12 + (#SOURCE_FILTERS * 20) + 66)
+    -- Unsourced sits under a divider, so the menu is one gap taller.
+    menu:SetSize(200, 12 + (#SOURCE_FILTERS * 20) + 16 + 66)
     menu:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8X8",
         edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
@@ -10133,7 +10474,10 @@ function GQ.Log:EnsureSourceFilter(frame)
     for _, opt in ipairs(SOURCE_FILTERS) do
         local check = CreateFrame("CheckButton", nil, menu, "UICheckButtonTemplate")
         check:SetSize(22, 22)
-        if previous then
+        if opt.id == "unsourced" and previous then
+            menu._unsourcedAbove = previous
+            check:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, -14)
+        elseif previous then
             check:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, 2)
         else
             check:SetPoint("TOPLEFT", menu, "TOPLEFT", 8, -36)
@@ -10357,6 +10701,18 @@ function GQ.Log:EnsureSourceFilter(frame)
         previous = check
     end
     menu:SetWidth(menuWidth + 32)
+    if menu._unsourcedAbove then
+        local rule = menu.unsourcedRule
+        if not rule then
+            rule = menu:CreateTexture(nil, "ARTWORK")
+            rule:SetHeight(1)
+            rule:SetColorTexture(0.62, 0.54, 0.36, 1)
+            menu.unsourcedRule = rule
+        end
+        rule:ClearAllPoints()
+        rule:SetPoint("TOPLEFT", menu._unsourcedAbove, "BOTTOMLEFT", 2, -6)
+        rule:SetPoint("TOPRIGHT", menu._unsourcedAbove, "BOTTOMLEFT", (menu:GetWidth() or menuWidth) - 28, -6)
+    end
 
     local applyBtn = CreateFrame("Button", nil, menu, "UIPanelButtonTemplate")
     applyBtn:SetHeight(22)
@@ -10558,7 +10914,11 @@ function GQ.Log:SyncFilterBranchMark(check, name)
     if not check or not check.label or not name then
         return
     end
-    check.label:SetText(GQ.TX(name))
+    local text = GQ.TX(name)
+    if check.sourceId and self:SourceBranchNarrowed(check.sourceId) then
+        text = text .. "*"
+    end
+    check.label:SetText(text)
     if not check.branchArrow then
         local arrow = check:CreateTexture(nil, "OVERLAY")
         arrow:SetTexture("Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Up")
@@ -10666,6 +11026,68 @@ function GQ.Log:SyncBranchSelectLabel(branch, hidden, keys)
         end
     end
     btn:SetText(allOn and L["Deselect all"] or L["Select all"])
+    self:RefreshBranchParentStar(branch)
+end
+
+function GQ.Log:SourceBranchNarrowed(sourceId)
+    local draft = self._filterDraft
+    if sourceId == "profession" then
+        local hidden = (draft and draft.professions) or self:GetHiddenProfessions()
+        for _ in pairs(hidden) do
+            return true
+        end
+    elseif sourceId == "boss_drop" then
+        local hidden = (draft and draft.dungeons) or self:GetHiddenDungeons()
+        local reachable = self:ReachableBossDungeons()
+        for i = 1, #reachable do
+            if hidden[reachable[i]] then
+                return true
+            end
+        end
+    elseif sourceId == "raid_trash" then
+        local hidden = (draft and draft.trashDungeons) or self:GetHiddenTrashDungeons()
+        local reachable = self:ReachableTrashDungeons()
+        for i = 1, #reachable do
+            if hidden[reachable[i]] then
+                return true
+            end
+        end
+    elseif sourceId == "vendor" then
+        local hidden = (draft and draft.vendors) or self:GetHiddenVendors()
+        local kinds = self.VENDOR_KINDS or {}
+        for i = 1, #kinds do
+            if hidden[kinds[i].id] then
+                return true
+            end
+        end
+    elseif sourceId == "quest_reward" then
+        local hidden = (draft and draft.quests) or self:GetHiddenQuests()
+        local kinds = self.QUEST_KINDS or {}
+        for i = 1, #kinds do
+            if hidden[kinds[i].id] then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+function GQ.Log:RefreshBranchParentStar(branch)
+    local menu = self.frame and self.frame.sourceFilterMenu
+    if not menu or not branch then
+        return
+    end
+    if branch == menu.profBranch then
+        self:SyncProfessionRowLabel(menu.profRow)
+    elseif branch == menu.dungeonBranch then
+        self:SyncBossDropRowLabel(menu.bossRow)
+    elseif branch == menu.trashBranch then
+        self:SyncTrashRowLabel(menu.trashRow)
+    elseif branch == menu.vendorBranch then
+        self:SyncVendorRowLabel(menu.vendorRow)
+    elseif branch == menu.questBranch then
+        self:SyncQuestRowLabel(menu.questRow)
+    end
 end
 
 function GQ.Log:ToggleBranchSelectAll(branch)
@@ -12389,6 +12811,55 @@ function GQ.Log:CreateGearScoreTooltipSettings(frame, detail, anchor)
     specHint:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
     specHint:SetText(L["Adds the rank each of your class's other specs gives the item at your level, for gearing two specs at once. Off shows only the spec you are playing or simulating."])
     frame.settingsOtherSpecHint = specHint
+
+    local missHitExisting = frame.settingsScoreMissLabelHit
+    if missHitExisting and missHitExisting.GetParent and missHitExisting:GetParent() == detail then
+        return
+    end
+
+    local missLabel = CreateSettingTitle(detail, detail)
+    missLabel:SetText(L["Show when GearQuest is not scoring this item"])
+    frame.settingsScoreMissLabel = missLabel
+
+    local missHit = CreateFrame("Button", nil, detail)
+    missHit:SetPoint("TOPLEFT", specHint, "BOTTOMLEFT", 0, -16)
+    missHit:SetSize(math.max(missLabel:GetStringWidth() or 0, 1) + 4, math.max(missLabel:GetStringHeight() or 0, 18))
+    missLabel:SetParent(missHit)
+    missLabel:ClearAllPoints()
+    missLabel:SetPoint("LEFT", missHit, "LEFT", 0, 0)
+    frame.settingsScoreMissLabelHit = missHit
+
+    local function ApplyMissCheck(checked)
+        GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+        GearQuestForeverDB.settings.showGearScoreMiss = checked and true or false
+        if GQ.Data then
+            GQ.Data._scoreMissCache = nil
+        end
+        GQ.Log:NotifyTooltipsPreview()
+    end
+
+    local missCheck = GQ.Log.CreateSettingsCheck(detail, "")
+    missCheck:SetPoint("RIGHT", missHit, "LEFT", -6, 0)
+    missCheck:SetChecked(true)
+    if missCheck.text then
+        missCheck.text:SetText("")
+        missCheck.text:Hide()
+    end
+    missCheck:SetScript("OnClick", function(self)
+        ApplyMissCheck(self:GetChecked())
+    end)
+    missHit:SetScript("OnClick", function()
+        local checked = not missCheck:GetChecked()
+        missCheck:SetChecked(checked)
+        ApplyMissCheck(checked)
+    end)
+    frame.settingsScoreMissCheck = missCheck
+
+    local missHint = CreateSettingHint(detail, detail)
+    missHint:SetPoint("TOPLEFT", missHit, "BOTTOMLEFT", 0, -4)
+    missHint:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
+    missHint:SetText(L["Uncheck to hide the line that says GearQuest is not scoring this item for your class."])
+    frame.settingsScoreMissHint = missHint
 end
 
 function GQ.Log:CreateGearScoreBarSetting(frame, detail, anchor)
@@ -14019,7 +14490,7 @@ function GQ.Log:EnsureSettingsPage(frame)
     creditsBody:SetPoint("TOPLEFT", creditsTitle, "BOTTOMLEFT", 0, -6)
     creditsBody:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
     creditsBody:SetJustifyH("LEFT")
-    creditsBody:SetText("Eao\nMainWon\nStikmyre\nClick\nVaniron\nThrayne\nAlteredigor\nDeadlybrew\nTheWawan\nBart2137\nmoosetraxftw\nkaeldrin")
+    creditsBody:SetText("Eao\nMainWon\nStikmyre\nClick\nVaniron\nThrayne\nAlteredigor\nDeadlybrew\nTheWawan\nBart2137\nmoosetraxftw\nkaeldrin\nCookiesShorts")
     creditsBody:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
     creditsBody:Hide()
     frame.settingsCreditsBody = creditsBody
@@ -14990,6 +15461,11 @@ function GQ.Log:RefreshSettings()
     if specCheck then
         local settings = GearQuestForeverDB and GearQuestForeverDB.settings
         specCheck:SetChecked(not settings or settings.showOtherSpecRanks ~= false)
+    end
+    local missCheck = frame.settingsScoreMissCheck
+    if missCheck then
+        local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+        missCheck:SetChecked(not settings or settings.showGearScoreMiss ~= false)
     end
     local chatCheck = frame.settingsChatCheck
     if chatCheck then
@@ -18365,6 +18841,7 @@ function GQ.Log:LayoutDetailRank(rank, entry)
         end
         frame.detailTitle:SetPoint("RIGHT", frame.detailChild, "RIGHT", -8, 0)
         self:PlaceDetailTitleIcon(entry)
+        self:UpdateOrderButton()
         return
     end
     box.rank = rank
@@ -18406,6 +18883,7 @@ function GQ.Log:LayoutDetailRank(rank, entry)
     if owner == box then
         self:ShowRankBoxTooltip(box)
     end
+    self:UpdateOrderButton()
 end
 
 function GQ.Log:ShowCoordinateTooltip(button)
@@ -20322,6 +20800,7 @@ function GQ.Log:Refresh()
     end
 
     self:UpdateHuntAdvice(layoutRows, tab)
+    self:UpdateCollapseAllButton()
 
     for i, spec in ipairs(layoutRows) do
         if spec.entry then
@@ -21734,7 +22213,11 @@ function GQ.Log:PlaceDetailPanel(frame)
         frame.detailBg:SetParent(host)
     end
     frame.detailBg:ClearAllPoints()
-    frame.detailBg:SetPoint("TOPLEFT", host, "TOPLEFT", LEFT_COLUMN_WIDTH + COLUMN_GAP, LOG_SECTION_TOP)
+    local detailTop = LOG_SECTION_TOP
+    if host == frame.logPage then
+        detailTop = LOG_SECTION_TOP - FILTER_ROW_HEIGHT
+    end
+    frame.detailBg:SetPoint("TOPLEFT", host, "TOPLEFT", LEFT_COLUMN_WIDTH + COLUMN_GAP, detailTop)
     frame.detailBg:SetPoint("BOTTOMRIGHT", host, "BOTTOMRIGHT", 0, FOOTER_OFFSET)
     ApplyMetalEdge(frame.detailBg, 16)
 end

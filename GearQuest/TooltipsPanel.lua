@@ -102,6 +102,7 @@ local RIGHT_SETTING_KEYS = {
     "settingsEnchantLabel", "settingsEnchantLabelHit", "settingsEnchantCheck", "settingsEnchantHint",
     "settingsScoreLabel", "settingsScoreLabelHit", "settingsScoreCheck", "settingsScoreHint",
     "settingsOtherSpecLabel", "settingsOtherSpecLabelHit", "settingsOtherSpecCheck", "settingsOtherSpecHint",
+    "settingsScoreMissLabel", "settingsScoreMissLabelHit", "settingsScoreMissCheck", "settingsScoreMissHint",
 }
 
 local function wheelScroll(scroll, arg2, arg3)
@@ -192,7 +193,7 @@ local function layoutColumnScroll(panel, side)
         last = panel._frame and panel._frame.settingsUnitGearMinDropHint
     end
     if not last and side == "right" then
-        last = panel._frame and panel._frame.settingsOtherSpecHint
+        last = panel._frame and (panel._frame.settingsScoreMissHint or panel._frame.settingsOtherSpecHint)
     end
     local top = child:GetTop()
     local bottom = last and last.GetBottom and last:GetBottom()
@@ -1239,7 +1240,7 @@ function GQ.Log:LayoutTooltipsPanelSettingRows(frame, panel)
         "settingsUnitGearSourcesHint", "settingsUnitGearMinDropHint",
     })
     wrapHints({
-        "settingsEnchantHint", "settingsScoreHint", "settingsOtherSpecHint",
+        "settingsEnchantHint", "settingsScoreHint", "settingsOtherSpecHint", "settingsScoreMissHint",
     })
 
     local sourcesTitle = frame.settingsUnitGearSourcesLabel
@@ -1532,6 +1533,7 @@ function GQ.Log:MountTooltipsPanelSettings(frame, panel)
         frame.settingsEnchantHint,
         frame.settingsScoreHint,
         frame.settingsOtherSpecHint,
+        frame.settingsScoreMissHint,
     }
     for i = 1, #rightHints do
         local hint = rightHints[i]
@@ -1545,7 +1547,7 @@ function GQ.Log:MountTooltipsPanelSettings(frame, panel)
     end
 
     panel.leftSettingsLast = frame.settingsUnitGearMinDropHint
-    panel.rightSettingsLast = frame.settingsOtherSpecHint
+    panel.rightSettingsLast = frame.settingsScoreMissHint or frame.settingsOtherSpecHint
     panel.settingsReady = self:TargetTooltipsSettingsComplete(frame, leftChild)
         and self:ItemTooltipsSettingsComplete(frame, rightChild)
 

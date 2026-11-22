@@ -3356,6 +3356,57 @@ function GQ.Data:RewardQuestId(entry)
     return nil
 end
 
+-- A title that shows up twice in one stored chain. Completing the earlier
+-- step must not close the hunt that the last step rewards.
+function GQ.Data:SharedQuestTitles()
+    if self._sharedQuestTitles then
+        return self._sharedQuestTitles
+    end
+    local shared = {}
+    local function consume(steps)
+        if type(steps) ~= "table" then
+            return
+        end
+        local counts = {}
+        for i = 1, #steps do
+            local step = steps[i]
+            if type(step) == "table" and type(step[2]) == "string" then
+                local key = self:QuestTitleKey(step[2])
+                if key then
+                    counts[key] = (counts[key] or 0) + 1
+                end
+            end
+        end
+        for key, n in pairs(counts) do
+            if n >= 2 then
+                shared[key] = true
+            end
+        end
+    end
+    local chains = self.questChain
+    if type(chains) == "table" then
+        for _, row in pairs(chains) do
+            if type(row) == "table" then
+                if row.Alliance or row.Horde then
+                    consume(row.Alliance)
+                    consume(row.Horde)
+                elseif type(row[1]) == "table" and type(row[1][1]) == "string" and type(row[1][2]) == "table" then
+                    for i = 1, #row do
+                        local chain = row[i]
+                        if type(chain) == "table" then
+                            consume(chain[2])
+                        end
+                    end
+                else
+                    consume(row)
+                end
+            end
+        end
+    end
+    self._sharedQuestTitles = shared
+    return shared
+end
+
 function GQ.Data:QuestTitleKey(name)
     if type(name) ~= "string" then
         return nil
@@ -3456,6 +3507,10 @@ function GQ.Data:QuestRewardClosed(entry)
         end
         local doneIds = self:CompletedQuestMarks()
         return doneIds[questId] and true or false
+    end
+    local key = self:QuestTitleKey(entry.questName)
+    if key and self:SharedQuestTitles()[key] then
+        return false
     end
     local _, titles = self:CompletedQuestMarks()
     return self:QuestTitleDone(entry.questName, titles)
@@ -7516,7 +7571,10 @@ function GQ.Data:GearScoreMissText(link)
     end
     local suffixId = self:SuffixIdFromLink(link) or 0
     local fullName = self:ItemLinkFullName(link)
+    local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+    local showMiss = not settings or settings.showGearScoreMiss ~= false
     local cacheKey = itemId .. ":" .. suffixId .. ":" .. (fullName and fullName:lower() or "")
+        .. (showMiss and ":1" or ":0")
     local hit = bucket[cacheKey]
     if hit ~= nil then
         return hit or nil
@@ -7529,6 +7587,9 @@ function GQ.Data:GearScoreMissText(link)
     -- Only one faction is expanded. The other faction's rows still count here.
     local hidden = self.UnexpandedRowSpecs and self:UnexpandedRowSpecs(itemId)
     if #rows == 0 and not hidden then
+        if not showMiss then
+            return remember(nil)
+        end
         return remember(L["GearQuest is not scoring this item for your class."])
     end
 

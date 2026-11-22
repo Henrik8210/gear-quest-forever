@@ -2,7 +2,67 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.3.1
+## v1.3.2
+
+The log header reads **GearQuest Forever v1.3.2**. **`/reload`** after updating.
+
+### Account crafting orders
+
+**Who:** Every class and spec, Alliance and Horde, any level. The list is saved on the account, so another character sees the orders.
+
+**What you see:** A new handle, second on the right, under Log. The page is **Account crafting orders**, with a dark shade over the landscape so the white text can be read. Blacksmithing, Leatherworking, Tailoring, and Engineering sit across the top, each with a count. Alchemy and Enchanting appear once an order for them exists. Orders are grouped by who asked, and a crafted piece shows the recipe skill.
+
+On a crafted hunt, **Add order** sits beside the Rank box at the top of the parchment. Alt-clicking that hunt does the same. A box in the middle of the screen says **Added to your orders**. It fades in, stays 3 seconds, and fades out. Clicking an order opens that hunt on the log. **Remove order** takes it off the list.
+
+Thanks **CookiesShorts**.
+
+### Collapse and the source filter
+
+**Who:** Every class and spec, levels **1–60**, Alliance and Horde, including while you simulate.
+
+**What you see:** **Collapse** and **Filter** sit on their own line above Active, Completed, Removed, and Tracked, lined up with the left of the hunt list. Collapse is only as wide as the word. It closes every slot, and the same button opens them again. A source header shows a star when any box under it is off. **Unsourced** is last in that menu, under a line of its own.
+
+### The reward on the parchment
+
+**Who:** Every class.
+
+**What you see:** The reward name is white. The rarity color is a thin border on the icon, the same way the quest log draws it. The hunt list still paints the name in the rarity color.
+
+### Paladin spell power
+
+**Who:** Holy, Protection, and Retribution, both factions. Levels **1–9** keep the early weights. Shockadin is unchanged. Healing stays **1.3**.
+
+**What you see:** Generic spell power and holy spell power are the same price. Holy **1**, Protection **0.85**, Retribution **0.45**. Paladin was scored again. A Holy paladin around 47 no longer keeps a strength set and its boots at rank 1 because holy spell power used to be **1.8**.
+
+### Hunts that were wrong
+
+**Pauldrons of Vindication**, from **Aeonas the Vindicated**, are Alliance only. A Horde paladin, including an undead at 40, no longer sees that hunt.
+
+**Swiftrunner Cape.** Finishing an earlier step that is also named **Alliance Relations** no longer marks the cape “No longer obtainable.” The cape closes when the quest that rewards it is done. The same rule applies to any chain whose steps share a name.
+
+**Deadliest Catch.** The chain is **Home on the Range**, then **Winter Frontier Fishery**, then **Deadliest Catch**. The hat quest is not the first step.
+
+**Mark of the Pack Leader** drops from **Humar the Pridelord**. It is a rare, not a world drop. The filter is Rare NPC.
+
+**Pioneer Tunic.** The Valley of Trials pin is outside the camp, a short walk northeast, Durotar **47.4, 63.4**.
+
+### Minimap button
+
+**Who:** Every class, when **Hide minimap icon** is off.
+
+**What you see:** After you log in, the button is put back on the minimap if that box is off. Changing zone does not turn a hidden button back on.
+
+### Not scoring this item
+
+**Who:** Every class.
+
+**What you see:** General settings, under Tooltips and score, has **Show when GearQuest is not scoring this item**. The line stays until you uncheck it.
+
+### Dungeon sources
+
+Boss drops were checked against the Forever dungeon journal. Where our row disagreed and the journal names a boss, the hunt is a boss drop. **White Obsidian Wand** drops from **Obsidian Sentinel**. A set of faction locks from that pass are in as well. Raids that are not in the game stay out. The six leatherworking helms stay the boss patterns, and the crafted helms stay crafted.
+
+### v1.3.1
 
 The log header reads **GearQuest Forever v1.3.1**. The **Hunts per gear slot** name is no longer painted on the bar. Hunt ranks are unchanged. **`/reload`** after updating.
 

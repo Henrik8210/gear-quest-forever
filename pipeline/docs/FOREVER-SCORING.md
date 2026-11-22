@@ -1889,8 +1889,8 @@ and health per 5 ×3, armor ×2, intellect, spirit, mana per 5, and mana
 | Stat | Weight (`weights.json` / tooltip / sheet) |
 |---|---|
 | Healing | 1.3 |
-| Spell power | 1.35 |
-| Holy spell power | 1.8 |
+| Spell power | 1 |
+| Holy spell power | 1 |
 | Intellect | 0.85 |
 | Spirit | 0.3 |
 | Mana per 5 | 1.1 |
@@ -1904,7 +1904,7 @@ were **1.8**, intellect **1.2** (raw 0.60), spirit **1.5** (raw 0.75), and
 armor **0.15** (raw 0.075). Those figures were never copied into the weight
 row. The row has been the table above since the first Classic re-score.
 Do not retune the row to match that note. `+N Holy Spell Damage` is
-`spHoly`, and for Holy it stays at **1.8**. Cloth is `armorClass` 0.62,
+`spHoly`. Holy, Protection, and Retribution each price it the same as generic spell power: Holy **1**, Protection **0.85**, Retribution **0.45**. Holy stays at **1**. Cloth is `armorClass` 0.62,
 leather 0.82, mail 0.96, plate 1.0. A cloth piece shows up only when its
 healing pays for the missing armor. Blacksmithing healing mail and plate
 (Acolyte's, Prefect's, and the later plate sets) outrank tailoring cloth
@@ -1913,10 +1913,10 @@ of the same band.
 Protection paladin armor is **0.2** on the grid and tooltip (×2 in the
 scorer through 60). Its `armorClass` is plate 1.0, mail 0.55, leather 0.35,
 cloth 0.18. That armor weight is not why cloth loses on hunts — survivability
-comes from the scored stats on the piece. Generic spell power is **0.9**.
-`spHoly` is **0.05**. Mana per 5 is **0.2**. Ranged attack
-power is **0** on every paladin spec, including levels 1–9. Do not copy
-Holy's equality rule onto Protection. `speedWeight` is **-2**: points per
+comes from the scored stats on the piece. Generic spell power is **0.85**.
+`spHoly` is **0.85**, the same as generic spell power. Mana per 5 is **0.2**. Ranged attack
+power is **0** on every paladin spec, including levels 1–9. Holy, Protection,
+and Retribution each price holy spell power the same as generic spell power. `speedWeight` is **-2**: points per
 second of weapon speed. A 2 second weapon loses 4 points and a 3 second
 weapon loses 6, on top of melee weapon damage **0.5**. The seal lands on
 each hit, so the faster weapon loses less when the stats are close. The
@@ -1956,8 +1956,7 @@ leveling multipliers through 60 on hunts only:
 Weapon `dpsWeight` is **0.4**, so a swing still counts and a spell-power
 weapon stays ahead. `speedWeight` is **-2**, the same weapon-speed penalty as
 Protection. A faster weapon loses less when the spell power is close. Healing and `sp_from_heal` stay **0**. The damage half
-of an Equip line still folds into spell power. Do not copy Holy's
-`spHoly` equals healing rule onto this row. Holy `spHoly` stays **1.8**.
+of an Equip line still folds into spell power. Do not copy Holy's healing weight onto this row. Holy `spHoly` stays **1**, the same as generic spell power. Shockadin holy spell power stays **0.85**.
 `armorClass` matches Holy: plate 1.0, mail 0.96, leather 0.82, cloth 0.62.
 Do not flatten the cloth penalty.
 
