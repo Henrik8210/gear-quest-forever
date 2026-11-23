@@ -742,9 +742,7 @@ local function OnListRowItemClick(entry)
     end
 end
 
-local huntRowMenu
-
-local function HuntRowDisplayName(entry)
+function GQ.Log.HuntRowDisplayName(entry)
     if GQ.Data and GQ.Data.ShownEntryName then
         local shown = GQ.Data:ShownEntryName(entry)
         if shown and shown ~= "" then
@@ -761,7 +759,7 @@ local function HuntRowDisplayName(entry)
 end
 
 function GQ.Log:CopyHuntName(entry)
-    local name = HuntRowDisplayName(entry)
+    local name = GQ.Log.HuntRowDisplayName(entry)
     if not name or name == "" then
         return
     end
@@ -883,12 +881,12 @@ function GQ.Log:ShowHuntRowMenu(entry)
     if not entry or not entry.id or not UIDropDownMenu_Initialize or not ToggleDropDownMenu then
         return
     end
-    if not huntRowMenu then
-        huntRowMenu = CreateFrame("Frame", "GearQuestHuntRowMenu", UIParent, "UIDropDownMenuTemplate")
+    if not GQ.Log.huntRowMenu then
+        GQ.Log.huntRowMenu = CreateFrame("Frame", "GearQuestHuntRowMenu", UIParent, "UIDropDownMenuTemplate")
     end
     local tracked = GetHuntStatus(entry.id) == "tracked"
     local hasSpot = GQ.Map and GQ.Map.HasSpot and GQ.Map:HasSpot(entry) and true or false
-    UIDropDownMenu_Initialize(huntRowMenu, function()
+    UIDropDownMenu_Initialize(GQ.Log.huntRowMenu, function()
         local function add(text, func, disabled)
             local info = UIDropDownMenu_CreateInfo()
             info.text = text
@@ -922,10 +920,10 @@ function GQ.Log:ShowHuntRowMenu(entry)
     end, "MENU")
     -- The same mouse-up that opened the row would close the menu.
     C_Timer.After(0, function()
-        if not huntRowMenu then
+        if not GQ.Log.huntRowMenu then
             return
         end
-        ToggleDropDownMenu(1, nil, huntRowMenu, "cursor", 0, 0)
+        ToggleDropDownMenu(1, nil, GQ.Log.huntRowMenu, "cursor", 0, 0)
     end)
 end
 
