@@ -45,7 +45,7 @@ Ingest inserts new ids only. An existing `items.json` row keeps its facts. Then 
 
 **Wowhead is still the ingest source.** [veldt1 Forever Item Explorer](https://veldt1.github.io/wowf-items/) is a second reference: a client-diff of beta `1.60.1` vs Classic `1.15.9` with stats computed from DBC (`StatPercentEditor × RandPropPoints`). `diff-veldt-wowhead.mjs` downloads that table and reports (1) Forever equipment veldt has that Wowhead has not indexed yet, and (2) Wowhead tooltips still missing combat stats where veldt already has numbers. Do **not** merge veldt rows into `items.json` from that report — use it to decide what to re-scrape or verify on Wowhead.
 
-The in-game **seen-item notebook is retired**. Do not run `scripts/backup-seen-notebook.ps1`. `GQ.Collector` is not started. `/gq seen` tells you Wowhead is the source. Horde `foreverDelta` rows already in `Data.lua` stay; new Forever items come from Wowhead as the catalog grows.
+The in-game **seen-item notebook is retired**. Do not run `scripts/backup-seen-notebook.ps1`. `GQ.Collector` is not started. `/gq seen` tells you Wowhead is the source. The Horde `foreverDelta` pins have left `Data.lua`. New Forever items come from Wowhead as the catalog grows.
 
 Classic ids that 404 on `wowhead.com/forever/item={id}` (example: **Bands of Serra'kis**, 6902) are likely gone or retuned. Leave them until a Forever replacement is catalogued — do not invent ids.
 
@@ -62,7 +62,7 @@ Curated Alliance paladin/warrior 1–9 greens need the same `suffix` / `suffixCh
 
 ### Phase 4 — Horde notebook (done)
 
-Horde `foreverDelta` rows in `Data.lua` were scored from beta `seenItems` tooltips against generated #1 until they lose. Compare still shows the top 3. Do not invent IDs or stats.
+Those Horde starter rows have been removed from `Data.lua`. The class catalogs already score them. Do not invent IDs or stats.
 
 | Class | What landed |
 |-------|-------------|
@@ -179,7 +179,7 @@ have stats). New Forever items can displace Classic rows in the top 3.
 The older filter (`filter-generated-classic.mjs`) is only for emergency rollback;
 do not re-run it over a Classic regen.
 
-Rank order is the Forever model: Classic pool plus indexed Forever gear, jackpot suffixes, and the weights in `weights.json`. Priest, mage, and warlock ranged damage is 7. Hunter ranged is a bow, gun, or crossbow. Horde Forever starter rows in `Data.lua` still use `foreverDelta`. Alliance early pieces come from the generated Early 1–9 files.
+Rank order is the Forever model: Classic pool plus indexed Forever gear, jackpot suffixes, and the weights in `weights.json`. Priest, mage, and warlock ranged damage is 7. Hunter ranged is a bow, gun, or crossbow. Alliance and Horde early pieces come from the generated Early 1–9 files.
 
 ### Still required after phase 3
 

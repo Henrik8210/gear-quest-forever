@@ -195,7 +195,15 @@ HORDE_ZONES={"Valley of Trials","Durotar","Razor Hill","Orgrimmar","Mulgore","Ca
  "Sen'jin Village","The Barrens",
  "Camp Mojache","Hammerfall","Kargath",
  "Stonard","Grom'gol Base Camp","Brackenwall Village","Splintertree Post","Zoram'gar Outpost",
- "Valormok","Crossroads","Taurajo"}
+ "Valormok"}
+# The Barrens is Horde territory. Ratchet and the Crossroads are places in
+# that zone, not zones of their own. The zone does not decide a quest, a
+# world drop, or a rare. Each quest reward is Horde, Alliance, or both from
+# that quest's Side. A world drop or a rare stays on both lists. A vendor
+# or a trainer standing in the Barrens stays Horde, unless that seller is
+# neutral (the Ratchet names below) or the craft is taught for both factions
+# and stores no zone.
+RATCHET_VENDORS = {"Vexspindle", "Grazlix", "Lizzarik", "Ironzar"}
 # TBC race hubs and Outland towns do not exist in Forever. Deny both factions so
 # leftover item zones cannot leak after those names left the faction lists.
 # Zephras Isle is the shared Skyborne start and stays unlisted (reachable by both).
@@ -496,7 +504,19 @@ def eligible(it, cls, spec, level, faction, prof, wsubs):
     # Ilgalar). The label is now the parent zone, and the drop stays listed.
     if src.get("zone") in GONE_ZONES:
         return False
-    if (src.get("sourceType") != "rare_npc" and not src.get("zoneOpen")
+    neutral_ratchet = (
+        src.get("sourceType") == "vendor" and (src.get("npc") or "") in RATCHET_VENDORS
+    )
+    # The Barrens is the example, not the only zone. A world drop or a rare
+    # is hostile wherever it stands, so Elwynn does not hide a wolf from Horde
+    # and the Barrens does not hide a drop from Alliance. A quest is Alliance,
+    # Horde, or both from its own Side, never from the zone. A Horde-only
+    # hunt stays off Alliance, and the reverse. Only a hunt both factions can
+    # get is on both lists. A vendor or a trainer in the other faction's zone
+    # stays off unless that seller is neutral or the craft stores no zone.
+    if (src.get("sourceType") not in ("rare_npc", "quest_reward", "world_drop")
+            and not src.get("zoneOpen")
+            and not neutral_ratchet
             and not zone_ok(src.get("zone"), faction)):
         return False
     if not quest_side_ok(it, faction): return False
@@ -803,6 +823,17 @@ def hidden_spell_item(it):
 # The Weapons list (main hand and off hand together) keeps this many names
 # per level band. Lower scores stay in items.json and can return if weights change.
 WEAPON_LIST_CAP=30
+# A lower level is not a reason to drop a piece. It stays while it still
+# scores at least this share of the best piece in that slot. The
+# three-per-source cap does not remove it. Heavy Woolen Pants stays on
+# cloth legs past 22 while it is still in that range.
+# Once the character is past the item level, that piece also has to sit
+# inside the top VIABLE_LATER names of the band. A level-22 craft can still
+# be the hunt at 25. It does not stay as a deep rank at 50. A piece of the
+# current item level can still fill out to VIABLE_KEEP.
+VIABLE_SHARE=0.25
+VIABLE_LATER=30
+VIABLE_KEEP=40
 
 def load_exclusions():
     try: ob=json.load(open("obtainability.json"))
@@ -1348,6 +1379,41 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     rows = pair_weapon_styles(rows)
                 rows = rows[:8] + carry_through_ilvl(
                     per.get((faction, level - 1, sl)), rows[:8], level, sl, cls, spec_key)
+                # Anything still within a quarter of the best stays, including
+                # a lower-level craft the source cap would have dropped.
+                # Past its item level it only stays inside the top 30.
+                if rows:
+                    floor = max(r[0] for r in rows) * VIABLE_SHARE
+                    have = {r[1]["id"] for r in rows}
+                    names = {r[1]["name"] for r in rows}
+                    skip_spell = not spec_uses_spell_power(wl)
+                    for r in ranked_all:
+                        if r[0] < floor:
+                            break
+                        it = r[1]
+                        ilvl = it.get("ilvl") or 0
+                        later = ilvl and ilvl < level
+                        if len(rows) >= VIABLE_KEEP:
+                            break
+                        if later and len(rows) >= VIABLE_LATER:
+                            continue
+                        if it["id"] in FOREVER_MISSING or it["id"] in have or it["name"] in names:
+                            continue
+                        if slot_rejects_item(it, sl, cls, spec_key, level, dw_level, skip_spell):
+                            continue
+                        have.add(it["id"])
+                        names.add(it["name"])
+                        rows.append(r)
+                    head, tail = rows[:8], rows[8:]
+                    tail.sort(key=lambda r: (-r[0], r[1]["id"]))
+                    rows = head + tail
+                    kept = []
+                    for r in rows:
+                        ilvl = r[1].get("ilvl") or 0
+                        if ilvl and ilvl < level and len(kept) >= VIABLE_LATER:
+                            continue
+                        kept.append(r)
+                    rows = kept
                 per[(faction,level,sl)]=rows
                 # Alternates for the source filter. The shipped top stays as
                 # ranked above. The tail is weapons kept through their item
@@ -1356,7 +1422,15 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                 held_ids={r[1]["id"] for r in rows}
                 held_names={r[1]["name"] for r in rows}
                 skip_spell=not spec_uses_spell_power(wl)
-                counts={}; extra=[]
+                # A source that already has three pieces in the scored list
+                # does not add weaker ones past them. That cap used to drop
+                # Heavy Woolen Pants and keep a much lower score from a
+                # source that had nothing in the list.
+                counts={}
+                for r in rows:
+                    src=(srcs.get(str(r[1]["id"])) or {}).get("sourceType") or "unknown"
+                    counts[src]=counts.get(src,0)+1
+                extra=[]
                 for r in ranked_all:
                     it=r[1]
                     if it["id"] in FOREVER_MISSING or it["id"] in held_ids or it["name"] in held_names:
@@ -1364,13 +1438,12 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     if cls == "HUNTER" and sl == "MainHand" and not is_two_hand_item(it) and not is_mainhand_only(it):
                         if not hunter_main_one_hand(it, level, dw_level):
                             continue
-                    # Past its item level, a weapon stays only when the score
-                    # already put it in the top of this hand. Do not pad the
-                    # later bands with a quest dagger that is no longer a real option.
-                    if sl in ("MainHand", "SecondaryHand"):
-                        ilvl = it.get("ilvl") or 0
-                        if ilvl and ilvl < level:
-                            continue
+                    # Past its item level, a piece is on the list only when the
+                    # scored pass kept it inside the top 30. Do not add it back
+                    # here, or a level-22 craft returns as a deep rank at 50.
+                    ilvl = it.get("ilvl") or 0
+                    if ilvl and ilvl < level:
+                        continue
                     if cls == "HUNTER" and sl == "SecondaryHand" and not is_either_hand(it):
                         continue
                     if cls == "ROGUE" and sl == "SecondaryHand" and not (is_either_hand(it) or is_offhand_only(it)):
@@ -1555,6 +1628,29 @@ def hand_still_legal(it, sl, cls, spec_key, level, dw):
         if sl == "MainHand":
             return is_two_hand_item(it)
     return True
+
+def slot_rejects_item(it, sl, cls, spec_key, level, dw, skip_spell):
+    """The piece cannot be worn in this slot for this spec at this level."""
+    if cls == "HUNTER" and sl == "MainHand" and not is_two_hand_item(it) and not is_mainhand_only(it):
+        if not hunter_main_one_hand(it, level, dw):
+            return True
+    if cls == "HUNTER" and sl == "SecondaryHand" and not is_either_hand(it):
+        return True
+    if cls == "ROGUE" and sl == "SecondaryHand" and not (is_either_hand(it) or is_offhand_only(it)):
+        return True
+    if cls == "WARRIOR" and spec_key == "fury" and sl == "SecondaryHand":
+        fury_dw = dual_wield_level(cls, spec_key)
+        if fury_dw is not None and level >= fury_dw and not (is_either_hand(it) or is_offhand_only(it)):
+            return True
+    if cls == "SHAMAN" and spec_key == "enhancement" and sl == "MainHand" and not is_two_hand_item(it):
+        return True
+    if cls == "SHAMAN" and spec_key == "enhancement" and sl == "SecondaryHand":
+        return True
+    if skip_spell and item_is_spell_gear(it):
+        return True
+    if not spec_wants_heal(cls, spec_key) and item_is_heal_only(it):
+        return True
+    return False
 
 def carry_through_ilvl(prev_rows, rows, level, sl, cls, spec_key):
     """Keep a weapon that earned a place until the character passes its item level.

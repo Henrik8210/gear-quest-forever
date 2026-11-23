@@ -381,6 +381,10 @@ jackpot, or a spell-power piece on a physical spec takes whatever rank its
 score earns, including rank 4 and later on the rank list. The hunt list
 still shows three.
 
+**A lower level stays while it is still a hunt.** Item level is not a reason to drop a piece when the next band is built. After the top 8 names, anything that still scores at least a quarter of the best piece in that slot is kept (`VIABLE_SHARE` in `score.py`). The three alternates per source do not push it off, and a source that already has three scored pieces does not append a weaker one past them. Heavy Woolen Pants (4316, item level 22, +6 spirit and +3 spell damage and healing) are the case: they used to vanish at 22 because newer profession pieces filled those slots, while the pants were still a real upgrade. Once the character is past the item's item level, the piece also has to sit inside the top 30 of that band (`VIABLE_LATER`). A piece whose item level is the level being scored can still fill out to 40 (`VIABLE_KEEP`). Weapons stay on their own cap of 30. Under a quarter of the best, or past that depth, the piece leaves. Do not bring it back by retuning weights.
+
+On a warlock that means: Affliction keeps the pants through 24 for Alliance and through 25 for Horde, and at 25 Horde they are rank 30. Demonology and Destruction keep them through 24. They are off every warlock list at 50. `scripts/ci/gear_expectations.json` locks those levels. A new item, or a fresh import of an old one, is scored through the later levels in the same pass. Look at the band after its item level before calling the import done.
+
 **Warrior Protection is physical.** No spell power / healing weight. A glove
 with +SP and +healing (Silvered Gauntlets) ranks on the stamina, armor, and
 defense it actually has. Paladin Protection still scores holy/spell threat;
@@ -829,8 +833,7 @@ aged out, it uses the nearest same-spec, same-faction band: the highest
 
 `EntryForItemLink` prefers the suffix, then filters to the active band
 (exact min and max, not `LEVEL_GRACE`). A chat link then matches the hunt
-list. **Kodohide Legguards** (285338) is rank 10 for Enhancement Horde at
-25–27 (score 13.98; rank 9 Alliance). **Pathfinder Belt** (15347) is the unsuffixed base;
+list. **Kodohide Legguards** (285338) leaves the Enhancement list at 25–27. At 28 it is rank 11 for both factions (score 13.98). The later-band fill put higher-scoring legs in front of it. **Pathfinder Belt** (15347) is the unsuffixed base;
 Enhancement ranks **Pathfinder Belt of the Falcon**.
 
 When the hovered piece is gear and it is not the ranked row, say why
@@ -1257,7 +1260,7 @@ Every class is scored for levels 1–9, both factions, one list per spec. Paladi
 
 The emitter is `emit_early.py` with `GQ_FACTIONS=Alliance,Horde`. `reemit_all.py` and `rescore_hunter_shaman.py` use kind `early` for all nine classes. Do not run `emit_horde19.py` for paladin or warrior. The tables are `paladinEarly1to9` / `paladinEarly1to9Facts` and `warriorEarly1to9` / `warriorEarly1to9Facts`. `GetItemFact` reads those fact tables. A nil `paladinHorde1to9Facts` is not a source.
 
-`Data.lua` is not a leveling catalog. The rows left there are Forever pins (`foreverDelta`) for shaman, hunter, druid, priest, mage, warlock, and rogue. Paladin and warrior do not have those pins. Do not add a hand-written 1–9 band for any class.
+`Data.lua` is not a leveling catalog. The old Horde starter pins (`foreverDelta`) are gone. Those 18 items are already in the class catalogs at the rank the scorer gave them. Do not put a hand-written pin back. Do not add a hand-written 1–9 band for any class.
 
 Retribution Alliance main hand: **Northshire Hammer** (248005) is rank 1 from 1 through 5, **Empyrean Greatsword** (263407) at 7 and 8, **Ironforge Greathammer** (279895) at 9. Holy Alliance at 8–9 is **Thornroot Club** (5587). Horde Arms main hand: **Rusty Cutlass** (270001) from 1 through 4, **Goblin Smasher** (4964) at 5, **Riptear's Cleaver** (286742) at 6. Back at 1–2 is **Linen Cloak** (2570) for Retribution Alliance and for Arms Horde.
 
@@ -1635,24 +1638,53 @@ is still missing or Wowhead's stub of 1. Do not lower a level the tooltip
 already set.
 
 The hunt zone is the zone, not a place inside it. Tower of Ilgalar is
-Redridge Mountains. The parent zone is the one the Wowhead page names, and
-an existing coordinate row that sits entirely on one zone map wins over the
-area name. An open-world rare stays on both factions' lists when that zone
-is the other side's territory, and the rare pin ignores the faction map
-deny. A world drop that was already listed under the area name stays listed
-after the label becomes the parent zone (`zoneOpen`). Do not rename a
-dungeon to the zone its entrance sits in. Do not turn Refuge Pointe or
-Alliance. Through level 15 the log shows that faction's own farming pin
-and leaves the other faction's zone off the parchment. Above 15 a
-world drop stores a published camp in every zone a dropping creature
-lives in, up to three spawns per zone when they are far apart, and the
-log shows the camp closest to the character. A named creature in that zone stays on
-that faction's list. A world drop that was already listed under the area
-name stays listed after the label becomes the parent zone (`zoneOpen`).
-Do not rename a
-dungeon to the zone its entrance sits in. Do not turn Refuge Pointe or
-Hammerfall into Arathi Highlands: that name is what keeps the other faction
-off those vendors.
+Redridge Mountains. Ratchet and the Crossroads are places in The Barrens,
+not zones. The parent zone is the one the Wowhead page names, and an
+existing coordinate row that sits entirely on one zone map wins over the
+area name. Do not rename a dungeon to the zone its entrance sits in. Do not
+turn Refuge Pointe or Hammerfall into Arathi Highlands: that name is what
+keeps the other faction off those vendors.
+
+**The zone does not decide who can get the hunt.** The Barrens is the example. A Horde-only hunt never shows to Alliance, and an Alliance-only hunt never shows to Horde. Only a hunt both factions can get is on both lists. The same lookup is Elwynn, Durotar, and every other one-faction zone. The Barrens is Horde
+territory, and it stays in `HORDE_ZONES` so a vendor or a trainer standing
+there stays off the Alliance list. That map is not a reason to drop a quest,
+a world drop, or a rare. `eligible()` skips the zone test for
+`quest_reward`, `world_drop`, and `rare_npc`. `index_coordinates.py` keeps
+The Barrens out of `HORDE_MAPS`, so a quest pin there takes the quest's
+Side. Look the source up, then decide:
+
+- **Quest reward.** Wowhead Forever `Side:` is Alliance, Horde, or Both.
+  Side Both is absent from `quest_faction.json` and scores for both factions.
+  Stolen Booty, Samophlange, The Escape, Root Samples, Raptor Horns, and the
+  Orb of Soran'ruk series are Both. Their ids are in `BOTH_FACTION_QUEST_ITEMS`
+  (5320, 5324, 5325, 5326, 5327, 5337, 5341, 5343, 6898, 15109, 6900, 15105,
+  15106, 15107, 15108). Orb of Soran'ruk (6898) is rank 1 off hand for
+  Affliction at 22 on both factions. A Horde-only Barrens quest stays off
+  the Alliance list. Do not stamp a reward Horde because the pin is in the
+  Barrens, and do not open every Barrens hunt to Alliance because one quest
+  is Both.
+- **World drop and rare.** Both factions, whichever zone the creature stands
+  in. A wolf in Elwynn is a hunt for a Horde character. Buckskin Cape (1355)
+  is a Barrens rare and rank 1 back at 12 for Beast Mastery on both factions.
+  The log offers the camp closest to the character. A dropper who is friendly
+  to one faction and hostile to the other stays on the side that can attack
+  them (`drop_faction.json`). Through level 15, when Wowhead lists no dropper,
+  each faction gets one published pin (`GENERIC_LOW_FARM`). Above 15 the drop
+  stores a published camp in every zone a creature lives in, up to three
+  spawns per zone when they are far apart.
+- **Vendor and trainer.** A seller or a trainer the other faction cannot
+  reach stays off that list. They would be hostile. Halija Whitestrider and
+  Nargal Deatheye at the Crossroads are Horde (`vendor_side.json`: 4790,
+  4792, 4793, 4765). A neutral seller stays on both. Vexspindle, Grazlix,
+  Lizzarik, and Ironzar in Ratchet are that case. A craft both factions can
+  make stores no zone and no npc, and the sentence names every seller. A
+  trainer who teaches both factions, or one trainer on each side, stays on
+  both lists.
+
+A world drop that was listed under a subzone name stays listed after the
+label becomes the parent zone (`zoneOpen`). `tests/pipeline/test_score.py`
+keeps the zone skip, and `scripts/ci/check_gear.py` keeps the Barrens
+examples above.
 
 **Vendor reputation is a line of its own, just before Source.** A Forever tip
 `Requires Booty Bay - Honored` is `reqRep`. The parchment reads

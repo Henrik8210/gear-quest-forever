@@ -2,129 +2,49 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.3.3
+## v1.3.4
 
-The log header reads **GearQuest Forever v1.3.3**. **`/reload`** after updating.
+The log header reads **GearQuest Forever v1.3.4**. **`/reload`** after updating.
 
-### Level 60 Best in Slot lists
+### A lower-level piece can still be the hunt
 
-**Who:** Every class at level **60**, Alliance and Horde, including while you simulate. Levels **1–59** stay on the scored list. Feral, Battle Mage, Shockadin, and Enhancement Tank do not have a Wowhead Forever page yet, so they stay on the scored list at 60 as well.
+**Who:** Every class and spec, Alliance and Horde, levels **1–60**, including while you simulate.
 
-**What you see:** A spec that has a Wowhead Forever Best in Slot page follows that list, in the page's order, marked **(Guide)**. The list is entered by hand. A higher score does not move a later piece in front of it. Raising **Hunts per gear slot** walks further down that same list. The **(i)** on one of those slots opens the Wowhead Forever link for the spec on screen. Select the link and press Ctrl+C. A spec with no page yet keeps the scored hunts.
+**What you see:** A piece stays on the list while it still scores at least a quarter of the best piece in that slot. Once you are past its item level, it also has to sit inside the top **30** of that band. A piece of the current item level can still sit as deep as rank **40**. Weapons stay capped at **30**.
 
-### Dungeon set quests
+**Heavy Woolen Pants** (tailoring, item level 22, requires 17) are the example. **Affliction** keeps them through **24** for Alliance and through **25** for Horde, where they are rank **30**. **Demonology** and **Destruction** keep them through **24**. They are off the list at **50**. The same rule is every slot and every class.
 
-**Who:** Every class at level **60**, both factions.
+Some pieces that were only filling a source move the other way. **Kodohide Legguards** leave Enhancement at **25–27** and are rank **11** at **28**, both factions. **Sprightring Helm** leaves Combat Alliance at **40** and is rank **5** from **41** to **43**.
 
-**What you see:** The dungeon-set upgrade is a quest reward. It is not a vendor purchase. The chain is **An Earnest Proposition** (wrists), **Just Compensation** (hands and waist), **Anthion's Parting Words** (feet, legs, and shoulders), then **Saving the Best for Last** (head and chest). Each piece requires level 60. The pin is the start of the chain: **Deliana** in Ironforge, or **Mokvar** in Orgrimmar. The turn-in names the piece you bring from the first set, such as Wildheart, Beaststalker's, Magister's, Lightforge, Devout, Shadowcraft, Dreadmist, Valor, or Elements.
+### A faction zone is not a lock
 
-### Where the pattern drops
+**Who:** Every class and spec, both factions.
 
-**Who:** The classes that can wear the piece, at the level the pattern can be used.
+**What you see:** Elwynn, Durotar, the Barrens, and every other one-faction zone stay that faction's territory for a vendor or a trainer standing there. They do not hide a hunt the other faction can actually get. A Horde-only hunt never shows to Alliance, and an Alliance-only hunt never shows to Horde. Only a hunt both factions can get is on both lists.
 
-**What you see:** A craft whose pattern drops now says who drops it, keeps the profession skill line, and pins the place when Wowhead Forever publishes one.
+A **world drop** or a **rare** shows for both factions, whichever zone it stands in. **Buckskin Cape** is a Barrens rare and rank **1** back at **12** for Beast Mastery, Alliance and Horde. A dropper who is friendly to one faction and hostile to the other stays on the side that can attack them.
 
-**Black Dragonscale Helm** (Leatherworking 300, requires 56) — the pattern drops from **Blackhand Assassin** in Blackrock Spire. Both Spire doors are pinned.
+A **quest** is Alliance, Horde, or both from that quest's own side. The Barrens is the example. **The Orb of Soran'ruk** is both factions. **Affliction** ranks **Orb of Soran'ruk** **1** in the off hand at **22**, Alliance and Horde. **Stolen Booty**, **Samophlange**, **The Escape**, **Root Samples**, and **Raptor Horns** are both as well.
 
-**Red Dragonscale Leggings** — **Crimson Battle Mage** in Stratholme. Both Stratholme doors are pinned.
+A vendor or a trainer the other faction cannot reach stays off that list. **Halija Whitestrider** and **Nargal Deatheye** at the Crossroads stay Horde. **Vexspindle**, **Grazlix**, **Lizzarik**, and **Ironzar** in Ratchet stay on both. A craft both factions can make stays on both.
 
-**Red Dragonscale Breastplate** — **General Drakkisath** in Blackrock Spire.
-
-**Blue Dragonscale Helm** — Azurepetal Trapper, Azurepetal Flayer, Emerald Flayer, Emberleaf Flayer, Emberleaf Germinator, and Quickpetal Flayer. Forever lists those elites and publishes no map, so this hunt has no pin.
-
-**Robe of the Archmage** — **Firebrand Pyromancer** in Blackrock Spire, dungeon trash. **Gloves of Spell Mastery** drops in Stratholme. **Pristine Scorpid Leggings** drops from **Spectral Researcher** in Scholomance. Blackrock Depths, the Temple of Atal'Hakkar, and Scarlet Monastery patterns that were only “Crafted with …” now name the trash that drops them.
-
-**Stormcloth Headband** drops from **Firemane Flamecaller** in Dustwallow Marsh. **Stormcloth Shoulders** drop from **Glassweb Spider** in Searing Gorge. **Stormcloth Boots** drop from **Hatecrest Serpent Guard** in Feralas. **Nightscape Cloak** drops from **Bristleback Nomad**, **Bristleback Thornweaver**, and **Bristleback Skullcrusher** in Shen'dralas.
-
-### New hunts
-
-**Who:** The classes that can wear the piece. Each one is **New in Forever**. Wowhead lists no dropper, seller, or quest, so there is no pin.
-
-**Ancient Giant's Gaze**, plate head, requires 51. Warrior and paladin.
-
-**Shadow Scalper**, one-hand axe, requires 37. Hunter, shaman, paladin, warrior, and rogue.
-
-**Cannibal's Cleaver**, two-hand axe, requires 45. Hunter, shaman, paladin, and warrior.
-
-**Reforged Atal'ai Spear**, polearm, requires 45. Hunter, paladin, warrior, and druid.
-
-### Ward of the Dead
+### Right-click a hunt
 
 **Who:** Every class.
 
-**What you see:** **Ward of the Dead** is gone. It is a level 1 trinket that reveals a grave, and it is not a hunt.
+**What you see:** Right-click a hunt row. The menu is **Track** or **Untrack**, **Add order** or **Remove order** when the hunt is a craft, **Copy name**, and **Show on map**. Show on map stays grey when the hunt has no spot.
 
-### Lookup
+**Copy name** opens a box titled **Press Ctrl+C** with the name highlighted. Ctrl+C copies it. The box closes and **Name copied!** fades in. C does not also open the character panel. Adding or removing an order uses that same fading notice.
 
-**Who:** Every class.
+Thanks **nohemeier**, **cope7736**, and **ja.he**.
 
-**What you see:** After a search, including one that finds nothing, you can change the text and search again without leaving the tab.
+### v1.3.3
 
-### Crafting orders
-
-**Who:** Every class, on a crafted hunt, including from Lookup.
-
-**What you see:** Adding an order updates the button. An order that is already on the list says so and the button still updates.
+Level **60** specs with a Wowhead Forever Best in Slot page follow that list, marked **(Guide)**. Dungeon-set upgrades are the level **60** quest chain from **An Earnest Proposition** through **Saving the Best for Last**, pinned on **Deliana** or **Mokvar**. Pattern drops name the creature, including the dragonscale pieces, **Robe of the Archmage**, and the Stormcloth set. **Ancient Giant's Gaze**, **Shadow Scalper**, **Cannibal's Cleaver**, and **Reforged Atal'ai Spear** are new hunts with no pin. **Ward of the Dead** is gone. Lookup can be searched again without leaving the tab. A crafting order that is already on the list says so.
 
 ### v1.3.2
 
-The log header reads **GearQuest Forever v1.3.2**. **`/reload`** after updating.
-
-### Account crafting orders
-
-**Who:** Every class and spec, Alliance and Horde, any level. The list is saved on the account, so another character sees the orders.
-
-**What you see:** A new handle, second on the right, under Log. The page is **Account crafting orders**, with a dark shade over the landscape so the white text can be read. Blacksmithing, Leatherworking, Tailoring, and Engineering sit across the top, each with a count. Alchemy and Enchanting appear once an order for them exists. Orders are grouped by who asked, and a crafted piece shows the recipe skill.
-
-On a crafted hunt, **Add order** sits beside the Rank box at the top of the parchment. Alt-clicking that hunt does the same. A box in the middle of the screen says **Added to your orders**. It fades in, stays 3 seconds, and fades out. Clicking an order opens that hunt on the log. **Remove order** takes it off the list.
-
-Thanks **CookiesShorts**.
-
-### Collapse and the source filter
-
-**Who:** Every class and spec, levels **1–60**, Alliance and Horde, including while you simulate.
-
-**What you see:** **Collapse** and **Filter** sit on their own line above Active, Completed, Removed, and Tracked, lined up with the left of the hunt list. Collapse is only as wide as the word. It closes every slot, and the same button opens them again. A source header shows a star when any box under it is off. **Unsourced** is last in that menu, under a line of its own.
-
-### The reward on the parchment
-
-**Who:** Every class.
-
-**What you see:** The reward name is white. The rarity color is a thin border on the icon, the same way the quest log draws it. The hunt list still paints the name in the rarity color.
-
-### Paladin spell power
-
-**Who:** Holy, Protection, and Retribution, both factions. Levels **1–9** keep the early weights. Shockadin is unchanged. Healing stays **1.3**.
-
-**What you see:** Generic spell power and holy spell power are the same price. Holy **1**, Protection **0.85**, Retribution **0.45**. Paladin was scored again. A Holy paladin around 47 no longer keeps a strength set and its boots at rank 1 because holy spell power used to be **1.8**.
-
-### Hunts that were wrong
-
-**Pauldrons of Vindication**, from **Aeonas the Vindicated**, are Alliance only. A Horde paladin, including an undead at 40, no longer sees that hunt.
-
-**Swiftrunner Cape.** Finishing an earlier step that is also named **Alliance Relations** no longer marks the cape “No longer obtainable.” The cape closes when the quest that rewards it is done. The same rule applies to any chain whose steps share a name.
-
-**Deadliest Catch.** The chain is **Home on the Range**, then **Deadliest Catch**. **Winter Frontier Fishery** is a separate quest. You can pick up Deadliest Catch without finishing it. The hat quest is not the first step.
-
-**Mark of the Pack Leader** drops from **Humar the Pridelord**. It is a rare, not a world drop. The filter is Rare NPC.
-
-**Pioneer Tunic.** The Valley of Trials pin is outside the camp, a short walk northeast, Durotar **47.4, 63.4**.
-
-### Minimap button
-
-**Who:** Every class, when **Hide minimap icon** is off.
-
-**What you see:** After you log in, the button is put back on the minimap if that box is off. Changing zone does not turn a hidden button back on.
-
-### Not scoring this item
-
-**Who:** Every class.
-
-**What you see:** The **Tooltips** window has **Show when GearQuest is not scoring this item**. The line stays until you uncheck it.
-
-### Dungeon sources
-
-Boss drops were checked against the Forever dungeon journal. Where our row disagreed and the journal names a boss, the hunt is a boss drop. **White Obsidian Wand** drops from **Obsidian Sentinel**. Raids that are not in the game stay out. The six leatherworking helms stay the boss patterns, and the crafted helms stay crafted.
+Account crafting orders are saved on the account. Collapse and Filter sit above the tabs, and a source header shows a star when a box under it is off. The parchment reward name is white, with the rarity color on the icon border. Holy, Protection, and Retribution price generic spell power and holy spell power the same. **Pauldrons of Vindication** are Alliance only. **Swiftrunner Cape**, **Deadliest Catch**, **Mark of the Pack Leader**, and the **Pioneer Tunic** pin were corrected. The minimap button comes back after login when it is not hidden. The Tooltips window can show when GearQuest is not scoring an item. Boss drops were checked against the Forever dungeon journal.
 
 ### v1.3.1
 

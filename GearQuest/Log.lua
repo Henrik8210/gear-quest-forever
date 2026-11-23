@@ -742,6 +742,193 @@ local function OnListRowItemClick(entry)
     end
 end
 
+local huntRowMenu
+
+local function HuntRowDisplayName(entry)
+    if GQ.Data and GQ.Data.ShownEntryName then
+        local shown = GQ.Data:ShownEntryName(entry)
+        if shown and shown ~= "" then
+            return shown
+        end
+    end
+    if GQ.Data and GQ.Data.GetEntryDisplayName then
+        local shown = GQ.Data:GetEntryDisplayName(entry)
+        if shown and shown ~= "" then
+            return shown
+        end
+    end
+    return entry and entry.name
+end
+
+function GQ.Log:CopyHuntName(entry)
+    local name = HuntRowDisplayName(entry)
+    if not name or name == "" then
+        return
+    end
+    -- Our own box. CopyToClipboard is protected, and calling it from this
+    -- menu is what the client blocks. A focused edit box can still copy.
+    -- The hunt window sits at DIALOG level 100, so this box has to open
+    -- above it or the click looks like it did nothing.
+    local box = self.copyNameBox
+    if not box then
+        local catcher = CreateFrame("Frame", "GearQuestCopyNameCatcher", UIParent)
+        catcher:SetAllPoints(UIParent)
+        catcher:SetFrameStrata("FULLSCREEN_DIALOG")
+        catcher:SetFrameLevel(80)
+        catcher:EnableMouse(true)
+        catcher:Hide()
+
+        box = CreateFrame("Frame", "GearQuestCopyName", UIParent, BackdropTemplateMixin and "BackdropTemplate" or nil)
+        box:SetFrameStrata("FULLSCREEN_DIALOG")
+        box:SetFrameLevel(200)
+        box:SetSize(440, 92)
+        box:SetPoint("CENTER", UIParent, "CENTER", 0, 48)
+        box:EnableMouse(true)
+        if box.SetClampedToScreen then
+            box:SetClampedToScreen(true)
+        end
+        box:Hide()
+        if box.SetBackdrop then
+            box:SetBackdrop({
+                bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+                edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+                tile = true,
+                tileSize = 32,
+                edgeSize = 16,
+                insets = { left = 5, right = 5, top = 5, bottom = 5 },
+            })
+            box:SetBackdropColor(0.05, 0.05, 0.08, 0.96)
+            box:SetBackdropBorderColor(0.85, 0.65, 0.12, 1)
+        else
+            local bg = box:CreateTexture(nil, "BACKGROUND")
+            bg:SetAllPoints()
+            bg:SetColorTexture(0.05, 0.05, 0.08, 0.96)
+        end
+
+        local function hide()
+            if box.edit then
+                box.edit:ClearFocus()
+            end
+            box:Hide()
+            catcher:Hide()
+        end
+        box.HideCopy = hide
+        catcher:SetScript("OnMouseDown", hide)
+
+        box.title = box:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        box.title:SetPoint("TOP", box, "TOP", 0, -14)
+        box.title:SetText(L["Press Ctrl+C"])
+        local edit = CreateFrame("EditBox", nil, box, "InputBoxTemplate")
+        edit:SetSize(360, 22)
+        edit:SetPoint("BOTTOM", box, "BOTTOM", 0, 16)
+        edit:SetAutoFocus(false)
+        edit:SetFontObject("GameFontHighlight")
+        edit:SetScript("OnEscapePressed", hide)
+        edit:SetScript("OnEnterPressed", hide)
+        edit:SetScript("OnEditFocusGained", function(self)
+            self:HighlightText()
+        end)
+        -- The client copies from this field on Ctrl+C. Passing the key on
+        -- also opens the character panel, because that binding is C.
+        local function onCopyKey(self, key)
+            if self.SetPropagateKeyboardInput then
+                self:SetPropagateKeyboardInput(false)
+            end
+            if (key == "C" or key == "c") and IsControlKeyDown and IsControlKeyDown() and not box._copyNoted then
+                box._copyNoted = true
+                C_Timer.After(0, function()
+                    box._copyNoted = nil
+                    hide()
+                    if GQ.Orders and GQ.Orders.ShowNotice then
+                        GQ.Orders:ShowNotice(L["Name copied!"])
+                    end
+                end)
+            end
+        end
+        edit:SetScript("OnKeyDown", onCopyKey)
+        edit:SetScript("OnKeyUp", onCopyKey)
+        local close = CreateFrame("Button", nil, box, "UIPanelCloseButton")
+        close:SetPoint("TOPRIGHT", box, "TOPRIGHT", 2, 2)
+        close:SetScript("OnClick", hide)
+        box:SetScript("OnMouseDown", function()
+            edit:SetFocus()
+            edit:HighlightText()
+        end)
+        box.edit = edit
+        box.catcher = catcher
+        self.copyNameBox = box
+    end
+    box._copyNoted = nil
+    box.edit:SetText(name)
+    box.catcher:Show()
+    box:Show()
+    if box.Raise then
+        box:Raise()
+    end
+    -- The menu click clears focus after this returns. Take it back once that
+    -- click is finished, and again a moment later in case the menu wins.
+    local edit = box.edit
+    local function focus()
+        if not box:IsShown() then
+            return
+        end
+        edit:SetFocus()
+        edit:HighlightText()
+    end
+    C_Timer.After(0, focus)
+    C_Timer.After(0.1, focus)
+end
+
+function GQ.Log:ShowHuntRowMenu(entry)
+    if not entry or not entry.id or not UIDropDownMenu_Initialize or not ToggleDropDownMenu then
+        return
+    end
+    if not huntRowMenu then
+        huntRowMenu = CreateFrame("Frame", "GearQuestHuntRowMenu", UIParent, "UIDropDownMenuTemplate")
+    end
+    local tracked = GetHuntStatus(entry.id) == "tracked"
+    local hasSpot = GQ.Map and GQ.Map.HasSpot and GQ.Map:HasSpot(entry) and true or false
+    UIDropDownMenu_Initialize(huntRowMenu, function()
+        local function add(text, func, disabled)
+            local info = UIDropDownMenu_CreateInfo()
+            info.text = text
+            info.notCheckable = true
+            info.disabled = disabled and true or nil
+            info.func = func
+            UIDropDownMenu_AddButton(info)
+        end
+        add(tracked and L["Untrack"] or L["Track"], function()
+            if tracked then
+                GQ.Log:RequestUntrackHunt(entry.id)
+            else
+                GQ.Log:TrackHunt(entry.id)
+            end
+        end)
+        local craft = GQ.Log.CraftedProfession and GQ.Log:CraftedProfession(entry)
+        if craft and craft ~= "" then
+            local ordered = GQ.Log.CraftingOrderIndex and GQ.Log:CraftingOrderIndex(entry)
+            add(ordered and L["Remove order"] or L["Add order"], function()
+                GQ.Log:ToggleCraftingOrder(entry)
+            end)
+        end
+        add(L["Copy name"], function()
+            GQ.Log:CopyHuntName(entry)
+        end)
+        add(L["Show on map"], function()
+            if hasSpot and GQ.Map and GQ.Map.Show then
+                GQ.Map:Show(entry)
+            end
+        end, not hasSpot)
+    end, "MENU")
+    -- The same mouse-up that opened the row would close the menu.
+    C_Timer.After(0, function()
+        if not huntRowMenu then
+            return
+        end
+        ToggleDropDownMenu(1, nil, huntRowMenu, "cursor", 0, 0)
+    end)
+end
+
 local function CreateRewardItemButton(parent, name)
     local button = CreateFrame("Button", name, parent)
     button:SetHeight(REWARD_ICON_SIZE)
@@ -5677,6 +5864,9 @@ function GQ.Log:TrackHunt(id)
     if GQ.Tracker then
         GQ.Tracker:Refresh()
     end
+    if GQ.Orders and GQ.Orders.ShowNotice then
+        GQ.Orders:ShowNotice(L["Pin added to your world map"])
+    end
 end
 
 function GQ.Log:ActivateHunt(id)
@@ -6016,6 +6206,9 @@ function GQ.Log:RequestUntrackHunt(id)
         return
     end
     self:UntrackHunt(id)
+    if GQ.Orders and GQ.Orders.ShowNotice then
+        GQ.Orders:ShowNotice(L["Pin removed from your world map"])
+    end
 end
 
 function GQ.Log:UntrackHunt(id)
@@ -6869,11 +7062,11 @@ function GQ.Log:CreateListRow(index)
             ScrollFrameOnMouseWheel(log.frame.scroll, delta)
         end
     end)
-    row.sourceMark:SetScript("OnClick", function(self)
+    row.sourceMark:SetScript("OnClick", function(self, button)
         local parent = self:GetParent()
         local click = parent and parent:GetScript("OnClick")
         if click then
-            click(parent, "LeftButton")
+            click(parent, button or "LeftButton")
         end
     end)
     row.sourceMark:Hide()
@@ -17432,9 +17625,16 @@ function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry, label, hand
         self:PlaceHuntNotes(row, nameLeft, entry, status, showNewLabel)
 
         UpdateListRowHighlight(row)
-        row:SetScript("OnClick", function(self)
-            OnListRowItemClick(entry)
+        row:SetScript("OnClick", function(self, button)
             local log = _G.GearQuest and _G.GearQuest.Log
+            if button == "RightButton" then
+                HideItemTooltip()
+                if log and log.ShowHuntRowMenu then
+                    log:ShowHuntRowMenu(entry)
+                end
+                return
+            end
+            OnListRowItemClick(entry)
             if log and log.GamepadFollowClick then
                 log:GamepadFollowClick(self)
             end

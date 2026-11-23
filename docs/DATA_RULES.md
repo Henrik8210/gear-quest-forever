@@ -10,7 +10,7 @@ GearQuest uses **two different pipelines**. Do not apply one pipeline’s rules 
 
 | Source | Levels | Classes | How it gets in | Authoritative doc |
 |--------|--------|---------|----------------|-------------------|
-| **Curated** (`Data.lua`) | Forever pins only (`foreverDelta`) | Shaman, hunter, druid, priest, mage, warlock, rogue | Manual pins that compete with the scored bands | This file (§ Curation workflow) |
+| **Curated** (`Data.lua`) | Empty. The old Horde `foreverDelta` pins were duplicates of scored rows | None | Do not add a hand-written pin. The class catalog is the hunt list | This file (§ Curation workflow) |
 | **Generated** (`_generated/*.lua` → `DataAdapter.lua`) | **1–9 and 10–60**, both factions, per spec | **Nine classes**, including paladin and warrior 1–9 | Forever `score.py` (`pipeline/`); damage then survivability then endurance | [`pipeline/docs/FOREVER-SCORING.md`](../pipeline/docs/FOREVER-SCORING.md) |
 
 **Forever max level is 60** (`GQ.MAX_PLAYER_LEVEL` in `Core.lua`). TBC **level 70** curated data was removed; do not re-import Phase 3 AtlasLoot into this repo. Generated bands are capped at **60**. Migration phases: [FOREVER-DATA-MIGRATION.md](./FOREVER-DATA-MIGRATION.md).
@@ -21,7 +21,7 @@ GearQuest uses **two different pipelines**. Do not apply one pipeline’s rules 
 node scripts/verify-generated-bis.mjs
 ```
 
-Always use `node scripts/verify-generated-bis.mjs` for the live entry count, not a stale figure. All nine classes are Forever `score.py` regens with the Wowhead Forever pool (id ≥ 200000) merged in. Levels 1–9 are scored **per spec** for every class, both factions. Paladin and warrior are not a hand list. Horde Forever deltas in `Data.lua` use `foreverDelta = true` so they compete across generated per-level bands; Compare still shows the top 3.
+Always use `node scripts/verify-generated-bis.mjs` for the live entry count, not a stale figure. All nine classes are Forever `score.py` regens with the Wowhead Forever pool (id ≥ 200000) merged in. Levels 1–9 are scored **per spec** for every class, both factions. Paladin and warrior are not a hand list. The Horde `foreverDelta` pins have been removed from `Data.lua`. Those items stay in the class catalogs at the scored rank.
 
 ### Ranking philosophy by source
 
@@ -33,6 +33,12 @@ Always use `node scripts/verify-generated-bis.mjs` for the live entry count, not
 At **runtime**, a generated hunt with `curatedRank` keeps that pipeline order. `Compare.lua` `GetSortScore` sorts those rows as `500000 - curatedRank` for every class. Guide rows (`origin="guide"`) and level-60 hand-curated rows use `1000000 - curatedRank`. Item level versus what you have equipped is the fallback when a row has no `curatedRank`. The ≥8 ilvl lower-tier armor penalty is that fallback only. Generated picks were chosen by the Forever weights in [`FOREVER-SCORING.md`](../pipeline/docs/FOREVER-SCORING.md).
 
 **Faction gating (pipeline):** wrong-faction rows are stripped at emit time using vendor stock analysis (`npc_faction.json`), PvP prefix rules (`pvp_prefix_faction.json`), reputation exclusivity (mirror pairs + hand-verified names like Tranquillien), and quest/class locks on adjacent rows — **not** sub-zone lists alone (shared camps can host both factions’ vendors).
+
+**23 Nov 2026 — do not undo these.** The same rules are the approach for every new item. `scripts/ci/check_gear.py` and `tests/pipeline/test_score.py` fail when a rescore breaks them.
+
+- **A lower level stays while it is still a hunt.** Importing an item scores it into the later bands in the same pass. It stays while its score is at least a quarter of the best piece in that slot. Past its item level it also has to sit inside the top 30 of that band. A piece of the current item level can still fill out to 40. Weapons stay capped at 30. Heavy Woolen Pants (4316) stay on Affliction through 24 for Alliance and through 25 for Horde (rank 30 at 25). Demonology and Destruction keep them through 24. They are off the list at 50. Do not drop the pants at 22 because newer profession pieces filled the source slots, and do not leave them as a deep rank at 50. Details: [FOREVER-SCORING.md](../pipeline/docs/FOREVER-SCORING.md).
+- **A faction zone is not a lock.** The Barrens is the example, and the same rule is Elwynn, Durotar, and every other one-faction zone. A Horde-only hunt never shows to Alliance, and an Alliance-only hunt never shows to Horde. Only a hunt both factions can get is on both lists. The Barrens is Horde territory. Ratchet and the Crossroads are places in that zone. Look up each source. A quest is Alliance, Horde, or Both from that quest's own Wowhead Forever Side. Stolen Booty, Samophlange, The Escape, Root Samples, Raptor Horns, and the Orb of Soran'ruk series are Both, so both factions keep the reward. A world drop or a rare shows for both factions, whichever zone it stands in. Buckskin Cape (1355) is a Barrens rare and is on both lists. A vendor or a trainer the other faction cannot reach stays off that list. Halija Whitestrider and Nargal Deatheye at the Crossroads stay Horde. A neutral Ratchet seller, and a craft both factions can make, stay on both. The display reads questFaction, vendorSide, and dropFaction, so a locked row stays hidden even when it was stored on the wrong side. Do not hide every Barrens hunt from Alliance, and do not open a Horde-only quest, vendor, or trainer to Alliance because one quest in the zone is Both.
+- **Right-click a hunt row.** The menu is Track or Untrack, Add order or Remove order when the hunt is a craft, Copy name, and Show on map. Show on map stays disabled when the hunt has no spot. Copy name opens a box titled Press Ctrl+C with the name highlighted. Ctrl+C copies it and the box fades out with Name copied!. The key stays in the box, so C does not also open the character panel. Do not call `CopyToClipboard`. The client blocks an addon from writing the clipboard, and the error is the only thing the player sees. Add order and Remove order use the same fading notice as Name copied!.
 
 **11 Nov 2026 (v1.1.4) — do not undo these:**
 

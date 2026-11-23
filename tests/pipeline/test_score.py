@@ -2,6 +2,7 @@
 
 Run: python -m unittest discover -s tests/pipeline -v
 """
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -117,6 +118,97 @@ class HunterWeaponRoute(unittest.TestCase):
         self.assertEqual(rt[0], "onehand")
         self.assertEqual(rt[1], 20.0)
         self.assertEqual(rt[2], 23.0)
+
+
+class LaterBandsAndFactionZones(unittest.TestCase):
+    def test_viable_depth_constants(self):
+        self.assertEqual(score.VIABLE_SHARE, 0.25)
+        self.assertEqual(score.VIABLE_LATER, 30)
+        self.assertEqual(score.VIABLE_KEEP, 40)
+        self.assertIn("The Barrens", score.HORDE_ZONES)
+
+    def test_barrens_zone_does_not_decide_a_quest_drop_or_rare(self):
+        prof = score.ARMOR_PROF["MAGE"]
+        saved_src = {}
+        saved_quest = {}
+
+        def add(iid, source):
+            key = str(iid)
+            saved_src[key] = score.srcs.get(key)
+            score.srcs[key] = source
+
+        cases = {
+            990001: {"obtainable": True, "sourceType": "world_drop", "zone": "The Barrens"},
+            990002: {"obtainable": True, "sourceType": "rare_npc", "zone": "The Barrens"},
+            990003: {"obtainable": True, "sourceType": "quest_reward", "zone": "The Barrens"},
+            990004: {"obtainable": True, "sourceType": "vendor", "zone": "The Barrens", "npc": "Halija Whitestrider"},
+            990005: {"obtainable": True, "sourceType": "vendor", "zone": "The Barrens", "npc": "Grazlix"},
+            990006: {"obtainable": True, "sourceType": "profession", "zone": "The Barrens", "npc": "A Barrens Trainer"},
+            990007: {"obtainable": True, "sourceType": "profession", "zone": None, "npc": None},
+            990008: {"obtainable": True, "sourceType": "world_drop", "zone": "Elwynn Forest"},
+            990009: {"obtainable": True, "sourceType": "vendor", "zone": "Elwynn Forest", "npc": "Kurran Steele"},
+            990010: {"obtainable": True, "sourceType": "quest_reward", "zone": "Elwynn Forest"},
+        }
+        try:
+            for iid, source in cases.items():
+                add(iid, source)
+            saved_quest[990003] = score.QUEST_FACTION.get(990003)
+            item = {
+                "id": 0, "name": "Probe", "allowClass": -1, "allowRace": -1,
+                "rlvl": 1, "ilvl": 10, "cls": 4, "kind": "Cloth", "slot": "Chest",
+                "inv": 5, "reqRep": [],
+            }
+            both = dict(item)
+            both["id"] = 990003
+            self.assertTrue(score.eligible(dict(item, id=990001), "MAGE", "affliction", 20, "Alliance", prof, set()))
+            self.assertTrue(score.eligible(dict(item, id=990002), "MAGE", "affliction", 20, "Alliance", prof, set()))
+            self.assertTrue(score.eligible(both, "MAGE", "affliction", 20, "Alliance", prof, set()))
+            score.QUEST_FACTION[990003] = "Horde"
+            self.assertFalse(score.eligible(both, "MAGE", "affliction", 20, "Alliance", prof, set()))
+            self.assertTrue(score.eligible(both, "MAGE", "affliction", 20, "Horde", prof, set()))
+            self.assertFalse(score.eligible(dict(item, id=990004), "MAGE", "affliction", 20, "Alliance", prof, set()))
+            self.assertTrue(score.eligible(dict(item, id=990004), "MAGE", "affliction", 20, "Horde", prof, set()))
+            self.assertTrue(score.eligible(dict(item, id=990005), "MAGE", "affliction", 20, "Alliance", prof, set()))
+            self.assertFalse(score.eligible(dict(item, id=990006), "MAGE", "affliction", 20, "Alliance", prof, set()))
+            self.assertTrue(score.eligible(dict(item, id=990007), "MAGE", "affliction", 20, "Alliance", prof, set()))
+            self.assertTrue(score.eligible(dict(item, id=990008), "MAGE", "affliction", 20, "Horde", prof, set()))
+            self.assertFalse(score.eligible(dict(item, id=990009), "MAGE", "affliction", 20, "Horde", prof, set()))
+            self.assertTrue(score.eligible(dict(item, id=990009), "MAGE", "affliction", 20, "Alliance", prof, set()))
+            elwynn = dict(item, id=990010)
+            score.QUEST_FACTION[990010] = "Alliance"
+            self.assertFalse(score.eligible(elwynn, "MAGE", "affliction", 20, "Horde", prof, set()))
+            self.assertTrue(score.eligible(elwynn, "MAGE", "affliction", 20, "Alliance", prof, set()))
+        finally:
+            for key, prev in saved_src.items():
+                if prev is None:
+                    score.srcs.pop(key, None)
+                else:
+                    score.srcs[key] = prev
+            if saved_quest.get(990003) is None:
+                score.QUEST_FACTION.pop(990003, None)
+            else:
+                score.QUEST_FACTION[990003] = saved_quest[990003]
+            score.QUEST_FACTION.pop(990010, None)
+
+    def test_display_locks_match_the_exclusive_json(self):
+        root = Path(__file__).resolve().parents[2]
+        pairs = (
+            ("vendor_side.json", "Data.VendorSide.generated.lua"),
+            ("drop_faction.json", "Data.DropFaction.generated.lua"),
+        )
+        for json_name, lua_name in pairs:
+            sides = json.loads((root / "pipeline" / "data" / json_name).read_text(encoding="utf-8"))
+            text = (root / "GearQuest" / "_generated" / lua_name).read_text(encoding="utf-8")
+            self.assertGreater(len(sides), 0)
+            for iid, side in sides.items():
+                self.assertIn(f'[{int(iid)}] = "{side}"', text)
+
+    def test_barrens_is_not_a_horde_quest_map(self):
+        text = Path(__file__).resolve().parents[2].joinpath("pipeline/scripts/index_coordinates.py").read_text(encoding="utf-8")
+        start = text.index("HORDE_MAPS = {")
+        block = text[start:text.index("}", start)]
+        self.assertNotIn('"The Barrens"', block)
+        self.assertIn("6898", text)
 
 
 if __name__ == "__main__":

@@ -77,6 +77,23 @@ BOTH_FACTION_QUEST_ITEMS = {
     17705,
     17743,
     17753,
+    # Barrens quests whose Wowhead Forever Side is Both. The Barrens is Horde
+    # territory, and that map used to stamp the pin Horde. The quest's Side wins.
+    5320,  # Stolen Booty
+    5324,  # Samophlange
+    5325,  # Samophlange
+    5326,  # The Escape
+    5327,  # The Escape
+    5337,  # Stolen Booty
+    5341,  # Root Samples
+    5343,  # Raptor Horns
+    6898,  # The Orb of Soran'ruk
+    15109,  # Staff of Soran'ruk
+    6900,  # The Completed Robe
+    15105,  # Staff of Noh'Orahil
+    15106,  # Staff of Dar'Orahil
+    15107,  # Orb of Noh'Orahil
+    15108,  # Orb of Dar'Orahil
 }
 
 HAND_FACTION = {
@@ -371,6 +388,8 @@ def object_record(object_id: int, cache: dict) -> dict:
 
 # Maps that belong to one faction. A pin here is that faction's, even when the
 # quest page says Side: Both and the other faction turns in somewhere else.
+# The Barrens is Horde territory, and it is not in this list. A quest pin
+# there takes the quest's Side, not the zone.
 ALLIANCE_MAPS = {
     "Northshire Valley", "Elwynn Forest", "Dun Morogh", "Coldridge Valley", "Kharanos",
     "Teldrassil", "Shadowglen", "Darnassus", "Ironforge", "Stormwind City", "Loch Modan",
@@ -379,7 +398,7 @@ ALLIANCE_MAPS = {
 HORDE_MAPS = {
     "Valley of Trials", "Durotar", "Razor Hill", "Orgrimmar", "Mulgore", "Camp Narache",
     "Thunder Bluff", "Deathknell", "Tirisfal Glades", "Brill", "Undercity",
-    "Silverpine Forest", "The Barrens", "Camp Mojache",
+    "Silverpine Forest", "Camp Mojache",
 }
 # A capital is not a place to farm a world drop. Friendly city NPCs and a
 # Wowhead map filed on the wrong city were landing pins indoors. Dungeon
@@ -838,6 +857,9 @@ def spots_for_quest(name: str, item_id: int, cache: dict, xml_cache: dict) -> li
             continue
         for place in choose_quest_places(reward.get("places") or [], side):
             _add_spot(spots, seen, _stamp_spot(place, place.get("faction") or side))
+    if int(item_id) in BOTH_FACTION_QUEST_ITEMS:
+        for spot in spots:
+            spot.pop("faction", None)
     return spots
 
 

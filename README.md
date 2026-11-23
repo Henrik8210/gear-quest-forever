@@ -72,7 +72,7 @@ Mousing over a creature, a vendor, a trainer, or a quest giver adds up to three 
 
 A set piece can stay rank 1 because the set is scored together even when another piece in the slot has a higher score on its own. The tooltip then adds **Rank 1 when you wear multiple pieces of this set.** Enhancement at 26–27: **Armor of the Fang** stays rank 1 for Embrace of the Viper; **Garb of Florid Feathers** can still read **+100**.
 
-If the piece is gear and it is not the ranked row, the tooltip says why: the ranked suffix (**Only Pathfinder Belt of the Falcon is ranked for your level**), another level range, another spec, class, or faction, or **GearQuest is not scoring this item for your class.** Food and other things you cannot wear get no line. Bags, quivers, and ammo are skipped too. A chat link uses the same rank as the hunt list. **Kodohide Legguards** is rank 10 for Enhancement Horde at 25–27.
+If the piece is gear and it is not the ranked row, the tooltip says why: the ranked suffix (**Only Pathfinder Belt of the Falcon is ranked for your level**), another level range, another spec, class, or faction, or **GearQuest is not scoring this item for your class.** Food and other things you cannot wear get no line. Bags, quivers, and ammo are skipped too. A chat link uses the same rank as the hunt list. **Kodohide Legguards** leaves the Enhancement list at 25–27 and is rank 11 at 28.
 
 **General settings → GearQuest score on tooltips** is on by default. Simulation mode shows **Turn off simulation mode to see your GearQuest Score for this item.** The Simulator button says **Turn off simulation**.
 

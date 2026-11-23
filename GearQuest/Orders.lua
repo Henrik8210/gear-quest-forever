@@ -185,18 +185,25 @@ function Orders:EnsureNotice()
     return frame
 end
 
-function Orders:ShowAddedNotice()
+function Orders:ShowNotice(text)
     local frame = self:EnsureNotice()
-    frame.text:SetText(L["Added to your orders"])
+    frame.text:SetText(text or "")
     local width = (frame.text:GetStringWidth() or 180) + 56
     if width < 240 then
         width = 240
+    end
+    if width > 520 then
+        width = 520
     end
     frame:SetSize(width, 52)
     frame._phase = "in"
     frame._t = 0
     frame:SetAlpha(0)
     frame:Show()
+end
+
+function Orders:ShowAddedNotice()
+    self:ShowNotice(L["Added to your orders"])
 end
 
 function Orders:TickNotice(elapsed)
@@ -240,6 +247,7 @@ function Orders:RemoveAt(index)
     local list = self:List()
     if list[index] then
         table.remove(list, index)
+        self:ShowNotice(L["Removed from your orders"])
     end
     if self.page then
         self:Paint()

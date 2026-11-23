@@ -285,6 +285,11 @@ def check_expectations(cat: Catalog, fail, warn) -> None:
                         problems.append(f"{where}: {exp['name']} is rank {got}, expected off the list")
                     if "minRank" in exp and got is not None and got < exp["minRank"]:
                         problems.append(f"{where}: {exp['name']} is rank {got}, expected {exp['minRank']} or lower")
+                    if "maxRank" in exp:
+                        if got is None:
+                            problems.append(f"{where}: {exp['name']} is off the list, expected rank {exp['maxRank']} or better")
+                        elif got > exp["maxRank"]:
+                            problems.append(f"{where}: {exp['name']} is rank {got}, expected rank {exp['maxRank']} or better")
         report(exp, problems, fail, warn)
 
     for exp in spec_file["facts"]:
