@@ -5593,7 +5593,12 @@ function GQ.Data:WeaponLoadoutPipelineDelta(entry)
     if isTwo then
         candidate = entry.pipelineScore
     elseif mainIsTwo and slot == "SecondaryHand" then
-        local one = self:BestDualWieldPartnerFor(entry)
+        local one
+        if self:DualWieldReady() and self:EntryIsDamagingWeapon(entry) then
+            one = self:BestDualWieldPartnerFor(entry)
+        else
+            one = self:BestOneHandPartner()
+        end
         candidate = entry.pipelineScore + ((one and one.pipelineScore) or 0)
     elseif mainIsTwo then
         local off = self:BestOffHandPartner()
