@@ -5936,14 +5936,20 @@ function GQ.Data:GearScoreContext(slotName, handKind)
     end
 
     local baselineScore
+    local scoredFloor
     -- A free finger or trinket slot is a fill, not a replacement.
     if #slots > 1 then
         if not empty and #worn > 0 then
-            baselineScore = worn[1]
+            local lowest = worn[1]
             for i = 2, #worn do
-                if worn[i] < baselineScore then
-                    baselineScore = worn[i]
+                if worn[i] < lowest then
+                    lowest = worn[i]
                 end
+            end
+            if #unscoredWorn == 0 then
+                baselineScore = lowest
+            else
+                scoredFloor = lowest
             end
         end
     elseif #worn > 0 then
@@ -5968,6 +5974,7 @@ function GQ.Data:GearScoreContext(slotName, handKind)
         maxScore = maxScore,
         baseline = baseline,
         baselineScore = baselineScore,
+        scoredFloor = scoredFloor,
         handBaseline = handBaseline,
         equippedIds = equippedIds,
         bestListScore = bestList,
@@ -6015,7 +6022,7 @@ end
 -- candidate's score by the stat ratio so the slot is not treated as empty.
 -- The worn roll is the exact item link. A zero score is not cached: the
 -- item is not loaded yet, and the next call tries again.
-function GQ.Data:EstimateUnscoredBaseline(entry, ctx, slotName)
+function GQ.Data:EstimateUnscoredWorn(entry, ctx, slotName)
     if not entry or type(entry.pipelineScore) ~= "number" or not ctx or ctx.empty or ctx.baselineScore ~= nil then
         return nil
     end
@@ -6070,6 +6077,17 @@ function GQ.Data:EstimateUnscoredBaseline(entry, ctx, slotName)
         ctx.candStat[itemId] = candScore
     end
     return entry.pipelineScore * (wornScore / candScore)
+end
+
+-- Rings and trinkets compare to the weaker worn piece. With one scored and one
+-- unscored piece worn, that is the lower of the scored score and the estimate.
+function GQ.Data:EstimateUnscoredBaseline(entry, ctx, slotName)
+    local estimate = self:EstimateUnscoredWorn(entry, ctx, slotName)
+    local floor = ctx and ctx.scoredFloor
+    if estimate and floor then
+        return math.min(estimate, floor)
+    end
+    return estimate or floor
 end
 
 -- How much of an upgrade this piece is versus what is worn in the slot.
