@@ -2,9 +2,9 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.3.5
+## v1.3.6
 
-The log header reads **GearQuest Forever v1.3.5**. **`/reload`** after updating.
+The log header reads **GearQuest Forever v1.3.6**. **`/reload`** after updating.
 
 ### Level 60 follows the Wowhead Forever guide
 
