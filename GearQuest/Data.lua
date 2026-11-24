@@ -4430,11 +4430,13 @@ end
 
 function GQ.Data:InvalidateSpecCache()
     self._queryCache = nil
+    self._warmUnfinished = nil
     self._activeBandCache = nil
 end
 
 function GQ.Data:InvalidateQueryCache()
     self._queryCache = nil
+    self._warmUnfinished = nil
     self._activeBandCache = nil
     self._gearScoreCache = nil
     self._linkEntryCache = nil
@@ -6924,8 +6926,7 @@ function GQ.Data:BuildTopUpgradesForSlot(slotName, maxResults, ignoreWeaponFilte
     self:EnsureQueryCache()
 
     local guideMode = GQ.Log and GQ.Log.OnlyGuideGearEnabled and GQ.Log:OnlyGuideGearEnabled()
-    local cacheKey = slotName .. ":" .. maxResults .. (ignoreWeaponFilter and ":open" or "")
-        .. (guideMode and ":guide" or "")
+    local cacheKey = self:TopUpgradeCacheKey(slotName, maxResults, ignoreWeaponFilter)
     local cached = self._queryCache.topUpgrades[cacheKey]
     if cached then
         return cached
@@ -6997,8 +6998,19 @@ function GQ.Data:PeekTopUpgradesForSlot(slotName)
         return nil
     end
     slotName = self:NormalizeSlotName(slotName)
-    local maxResults = self:GetMaxUpgradesForSlot(slotName)
-    return cache.topUpgrades[slotName .. ":" .. maxResults]
+    return cache.topUpgrades[self:TopUpgradeCacheKey(slotName)]
+end
+
+-- The warm, the peek, and the "is this slot done" check have to use one key.
+-- Only Guide Gear stores slot:3:guide. Looking up slot:3 never hit, so the
+-- warm never counted as finished and auto-complete started it again.
+function GQ.Data:TopUpgradeCacheKey(slotName, maxResults, ignoreWeaponFilter)
+    slotName = self:NormalizeSlotName(slotName)
+    maxResults = maxResults or self:GetMaxUpgradesForSlot(slotName)
+    local guideMode = GQ.Log and GQ.Log.OnlyGuideGearEnabled and GQ.Log:OnlyGuideGearEnabled()
+    return slotName .. ":" .. maxResults
+        .. (ignoreWeaponFilter and ":open" or "")
+        .. (guideMode and ":guide" or "")
 end
 
 function GQ.Data:WarmSlotNames()
@@ -7031,7 +7043,8 @@ function GQ.Data:IsQueryCacheWarm()
                 return false
             end
             local maxResults = self:GetMaxUpgradesForSlot(slotName)
-            if #candidates > 0 and not (cache.topUpgrades and cache.topUpgrades[slotName .. ":" .. maxResults]) then
+            local topKey = self:TopUpgradeCacheKey(slotName, maxResults)
+            if #candidates > 0 and not (cache.topUpgrades and cache.topUpgrades[topKey]) then
                 return false
             end
         end

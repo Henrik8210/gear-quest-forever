@@ -4738,6 +4738,20 @@ function GQ.Log:GetActiveListCacheContextKey()
     }, "|")
 end
 
+-- Rank lists and the weapon pool are the unfiltered order. A play style only
+-- hides rows, so a toggle must not build a second copy of that pool. Only
+-- Guide Gear replaces the order, and that is the one flag in this key.
+function GQ.Log:GetRankCacheKey()
+    local spec = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec() or ""
+    return table.concat({
+        tostring(GQ:GetEffectiveClass()),
+        tostring(GQ:GetEffectiveLevel()),
+        tostring(spec),
+        tostring(GQ:GetEffectiveFaction()),
+        self:OnlyGuideGearEnabled() and "guide" or "",
+    }, "|")
+end
+
 function GQ.Log:ForEachOwnedItemLink(callback)
     if not callback then
         return
@@ -6561,12 +6575,20 @@ function GQ.Log:CheckAutoCompletion(includeReached)
     end
 
     if GQ.Data and GQ.Data.QueryCacheNeedsWarm and GQ.Data:QueryCacheNeedsWarm()
+        and not GQ.Data._warmUnfinished
         and GQ.Data.WarmQueryCacheAsync then
         local reached = includeReached
         GQ.Data:WarmQueryCacheAsync(function()
-            if GQ.Log and GQ.Log.CheckAutoCompletion then
-                GQ.Log:CheckAutoCompletion(reached)
+            if not (GQ.Log and GQ.Log.CheckAutoCompletion and GQ.Data) then
+                return
             end
+            -- A warm that finished and is still cold must not start another.
+            -- That loop rebuilt the hunt list about once a second while idle.
+            if GQ.Data:QueryCacheNeedsWarm() then
+                GQ.Data._warmUnfinished = true
+                return
+            end
+            GQ.Log:CheckAutoCompletion(reached)
         end)
     end
 end
@@ -6651,7 +6673,7 @@ function GQ.Log:ScheduleRankListWarm()
         end
         if phase == "weapons" then
             phase = "held"
-            local ctx = self.GetActiveListCacheContextKey and self:GetActiveListCacheContextKey() or ""
+            local ctx = self.GetRankCacheKey and self:GetRankCacheKey() or ""
             if not (self._weaponPool and self._weaponPoolBand == ctx) then
                 self:CollectWeaponPool()
                 C_Timer.After(0, step)
@@ -6660,7 +6682,7 @@ function GQ.Log:ScheduleRankListWarm()
         end
         if phase == "held" then
             phase = "done"
-            local ctx = self.GetActiveListCacheContextKey and self:GetActiveListCacheContextKey() or ""
+            local ctx = self.GetRankCacheKey and self:GetRankCacheKey() or ""
             if not (self._heldOffHand and self._heldOffBand == ctx) then
                 self:HeldOffHandEntries()
                 C_Timer.After(0, step)
@@ -10066,6 +10088,9 @@ function GQ.Log:SetPlayStyleFlag(key, enabled)
     self._playerProf = nil
     self:RefreshPlayStylePanel()
     self:CommitSourceFilter()
+    if GQ.CollectGarbageSoon then
+        GQ:CollectGarbageSoon()
+    end
 end
 
 function GQ.Log:SetNoDungeons(enabled)
@@ -10118,6 +10143,10 @@ function GQ.Log:SetOnlyGuideGear(enabled)
         GQ.Data:ClearTopUpgradeCache()
     end
     self._slotRankCache = nil
+    self._weaponPool = nil
+    self._weaponPoolBand = nil
+    self._weaponTrueList = nil
+    self._weaponTrueBand = nil
     self:SetPlayStyleFlag("playOnlyGuideGear", enabled)
 end
 
@@ -10149,6 +10178,9 @@ function GQ.Log:SetFocusZone(enabled)
     end
     if not enabled or not (self.frame and self.frame:IsShown()) then
         self:ScheduleListRefresh()
+    end
+    if GQ.CollectGarbageSoon then
+        GQ:CollectGarbageSoon()
     end
 end
 
@@ -19045,7 +19077,7 @@ end
 function GQ.Log:CachedRankListCount(slotName, handKind)
     local weaponList = (slotName == "MainHand" or slotName == "WeaponPair") and self:IsWeaponHandKind(handKind)
     if weaponList then
-        local ctx = self.GetActiveListCacheContextKey and self:GetActiveListCacheContextKey() or ""
+        local ctx = self.GetRankCacheKey and self:GetRankCacheKey() or ""
         if self._weaponTrueList and self._weaponTrueBand == ctx then
             return #self._weaponTrueList
         end
@@ -20269,7 +20301,7 @@ function GQ.Log:CasterBisOffHand()
     if not (GQ.Data and GQ.Data.PairsWeaponWithOffHand and GQ.Data:PairsWeaponWithOffHand()) then
         return nil
     end
-    local ctx = self.GetActiveListCacheContextKey and self:GetActiveListCacheContextKey() or ""
+    local ctx = self.GetRankCacheKey and self:GetRankCacheKey() or ""
     if self._casterOffBand == ctx then
         return self._casterOffHand
     end
@@ -20412,7 +20444,7 @@ function GQ.Log:CollectWeaponPool()
 end
 
 function GQ.Log:BuildCollectWeaponPool()
-    local ctx = self.GetActiveListCacheContextKey and self:GetActiveListCacheContextKey() or ""
+    local ctx = self.GetRankCacheKey and self:GetRankCacheKey() or ""
     if self._weaponPool and self._weaponPoolBand == ctx then
         return self._weaponPool
     end
@@ -20863,7 +20895,7 @@ function GQ.Log:WeaponStylesForMenu()
 end
 
 function GQ.Log:UnfilteredWeaponList()
-    local ctx = self.GetActiveListCacheContextKey and self:GetActiveListCacheContextKey() or ""
+    local ctx = self.GetRankCacheKey and self:GetRankCacheKey() or ""
     if self._weaponTrueList and self._weaponTrueBand == ctx then
         return self._weaponTrueList
     end
@@ -20951,7 +20983,7 @@ function GQ.Log:HeldOffHandEntries()
     if GQ.Data and GQ.Data.CanDualWield and GQ.Data:CanDualWield() then
         return {}
     end
-    local ctx = self.GetActiveListCacheContextKey and self:GetActiveListCacheContextKey() or ""
+    local ctx = self.GetRankCacheKey and self:GetRankCacheKey() or ""
     if self._heldOffHand and self._heldOffBand == ctx then
         return self._heldOffHand
     end

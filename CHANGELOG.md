@@ -2,109 +2,25 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.3.7
+## v1.3.8
 
-The log header reads **GearQuest Forever v1.3.7**. `/reload` after the update.
+The log header reads **GearQuest Forever v1.3.8**. `/reload` after the update.
 
-### A percent on the item is that percent
+### The list stops rebuilding while you stand still
 
-An Equip line that says chance to hit, chance to get a critical strike, chance to dodge, chance to parry, attack speed and casting speed, chance to block, or reduces chance to be dodged or parried by N% is scored as that percent. A 2% hit cloak is Hit 2. A stored rating beside that line is the old scale (10 hit rating was 1% hit, 14 critical strike rating was 1% crit) and is replaced by the percent the line says. This is every class and spec, levels 1 through 60, including a custom spec. A Chance on hit, a spell-specific crit, and a set bonus stay unscored. Copying the old rating scale onto the printed percent had put a 3% hit sword above Grand Marshal's Polearm.
+Only Guide Gear stored its upgrade list under one name and then looked for it under another. The check never matched, so the list was built again about once a second. That kept going with the log closed, with nothing tracked, and with the guide arrow dismissed. That rebuild is what hitched and climbed addon memory. The list is built once and then reused. This is every class at level 60, where that card exists.
 
-### Level 60 is the scored list again
+### Turning a play style off gives the memory back
 
-Only Guide Gear! is a play style. At level 60 it is the first card. Below 60 the card is not on the page. It starts off. Off, the level-60 hunt is the scored list, and a Wowhead Forever page piece is labeled (Guide) on the hunt row and (Guide #N) on the rank list, where N is its place on that page. On, the hunt rows and that slot's rank list are only the page, in page order. Hunts per gear slot still caps the rows. A slot the page leaves empty keeps the scored hunts. The card art is the blue rocket.
+Turning Only Guide Gear on built a second copy of the weapon list and left the first one until memory had about doubled. Turning it off and on again stacked another copy, so the addon could climb from about 40 MB to 80 MB in one session. The other play style cards did the same. Turning a card off now drops that extra copy. The number can rise for a moment, then fall over about 20 seconds. Closing the guide arrow still drops the arrow the same way. Hunts, ranks, scores, and pins are unchanged.
 
-### Raids that are not open stay off the hunt
+### v1.3.7
 
-The first raids are 8 December 2026. Until then a hunt is a dungeon or Blackrock Spire. These stay off every class, spec, and faction:
-
-- For All To See: Dragonslayer's Signet, Onyxia Tooth Pendant, and Onyxia Blood Talisman. The quest turns in an Onyxia head.
-- The Lord of Blackrock: Master Dragonslayer's Orb, Master Dragonslayer's Medallion, and Master Dragonslayer's Ring. The quest turns in a Nefarian head.
-- Quel'Serrar. It needs Onyxia's breath.
-- The green dragons: Ring of the Unliving and the other drops from Emeriss, Lethon, Taerar, and Ysondre.
-- Lord Kazzak and Azuregos.
-- The Silithus lords and colossi, including Cloudkeeper Legplates.
-- Ivus the Forest Lord and Lokholar the Ice Lord.
-
-Blackrock Spire stays, including Upper Blackrock Spire. The Brood of Onyxia in Dustwallow Marsh stays. A named boss of Zul'Farrak, Razorfen Downs, Stratholme, Scholomance, Dire Maul, or Blackrock Spire that had no stored zone is filed in that dungeon. Spellshock Leggings is Zul'Farrak. Coldbringer Spine is Razorfen Downs.
-
-### Alliance can hunt the Orb and the Staff of Soran'ruk
-
-Thanks to Cope. Orb of Soran'ruk and Staff of Soran'ruk show for Alliance and Horde. The quest starts with Doan Karhan in the Barrens. The pin is that start. A both-faction quest in the Barrens is not hidden from Alliance.
-
-### The Web of Magic lists the chain
-
-Thanks to Doctor Zee. Rune-Etched Epaulets and Apprentice Sorcerer's Slacks are Alliance. The parchment lists The Second Rebellion, Bad Medicine, Kurzen's Mystery, Troll Witchery, An Acquaintance in Southshore, Magics of the Drowned City, then The Web of Magic. Magics of the Drowned City is the dungeon step. The pin is Sergeant Yohwa at the Rebel Camp in Stranglethorn Vale.
-
-### Crafting orders show the recipe and the material price
-
-Thanks to BiLLI. The orders page has Item, Recipe, Skill required, and Material costs. Recipe is the recipe icon, and hovering it shows the recipe tooltip. Skill required is its own column, lined up on the left with the number under it. Material costs uses the gold, silver, and copper icons, with a gap before Remove order. The (i) on that header is the place that explains how the prices work: Auctionator prices every material, a full auction-house scan has to be run before a price can show, and hovering the total or the dash lists each material. Hovering the price or the dash is only that breakdown. The column is hidden when Auctionator is not installed.
-
-On a crafted hunt, the line under Requires [profession] is **Materials cost:** and the same coin icons. It appears only after a full Auctionator scan, and only when every material has a price. Otherwise the line is not there. Hovering it lists each material and when that scan was run. The scan time is also on the orders Material costs (i). The line on the parchment is the price.
-
-### Recommended enchantment wraps
-
-The yellow words **Recommended enchantment:** are their own line. The formula and the effect start on the next line and wrap after about 50 characters. This is every class, whenever Recommended gear enchantment is on.
-
-### Top donators
-
-Guiggiani is on the list, under Kamujin.
+An Equip percent is scored as that percent, on every class and spec, including a custom spec. Chance on hit is a proc. A crit line for one spell is not your crit. Critical strike with spells is still crit. Only Guide Gear is a level-60 play style and starts off. Off, level 60 is the scored list, and a Wowhead Forever page piece is labeled (Guide). Raids that are not open stay off the hunt until 8 December 2026, including the Onyxia and Nefarian head rewards, Quel'Serrar, the green dragons, Lord Kazzak, Azuregos, the Silithus lords, and Ivus. Blackrock Spire stays. Orb of Soran'ruk and Staff of Soran'ruk show for Alliance and Horde. The Web of Magic lists its chain from Sergeant Yohwa. Crafting orders show the recipe and the Auctionator material price. Recommended enchantment wraps onto its own lines. Guiggiani is a top donator.
 
 ### v1.3.6
 
-The log header reads **GearQuest Forever v1.3.6**. **`/reload`** after updating.
-
-### Level 60 follows the Wowhead Forever guide
-
-**Who:** Every spec that has a filled Best in Slot page, Alliance and Horde, level **60**, including while you simulate. Shockadin, Feral, Bear, Enhancement Tank, the three Battle Mage specs, and Assassination stay on the scorer. So does a slot the page leaves empty, and a faction that cannot use any piece that page lists for that slot. Levels **1–59** stay on the scorer.
-
-**What you see:** A guide slot is only the pieces on that page, in that order, marked **(Guide)**. Retribution head is **11**. **Lionheart Helm** is rank **1**, **Stalwart Helm** is rank **2**, and **Soulforge Greathelm** is rank **3**. The (i) list is that same order. Rank 1 reads **100**. A higher model score does not jump a later piece ahead of the page.
-
-### The sheet number is the score
-
-**Who:** Every class and spec, Alliance and Horde, levels **1–60**, including a custom spec with an empty box and the spec-name tooltip.
-
-**What you see:** Stamina, armor, intellect, spirit, and mana are no longer doubled or tripled while you level. The hunt and the tooltip use the same number that is on the weight sheet. Hit, crit, and weapon damage were already that number.
-
-**Heavy Woolen Pants** (tailoring, item level 22, requires 17) move with that. **Affliction** keeps them through **29** for both factions. They are off at **30**. **Demonology** keeps them through **26**. **Destruction** keeps them through **24**. They are off every warlock list at **50**.
-
-Melee specs score expertise. About **10** rating is **1%**. **Assassination** lists daggers only, in both hands, because Ambush, Backstab, and Mutilate require a dagger. Its haste is **0.85** and its expertise is **0.19**. **Combat** expertise is **0.16**. **Subtlety** expertise is **0.1**.
-
-**Holy** paladin scores healing **1.3**, spell power **1**, holy spell power **1**, intellect **0.85**, spirit **0.3**, stamina **0.3**, and armor **0.004**. **Protection** scores spell power and holy spell power at **0.85**, and armor at **0.2**. **Warrior Protection** scores hit **5**, strength **1**, crit **3**, and stamina **0.9**. **Beast Mastery** ranged attack power is **0.4**, **Marksmanship** **0.38**, and **Survival** **0.34**. Survival melee attack power is **0.28**.
-
-### Removing a hunt does not raise the score
-
-**Who:** Every class and spec, including while you simulate.
-
-**What you see:** Remove hides that row. The (i) list still shows it at the same number, so **Lionheart Helm** stays **#1** on Retribution head after you remove it. The 0–100 score does not move. Restore puts the row back in that same place.
-
-### Where the plans drop
-
-**Who:** The classes that hunt these crafts. Retribution, Arms, and Fury hunt **Lionheart Helm**. Protection and the plate specs that hunt **Stalwart Helm** see that one. The heart trinkets are the enchanting crafts. **Arcanite Reaper** is the two-hander.
-
-**What you see:** **Plans: Lionheart Helm** drop from **Ferra** in Dire Maul. The pin is the Dire Maul entrance in Feralas. It is not a Lower Blackrock Spire boss. **Stalwart Helm** plans drop from **Bloodaxe Veteran**, Blackrock Spire trash. **Frozen Heart of the Mountain** drops from **Mor Grayhoof**. **Dormant Heart of the Mountain** drops from **Mother Smolderweb**. **Arcanite Reaper** plans drop from **Bannok Grimaxe**. Those four pin the Blackrock Spire entrance, in Searing Gorge and the Burning Steppes.
-
-**Overgrown Cuffs** and **Thornplated Cord** require level **42**. The chain starts at **Word of the Woods** with **Mithera** in Shen'dralas. Thanks **kingcurly**. **Arathi Armbands** stay Alliance only. Thanks **kingcurly**.
-
-### Krol'dok Stronghold and Shaper's Terrace
-
-**Who:** Every class and spec that hunts a boss drop from those dungeons, Alliance and Horde. The pieces show once you can wear them, mostly around level **58–60**.
-
-**What you see:** **Krol'dok Stronghold** pins the cave in Riverglades, at **37.5, 37.3**, west of the fortress gates above Sunnyglade. **Shaper's Terrace** pins the titan temple on the north rim of Un'Goro Crater, at **48.1, 6.1**, above Marshal's Refuge. Bosses such as **Titanosaur**, **Venomridge**, **Thunderhoof**, **Nanaya**, **Blackmaw Behemoth**, and **War Handler Ashka** file under those dungeons in the Boss drop filter. No Dungeons, Dungeon Enjoyer, Manageable Dungeons, and Focus Zone follow that same door.
-
-### In Dreams starts with Tirion Fordring
-
-**Who:** Every class that hunts a reward from **In Dreams**. **Mark of Fordring**, **Ornate Adamantium Breastplate**, **Shimmering Platinum Warhammer**, **Shroud of the Exile**, and **Fordring's Seal**. Requires level **52**. Alliance and Horde.
-
-**What you see:** The hunt starts with **Tirion Fordring** in Eastern Plaguelands, at **7.6, 43.6**. The parchment lists the Wowhead Forever series: **Redemption**, **Of Forgotten Memories**, **Of Lost Honor**, **Of Love and Family**, **Of Love and Family**, **Find Myranda**, **Scarlet Subterfuge**, then **In Dreams**. The escort out of Hearthglen is that last step. **Ornate Adamantium Breastplate** no longer says there are no prequests.
-
-The same gap is closed on other rewards of a quest that already had the series. **Nimboya's Mystical Staff** lists the Saving Yenniku steps. **Forsaken Dagger** and **Forsaken Maul** list Night Web's Hollow, then The Scarlet Crusade. **Servomechanic Sledgehammer**, **Ceremonial Centaur Blanket**, **Thun'grim's Sword**, **Gemshale Pauldrons**, **Swashbuckler Sash**, **Seedtime Hoop**, and **Forest Troll Leggings** list the series their quest already had. **Overgrown Cuffs** and **Thornplated Cord** list Word of the Woods, then Rot and Regret.
-
-### Top donators
-
-**Who:** Everyone.
-
-**What you see:** Settings, **Donations**. Under the link, **Top donators** lists Rodeaschmi, Hugefan, Fucnred, Kamujin, Tony, Kestyn, Bonnie, Hendrik, KrazedKlow, and Gabriyel. The page scrolls, the same way **The GearQuest Community** scrolls.
+Level 60 guide pages were the hunt for specs with a Wowhead Forever page. Stamina, armor, intellect, spirit, and mana use the sheet number while you level. Removing a hunt hides the row and leaves the rank and the score. Plans: Lionheart Helm drops from Ferra in Dire Maul. Krol'dok Stronghold and Shaper's Terrace have entrance pins. In Dreams starts with Tirion Fordring. Top donators are listed under Donations.
 
 ### v1.3.4
 

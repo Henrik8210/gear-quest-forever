@@ -13,7 +13,7 @@ if GQ.LoadLocalePack then
     GQ:LoadLocalePack()
 end
 
-GQ.VERSION = "1.3.7"
+GQ.VERSION = "1.3.8"
 GQ.ADDON_NAME = ADDON_NAME
 
 -- General -> Hide chat messages. Off until the player checks it.
@@ -602,8 +602,12 @@ end
 -- A full collect walks the whole catalog in one frame. This finishes the
 -- same cycle in small steps, one per frame, and stops after about 20 seconds.
 function GQ:CollectGarbageSoon()
-    if not collectgarbage or self._gcStepping or not (C_Timer and C_Timer.NewTicker) then
+    if not collectgarbage or not (C_Timer and C_Timer.NewTicker) then
         return
+    end
+    if self._gcTicker and self._gcTicker.Cancel then
+        self._gcTicker:Cancel()
+        self._gcTicker = nil
     end
     self._gcStepping = true
     local ticks = 0
@@ -613,9 +617,13 @@ function GQ:CollectGarbageSoon()
         local ok, done = pcall(collectgarbage, "step", 256)
         if not ok or done or ticks >= 1200 then
             ticker:Cancel()
-            GQ._gcStepping = nil
+            if GQ._gcTicker == ticker then
+                GQ._gcTicker = nil
+                GQ._gcStepping = nil
+            end
         end
     end)
+    self._gcTicker = ticker
 end
 
 function GQ:GetEffectiveLevel()

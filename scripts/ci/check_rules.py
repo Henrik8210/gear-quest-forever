@@ -12,6 +12,9 @@ not trip it.
   Reading FrameControlsManager.currentFrame is fine.
 - Log.lua's main chunk is close to Lua 5.1's 200-local limit. It may not gain
   a file-scope local; put new state on GQ.Log instead.
+- v1.3.8 idle memory. Only Guide Gear's upgrade cache, the unfiltered weapon
+  pool, and the play-style reclaim stay wired. A mismatched cache key rebuilt
+  the hunt list about once a second, and each toggle left another copy.
 
 Usage: python scripts/ci/check_rules.py
 """
@@ -60,6 +63,55 @@ def file_scope_locals(text: str) -> int:
     return count
 
 
+def function_body(text: str, signature: str) -> str:
+    start = text.find(signature)
+    if start < 0:
+        return ""
+    rest = text[start + len(signature):]
+    match = re.search(r"\n(?:local )?function ", rest)
+    return rest[: match.start()] if match else rest
+
+
+# v1.3.8. Only Guide Gear looked up slot:3 while it stored slot:3:guide, so the
+# warm never finished and rebuilt the hunt list about once a second. A play
+# style that only hides rows must reuse the weapon pool, and turning one off
+# has to step the collector. Closing the guide arrow still does the same.
+MEMORY_WIRING = [
+    ("GearQuest/Data.lua", "function GQ.Data:InvalidateQueryCache()", "_warmUnfinished = nil"),
+    ("GearQuest/Data.lua", "function GQ.Data:InvalidateSpecCache()", "_warmUnfinished = nil"),
+    ("GearQuest/Data.lua", "function GQ.Data:BuildTopUpgradesForSlot(", "self:TopUpgradeCacheKey("),
+    ("GearQuest/Data.lua", "function GQ.Data:IsQueryCacheWarm()", "self:TopUpgradeCacheKey("),
+    ("GearQuest/Data.lua", "function GQ.Data:TopUpgradeCacheKey(", '":guide"'),
+    ("GearQuest/Log.lua", "function GQ.Log:CheckAutoCompletion(", "_warmUnfinished"),
+    ("GearQuest/Log.lua", "function GQ.Log:GetRankCacheKey()", "OnlyGuideGearEnabled"),
+    ("GearQuest/Log.lua", "function GQ.Log:SetPlayStyleFlag(", "CollectGarbageSoon"),
+    ("GearQuest/Log.lua", "function GQ.Log:SetOnlyGuideGear(", "_weaponPool = nil"),
+    ("GearQuest/Log.lua", "function GQ.Log:SetFocusZone(", "CollectGarbageSoon"),
+    ("GearQuest/Log.lua", "function GQ.Log:BuildCollectWeaponPool()", "GetRankCacheKey"),
+    ("GearQuest/Log.lua", "function GQ.Log:UnfilteredWeaponList()", "GetRankCacheKey"),
+    ("GearQuest/Log.lua", "function GQ.Log:HeldOffHandEntries()", "GetRankCacheKey"),
+    ("GearQuest/Log.lua", "function GQ.Log:CasterBisOffHand()", "GetRankCacheKey"),
+    ("GearQuest/Core.lua", "function GQ:CollectGarbageSoon()", "_gcTicker:Cancel"),
+    ("GearQuest/Guide.lua", "local function HideGuide(", "CollectGarbageSoon"),
+]
+
+
+def check_memory_wiring() -> int:
+    failures = 0
+    loaded: dict[str, str] = {}
+    for rel, signature, needle in MEMORY_WIRING:
+        if rel not in loaded:
+            loaded[rel] = (REPO / rel).read_text(encoding="utf-8-sig")
+        body = function_body(loaded[rel], signature)
+        if not body:
+            print(f"FAIL {rel}: missing {signature}")
+            failures += 1
+        elif needle not in body:
+            print(f"FAIL {rel}: {signature} no longer contains {needle}")
+            failures += 1
+    return failures
+
+
 def main() -> int:
     failures = 0
     files = [p for p in sorted(ADDON.rglob("*.lua")) if "_generated" not in p.parts]
@@ -71,6 +123,8 @@ def main() -> int:
                 line = code.count("\n", 0, match.start()) + 1
                 print(f"FAIL {rel}:{line}: {why}")
                 failures += 1
+
+    failures += check_memory_wiring()
 
     log_locals = file_scope_locals((ADDON / "Log.lua").read_text(encoding="utf-8-sig"))
     if log_locals > LOG_FILE_LOCALS:
