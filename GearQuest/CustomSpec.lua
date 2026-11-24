@@ -231,19 +231,10 @@ function GQ.Custom:Weights(classFile, record, level)
             typed[key] = true
         end
     end
-    local leveling = GQ.ScoringLeveling
-    if leveling and (tonumber(level) or 1) <= (leveling.untilLevel or 60) then
-        for key, mult in pairs(leveling) do
-            if key ~= "untilLevel" and type(mult) == "number" and weights[key] and not typed[key]
-                and not (record.base == "enhancement" and key == "int") then
-                weights[key] = weights[key] * mult
-            end
-        end
-    end
     -- Enhancement tank: 1 agility is also 2 armor, plus 1% dodge and 1% crit
     -- per 20. A typed agility replaces that whole number. An empty box uses
-    -- the armor, dodge, and crit already on the weights, including a typed
-    -- armor that skipped the leveling multiplier.
+    -- the armor, dodge, and crit already on the weights. The sheet number
+    -- is the score. Do not multiply an empty box by level.
     if record.base == "enhancement_tank" and not typed.agi then
         weights.agi = (weights.agi or 0)
             + 2 * (weights.armor or 0)

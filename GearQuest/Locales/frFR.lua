@@ -359,6 +359,7 @@ L["Hold Shift to see BiS items from this NPC"] = "Maintenez Maj pour voir les me
 L["Join the GearQuest community to talk about class specs, stat weights, and what to hunt next. Share how GearQuest is going for you. Bug reports and feature ideas are welcome there too. Get the latest news and insights, and comment on upcoming features before they are released."] = "Rejoignez la communauté GearQuest pour parler des spés, des pondérations et des prochaines traques. Racontez comment GearQuest se passe pour vous. Les rapports de bugs et les idées sont aussi les bienvenus. Suivez les dernières nouvelles et commentez les fonctionnalités à venir avant leur sortie."
 L["Copy"] = "Copier"
 L["Donations"] = "Dons"
+L["Top donators"] = "Principaux donateurs"
 L["Building GearQuest might be easier than it would have been 5 years ago, but code is expensive and I appreciate any support I can get, and donations enable me to do even more including implementing new cool features that hopefully make your Forever experience smoother :)\n\nAny donations are very much appreciated, thanks!"] = "Créer GearQuest est peut-être plus simple qu'il y a 5 ans, mais le développement coûte cher et j'apprécie tout le soutien que je reçois. Les dons me permettent d'aller plus loin, notamment d'ajouter de nouvelles fonctions qui, je l'espère, rendront votre expérience de Forever plus fluide :)\n\nTous les dons sont très appréciés, merci !"
 L["Opens or closes the GearQuest window. /gearquest does the same."] = "Ouvre ou ferme la fenêtre GearQuest. /gearquest fait pareil."
 L["Opens or closes the log. Same as /gq."] = "Ouvre ou ferme le journal. Comme /gq."
@@ -678,3 +679,4 @@ L["Hides crafted gear that binds when picked up until you can make it yourself, 
 L["Page %d / %d"] = "Page %d / %d"
 
 L["could not index %s hunt data (%s). Please /reload."] = "impossible d’indexer les données de traque de %s (%s). Veuillez utiliser /reload."
+L["Requires Fishing. Apprentice is enough, and the squid can be bought."] = "Requiert la pêche. Apprenti suffit, et le calmar peut être acheté."

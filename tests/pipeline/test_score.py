@@ -15,25 +15,11 @@ BASE = {"sta": 1.0, "health": 0.1, "hp5": 0.5, "armor": 0.01, "int": 0.4, "spi":
 
 
 class LevelingWeights(unittest.TestCase):
-    def test_survivability_and_endurance_through_60(self):
-        for level in (1, 22, 59, 60):
+    def test_sheet_row_is_the_score_at_every_level(self):
+        for level in (1, 22, 59, 60, 70):
             w = score.weights_at_level(BASE, level)
-            self.assertAlmostEqual(w["sta"], 3.0, msg=f"stamina x3 at {level}")
-            self.assertAlmostEqual(w["health"], 0.3, msg=f"health x3 at {level}")
-            self.assertAlmostEqual(w["hp5"], 1.5, msg=f"health per 5 x3 at {level}")
-            self.assertAlmostEqual(w["armor"], 0.02, msg=f"armor x2 at {level}")
-            self.assertAlmostEqual(w["int"], 0.8, msg=f"intellect x2 at {level}")
-            self.assertAlmostEqual(w["spi"], 0.4, msg=f"spirit x2 at {level}")
-            self.assertAlmostEqual(w["mp5"], 0.6, msg=f"mana per 5 x2 at {level}")
-            self.assertAlmostEqual(w["mana"], 0.04, msg=f"mana x2 at {level}")
-
-    def test_damage_stats_stay_raw(self):
-        w = score.weights_at_level(BASE, 30)
-        for key in ("agi", "str", "hit", "crit", "sp"):
-            self.assertEqual(w[key], BASE[key], key)
-
-    def test_level_60_uses_the_leveling_multipliers(self):
-        self.assertEqual(score.weights_at_level(BASE, 60), score.weights_at_level(BASE, 30))
+            self.assertEqual(w, BASE, msg=f"level {level} must keep the sheet row")
+            self.assertIsNot(w, BASE)
 
     def test_base_row_is_not_changed(self):
         before = dict(BASE)

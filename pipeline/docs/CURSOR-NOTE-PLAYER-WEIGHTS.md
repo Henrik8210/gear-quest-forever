@@ -4,7 +4,7 @@ The settings-tab plan below was not built. Players edit weights from the spec me
 
 ## What shipped
 
-The spec menu has a divider, then that class's custom specs, then **+ custom stat weights**. The window sits on the log. The name is at most 20 characters. The player picks the premade spec it is based on. An empty box shows that spec's weight through level 60, including the leveling multipliers. A typed number replaces it, including 0, with no extra multiplier.
+The spec menu has a divider, then that class's custom specs, then **+ custom stat weights**. The window sits on the log. The name is at most 20 characters. The player picks the premade spec it is based on. An empty box shows that spec's sheet weight. A typed number replaces it, including 0. Neither path multiplies the number by level.
 
 A typed Spell power weight scores the Spell Power stat only. The Equip line "Increases damage and healing done by magical spells and effects by up to N" stays on Healing. An empty Spell power box still counts that line's damage half as spell power.
 

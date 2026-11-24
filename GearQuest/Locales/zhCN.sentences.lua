@@ -524,4 +524,6 @@ for k, v in pairs({
     ["Provided item:."] = "提供的物品：",
     ["The Blacksmithing plans are a drop."] = "锻造图纸是掉落。",
     ["The creature is not named yet."] = "还没有写明是哪只生物。",
+    ["The chain starts with Word of the Woods, from Mithera in Shen'dralas."] = "任务链从 Shen'dralas 的 Mithera 处的 Word of the Woods 开始。",
+    ["This step sends you into Maraudon."] = "这一步要进入玛拉顿。",
 }) do sentences[k] = v end

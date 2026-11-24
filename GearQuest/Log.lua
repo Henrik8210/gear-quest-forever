@@ -5645,6 +5645,28 @@ function GQ.Log:GetRemovedScope()
     return classFile .. ":" .. tostring(spec)
 end
 
+-- A restore used to clear the item key and leave the row key. The hunt
+-- stayed hidden, and the Removed tab could not see a key that does not
+-- start with the item id. Drop a row key when its item is no longer removed.
+function GQ.Log:DropStuckRemovedKeys(map)
+    if not map then
+        return
+    end
+    local kept = {}
+    for key in pairs(map) do
+        local itemId = tonumber(tostring(key):match("^(%d+)"))
+        if itemId then
+            kept[itemId] = true
+        end
+    end
+    for key in pairs(map) do
+        local itemId = tonumber(tostring(key):match("^id:[^:]+:[^:]+:(%d+):"))
+        if itemId and not kept[itemId] then
+            map[key] = nil
+        end
+    end
+end
+
 function GQ.Log:GetRemovedMap(create)
     local progress = CharProgress()
     local all = progress.removedItems
@@ -5663,6 +5685,11 @@ function GQ.Log:GetRemovedMap(create)
         end
         map = {}
         all[scope] = map
+    end
+    for _, stored in pairs(all) do
+        if type(stored) == "table" then
+            self:DropStuckRemovedKeys(stored)
+        end
     end
     return map
 end
@@ -5716,9 +5743,25 @@ end
 function GQ.Log:GetRemovedSlotListEntries(slotName)
     local results = {}
     local seen = {}
+    local map = self:GetRemovedMap(false)
+    if not map or not GQ.Data or not GQ.Data.GetEntriesByItemId then
+        return results
+    end
+    if GQ.Data.EnsureClassLoaded and GQ.GetEffectiveClass then
+        GQ.Data:EnsureClassLoaded(GQ:GetEffectiveClass())
+    end
+    slotName = GQ.Data.NormalizeSlotName and GQ.Data:NormalizeSlotName(slotName) or slotName
+    local wanted = {}
+    for key in pairs(map) do
+        local itemId = tonumber(tostring(key):match("^(%d+)"))
+            or tonumber(tostring(key):match("^id:[^:]+:[^:]+:(%d+):"))
+        if itemId then
+            wanted[itemId] = true
+        end
+    end
 
     local function consider(entry)
-        if not entry or not self:IsHuntRemoved(entry) then
+        if not entry or GQ.Data:NormalizeSlotName(entry.slot) ~= slotName or not self:IsHuntRemoved(entry) then
             return
         end
         if GQ.Data.EntryMatchesPlayerFaction and not GQ.Data:EntryMatchesPlayerFaction(entry) then
@@ -5737,16 +5780,10 @@ function GQ.Log:GetRemovedSlotListEntries(slotName)
         end
     end
 
-    if GQ.Data.EnsureClassLoaded and GQ.GetEffectiveClass then
-        GQ.Data:EnsureClassLoaded(GQ:GetEffectiveClass())
-    end
-    local slotKeys = GQ.Data.GetCandidateSlotKeys and GQ.Data:GetCandidateSlotKeys(slotName) or { slotName }
-    for i = 1, #slotKeys do
-        local list = GQ.Data.GetClassSlotEntryList and GQ.Data:GetClassSlotEntryList(slotKeys[i])
-        if list then
-            for j = 1, #list do
-                consider(list[j])
-            end
+    for itemId in pairs(wanted) do
+        local entries = GQ.Data:GetEntriesByItemId(itemId) or {}
+        for j = 1, #entries do
+            consider(entries[j])
         end
     end
 
@@ -5802,8 +5839,14 @@ function GQ.Log:RestoreHunt(entry)
         return
     end
 
-    for i = 1, #keys do
-        map[keys[i]] = nil
+    local itemId = tostring(entry.itemId)
+    for key in pairs(map) do
+        local text = tostring(key)
+        if text == itemId
+            or text:match("^" .. itemId .. "%z")
+            or text:match("^id:[^:]+:[^:]+:" .. itemId .. ":") then
+            map[key] = nil
+        end
     end
     self.selectedHuntId = nil
     self.selectedEntry = nil
@@ -14909,6 +14952,27 @@ function GQ.Log:EnsureSettingsPage(frame)
             end)
         end
     end)
+
+    local donationTitle = CreateFontStringWithFallback(donationChild, QUEST_DETAIL_TITLE_FONTS)
+    donationTitle:SetPoint("TOPLEFT", donationBox, "BOTTOMLEFT", -8, -18)
+    donationTitle:SetPoint("RIGHT", donationChild, "RIGHT", -8, 0)
+    donationTitle:SetJustifyH("LEFT")
+    donationTitle:SetWordWrap(true)
+    donationTitle:SetText(L["Top donators"])
+    donationTitle:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    donationTitle:Hide()
+    frame.settingsDonationTitle = donationTitle
+
+    local donationNames = CreateFontStringWithFallback(donationChild, QUEST_DETAIL_BODY_FONTS)
+    donationNames:SetPoint("TOPLEFT", donationTitle, "BOTTOMLEFT", 0, -6)
+    donationNames:SetPoint("RIGHT", donationChild, "RIGHT", -8, 0)
+    donationNames:SetJustifyH("LEFT")
+    donationNames:SetWordWrap(true)
+    donationNames:SetText("Rodeaschmi\nHugefan\nFucnred\nKamujin\nTony\nKestyn\nBonnie\nHendrik\nKrazedKlow\nGabriyel")
+    donationNames:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    donationNames:Hide()
+    frame.settingsDonationNames = donationNames
+
     WireMouseWheel(donationScroll, donationScroll)
     WireMouseWheel(donationChild, donationScroll)
 
@@ -15439,6 +15503,8 @@ function GQ.Log:SetSettingsSection(section)
         frame.settingsDonationBody,
         frame.settingsDonationBox,
         frame.settingsDonationCopy,
+        frame.settingsDonationTitle,
+        frame.settingsDonationNames,
     }, showDonations)
     if frame.settingsDonationBox and not showDonations then
         frame.settingsDonationBox:ClearFocus()
@@ -15579,8 +15645,15 @@ function GQ.Log:LayoutSettingsDonations(frame)
     end
     child:SetWidth(math.max(width, 40))
     local textWidth = math.max(width - 12, 40)
-    if frame.settingsDonationBody then
-        frame.settingsDonationBody:SetWidth(textWidth)
+    local wrapping = {
+        frame.settingsDonationBody,
+        frame.settingsDonationTitle,
+        frame.settingsDonationNames,
+    }
+    for i = 1, #wrapping do
+        if wrapping[i] then
+            wrapping[i]:SetWidth(textWidth)
+        end
     end
 
     local function lineHeight(fs, fallback)
@@ -15592,7 +15665,9 @@ function GQ.Log:LayoutSettingsDonations(frame)
     end
     local height = 8
     height = height + lineHeight(frame.settingsDonationBody, 96) + 12
-    height = height + 22 + 16
+    height = height + 22 + 18
+    height = height + lineHeight(frame.settingsDonationTitle, 18) + 6
+    height = height + lineHeight(frame.settingsDonationNames, 160) + 16
     child:SetHeight(height)
     UpdateScrollChildRect(scroll)
 
@@ -17490,6 +17565,10 @@ function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry, label, hand
         elseif slotName == "Ranged" and self:HunterRangedFilter() and self:RangedFilterNarrowed() then
             header = header .. "*"
         end
+        local rankCount = self.CachedRankListCount and self:CachedRankListCount(slotName, handKind)
+        if rankCount then
+            header = header .. " (" .. rankCount .. ")"
+        end
         row.text:SetText(header)
         row.text:SetTextColor(1, 0.82, 0)
         if row.info then
@@ -17925,6 +18004,13 @@ function GQ.Log:BuildDetailLines(entry)
                     else
                         table.insert(lines, questName)
                     end
+                end
+            end
+            for i = 1, #chainSteps do
+                local stepName = chainSteps[i] and chainSteps[i][2]
+                if stepName == "Winter Frontier Fishery" then
+                    table.insert(lines, L["Requires Fishing. Apprentice is enough, and the squid can be bought."])
+                    break
                 end
             end
         elseif GQ.Data.QuestChainLines then
@@ -18568,6 +18654,8 @@ function GQ.Log:GetSlotRankList(slotName, handKind)
                         and GQ.Data:ShouldShowEntry(entry)
                         and GQ.Data:EntryMatchesPlayerBand(entry)
                         and (not equip or not equip.EntryArmorIsWearable or equip:EntryArmorIsWearable(entry, loadSlot))
+                        and not (GQ.Data.DropsTwoHandWeapon and GQ.Data:DropsTwoHandWeapon(entry))
+                        and not (GQ.Data.DropsNonDagger and GQ.Data:DropsNonDagger(entry))
                         and (not handKind or self:EntryInWeaponHand(entry, loadSlot, handKind)) then
                         local fact = GQ.Data:GetItemFact(entry.itemId)
                         local req = fact and fact.reqLevel
@@ -18593,6 +18681,25 @@ function GQ.Log:GetSlotRankList(slotName, handKind)
         collect()
     end
     pool = GQ.Data:DeduplicateEntriesByItem(pool)
+    -- A Forever guide list at 60 is the whole hunt for that slot. A scored
+    -- piece must not sit on the same list. A slot with no guide row keeps
+    -- the scored list.
+    local guided = false
+    for i = 1, #pool do
+        if pool[i].origin == "guide" then
+            guided = true
+            break
+        end
+    end
+    if guided then
+        local only = {}
+        for i = 1, #pool do
+            if pool[i].origin == "guide" then
+                only[#only + 1] = pool[i]
+            end
+        end
+        pool = only
+    end
     local scores = self:WeaponCompareScoreMap(pool)
     table.sort(pool, function(a, b)
         -- A later band start is not a better weapon. The off hand can be on
@@ -18785,6 +18892,36 @@ function GQ.Log:EntryIsEquippedInSlots(entry, invSlots)
     return false
 end
 
+-- The (i) list's length, read from the cache the (i) itself uses.
+-- Nil until that list has been built, so a header never flashes (0).
+function GQ.Log:CachedRankListCount(slotName, handKind)
+    local weaponList = (slotName == "MainHand" or slotName == "WeaponPair") and self:IsWeaponHandKind(handKind)
+    if weaponList then
+        local ctx = self.GetActiveListCacheContextKey and self:GetActiveListCacheContextKey() or ""
+        if self._weaponTrueList and self._weaponTrueBand == ctx then
+            return #self._weaponTrueList
+        end
+        -- The pool is already built by the rank warm. The (i) list is that
+        -- pool with duplicate names removed, so count it without scoring again.
+        if self._weaponPool and self._weaponPoolBand == ctx and self.UnfilteredWeaponList then
+            return #(self:UnfilteredWeaponList() or {})
+        end
+        return nil
+    end
+    if not (GQ.Data and GQ.Data.GetActiveBandCacheKey) then
+        return nil
+    end
+    local band = GQ.Data:GetActiveBandCacheKey()
+    if self._slotRankBand ~= band or not self._slotRankCache then
+        return nil
+    end
+    local cached = self._slotRankCache[tostring(slotName) .. ":" .. tostring(handKind)]
+    if not cached then
+        return nil
+    end
+    return #cached
+end
+
 function GQ.Log:SlotRankListEntries(row)
     local slotName = row.slotName
     local handKind = row.handKind
@@ -18797,6 +18934,9 @@ function GQ.Log:SlotRankListEntries(row)
         entries = self:GetSlotRankList(slotName, handKind)
     end
     local title = row.text and row.text:GetText()
+    if title and title ~= "" then
+        title = title:gsub("%s*%(%d+%)%s*$", "")
+    end
     if not title or title == "" then
         title = (GQ.Data.SlotHeaderLabel and GQ.Data:SlotHeaderLabel(slotName)) or slotName or L["Slot"]
     end
@@ -18870,16 +19010,6 @@ function GQ.Log:ShowSlotRankTooltip(row)
     local slotName = row.slotName
     local handKind = row.handKind
     local entries, weaponList, title = self:SlotRankListEntries(row)
-    local bisUrl = self:ForeverBisUrl()
-    if bisUrl then
-        for i = 1, #entries do
-            if entries[i].origin == "guide" then
-                self:ShowForeverBisPanel(row, bisUrl, title)
-                return
-            end
-        end
-    end
-
     local scoreOn = GQ.Data.GearScoreTooltipEnabled and GQ.Data:GearScoreTooltipEnabled()
     local scoreSim = scoreOn and GQ.IsPreviewEnabled and GQ:IsPreviewEnabled()
     local scoreCtx
@@ -18901,7 +19031,7 @@ function GQ.Log:ShowSlotRankTooltip(row)
         if not text or text == "" then
             return ""
         end
-        if type(entry.pipelineScore) == "number" then
+        if type(entry.pipelineScore) == "number" and entry.origin ~= "guide" then
             local raw = string.format(" |cffffffff(%.2f)|r", entry.pipelineScore)
             local head, tail = text:match("^(|c%x+%d+|r)(.*)$")
             if head then
@@ -20066,6 +20196,8 @@ function GQ.Log:BuildCollectWeaponPool()
                         and GQ.Data:ShouldShowEntry(entry)
                         and GQ.Data:EntryMatchesPlayer(entry)
                         and GQ.Data:EntryIsDamagingWeapon(entry)
+                        and not (GQ.Data.DropsTwoHandWeapon and GQ.Data:DropsTwoHandWeapon(entry))
+                        and not (GQ.Data.DropsNonDagger and GQ.Data:DropsNonDagger(entry))
                         and (not equip or not equip.EntryMatchesSpec or equip:EntryMatchesSpec(entry))
                         and (not equip or not equip.MeetsRequiredLevel or equip:MeetsRequiredLevel(entry.itemId, playerLevel))
                     then
@@ -20219,6 +20351,19 @@ function GQ.Log:WeaponStyleEnabled(style)
     if not self:IsWeaponFilterStyle(style) then
         return false
     end
+    if GQ.Data.UsesOneHandAndShield and GQ.Data:UsesOneHandAndShield() then
+        if style == "two" then
+            return false
+        end
+        -- A saved Two-hand-only filter would leave the weapon list empty.
+        if style == "main" then
+            local saved = self:WeaponFilterRecord()
+            local styles = saved and saved.styles
+            if styles and styles.two and not styles.main then
+                return true
+            end
+        end
+    end
     local available = self:WeaponStylesAvailable()
     local exists = false
     for i = 1, #available do
@@ -20337,6 +20482,12 @@ function GQ.Log:WeaponPassesFilter(entry)
     if not entry or not GQ.Data:EntryIsDamagingWeapon(entry) then
         return false
     end
+    if GQ.Data.DropsTwoHandWeapon and GQ.Data:DropsTwoHandWeapon(entry) then
+        return false
+    end
+    if GQ.Data.DropsNonDagger and GQ.Data:DropsNonDagger(entry) then
+        return false
+    end
     if GQ.Data:EntryIsTwoHand(entry) then
         if not self:WeaponStyleEnabled("two") then
             return false
@@ -20412,6 +20563,9 @@ function GQ.Log:WeaponStylesAvailable()
             hasOff = true
         end
     end
+    if GQ.Data.UsesOneHandAndShield and GQ.Data:UsesOneHandAndShield() then
+        hasTwo = false
+    end
     local out = {}
     if hasTwo then
         out[#out + 1] = "two"
@@ -20450,6 +20604,9 @@ function GQ.Log:WeaponStylesForMenu()
                 hasOff = true
             end
         end
+    end
+    if GQ.Data.UsesOneHandAndShield and GQ.Data:UsesOneHandAndShield() then
+        hasTwo = false
     end
     local out = {}
     if hasTwo then
@@ -22415,15 +22572,6 @@ function GQ.Log:OpenSlotRankInLookup(row)
         return
     end
     local entries, weaponList, title = self:SlotRankListEntries(row)
-    local bisUrl = self:ForeverBisUrl()
-    if bisUrl then
-        for i = 1, #entries do
-            if entries[i].origin == "guide" then
-                self:ShowForeverBisPanel(row, bisUrl, title)
-                return
-            end
-        end
-    end
     if #entries == 0 then
         return
     end

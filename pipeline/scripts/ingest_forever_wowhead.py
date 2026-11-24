@@ -259,7 +259,7 @@ def parse_tooltip(t):
             eff.append(line[:400])
     if eff:
         o["effects"] = eff
-    proclike = re.compile(r"Chance on hit|^Use:|chance to|Equip: Chance", re.I)
+    proclike = re.compile(r"Chance on hit|^Use:|chance to|Equip: Chance|Proc chance", re.I)
     o["procs"] = [e for e in eff if proclike.search(e)]
     o["_effectDriven"] = bool(o["procs"]) and sum(
         v for k, v in o["stats"].items() if k not in ("armor", "block")

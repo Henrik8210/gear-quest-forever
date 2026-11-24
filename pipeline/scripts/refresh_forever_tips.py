@@ -31,6 +31,7 @@ from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from gq_paths import DATA, forever_beta_copy_ids
+from hunt_revisions import locked_rlvl
 from ingest_forever_wowhead import ARMOR_SUB, parse_tooltip
 from probe_forever_hunt_tooltips import plain as plain_tip
 
@@ -125,7 +126,8 @@ def apply_row(item: dict, raw: dict) -> bool:
     name = raw.get("name")
     if name:
         item["name"] = name
-    locked = LOCK_RLVL.get(int(item.get("id") or 0))
+    iid = int(item.get("id") or 0)
+    locked = LOCK_RLVL.get(iid) or locked_rlvl(iid)
     if locked:
         item["rlvl"] = locked
     # An empty parse means the span did not match. Leave a stored proc in place

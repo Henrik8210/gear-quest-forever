@@ -5285,6 +5285,12 @@ function GQ.Data:WornSlotIndex(slotName, itemId, handKind, itemLink)
     -- Another suffix of the same item must not stand in for this roll.
     if itemLink and self.EntryForItemLink then
         local entry = self:EntryForItemLink(itemLink)
+        if entry then
+            local guideIndex = self:GuideRankIndex(entry)
+            if guideIndex then
+                return guideIndex
+            end
+        end
         if entry and type(entry.pipelineScore) == "number" then
             local indexScore = entry.pipelineScore
             if self.EntryIsDamagingWeapon and self:EntryIsDamagingWeapon(entry) then
@@ -5404,6 +5410,8 @@ function GQ.Data:TwoHandCompetesWithPair()
     -- Enhancement has no second weapon. A rogue cannot wear a two-hander.
     -- Feral stays on the two-hand list. Everyone else can hold a two-hander
     -- or a main hand plus an off-hand piece, so those two loadouts share a scale.
+    -- Protection paladin does not hunt a two-hander. A one-hander plus a shield
+    -- still competes with a two-hander the character is already wearing.
     if self:UsesTwoHandOnlyWeapons() then
         return false
     end
@@ -5745,6 +5753,111 @@ function GQ.Data:DisplayedWeaponScore(entry)
         return GQ.Log:WeaponCompareScore(entry)
     end
     return entry and entry.pipelineScore
+end
+
+-- A level-60 Wowhead Forever list is already in guide order. Rank 1 reads
+-- 100. Each later place keeps a share of that list, so the last place stays
+-- above 0. The stored pipeline score stays the model's number.
+function GQ.Data:GuideList(slotName)
+    if self._guideListBusy or not (GQ.Log and GQ.Log.GetSlotRankList) or not slotName then
+        return nil
+    end
+    local slot = slotName
+    if self.NormalizeSlotName then
+        slot = self:NormalizeSlotName(slotName) or slotName
+    end
+    if slot == "OffHand" then
+        slot = "SecondaryHand"
+    end
+    self._guideListBusy = true
+    local list = GQ.Log:GetSlotRankList(slot)
+    self._guideListBusy = nil
+    if not list or #list == 0 then
+        return nil
+    end
+    for i = 1, #list do
+        if list[i].origin ~= "guide" then
+            return nil
+        end
+    end
+    return list
+end
+
+function GQ.Data:GuideRankIndex(entry)
+    if not entry or entry.origin ~= "guide" then
+        return nil
+    end
+    local slot = entry.slot
+    if self.NormalizeSlotName then
+        slot = self:NormalizeSlotName(slot) or slot
+    end
+    local list = self:GuideList(slot)
+    if not list then
+        return nil
+    end
+    local n = #list
+    local rank
+    for i = 1, n do
+        local row = list[i]
+        if row == entry or (row.itemId == entry.itemId and row.curatedRank == entry.curatedRank
+            and (row.suffix or "") == (entry.suffix or "")) then
+            rank = i
+            break
+        end
+    end
+    if not rank then
+        rank = entry.curatedRank
+    end
+    if type(rank) ~= "number" or rank < 1 then
+        return nil
+    end
+    if rank > n then
+        rank = n
+    end
+    local index = math.floor(((n - rank + 1) / n) * 100 + 0.5)
+    if index < 1 then
+        index = 1
+    elseif index > 100 then
+        index = 100
+    end
+    return index
+end
+
+function GQ.Data:WornGuideBaseline(entry)
+    if not entry then
+        return nil
+    end
+    local slot = entry.slot
+    if self.NormalizeSlotName then
+        slot = self:NormalizeSlotName(slot) or slot
+    end
+    local list = self:GuideList(slot)
+    if not list then
+        return nil
+    end
+    local slots = self:GetInventorySlots(slot) or {}
+    local filled = 0
+    local worst
+    for i = 1, #slots do
+        local itemId = self:EquippedItemId(slots[i])
+        if itemId then
+            filled = filled + 1
+            local index = 0
+            for j = 1, #list do
+                if list[j].itemId == itemId then
+                    index = self:GuideRankIndex(list[j]) or 0
+                    break
+                end
+            end
+            if not worst or index < worst then
+                worst = index
+            end
+        end
+    end
+    if filled == 0 or (#slots > 1 and filled < #slots) then
+        return nil
+    end
+    return worst or 0
 end
 
 function GQ.Data:GearScoreIndex(score, minScore, maxScore)
@@ -6142,6 +6255,22 @@ end
 -- what is worn. Negative is a downgrade. Nil means the worn piece could
 -- not be compared. Zero means the same piece, or a tie.
 function GQ.Data:GearScoreArrowDelta(entry, ctx)
+    local guideIndex = self:GuideRankIndex(entry)
+    if guideIndex then
+        if not ctx then
+            return nil
+        end
+        if entry.itemId and ctx.equippedIds and ctx.equippedIds[entry.itemId] then
+            if not entry.suffix or entry.suffix == "" then
+                return 0
+            end
+        end
+        local baseline = self:WornGuideBaseline(entry)
+        if baseline == nil then
+            return nil
+        end
+        return guideIndex - baseline
+    end
     if not ctx or not entry or type(entry.pipelineScore) ~= "number" then
         return nil
     end
@@ -6225,6 +6354,17 @@ function GQ.Data:GearScoreArrowDelta(entry, ctx)
 end
 
 function GQ.Data:GearScoreTrail(entry, ctx)
+    local guideIndex = self:GuideRankIndex(entry)
+    if guideIndex then
+        local delta = ""
+        if ctx and not (entry.itemId and ctx.equippedIds and ctx.equippedIds[entry.itemId]) then
+            local arrow = self:GearScoreArrowDelta(entry, ctx)
+            if arrow and arrow ~= 0 then
+                delta = self:GearScoreDeltaText(arrow, 0)
+            end
+        end
+        return string.format("|cffffffff%d|r%s", guideIndex, delta)
+    end
     if not ctx or not entry or type(entry.pipelineScore) ~= "number" then
         return ""
     end
@@ -6420,9 +6560,16 @@ function GQ.Data:EntryForItemLink(link)
         end
         return current
     end
+    local level = GQ.GetEffectiveLevel and GQ:GetEffectiveLevel() or 1
+    local function inStrictBand(entry)
+        return level >= (entry.minLevel or 1) and level <= (entry.maxLevel or level)
+    end
     local suffixRows, rows = {}, {}
     for _, entry in ipairs(self:GetEntriesByItemId(itemId)) do
-        if type(entry.pipelineScore) == "number" and self:EntryMatchesPlayerBand(entry) then
+        -- The five-level grace keeps a hunt on the list a little past its band.
+        -- The tooltip uses the band that contains this level. A grace-only row
+        -- used to match, then print nothing under the enchant.
+        if type(entry.pipelineScore) == "number" and inStrictBand(entry) and self:EntryMatchesPlayerBand(entry) then
             if entry.suffix and entry.suffix ~= "" then
                 if self:EntrySuffixMatchesLink(entry, link) then
                     suffixRows[#suffixRows + 1] = entry
@@ -7189,6 +7336,49 @@ function GQ.Data:UsesTwoHandOnlyWeapons()
     return classFile == "SHAMAN" and spec == "enhancement"
 end
 
+function GQ.Data:UsesOneHandAndShield()
+    -- Protection paladin wears a one-hander and a shield. A two-hander is not a hunt.
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    local spec = self:RuleSpec()
+    return classFile == "PALADIN" and spec == "protection"
+end
+
+function GQ.Data:ClientEquipIsTwoHand(itemId)
+    if not itemId or not GetItemInfoInstant then
+        return false
+    end
+    local _, _, _, equipLoc = GetItemInfoInstant(itemId)
+    return equipLoc == "INVTYPE_2HWEAPON"
+end
+
+function GQ.Data:AssassinationDaggerOnly()
+    -- Ambush, Backstab, and Mutilate require a dagger in both hands.
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    local spec = self:RuleSpec()
+    return classFile == "ROGUE" and spec == "assassination"
+end
+
+function GQ.Data:DropsNonDagger(entry)
+    if not self:AssassinationDaggerOnly() then
+        return false
+    end
+    local kind = self:WeaponTypeOf(entry)
+    if not kind then
+        return false
+    end
+    return kind ~= "Dagger"
+end
+
+function GQ.Data:DropsTwoHandWeapon(entry)
+    if not self:UsesOneHandAndShield() then
+        return false
+    end
+    if self:EntryIsTwoHand(entry) then
+        return true
+    end
+    return entry and self:ClientEquipIsTwoHand(entry.itemId) or false
+end
+
 function GQ.Data:PairsWeaponWithOffHand()
     local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
     local spec = self.RuleSpec and self:RuleSpec() or (GQ.GetEffectiveSpec and GQ:GetEffectiveSpec())
@@ -7277,6 +7467,9 @@ end
 
 function GQ.Data:EntryFitsPaperDollSlot(entry, slotName, ignoreWeaponFilter)
     slotName = self:NormalizeSlotName(slotName)
+    if (slotName == "MainHand" or slotName == "SecondaryHand") and (self:DropsTwoHandWeapon(entry) or self:DropsNonDagger(entry)) then
+        return false
+    end
     local function allow(ok)
         if not ok then
             return false
@@ -7748,6 +7941,9 @@ function GQ.Data:WeaponCanEquipHand(entry, hand)
     if not entry or not self:EntryIsDamagingWeapon(entry) then
         return false
     end
+    if self:DropsTwoHandWeapon(entry) or self:DropsNonDagger(entry) then
+        return false
+    end
     if hand == "two" then
         return self:EntryIsTwoHand(entry)
     end
@@ -7776,6 +7972,9 @@ function GQ.Data:WeaponFitsFilterHand(entry, hand)
         return false
     end
     if not entry or not self:EntryIsDamagingWeapon(entry) then
+        return false
+    end
+    if self:DropsTwoHandWeapon(entry) or self:DropsNonDagger(entry) then
         return false
     end
     if hand == "two" then

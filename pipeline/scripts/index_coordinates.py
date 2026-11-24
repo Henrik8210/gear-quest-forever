@@ -34,6 +34,7 @@ from pathlib import Path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from commerce_camps import CAMP_NOTE, camp_pins
 from gq_paths import ADDON_GEN, DATA
+from hunt_revisions import locked_quest_factions
 
 UA = "wow-classic-data-research/1.0 (+contact: local script)"
 DELAY = float(os.environ.get("GQ_COORD_DELAY", "0.7"))
@@ -1442,6 +1443,8 @@ QUEST_FACTION_LUA = Path(ADDON_GEN) / "Data.QuestFaction.generated.lua"
 
 def write_quest_faction(sides: dict[int, str]) -> None:
     for iid, side in HAND_FACTION.items():
+        sides[iid] = side
+    for iid, side in locked_quest_factions().items():
         sides[iid] = side
     payload = {str(iid): side for iid, side in sorted(sides.items())}
     QUEST_FACTION_JSON.write_text(

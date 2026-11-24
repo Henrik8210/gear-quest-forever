@@ -17,6 +17,7 @@ from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from gq_paths import DATA
+from hunt_revisions import locked_levels
 
 ITEMS = Path(DATA) / "items.json"
 SOURCES = Path(DATA) / "sources.json"
@@ -235,7 +236,7 @@ def main():
             src["gateLevel"] = level
         changed.append((iid, it.get("name"), old, level, [e.get("n") for e in more]))
 
-    for iid, level in LOCK_RLVL.items():
+    for iid, level in {**LOCK_RLVL, **locked_levels()}.items():
         it = items.get(str(iid))
         if not it:
             continue

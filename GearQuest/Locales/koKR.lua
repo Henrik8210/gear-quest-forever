@@ -359,6 +359,7 @@ L["Hold Shift to see BiS items from this NPC"] = "Shift 키를 누르고 있으�
 L["Join the GearQuest community to talk about class specs, stat weights, and what to hunt next. Share how GearQuest is going for you. Bug reports and feature ideas are welcome there too. Get the latest news and insights, and comment on upcoming features before they are released."] = "GearQuest 커뮤니티에 참여해 직업 전문화, 능력치 가중치, 다음에 노릴 장비에 대해 이야기하세요. GearQuest 사용 경험을 공유해 주세요. 버그 제보와 기능 제안도 환영합니다. 최신 소식을 받고, 출시 전에 예정된 기능에 의견을 남기세요."
 L["Copy"] = "복사"
 L["Donations"] = "후원"
+L["Top donators"] = "상위 후원자"
 L["Building GearQuest might be easier than it would have been 5 years ago, but code is expensive and I appreciate any support I can get, and donations enable me to do even more including implementing new cool features that hopefully make your Forever experience smoother :)\n\nAny donations are very much appreciated, thanks!"] = "GearQuest를 만드는 일은 5년 전보다 쉬울지 모르지만, 개발에는 비용이 들고 어떤 도움이든 고맙습니다. 후원 덕분에 더 많은 일을 할 수 있고, Forever에서의 플레이가 더 매끄러워지도록 새 기능도 넣을 수 있습니다 :)\n\n어떤 후원이든 정말 감사합니다!"
 L["Opens or closes the GearQuest window. /gearquest does the same."] = "GearQuest 창을 열거나 닫습니다. /gearquest도 같습니다."
 L["Opens or closes the log. Same as /gq."] = "기록을 열거나 닫습니다. /gq와 같습니다."
@@ -677,3 +678,4 @@ GQ.LocaleGuidePages = {
 }
 
 L["could not index %s hunt data (%s). Please /reload."] = "%s 사냥 데이터를 색인하지 못했습니다 (%s). /reload를 입력하세요."
+L["Requires Fishing. Apprentice is enough, and the squid can be bought."] = "낚시가 필요합니다. 초급이면 충분하며, 오징어는 구매할 수 있습니다."

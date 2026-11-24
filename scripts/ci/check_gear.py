@@ -38,6 +38,11 @@ Known answers
   rescore that moves one updates that file in the same change. An entry with
   "knownIssue" is reported and does not fail; it fails once it passes, so the
   note gets removed.
+Level 60 guides
+- A slot listed on a spec's Wowhead Forever page is only those items at level
+  60, in that page's order, each marked origin="guide", once any of them is on
+  that faction's list. A faction with none of the page's pieces for that slot,
+  a slot the page leaves empty, and a spec with no page, stay on the scorer.
 
 Usage: python scripts/ci/check_gear.py
 """
@@ -312,6 +317,46 @@ def check_expectations(cat: Catalog, fail, warn) -> None:
         report(exp, problems, fail, warn)
 
 
+def check_forever_guides(cat: Catalog, fail) -> None:
+    """A listed Forever slot at level 60 is that page's items, in that order."""
+    pages = json.loads((REPO / "pipeline" / "guides" / "forever_bis.json").read_text(encoding="utf-8"))
+    for cls in CLASSES:
+        specs = pages.get(cls.upper()) or {}
+        for spec, page in specs.items():
+            if not isinstance(page, dict):
+                continue
+            for slot, ids in (page.get("slots") or {}).items():
+                if not ids:
+                    continue
+                order = {int(iid): index for index, iid in enumerate(ids)}
+                for faction in ("Alliance", "Horde"):
+                    covering = [
+                        row for row in cat.rows[cls]
+                        if row[5] == spec and row[1] == slot and row[6] == faction
+                        and row[2] <= 60 <= row[3]
+                    ]
+                    # No guide piece is legal for this faction. The scored list stays.
+                    if not covering or not any(row[8] == "guide" for row in covering):
+                        continue
+                    for row in covering:
+                        item = int(row[0])
+                        if item not in order or row[8] != "guide":
+                            name = (cat.item[cls].get(item) or (str(item),))[0]
+                            fail(f"{cls} {spec} {faction} {slot} level 60 lists {name} ({item}), "
+                                 f"which is not on the Forever guide")
+                    band = sorted((row for row in covering if row[2] == 60 and row[3] == 60),
+                                  key=lambda row: row[4])
+                    previous = -1
+                    for row in band:
+                        place = order.get(int(row[0]))
+                        if place is None:
+                            continue
+                        if place < previous:
+                            fail(f"{cls} {spec} {faction} {slot} level 60 has item {int(row[0])} "
+                                 f"ahead of the guide order")
+                        previous = place
+
+
 def report(exp: dict, problems: list[str], fail, warn) -> None:
     if exp.get("knownIssue"):
         if problems:
@@ -332,6 +377,7 @@ def main() -> int:
         cat.load(cls)
     check_structure(cat, failures.append)
     check_banned(cat, failures.append)
+    check_forever_guides(cat, failures.append)
     check_tooltips(cat, failures.append, warnings.append)
     check_factions(cat, failures.append)
     check_expectations(cat, failures.append, warnings.append)

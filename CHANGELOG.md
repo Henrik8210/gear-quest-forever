@@ -2,7 +2,49 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.3.4
+## v1.3.5
+
+The log header reads **GearQuest Forever v1.3.5**. **`/reload`** after updating.
+
+### Level 60 follows the Wowhead Forever guide
+
+**Who:** Every spec that has a filled Best in Slot page, Alliance and Horde, level **60**, including while you simulate. Shockadin, Feral, Bear, Enhancement Tank, the three Battle Mage specs, and Assassination stay on the scorer. So does a slot the page leaves empty, and a faction that cannot use any piece that page lists for that slot. Levels **1–59** stay on the scorer.
+
+**What you see:** A guide slot is only the pieces on that page, in that order, marked **(Guide)**. Retribution head is **11**. **Lionheart Helm** is rank **1**, **Stalwart Helm** is rank **2**, and **Soulforge Greathelm** is rank **3**. The (i) list is that same order. Rank 1 reads **100**. A higher model score does not jump a later piece ahead of the page.
+
+### The sheet number is the score
+
+**Who:** Every class and spec, Alliance and Horde, levels **1–60**, including a custom spec with an empty box and the spec-name tooltip.
+
+**What you see:** Stamina, armor, intellect, spirit, and mana are no longer doubled or tripled while you level. The hunt and the tooltip use the same number that is on the weight sheet. Hit, crit, and weapon damage were already that number.
+
+**Heavy Woolen Pants** (tailoring, item level 22, requires 17) move with that. **Affliction** keeps them through **29** for both factions. They are off at **30**. **Demonology** keeps them through **26**. **Destruction** keeps them through **24**. They are off every warlock list at **50**.
+
+Melee specs score expertise. About **10** rating is **1%**. **Assassination** lists daggers only, in both hands, because Ambush, Backstab, and Mutilate require a dagger. Its haste is **0.85** and its expertise is **0.19**. **Combat** expertise is **0.16**. **Subtlety** expertise is **0.1**.
+
+**Holy** paladin scores healing **1.3**, spell power **1**, holy spell power **1**, intellect **0.85**, spirit **0.3**, stamina **0.3**, and armor **0.004**. **Protection** scores spell power and holy spell power at **0.85**, and armor at **0.2**. **Warrior Protection** scores hit **5**, strength **1**, crit **3**, and stamina **0.9**. **Beast Mastery** ranged attack power is **0.4**, **Marksmanship** **0.38**, and **Survival** **0.34**. Survival melee attack power is **0.28**.
+
+### Removing a hunt does not raise the score
+
+**Who:** Every class and spec, including while you simulate.
+
+**What you see:** Remove hides that row. The (i) list still shows it at the same number, so **Lionheart Helm** stays **#1** on Retribution head after you remove it. The 0–100 score does not move. Restore puts the row back in that same place.
+
+### Where the plans drop
+
+**Who:** The classes that hunt these crafts. Retribution, Arms, and Fury hunt **Lionheart Helm**. Protection and the plate specs that hunt **Stalwart Helm** see that one. The heart trinkets are the enchanting crafts. **Arcanite Reaper** is the two-hander.
+
+**What you see:** **Plans: Lionheart Helm** drop from **Ferra** in Dire Maul. The pin is the Dire Maul entrance in Feralas. It is not a Lower Blackrock Spire boss. **Stalwart Helm** plans drop from **Bloodaxe Veteran**, Blackrock Spire trash. **Frozen Heart of the Mountain** drops from **Mor Grayhoof**. **Dormant Heart of the Mountain** drops from **Mother Smolderweb**. **Arcanite Reaper** plans drop from **Bannok Grimaxe**. Those four pin the Blackrock Spire entrance, in Searing Gorge and the Burning Steppes.
+
+**Overgrown Cuffs** and **Thornplated Cord** require level **42**. The chain starts at **Word of the Woods** with **Mithera** in Shen'dralas. Thanks **kingcurly**. **Arathi Armbands** stay Alliance only. Thanks **kingcurly**.
+
+### Top donators
+
+**Who:** Everyone.
+
+**What you see:** Settings, **Donations**. Under the link, **Top donators** lists Rodeaschmi, Hugefan, Fucnred, Kamujin, Tony, Kestyn, Bonnie, Hendrik, KrazedKlow, and Gabriyel. The page scrolls, the same way **The GearQuest Community** scrolls.
+
+### v1.3.4
 
 The log header reads **GearQuest Forever v1.3.4**. **`/reload`** after updating.
 

@@ -4,6 +4,9 @@
 local _, GQ = ...
 GQ.Data = GQ.Data or {}
 
+GQ.Data.questChain[272186] = { {93594, "Word of the Woods"}, {93404, "Rot and Regret"} }
+GQ.Data.questChain[272187] = { {93594, "Word of the Woods"}, {93404, "Rot and Regret"} }
+
 GQ.Data.vendorCost = {}
 GQ.Data.vendorCost[85] = { copper = 62 }
 GQ.Data.vendorCost[193] = { copper = 48 }
@@ -707,6 +710,19 @@ GQ.Data.vendorCost[287063] = { copper = 3612, sellers = { ["Frederick Stover"] =
 
 GQ.Data.questChain = {}
 GQ.Data.questChain[60] = 1
+GQ.Data.questChain[22002] = { Alliance = { {84152, "An Earnest Proposition"}, {84168, "Just Compensation"} }, Horde = { {84159, "An Earnest Proposition"}, {84175, "Just Compensation"} } }
+GQ.Data.questChain[22008] = { Alliance = { {84152, "An Earnest Proposition"}, {84168, "Just Compensation"}, {84184, "Anthion's Parting Words"} }, Horde = { {84159, "An Earnest Proposition"}, {84175, "Just Compensation"}, {84191, "Anthion's Parting Words"} } }
+GQ.Data.questChain[22011] = { Alliance = { {84148, "An Earnest Proposition"} }, Horde = { {84156, "An Earnest Proposition"} } }
+GQ.Data.questChain[22013] = { Alliance = { {84148, "An Earnest Proposition"}, {84164, "Just Compensation"}, {84180, "Anthion's Parting Words"}, {84196, "Saving the Best for Last"} }, Horde = { {84156, "An Earnest Proposition"}, {84172, "Just Compensation"}, {84188, "Anthion's Parting Words"}, {84204, "Saving the Best for Last"} } }
+GQ.Data.questChain[22060] = { Alliance = { {84148, "An Earnest Proposition"}, {84164, "Just Compensation"}, {84180, "Anthion's Parting Words"}, {84196, "Saving the Best for Last"} }, Horde = { {84156, "An Earnest Proposition"}, {84172, "Just Compensation"}, {84188, "Anthion's Parting Words"}, {84204, "Saving the Best for Last"} } }
+GQ.Data.questChain[22061] = { Alliance = { {84148, "An Earnest Proposition"}, {84164, "Just Compensation"}, {84180, "Anthion's Parting Words"} }, Horde = { {84156, "An Earnest Proposition"}, {84172, "Just Compensation"}, {84188, "Anthion's Parting Words"} } }
+GQ.Data.questChain[22069] = { Alliance = { {84149, "An Earnest Proposition"}, {84165, "Just Compensation"}, {84181, "Anthion's Parting Words"}, {84197, "Saving the Best for Last"} }, Horde = { {84157, "An Earnest Proposition"}, {84173, "Just Compensation"}, {84189, "Anthion's Parting Words"}, {84205, "Saving the Best for Last"} } }
+GQ.Data.questChain[22077] = { Alliance = { {84153, "An Earnest Proposition"}, {84169, "Just Compensation"} }, Horde = { {84161, "An Earnest Proposition"}, {84177, "Just Compensation"} } }
+GQ.Data.questChain[22096] = { Horde = { {84160, "An Earnest Proposition"}, {84176, "Just Compensation"}, {84192, "Anthion's Parting Words"} } }
+GQ.Data.questChain[22098] = { Horde = { {84160, "An Earnest Proposition"}, {84176, "Just Compensation"} } }
+GQ.Data.questChain[22099] = { Horde = { {84160, "An Earnest Proposition"}, {84176, "Just Compensation"} } }
+GQ.Data.questChain[22100] = { Horde = { {84160, "An Earnest Proposition"}, {84176, "Just Compensation"}, {84192, "Anthion's Parting Words"} } }
+GQ.Data.questChain[22101] = { Horde = { {84160, "An Earnest Proposition"}, {84176, "Just Compensation"}, {84192, "Anthion's Parting Words"} } }
 GQ.Data.questChain[61] = 1
 GQ.Data.questChain[79] = 1
 GQ.Data.questChain[80] = { {5261, "Eagan Peltskinner"}, {33, "Wolves Across the Border"} }
@@ -2047,6 +2063,7 @@ GQ.Data.questChain[226829] = { Alliance = { {84152, "An Earnest Proposition"}, {
 GQ.Data.questChain[226830] = { Alliance = { {84152, "An Earnest Proposition"} }, Horde = { {84159, "An Earnest Proposition"} } }
 GQ.Data.questChain[226831] = { Alliance = { {84152, "An Earnest Proposition"}, {84168, "Just Compensation"}, {84184, "Anthion's Parting Words"} }, Horde = { {84159, "An Earnest Proposition"}, {84175, "Just Compensation"}, {84191, "Anthion's Parting Words"} } }
 GQ.Data.questChain[226832] = { Alliance = { {84152, "An Earnest Proposition"}, {84168, "Just Compensation"} }, Horde = { {84159, "An Earnest Proposition"}, {84175, "Just Compensation"} } }
+GQ.Data.questChain[21995] = { Alliance = { {84154, "An Earnest Proposition"}, {84170, "Just Compensation"}, {84186, "Anthion's Parting Words"} }, Horde = { {84162, "An Earnest Proposition"}, {84178, "Just Compensation"}, {84194, "Anthion's Parting Words"} } }
 GQ.Data.questChain[226857] = { Alliance = { {84154, "An Earnest Proposition"}, {84170, "Just Compensation"}, {84186, "Anthion's Parting Words"} }, Horde = { {84162, "An Earnest Proposition"}, {84178, "Just Compensation"}, {84194, "Anthion's Parting Words"} } }
 GQ.Data.questChain[226858] = { Alliance = { {84154, "An Earnest Proposition"}, {84170, "Just Compensation"}, {84186, "Anthion's Parting Words"} }, Horde = { {84162, "An Earnest Proposition"}, {84178, "Just Compensation"}, {84194, "Anthion's Parting Words"} } }
 GQ.Data.questChain[226859] = { Alliance = { {84154, "An Earnest Proposition"}, {84170, "Just Compensation"}, {84186, "Anthion's Parting Words"} }, Horde = { {84162, "An Earnest Proposition"}, {84178, "Just Compensation"}, {84194, "Anthion's Parting Words"} } }
@@ -2186,10 +2203,16 @@ GQ.Data.questChain[257345] = 1
 GQ.Data.questChain[257346] = 1
 GQ.Data.questChain[257943] = 1
 GQ.Data.questChain[258882] = { {92464, "Elemental Unrest"}, {92465, "Agitators"}, {92469, "Return to Rorian"}, {92470, "Foul Matriarch"} }
-GQ.Data.questChain[259890] = { Alliance = { {89001, "Home on the Range"}, {89228, "Winter Frontier Fishery"} }, Horde = { {91488, "Home on the Range"}, {91610, "Winter Frontier Fishery"} } }
-GQ.Data.questChain[260210] = { Alliance = { {89001, "Home on the Range"}, {89015, "Deadliest Catch"} }, Horde = { {91488, "Home on the Range"}, {91611, "Deadliest Catch"} } }
-GQ.Data.questChain[260211] = { Alliance = { {89001, "Home on the Range"}, {89015, "Deadliest Catch"} }, Horde = { {91488, "Home on the Range"}, {91611, "Deadliest Catch"} } }
-GQ.Data.questChain[260212] = { Alliance = { {89001, "Home on the Range"}, {89015, "Deadliest Catch"} }, Horde = { {91488, "Home on the Range"}, {91611, "Deadliest Catch"} } }
+GQ.Data.questChain[259890] = { Alliance = { {89001, "Home on the Range"}, {89013, "Gettin' Buzzed"}, {89228, "Winter Frontier Fishery"} }, Horde = { {91488, "Home on the Range"}, {91608, "Gettin' Buzzed"}, {91610, "Winter Frontier Fishery"} } }
+GQ.Data.questChain[260210] = { Alliance = { {89001, "Home on the Range"}, {89013, "Gettin' Buzzed"}, {89228, "Winter Frontier Fishery"}, {89015, "Deadliest Catch"} }, Horde = { {91488, "Home on the Range"}, {91608, "Gettin' Buzzed"}, {91610, "Winter Frontier Fishery"}, {91611, "Deadliest Catch"} } }
+GQ.Data.questChain[260211] = { Alliance = { {89001, "Home on the Range"}, {89013, "Gettin' Buzzed"}, {89228, "Winter Frontier Fishery"}, {89015, "Deadliest Catch"} }, Horde = { {91488, "Home on the Range"}, {91608, "Gettin' Buzzed"}, {91610, "Winter Frontier Fishery"}, {91611, "Deadliest Catch"} } }
+GQ.Data.questChain[260212] = { Alliance = { {89001, "Home on the Range"}, {89013, "Gettin' Buzzed"}, {89228, "Winter Frontier Fishery"}, {89015, "Deadliest Catch"} }, Horde = { {91488, "Home on the Range"}, {91608, "Gettin' Buzzed"}, {91610, "Winter Frontier Fishery"}, {91611, "Deadliest Catch"} } }
+GQ.Data.questChain[275739] = { {90647, "The Staff of the Mountain"}, {92169, "Paying Back the Pact"}, {92833, "Ve'han's Fall"}, {93848, "Work Well Done"} }
+GQ.Data.questChain[275740] = { {90647, "The Staff of the Mountain"}, {92169, "Paying Back the Pact"}, {92833, "Ve'han's Fall"}, {93848, "Work Well Done"} }
+GQ.Data.questChain[275741] = { {90647, "The Staff of the Mountain"}, {92169, "Paying Back the Pact"}, {92833, "Ve'han's Fall"}, {93848, "Work Well Done"} }
+GQ.Data.questChain[260183] = { {86777, "Master Feardred"}, {86792, "Thinning Their Forces"}, {86796, "Later, Satyr"}, {86797, "Return to Rageroar"}, {86798, "Timbermaw Reinforcements"}, {87346, "Chieftain Bloodmaw"}, {86814, "Blackmaw Counter-Offensive"} }
+GQ.Data.questChain[260184] = { {86777, "Master Feardred"}, {86792, "Thinning Their Forces"}, {86796, "Later, Satyr"}, {86797, "Return to Rageroar"}, {86798, "Timbermaw Reinforcements"}, {87346, "Chieftain Bloodmaw"}, {86814, "Blackmaw Counter-Offensive"} }
+GQ.Data.questChain[260185] = { {86777, "Master Feardred"}, {86792, "Thinning Their Forces"}, {86796, "Later, Satyr"}, {86797, "Return to Rageroar"}, {86798, "Timbermaw Reinforcements"}, {87346, "Chieftain Bloodmaw"}, {86814, "Blackmaw Counter-Offensive"} }
 GQ.Data.questChain[260216] = { {86777, "Master Feardred"}, {86792, "Thinning Their Forces"}, {86796, "Later, Satyr"}, {86797, "Return to Rageroar"}, {86798, "Timbermaw Reinforcements"}, {87346, "Chieftain Bloodmaw"}, {86814, "Blackmaw Counter-Offensive"}, {92065, "Blackmaw Reclamation"} }
 GQ.Data.questChain[260217] = { {86777, "Master Feardred"}, {86792, "Thinning Their Forces"}, {86796, "Later, Satyr"}, {86797, "Return to Rageroar"}, {86798, "Timbermaw Reinforcements"}, {87346, "Chieftain Bloodmaw"}, {86814, "Blackmaw Counter-Offensive"}, {92065, "Blackmaw Reclamation"} }
 GQ.Data.questChain[260218] = { {86777, "Master Feardred"}, {86792, "Thinning Their Forces"}, {86796, "Later, Satyr"}, {86797, "Return to Rageroar"}, {86798, "Timbermaw Reinforcements"}, {87346, "Chieftain Bloodmaw"}, {86814, "Blackmaw Counter-Offensive"}, {92065, "Blackmaw Reclamation"} }
@@ -2300,7 +2323,6 @@ GQ.Data.questChain[270072] = { {500, "Crushridge Bounty"}, {504, "Crushridge War
 GQ.Data.questChain[270074] = 1
 GQ.Data.questChain[270075] = 1
 GQ.Data.questChain[270079] = 1
-GQ.Data.questChain[270080] = 1
 GQ.Data.questChain[270084] = 1
 GQ.Data.questChain[270085] = 1
 GQ.Data.questChain[270090] = 1

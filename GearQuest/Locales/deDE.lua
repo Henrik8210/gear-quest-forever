@@ -360,6 +360,7 @@ L["Hold Shift to see BiS items from this NPC"] = "Umschalttaste halten, um die b
 L["Join the GearQuest community to talk about class specs, stat weights, and what to hunt next. Share how GearQuest is going for you. Bug reports and feature ideas are welcome there too. Get the latest news and insights, and comment on upcoming features before they are released."] = "Tritt der GearQuest-Community bei, um über Spezialisierungen, Wertegewichtungen und die nächste Hunt zu reden. Erzähl, wie GearQuest für dich läuft. Fehlerberichte und Ideen für neue Funktionen sind dort ebenfalls willkommen. Hol dir die neuesten Infos und kommentiere kommende Funktionen, bevor sie erscheinen."
 L["Copy"] = "Kopieren"
 L["Donations"] = "Spenden"
+L["Top donators"] = "Die größten Spender"
 L["Building GearQuest might be easier than it would have been 5 years ago, but code is expensive and I appreciate any support I can get, and donations enable me to do even more including implementing new cool features that hopefully make your Forever experience smoother :)\n\nAny donations are very much appreciated, thanks!"] = "GearQuest zu bauen ist vielleicht leichter, als es vor 5 Jahren gewesen wäre, aber Programmcode ist teuer, und ich bin für jede Unterstützung dankbar. Spenden ermöglichen mir, noch mehr zu tun, auch neue Funktionen, die dein Forever-Erlebnis hoffentlich angenehmer machen :)\n\nJede Spende weiß ich sehr zu schätzen, danke!"
 L["Opens or closes the GearQuest window. /gearquest does the same."] = "Öffnet oder schließt das GearQuest-Fenster. /gearquest macht dasselbe."
 L["Opens or closes the log. Same as /gq."] = "Öffnet oder schließt das Log. Wie /gq."
@@ -677,3 +678,4 @@ GQ.LocaleGuidePages = {
 }
 
 L["could not index %s hunt data (%s). Please /reload."] = "Die Hunt-Daten für %s konnten nicht indiziert werden (%s). Bitte /reload eingeben."
+L["Requires Fishing. Apprentice is enough, and the squid can be bought."] = "Erfordert Angeln. Lehrling genügt, und der Tintenfisch kann gekauft werden."

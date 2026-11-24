@@ -524,4 +524,6 @@ for k, v in pairs({
     ["Provided item:."] = "Objeto proporcionado:",
     ["The Blacksmithing plans are a drop."] = "Los planos de herrería son un botín.",
     ["The creature is not named yet."] = "La criatura todavía no tiene nombre.",
+    ["The chain starts with Word of the Woods, from Mithera in Shen'dralas."] = "La cadena empieza con Word of the Woods, con Mithera en Shen'dralas.",
+    ["This step sends you into Maraudon."] = "Este paso te envía a Maraudon.",
 }) do sentences[k] = v end

@@ -454,28 +454,9 @@ local function IsSpellPowerKey(statKey)
         or statKey == "Spell Power"
 end
 
--- Hunt scores multiply stamina, intellect, spirit, and mana through level 60.
--- The raw profile weight is what GetStatWeight returns.
+-- The sheet number is the score. Do not multiply stamina, armor, or mana by level.
 local function LeveledStatWeight(statName)
-    local weight = SuffixStatWeight(statName)
-    local level = GQ.GetEffectiveLevel and GQ:GetEffectiveLevel() or 1
-    local leveling = GQ.ScoringLeveling
-    if not leveling or level > (leveling.untilLevel or 60) then
-        return weight
-    end
-    local key = ResolveStatWeightKey(statName)
-    -- Enhancement intellect stays the raw weight. The endurance double put it above strength.
-    if key == "int" then
-        local specId = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec()
-        if specId == "enhancement" then
-            return weight
-        end
-    end
-    local mult = key and leveling[key]
-    if mult then
-        return weight * mult
-    end
-    return weight
+    return SuffixStatWeight(statName)
 end
 
 local function ScoreNormalizedStats(statTable, leveled)

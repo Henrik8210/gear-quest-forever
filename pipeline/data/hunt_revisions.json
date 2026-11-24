@@ -1,0 +1,57 @@
+{
+  "about": "Revisions to an existing hunt. A Wowhead Forever scrape must not replace a lock. reportedBy is the Discord name. Henrik is the reporter when nobody else is named. Stats the client shows and Wowhead does not stay in client_item_overrides.json; check that file too.",
+  "items": {
+    "272186": {
+      "name": "Overgrown Cuffs",
+      "reportedBy": "kingcurly",
+      "date": "2026-11-24",
+      "where": "Discord missing-or-wrong-items",
+      "verifiedInGame": true,
+      "wowheadSays": "Rot and Regret (93404) requires level 35. Maraudon is listed as level 42-52.",
+      "kept": "Required level 42, the level Maraudon can be entered. The chain is Word of the Woods (93594) from Mithera in Shen'dralas (53.2, 75.8), then Rot and Regret, which sends you into Maraudon. Same revision as Thornplated Cord.",
+      "lock": {
+        "rlvl": 42,
+        "gateLevel": 42
+      }
+    },
+    "272187": {
+      "name": "Thornplated Cord",
+      "reportedBy": "kingcurly",
+      "date": "2026-11-24",
+      "where": "Discord missing-or-wrong-items",
+      "verifiedInGame": true,
+      "wowheadSays": "Rot and Regret (93404) requires level 35. Maraudon is listed as level 42-52.",
+      "kept": "Required level 42. Same quest, chain, and pin as Overgrown Cuffs.",
+      "lock": {
+        "rlvl": 42,
+        "gateLevel": 42
+      }
+    },
+    "270080": {
+      "name": "Arathi Armbands",
+      "reportedBy": "kingcurly",
+      "date": "2026-11-24",
+      "where": "Discord missing-or-wrong-items",
+      "verifiedInGame": true,
+      "wowheadSays": "WANTED: Otto and Falconcrest (685) is Side: Alliance. The series box is empty.",
+      "kept": "Alliance only. The pin is the Wanted Board in Arathi Highlands (46.0, 47.7). Do not write quest chain 1: an empty series is not 'no prequests'. War Rider Bracers (4745) was already Alliance; this id had been left off that list.",
+      "lock": {
+        "questFaction": "Alliance"
+      }
+    },
+    "12640": {
+      "name": "Lionheart Helm",
+      "reportedBy": "Henrik",
+      "date": "2026-11-24",
+      "where": "in game, level 60 Retribution",
+      "verifiedInGame": false,
+      "wowheadSays": "Plans: Lionheart Helm (12717) is not an LBRS boss. The Forever drops that are not Classic Era leftovers are Ferra in Dire Maul (2 of 80), then rare Blackrock Spire trash and a Plague Ghoul in Stratholme.",
+      "kept": "Boss drop. The plans drop from Ferra. The pin is the Dire Maul entrance in Feralas. Do not file it as a trainer recipe or as a Lower Blackrock Spire boss.",
+      "lock": {
+        "sourceType": "boss_drop",
+        "npc": "Ferra",
+        "zone": "Dire Maul"
+      }
+    }
+  }
+}

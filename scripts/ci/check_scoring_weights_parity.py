@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Spec tooltip (Compare.lua) must show raw weights.json; scorer uses leveling at L30+.
+"""Spec tooltip and hunt score both use the weights.json row. No level multiplier.
 
 Usage: python scripts/ci/check_scoring_weights_parity.py
 """
@@ -23,17 +23,9 @@ SCORING_LABELS = {
     "blockRating", "blockValue", "resist",
 }
 
-LEVELING_UNTIL = 60  # Lua untilLevel; score.py uses level < 61
-LEVELING = {
-    "sta": 3.0,
-    "health": 3.0,
-    "hp5": 3.0,
-    "armor": 2.0,
-    "int": 2.0,
-    "spi": 2.0,
-    "mp5": 2.0,
-    "mana": 2.0,
-}
+SHEET_STATS = (
+    "sta", "health", "hp5", "armor", "int", "spi", "mp5", "mana",
+)
 
 HEALER_SPECS = {
     ("PALADIN", "holy"),
@@ -58,16 +50,8 @@ def spec_wants_heal(cls: str, spec: str) -> bool:
 
 def score_effective(cls: str, spec: str, level: int, base: dict[str, float]) -> dict[str, float]:
     """pipeline/scripts/score.py weights_at_level + per-spec overrides."""
-    w = dict(base)
-    if level >= LEVELING_UNTIL + 1:
-        wl = dict(w)
-    else:
-        wl = dict(w)
-        for key, mult in LEVELING.items():
-            if key in wl:
-                wl[key] = wl[key] * mult
-    if cls == "SHAMAN" and spec == "enhancement":
-        wl["int"] = w.get("int", 0.0)
+    del level
+    wl = dict(base)
     if cls == "SHAMAN" and spec == "enhancement_tank":
         wl["agi"] = (
             wl.get("agi", 0.0)
@@ -82,7 +66,7 @@ def score_effective(cls: str, spec: str, level: int, base: dict[str, float]) -> 
 
 
 def display_effective(cls: str, spec: str, level: int, base: dict[str, float]) -> dict[str, float]:
-    """GearQuest/Compare.lua GetEffectiveScoringRows — raw grid, no leveling multipliers."""
+    """GearQuest/Compare.lua GetEffectiveScoringRows — the sheet row."""
     weights = dict(base)
     if not spec_wants_heal(cls, spec):
         weights["heal"] = 0.0
@@ -91,16 +75,9 @@ def display_effective(cls: str, spec: str, level: int, base: dict[str, float]) -
 
 
 def leveled_stat_weight(cls: str, spec: str, level: int, base: dict[str, float], key: str) -> float:
-    """Compare.lua LeveledStatWeight(GetStatWeight raw)."""
-    raw = base.get(key, 0.0)
-    if level > LEVELING_UNTIL:
-        return raw
-    if cls == "SHAMAN" and spec == "enhancement" and key == "int":
-        return raw
-    mult = LEVELING.get(key)
-    if mult is not None:
-        return raw * mult
-    return raw
+    """Compare.lua LeveledStatWeight is the sheet number."""
+    del cls, spec, level
+    return base.get(key, 0.0)
 
 
 def lua_get(tbl, key, default=None):
@@ -175,20 +152,12 @@ def main() -> int:
                     )
             for level in levels:
                 s = score_effective(cls, spec, level, base)
-                # Tooltip is raw; only verify scorer leveling separately at L30 for sta.
-                if level != 30:
-                    continue
-                for key in LEVELING:
-                    if key not in base or base.get(key, 0) == 0:
+                for key in SHEET_STATS:
+                    if key not in base:
                         continue
-                    if cls == "SHAMAN" and spec == "enhancement" and key == "int":
-                        if abs(s.get("int", 0) - float(base.get("int", 0))) > 1e-6:
-                            failures.append(f"{cls}/{spec} enh int should stay raw in score")
-                        continue
-                    mult = LEVELING[key]
-                    if abs(s.get(key, 0) - float(base.get(key, 0)) * mult) > 1e-6:
+                    if abs(float(s.get(key, 0)) - float(base.get(key, 0))) > 1e-6:
                         failures.append(
-                            f"{cls}/{spec} L30 score {key}: expected {base[key]*mult}, got {s.get(key)}"
+                            f"{cls}/{spec} L{level} score {key}: sheet={base[key]} scored={s.get(key)}"
                         )
 
     generated = load_scoring_weights_lua()
@@ -273,8 +242,8 @@ def main() -> int:
         return 1
 
     print(
-        f"OK: spec tooltip shows raw grid weights ({spec_count} specs); "
-        f"score.py leveling checked at L30; ScoringWeights.generated.lua matches pipeline."
+        f"OK: tooltip and hunt score use the sheet row ({spec_count} specs); "
+        f"ScoringWeights.generated.lua matches pipeline."
     )
     seen = set()
     for w in warnings:

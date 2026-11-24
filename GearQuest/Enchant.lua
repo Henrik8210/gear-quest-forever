@@ -350,19 +350,14 @@ function GQ.Enchant:Weights()
     if not specRow or not specRow.weights then
         return nil
     end
-    local leveling = GQ.ScoringLeveling
-    local useLeveling = leveling and level <= (leveling.untilLevel or 60)
     local weights = {}
     for key, raw in pairs(specRow.weights) do
-        local mult = 1
-        if useLeveling and leveling[key] and not (specId == "enhancement" and key == "int") then
-            mult = leveling[key]
-        end
-        weights[key] = raw * mult
+        weights[key] = raw
     end
     if specId == "enhancement_tank" then
-        local armorMult = (useLeveling and leveling and leveling.armor) or 1
-        local armorW = (specRow.weights.armor or 0) * armorMult
+        -- 1 agility is 2 armor, plus 1% dodge and 1% crit per 20.
+        -- Armor from agility uses the sheet armor weight.
+        local armorW = specRow.weights.armor or 0
         weights.agi = (weights.agi or 0) + 2 * armorW + (specRow.weights.dodge or 0) / 20 + (specRow.weights.crit or 0) / 20
     end
     return weights, specRow.dpsWeight or 0, specRow.dpsWeightRanged or 0, level, classFile, specId

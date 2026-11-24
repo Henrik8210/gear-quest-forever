@@ -524,4 +524,6 @@ for k, v in pairs({
     ["Provided item:."] = "제공된 아이템:",
     ["The Blacksmithing plans are a drop."] = "대장기술 도면은 몬스터가 떨어뜨립니다.",
     ["The creature is not named yet."] = "어떤 생물인지는 아직 나와 있지 않습니다.",
+    ["The chain starts with Word of the Woods, from Mithera in Shen'dralas."] = "사슬은 Shen'dralas의 Mithera에게서 받는 Word of the Woods에서 시작합니다.",
+    ["This step sends you into Maraudon."] = "이 단계는 마라우돈으로 보냅니다.",
 }) do sentences[k] = v end

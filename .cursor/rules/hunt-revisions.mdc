@@ -1,0 +1,14 @@
+---
+description: Log every hunt revision and do not let a Wowhead scrape undo it
+alwaysApply: true
+---
+
+# Hunt revisions
+
+`pipeline/data/hunt_revisions.json` is the log of corrections to an existing item or hunt. Read it before a Wowhead Forever scrape, tooltip refresh, ingest, quest-level lookup, or source rebuild. A locked field stays. Wowhead can be behind what a player has already checked in the game.
+
+When a revision lands, add that item in the same change. `reportedBy` is the Discord name of the person who reported it. When nobody else reported it, `reportedBy` is Henrik. Write the date, where it was reported, what Wowhead currently says, what we kept, and a `lock` for any field a later scrape would put back (required level, gate level, quest faction, source text, pin). Do not drop a row because a later Wowhead page matches. Leave the lock until Henrik says it can go.
+
+`pipeline/data/client_item_overrides.json` is the same kind of pin for stats and weapon damage the client shows. A scrape already skips those ids. Check that file too. Do not copy those stat pins into the revision log.
+
+The tooltip refresh and the quest-level lookup read `lock.rlvl`. Rebuilding quest faction reads `lock.questFaction`. A new scrape script that writes item facts has to do the same.

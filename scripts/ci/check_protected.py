@@ -3,7 +3,7 @@
 
 - Weights stay until a retune is asked for. A PR that changes
   pipeline/data/weights.json, the generated weight tables, or the leveling
-  multipliers and weights_at_level() in score.py needs the `weights-change`
+  weights_at_level() in score.py needs the `weights-change`
   label.
 - notebook/seenItems/ is retired. No PR grows, shrinks, or edits it.
 
@@ -36,11 +36,11 @@ def git(*args: str) -> str:
 
 
 def leveling_block(text: str) -> str:
-    """The LEVELING_* constants through the end of weights_at_level()."""
-    start = text.find("LEVELING_SURVIVE_UNTIL")
+    """weights_at_level(), which must keep returning the sheet row."""
+    start = text.find("def weights_at_level")
     if start < 0:
         return ""
-    end = text.find("\n    return w", start)
+    end = text.find("\ndef ", start + 1)
     return text[start:end] if end > 0 else text[start:]
 
 
@@ -61,7 +61,7 @@ def main() -> int:
             before = ""
         after = open(SCORE_PY, encoding="utf-8").read()
         if leveling_block(before) != leveling_block(after):
-            weights.append(f"{SCORE_PY} (leveling multipliers / weights_at_level)")
+            weights.append(f"{SCORE_PY} (weights_at_level)")
     if weights and LABEL not in labels:
         errors.append(
             "weights changed without the `weights-change` label: " + ", ".join(weights)

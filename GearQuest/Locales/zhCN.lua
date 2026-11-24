@@ -359,6 +359,7 @@ L["Hold Shift to see BiS items from this NPC"] = "按住Shift查看此NPC的最�
 L["Join the GearQuest community to talk about class specs, stat weights, and what to hunt next. Share how GearQuest is going for you. Bug reports and feature ideas are welcome there too. Get the latest news and insights, and comment on upcoming features before they are released."] = "加入 GearQuest 社区，讨论职业专精、属性权重和接下来该刷什么。分享你使用 GearQuest 的情况。也欢迎提交错误报告和功能建议。获取最新消息，并在新功能发布前提出意见。"
 L["Copy"] = "复制"
 L["Donations"] = "捐赠"
+L["Top donators"] = "主要捐赠者"
 L["Building GearQuest might be easier than it would have been 5 years ago, but code is expensive and I appreciate any support I can get, and donations enable me to do even more including implementing new cool features that hopefully make your Forever experience smoother :)\n\nAny donations are very much appreciated, thanks!"] = "做出 GearQuest 也许比五年前容易，但写程序并不便宜，任何支持我都很感激。捐赠让我能做更多，包括新功能，希望能让你的 Forever 体验更顺畅 :)\n\n任何捐赠都非常感谢，谢谢！"
 L["Opens or closes the GearQuest window. /gearquest does the same."] = "打开或关闭 GearQuest 窗口。/gearquest 效果相同。"
 L["Opens or closes the log. Same as /gq."] = "打开或关闭日志。与 /gq 相同。"
@@ -677,3 +678,4 @@ GQ.LocaleGuidePages = {
 }
 
 L["could not index %s hunt data (%s). Please /reload."] = "无法为 %s 的狩猎数据建立索引（%s）。请输入 /reload。"
+L["Requires Fishing. Apprentice is enough, and the squid can be bought."] = "需要钓鱼。学徒即可，鱿鱼可以购买。"

@@ -68,6 +68,9 @@ jobs:
       - name: Scoring vs tooltip weights
         run: python scripts/ci/check_scoring_weights_parity.py
 
+      - name: No level multipliers
+        run: python scripts/ci/check_no_leveling_multipliers.py
+
       - name: Recommended enchants
         run: python scripts/ci/check_enchants.py
 

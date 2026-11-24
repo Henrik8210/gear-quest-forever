@@ -12,7 +12,7 @@ W=json.load(open(G+"weights.json"))
 MELEE_OFFENSE=["ap","rap","feralAp","expertise","armorPen","wpnDmg","wpnSkill","str"]
 SPELL_OFFENSE=["sp","spSchool","spHoly","heal","sp_from_heal","damageDone","spellPen",
                "spShadow","spFire","spFrost","spNature","spArcane"]
-DEAD=["expertise","armorPen","resilience","wpnSkill","spellHit","spellCrit","spellHaste"]
+DEAD=["armorPen","resilience","wpnSkill","spellHit","spellCrit","spellHaste"]
 # Hybrids swing AND cast (or tank with holy/spell threat).
 HYBRID={("PALADIN","protection"),
         ("PALADIN","retribution"),("PALADIN","shockadin"),

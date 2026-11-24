@@ -611,36 +611,15 @@ def fmt_range(lo,hi):
 ROLL_POLICY="bestRoll"       # bestRoll | expectedValue | chanceFloor
 CHANCE_FLOOR=1.0             # used by chanceFloor policy (% for the whole suffix family)
 
-# Leveling is not raid min-max. Through 60, same as 1-59:
-#   survivability -- sta / health / hp5 x3, armor x2
-#   endurance     -- int / spi / mp5 / mana x2 (keep casting; less than stam)
-# A +1 primary-stat stick with no stam/mana cannot beat a real leveling chest.
-# Level 60 used to drop back to the raw raid weights. That let Frenzied
-# Striker (a hit stick) outrank Grand Marshal's Polearm. Hit, crit, parry,
-# dodge, and weapon damage stay on the raw weights at every level.
-LEVELING_SURVIVE_UNTIL = 61
-LEVELING_STA_MULT = 3.0
-LEVELING_HEALTH_MULT = 3.0
-LEVELING_HP5_MULT = 3.0
-LEVELING_ARMOR_MULT = 2.0
-LEVELING_ENDURANCE_MULT = 2.0
-
+# The sheet number is the score. Do not multiply stamina, health, hp5, armor,
+# intellect, spirit, mp5, or mana by level. A hidden x3 / x2 made the hunt
+# disagree with the Google Sheet. scripts/ci/check_no_leveling_multipliers.py
+# fails if this function stops returning the sheet row.
 def weights_at_level(base_w, level):
-    if level >= LEVELING_SURVIVE_UNTIL:
-        return base_w
-    w = dict(base_w)
-    w["sta"] = w.get("sta", 0.0) * LEVELING_STA_MULT
-    w["health"] = w.get("health", 0.0) * LEVELING_HEALTH_MULT
-    w["hp5"] = w.get("hp5", 0.0) * LEVELING_HP5_MULT
-    w["armor"] = w.get("armor", 0.0) * LEVELING_ARMOR_MULT
-    w["int"] = w.get("int", 0.0) * LEVELING_ENDURANCE_MULT
-    w["spi"] = w.get("spi", 0.0) * LEVELING_ENDURANCE_MULT
-    w["mp5"] = w.get("mp5", 0.0) * LEVELING_ENDURANCE_MULT
-    w["mana"] = w.get("mana", 0.0) * LEVELING_ENDURANCE_MULT
-    return w
+    return dict(base_w)
 
 # Forever combat: one Hit, one Crit, one Haste. TBC leftover keys on classic
-# item rows fold in. Warrior hunts score expertise; armour pen / resilience do not.
+# item rows fold in. Melee hunts score expertise rating; armour pen / resilience do not.
 # Heal-only tooltips still grant SP at 1/3 (Blizzard rule); combined
 # "healing + damage" lines already carry sp_from_heal -- take the larger.
 UNIFIED_STAT={"spellHit":"hit","hitRanged":"hit",
@@ -817,6 +796,10 @@ def hidden_spell_item(it):
     if "(DNT)" in name or "[DNT]" in name:
         return True
     if name in ("Placeholder", "Invisible Dagger"):
+        return True
+    low = name.lower()
+    # "Test Dagger", "QA Test Ring", "QATest +1000 Spell Dmg Ring".
+    if low.startswith("test ") or low.startswith("qa ") or low.startswith("qatest"):
         return True
     return False
 
@@ -1098,16 +1081,10 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
         for level in levels:
             rscale=70.0/max(1,level)
             wl=weights_at_level(w, level)
-            if cls == "SHAMAN" and spec_key == "enhancement":
-                # Mental Quickness is 100% of intellect as attack power.
-                # The endurance double put intellect above strength and
-                # cloth ahead of mail. Enhancement keeps the raw intellect.
-                wl["int"] = w.get("int", 0.0)
             if cls == "SHAMAN" and spec_key == "enhancement_tank":
                 # 1 agility is 2 armor, 1% dodge per 20, and 1% crit per 20.
                 # The listed agility weight is the rest. Armor from agility
-                # uses the same armor weight as armor on the piece, including
-                # the leveling multiplier.
+                # uses the sheet armor weight, the same number as armor on the piece.
                 wl["agi"] = (wl.get("agi", 0.0)
                     + 2.0 * wl.get("armor", 0.0)
                     + wl.get("dodge", 0.0) / 20.0
@@ -1125,11 +1102,15 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                 sl=slot_for(it,cls)
                 if sl=="MainHand":
                     # Optional. A spec sets mainHandKinds only when a weapon type
-                    # cannot be equipped. Rogue specs do not: classic Subtlety and
-                    # Assassination are not a dagger lock, and the Weapons menu
+                    # cannot be equipped. Assassination is daggers in both hands.
+                    # Combat and Subtlety do not set this, and the Weapons menu
                     # is where the player turns a type off.
                     if mhKinds and it["kind"] not in mhKinds: continue
                     twoh = it["inv"]==17
+                    # Protection wears a one-hander and a shield. A polearm or
+                    # two-hand sword with a bad inventory type is still a two-hander.
+                    if cls == "PALADIN" and spec_key == "protection" and is_two_hand_item(it):
+                        twoh = True
                     if style=="twohand" and not twoh and level>=20: continue
                     # Elemental and restoration wear a staff or a one-hander
                     # and a shield. Holy and Shockadin wear a two-hander or a
@@ -1144,6 +1125,9 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                         if not keep_two:
                             continue
                 if sl=="SecondaryHand":
+                    # Assassination cannot put a sword, mace, axe, or fist in the off hand.
+                    if mhKinds and it.get("cls") == 2 and it.get("kind") not in mhKinds:
+                        continue
                     dw=dual_wield_level(cls,spec_key)
                     canDW = dw is not None and level>=dw
                     if it["cls"]==2 and it["inv"] in (13,22):
@@ -1225,7 +1209,14 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                 # For anyone but a hunter the ranged slot is a stat stick, so an
                 # on-attack proc there scores zero. A Use: effect still counts:
                 # it fires from the item, not from a shot.
-                pr=it.get("procs")
+                pr=list(it.get("procs") or [])
+                seen=set(pr)
+                for line in it.get("effects") or []:
+                    # Some Forever lines say "17% chance when struck" and never
+                    # matched the Chance-on-hit filter, so the proc scored 0.
+                    if line not in seen and PROCS.struck_stat_line(line):
+                        pr.append(line)
+                        seen.add(line)
                 if pr:
                     procDw = dpsWRanged if sl=="Ranged" else dpsW
                     # A proc that deals 100 damage deals 100 damage whichever hand
@@ -1614,6 +1605,9 @@ def hand_still_legal(it, sl, cls, spec_key, level, dw):
         return is_either_hand(it) and dw is not None and level < dw
     if cls == "HUNTER" and sl == "SecondaryHand":
         return is_either_hand(it)
+    if cls == "ROGUE" and spec_key == "assassination" and sl in ("MainHand", "SecondaryHand"):
+        if it.get("kind") != "Dagger":
+            return False
     if cls == "ROGUE" and sl == "SecondaryHand":
         return is_either_hand(it) or is_offhand_only(it)
     if cls == "WARRIOR" and spec_key == "fury" and sl == "SecondaryHand":
@@ -1627,6 +1621,8 @@ def hand_still_legal(it, sl, cls, spec_key, level, dw):
             return False
         if sl == "MainHand":
             return is_two_hand_item(it)
+    if cls == "PALADIN" and spec_key == "protection" and sl == "MainHand":
+        return not is_two_hand_item(it)
     return True
 
 def slot_rejects_item(it, sl, cls, spec_key, level, dw, skip_spell):
@@ -1635,6 +1631,8 @@ def slot_rejects_item(it, sl, cls, spec_key, level, dw, skip_spell):
         if not hunter_main_one_hand(it, level, dw):
             return True
     if cls == "HUNTER" and sl == "SecondaryHand" and not is_either_hand(it):
+        return True
+    if cls == "ROGUE" and spec_key == "assassination" and sl in ("MainHand", "SecondaryHand") and it.get("kind") != "Dagger":
         return True
     if cls == "ROGUE" and sl == "SecondaryHand" and not (is_either_hand(it) or is_offhand_only(it)):
         return True
@@ -1645,6 +1643,8 @@ def slot_rejects_item(it, sl, cls, spec_key, level, dw, skip_spell):
     if cls == "SHAMAN" and spec_key == "enhancement" and sl == "MainHand" and not is_two_hand_item(it):
         return True
     if cls == "SHAMAN" and spec_key == "enhancement" and sl == "SecondaryHand":
+        return True
+    if cls == "PALADIN" and spec_key == "protection" and sl == "MainHand" and is_two_hand_item(it):
         return True
     if skip_spell and item_is_spell_gear(it):
         return True

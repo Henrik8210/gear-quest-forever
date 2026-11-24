@@ -122,7 +122,11 @@ SLOT_NAMES = [
 ]
 SLOT_NAMES.sort(key=lambda pair: len(pair[0]), reverse=True)
 
-TIER = re.compile(r"(?:\[td\]|<td[^>]*>)\s*(BiS|Great|Good|Option)\s*(?:\[/td\]|</td>)", re.I)
+# The Forever pages label a row BiS, BiS - Set, Near BiS, Great - Hit, Okay, Optional.
+RANK_LABEL = re.compile(
+    r"^(?:Near\s+)?(?:BiS|Great|Good|Okay|Optional|Option)(?:\s*[-–—]\s*[A-Za-z]+)?$",
+    re.I,
+)
 ITEM_BB = re.compile(r"\[item=(\d+)")
 ITEM_HREF = re.compile(r"item=(\d+)")
 ROW_BB = re.compile(r"\[tr\](.*?)\[/tr\]", re.S | re.I)
@@ -185,8 +189,10 @@ def rows_in(section: str):
     found = []
     for row in rows:
         cells = cell.findall(row)
-        label = re.sub(r"\s+", " ", cells[0]).strip() if cells else ""
-        if len(cells) < 2 or label not in ("BiS", "Great", "Good", "Option"):
+        label = re.sub(r"<[^>]+>", " ", cells[0]) if cells else ""
+        label = re.sub(r"\[[^\]]+\]", " ", label)
+        label = re.sub(r"\s+", " ", label).strip()
+        if len(cells) < 2 or not RANK_LABEL.match(label):
             continue
         ids = [int(n) for n in ITEM_BB.findall(cells[1])]
         if not ids:
@@ -337,7 +343,7 @@ def main():
             "quest chain, and description as any other hunt, then put it back "
             "on the level-60 list."
         ),
-        "checked": "2026-11-22",
+        "checked": time.strftime("%Y-%m-%d"),
         "items": [
             {
                 "id": iid,

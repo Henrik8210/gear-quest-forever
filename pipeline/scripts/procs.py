@@ -59,6 +59,11 @@ HP_PER_STA       = 10.0
 MIT_RELEVANCE    = {"protection":1.00,"retribution":0.35,"holy":0.35,"shockadin":0.35,"levelling_1_9":0.40}
 # threat-only value (AoE threat, taunt-adjacent) matters to a tank and nobody else
 THREAT_RELEVANCE = {"protection":1.00,"retribution":0.10,"holy":0.05,"shockadin":0.10,"levelling_1_9":0.15}
+# "When struck" procs. A tank is hit about every 2 seconds. Everyone else is
+# hit less often, so the same 17% line is not a permanent buff.
+STRUCK_PER_MIN = {"protection": 30.0, "enhancement_tank": 30.0, "bear": 24.0}
+STRUCK_DEFAULT = 8.0
+STRUCK_UPTIME_CAP = 0.85
 
 def player_hp(level):
     """Rough unbuffed plate-wearer health. Used only to price mitigation procs."""
@@ -110,6 +115,28 @@ def classify(text):
     pct=None
     m=re.search(r"(\d+)%\s*chance", low)
     if m: pct=n(m.group(1))/100.0
+
+    # "17% chance when struck ... gain 12 mana per 5 sec for 10 sec."
+    # The chance is not the uptime. Uptime is how long the buff stays up
+    # given how often this spec is actually hit. Party auras are not scored.
+    if pct and "party" not in low and ("when struck" in low or "when hit" in low):
+        struck = []
+        m=re.search(r"gain "+NUM+r" mana per 5 sec(?:onds?)? for (\d+) sec", low)
+        if m:
+            struck.append(("mp5", n(m.group(1)), n(m.group(2))))
+        m=re.search(r"increasing (?:your )?armor by "+NUM+r" for (\d+)\s*(sec|min)", low)
+        if m:
+            struck.append(("armor", n(m.group(1)), n(m.group(2))*(60 if m.group(3)=="min" else 1)))
+        m=re.search(r"increasing all stats by "+NUM+r" for (\d+)\s*(sec|min)", low)
+        if m:
+            dur=n(m.group(2))*(60 if m.group(3)=="min" else 1)
+            for key in ("str","agi","sta","int","spi"):
+                struck.append((key, n(m.group(1)), dur))
+        if struck:
+            for stat, amt, dur in struck:
+                out.append(("stat_buff",{"stat":stat,"amt":amt,"dur":dur,"pct":pct,
+                                         "whenStruck":True,"onUse":on_use}))
+            return out
 
     # --- mitigation / control -------------------------------------------------
     # "slowing its attack speed by 20% for 12 sec" (Thunderfury) as well as
@@ -195,6 +222,21 @@ def creature_limited(low):
     m = re.search(r"against ([a-z]+)", low)
     return bool(m and m.group(1) in _CREATURE)
 
+def struck_stat_line(line):
+    """A when-struck stat proc the Chance-on-hit filter used to drop."""
+    if not line:
+        return False
+    low = " ".join(line.lower().split())
+    if "party" in low or not re.search(r"\d+%\s*chance", low):
+        return False
+    if "when struck" not in low and "when hit" not in low:
+        return False
+    return bool(
+        re.search(r"mana per 5 sec", low)
+        or re.search(r"increasing (?:your )?armor by", low)
+        or re.search(r"increasing all stats by", low)
+    )
+
 def value(procs, item, spec, weights, dpsWeight, level, onUseOnly=False):
     """-> (points, [explanation lines])
 
@@ -263,7 +305,10 @@ def value(procs, item, spec, weights, dpsWeight, level, onUseOnly=False):
                 pts,dps = dmg_points(swing, rate)
                 total+=pts; why.append(f"extra attack ({swing:.0f} dmg) @ {rate:.1f}/min -> {pts:.1f}")
             elif kind=="stat_buff":
-                if p["onUse"]:
+                if p.get("whenStruck") and p.get("pct"):
+                    struck = STRUCK_PER_MIN.get(spec, STRUCK_DEFAULT)
+                    up = min(STRUCK_UPTIME_CAP, struck * p["pct"] * p["dur"] / 60.0)
+                elif p["onUse"]:
                     cd=max(p["cd"] or FIGHT_SECONDS, p["dur"])
                     up = min(1.0, p["dur"]/cd) if cd<=FIGHT_SECONDS else \
                          min(1.0, p["dur"]/FIGHT_SECONDS)*min(1.0,FIGHT_SECONDS/cd)

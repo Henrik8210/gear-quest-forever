@@ -9,6 +9,7 @@ GQ.Data.ForeverBisUrl = {
         frost = "https://www.wowhead.com/forever/guide/classes/mage/frost/bis-gear",
     },
     PRIEST = {
+        discipline = "https://www.wowhead.com/forever/guide/classes/priest/discipline/bis-gear",
         holy = "https://www.wowhead.com/forever/guide/classes/priest/holy/bis-gear",
         shadow = "https://www.wowhead.com/forever/guide/classes/priest/shadow/bis-gear",
     },
@@ -28,6 +29,7 @@ GQ.Data.ForeverBisUrl = {
     },
     ROGUE = {
         combat = "https://www.wowhead.com/forever/guide/classes/rogue/combat/bis-gear",
+        subtlety = "https://www.wowhead.com/forever/guide/classes/rogue/subtlety/bis-gear",
     },
     SHAMAN = {
         elemental = "https://www.wowhead.com/forever/guide/classes/shaman/elemental/bis-gear",
@@ -35,9 +37,12 @@ GQ.Data.ForeverBisUrl = {
         restoration = "https://www.wowhead.com/forever/guide/classes/shaman/restoration/bis-gear",
     },
     WARRIOR = {
+        arms = "https://www.wowhead.com/forever/guide/classes/warrior/arms/bis-gear",
+        fury = "https://www.wowhead.com/forever/guide/classes/warrior/fury/bis-gear",
         protection = "https://www.wowhead.com/forever/guide/classes/warrior/protection/bis-gear",
     },
     PALADIN = {
+        holy = "https://www.wowhead.com/forever/guide/classes/paladin/holy/bis-gear",
         protection = "https://www.wowhead.com/forever/guide/classes/paladin/protection/bis-gear",
         retribution = "https://www.wowhead.com/forever/guide/classes/paladin/retribution/bis-gear",
     },
