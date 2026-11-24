@@ -495,6 +495,123 @@ function GQ.Enchant:Usable(row, level, ilvl)
     return need <= SkillCap(level)
 end
 
+local function NextChar(text, index)
+    local byte = text:byte(index)
+    if not byte then
+        return nil, index
+    end
+    local size = 1
+    if byte >= 240 then
+        size = 4
+    elseif byte >= 224 then
+        size = 3
+    elseif byte >= 192 then
+        size = 2
+    end
+    return text:sub(index, index + size - 1), index + size
+end
+
+-- Color codes are not characters. A break lands on a space once the visible
+-- text passes the limit, and the open color is repeated on the next line.
+local function WrapEnchantLines(text, limit)
+    local lines = {}
+    local parts = {}
+    local width = 0
+    local spaceAt = nil
+    local color = nil
+    local function finish(at)
+        local stop = at or #parts
+        if stop < 1 then
+            return
+        end
+        local kept = {}
+        for i = 1, stop do
+            kept[i] = parts[i]
+        end
+        if kept[#kept] == " " then
+            kept[#kept] = nil
+        end
+        if color then
+            kept[#kept + 1] = "|r"
+        end
+        lines[#lines + 1] = table.concat(kept)
+        local rest = {}
+        for i = stop + 1, #parts do
+            rest[#rest + 1] = parts[i]
+        end
+        parts = rest
+        if color then
+            table.insert(parts, 1, color)
+        end
+        width = 0
+        spaceAt = nil
+        for i = 1, #parts do
+            if parts[i] == " " then
+                spaceAt = i
+                width = width + 1
+            elseif parts[i]:sub(1, 2) ~= "|c" and parts[i] ~= "|r" then
+                width = width + 1
+            end
+        end
+    end
+    local index = 1
+    while index <= #text do
+        if text:sub(index, index + 1) == "|c" and index + 9 <= #text then
+            color = text:sub(index, index + 9)
+            parts[#parts + 1] = color
+            index = index + 10
+        elseif text:sub(index, index + 1) == "|r" then
+            color = nil
+            parts[#parts + 1] = "|r"
+            index = index + 2
+        else
+            local char
+            char, index = NextChar(text, index)
+            if not char then
+                break
+            end
+            if width >= limit and char ~= " " then
+                if spaceAt then
+                    finish(spaceAt)
+                else
+                    finish()
+                end
+            end
+            if not (char == " " and width == 0) then
+                parts[#parts + 1] = char
+                width = width + 1
+                if char == " " then
+                    spaceAt = #parts
+                end
+            end
+        end
+    end
+    if width > 0 then
+        finish()
+    end
+    return lines
+end
+
+function GQ.Enchant:AddLines(tooltip, text)
+    if not tooltip or not text or text == "" then
+        return
+    end
+    local function paint(lines)
+        for i = 1, #lines do
+            if lines[i] ~= "" then
+                tooltip:AddLine(lines[i], 1, 1, 1, true)
+            end
+        end
+    end
+    local breakAt = text:find("\n", 1, true)
+    if not breakAt then
+        paint(WrapEnchantLines(text, 50))
+        return
+    end
+    tooltip:AddLine(text:sub(1, breakAt - 1), 1, 1, 1, true)
+    paint(WrapEnchantLines(text:sub(breakAt + 1), 50))
+end
+
 function GQ.Enchant:Text(link, entry)
     if not self:Enabled() then
         return nil
@@ -524,7 +641,9 @@ function GQ.Enchant:Text(link, entry)
     if not best or not bestScore or bestScore <= 0 then
         return nil
     end
-    return string.format(L["|cffffff00Recommended enchantment|r|cffffffff: %s - %s|r"], GQ.TN("enchant", best.name), GQ.TL(best.effect))
+    local label = "|cffffff00" .. L["Recommended enchantment:"] .. "|r"
+    local body = "|cffffffff" .. GQ.TN("enchant", best.name) .. " - " .. GQ.TL(best.effect) .. "|r"
+    return label .. "\n" .. body
 end
 
 function GQ.Enchant:Add(tooltip, link, entry)
@@ -536,6 +655,6 @@ function GQ.Enchant:Add(tooltip, link, entry)
         return false
     end
     tooltip.gqEnchantAdded = true
-    tooltip:AddLine(text, 1, 1, 1)
+    self:AddLines(tooltip, text)
     return true
 end

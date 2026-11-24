@@ -1,0 +1,12 @@
+---
+description: Keep the ranking JSON identical to the addon lists on every commit and push
+alwaysApply: true
+---
+
+# Ranking export
+
+`export/gearquest-forever.json` is the ranked lists the addon ships. Dreamer's bot reads that file from the repo. It is not in the CurseForge package.
+
+Before every commit and push, run `python pipeline/scripts/export_bot_json.py` and include `export/gearquest-forever.json` in that same commit when the file changes. Do not push while the JSON disagrees with the class catalogs. A rescore, a catalog emit, a hunt-fact change, and an edit to `pipeline/guides/forever_bis.json` all change the lists, so the JSON goes in the same change.
+
+`python pipeline/scripts/export_bot_json.py --check` fails when the rankings, the item facts, or the level-60 guide pages differ. CI runs that check. The generated time and the commit hash are not the lists, so a matching file does not need a rewrite just to refresh those two fields.

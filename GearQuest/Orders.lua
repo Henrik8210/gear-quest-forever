@@ -10,6 +10,34 @@ Orders.PRIMARY = { "Blacksmithing", "Leatherworking", "Tailoring", "Engineering"
 
 local ROW_H = 28
 local HEADER_H = 22
+local COLUMN_H = 20
+local PRICE_W = 150
+local SKILL_W = 130
+local RECIPE_W = 22
+local RECIPE_COL_W = 72
+local REMOVE_W = 108
+local COLUMN_GAP = 10
+local REMOVE_GAP = 24
+local AUCTIONATOR_ID = "GearQuestForever"
+
+function Orders:ColumnEdges(showPrice)
+    local cursor = 4 + REMOVE_W + REMOVE_GAP
+    local price
+    if showPrice then
+        price = cursor
+        cursor = cursor + PRICE_W + COLUMN_GAP
+    end
+    local skillRight = cursor
+    cursor = cursor + SKILL_W + COLUMN_GAP
+    local recipeRight = cursor
+    cursor = cursor + RECIPE_COL_W + COLUMN_GAP
+    return {
+        price = price and -price or nil,
+        skillLeft = -(skillRight + SKILL_W),
+        recipeLeft = -(recipeRight + RECIPE_COL_W),
+        text = -cursor,
+    }
+end
 
 function Orders:List()
     GearQuestForeverDB = GearQuestForeverDB or {}
@@ -257,6 +285,138 @@ function Orders:RemoveAt(index)
     end
 end
 
+function Orders:AuctionatorReady()
+    return Auctionator and Auctionator.API and Auctionator.API.v1
+        and type(Auctionator.API.v1.GetAuctionPriceByItemID) == "function"
+end
+
+function Orders:FullScanTime()
+    local state = Auctionator and Auctionator.SavedState
+    if type(state) ~= "table" then
+        return nil
+    end
+    -- GetAll is the old auction house. Replicate and the browse summary are
+    -- the two full-scan buttons on the current one. A search does not set these.
+    local when
+    local keys = { "TimeOfLastGetAllScan", "TimeOfLastReplicateScan", "TimeOfLastBrowseScan" }
+    for i = 1, #keys do
+        local stamp = state[keys[i]]
+        if type(stamp) == "number" and stamp > 0 and (not when or stamp > when) then
+            when = stamp
+        end
+    end
+    return when
+end
+
+function Orders:AddScanLine()
+    local when = self:FullScanTime()
+    if not when or not date then
+        return
+    end
+    GameTooltip:AddLine(string.format(L["Last full scan: %s"], date("%Y-%m-%d %H:%M", when)), 0.7, 0.7, 0.7, true)
+end
+
+-- The parchment shows a price only after a full scan, and only when every
+-- material has one. A missing scan leaves the line out.
+function Orders:ShownCraftCost(itemId)
+    if not self:FullScanTime() then
+        return nil
+    end
+    local cost = self:CraftCost(itemId)
+    if cost and cost.total then
+        return cost
+    end
+    return nil
+end
+
+function Orders:WatchAuctionator()
+    if self._auctionWatch or not self:AuctionatorReady() then
+        return
+    end
+    if type(Auctionator.API.v1.RegisterForDBUpdate) ~= "function" then
+        return
+    end
+    self._auctionWatch = true
+    Auctionator.API.v1.RegisterForDBUpdate(AUCTIONATOR_ID, function()
+        if Orders.page and Orders.page:IsShown() then
+            Orders:Paint()
+        end
+        local log = GQ.Log
+        if log and log.selectedEntry and log.ApplyEntryDetail and log.frame and log.frame:IsShown() then
+            log:ApplyEntryDetail(log.selectedEntry)
+        end
+    end)
+end
+
+function Orders:UnitPrice(itemId)
+    if not itemId or not self:AuctionatorReady() then
+        return nil
+    end
+    local ok, price = pcall(Auctionator.API.v1.GetAuctionPriceByItemID, AUCTIONATOR_ID, itemId)
+    if ok and type(price) == "number" and price > 0 then
+        return price
+    end
+    return nil
+end
+
+-- Mats for the craft, plus the recipe when the piece binds on pickup and
+-- the recipe itself binds on equip. A missing scan leaves the total empty.
+function Orders:CraftCost(itemId)
+    local lines = {}
+    local total = 0
+    local missing = false
+    local any = false
+    local known = GQ.CraftSkills and itemId and GQ.CraftSkills[itemId]
+    local reagents = known and known.reagents or {}
+    for i = 1, #reagents do
+        local row = reagents[i]
+        local id = row and row[1]
+        local count = row and row[2] or 1
+        local name = row and row[3]
+        if id and name and name ~= "" then
+            any = true
+            local unit = self:UnitPrice(id)
+            local price = unit and unit * count or nil
+            if not price then
+                missing = true
+            else
+                total = total + price
+            end
+            lines[#lines + 1] = { name = name, count = count, price = price }
+        end
+    end
+    local recipe = GQ.CraftRecipes and itemId and GQ.CraftRecipes[itemId]
+    local recipeId = recipe and recipe[1]
+    if recipeId and GQ.Equip and GQ.Equip.IsBindOnPickup and GQ.Equip:IsBindOnPickup(itemId)
+        and GQ.Equip:IsBindOnEquip(recipeId) then
+        any = true
+        local price = self:UnitPrice(recipeId)
+        if not price then
+            missing = true
+        else
+            total = total + price
+        end
+        lines[#lines + 1] = { name = recipe[2] or "Recipe", count = 1, price = price }
+    end
+    return {
+        any = any,
+        missing = missing or not any,
+        total = (any and not missing) and total or nil,
+        lines = lines,
+    }
+end
+
+function Orders:CoinText(copper)
+    if type(copper) ~= "number" or copper <= 0 then
+        return "-"
+    end
+    local icons = GQ.Data and GQ.Data.CoinIcons and GQ.Data:CoinIcons(copper)
+    if icons and icons ~= "" then
+        return icons
+    end
+    return "-"
+end
+
 function Orders:Ensure(frame)
     if self.page or not frame then
         return
@@ -291,6 +451,39 @@ function Orders:Ensure(frame)
 
     page.profButtons = {}
     page.rows = {}
+
+    local columns = CreateFrame("Frame", nil, page)
+    columns:SetHeight(COLUMN_H)
+    columns:Hide()
+    page.columns = columns
+    local function HeaderLabel(text, justify)
+        local fs = columns:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+        fs:SetText(text)
+        fs:SetJustifyH(justify or "RIGHT")
+        fs:SetTextColor(1, 0.82, 0)
+        return fs
+    end
+    columns.item = HeaderLabel(L["Item"], "LEFT")
+    columns.item:SetPoint("LEFT", columns, "LEFT", 8, 0)
+    columns.recipe = HeaderLabel(L["Recipe"], "LEFT")
+    columns.skill = HeaderLabel(L["Skill required"], "LEFT")
+    columns.costs = HeaderLabel(L["Material costs"], "RIGHT")
+    local info = CreateFrame("Button", nil, columns)
+    info:SetSize(16, 16)
+    info.icon = info:CreateTexture(nil, "OVERLAY")
+    info.icon:SetAllPoints()
+    info.icon:SetTexture("Interface\\FriendsFrame\\InformationIcon")
+    info:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetText(L["Material costs"], 1, 0.82, 0)
+        GameTooltip:AddLine(L["Material costs adds Auctionator's price for every material. Hover the total, or the dash, to see each material. Scan the auction house with Auctionator before a price can be shown."], 1, 1, 1, true)
+        Orders:AddScanLine()
+        GameTooltip:Show()
+    end)
+    info:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+    columns.info = info
 
     local scroll = CreateFrame("ScrollFrame", "GearQuestOrdersScroll", page, "UIPanelScrollFrameTemplate")
     scroll:SetPoint("TOPLEFT", page, "TOPLEFT", 4, -96)
@@ -393,6 +586,43 @@ function Orders:EnsureRow(index)
             Orders:RemoveAt(self.orderIndex)
         end
     end)
+    row.price = CreateFrame("Button", nil, row)
+    row.price:SetSize(PRICE_W, 22)
+    row.price:SetPoint("RIGHT", row, "RIGHT", -116, 0)
+    row.price.text = row.price:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    row.price.text:SetAllPoints()
+    row.price.text:SetJustifyH("RIGHT")
+    row.price:SetScript("OnEnter", function(self)
+        Orders:ShowPriceTip(self)
+    end)
+    row.price:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+    row.price:Hide()
+    row.recipe = CreateFrame("Button", nil, row)
+    row.recipe:SetSize(RECIPE_W, RECIPE_W)
+    row.recipe.icon = row.recipe:CreateTexture(nil, "ARTWORK")
+    row.recipe.icon:SetAllPoints()
+    row.recipe:SetScript("OnEnter", function(self)
+        if not self.recipeId then
+            return
+        end
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        if GameTooltip.SetItemByID then
+            GameTooltip:SetItemByID(self.recipeId)
+        else
+            GameTooltip:SetHyperlink("item:" .. self.recipeId)
+        end
+        GameTooltip:Show()
+    end)
+    row.recipe:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+    row.recipe:Hide()
+    row.skill = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    row.skill:SetWidth(SKILL_W)
+    row.skill:SetJustifyH("LEFT")
+    row.skill:Hide()
     row:EnableMouse(true)
     row:SetScript("OnMouseUp", function(self, button)
         if button ~= "LeftButton" or not self.itemId then
@@ -418,6 +648,31 @@ function Orders:EnsureRow(index)
     end)
     self.page.rows[index] = row
     return row
+end
+
+function Orders:ShowPriceTip(button, withScan)
+    local cost = button and button.cost
+    if not cost then
+        return
+    end
+    GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
+    GameTooltip:SetText("Auctionator", 1, 0.82, 0)
+    if not cost.any then
+        GameTooltip:AddLine(L["Materials are not listed for this craft."], 1, 0.82, 0.4, true)
+    else
+        for i = 1, #cost.lines do
+            local line = cost.lines[i]
+            local left = line.name
+            if line.count and line.count > 1 then
+                left = string.format("%s x%d", line.name, line.count)
+            end
+            GameTooltip:AddDoubleLine(left, line.price and self:CoinText(line.price) or "-", 1, 1, 1, 1, 1, 1)
+        end
+    end
+    if withScan then
+        self:AddScanLine()
+    end
+    GameTooltip:Show()
 end
 
 function Orders:Paint()
@@ -472,8 +727,33 @@ function Orders:Paint()
     for i = #names + 1, #page.profButtons do
         page.profButtons[i]:Hide()
     end
+    local showPrice = self:AuctionatorReady()
+    local edges = self:ColumnEdges(showPrice)
+    local columns = page.columns
+    columns:ClearAllPoints()
+    columns:SetPoint("TOPLEFT", page, "TOPLEFT", 4, rowY - 28)
+    columns:SetPoint("TOPRIGHT", page, "TOPRIGHT", -28, rowY - 28)
+    columns:SetFrameLevel((page:GetFrameLevel() or 1) + 6)
+    columns:Show()
+    columns.recipe:ClearAllPoints()
+    columns.recipe:SetPoint("LEFT", columns, "RIGHT", edges.recipeLeft, 0)
+    columns.recipe:SetWidth(RECIPE_COL_W)
+    columns.skill:ClearAllPoints()
+    columns.skill:SetPoint("LEFT", columns, "RIGHT", edges.skillLeft, 0)
+    columns.skill:SetWidth(SKILL_W)
+    if showPrice then
+        columns.info:ClearAllPoints()
+        columns.info:SetPoint("RIGHT", columns, "RIGHT", edges.price, 0)
+        columns.costs:ClearAllPoints()
+        columns.costs:SetPoint("RIGHT", columns.info, "LEFT", -4, 0)
+        columns.costs:Show()
+        columns.info:Show()
+    else
+        columns.costs:Hide()
+        columns.info:Hide()
+    end
     page.scroll:ClearAllPoints()
-    page.scroll:SetPoint("TOPLEFT", page, "TOPLEFT", 4, rowY - 30)
+    page.scroll:SetPoint("TOPLEFT", page, "TOPLEFT", 4, rowY - 28 - COLUMN_H - 4)
     page.scroll:SetPoint("BOTTOMRIGHT", page, "BOTTOMRIGHT", -28, 8)
 
     local list = self:List()
@@ -491,6 +771,7 @@ function Orders:Paint()
         end
     end
 
+    self:WatchAuctionator()
     local y = 0
     local used = 0
     local child = page.child
@@ -518,6 +799,15 @@ function Orders:Paint()
             header.icon:Hide()
             header.border:Hide()
             header.drop:Hide()
+            if header.price then
+                header.price:Hide()
+            end
+            if header.recipe then
+                header.recipe:Hide()
+            end
+            if header.skill then
+                header.skill:Hide()
+            end
             header.itemId = nil
             header.entryId = nil
             header.text:ClearAllPoints()
@@ -557,14 +847,40 @@ function Orders:Paint()
                     end
                 end
                 local skill = data.skill
-                local line = itemName
-                if type(skill) == "number" and skill > 1 then
-                    line = itemName .. "  |cffb0b0b0" .. string.format(L["Skill %d"], skill) .. "|r"
-                end
                 row.text:ClearAllPoints()
                 row.text:SetPoint("LEFT", row.icon, "RIGHT", 8, 0)
-                row.text:SetPoint("RIGHT", row, "RIGHT", -116, 0)
-                row.text:SetText(line)
+                row.text:SetPoint("RIGHT", row, "RIGHT", edges.text, 0)
+                row.text:SetText(itemName)
+                row.skill:ClearAllPoints()
+                row.skill:SetPoint("LEFT", row, "RIGHT", edges.skillLeft, 0)
+                if type(skill) == "number" then
+                    row.skill:SetText(tostring(skill))
+                    row.skill:Show()
+                else
+                    row.skill:Hide()
+                end
+                local recipe = GQ.CraftRecipes and GQ.CraftRecipes[data.itemId]
+                if recipe and recipe[1] then
+                    row.recipe.recipeId = recipe[1]
+                    local recipeIcon = recipe[3] or ItemIcon(recipe[1])
+                    row.recipe.icon:SetTexture(recipeIcon or "Interface\\Icons\\INV_Scroll_03")
+                    row.recipe:ClearAllPoints()
+                    row.recipe:SetPoint("LEFT", row, "RIGHT", edges.recipeLeft, 0)
+                    row.recipe:Show()
+                else
+                    row.recipe.recipeId = nil
+                    row.recipe:Hide()
+                end
+                if showPrice then
+                    local cost = self:CraftCost(data.itemId)
+                    row.price.cost = cost
+                    row.price.text:SetText(cost.total and self:CoinText(cost.total) or "-")
+                    row.price:ClearAllPoints()
+                    row.price:SetPoint("RIGHT", row, "RIGHT", edges.price, 0)
+                    row.price:Show()
+                else
+                    row.price:Hide()
+                end
                 local nr, ng, nb = QualityColor(data.itemId)
                 if nr then
                     row.text:SetTextColor(nr, ng, nb)

@@ -31,7 +31,7 @@ FOREVER_BIS = json.load(open(_FOREVER_BIS_PATH, encoding="utf-8")) if os.path.ex
 # ilvl -> typical RequiredLevel, median over every item that states one.
 ILVL_FLOOR = json.load(open(G+"ilvl_floor.json"))
 
-items  = json.load(open(G+"items.json"))
+items  = json.load(open(G+"items.json", encoding="utf-8"))
 # "Increases damage done by Shadow spells and effects by up to N" is the
 # item's spell damage. Some rows kept that sentence on effects and never
 # copied it into stats, so a +14 shadow circlet scored as stamina only.
@@ -651,59 +651,25 @@ def forever_stats(st):
         out["sp_from_heal"] = max(out.get("sp_from_heal") or 0, heal / 3.0)
     return out
 
-# Forever tooltips say "by N%". A few items stored that percent on the old
-# rating scale (2% hit -> 20, 1% crit -> 14, 1% dodge -> 12, 1% parry -> 15)
-# and the other thousand did not. Frenzied Striker's stored 20 hit is that
-# conversion, and it outranked Grand Marshal's Polearm. At 60, drop a stored
-# hit/crit/dodge/parry when it is exactly that conversion. Do not invent the
-# rating on the items that never had it. A Chance on hit, a spell-specific
-# crit, and a line that reduces the chance to be dodged are not touched.
-_PCT_PER = {"hit": 10.0, "crit": 14.0, "dodge": 12.0, "parry": 15.0}
-
-def _percent_rating(line):
-    low = line.lower()
-    if not low.startswith("equip:"):
-        return None
-    if low.startswith("equip: improves your chance to get a critical strike"):
-        key = "crit"
-    elif low.startswith("equip: improves your chance to hit by"):
-        key = "hit"
-    elif low.startswith("equip: increases your chance to dodge an attack"):
-        key = "dodge"
-    elif low.startswith("equip: increases your chance to parry an attack"):
-        key = "parry"
-    else:
-        return None
-    m = re.search(r"by ([\d.]+)%", line)
-    if not m:
-        return None
-    return key, float(m.group(1)) * _PCT_PER[key]
-
 def _level60_stats(it, level):
-    """Stats the level-60 score uses. 1-59 keeps the stored row."""
+    """Stats the score uses. Percent lines count as that percent at every level."""
+    from equip_percents import merge_equip_percents
     base = forever_stats(it.get("stats") or {})
-    if level < 60:
-        return base
     effects = it.get("effects") or []
-    equip = "\n".join(e for e in effects if e.lower().startswith("equip:")).lower()
-    for line in effects:
-        low = line.lower()
-        if not low.startswith("use:"):
-            continue
-        # Earthstrike stores the on-use 280 attack power as a passive stat
-        # and the proc model prices the use again. A Use amount with no Equip
-        # line is not a passive.
-        m = re.search(r"attack power by (\d+)", low)
-        if m and "attack power" not in equip:
-            if base.get("ap", 0) <= float(m.group(1)) + 0.01:
-                base["ap"] = 0
-    for line in effects:
-        got = _percent_rating(line)
-        if not got:
-            continue
-        key, pts = got
-        if abs(base.get(key, 0) - pts) < 0.6:
-            base[key] = 0
+    if level >= 60:
+        equip = "\n".join(e for e in effects if e.lower().startswith("equip:")).lower()
+        for line in effects:
+            low = line.lower()
+            if not low.startswith("use:"):
+                continue
+            # Earthstrike stores the on-use 280 attack power as a passive stat
+            # and the proc model prices the use again. A Use amount with no Equip
+            # line is not a passive.
+            m = re.search(r"attack power by (\d+)", low)
+            if m and "attack power" not in equip:
+                if base.get("ap", 0) <= float(m.group(1)) + 0.01:
+                    base["ap"] = 0
+    merge_equip_percents(base, effects)
     return base
 
 def best_variant(it, w, level, rscale):
@@ -1926,7 +1892,9 @@ def cap_weapon_bands(bands, limit=WEAPON_LIST_CAP):
                 # once. The slot keeps its own copy.
                 keep.add((id(band), index))
                 return False
-            if len(seen) >= limit:
+            # A guide weapon stays even past the cap, so Only Guide Gear can
+            # still list the page when that weapon is not a top score.
+            if len(seen) >= limit and not _pick(item).get("guidePlace"):
                 return False
             seen.add(key)
             keep.add((id(band), index))
@@ -2001,20 +1969,38 @@ if __name__=="__main__":
             slots=sorted({k[2] for k in per})
             bands=collapse(per,("Alliance","Horde"),slots,lv)
             early_band = max(lv)==9
-            def emit(faction,sl,lo,hi,rows,origins=None, guide_list=False, _spec=spec, _notable=notable, _alts=source_alts):
+            def emit(faction,sl,lo,hi,rows,origins=None, guide_list=False, guide_places=None, guide_rows=None, _spec=spec, _notable=notable, _alts=source_alts):
                 # Append source alternates after the existing picks. Ranks 1-3
                 # stay the rows this band already chose. A Forever BiS list is
                 # the whole order, so those extras stay off it.
-                base_count=len(rows)
                 have={r[1]["id"] for r in rows}
                 have_names={r[1]["name"] for r in rows}
                 merged=list(rows)
+                alt_ids=set()
                 if not guide_list:
                     for r in (_alts.get((faction,hi,sl)) or []):
                         if r[1]["id"] in have or r[1]["name"] in have_names:
                             continue
                         have.add(r[1]["id"]); have_names.add(r[1]["name"])
+                        alt_ids.add(r[1]["id"])
                         merged.append(r)
+                # A page piece the scored list missed is inserted where its
+                # score belongs, after the alternates, so it does not sit in
+                # front of a higher-scoring alternate. A set piece may lead
+                # with a lower score; the insert does not land in that dip.
+                for r in (guide_rows or []):
+                    if r[1]["id"] in have or r[1]["name"] in have_names:
+                        continue
+                    score = r[0]
+                    index = len(merged)
+                    for i, existing in enumerate(merged):
+                        if existing[0] + 1e-9 < score:
+                            later = max(item[0] for item in merged[i:])
+                            if later <= score + 1e-9:
+                                index = i
+                                break
+                    merged.insert(index, r)
+                    have.add(r[1]["id"]); have_names.add(r[1]["name"])
                 rows=merged
                 out[_spec]["bands"].append({"faction":faction,"slot":sl,"lo":lo,"hi":hi,
                   "picks":[{"id":r[1]["id"],"name":r[1]["name"],"q":r[1]["quality"],
@@ -2027,10 +2013,15 @@ if __name__=="__main__":
                             "reqSkills":r[1].get("reqSkills") or [],"reqRep":r[1].get("reqRep") or [],
                             "hand": weapon_hand(r[1], sl)} for r in rows]})
                 for p in out[_spec]["bands"][-1]["picks"]:
+                    place = (guide_places or {}).get(p["id"])
+                    if place:
+                        p["guidePlace"] = place
+                        p["origin"] = "guide"
                     if not spec_wants_heal(cls, _spec) and item_is_heal_only({"stats": p.get("stats") or {}}):
                         p["healOnly"] = True
-                for p in out[_spec]["bands"][-1]["picks"][base_count:]:
-                    p["alt"]=True
+                for p in out[_spec]["bands"][-1]["picks"]:
+                    if p["id"] in alt_ids:
+                        p["alt"]=True
                 if origins: out[_spec]["bands"][-1]["origins"]=origins
                 if guide_list:
                     out[_spec]["bands"][-1]["guideList"]=True
@@ -2045,10 +2036,15 @@ if __name__=="__main__":
                     emit(faction,sl,lo,hi,rows); continue
                 r60=full60.get((faction,sl)) or []
                 guided=forever_guide_rows(cls, spec, sl, r60)
+                # Level 60 stays the scored list. A Wowhead page piece is
+                # stamped with its page place. Only Guide Gear shows that
+                # page, in page order. A slot with no page stays scored.
                 if guided:
-                    if lo<60:
-                        emit(faction,sl,lo,59,per.get((faction,59,sl)) or rows)
-                    emit(faction,sl,60,60,guided,["guide"]*len(guided),guide_list=True)
+                    page_ids = ((FOREVER_BIS.get(cls) or {}).get(spec) or {}).get("slots", {}).get(sl) or []
+                    places = {}
+                    for index, iid in enumerate(page_ids, 1):
+                        places.setdefault(iid, index)
+                    emit(faction, sl, lo, hi, rows, guide_places=places, guide_rows=guided)
                     continue
                 if NO_GUIDES:
                     emit(faction,sl,lo,hi,rows); continue
@@ -2067,5 +2063,5 @@ if __name__=="__main__":
         prev=json.load(open(out_path, encoding="utf-8"))
         prev[only]=out[only]
         out=prev
-    json.dump(out,open(out_path,"w"))
+    json.dump(out, open(out_path, "w", encoding="utf-8"))
     print("wrote "+out_path)

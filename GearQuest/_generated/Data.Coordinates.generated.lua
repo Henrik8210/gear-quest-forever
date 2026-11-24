@@ -8084,4 +8084,6 @@ GQ.Data.coordinates = {
     [287014]={note="entrance to dungeon or raid",spots={{map="Riverglades",mapId=2548,x=37.5,y=37.3}}},
     [287015]={note="entrance to dungeon or raid",spots={{map="Riverglades",mapId=2548,x=37.5,y=37.3}}},
     [287016]={note="entrance to dungeon or raid",spots={{map="Riverglades",mapId=2548,x=37.5,y=37.3}}},
+    [279878]={note="beginning of the quest or chain",spots={{map="Stranglethorn Vale",mapId=1434,x=38.0,y=3.4,faction="Alliance",npc="Sergeant Yohwa"}}},
+    [279879]={note="beginning of the quest or chain",spots={{map="Stranglethorn Vale",mapId=1434,x=38.0,y=3.4,faction="Alliance",npc="Sergeant Yohwa"}}},
 }

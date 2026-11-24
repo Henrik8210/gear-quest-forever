@@ -24,3 +24,4 @@ ignore:
   - assets
   - GearQuest/_generated/*.json
   - pipeline
+  - export

@@ -1806,6 +1806,17 @@ GQ.Data.RUNE_BROKER_INSTRUCTIONS = {
         .. "and in Orgrimmar, Thunder Bluff, Undercity, Durotar, Mulgore, and Tirisfal Glades.",
 }
 
+-- Capitals only. A both-faction quest can start in the Barrens or Elwynn.
+-- A pin inside the other faction's city still stays off that side.
+GQ.Data.FACTION_CITY_DENY = {
+    Alliance = {
+        ["Orgrimmar"] = true, ["Thunder Bluff"] = true, ["Undercity"] = true,
+    },
+    Horde = {
+        ["Stormwind City"] = true, ["Ironforge"] = true, ["Darnassus"] = true,
+    },
+}
+
 -- One-faction maps (mirrors pipeline ALLIANCE_MAPS / HORDE_MAPS). A pin in the
 -- other faction's city is never shown, even when the spot was tagged wrong.
 GQ.Data.FACTION_ZONE_DENY = {
@@ -1825,9 +1836,13 @@ GQ.Data.FACTION_ZONE_DENY = {
 
 -- A dungeon door, a boss, a rare, or a farm is the place itself. Wailing
 -- Caverns is in the Barrens and both factions walk in, so that pin is not
--- a Horde leveling pin. Quest starts and city vendors stay on the deny list.
+-- a Horde leveling pin. A quest start ignores that leveling-zone list, and
+-- still hides a pin inside the other faction's capital. City vendors stay.
 function GQ.Data:PinIgnoresFactionZone(row)
     local note = row and row.note
+    if note == "beginning of the quest or chain" then
+        return "quest"
+    end
     if note == "where this rare spawns"
         or note == "a farming spot"
         or note == "where the recipe drops"
@@ -1861,7 +1876,12 @@ function GQ.Data:SpotVisible(spot, faction, ignoreMapDeny)
     if not spot then
         return false
     end
-    if not ignoreMapDeny then
+    if ignoreMapDeny == "quest" then
+        local cities = faction and self.FACTION_CITY_DENY and self.FACTION_CITY_DENY[faction]
+        if cities and spot.map and cities[spot.map] then
+            return false
+        end
+    elseif not ignoreMapDeny then
         local deny = faction and self.FACTION_ZONE_DENY[faction]
         if deny and spot.map and deny[spot.map] then
             return false
@@ -6515,7 +6535,7 @@ function GQ.Data:AppendGearScoreLine(tooltip, entry)
     tooltip:AddLine(" ")
     if enchant then
         tooltip.gqEnchantAdded = true
-        tooltip:AddLine(enchant, 1, 1, 1)
+        GQ.Enchant:AddLines(tooltip, enchant)
     end
     if line then
         tooltip:AddLine(line, 1, 1, 1)
@@ -6612,7 +6632,7 @@ function GQ.Data:AddGearScoreToItemTooltip(tooltip)
                 tooltip.gqScoreLineAdded = true
                 tooltip.gqEnchantAdded = true
                 tooltip:AddLine(" ")
-                tooltip:AddLine(enchant, 1, 1, 1)
+                GQ.Enchant:AddLines(tooltip, enchant)
             end
         end
         self:AppendOtherSpecRanks(tooltip, link)
@@ -6632,7 +6652,7 @@ function GQ.Data:AddGearScoreToItemTooltip(tooltip)
         tooltip:AddLine(" ")
         if enchant then
             tooltip.gqEnchantAdded = true
-            tooltip:AddLine(enchant, 1, 1, 1)
+            GQ.Enchant:AddLines(tooltip, enchant)
         end
         if miss then
             tooltip:AddLine(miss, 0.69, 0.69, 0.69)
@@ -6650,7 +6670,7 @@ function GQ.Data:AddGearScoreToItemTooltip(tooltip)
             tooltip:AddLine(" ")
             if enchant then
                 tooltip.gqEnchantAdded = true
-                tooltip:AddLine(enchant, 1, 1, 1)
+                GQ.Enchant:AddLines(tooltip, enchant)
             end
             if miss then
                 tooltip:AddLine(miss, 0.69, 0.69, 0.69)
@@ -6903,10 +6923,40 @@ function GQ.Data:BuildTopUpgradesForSlot(slotName, maxResults, ignoreWeaponFilte
     maxResults = maxResults or self:GetMaxUpgradesForSlot(slotName)
     self:EnsureQueryCache()
 
+    local guideMode = GQ.Log and GQ.Log.OnlyGuideGearEnabled and GQ.Log:OnlyGuideGearEnabled()
     local cacheKey = slotName .. ":" .. maxResults .. (ignoreWeaponFilter and ":open" or "")
+        .. (guideMode and ":guide" or "")
     local cached = self._queryCache.topUpgrades[cacheKey]
     if cached then
         return cached
+    end
+
+    if guideMode then
+        local guide = {}
+        for _, entry in ipairs(self:GetCandidatesForSlot(slotName)) do
+            if entry.guidePlace
+                and self:EntryFitsPaperDollSlot(entry, slotName, ignoreWeaponFilter)
+                and not (GQ.Log and GQ.Log.IsHuntRemoved and GQ.Log:IsHuntRemoved(entry)) then
+                guide[#guide + 1] = entry
+            end
+        end
+        if #guide > 0 then
+            table.sort(guide, function(a, b)
+                local placeA = a.guidePlace or 99
+                local placeB = b.guidePlace or 99
+                if placeA ~= placeB then
+                    return placeA < placeB
+                end
+                return (a.itemId or 0) < (b.itemId or 0)
+            end)
+            local results = {}
+            local count = math.min(maxResults, #guide)
+            for i = 1, count do
+                results[i] = guide[i]
+            end
+            self._queryCache.topUpgrades[cacheKey] = results
+            return results
+        end
     end
 
     local removedAny = false

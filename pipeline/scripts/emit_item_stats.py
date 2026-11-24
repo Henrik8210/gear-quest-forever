@@ -7,6 +7,8 @@ import json
 import re
 from pathlib import Path
 
+from equip_percents import merge_equip_percents
+
 ROOT = Path(__file__).resolve().parents[2]
 GEN = ROOT / "GearQuest" / "_generated"
 ITEMS = ROOT / "pipeline" / "data" / "items.json"
@@ -155,6 +157,7 @@ def main():
             missing += 1
             continue
         folded = forever_stats(it.get("stats") or {})
+        merge_equip_percents(folded, it.get("effects") or [])
         extra = []
         if it.get("cls") == 2:
             if it.get("dps"):

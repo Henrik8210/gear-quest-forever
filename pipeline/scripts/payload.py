@@ -10,10 +10,10 @@ FACTS = "itemFacts" if CLS=="PALADIN" else LC+"ItemFacts"
 SHORT={"levelling_1_9":"Levels 1\u20139","retribution":"Retribution","protection":"Protection",
        "holy":"Holy","arms":"Arms","fury":"Fury"}
 import procs as PROCS
-gen=json.load(open(os.path.join(OUT, os.environ.get("GQ_OUT","paladin.json")))); items=json.load(open(G+"items.json"))
-rand=json.load(open(G+"items_random.json")); W=json.load(open(G+"weights.json"))
-srcs=json.load(open(G+"sources.json"))
-LORE=json.load(open(G+"lore.json"))
+gen=json.load(open(os.path.join(OUT, os.environ.get("GQ_OUT","paladin.json")), encoding="utf-8")); items=json.load(open(G+"items.json", encoding="utf-8"))
+rand=json.load(open(G+"items_random.json", encoding="utf-8")); W=json.load(open(G+"weights.json", encoding="utf-8"))
+srcs=json.load(open(G+"sources.json", encoding="utf-8"))
+LORE=json.load(open(G+"lore.json", encoding="utf-8"))
 
 # Embrace of the Viper. The drop line stays on the source. The rest is the
 # package result for this class: when 4 pieces are the hunt, when 5 are,
@@ -341,7 +341,10 @@ for sp,blob in gen.items():
                 if p.get("suffixRange"):
                     extra+=f',suffixRange={lua(p["suffixRange"])}'
             org=(b.get("origins") or [None]*3)
-            if rank<=len(org) and org[rank-1]=="guide": extra+=',origin="guide"'
+            if p.get("origin") == "guide" or (rank<=len(org) and org[rank-1]=="guide"):
+                extra+=',origin="guide"'
+            if p.get("guidePlace"):
+                extra+=",guidePlace=%d" % int(p["guidePlace"])
             # Two-hander or one-hander + off-hand? Only present on specs that can
             # legally do both, and only on the two weapon slots. The addon uses it to
             # grey the row that does not apply, so a staff and an off-hand item are never
@@ -381,7 +384,7 @@ def stored_hand(slot, item_id):
     return None
 
 facts=build_facts(allused)
-open(os.path.join(OUT,"Data.%s.generated.lua"%CLS.title()),"w").write(
+open(os.path.join(OUT,"Data.%s.generated.lua"%CLS.title()),"w", encoding="utf-8", newline="\n").write(
 """local GQ = _G.GearQuest
 if not GQ then
     error("GearQuest Forever class data loaded without the main addon")
@@ -406,9 +409,9 @@ GQ.Data = GQ.Data or {}
 --   levels 10-60 -> this file
 --   level 70      -> Henrik's curated AtlasLoot Phase 3 entries in Data.lua
 --
--- At level 60, a spec with a Wowhead Forever page in guides/forever_bis.json
--- uses that list in the page's order. Rows carrying origin="guide" are that
--- list. A spec with no page, and every level below 60, stays on the model.
+-- At level 60 the band stays the scored list. A Wowhead Forever page piece is
+-- marked origin="guide" and guidePlace is its page number. Only Guide Gear is
+-- what shows that page alone. A spec with no page stays on the scorer.
 --
 -- Two tables instead of one, on purpose: everything that is a fact about an
 -- ITEM (its name, where it comes from, what to do to get it) is stored once in

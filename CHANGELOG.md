@@ -2,7 +2,55 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.3.6
+## v1.3.7
+
+The log header reads **GearQuest Forever v1.3.7**. `/reload` after the update.
+
+### A percent on the item is that percent
+
+An Equip line that says chance to hit, chance to get a critical strike, chance to dodge, chance to parry, attack speed and casting speed, chance to block, or reduces chance to be dodged or parried by N% is scored as that percent. A 2% hit cloak is Hit 2. A stored rating beside that line is the old scale (10 hit rating was 1% hit, 14 critical strike rating was 1% crit) and is replaced by the percent the line says. This is every class and spec, levels 1 through 60, including a custom spec. A Chance on hit, a spell-specific crit, and a set bonus stay unscored. Copying the old rating scale onto the printed percent had put a 3% hit sword above Grand Marshal's Polearm.
+
+### Level 60 is the scored list again
+
+Only Guide Gear! is a play style. At level 60 it is the first card. Below 60 the card is not on the page. It starts off. Off, the level-60 hunt is the scored list, and a Wowhead Forever page piece is labeled (Guide) on the hunt row and (Guide #N) on the rank list, where N is its place on that page. On, the hunt rows and that slot's rank list are only the page, in page order. Hunts per gear slot still caps the rows. A slot the page leaves empty keeps the scored hunts. The card art is the blue rocket.
+
+### Raids that are not open stay off the hunt
+
+The first raids are 8 December 2026. Until then a hunt is a dungeon or Blackrock Spire. These stay off every class, spec, and faction:
+
+- For All To See: Dragonslayer's Signet, Onyxia Tooth Pendant, and Onyxia Blood Talisman. The quest turns in an Onyxia head.
+- The Lord of Blackrock: Master Dragonslayer's Orb, Master Dragonslayer's Medallion, and Master Dragonslayer's Ring. The quest turns in a Nefarian head.
+- Quel'Serrar. It needs Onyxia's breath.
+- The green dragons: Ring of the Unliving and the other drops from Emeriss, Lethon, Taerar, and Ysondre.
+- Lord Kazzak and Azuregos.
+- The Silithus lords and colossi, including Cloudkeeper Legplates.
+- Ivus the Forest Lord and Lokholar the Ice Lord.
+
+Blackrock Spire stays, including Upper Blackrock Spire. The Brood of Onyxia in Dustwallow Marsh stays. A named boss of Zul'Farrak, Razorfen Downs, Stratholme, Scholomance, Dire Maul, or Blackrock Spire that had no stored zone is filed in that dungeon. Spellshock Leggings is Zul'Farrak. Coldbringer Spine is Razorfen Downs.
+
+### Alliance can hunt the Orb and the Staff of Soran'ruk
+
+Thanks to Cope. Orb of Soran'ruk and Staff of Soran'ruk show for Alliance and Horde. The quest starts with Doan Karhan in the Barrens. The pin is that start. A both-faction quest in the Barrens is not hidden from Alliance.
+
+### The Web of Magic lists the chain
+
+Thanks to Doctor Zee. Rune-Etched Epaulets and Apprentice Sorcerer's Slacks are Alliance. The parchment lists The Second Rebellion, Bad Medicine, Kurzen's Mystery, Troll Witchery, An Acquaintance in Southshore, Magics of the Drowned City, then The Web of Magic. Magics of the Drowned City is the dungeon step. The pin is Sergeant Yohwa at the Rebel Camp in Stranglethorn Vale.
+
+### Crafting orders show the recipe and the material price
+
+Thanks to BiLLI. The orders page has Item, Recipe, Skill required, and Material costs. Recipe is the recipe icon, and hovering it shows the recipe tooltip. Skill required is its own column, lined up on the left with the number under it. Material costs uses the gold, silver, and copper icons, with a gap before Remove order. The (i) on that header is the place that explains how the prices work: Auctionator prices every material, a full auction-house scan has to be run before a price can show, and hovering the total or the dash lists each material. Hovering the price or the dash is only that breakdown. The column is hidden when Auctionator is not installed.
+
+On a crafted hunt, the line under Requires [profession] is **Materials cost:** and the same coin icons. It appears only after a full Auctionator scan, and only when every material has a price. Otherwise the line is not there. Hovering it lists each material and when that scan was run. The scan time is also on the orders Material costs (i). The line on the parchment is the price.
+
+### Recommended enchantment wraps
+
+The yellow words **Recommended enchantment:** are their own line. The formula and the effect start on the next line and wrap after about 50 characters. This is every class, whenever Recommended gear enchantment is on.
+
+### Top donators
+
+Guiggiani is on the list, under Kamujin.
+
+### v1.3.6
 
 The log header reads **GearQuest Forever v1.3.6**. **`/reload`** after updating.
 

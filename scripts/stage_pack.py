@@ -23,7 +23,7 @@ NAMED = re.compile(r"^([A-Za-z_]\w*)=(.*)$", re.S)
 
 EXTRA_KEYS = {
     "reserve", "suffix", "suffixChance", "suffixId", "suffixRange",
-    "hand", "route", "healOnly", "origin",
+    "hand", "route", "healOnly", "origin", "guidePlace",
 }
 NO_FACTION = "_"
 

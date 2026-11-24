@@ -24090,24 +24090,6 @@
       "questName": null
     },
     {
-      "id": 279878,
-      "name": "Apprentice Sorcerer's Slacks",
-      "sourceType": "quest_reward",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": "The Web of Magic"
-    },
-    {
-      "id": 279879,
-      "name": "Rune-Etched Epaulets",
-      "sourceType": "quest_reward",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": "The Web of Magic"
-    },
-    {
       "id": 279880,
       "name": "Ancient Voodoo Pouch",
       "sourceType": "quest_reward",

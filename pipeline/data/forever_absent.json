@@ -3,6 +3,7 @@
   "absentRaids": [
     "Molten Core",
     "Blackwing Lair",
+    "Onyxia's Lair",
     "Zul'Gurub",
     "Ruins of Ahn'Qiraj",
     "Temple of Ahn'Qiraj",
@@ -10,10 +11,36 @@
     "Naxxramas"
   ],
   "openRaids": [
-    "Onyxia's Lair",
     "Hyjal Summit",
     "Barrow Deeps"
   ],
+  "absentBosses": [
+    "Prince Skaldrenox",
+    "Lord Skwol",
+    "Baron Kazum",
+    "High Marshal Whirlaxis",
+    "Colossus of Zora",
+    "Colossus of Regal",
+    "Colossus of Ashi",
+    "Ivus the Forest Lord",
+    "Lokholar the Ice Lord",
+    "Gill"
+  ],
+  "knownBossDungeons": {
+    "Antu'sul": "Zul'Farrak",
+    "Ruuzlu": "Zul'Farrak",
+    "Sergeant Bly": "Zul'Farrak",
+    "Urok Doomhowl": "Blackrock Spire",
+    "Death Knight Darkreaver": "Scholomance",
+    "Isalien": "Dire Maul",
+    "Mor Grayhoof": "Dire Maul",
+    "Grand Crusader Dathrohan": "Stratholme",
+    "Magistrate Barthilas": "Stratholme",
+    "The Great Fras Siabi": "Stratholme",
+    "Plaguemaw the Rotting": "Razorfen Downs",
+    "Amnennar the Coldbringer": "Razorfen Downs",
+    "Glutton": "Razorfen Downs"
+  },
   "worldBosses": [
     "Azuregos",
     "Lord Kazzak",
@@ -39,6 +66,14 @@
     "21523": "Treasure of the Timeless One needs the Eye of C'Thun from Ahn'Qiraj.",
     "21517": "The Only Prescription needs the Draconic for Dummies chapters from Blackwing Lair.",
     "240132": "Test item.",
-    "240994": "Test item."
+    "240994": "Test item.",
+    "18348": "Quel'Serrar has to be breathed on by Onyxia. Onyxia's Lair is not open yet.",
+    "18403": "For All To See turns in Onyxia's head. Onyxia's Lair is not open yet.",
+    "18404": "For All To See turns in Onyxia's head. Onyxia's Lair is not open yet.",
+    "18406": "For All To See turns in Onyxia's head. Onyxia's Lair is not open yet.",
+    "19366": "The Lord of Blackrock turns in Nefarian's head. Blackwing Lair is not open yet.",
+    "19383": "The Lord of Blackrock turns in Nefarian's head. Blackwing Lair is not open yet.",
+    "19384": "The Lord of Blackrock turns in Nefarian's head. Blackwing Lair is not open yet.",
+    "14554": "Cloudkeeper Legplates drop from the Silithus colossi. That is not a dungeon that is in the game yet."
   }
 }

@@ -203,7 +203,7 @@ local SHARED_FACT_FIELDS = {
 }
 local OPTIONAL_ROW_FIELDS = {
     "suffix", "suffixChance", "suffixId", "suffixRange", "route", "hand",
-    "origin", "reserve", "healOnly",
+    "origin", "guidePlace", "reserve", "healOnly",
 }
 local SHARED_MT = setmetatable({}, { __mode = "k" })
 

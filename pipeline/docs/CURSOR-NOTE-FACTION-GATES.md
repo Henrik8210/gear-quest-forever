@@ -64,18 +64,18 @@ audited faction pairs and reputation cases now resolve to exactly one faction, z
 
 ## 4. The ordering question
 
-Audited every band: **16,032 bands, and the only 220 with a non-descending score are
-level-60 guide bands, where that is deliberate.** Rank is score-ordered everywhere else.
+The level-60 band stays the scored list. Scored pieces stay in that band beside the
+Wowhead Forever page pieces. A page piece is marked `origin="guide"` and `guidePlace`
+is its page number. **Only Guide Gear** is the filter that shows just that page, in
+page order. Do not replace the level-60 band with the guide, and do not keep scored
+gear out of it.
 
-So if a list looks misordered outside level 60, it is the addon's rendering, not `rank`.
-And at level 60 the score column is *intentionally* non-monotonic — the guide's tier
-order wins, e.g. *Dreadnaught Helmet* scores 130.7 behind *Conqueror's Crown*'s 104.9
-because the guide calls the Crown the plain Best and the Helmet the Best Mitigation.
-The same rule is the Forever guardrail: a spec with a page in
-`pipeline/guides/forever_bis.json` keeps that hand-entered order at level 60.
-A spec with no page stays on the scorer, and so does every level below 60.
-**Never re-sort an `origin="guide"` band by score.** `rank` is authoritative; `score` is
-context.
+Rank on the stored band is score order, including at 60. A set piece may still lead
+its slot with a lower score. The page number does not reorder the stored rows. When
+Only Guide Gear is on, the hunt rows and that slot's rank list are the page, and
+the 0–100 index follows that page order. With the card off, the index is the scored
+list. A spec with no page, a slot the page leaves empty, and every level below 60
+stay on the scorer.
 
 One thing worth knowing about the screenshot: `Batskin Belt` (28158) is **not in any of
 my picks or notables** for paladin, at any level, on either faction. So whatever surfaced

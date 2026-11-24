@@ -19,7 +19,7 @@ Publishing uses **GitHub Actions**, not the CurseForge webhook. Keep any CurseFo
 
 Only when explicitly publishing:
 
-1. Bump `## Version:` in `GearQuest/GearQuestForever.toc` and `GearQuest/Core.lua` (`GQ.VERSION`) to **`X.Y.Z`** (the current release is `1.3.6`). The language addon version comes from that same TOC line when `scripts/stage-locale-addons.py` runs. The release workflow runs that stager, so a new player-facing sentence is already in `GearQuest/Locales/` before the tag. A beta tag is `X.Y.Z-beta` only when that upload should stay on the beta channel. The log window header is **`GearQuest Forever v`** plus `GQ.VERSION` (`GearQuest/Log.lua`, `GearQuestWindowTitle`). It must stay that string — do not hardcode a different version in the header. Bumping `GQ.VERSION` is what updates the band on every release.
+1. Bump `## Version:` in `GearQuest/GearQuestForever.toc` and `GearQuest/Core.lua` (`GQ.VERSION`) to **`X.Y.Z`** (the current release is `1.3.7`). The language addon version comes from that same TOC line when `scripts/stage-locale-addons.py` runs. The release workflow runs that stager, so a new player-facing sentence is already in `GearQuest/Locales/` before the tag. A beta tag is `X.Y.Z-beta` only when that upload should stay on the beta channel. The log window header is **`GearQuest Forever v`** plus `GQ.VERSION` (`GearQuest/Log.lua`, `GearQuestWindowTitle`). It must stay that string — do not hardcode a different version in the header. Bumping `GQ.VERSION` is what updates the band on every release.
 2. Add a `## vX.Y.Z` section at the top of `CHANGELOG.md` and demote the previous `## ` heading to `###`. `scripts/upload-curseforge-forever.py` sends markdown from that first `## ` line through the end of the file. Older versions stay as `###` so there is only one level-2 heading. Write the new section for players: a short lead, then a subsection per change, with the classes, specs, levels, and what they will see. A one-line summary is not enough.
 3. Commit and push to `main`. Wait for **GitHub Actions → CI** to pass on that commit before tagging (see [Checks](#checks)).
 4. Tag and push: `git tag vX.Y.Z` then `git push origin vX.Y.Z`. CurseForge **Files** shows that tag (keep the `v`). A tag that does not end in `-beta` uploads on the **release** channel. A tag that ends in `-beta` uploads on the **beta** channel. `.github/workflows/release.yml` sets `CF_RELEASE_TYPE` from the tag name.
@@ -41,6 +41,7 @@ Each step is a script you can run locally after `pip install lupa`:
 | Translations | `python scripts/ci/check_locales.py` | A `GQ.L` key missing in any of the eight languages, or a language file that loads under another locale |
 | Scoring vs tooltip | `python scripts/ci/check_scoring_weights_parity.py` | Spec tooltip or hunt score drifts from the `weights.json` row, or `ScoringWeights.generated.lua` drifts from that file |
 | Gear lists | `python scripts/ci/check_gear.py` | Ranks that do not close up, bad or overlapping level bands, a row without facts, a lower rank with a higher score outside the weapon slots (set pieces excepted), a banned or test item, a fishing pole, a non-bow/gun/crossbow on a hunter ranged list, a faction-locked item on the other faction's list, Heavy Woolen Pants leaving the warlock bands they still belong in, a rare or a Both-side quest missing from one faction, a one-faction vendor on the other faction's list, or any other known answer in `scripts/ci/gear_expectations.json` that moved |
+| Ranking export | `python scripts/ci/check_export_json.py` | `export/gearquest-forever.json` is missing, or its rankings, item facts, or level-60 guide pages differ from the addon catalogs. Regenerate with `python pipeline/scripts/export_bot_json.py` in the same commit. The generated time and the commit hash are not compared |
 | Recommended enchants | `python scripts/ci/check_enchants.py` | A hunt row on an enchantable slot with no `Enchant.lua` formula at that item's level (after ingest, rescrape, or a new slot type) |
 | Sheet weights, no level multiplier | `python scripts/ci/check_no_leveling_multipliers.py` | `weights_at_level()` changes a sheet stat, `GQ.ScoringLeveling` is not 1, hunt or enchant code multiplies by that table, or a live doc tells the scorer to multiply stamina, armor, or mana by level |
 | Scorer tests | `python -m unittest discover -s tests/pipeline -v` | The sheet-weight identity, `forever_stats`, the jackpot-roll ranking, or the faction-zone gate in `score.py` (a quest, a world drop, and a rare stay available in the other faction's zone; a one-faction vendor, trainer, or quest does not) |
@@ -53,6 +54,7 @@ The lazy catalog comparison (`tests/lazy_catalog/run.py`, about 50 minutes) is n
 
 ## Rules
 
+- Every commit that is pushed includes a current `export/gearquest-forever.json` when the addon lists changed. CI rejects a push where that file is not the catalogs.
 - **Never tag** unless explicitly publishing a release.
 - **Do not** delete and re-push tags — bump the patch version instead.
 - Pushing to `main` alone is **not** a release.
@@ -60,7 +62,7 @@ The lazy catalog comparison (`tests/lazy_catalog/run.py`, about 50 minutes) is n
 
 ## Next upload
 
-`v1.0.0` is the first file on the CurseForge **release** channel. `v1.3.6` is the current file on that channel. The next version is the next `X.Y.Z` unless a beta was asked for.
+`v1.0.0` is the first file on the CurseForge **release** channel. `v1.3.7` is the current file on that channel. The next version is the next `X.Y.Z` unless a beta was asked for.
 
 After a tag exists, bump the version rather than deleting the tag.
 

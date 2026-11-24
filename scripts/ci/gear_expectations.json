@@ -79,6 +79,12 @@
   {"name": "Coldflame Saber", "item": 276631, "reqLevel": 21, "why": "Battle Mage client pin, required level 21"},
   {"name": "Blade of Silverlaine", "item": 273637, "reqLevel": 21, "why": "Battle Mage client pin, required level 21"},
   {"name": "Wolfsbane", "item": 267369, "reqLevel": 20, "why": "client pin, required level 20"},
-  {"name": "Blessed Prayer Beads", "item": 19990, "absent": true, "why": "no passive stats, so it never enters a list"}
+  {"name": "Blessed Prayer Beads", "item": 19990, "absent": true, "why": "no passive stats, so it never enters a list"},
+  {"name": "Master Dragonslayer's Medallion", "item": 19383, "absent": true, "why": "For All To See turns in an Onyxia head, and Onyxia is not open"},
+  {"name": "Master Dragonslayer's Ring", "item": 19384, "absent": true, "why": "The Lord of Blackrock turns in a Nefarian head, and the raid is not open"},
+  {"name": "Master Dragonslayer's Orb", "item": 19366, "absent": true, "why": "The Lord of Blackrock turns in a Nefarian head, and the raid is not open"},
+  {"name": "Quel'Serrar", "item": 18348, "absent": true, "why": "Quel'Serrar needs Onyxia's breath, and Onyxia is not open"},
+  {"name": "Ring of the Unliving", "item": 20624, "absent": true, "why": "Emeriss is not in the game yet"},
+  {"name": "Cloudkeeper Legplates", "item": 14554, "absent": true, "why": "the Silithus colossi are not in a dungeon that is open"}
  ]
 }

@@ -167,6 +167,38 @@ def parse_tooltip(t):
 
     for m in re.finditer(r'<span class="q2">Equip:(.*?)</span>', t, re.S):
         raw = m.group(1)
+        # Forever prints "by 1%". The rtg comment is the old rating (14 = 1%
+        # crit, 10 = 1% hit, 12 = 1% dodge). The percent is the stored stat.
+        visible = plain(raw)
+        percent_key = None
+        percent_value = None
+        for key, rx in (
+            ("hit", re.compile(r"improves your chance to hit(?: with ranged weapons)? by ([\d.]+)%", re.I)),
+            ("crit", re.compile(r"improves your chance to get a critical strike(?: with [a-z ,]+)? by ([\d.]+)%", re.I)),
+            ("dodge", re.compile(r"increases your chance to dodge an attack by ([\d.]+)%", re.I)),
+            ("parry", re.compile(r"increases your chance to parry an attack by ([\d.]+)%", re.I)),
+            ("haste", re.compile(r"increases your attack speed and casting speed by ([\d.]+)%", re.I)),
+            ("blockRating", re.compile(r"increases your chance to block attacks with a shield by ([\d.]+)%", re.I)),
+            ("expertise", re.compile(r"reduces chance to be dodged or parried by ([\d.]+)%", re.I)),
+        ):
+            mm = rx.search(visible)
+            if mm:
+                percent_key = key
+                percent_value = float(mm.group(1))
+                break
+        if percent_key:
+            for sid, val in re.findall(r"<!--rtg(\d+)-->(\d+)", raw):
+                k = MOD.get(int(sid))
+                if not k:
+                    continue
+                left = (o["stats"].get(k) or 0) - int(val)
+                if left > 0:
+                    o["stats"][k] = left
+                else:
+                    o["stats"].pop(k, None)
+            pct = percent_value
+            o["stats"][percent_key] = int(pct) if abs(pct - round(pct)) < 1e-6 else pct
+            continue
         if "<!--rtg" in raw:
             # rtg41 already counted the number as healing. rtg45 counted it
             # as spell power. The sentence is both. A split line (rtg41 and

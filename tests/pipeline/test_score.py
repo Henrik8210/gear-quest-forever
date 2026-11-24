@@ -197,5 +197,59 @@ class LaterBandsAndFactionZones(unittest.TestCase):
         self.assertIn("6898", text)
 
 
+class EquipPercent(unittest.TestCase):
+    def test_a_percent_line_is_that_percent(self):
+        item = {
+            "stats": {"armor": 92, "int": 13, "heal": 27, "damageDone": 27},
+            "effects": ["Equip: Improves your chance to hit by 2.0%."],
+        }
+        out = score._level60_stats(item, 60)
+        self.assertEqual(out["hit"], 2)
+
+    def test_old_rating_scale_is_replaced_by_the_line(self):
+        one = score._level60_stats(
+            {"stats": {"crit": 14}, "effects": ["Equip: Improves your chance to get a critical strike by 1.0%."]},
+            22,
+        )
+        self.assertEqual(one["crit"], 1)
+        two = score._level60_stats(
+            {
+                "stats": {"crit": 28},
+                "effects": ["Equip: Improves your chance to get a Critical Strike with Melee and Ranged attacks by 1.0%."],
+            },
+            60,
+        )
+        self.assertEqual(two["crit"], 1)
+
+    def test_spell_crit_percent_replaces_the_folded_rating(self):
+        out = score._level60_stats(
+            {
+                "stats": {"spellCrit": 28},
+                "effects": ["Equip: Improves your chance to get a Critical Strike with Spells by 1.0%."],
+            },
+            60,
+        )
+        self.assertEqual(out["crit"], 1)
+
+    def test_haste_percent_and_a_rating_number_becomes_the_percent(self):
+        haste = score._level60_stats(
+            {"stats": {}, "effects": ["Equip: Increases your attack speed and casting speed by 2%."]},
+            40,
+        )
+        self.assertEqual(haste["haste"], 2)
+        kept = score._level60_stats(
+            {"stats": {"hit": 16}, "effects": ["Equip: Improves your chance to hit by 1.0%."]},
+            60,
+        )
+        self.assertEqual(kept["hit"], 1)
+
+    def test_a_spell_specific_crit_is_not_generic_crit(self):
+        out = score._level60_stats(
+            {"stats": {}, "effects": ["Equip: Increases the critical strike chance of your Flash of Light by 2%."]},
+            60,
+        )
+        self.assertFalse(out.get("crit"))
+
+
 if __name__ == "__main__":
     unittest.main()

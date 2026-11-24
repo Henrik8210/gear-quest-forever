@@ -1,0 +1,1 @@
+# Item ids whose live Forever tooltip still says "rating". Empty unless Wowhead does.

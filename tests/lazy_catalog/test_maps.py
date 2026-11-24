@@ -12,9 +12,10 @@ source.lua.execute('''
         local out={}
         for _,item in ipairs(ITEMS)do
             local row=G.Data.coordinates[item]
+            local openWorld=G.Data.PinIgnoresFactionZone and G.Data:PinIgnoresFactionZone(row)
             for _,side in ipairs({'Alliance','Horde'})do
                 local allowed=not row or not row.spots or #row.spots==0
-                for _,spot in ipairs(row and row.spots or {})do allowed=allowed or G.Data:SpotVisible(spot,side)end
+                for _,spot in ipairs(row and row.spots or {})do allowed=allowed or G.Data:SpotVisible(spot,side,openWorld)end
                 out[#out+1]=tostring(allowed)
             end
         end

@@ -2657,6 +2657,19 @@ GQ.Log.BOSS_DUNGEON = {
     ["Nar'gurk"] = "Krol'dok Stronghold",
     ["Bossman Toof"] = "Krol'dok Stronghold",
     ["Overlord Mugg"] = "Krol'dok Stronghold",
+    ["Antu'sul"] = "Zul'Farrak",
+    ["Ruuzlu"] = "Zul'Farrak",
+    ["Sergeant Bly"] = "Zul'Farrak",
+    ["Urok Doomhowl"] = "Blackrock Spire",
+    ["Death Knight Darkreaver"] = "Scholomance",
+    ["Isalien"] = "Dire Maul",
+    ["Mor Grayhoof"] = "Dire Maul",
+    ["Grand Crusader Dathrohan"] = "Stratholme",
+    ["Magistrate Barthilas"] = "Stratholme",
+    ["The Great Fras Siabi"] = "Stratholme",
+    ["Plaguemaw the Rotting"] = "Razorfen Downs",
+    ["Amnennar the Coldbringer"] = "Razorfen Downs",
+    ["Glutton"] = "Razorfen Downs",
 }
 
 -- Vendor flyout. Checked means show. Ordinary is a purchase with no faction
@@ -3201,6 +3214,15 @@ function GQ.Log:NoCraftedBoPEnabled()
     return ui and ui.playNoCraftedBoP and true or false
 end
 
+function GQ.Log:OnlyGuideGearEnabled()
+    local level = GQ.GetEffectiveLevel and GQ:GetEffectiveLevel() or 1
+    if level < 60 then
+        return false
+    end
+    local ui = GearQuestForeverDB and GearQuestForeverDB.ui
+    return ui and ui.playOnlyGuideGear and true or false
+end
+
 -- Both styles read the character's professions, so a skill-up or a new
 -- profession has to rebuild the list.
 function GQ.Log:PlayStyleWatchesProfessions()
@@ -3240,7 +3262,7 @@ function GQ.Log:PlayStyleActive()
     return self:NoDungeonsEnabled() or self:DungeonEnjoyerEnabled() or self:GetItTodayEnabled()
         or self:ManageableDungeonsEnabled() or self:BuyItEnabled() or self:ManageableQuestsEnabled()
         or self:FocusZoneEnabled() or self:TheirCitiesEnabled() or self:NoZephrasEnabled()
-        or self:NoCraftedBoPEnabled()
+        or self:NoCraftedBoPEnabled() or self:OnlyGuideGearEnabled()
 end
 
 function GQ.Log:PlayerZoneName()
@@ -7030,6 +7052,12 @@ function GQ.Log:MeasureDetailContentHeight()
     if self.frame.detailBodyTail and self.frame.detailBodyTail:IsShown() then
         height = height + (self.frame.detailBodyTail:GetStringHeight() or 0) + 8
     end
+    if self.frame.detailMats and self.frame.detailMats:IsShown() then
+        height = height + (self.frame.detailMats:GetHeight() or 18) + 6
+    end
+    if self.frame.detailMatsTail and self.frame.detailMatsTail:IsShown() then
+        height = height + (self.frame.detailMatsTail:GetStringHeight() or 0) + 8
+    end
     if self.frame.detailCoords and self.frame.detailCoords:IsShown() then
         height = height + (self.frame.detailCoords:GetStringHeight() or 0) + 16
     end
@@ -9752,6 +9780,18 @@ function GQ.Log:EnsurePlayStyle(frame)
             end
         end
     )
+    panel.onlyGuideGearCard = makeCard(
+        L["Only Guide Gear!"],
+        art .. "GQ-Play-OnlyGuideGear.png",
+        intro, 0, -32,
+        L["At level 60, the hunts and the rank list for a slot are the Wowhead Forever guide, in the guide's order. Score does not reorder them. A slot with nothing on that guide keeps the scored list. Below 60 this does nothing."],
+        function()
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if log then
+                log:SetOnlyGuideGear(not log:OnlyGuideGearEnabled())
+            end
+        end
+    )
     panel.noCraftedBoPCard = makeCard(
         L["No crafted BoP!"],
         art .. "GQ-Play-NoCraftedBoP.png",
@@ -9773,7 +9813,7 @@ function GQ.Log:EnsurePlayStyle(frame)
             panel.focusZoneCard, panel.theirCitiesCard, panel.noZephrasCard,
         },
         {
-            panel.noCraftedBoPCard,
+            panel.noCraftedBoPCard, panel.onlyGuideGearCard,
         },
     }
 
@@ -9802,6 +9842,7 @@ function GQ.Log:EnsurePlayStyle(frame)
         pageBtn:SetScript("OnClick", function()
             local log = _G.GearQuest and _G.GearQuest.Log
             if log then
+                GameTooltip:Hide()
                 log:ShowPlayStylePage((panel.cardPage or 1) + step)
             end
         end)
@@ -9826,19 +9867,53 @@ function GQ.Log:EnsurePlayStyle(frame)
 end
 
 -- The arrows wrap, so the gamepad never lands on a disabled button.
+-- At level 60, Only Guide Gear is the first card. Below 60 it stays off the pages.
 function GQ.Log:ShowPlayStylePage(page)
     local panel = self.frame and self.frame.playStylePanel
-    local pages = panel and panel.cardPages
-    if not pages then
+    if not panel or not panel.intro then
         return
     end
+    local cards = {
+        panel.noDungeonsCard, panel.dungeonEnjoyerCard, panel.getItTodayCard,
+        panel.manageableDungeonsCard, panel.manageableCard, panel.buyItCard,
+        panel.focusZoneCard, panel.theirCitiesCard, panel.noZephrasCard,
+        panel.noCraftedBoPCard,
+    }
+    local guideCard = panel.onlyGuideGearCard
+    if guideCard and (GQ:GetEffectiveLevel() or 1) >= 60 then
+        table.insert(cards, 1, guideCard)
+    elseif guideCard then
+        guideCard:Hide()
+        if guideCard.title then
+            guideCard.title:Hide()
+        end
+    end
+    local pages = {}
+    local bucket
+    for i = 1, #cards do
+        if (i - 1) % 9 == 0 then
+            bucket = {}
+            pages[#pages + 1] = bucket
+        end
+        bucket[#bucket + 1] = cards[i]
+        local slot = (i - 1) % 9
+        local col = slot % 3
+        local row = math.floor(slot / 3)
+        local card = cards[i]
+        card:ClearAllPoints()
+        card:SetPoint("TOP", panel.intro, "BOTTOM", (col - 1) * 190, -32 - row * 124)
+    end
+    panel.cardPages = pages
     local count = #pages
+    if count < 1 then
+        return
+    end
     page = ((math.floor(tonumber(page) or 1) - 1) % count) + 1
     panel.cardPage = page
     for i = 1, count do
-        local cards = pages[i]
-        for j = 1, #cards do
-            local card = cards[j]
+        local shown = pages[i]
+        for j = 1, #shown do
+            local card = shown[j]
             card:SetShown(i == page)
             if card.title then
                 card.title:SetShown(i == page)
@@ -9848,7 +9923,6 @@ function GQ.Log:ShowPlayStylePage(page)
     if panel.pageText then
         panel.pageText:SetText(string.format(L["Page %d / %d"], page, count))
     end
-    GameTooltip:Hide()
 end
 
 function GQ.Log:StartPlayStyleIntro(btn)
@@ -10039,6 +10113,14 @@ function GQ.Log:SetNoZephras(enabled)
     self:SetPlayStyleFlag("playNoZephras", enabled)
 end
 
+function GQ.Log:SetOnlyGuideGear(enabled)
+    if GQ.Data and GQ.Data.ClearTopUpgradeCache then
+        GQ.Data:ClearTopUpgradeCache()
+    end
+    self._slotRankCache = nil
+    self:SetPlayStyleFlag("playOnlyGuideGear", enabled)
+end
+
 function GQ.Log:SetNoCraftedBoP(enabled)
     self._profSnapshot = nil
     self:SetPlayStyleFlag("playNoCraftedBoP", enabled)
@@ -10085,6 +10167,9 @@ end
 
 function GQ.Log:RefreshPlayStylePanel()
     local panel = self.frame and self.frame.playStylePanel
+    if panel and panel.cardPage then
+        self:ShowPlayStylePage(panel.cardPage)
+    end
     local card = panel and panel.noDungeonsCard
     if card then
         self:SetSimulatorChoiceHighlight(card, self:NoDungeonsEnabled(), 0.35)
@@ -10124,6 +10209,10 @@ function GQ.Log:RefreshPlayStylePanel()
     local craftedBoP = panel and panel.noCraftedBoPCard
     if craftedBoP then
         self:SetSimulatorChoiceHighlight(craftedBoP, self:NoCraftedBoPEnabled(), 0.35)
+    end
+    local guideGear = panel and panel.onlyGuideGearCard
+    if guideGear then
+        self:SetSimulatorChoiceHighlight(guideGear, self:OnlyGuideGearEnabled(), 0.35)
     end
     self:UpdatePlayStyleButton()
 end
@@ -15000,7 +15089,7 @@ function GQ.Log:EnsureSettingsPage(frame)
     donationNames:SetPoint("RIGHT", donationChild, "RIGHT", -8, 0)
     donationNames:SetJustifyH("LEFT")
     donationNames:SetWordWrap(true)
-    donationNames:SetText("Rodeaschmi\nHugefan\nFucnred\nKamujin\nTony\nKestyn\nBonnie\nHendrik\nKrazedKlow\nGabriyel")
+    donationNames:SetText("Rodeaschmi\nHugefan\nFucnred\nKamujin\nGuiggiani\nTony\nKestyn\nBonnie\nHendrik\nKrazedKlow\nGabriyel")
     donationNames:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
     donationNames:Hide()
     frame.settingsDonationNames = donationNames
@@ -16922,6 +17011,12 @@ function GQ.Log:SetDetailEmpty(empty)
         if self.frame.detailBodyTail then
             self.frame.detailBodyTail:Hide()
         end
+        if self.frame.detailMats then
+            self.frame.detailMats:Hide()
+        end
+        if self.frame.detailMatsTail then
+            self.frame.detailMatsTail:Hide()
+        end
         if self.frame.detailCoords then
             self.frame.detailCoords:Hide()
         end
@@ -17416,6 +17511,9 @@ end
 function GQ.Log:HuntListRank(entry, slotName, handKind)
     if not entry then
         return nil
+    end
+    if self:OnlyGuideGearEnabled() and entry.guidePlace then
+        return entry.guidePlace
     end
     local dataSlot = slotName == "WeaponPair" and "MainHand" or slotName
     if dataSlot == "MainHand" and self:IsWeaponHandKind(handKind) then
@@ -17993,6 +18091,11 @@ function GQ.Log:BuildDetailLines(entry)
     local skillLine = self:ProfessionSkillLine(craftProf, craftSkill)
     if skillLine then
         table.insert(lines, "\n" .. skillLine)
+        local cost = GQ.Orders and GQ.Orders.ShownCraftCost and GQ.Orders:ShownCraftCost(entry.itemId)
+        if cost then
+            lines.matsAt = #lines + 1
+            lines.matsCost = cost
+        end
     end
 
     local src = GQ.NormalizeSourceType and GQ:NormalizeSourceType(entry.sourceType or "") or (entry.sourceType or "")
@@ -18659,6 +18762,7 @@ function GQ.Log:GetSlotRankList(slotName, handKind)
         self._slotRankCache = {}
     end
     local cacheKey = tostring(slotName) .. ":" .. tostring(handKind)
+        .. (self:OnlyGuideGearEnabled() and ":guide" or "")
     local cached = self._slotRankCache and self._slotRankCache[cacheKey]
     if cached then
         return cached
@@ -18713,24 +18817,36 @@ function GQ.Log:GetSlotRankList(slotName, handKind)
         collect()
     end
     pool = GQ.Data:DeduplicateEntriesByItem(pool)
-    -- A Forever guide list at 60 is the whole hunt for that slot. A scored
-    -- piece must not sit on the same list. A slot with no guide row keeps
-    -- the scored list.
-    local guided = false
-    for i = 1, #pool do
-        if pool[i].origin == "guide" then
-            guided = true
-            break
-        end
-    end
-    if guided then
-        local only = {}
+    -- Only Guide Gear, at 60, shows the Wowhead page in page order. The
+    -- score rank stays on the row. A slot with no guide piece keeps the
+    -- scored list. Below 60 the saved check hides nothing.
+    if self:OnlyGuideGearEnabled() then
+        local guided = false
         for i = 1, #pool do
-            if pool[i].origin == "guide" then
-                only[#only + 1] = pool[i]
+            if pool[i].guidePlace then
+                guided = true
+                break
             end
         end
-        pool = only
+        if guided then
+            local only = {}
+            for i = 1, #pool do
+                if pool[i].guidePlace then
+                    only[#only + 1] = pool[i]
+                end
+            end
+            table.sort(only, function(a, b)
+                local placeA = a.guidePlace or 99
+                local placeB = b.guidePlace or 99
+                if placeA ~= placeB then
+                    return placeA < placeB
+                end
+                return (a.itemId or 0) < (b.itemId or 0)
+            end)
+            pool = only
+            self._slotRankCache[cacheKey] = pool
+            return pool
+        end
     end
     local scores = self:WeaponCompareScoreMap(pool)
     table.sort(pool, function(a, b)
@@ -19090,14 +19206,24 @@ function GQ.Log:ShowSlotRankTooltip(row)
             local r, g, b = GetListItemQualityColor(entry.itemId)
             local color = string.format("|cff%02x%02x%02x", math.floor(r * 255 + 0.5), math.floor(g * 255 + 0.5), math.floor(b * 255 + 0.5))
             local place = i
-            if weaponList and self.WeaponTrueRank then
+            if self:OnlyGuideGearEnabled() and entry.guidePlace then
+                place = entry.guidePlace
+            elseif weaponList and self.WeaponTrueRank then
                 place = self:WeaponTrueRank(entry) or i
             end
             local equipped = ""
             if self:EntryIsEquippedInSlots(entry, equipSlots) then
                 equipped = "  |cffffd100" .. L["Equipped"] .. "|r"
             end
-            add(string.format("|cffffd100#%d|r %s%s|r%s%s", place, color, name, equipped, scoreTrail(entry)))
+            local guide = ""
+            if entry.guidePlace then
+                if self:OnlyGuideGearEnabled() then
+                    guide = "  " .. L["|cff88ccff(Guide)|r"]
+                else
+                    guide = "  " .. string.format(L["|cff88ccff(Guide #%s)|r"], entry.guidePlace)
+                end
+            end
+            add(string.format("|cffffd100#%d|r %s%s|r%s%s%s", place, color, name, equipped, guide, scoreTrail(entry)))
         end
     end
 
@@ -19643,6 +19769,75 @@ function GQ.Log:LayoutDetailRecipe(recipe, tailBody)
     end
 end
 
+function GQ.Log:LayoutDetailMats(cost, restBody)
+    local frame = self.frame
+    if not frame or not frame.detailBody then
+        return
+    end
+    if GQ.Orders and GQ.Orders.WatchAuctionator then
+        GQ.Orders:WatchAuctionator()
+    end
+    local button = frame.detailMats
+    if cost and not button then
+        button = CreateFrame("Button", nil, frame.detailChild)
+        button.text = CreateFontStringWithFallback(button, QUEST_DETAIL_BODY_FONTS)
+        button.text:SetPoint("TOPLEFT", button, "TOPLEFT", 0, 0)
+        button.text:SetPoint("RIGHT", button, "RIGHT", 0, 0)
+        button.text:SetJustifyH("LEFT")
+        button.text:SetWordWrap(true)
+        button.text:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
+        button:SetScript("OnEnter", function(self)
+            if GQ.Orders and GQ.Orders.ShowPriceTip then
+                GQ.Orders:ShowPriceTip(self, true)
+            end
+        end)
+        button:SetScript("OnLeave", function()
+            GameTooltip:Hide()
+        end)
+        frame.detailMats = button
+    end
+    local restFs = frame.detailMatsTail
+    if cost and not restFs then
+        restFs = CreateFontStringWithFallback(frame.detailChild, QUEST_DETAIL_BODY_FONTS)
+        restFs:SetJustifyH("LEFT")
+        restFs:SetWordWrap(true)
+        restFs:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
+        frame.detailMatsTail = restFs
+    end
+    if not cost then
+        if button then
+            button.cost = nil
+            button:Hide()
+        end
+        if restFs then
+            restFs:SetText("")
+            restFs:Hide()
+        end
+        return
+    end
+    local anchor = frame.detailBodyEnd or frame.detailBody
+    local coins = GQ.Orders and GQ.Orders.CoinText and GQ.Orders:CoinText(cost.total) or ""
+    button.cost = cost
+    button:ClearAllPoints()
+    button:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 0, -6)
+    button:SetPoint("RIGHT", frame.detailChild, "RIGHT", -8, 0)
+    button.text:SetText(string.format(L["Materials cost: %s"], coins))
+    button:SetHeight(math.max(18, button.text:GetStringHeight() or 18))
+    button:Show()
+    frame.detailBodyEnd = button
+    if restBody and restBody ~= "" and restFs then
+        restFs:ClearAllPoints()
+        restFs:SetPoint("TOPLEFT", button, "BOTTOMLEFT", 0, -8)
+        restFs:SetPoint("RIGHT", frame.detailChild, "RIGHT", -8, 0)
+        restFs:SetText(restBody)
+        restFs:Show()
+        frame.detailBodyEnd = restFs
+    elseif restFs then
+        restFs:SetText("")
+        restFs:Hide()
+    end
+end
+
 function GQ.Log:LayoutDetailCoords(entry, completedLine)
     local frame = self.frame
     if not frame or not frame.detailCoords or not frame.detailBody then
@@ -19909,30 +20104,42 @@ function GQ.Log:ApplyEntryDetail(entry)
         lines[1] = GQ.TL(lines[1])
     end
     -- The recipe row sits between the text before the craft skill line and
-    -- the text from that line on.
+    -- the text from that line on. The material cost sits under that skill line.
+    local function joinLines(list, first, last)
+        if not first or not last or last < first then
+            return ""
+        end
+        local parts = {}
+        for i = first, last do
+            parts[#parts + 1] = list[i]
+        end
+        local text = table.concat(parts, "\n"):gsub("^\n+", "")
+        if GQ.Data and GQ.Data.SanitizeText then
+            text = GQ.Data:SanitizeText(text) or text
+        end
+        return text
+    end
     local recipeAt = lines.recipeAt
-    local head, tail = lines, nil
+    local matsAt = lines.matsAt
+    local last = #lines
+    local bodyEnd = last
     if recipeAt then
-        head, tail = {}, {}
-        for i = 1, #lines do
-            if i < recipeAt then
-                head[#head + 1] = lines[i]
-            else
-                tail[#tail + 1] = lines[i]
-            end
-        end
-        if tail[1] then
-            tail[1] = tail[1]:gsub("^\n+", "")
-        end
+        bodyEnd = recipeAt - 1
+    elseif matsAt then
+        bodyEnd = matsAt - 1
     end
-    local body = table.concat(head, "\n"):gsub("^\n+", "")
-    local tailBody = tail and table.concat(tail, "\n") or ""
-    if GQ.Data and GQ.Data.SanitizeText then
-        body = GQ.Data:SanitizeText(body) or body
-        tailBody = GQ.Data:SanitizeText(tailBody) or tailBody
+    local mid, rest = "", ""
+    if recipeAt and matsAt then
+        mid = joinLines(lines, recipeAt, matsAt - 1)
+        rest = joinLines(lines, matsAt, last)
+    elseif recipeAt then
+        mid = joinLines(lines, recipeAt, last)
+    elseif matsAt then
+        rest = joinLines(lines, matsAt, last)
     end
-    self.frame.detailBody:SetText(body)
-    self:LayoutDetailRecipe(recipeAt and entry.itemId and GQ.CraftRecipes[entry.itemId], tailBody)
+    self.frame.detailBody:SetText(joinLines(lines, 1, bodyEnd))
+    self:LayoutDetailRecipe(recipeAt and entry.itemId and GQ.CraftRecipes[entry.itemId], mid)
+    self:LayoutDetailMats(lines.matsCost, rest)
 
     self:UpdateDetailReward(entry)
     self:LayoutDetailCoords(entry, completedLine)

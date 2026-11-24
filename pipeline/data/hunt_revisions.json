@@ -52,6 +52,50 @@
         "npc": "Ferra",
         "zone": "Dire Maul"
       }
+    },
+    "6898": {
+      "name": "Orb of Soran'ruk",
+      "reportedBy": "cope7736",
+      "date": "2026-11-24",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "The quest is both factions. It starts with Doan Karhan in the Barrens.",
+      "kept": "Both factions. The pin is Doan Karhan. Alliance still sees it. The Barrens is not a reason to hide a both-faction quest.",
+      "lock": {}
+    },
+    "15109": {
+      "name": "Staff of Soran'ruk",
+      "reportedBy": "cope7736",
+      "date": "2026-11-24",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "The quest is both factions. It starts with Doan Karhan in the Barrens.",
+      "kept": "Both factions. The pin is Doan Karhan. Alliance still sees it. The Barrens is not a reason to hide a both-faction quest.",
+      "lock": {}
+    },
+    "279878": {
+      "name": "Apprentice Sorcerer's Slacks",
+      "reportedBy": "doctorzee",
+      "date": "2026-11-24",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "The Web of Magic series box is empty.",
+      "kept": "Alliance. The chain is The Second Rebellion, Bad Medicine, Kurzen's Mystery, Troll Witchery, An Acquaintance in Southshore, Magics of the Drowned City, then The Web of Magic. The pin is Sergeant Yohwa at the Rebel Camp in Stranglethorn Vale. Do not write the chain back to 1.",
+      "lock": {
+        "questFaction": "Alliance"
+      }
+    },
+    "279879": {
+      "name": "Rune-Etched Epaulets",
+      "reportedBy": "doctorzee",
+      "date": "2026-11-24",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "The Web of Magic series box is empty.",
+      "kept": "Alliance. The chain is The Second Rebellion, Bad Medicine, Kurzen's Mystery, Troll Witchery, An Acquaintance in Southshore, Magics of the Drowned City, then The Web of Magic. The pin is Sergeant Yohwa at the Rebel Camp in Stranglethorn Vale. Do not write the chain back to 1.",
+      "lock": {
+        "questFaction": "Alliance"
+      }
     }
   }
 }

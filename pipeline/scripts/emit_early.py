@@ -6,9 +6,9 @@ import json, os
 from gq_paths import G, OUT, forever_missing_ids
 FOREVER_MISSING = forever_missing_ids()
 CLS=os.environ.get("GQ_CLASS","PALADIN"); LC=CLS.lower()
-gen=json.load(open(os.path.join(OUT, os.environ.get("GQ_OUT","paladin.json")))); items=json.load(open(G+"items.json"))
-srcs=json.load(open(G+"sources.json"))
-LORE=json.load(open(G+"lore.json"))
+gen=json.load(open(os.path.join(OUT, os.environ.get("GQ_OUT","paladin.json")), encoding="utf-8")); items=json.load(open(G+"items.json", encoding="utf-8"))
+srcs=json.load(open(G+"sources.json", encoding="utf-8"))
+LORE=json.load(open(G+"lore.json", encoding="utf-8"))
 
 def lua(v):
     if v is None: return "nil"
@@ -103,7 +103,7 @@ for iid in sorted(used):
 
 TAG = FACTIONS[0] if len(FACTIONS)==1 else "Early"
 out=os.path.join(OUT,"Data.%s.%s.1to9.generated.lua"%(CLS.title(),TAG))
-open(out,"w").write("""local GQ = _G.GearQuest
+open(out,"w", encoding="utf-8", newline="\n").write("""local GQ = _G.GearQuest
 if not GQ then
     error("GearQuest Forever class data loaded without the main addon")
 end

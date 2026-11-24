@@ -13,8 +13,7 @@ Structure
 - Every row's item has a facts row with a name and a known source type.
 Order
 - Outside MainHand and SecondaryHand, a higher rank never has a lower score,
-  except a set piece, which may lead for its set bonus, and a level-60
-  Wowhead Forever list (origin="guide"), which keeps the page's order. The weapon slots rank
+  except a set piece, which may lead for its set bonus. The weapon slots rank
   a one-hander with its off-hand partner, so their order is not the stored
   score.
 Banned
@@ -39,10 +38,11 @@ Known answers
   "knownIssue" is reported and does not fail; it fails once it passes, so the
   note gets removed.
 Level 60 guides
-- A slot listed on a spec's Wowhead Forever page is only those items at level
-  60, in that page's order, each marked origin="guide", once any of them is on
-  that faction's list. A faction with none of the page's pieces for that slot,
-  a slot the page leaves empty, and a spec with no page, stay on the scorer.
+- The level-60 band stays the scored list. A Wowhead Forever page piece on
+  that list is marked origin="guide" and guidePlace is its page number,
+  starting at 1. Scored pieces that are not on the page stay on the list.
+  A faction with none of the page's pieces, a slot the page leaves empty,
+  and a spec with no page, stay on the scorer with no guide mark.
 
 Usage: python scripts/ci/check_gear.py
 """
@@ -81,7 +81,7 @@ function(t)
     local out = {}
     for i = 1, #t do
         local r = t[i]
-        out[i] = { r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8] or 0, r.origin or false }
+        out[i] = { r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8] or 0, r.origin or false, r.guidePlace or false }
     end
     return out
 end
@@ -164,10 +164,7 @@ def check_structure(cat: Catalog, fail) -> None:
             ranks = sorted(r[4] for r in group)
             if ranks != list(range(1, len(ranks) + 1)):
                 fail(f"{cls} {spec} {faction} {slot} {lo}-{hi}: ranks {ranks[:15]} do not close up")
-            # A Wowhead Forever list keeps the page's order. Rank 1 can score
-            # below a later option. The model still has to rank by score.
-            guided = any(len(r) > 8 and r[8] == "guide" for r in group)
-            if slot in WEAPON_PAIR_SLOTS or guided:
+            if slot in WEAPON_PAIR_SLOTS:
                 continue
             ordered = sorted(group, key=lambda r: r[4])
             for a, b in zip(ordered, ordered[1:]):
@@ -318,7 +315,7 @@ def check_expectations(cat: Catalog, fail, warn) -> None:
 
 
 def check_forever_guides(cat: Catalog, fail) -> None:
-    """A listed Forever slot at level 60 is that page's items, in that order."""
+    """A Forever page piece on a level-60 band carries its page place."""
     pages = json.loads((REPO / "pipeline" / "guides" / "forever_bis.json").read_text(encoding="utf-8"))
     for cls in CLASSES:
         specs = pages.get(cls.upper()) or {}
@@ -335,26 +332,22 @@ def check_forever_guides(cat: Catalog, fail) -> None:
                         if row[5] == spec and row[1] == slot and row[6] == faction
                         and row[2] <= 60 <= row[3]
                     ]
-                    # No guide piece is legal for this faction. The scored list stays.
-                    if not covering or not any(row[8] == "guide" for row in covering):
+                    if not covering:
                         continue
                     for row in covering:
                         item = int(row[0])
-                        if item not in order or row[8] != "guide":
-                            name = (cat.item[cls].get(item) or (str(item),))[0]
-                            fail(f"{cls} {spec} {faction} {slot} level 60 lists {name} ({item}), "
-                                 f"which is not on the Forever guide")
-                    band = sorted((row for row in covering if row[2] == 60 and row[3] == 60),
-                                  key=lambda row: row[4])
-                    previous = -1
-                    for row in band:
-                        place = order.get(int(row[0]))
-                        if place is None:
+                        origin = row[8] if len(row) > 8 else False
+                        place = row[9] if len(row) > 9 else False
+                        page_place = order.get(item)
+                        name = (cat.item[cls].get(item) or (str(item),))[0]
+                        if page_place is None:
+                            if origin == "guide":
+                                fail(f"{cls} {spec} {faction} {slot} marks {name} ({item}) as guide, "
+                                     f"and it is not on the Forever page")
                             continue
-                        if place < previous:
-                            fail(f"{cls} {spec} {faction} {slot} level 60 has item {int(row[0])} "
-                                 f"ahead of the guide order")
-                        previous = place
+                        if origin != "guide" or place != page_place + 1:
+                            fail(f"{cls} {spec} {faction} {slot} {name} ({item}) is page "
+                                 f"#{page_place + 1}, stored origin {origin!r} place {place!r}")
 
 
 def report(exp: dict, problems: list[str], fail, warn) -> None:

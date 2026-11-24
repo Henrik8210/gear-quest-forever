@@ -43,8 +43,9 @@ function Data:CoordinateAllowsFaction(itemId, faction)
     if not row or not row.spots or #row.spots == 0 then
         return true
     end
+    local openWorld = self.PinIgnoresFactionZone and self:PinIgnoresFactionZone(row)
     for _, spot in ipairs(row.spots) do
-        if self:SpotVisible(spot, faction) then
+        if self:SpotVisible(spot, faction, openWorld) then
             return true
         end
     end

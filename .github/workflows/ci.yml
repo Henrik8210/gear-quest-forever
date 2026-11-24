@@ -65,11 +65,17 @@ jobs:
       - name: Gear lists
         run: python scripts/ci/check_gear.py
 
+      - name: Ranking export matches the addon
+        run: python scripts/ci/check_export_json.py
+
       - name: Scoring vs tooltip weights
         run: python scripts/ci/check_scoring_weights_parity.py
 
       - name: No level multipliers
         run: python scripts/ci/check_no_leveling_multipliers.py
+
+      - name: No rating lines
+        run: python scripts/ci/check_no_rating_lines.py
 
       - name: Recommended enchants
         run: python scripts/ci/check_enchants.py

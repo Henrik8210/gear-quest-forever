@@ -7,6 +7,11 @@ in `openRaids` are in the game. `pipeline/data/forever_absent.json` lists:
   one of these (by zone, or by a boss in `dungeon_entrances.json`
   bossNpcs) gets obtainable false. A world drop keeps its row, because a
   misfiled zone on an outdoor mob (Onyx Shredder Plate) is not a raid.
+- worldBosses and absentBosses: a boss drop or rare from one of these
+  names is the Boss drop flyout's Other bucket. That boss is not in a
+  dungeon or raid that is in the game yet.
+- knownBossDungeons: a boss drop with no zone is filed under that dungeon
+  and stays. Antu'sul is Zul'Farrak, not Other.
 - absentFactions: a reputation requirement on one of these does the same.
 - items: single ids with the reason (a quest Forever does not offer, a
   plan that only drops in those raids, a test item).
@@ -54,11 +59,18 @@ def main() -> None:
     absent = set(cfg["absentRaids"])
     factions = set(cfg["absentFactions"])
     single = cfg["items"]
+    outdoors = set(cfg.get("worldBosses") or []) | set(cfg.get("absentBosses") or [])
+    known = cfg.get("knownBossDungeons") or {}
 
     excluded = restored = 0
     for key, src in sources.items():
         if not isinstance(src, dict):
             continue
+        if src.get("sourceType") == "boss_drop" and not (src.get("zone") or ""):
+            npc = src.get("npc") or ""
+            if npc in known:
+                src["zone"] = known[npc]
+        names = [src.get("npc")] + [a.get("npc") for a in src.get("alts") or [] if isinstance(a, dict)]
         reason_key = reason = None
         if key in single:
             reason_key, reason = "item", single[key]
@@ -66,6 +78,10 @@ def main() -> None:
             raid = raid_of(src, absent, boss)
             if raid:
                 reason_key, reason = raid, f"{raid} is not in WoW: Forever yet."
+        if not reason_key and src.get("sourceType") in {"boss_drop", "rare_npc"}:
+            hit = next((npc for npc in names if npc and npc in outdoors), None)
+            if hit:
+                reason_key, reason = hit, f"{hit} is not in a dungeon or raid that is in the game yet."
         if not reason_key:
             reps = (items.get(key) or {}).get("reqRep") or []
             hit = next((r[0] for r in reps if r and r[0] in factions), None)
