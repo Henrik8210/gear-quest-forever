@@ -1231,6 +1231,9 @@ function GQ.Custom:Finish(job)
     if GQ.Data.InvalidateQueryCache then
         GQ.Data:InvalidateQueryCache()
     end
+    if GQ.Log and GQ.Log.InvalidateActiveListCaches then
+        GQ.Log:InvalidateActiveListCaches()
+    end
     return true
 end
 
