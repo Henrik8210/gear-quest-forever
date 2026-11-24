@@ -4,8 +4,6 @@
 local _, GQ = ...
 GQ.Data = GQ.Data or {}
 
-GQ.Data.questChain[272186] = { {93594, "Word of the Woods"}, {93404, "Rot and Regret"} }
-GQ.Data.questChain[272187] = { {93594, "Word of the Woods"}, {93404, "Rot and Regret"} }
 
 GQ.Data.vendorCost = {}
 GQ.Data.vendorCost[85] = { copper = 62 }
@@ -709,6 +707,17 @@ GQ.Data.vendorCost[277091] = { copper = 659 }
 GQ.Data.vendorCost[287063] = { copper = 3612, sellers = { ["Frederick Stover"] = 3612, ["Kuna Thunderhorn"] = 3802, ["Landria"] = 3802, ["Railee Thriceforged"] = 3612, ["Rallic Finn"] = 3802 } }
 
 GQ.Data.questChain = {}
+GQ.Data.questChain[270111] = { {7845, "Kidnapped Elder Torntusk!"}, {7846, "Recover the Key!"}, {7847, "Return to Primal Torntusk"} }
+GQ.Data.questChain[9655] = { {2879, "The Stave of Equinex"}, {2942, "The Morrow Stone"} }
+GQ.Data.questChain[9636] = { {2872, "Stoley's Debt"}, {2873, "Stoley's Shipment"}, {2874, "Deliver to MacKinley"} }
+GQ.Data.questChain[9531] = { {2861, "Tabetha's Task"}, {2846, "Tiara of the Deep"} }
+GQ.Data.questChain[7329] = { {1505, "Veteran Uzzek"}, {1498, "Path of Defense"}, {1502, "Thun'grim Firegaze"}, {1503, "Forged Steel"} }
+GQ.Data.questChain[6789] = { {1375, "Khan Shaka"}, {1381, "Khan Hratha"} }
+GQ.Data.questChain[4548] = { {665, "Sunken Treasure"}, {666, "Sunken Treasure"} }
+GQ.Data.questChain[3269] = { {380, "Night Web's Hollow"}, {381, "The Scarlet Crusade"} }
+GQ.Data.questChain[3268] = { {380, "Night Web's Hollow"}, {381, "The Scarlet Crusade"} }
+GQ.Data.questChain[272186] = { {93594, "Word of the Woods"}, {93404, "Rot and Regret"} }
+GQ.Data.questChain[272187] = { {93594, "Word of the Woods"}, {93404, "Rot and Regret"} }
 GQ.Data.questChain[60] = 1
 GQ.Data.questChain[22002] = { Alliance = { {84152, "An Earnest Proposition"}, {84168, "Just Compensation"} }, Horde = { {84159, "An Earnest Proposition"}, {84175, "Just Compensation"} } }
 GQ.Data.questChain[22008] = { Alliance = { {84152, "An Earnest Proposition"}, {84168, "Just Compensation"}, {84184, "Anthion's Parting Words"} }, Horde = { {84159, "An Earnest Proposition"}, {84175, "Just Compensation"}, {84191, "Anthion's Parting Words"} } }
@@ -935,7 +944,7 @@ GQ.Data.questChain[4129] = 1
 GQ.Data.questChain[4131] = 1
 GQ.Data.questChain[4132] = { {581, "Hunt for Yenniku"}, {582, "Headhunting"} }
 GQ.Data.questChain[4133] = { {581, "Hunt for Yenniku"}, {582, "Headhunting"} }
-GQ.Data.questChain[4134] = 1
+GQ.Data.questChain[4134] = { {588, "The Fate of Yenniku"}, {589, "The Singing Crystals"}, {591, "The Mind's Eye"}, {592, "Saving Yenniku"} }
 GQ.Data.questChain[4135] = 1
 GQ.Data.questChain[4136] = 1
 GQ.Data.questChain[4137] = 1
@@ -1513,7 +1522,7 @@ GQ.Data.questChain[15404] = 1
 GQ.Data.questChain[15405] = 1
 GQ.Data.questChain[15406] = 1
 GQ.Data.questChain[15411] = { {5742, "Redemption"}, {5781, "Of Forgotten Memories"}, {5845, "Of Lost Honor"}, {5846, "Of Love and Family"}, {5848, "Of Love and Family"}, {5861, "Find Myranda"}, {5862, "Scarlet Subterfuge"}, {5944, "In Dreams"} }
-GQ.Data.questChain[15413] = 1
+GQ.Data.questChain[15413] = { {5742, "Redemption"}, {5781, "Of Forgotten Memories"}, {5845, "Of Lost Honor"}, {5846, "Of Love and Family"}, {5848, "Of Love and Family"}, {5861, "Find Myranda"}, {5862, "Scarlet Subterfuge"}, {5944, "In Dreams"} }
 GQ.Data.questChain[15418] = { {5742, "Redemption"}, {5781, "Of Forgotten Memories"}, {5845, "Of Lost Honor"}, {5846, "Of Love and Family"}, {5848, "Of Love and Family"}, {5861, "Find Myranda"}, {5862, "Scarlet Subterfuge"}, {5944, "In Dreams"} }
 GQ.Data.questChain[15421] = { {5742, "Redemption"}, {5781, "Of Forgotten Memories"}, {5845, "Of Lost Honor"}, {5846, "Of Love and Family"}, {5848, "Of Love and Family"}, {5861, "Find Myranda"}, {5862, "Scarlet Subterfuge"}, {5944, "In Dreams"} }
 GQ.Data.questChain[15424] = { {5727, "Hidden Enemies"}, {5728, "Hidden Enemies"}, {5729, "Hidden Enemies"}, {5730, "Hidden Enemies"} }

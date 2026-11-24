@@ -349,12 +349,25 @@
         "x": 21.0,
         "y": 27.7
       }
+    ],
+    "Krol'dok Stronghold": [
+      {
+        "map": "Riverglades",
+        "mapId": 2548,
+        "x": 37.5,
+        "y": 37.3
+      }
+    ],
+    "Shaper's Terrace": [
+      {
+        "map": "Un'Goro Crater",
+        "mapId": 1449,
+        "x": 48.1,
+        "y": 6.1
+      }
     ]
   },
-  "describedOnly": {
-    "Krol'dok Stronghold": "northern Riverglades",
-    "Shaper's Terrace": "northern Un'Goro Crater"
-  },
+  "describedOnly": {},
   "bossNpcs": {
     "Nefarian": "Blackwing Lair",
     "Ragnaros": "Molten Core",
@@ -456,6 +469,30 @@
     "Overlord Mugg": "Krol'dok Stronghold",
     "Slavecrusher Grox": "Krol'dok Stronghold",
     "Twilight Commander Zarmok": "Krol'dok Stronghold",
-    "War Handler Ashka": "Krol'dok Stronghold"
+    "War Handler Ashka": "Krol'dok Stronghold",
+    "Titanosaur": "Shaper's Terrace",
+    "Venomridge": "Shaper's Terrace",
+    "Thunderhoof": "Shaper's Terrace",
+    "Direhorn Matriarch": "Shaper's Terrace",
+    "Cinder": "Shaper's Terrace",
+    "Bolt": "Shaper's Terrace",
+    "Snowtalon": "Shaper's Terrace",
+    "Vitrix": "Shaper's Terrace",
+    "Nanaya": "Shaper's Terrace",
+    "Withermaw": "Blackmaw Hold",
+    "Impaan the Imprisoner": "Blackmaw Hold",
+    "Bonesnout the Unbroken": "Blackmaw Hold",
+    "Varrox Bleakhoof": "Blackmaw Hold",
+    "Elder Shaman Bloodmane": "Blackmaw Hold",
+    "Blackmaw Behemoth": "Blackmaw Hold",
+    "Unbound Spirit": "Blackmaw Hold",
+    "Moontouched Wanderer": "Blackmaw Hold",
+    "Gortek the Apprentice": "Blackmaw Hold",
+    "Tunnelweb Matriarch": "Blackmaw Hold",
+    "Overseer Wrex": "Alcaz Prison",
+    "Tidemistress Ca'zass": "Alcaz Prison",
+    "Katerina the Cleaner": "Alcaz Prison",
+    "The Questioner": "Alcaz Prison",
+    "Kroog": "Krol'dok Stronghold"
   }
 }

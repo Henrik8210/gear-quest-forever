@@ -2140,7 +2140,16 @@ Notes by source:
   rewards start at Call of Air: Alliance Ironforge 46.2, 13.0 (94789),
   Horde Orgrimmar 37.4, 37.2 (1531) and Thunder Bluff 24.2, 20.4 (1532).
   Wowhead's Horde series begins at Elemental Aid with Rau Cliffrunner;
-  that giver is the next step. `(beginning of the quest or chain)`
+  that giver is the next step. In Dreams (5944) rewards Mark of Fordring
+  (15411), Ornate Adamantium Breastplate (15413), Shimmering Platinum
+  Warhammer (15418), Shroud of the Exile (15421), and Fordring's Seal
+  (16058). The Forever series starts at Redemption (5742) with Tirion
+  Fordring in Eastern Plaguelands (7.6, 43.6). The escort out of Hearthglen
+  is the last step, not the pin. Demon Dogs, Blood Tinged Skies, and
+  Carrion Grubbage unlock Redemption and are not in that series box, so
+  they stay off the parchment. A second reward of the same last quest uses
+  that series. A reward of an earlier step in a same-named chain stays a
+  one-quest series when that is the step it comes from. `(beginning of the quest or chain)`
 - Boss and raid trash: the dungeon or raid entrance, not the boss room.
   `(entrance to dungeon or raid)`
 - Vendor: every NPC who sells it. The line shows the seller closest to
@@ -2162,11 +2171,12 @@ spawn at that door. Blackmaw Hold is Azshara 42.4, 20.2, where Gatekeeper
 Rageroar stands at the furbolg gate. Alcaz Prison is Dustwallow Marsh
 75.6, 13.8, the north end of Alcaz Island. The Drowned City is
 Stranglethorn Vale 21.0, 27.7, the west edge of the Brinescale Skirmisher
-patrol at the underwater cave. Krol'dok Stronghold (northern Riverglades)
-and Shaper's Terrace (northern Un'Goro) still have a description only.
-Wowhead Forever puts Krol'dok's creatures on the Eastern Kingdoms continent
-map, which is not a place to stand, so the door stays unpinned until a
-Riverglades coordinate is published. Its six bosses (Slavecrusher Grox,
+patrol at the underwater cave. Krol'dok Stronghold is Riverglades 37.5, 37.3 (map 2548), the small
+cave west of the fortress gates above Sunnyglade, from the Forever dungeon
+journal. Shaper's Terrace is Un'Goro Crater 48.1, 6.1 (map 1449), the titan
+temple on the hill above Marshal's Refuge. Both names are on the Boss drop
+and Dungeon & Raid trash filters, and No Dungeons, Dungeon Enjoyer,
+Manageable Dungeons, and Focus Zone follow that door. Krol'dok's six bosses (Slavecrusher Grox,
 Twilight Commander Zarmok, War Handler Ashka, Nar'gurk, Bossman Toof,
 Overlord Mugg) are in `bossNpcs`, and their 19 pieces are Boss drop in
 Krol'dok Stronghold. The nine pieces Wowhead lists only on the Krol'dok

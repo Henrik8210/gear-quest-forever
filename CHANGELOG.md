@@ -38,6 +38,20 @@ Melee specs score expertise. About **10** rating is **1%**. **Assassination** li
 
 **Overgrown Cuffs** and **Thornplated Cord** require level **42**. The chain starts at **Word of the Woods** with **Mithera** in Shen'dralas. Thanks **kingcurly**. **Arathi Armbands** stay Alliance only. Thanks **kingcurly**.
 
+### Krol'dok Stronghold and Shaper's Terrace
+
+**Who:** Every class and spec that hunts a boss drop from those dungeons, Alliance and Horde. The pieces show once you can wear them, mostly around level **58–60**.
+
+**What you see:** **Krol'dok Stronghold** pins the cave in Riverglades, at **37.5, 37.3**, west of the fortress gates above Sunnyglade. **Shaper's Terrace** pins the titan temple on the north rim of Un'Goro Crater, at **48.1, 6.1**, above Marshal's Refuge. Bosses such as **Titanosaur**, **Venomridge**, **Thunderhoof**, **Nanaya**, **Blackmaw Behemoth**, and **War Handler Ashka** file under those dungeons in the Boss drop filter. No Dungeons, Dungeon Enjoyer, Manageable Dungeons, and Focus Zone follow that same door.
+
+### In Dreams starts with Tirion Fordring
+
+**Who:** Every class that hunts a reward from **In Dreams**. **Mark of Fordring**, **Ornate Adamantium Breastplate**, **Shimmering Platinum Warhammer**, **Shroud of the Exile**, and **Fordring's Seal**. Requires level **52**. Alliance and Horde.
+
+**What you see:** The hunt starts with **Tirion Fordring** in Eastern Plaguelands, at **7.6, 43.6**. The parchment lists the Wowhead Forever series: **Redemption**, **Of Forgotten Memories**, **Of Lost Honor**, **Of Love and Family**, **Of Love and Family**, **Find Myranda**, **Scarlet Subterfuge**, then **In Dreams**. The escort out of Hearthglen is that last step. **Ornate Adamantium Breastplate** no longer says there are no prequests.
+
+The same gap is closed on other rewards of a quest that already had the series. **Nimboya's Mystical Staff** lists the Saving Yenniku steps. **Forsaken Dagger** and **Forsaken Maul** list Night Web's Hollow, then The Scarlet Crusade. **Servomechanic Sledgehammer**, **Ceremonial Centaur Blanket**, **Thun'grim's Sword**, **Gemshale Pauldrons**, **Swashbuckler Sash**, **Seedtime Hoop**, and **Forest Troll Leggings** list the series their quest already had. **Overgrown Cuffs** and **Thornplated Cord** list Word of the Woods, then Rot and Regret.
+
 ### Top donators
 
 **Who:** Everyone.
@@ -46,39 +60,7 @@ Melee specs score expertise. About **10** rating is **1%**. **Assassination** li
 
 ### v1.3.4
 
-The log header reads **GearQuest Forever v1.3.4**. **`/reload`** after updating.
-
-### A lower-level piece can still be the hunt
-
-**Who:** Every class and spec, Alliance and Horde, levels **1–60**, including while you simulate.
-
-**What you see:** A piece stays on the list while it still scores at least a quarter of the best piece in that slot. Once you are past its item level, it also has to sit inside the top **30** of that band. A piece of the current item level can still sit as deep as rank **40**. Weapons stay capped at **30**.
-
-**Heavy Woolen Pants** (tailoring, item level 22, requires 17) are the example. **Affliction** keeps them through **24** for Alliance and through **25** for Horde, where they are rank **30**. **Demonology** and **Destruction** keep them through **24**. They are off the list at **50**. The same rule is every slot and every class.
-
-Some pieces that were only filling a source move the other way. **Kodohide Legguards** leave Enhancement at **25–27** and are rank **11** at **28**, both factions. **Sprightring Helm** leaves Combat Alliance at **40** and is rank **5** from **41** to **43**.
-
-### A faction zone is not a lock
-
-**Who:** Every class and spec, both factions.
-
-**What you see:** Elwynn, Durotar, the Barrens, and every other one-faction zone stay that faction's territory for a vendor or a trainer standing there. They do not hide a hunt the other faction can actually get. A Horde-only hunt never shows to Alliance, and an Alliance-only hunt never shows to Horde. Only a hunt both factions can get is on both lists.
-
-A **world drop** or a **rare** shows for both factions, whichever zone it stands in. **Buckskin Cape** is a Barrens rare and rank **1** back at **12** for Beast Mastery, Alliance and Horde. A dropper who is friendly to one faction and hostile to the other stays on the side that can attack them.
-
-A **quest** is Alliance, Horde, or both from that quest's own side. The Barrens is the example. **The Orb of Soran'ruk** is both factions. **Affliction** ranks **Orb of Soran'ruk** **1** in the off hand at **22**, Alliance and Horde. **Stolen Booty**, **Samophlange**, **The Escape**, **Root Samples**, and **Raptor Horns** are both as well.
-
-A vendor or a trainer the other faction cannot reach stays off that list. **Halija Whitestrider** and **Nargal Deatheye** at the Crossroads stay Horde. **Vexspindle**, **Grazlix**, **Lizzarik**, and **Ironzar** in Ratchet stay on both. A craft both factions can make stays on both.
-
-### Right-click a hunt
-
-**Who:** Every class.
-
-**What you see:** Right-click a hunt row. The menu is **Track** or **Untrack**, **Add order** or **Remove order** when the hunt is a craft, **Copy name**, and **Show on map**. Show on map stays grey when the hunt has no spot.
-
-**Copy name** opens a box titled **Press Ctrl+C** with the name highlighted. Ctrl+C copies it. The box closes and **Name copied!** fades in. C does not also open the character panel. Adding or removing an order uses that same fading notice.
-
-Thanks **nohemeier**, **cope7736**, and **ja.he**.
+A piece stays while it still scores at least a quarter of the best in that slot, and inside the top 30 once you are past its item level. Weapons stay capped at 30. **Heavy Woolen Pants** stay on Affliction through 24 Alliance and 25 Horde. A one-faction zone does not hide a hunt the other faction can get. **Orb of Soran'ruk** is both factions. Right-click a hunt for Track, Add order, Copy name, and Show on map. Thanks **nohemeier**, **cope7736**, and **ja.he**.
 
 ### v1.3.3
 
