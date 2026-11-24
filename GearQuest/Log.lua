@@ -4661,6 +4661,8 @@ function GQ.Log:InvalidateActiveListCaches()
     self._weaponStylesBand = nil
     self._weaponTrueList = nil
     self._weaponTrueBand = nil
+    self._casterOffHand = nil
+    self._casterOffBand = nil
     self:InvalidateSourceFilterCache()
 end
 

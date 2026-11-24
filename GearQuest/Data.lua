@@ -4421,6 +4421,13 @@ function GQ.Data:InvalidateQueryCache()
     self._scoreMissCache = nil
     self._unitGearCache = nil
     self._unitGearWarmDone = nil
+    self._offPartnerBand = nil
+    self._offPartnerKind = nil
+    self._offPartnerEntry = nil
+    self._onePartnerBand = nil
+    self._onePartnerEntry = nil
+    self._loadoutBand = nil
+    self._loadoutBest = nil
     if GQ.Log then
         GQ.Log._slotRankCache = nil
         GQ.Log._slotRankBand = nil
