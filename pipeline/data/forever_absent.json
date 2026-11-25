@@ -53,6 +53,14 @@
     "Brood of Nozdormu",
     "Zandalar Tribe"
   ],
+  "season1LockedEpicTitles": [
+    "High Warlord's",
+    "Grand Marshal's",
+    "Field Marshal's",
+    "Warlord's",
+    "Marshal's",
+    "General's"
+  ],
   "items": {
     "19106": "Korrak the Bloodrager (quest 7202) is not offered in WoW: Forever. The Alterac Valley victory quests give reputation only.",
     "19107": "Korrak the Bloodrager (quest 7202) is not offered in WoW: Forever. The Alterac Valley victory quests give reputation only.",

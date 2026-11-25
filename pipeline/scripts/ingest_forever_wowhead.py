@@ -743,14 +743,27 @@ def places_differ(old, new):
     return False
 
 
-def should_update_places(old, new):
+def _locked_source(iid):
+    from hunt_revisions import lock as revision_lock
+    return bool(revision_lock(int(iid)).get("sourceType"))
+
+
+def should_update_places(old, new, iid=None):
     """A named quest, vendor, dropper, or profession on the live listview.
 
     The listview calls a rare and a dungeon trash mob a drop. That row must
     not turn rare_npc, raid_trash, or boss_drop back into a world drop.
+    A hunt_revisions lock on the source stays.
     """
     if not old or not new:
         return False
+    if iid is not None:
+        from hunt_revisions import lock as revision_lock
+        locked = revision_lock(int(iid))
+        for key in ("sourceType", "npc", "zone"):
+            pinned = locked.get(key)
+            if pinned and new.get(key) != pinned:
+                return False
     new_type = new.get("sourceType")
     if new_type in (None, "", "unsourced"):
         return False
@@ -836,13 +849,13 @@ def main():
             sources[key] = new_src
             added_sources += 1
             coord_ids.append(iid)
-        elif placeholder and specific:
+        elif placeholder and specific and not _locked_source(iid):
             # Wowhead listed a source that used to be empty. Keep a real source
             # that is already on the row (boss pin, camp vendor, hand edit).
             sources[key] = new_src
             filled_sources += 1
             coord_ids.append(iid)
-        elif specific and should_update_places(old_src, new_src):
+        elif specific and should_update_places(old_src, new_src, iid):
             # The listview named a different quest, vendor, dropper, or
             # profession. Keep faction, alts, and gate. Re-pin this id.
             sources[key] = merge_places(old_src, new_src)

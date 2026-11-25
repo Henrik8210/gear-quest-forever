@@ -2,93 +2,66 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.3.9
+## v1.4.0
 
-The log header reads **GearQuest Forever v1.3.9**. `/reload` after the update. Every class was scored again, levels 1–60, Alliance and Horde. Ranks move. The spec tooltip shows the new weights.
+The log header reads **GearQuest Forever v1.4.0**. `/reload` after the update.
 
-### Attack power is one stat
+Level 60 is scored by GearQuest again. A Wowhead Forever page no longer replaces that list, and it no longer turns the first page piece into a score of 100. Season 1 epic PvP that the vendors do not sell yet is off the hunts.
 
-**Who:** Every class and spec, including while you simulate.
+### Level 60 keeps GearQuest's score
 
-**What you see:** The spec tooltip lists Attack power and does not list Ranged attack power. A gear line that says ranged attack power is scored as attack power. Hunter attack power is the old ranged weight: **0.45** at levels 1–9, **0.4** for Beast Mastery, **0.38** for Marksmanship, and **0.34** for Survival.
+**Who:** Every class and spec at level 60, Alliance and Horde. Below 60 the guide card still does nothing.
 
-### One percent is one percent
+**What you see:** The hunt and the (i) list are the scored order. A piece that is also on the Wowhead Forever Best in Slot page is labeled (Guide) on the hunt row and (Guide #N) on the rank list. N is its place on that page. The 0–100 GearQuest score is how good the piece is for your spec. First on the page is not 100 unless it is also the best score in the slot.
 
-**Who:** Every class and spec, including a custom spec. Spell hit, spell crit, and spell haste use the same hit, crit, and haste weights as a weapon line.
+**Only Guide Gear** still starts off. On, at 60, the hunt rows and that slot's rank list are only the page, in page order. A slot the page leaves empty stays the scored list. Retribution's page has no off-hand piece, so the shields stay. Specs with no page stay on the scored list: Feral, Bear, Battle Mage, Shockadin, Enhancement Tank, and Assassination.
 
-**What you see:** An Equip line that says 2% hit scores as the hit weight times 2. 0.5% scores as times 0.5. Crit, haste, dodge, parry, and expertise work the same way. Chance on hit stays a proc, and a crit line for one spell is still not your crit.
+Turning Only Guide Gear off brings the weapon checkboxes back. A hunter who could see one-handers on the (i) list and could not turn that box on can turn it on again. The paper doll follows the scored list once the card is off. It does not keep the page's order.
 
-The first percent scale priced 1% hit like about 55 attack power on a Beast Mastery hunter, so a caster neck outranked a hunter neck. Hit was then halved on every spec. 1% hit now sits near 1% crit.
+### Season 1 epic PvP that is not sold yet
 
-**Level 60 hunter necks:**
+**Who:** Every class at 60 that was listing rank epic armor or weapons.
 
-- Beast Mastery, Horde: **Mark of Fordring** (In Dreams, 26 attack power and 1% crit) is rank 1, score 21.3. Alliance rank 1 is **Medallion of the Dawn** (21.7), rank 2 is **Mark of Fordring**, rank 3 is **Amulet of the Darkmoon**.
-- Marksmanship: the same shape. Horde rank 1 is **Mark of Fordring** (21.8). Alliance rank 1 is **Medallion of the Dawn** (22.2) and rank 2 is **Mark of Fordring**.
-- Survival, both factions: rank 1 is **Amulet of the Darkmoon** (27). Alliance rank 3 and Horde rank 2 are **Mark of Fordring** (20).
-- **Star of Mystaria** (Balnazzar, 1.3% hit) is Beast Mastery and Marksmanship rank 4 (16.2 and 18.9). Survival Alliance has it at rank 6. **Horn of Ve'han** is Beast Mastery rank 6 (15.4).
+**What you see:** The pieces Season 1 vendors sell stay. Those are the Premier epic armor and the Premier rank-14 weapons. **Premier Grand Marshal's Longsword** stays on the Alliance weapon lists. The Premier High Warlord weapons stay on the Horde lists. They are bought with Honor and labeled (PvP).
 
-Warrior Protection still prices hit at **25** and crit at **42** per 1%. A protection piece with those percents leads on those two stats.
+The unprefixed epics are gone until a later season sells them. A name that does not start with Premier is not a hunt: Field Marshal, Grand Marshal, Warlord, High Warlord, Marshal, and General. **Field Marshal's Plate Helm** and **Warlord's Plate Headpiece** are that case.
 
-**Feral chest:** **Armor of the Fang** stays rank 1 at 18 for both factions. At 20 the set no longer beats the other leather. Horde rank 1 is **Brawler's Leather Armor**, and the Fang chest is rank 23. It leaves the list at 21. Enhancement still keeps the Fang chest at rank 1 through 24.
+The blue PvP sets stay, with the classic names: Champion's, Lieutenant Commander's, Blood Guard's, Legionnaire's, Knight-Lieutenant's, Knight-Captain's, Centurion's, and Knight-Champion's. They are bought with Honor. The parchment does not invent a rank from the title. Warsong Gulch leggings, Alterac insignias, tabards, mounts, and trinkets stay, and they keep the rank when the tooltip states one. Every Honor piece is labeled (PvP), at every level.
 
-### Only Guide Gear includes weapons
+### The green arrow stays off gear you cannot wear
 
-**Who:** Level 60, when **Only Guide Gear** is on. Below 60 the card does nothing. It still starts off.
+**Who:** Every class, on a quest reward, in a bag, and on a vendor.
 
-**What you see:** With the card on, the weapon hunt, the weapons (i) list, shields and held off-hand items, the off-hand a caster one-hander is paired with, and the paper-doll upgrade list follow the Wowhead Forever page. A slot the page leaves empty stays the scored list. Retribution's page has no off-hand piece, so the shields stay the scored shields. With the card off, level 60 is still the scored list, and a page piece is labeled (Guide) on the hunt and (Guide #N) on the rank list.
+**What you see:** A green upgrade arrow is only on a piece your class can equip. Plate does not get an arrow on a hunter. Leather stays off a mage, a priest, and a warlock. Mail stays off a hunter and a shaman until 40.
 
-### Ashbringer and Atiesh are not hunts
+### A worn random enchant uses the roll you have
 
-**Ashbringer** stays off every list until that quest can be finished. The four **Atiesh, Greatstaff of the Guardian** staves stay off until Naxxramas is open: mage, warlock, priest, and druid.
+**Who:** Every class, when the piece you are wearing is a random-enchant green and that roll scores below the best suffix the hunt is ranked on.
 
-### Weights on the spec tooltip
+**What you see:** The hunt list still ranks the best possible roll, and it still tells you the chance. The comparison against what you are wearing uses the roll that is actually on the item when that roll is worse. A weaker suffix no longer compares as if it were the jackpot.
 
-Hover the spec name. These are the numbers, per 1% for hit, crit, haste, dodge, parry, and expertise. A blank cell is 0, so that row stays off the tooltip. The class stat weight sheet uses the same grid, including Shockadin, Enhancement Tank, and the three Battle Mage columns.
+### Hunter weapon enchants
 
-| Class | Spec | Hit | Crit | Haste | Dodge | Parry | Expertise | Attack power |
-|---|---|---:|---:|---:|---:|---:|---:|---:|
-| Paladin | Levels 1–9 | 3.5 | 9.1 | 5.3 | 0.72 | 0.9 | 0.6 | 0.5 |
-| Paladin | Retribution | 6.85 | 7.98 | 4.7 | 0.48 | 0.6 | 1.4 | 0.5 |
-| Paladin | Protection | 3.25 | 4.9 | 2.5 | 7.8 | 9 | 1 | 0.15 |
-| Paladin | Holy | 0.25 | 11.2 | 5 | 0.36 | 0.3 |  |  |
-| Paladin | Shockadin | 2 | 7.7 | 3 | 0.48 | 0.6 | 0.6 | 0.1 |
-| Warrior | Levels 1–9 | 3.1 | 7.98 | 3.7 | 2.16 | 2.7 | 0.8 | 0.5 |
-| Warrior | Arms | 6.75 | 8.4 | 4 | 0.72 | 0.9 | 4.5 | 0.5 |
-| Warrior | Fury | 7.25 | 9.1 | 4.5 | 0.72 | 0.9 | 5 | 0.55 |
-| Warrior | Protection | 25 | 42 | 1.7 | 7.8 | 9 | 3 | 0.48 |
-| Hunter | Levels 1–9 | 6 | 7 | 6.5 | 0.6 |  | 0.6 | 0.45 |
-| Hunter | Beast Mastery | 11 | 10.92 | 6.5 | 0.6 |  | 0.4 | 0.4 |
-| Hunter | Marksmanship | 11.75 | 11.9 | 6.5 | 0.6 |  | 0.4 | 0.38 |
-| Hunter | Survival | 11 | 11.2 | 6.5 | 0.6 |  | 1.2 | 0.34 |
-| Druid | Levels 1–9 | 2 | 3.5 | 0.5 | 0.6 |  | 0.4 | 0.12 |
-| Druid | Guardian (Bear) | 4.4 | 8.12 | 1 | 8.4 |  | 1.2 | 0.18 |
-| Druid | Feral (Cat) | 6.5 | 11.9 | 6 | 1.2 |  | 1.3 | 0.35 |
-| Druid | Balance | 6 | 9.8 | 6 | 0.6 |  |  |  |
-| Druid | Restoration |  | 4.9 | 4 | 0.6 |  |  |  |
-| Shaman | Levels 1–9 | 2 | 7 |  | 0.6 | 0.3 | 0.4 | 0.15 |
-| Shaman | Elemental | 6.25 | 10.5 | 6 | 0.6 | 0.3 |  |  |
-| Shaman | Enhancement | 7 | 11.9 | 5.5 | 0.6 | 0.3 | 1.4 | 0.55 |
-| Shaman | Enhancement Tank | 3.75 | 4.9 | 2 | 7.8 | 8.25 | 1.2 | 0.22 |
-| Shaman | Restoration |  | 4.9 | 4 | 0.6 | 0.3 |  |  |
-| Rogue | Levels 1–9 | 6 | 7 | 3 | 1.2 | 0.45 | 1 | 0.35 |
-| Rogue | Combat | 10 | 11.9 | 6.5 | 1.2 | 0.45 | 1.6 | 0.35 |
-| Rogue | Assassination | 9.25 | 12.6 | 8.5 | 1.2 | 0.45 | 1.9 | 0.4 |
-| Rogue | Subtlety | 9.25 | 14 | 6 | 1.2 | 0.45 | 1.6 | 0.35 |
-| Priest | Levels 1–9 | 2 | 4.2 |  | 0.6 |  |  |  |
-| Priest | Holy |  | 5.6 | 4 | 0.6 |  |  |  |
-| Priest | Discipline |  | 4.9 | 4 | 0.6 |  |  |  |
-| Priest | Shadow | 6.25 | 9.8 | 6 | 0.6 |  |  |  |
-| Warlock | Levels 1–9 | 2 | 4.2 |  | 0.6 |  |  |  |
-| Warlock | Affliction | 6.25 | 9.8 | 5 | 0.6 |  |  |  |
-| Warlock | Demonology | 6.25 | 9.1 | 5 | 0.6 |  |  |  |
-| Warlock | Destruction | 6.25 | 13.3 | 5 | 0.6 |  |  |  |
-| Mage | Levels 1–9 | 2 | 4.2 |  | 0.6 |  |  |  |
-| Mage | Frost | 6.25 | 9.1 | 5.5 | 0.6 |  |  |  |
-| Mage | Fire | 6.25 | 11.9 | 5.5 | 0.6 |  |  |  |
-| Mage | Arcane | 6.25 | 9.8 | 5.5 | 0.6 |  |  |  |
-| Mage | Battle Mage (Frost) | 6.25 | 9.1 | 5.5 | 0.6 |  |  |  |
-| Mage | Battle Mage (Fire) | 6.25 | 11.9 | 5.5 | 0.6 |  |  |  |
-| Mage | Battle Mage (Arcane) | 6.25 | 9.8 | 5.5 | 0.6 |  |  |  |
+**Who:** Beast Mastery, Marksmanship, and Survival, when Recommended gear enchantment is on.
+
+**What you see:** Crusader and Grand Crusader are not recommended on a hunter weapon. Beast Mastery and Marksmanship are recommended agility, +15 on a one-hander and +25 on a two-hander. Survival can still be recommended a weapon-damage enchant on a two-hander, because that spec prices weapon damage. A scope is still only a bow, a gun, or a crossbow.
+
+### Sources that were wrong or missing
+
+**Who:** The classes that hunt these pieces.
+
+**What you see:**
+
+- **Filcher's Cowl** is a rogue cloak from Biding Our Time. The chain starts at Fool Me Twice, with Fahrad in Alterac Mountains. Both factions. It is on the cloak rank list from level 50.
+- **Wyvern Heart Band** drops from Heartrazor, a rare in Thousand Needles. The source is Rare NPC.
+- **Skin-Flayed Footguards** drop from trash in The Drowned City.
+- **Brinebelly Leggings** drop from Var'Taka in The Drowned City.
+- **Rocket Pilot Gloves** are the Alliance quest Contents Under Pressure. They leave the Horde lists for mage, priest, and warlock.
+- Named rares that were filed as world drops are Rare NPC. The map pin is where that rare spawns when the spot is known. Hunts that had no source now name the quest, the vendor, or the creature, and the source filter follows that.
+
+### v1.3.9
+
+Every class was scored again. An Equip percent is that percent, and hit was halved on every spec so 1% hit sits near 1% crit. Ranged attack power is attack power. Hunter attack power is 0.45 at levels 1–9, 0.4 for Beast Mastery, 0.38 for Marksmanship, and 0.34 for Survival. Armor of the Fang stays Feral rank 1 at 18 and leaves at 21. Enhancement keeps the Fang chest through 24. Only Guide Gear includes weapons. Ashbringer and the four Atiesh staves stay off.
 
 ### v1.3.8
 

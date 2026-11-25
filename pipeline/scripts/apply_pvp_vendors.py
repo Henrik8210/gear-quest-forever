@@ -211,6 +211,26 @@ def absorb_npc(npc_id: int, npc_name: str, cache: dict) -> None:
     print(f"  vendor {npc_name} sells {len(rows)}", flush=True)
 
 
+# Season 1 buys these rare sets with Honor. The title is the slot name.
+# A tooltip rank still wins. Do not invent one from the name.
+RARE_SET_HONOR_ONLY = (
+    "Lieutenant Commander's",
+    "Knight-Lieutenant's",
+    "Knight-Captain's",
+    "Knight-Champion's",
+    "Blood Guard's",
+    "Legionnaire's",
+    "Centurion's",
+    "Champion's",
+)
+
+
+def rare_set_honor_only(name: str, quality) -> bool:
+    if quality != 3 or name.startswith("Premier "):
+        return False
+    return any(name.startswith(prefix) for prefix in RARE_SET_HONOR_ONLY)
+
+
 def rank_from_name(name: str) -> str | None:
     bare = name[8:] if name.startswith("Premier ") else name
     for prefix, label in RANK_TITLES:
@@ -427,6 +447,8 @@ def main() -> None:
             level_changes.append((iid, name, old_rl, req))
 
         rank = tip or rank_from_name(name)
+        if not tip and rare_set_honor_only(name, it.get("quality")):
+            rank = None
         if sellers:
             npc = sellers[0]["name"]
             zone_id = sellers[0]["zone"]

@@ -707,6 +707,7 @@ GQ.Data.vendorCost[277091] = { copper = 659 }
 GQ.Data.vendorCost[287063] = { copper = 3612, sellers = { ["Frederick Stover"] = 3612, ["Kuna Thunderhorn"] = 3802, ["Landria"] = 3802, ["Railee Thriceforged"] = 3612, ["Rallic Finn"] = 3802 } }
 
 GQ.Data.questChain = {}
+GQ.Data.questChain[219343] = { {80526, "Fool Me Twice"}, {80411, "The Talisman of Kazdor"}, {80453, "Best Laid Plans"}, {80454, "One Last Drop"}, {80455, "Biding Our Time"} }
 GQ.Data.questChain[270111] = { {7845, "Kidnapped Elder Torntusk!"}, {7846, "Recover the Key!"}, {7847, "Return to Primal Torntusk"} }
 GQ.Data.questChain[9655] = { {2879, "The Stave of Equinex"}, {2942, "The Morrow Stone"} }
 GQ.Data.questChain[9636] = { {2872, "Stoley's Debt"}, {2873, "Stoley's Shipment"}, {2874, "Deliver to MacKinley"} }

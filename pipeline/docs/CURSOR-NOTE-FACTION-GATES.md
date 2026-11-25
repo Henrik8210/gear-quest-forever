@@ -71,11 +71,14 @@ page order. Do not replace the level-60 band with the guide, and do not keep sco
 gear out of it.
 
 Rank on the stored band is score order, including at 60. A set piece may still lead
-its slot with a lower score. The page number does not reorder the stored rows. When
-Only Guide Gear is on, the hunt rows and that slot's rank list are the page, and
-the 0–100 index follows that page order. With the card off, the index is the scored
-list. A spec with no page, a slot the page leaves empty, and every level below 60
-stay on the scorer.
+its slot with a lower score. The page number does not reorder the stored rows, and
+it does not become the 0–100 index. First on the page reads 100 only when it is
+also the best score. When Only Guide Gear is on, the hunt rows and that slot's
+rank list are the page, in page order, and the index is still the pipeline score
+of those rows. With the card off, the list is the scored band. Turning the card
+off has to clear the weapon-style cache, or a hunter's one-hand boxes stay stuck
+on the page's hands. A spec with no page, a slot the page leaves empty, and every
+level below 60 stay on the scorer.
 
 One thing worth knowing about the screenshot: `Batskin Belt` (28158) is **not in any of
 my picks or notables** for paladin, at any level, on either faction. So whatever surfaced

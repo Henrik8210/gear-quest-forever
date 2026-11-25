@@ -213,6 +213,10 @@ local function BuildListItemTags(entry, status, includeNewLabel, slotName)
         tags = tags .. L[" |cff88ccff(Set piece)|r"]
     end
 
+    if GQ.Log and GQ.Log.EntryIsPvp and GQ.Log:EntryIsPvp(entry) then
+        tags = tags .. L[" |cff88ccff(PvP)|r"]
+    end
+
     if includeNewLabel and entry and GQ.Data:IsEntryNewForPlayer(entry) then
         tags = tags .. L[LIST_NEW_LABEL]
     end
@@ -3037,6 +3041,17 @@ function GQ.Log:VendorFlags(entry)
     return entry._gqVendorRep, entry._gqVendorHonor
 end
 
+-- Same pieces the Honor (PvP) filter keeps: battleground reputation, a
+-- battleground or rank vendor, an honor price, or a rank title with no
+-- town seller. Level does not matter.
+function GQ.Log:EntryIsPvp(entry)
+    if not entry then
+        return false
+    end
+    local _, honor = self:VendorFlags(entry)
+    return honor and true or false
+end
+
 function GQ.Log:DungeonFilterSet()
     if self._dungeonFilterSet then
         return self._dungeonFilterSet
@@ -4809,6 +4824,12 @@ function GQ.Log:InvalidateSourceFilterCache()
     self._weaponStyleNow = nil
     self._weaponMenuStyles = nil
     self._weaponMenuStylesBand = nil
+    -- Which hands exist is read from the weapon pool. Only Guide Gear swaps
+    -- that pool for the page, and this cache used to keep the page's hands
+    -- after the card was turned off, so a one-hander on the rank list had
+    -- no checkbox that would stay on.
+    self._weaponStyles = nil
+    self._weaponStylesBand = nil
     -- Shields and held items keep their own hunt rows. That list is filtered
     -- when it is built, then saved for the level and spec. The source filter
     -- is not part of that key, so a Boss drop list was still the old world
@@ -17638,6 +17659,9 @@ function GQ.Log:PlaceHuntNotes(row, nameLeft, entry, status, showNewLabel)
     if entry and entry.setPiece then
         notes[#notes + 1] = L["|cff88ccff(Set piece)|r"]
     end
+    if self:EntryIsPvp(entry) then
+        notes[#notes + 1] = L["|cff88ccff(PvP)|r"]
+    end
     if entry and entry.origin == "guide" then
         notes[#notes + 1] = L["|cff88ccff(Guide)|r"]
     end
@@ -18258,7 +18282,8 @@ function GQ.Log:BuildDetailLines(entry)
     if entry.itemId and GQ.Data and GQ.Data.GetItemFact then
         local fact = GQ.Data:GetItemFact(entry.itemId)
         local pvpRank = fact and fact.pvpRank
-        if (type(pvpRank) ~= "string" or pvpRank == "") and src == "vendor" and GQ.Data.PvpRankLabel then
+        if (type(pvpRank) ~= "string" or pvpRank == "") and src == "vendor" and GQ.Data.PvpRankLabel
+            and not (GQ.Data.RarePvpSetBoughtWithHonor and GQ.Data:RarePvpSetBoughtWithHonor(entry.name)) then
             pvpRank = GQ.Data:PvpRankLabel(entry.name)
         end
         if type(pvpRank) == "string" and pvpRank ~= "" then
@@ -19226,7 +19251,7 @@ function GQ.Log:ShowSlotRankTooltip(row)
         if not text or text == "" then
             return ""
         end
-        if type(entry.pipelineScore) == "number" and entry.origin ~= "guide" then
+        if type(entry.pipelineScore) == "number" then
             local raw = string.format(" |cffffffff(%.2f)|r", entry.pipelineScore)
             local head, tail = text:match("^(|c%x+%d+|r)(.*)$")
             if head then
@@ -19270,7 +19295,11 @@ function GQ.Log:ShowSlotRankTooltip(row)
                     guide = "  " .. string.format(L["|cff88ccff(Guide #%s)|r"], entry.guidePlace)
                 end
             end
-            add(string.format("|cffffd100#%d|r %s%s|r%s%s%s", place, color, name, equipped, guide, scoreTrail(entry)))
+            local pvp = ""
+            if self:EntryIsPvp(entry) then
+                pvp = "  " .. L["|cff88ccff(PvP)|r"]
+            end
+            add(string.format("|cffffd100#%d|r %s%s|r%s%s%s%s", place, color, name, equipped, guide, pvp, scoreTrail(entry)))
         end
     end
 
@@ -20850,6 +20879,9 @@ end
 
 function GQ.Log:WeaponStylesAvailable()
     local ctx = self.GetActiveListCacheContextKey and self:GetActiveListCacheContextKey() or ""
+    if self.OnlyGuideGearEnabled and self:OnlyGuideGearEnabled() then
+        ctx = ctx .. "|guide"
+    end
     if self._weaponStyles and self._weaponStylesBand == ctx then
         return self._weaponStyles
     end
@@ -20890,6 +20922,9 @@ end
 -- back the way the player left it. Rank checks still use the full band.
 function GQ.Log:WeaponStylesForMenu()
     local ctx = self.GetActiveListCacheContextKey and self:GetActiveListCacheContextKey() or ""
+    if self.OnlyGuideGearEnabled and self:OnlyGuideGearEnabled() then
+        ctx = ctx .. "|guide"
+    end
     if self._weaponMenuStyles and self._weaponMenuStylesBand == ctx then
         return self._weaponMenuStyles
     end

@@ -2122,6 +2122,32 @@ local PVP_RANK_TITLES = {
     { "Grunt's", "Grunt (Rank 2)" },
 }
 
+-- Season 1 rare sets keep these titles and are bought with Honor.
+-- The Forever tooltip has no rank line. Premier epics are not in this list.
+local RARE_SET_HONOR_ONLY = {
+    "Lieutenant Commander's",
+    "Knight-Lieutenant's",
+    "Knight-Captain's",
+    "Knight-Champion's",
+    "Blood Guard's",
+    "Legionnaire's",
+    "Centurion's",
+    "Champion's",
+}
+
+function GQ.Data:RarePvpSetBoughtWithHonor(name)
+    if type(name) ~= "string" or name == "" or name:sub(1, 8) == "Premier " then
+        return false
+    end
+    for i = 1, #RARE_SET_HONOR_ONLY do
+        local prefix = RARE_SET_HONOR_ONLY[i]
+        if name:sub(1, #prefix) == prefix then
+            return true
+        end
+    end
+    return false
+end
+
 function GQ.Data:PvpRankLabel(name)
     if type(name) ~= "string" or name == "" then
         return nil
@@ -5307,14 +5333,17 @@ function GQ.Data:WornSlotIndex(slotName, itemId, handKind, itemLink)
     -- Another suffix of the same item must not stand in for this roll.
     if itemLink and self.EntryForItemLink then
         local entry = self:EntryForItemLink(itemLink)
-        if entry then
-            local guideIndex = self:GuideRankIndex(entry)
-            if guideIndex then
-                return guideIndex
-            end
-        end
         if entry and type(entry.pipelineScore) == "number" then
             local indexScore = entry.pipelineScore
+            -- A ranged suffix is stored at the top of the range. The index
+            -- on the worn piece is the roll in the link.
+            if entry.suffixRange and string.find(entry.suffixRange, "%d+%-%d+")
+                and GQ.Compare and GQ.Compare.ScoreItemLinkStats then
+                local actual = GQ.Compare:ScoreItemLinkStats(itemLink, slotName)
+                if type(actual) == "number" and actual > 0 and actual < indexScore then
+                    indexScore = actual
+                end
+            end
             if self.EntryIsDamagingWeapon and self:EntryIsDamagingWeapon(entry) then
                 local shown = self:DisplayedWeaponScore(entry)
                 if type(shown) == "number" and shown > 0 then
@@ -5402,7 +5431,7 @@ function GQ.Data:WornHandScore(invSlot, slotName)
         return 0
     end
     local itemId = tonumber(string.match(link, "item:(%d+)"))
-    local score = itemId and self:EquippedPipelineScore(itemId, slotName)
+    local score = itemId and self:WornRollScore(itemId, slotName, link)
     if type(score) == "number" then
         return score
     end
@@ -5777,9 +5806,8 @@ function GQ.Data:DisplayedWeaponScore(entry)
     return entry and entry.pipelineScore
 end
 
--- A level-60 Wowhead Forever list is already in guide order. Rank 1 reads
--- 100. Each later place keeps a share of that list, so the last place stays
--- above 0. The stored pipeline score stays the model's number.
+-- The page place is a label. The 0-100 index stays the scored list, including
+-- while Only Guide Gear is showing only that page.
 function GQ.Data:GuideList(slotName)
     if self._guideListBusy or not (GQ.Log and GQ.Log.GetSlotRankList) or not slotName then
         return nil
@@ -5806,43 +5834,9 @@ function GQ.Data:GuideList(slotName)
 end
 
 function GQ.Data:GuideRankIndex(entry)
-    if not entry or entry.origin ~= "guide" then
-        return nil
-    end
-    local slot = entry.slot
-    if self.NormalizeSlotName then
-        slot = self:NormalizeSlotName(slot) or slot
-    end
-    local list = self:GuideList(slot)
-    if not list then
-        return nil
-    end
-    local n = #list
-    local rank
-    for i = 1, n do
-        local row = list[i]
-        if row == entry or (row.itemId == entry.itemId and row.curatedRank == entry.curatedRank
-            and (row.suffix or "") == (entry.suffix or "")) then
-            rank = i
-            break
-        end
-    end
-    if not rank then
-        rank = entry.curatedRank
-    end
-    if type(rank) ~= "number" or rank < 1 then
-        return nil
-    end
-    if rank > n then
-        rank = n
-    end
-    local index = math.floor(((n - rank + 1) / n) * 100 + 0.5)
-    if index < 1 then
-        index = 1
-    elseif index > 100 then
-        index = 100
-    end
-    return index
+    -- Page place must not become the 0-100 score. First on the Wowhead page
+    -- is not rank 1 of this slot unless the scorer put it there.
+    return nil
 end
 
 function GQ.Data:WornGuideBaseline(entry)
@@ -5932,9 +5926,33 @@ function GQ.Data:GearScoreEquipKey(slotName)
     local slots = slotName and self:GetInventorySlots(slotName) or {}
     local parts = {}
     for i = 1, #slots do
-        parts[i] = tostring(self:EquippedItemId(slots[i]) or 0)
+        local link = GetInventoryItemLink and GetInventoryItemLink("player", slots[i])
+        parts[i] = link or tostring(self:EquippedItemId(slots[i]) or 0)
     end
     return table.concat(parts, ",")
+end
+
+-- The hunt row for a random suffix is the top of the range. Infiltrator
+-- Bracers of Agility are stored as +7, and the +6 she is wearing is a
+-- worse piece. The arrow uses the roll on the link.
+function GQ.Data:WornRollScore(itemId, slotName, itemLink)
+    local stored = self:EquippedPipelineScore(itemId, slotName)
+    if not itemLink or type(stored) ~= "number" or stored <= 0 then
+        return stored
+    end
+    if not GQ.Compare or not GQ.Compare.ScoreItemLinkStats or not self.EntryForItemLink then
+        return stored
+    end
+    local entry = self:EntryForItemLink(itemLink)
+    local range = entry and entry.suffixRange
+    if type(range) ~= "string" or not string.find(range, "%d+%-%d+") then
+        return stored
+    end
+    local actual = GQ.Compare:ScoreItemLinkStats(itemLink, slotName)
+    if type(actual) ~= "number" or actual <= 0 or actual >= stored then
+        return stored
+    end
+    return actual
 end
 
 -- The row of this item on the list in front of the player. Another spec's
@@ -6014,7 +6032,8 @@ function GQ.Data:GearScoreContext(slotName, handKind)
             empty = true
         else
             equippedIds[itemId] = true
-            local score = self:EquippedPipelineScore(itemId, dataSlot)
+            local wornLink = GetInventoryItemLink and GetInventoryItemLink("player", invSlot)
+            local score = self:WornRollScore(itemId, dataSlot, wornLink)
             if handKind == "both" then
                 local shown = self:WornListScore(itemId, dataSlot)
                 if type(shown) == "number" then
@@ -6277,22 +6296,6 @@ end
 -- what is worn. Negative is a downgrade. Nil means the worn piece could
 -- not be compared. Zero means the same piece, or a tie.
 function GQ.Data:GearScoreArrowDelta(entry, ctx)
-    local guideIndex = self:GuideRankIndex(entry)
-    if guideIndex then
-        if not ctx then
-            return nil
-        end
-        if entry.itemId and ctx.equippedIds and ctx.equippedIds[entry.itemId] then
-            if not entry.suffix or entry.suffix == "" then
-                return 0
-            end
-        end
-        local baseline = self:WornGuideBaseline(entry)
-        if baseline == nil then
-            return nil
-        end
-        return guideIndex - baseline
-    end
     if not ctx or not entry or type(entry.pipelineScore) ~= "number" then
         return nil
     end
@@ -6376,17 +6379,6 @@ function GQ.Data:GearScoreArrowDelta(entry, ctx)
 end
 
 function GQ.Data:GearScoreTrail(entry, ctx)
-    local guideIndex = self:GuideRankIndex(entry)
-    if guideIndex then
-        local delta = ""
-        if ctx and not (entry.itemId and ctx.equippedIds and ctx.equippedIds[entry.itemId]) then
-            local arrow = self:GearScoreArrowDelta(entry, ctx)
-            if arrow and arrow ~= 0 then
-                delta = self:GearScoreDeltaText(arrow, 0)
-            end
-        end
-        return string.format("|cffffffff%d|r%s", guideIndex, delta)
-    end
     if not ctx or not entry or type(entry.pipelineScore) ~= "number" then
         return ""
     end

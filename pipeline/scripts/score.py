@@ -21,6 +21,31 @@ from gq_paths import G, GUIDES_DIR, OUT, forever_missing_ids, tbc_only_ids, fore
 FOREVER_MISSING = forever_missing_ids()
 TBC_ONLY = tbc_only_ids()
 BETA_COPIES = forever_beta_copy_ids()
+
+def _season1_locked_titles():
+    path = os.path.join(G, "forever_absent.json")
+    try:
+        cfg = json.load(open(path, encoding="utf-8"))
+    except OSError:
+        return ()
+    return tuple(cfg.get("season1LockedEpicTitles") or ())
+
+SEASON1_LOCKED_EPIC_TITLES = _season1_locked_titles()
+
+def season1_epic_unavailable(it):
+    """Unprefixed Field Marshal, Warlord, Marshal, General, and rank-14 epics.
+
+    Season 1 sells the Premier copy. Rare sets (Champion's, Lieutenant
+    Commander's, Blood Guard's, Legionnaire's, Knight-Lieutenant's,
+    Knight-Captain's, Centurion's, Knight-Champion's), Warsong leggings,
+    and Alterac insignias are not these titles.
+    """
+    if not it or it.get("quality") != 4:
+        return False
+    name = it.get("name") or ""
+    if name.startswith("Premier "):
+        return False
+    return any(name.startswith(title) for title in SEASON1_LOCKED_EPIC_TITLES)
 NO_GUIDES = os.environ.get("GQ_NO_GUIDES") == "1"
 # Wowhead Forever level-60 lists. Classic guides_*.json stay behind NO_GUIDES.
 # A spec with no page (feral, battle mage, shockadin, enhancement tank) is absent,
@@ -467,6 +492,9 @@ def eligible(it, cls, spec, level, faction, prof, wsubs):
         return False
     src=srcs[str(it["id"])]
     if not src["obtainable"]: return False
+    # Season 1 epic PvP is the Premier line. The unprefixed rank epics stay
+    # in the client for a later season, so a vendor refresh must not score them.
+    if season1_epic_unavailable(it): return False
     if it.get("temporary"): return False        # conjured / duration-limited, not gear
     nm=(it.get("name") or "").lower()
     if "test copy" in nm or "animation as" in nm:

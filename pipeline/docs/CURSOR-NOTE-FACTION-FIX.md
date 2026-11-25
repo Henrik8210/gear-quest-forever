@@ -1,5 +1,7 @@
 # Follow-up: re-import four data files (no addon code change)
 
+The faction pairs below are still the right pairs. In Season 1 the unprefixed epics in that table are not hunts. `Field Marshal's Plate Helm` (16478) and the rest of that line stay out until a later season sells them. The Premier copies are the pieces the vendors sell. See FOREVER-SCORING.md, Season 1 PvP.
+
 The bug I found after you imported was in **my generator, not in the addon**. There is
 nothing to fix in `DataAdapter.lua`, `Data.lua`, the `.toc` or any UI code. The fix is
 data: replace four generated files and re-run the counts.

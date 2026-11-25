@@ -411,6 +411,36 @@ function GQ.Equip:ClassCanWearArmorSubclass(subclass, classFile, playerLevel)
     return true
 end
 
+-- Cloth, leather, mail, plate, shields, and relics. A hunter never wears
+-- plate, a mage never wears leather, and mail stays off a hunter until 40.
+-- Unknown items stay allowed; the client has not said what they are yet.
+function GQ.Equip:ClassCanWearItem(itemId)
+    if not itemId then
+        return true
+    end
+    local subclass = self:PeekItemArmorSubclass(itemId)
+    if not subclass or subclass == "" or subclass == "Miscellaneous" then
+        return true
+    end
+    if subclass == "Cloth" or subclass == "Leather" or subclass == "Mail" or subclass == "Plate" then
+        return self:ClassCanWearArmorSubclass(subclass) and true or false
+    end
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    if subclass == "Shields" then
+        return classFile == "WARRIOR" or classFile == "PALADIN" or classFile == "SHAMAN"
+    end
+    if subclass == "Librams" then
+        return classFile == "PALADIN"
+    end
+    if subclass == "Idols" then
+        return classFile == "DRUID"
+    end
+    if subclass == "Totems" then
+        return classFile == "SHAMAN"
+    end
+    return true
+end
+
 function GQ.Equip:PeekItemArmorSubclass(itemId)
     if not itemId or not GetItemInfo then
         return nil

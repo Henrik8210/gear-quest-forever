@@ -931,6 +931,14 @@ function GQ.Indicator:UpdateButton(button, link)
         return
     end
 
+    -- Plate on a hunter, leather on a mage, mail before 40. The arrow is an
+    -- upgrade the class can put on. The tooltip can still say it is not scored.
+    if itemId and GQ.Equip and GQ.Equip.ClassCanWearItem and not GQ.Equip:ClassCanWearItem(itemId) then
+        self:UnregisterOverlayPulse(overlay)
+        overlay:Hide()
+        return
+    end
+
     local isUpgrade = itemId and self:IsUpgradeItem(itemId)
     local isObtained = itemId and GQ.Log and GQ.Log.IsItemIdObtained and GQ.Log:IsItemIdObtained(itemId)
 
@@ -1016,6 +1024,9 @@ function GQ.Indicator:RebuildCacheForSlot(slotName)
             return
         end
         if GQ.Log and GQ.Log.EntryIsListedUpgrade and not GQ.Log:EntryIsListedUpgrade(entry, slotName) then
+            return
+        end
+        if GQ.Equip and GQ.Equip.ClassCanWearItem and not GQ.Equip:ClassCanWearItem(entry.itemId) then
             return
         end
         items[entry.itemId] = true
@@ -1530,8 +1541,10 @@ function GQ.Indicator:LinkFromQuestButton(button)
     if not button then
         return nil
     end
+    -- The reward row can hold the name. The quest page above it holds every
+    -- other reward, so a plate choice must not borrow a cloth reward's arrow.
     local current = button
-    for _ = 1, 4 do
+    for _ = 1, 2 do
         local ok, link = pcall(self.LinkFromHost, self, current)
         if ok and type(link) == "string" then
             return link
@@ -1539,7 +1552,7 @@ function GQ.Indicator:LinkFromQuestButton(button)
         local parentOk, parent = pcall(function()
             return current:GetParent()
         end)
-        if not parentOk or not parent then
+        if not parentOk or not parent or parent == current then
             break
         end
         current = parent

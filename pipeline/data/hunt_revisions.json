@@ -96,6 +96,47 @@
       "lock": {
         "questFaction": "Alliance"
       }
+    },
+    "285190": {
+      "name": "Wyvern Heart Band",
+      "reportedBy": "doctorzee",
+      "date": "2026-11-25",
+      "where": "Discord missing-or-wrong-items",
+      "verifiedInGame": true,
+      "wowheadSays": "Dropped by Heartrazor. The Forever tooltip is Level 32 Beast (Rare Elite) in Thousand Needles. The listview source is a drop, which had been stored as a world drop.",
+      "kept": "Rare NPC. Heartrazor in Thousand Needles. The hunt line stays Drops from Heartrazor.",
+      "lock": {
+        "sourceType": "rare_npc",
+        "npc": "Heartrazor",
+        "zone": "Thousand Needles"
+      }
+    },
+    "287000": {
+      "name": "Skin-Flayed Footguards",
+      "reportedBy": "doctorzee",
+      "date": "2026-11-25",
+      "where": "Discord missing-or-wrong-items",
+      "verifiedInGame": true,
+      "wowheadSays": "Drop in The Drowned City. The tooltip names no creature. The row was Unsourced.",
+      "kept": "Dungeon trash in The Drowned City. No named mob, so the line is Drops from trash in The Drowned City.",
+      "lock": {
+        "sourceType": "raid_trash",
+        "zone": "The Drowned City"
+      }
+    },
+    "274602": {
+      "name": "Brinebelly Leggings",
+      "reportedBy": "doctorzee",
+      "date": "2026-11-25",
+      "where": "Discord missing-or-wrong-items",
+      "verifiedInGame": true,
+      "wowheadSays": "Dropped by Var'Taka in The Drowned City. The tooltip says Humanoid (Elite) and does not say Boss. The row was a world drop.",
+      "kept": "Boss drop. Var'Taka in The Drowned City. A missing boss flag is not trash. The hunt line stays Drops from Var'Taka.",
+      "lock": {
+        "sourceType": "boss_drop",
+        "npc": "Var'Taka",
+        "zone": "The Drowned City"
+      }
     }
   }
 }

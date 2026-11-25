@@ -24,4 +24,4 @@ A pick is `[itemId, rank, score]` or `[itemId, rank, score, extras]`.
 
 Rank 1 is the best piece on that list. `reserve: true` means the row is past the three hunts the log shows first. It is still that rank. A random enchant is ranked on its best suffix. Match `suffixId`, not the suffix name. `hand` and `route` say which weapon hand the row belongs to. `healOnly` is a healing weapon on a spec that also carries a damaging one.
 
-Level 60 stays in score order. `origin: "guide"` and `guidePlace` mark a Wowhead Forever page piece, and `guidePlace` is its number on that page. `level60Guides` is the page itself, in page order, with the Wowhead URL. Only Guide Gear, inside the addon, is what shows the page alone.
+Level 60 stays in score order. `origin: "guide"` and `guidePlace` mark a Wowhead Forever page piece, and `guidePlace` is its number on that page. Do not sort a band by `guidePlace`, and do not treat page place 1 as a score of 100. `level60Guides` is the page itself, in page order, with the Wowhead URL. Only Guide Gear, inside the addon, is what shows the page alone. The unprefixed Season 1 epic PvP titles are not in these lists. The Premier copies are.

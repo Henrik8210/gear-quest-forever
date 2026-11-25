@@ -29,19 +29,72 @@ weapon damage are the sheet numbers too. Do not put a hidden multiplier back.
 `scripts/ci/check_no_leveling_multipliers.py` fails when one returns.
 
 **Level 60 guardrail.** A spec with a page in `guides/forever_bis.json` keeps
-the scored list. A page piece is marked with its page place. **Only Guide
-Gear** is a level-60 play style and starts off. Off, level 60 is the scored
-list and a page piece is labeled (Guide). On, that slot's hunt rows and rank
-list are only the page, in page order. Weapons, the shield and held off hand,
-the caster's paired off hand, and the paper-doll upgrade list follow the same
-card. A slot the page leaves empty stays the scored list, including a
-retribution shield when the page has no off-hand piece. A faction with none
-of that slot's pieces, and a spec with no page, stay on the scorer.
-Those specs today are Feral, Bear, Battle Mage (frost, fire, and arcane),
-Shockadin, Enhancement Tank, and Assassination. Levels 1-59 always stay on
-the scorer. `GQ_NO_GUIDES=1` only keeps the old Classic guide files out. It
-does not skip `forever_bis.json`. Removing a hunt only hides that row. The
-piece stays on the rank list and the 0-100 score does not move.
+the scored list. The page does not replace the band, does not reorder it,
+and does not turn the first page piece into a score of 100. `score.py`
+stamps `guidePlace` and `origin="guide"` on a scored row that is also on
+the page, and inserts a page piece the scorer missed at the index its
+score earns. The 0–100 index is `GearScoreIndex` of that pipeline score.
+First on the page reads 100 only when it is also the best score in the slot.
+
+**Only Guide Gear** is a level-60 play style and starts off. It is a
+runtime filter. Off, level 60 is the scored list and a page piece is
+labeled (Guide) on the hunt and (Guide #N) on the rank list. On, that
+slot's hunt rows and rank list are only the page, in page order. Weapons,
+the shield and held off hand, the caster's paired off hand, and the
+paper-doll upgrade list follow the same card. A slot the page leaves empty
+stays the scored list, including a retribution shield when the page has no
+off-hand piece. A faction with none of that slot's pieces, and a spec with
+no page, stay on the scorer. Those specs today are Feral, Bear, Battle Mage
+(frost, fire, and arcane), Shockadin, Enhancement Tank, and Assassination.
+Levels 1–59 always stay on the scorer.
+
+Do not put the page order back into the stored band. That is the bug this
+tree closed. The emit used to replace the level-60 rows with the page, the
+paper doll treated `origin="guide"` as a curated rank, and the 0–100 index
+followed the page place, so the first guide piece outranked a better scored
+piece. The hunter one-hand checkboxes cached the page's hands and stayed
+stuck after the card was turned off. `SetOnlyGuideGear` clears
+`_slotRankCache`, `_weaponPool`, and `_weaponTrueList` before the play-style
+flag changes. `WeaponStylesAvailable` appends `|guide` to the cache key
+while the card is on. The warm key is `TopUpgradeCacheKey` only. Only Guide
+Gear stores `slot:3:guide`. A lookup of `slot:3` while the card is on must
+not count as a cold cache, or the hunt list rebuilds about once a second.
+A warm that finishes and is still cold sets `_warmUnfinished` and does not
+start another.
+
+`GQ_NO_GUIDES=1` only keeps the old Classic guide files out
+(`guide_override` after the Forever page stamp). It does not skip
+`forever_bis.json`. Removing a hunt only hides that row. The piece stays
+on the rank list and the 0–100 score does not move.
+
+### Season 1 PvP stays the Premier line
+
+Season 1 sells the **Premier** epic armor and the **Premier** rank-14
+weapons. `Premier Grand Marshal's Longsword` (272693) stays on the Alliance
+lists. The matching Premier High Warlord weapons stay on the Horde lists.
+
+The unprefixed epics are not sold yet. `forever_absent.json`
+`season1LockedEpicTitles` is the lock: `High Warlord's`, `Grand Marshal's`,
+`Field Marshal's`, `Warlord's`, `Marshal's`, `General's`.
+`score.py` `season1_epic_unavailable` drops a quality-4 item whose name
+starts with one of those titles. A name that starts with `Premier ` is the
+Season 1 piece and stays. Do not delete a title because the Wowhead page
+still exists. Do not put `Field Marshal's Plate Helm` (16478), `Warlord's
+Plate Headpiece` (16542), or the rest of that unprefixed epic line back
+into a catalog, a guide page, or `forever_absent.json` `items` removal
+until a later season sells them. When that season is live, remove the
+title from `season1LockedEpicTitles` and rescore. Until then a scrape, an
+ingest, and a rescore keep the skip.
+
+Rare PvP sets are not those titles. They keep the classic names:
+Champion's, Lieutenant Commander's, Blood Guard's, Legionnaire's,
+Knight-Lieutenant's, Knight-Captain's, Centurion's, and Knight-Champion's.
+They are bought with Honor. `apply_pvp_vendors.py` still knows which rank
+a title is. That map must not invent a required rank on a rare set, and it
+must not be used as a reason to bring the locked epics back. Warsong Gulch
+leggings, Alterac insignias, tabards, mounts, and trinkets keep the classic
+names and their rank when the tooltip states one. The hunt row and the
+rank list label every Honor piece (PvP), at every level.
 
 Plans are the start of a crafted hunt. **Plans: Lionheart Helm** drop from
 **Ferra** in Dire Maul, not from a Lower Blackrock Spire boss. The pin is
@@ -692,7 +745,7 @@ use this scan. It compares the item id in the bags to the hunt on the list.
 
 `GearScoreIndex` maps that slot's comparison scores onto **0..100**. The best
 score in that comparison is **100**. The worst is **0**. One score in
-the slot is **100**. A level-60 Wowhead Forever guide list is the exception: rank 1 reads 100, each later place keeps a share of that list, and the last place stays above 0. The displayed index is clamped and rounded. The scale
+the slot is **100**. A Wowhead page piece uses that same scale. First on the page does not read 100 unless it is also the best score. Only Guide Gear only hides the other rows. The displayed index is clamped and rounded. The scale
 is the live level's rank list (`GetSlotRankList`) and the
 equipped piece's score on that same scale (so a worn piece that has aged out of the band
 still sits on the same line). There is no notable shelf, and notables are
@@ -747,8 +800,11 @@ scores the enchant's other stats and ignores its armor. Hunt scores are
 unchanged. Flat stats use the same sheet weights as the hunt. A weapon proc is a judgment of what the
 effect does. Insight is the healer proc. Revelation is the caster proc.
 Recovery, Fiery Weapon, Crusader, Grand Crusader, and Lifestealing are
-the melee and tank procs. A flat stat can still win at 60 when the
-weights say so.
+the melee and tank procs. A hunter does not take them. Beast Mastery and
+Marksmanship take agility on the melee weapon, because that weapon barely
+swings and strength is 0. Survival still prices weapon damage with its
+melee weight, so a damage enchant can beat agility there. A flat stat can
+still win at 60 when the weights say so.
 
 Wrists, chest, hands, feet, cloak, neck, shield, and weapons have
 formulas. Legs take an armor kit. The chest, hands, feet, and legs share
@@ -1222,8 +1278,9 @@ re-score the class, then copy Lua back.
 
 5. **Re-score** with the Forever model. One class at a time. `GQ_NO_GUIDES=1`
    is set inside the script. That flag keeps the old Classic guide files out.
-   A spec with a page in `guides/forever_bis.json` still takes that list at
-   level 60, in the page's order. A spec with no page stays on the model.
+   It does not skip `guides/forever_bis.json`. Level 60 stays the scored
+   list. The page stamps `guidePlace` on a row that is also on the page.
+   It does not replace the order. A spec with no page stays on the model.
    The script writes `pipeline/out/` and copies the Lua into
    `GearQuest/_generated/`.
 

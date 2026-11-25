@@ -64,8 +64,9 @@ local LOWER_ARMOR_ILVL_MARGIN = 8
 local LOWER_ARMOR_SCORE_PENALTY = 500
 
 -- Stat-based BiS reordering applies to generated sub-60 picks only.
--- Level 60 Wowhead guide rows (origin="guide") and hand-curated Data.lua rows
--- (generated=false, curatedRank) keep their professional list order untouched.
+-- Hand-curated Data.lua rows (generated=false, curatedRank) keep their
+-- professional list order. A Wowhead page piece is still the scored rank.
+-- Only Guide Gear chooses which rows show. It does not move one ahead.
 -- Weights come from GearQuest/_generated/*.weights.json (TBC stat priorities) via
 -- StatWeights.generated.lua — spec-aware at every level when the player has
 -- picked (or defaulted) a spec. levelling_1_9 is only the no-spec fallback.
@@ -793,10 +794,6 @@ end
 function GQ.Compare:UsesCuratedOrder(entry)
     if not entry or not entry.curatedRank then
         return false
-    end
-
-    if entry.origin == "guide" then
-        return true
     end
 
     local playerLevel = GQ.GetEffectiveLevel and GQ:GetEffectiveLevel() or 1

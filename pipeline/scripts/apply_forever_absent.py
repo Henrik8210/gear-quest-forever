@@ -83,6 +83,21 @@ def main() -> None:
             if hit:
                 reason_key, reason = hit, f"{hit} is not in a dungeon or raid that is in the game yet."
         if not reason_key:
+            # Season 1 sells the Premier epic. The unprefixed Field Marshal,
+            # Warlord, Marshal, General, Grand Marshal, and High Warlord
+            # pieces are in the client for a later season.
+            item = items.get(key) or {}
+            name = item.get("name") or ""
+            if item.get("quality") == 4 and not name.startswith("Premier "):
+                for title in cfg.get("season1LockedEpicTitles") or []:
+                    if name.startswith(title):
+                        reason_key = "season1-pvp"
+                        reason = (
+                            "Season 1 sells the Premier epic. "
+                            "This unprefixed rank piece is not sold yet."
+                        )
+                        break
+        if not reason_key:
             reps = (items.get(key) or {}).get("reqRep") or []
             hit = next((r[0] for r in reps if r and r[0] in factions), None)
             if hit:

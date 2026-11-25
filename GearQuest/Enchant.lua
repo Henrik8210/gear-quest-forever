@@ -20,7 +20,12 @@ local ROLE = {
     WARLOCK = { affliction = "caster", demonology = "caster", destruction = "caster", levelling_1_9 = "caster" },
     ROGUE = { assassination = "melee", combat = "melee", subtlety = "melee", levelling_1_9 = "melee" },
     WARRIOR = { arms = "melee", fury = "melee", protection = "tank", levelling_1_9 = "melee" },
-    HUNTER = { beast_mastery = "melee", marksmanship = "melee", survival = "melee", levelling_1_9 = "melee" },
+    -- Crusader and the other strength procs are for classes that swing.
+    -- A hunter's melee weapon is a stat stick. Beast Mastery and
+    -- Marksmanship have no strength weight. Survival still prices weapon
+    -- damage through its own melee weight, which can beat a flat agility
+    -- enchant. The strength proc does not.
+    HUNTER = { beast_mastery = "ranged", marksmanship = "ranged", survival = "ranged", levelling_1_9 = "ranged" },
 }
 
 -- skill is the yellow threshold: an enchanter of this level can use it.
