@@ -279,8 +279,10 @@ above, with Beast Mastery and Marksmanship melee `dpsWeight` still **0.05**):
   worse, not a Defias stat change.
 - Enhancement: the Fang chest is rank 1 through 24. At 26 it leaves
   (since the 17 Nov 2026 retune to agility 0.65, intellect 0.75).
-- Feral: the chest is rank 1 only at 18–21. At 22 feet and waist lose the
-  set share. Legs stay rank 1 on agility.
+- Feral: the chest is rank 1 at 18 for both factions. At 20 the v1.3.9
+  percent weights drop the set share. Horde chest rank 1 is **Brawler's
+  Leather Armor** (252490), and **Armor of the Fang** is rank 23. The chest
+  leaves at 21. Legs stay rank 1 at 20 on agility.
 
 Gloves (from 14) and legs (from 17) are already hunts on their own stats.
 Dream Venom is priced at item level 22, not the wearer’s level, or

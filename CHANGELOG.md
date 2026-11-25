@@ -29,6 +29,8 @@ The first percent scale priced 1% hit like about 55 attack power on a Beast Mast
 
 Warrior Protection still prices hit at **25** and crit at **42** per 1%. A protection piece with those percents leads on those two stats.
 
+**Feral chest:** **Armor of the Fang** stays rank 1 at 18 for both factions. At 20 the set no longer beats the other leather. Horde rank 1 is **Brawler's Leather Armor**, and the Fang chest is rank 23. It leaves the list at 21. Enhancement still keeps the Fang chest at rank 1 through 24.
+
 ### Only Guide Gear includes weapons
 
 **Who:** Level 60, when **Only Guide Gear** is on. Below 60 the card does nothing. It still starts off.
