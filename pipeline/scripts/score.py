@@ -618,8 +618,12 @@ CHANCE_FLOOR=1.0             # used by chanceFloor policy (% for the whole suffi
 def weights_at_level(base_w, level):
     return dict(base_w)
 
-# Forever combat: one Hit, one Crit, one Haste. TBC leftover keys on classic
-# item rows fold in. Melee hunts score expertise rating; armour pen / resilience do not.
+# Forever combat: one Hit, one Crit, one Haste. Spell hit, spell crit, and
+# spell haste fold into those three, and so do the ranged keys. The stored
+# point is the percent. The weight is per 1%. Against the old rating scale
+# that is crit ×14, haste ×10, dodge ×12, parry ×15, expertise ×10, and
+# hit ×5 (the ×10 hit scale was halved). Do not multiply the sheet again.
+# Armour pen and resilience stay dead.
 # Heal-only tooltips still grant SP at 1/3 (Blizzard rule); combined
 # "healing + damage" lines already carry sp_from_heal -- take the larger.
 UNIFIED_STAT={"spellHit":"hit","hitRanged":"hit",
@@ -672,7 +676,7 @@ def _level60_stats(it, level):
     merge_equip_percents(base, effects)
     return base
 
-def best_variant(it, w, level, rscale):
+def best_variant(it, w, level, rscale, fold_rap=False):
     """-> (score, suffixName or None, chance or None, statsUsed)
 
     No level scaling on rating stats. Ratings do buy more percent at low level,
@@ -683,8 +687,15 @@ def best_variant(it, w, level, rscale):
     """
     base=_level60_stats(it, level)
     def sc(st):
+        # Ranged attack power is attack power on every class.
+        folded = forever_stats(st)
+        if fold_rap:
+            rap = folded.get("rap") or 0
+            if rap:
+                folded["ap"] = (folded.get("ap") or 0) + rap
+                folded["rap"] = 0
         t=0.0
-        for k,v in forever_stats(st).items():
+        for k,v in folded.items():
             wt=w.get(k,0.0)
             if not wt: continue
             t+= v*wt
@@ -744,7 +755,10 @@ def best_variant(it, w, level, rscale):
 #                                       quest reward, so the audit flagged it wrongly.
 #   10020 Stormcloth Vest           -- inconclusive; only player speculation. Left in
 #                                       and surfaced in the review page instead.
-HAND_EXCLUDED={15141, 6730, 2867}
+# Not obtainable yet. Ashbringer's quest is not finished in the game.
+# The four Atiesh staves need Naxxramas, which is not open.
+# 22589 mage, 22630 warlock, 22631 priest, 22632 druid.
+HAND_EXCLUDED={15141, 6730, 2867, 13262, 22589, 22630, 22631, 22632}
 # Forever lists these, but they are spells or QA items rather than gear you can hunt.
 # 280304 Invisible Dagger is spell 1308095, a hidden dummy aura.
 # 24358 is QATest +1000 Spell Dmg Ring. 19503 and 19504 are the 2200 Test swords.
@@ -787,7 +801,8 @@ VIABLE_KEEP=40
 def load_exclusions():
     try: ob=json.load(open("obtainability.json"))
     except FileNotFoundError:
-        print("  !! obtainability.json missing -- NO exclusions applied"); return set(), {}
+        print(f"  !! obtainability.json missing -- excluding {len(HAND_EXCLUDED)} hand-verified items")
+        return set(HAND_EXCLUDED), {}
     auto={int(k) for k in ob.get("questDeadEnd",{})}
     reasons={}
     for k,v in ob.get("questDeadEnd",{}).items(): reasons[int(k)]=v
@@ -1120,7 +1135,8 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     # left the list to caster held-in-off-hand junk (Buccaneer's Orb,
                     # Ritual Stein) scoring 1.4 against a shield's 20+.
                     if style=="onehand_dual" and level>=20 and it.get("kind")in("Shield","Buckler"): continue
-                s,suf,ch,st,chAny,sBest,srange,sid=best_variant(it,wl,level,rscale)
+                s,suf,ch,st,chAny,sBest,srange,sid=best_variant(
+                    it, wl, level, rscale, True)
                 _roll_gain=sBest-s
                 # Armour-class preference. A multiplier, never a filter: Protection strongly
                 # favours plate, Retribution mildly. Holy paladin solos in melee, so cloth

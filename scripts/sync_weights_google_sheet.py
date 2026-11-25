@@ -46,6 +46,7 @@ SPEC_COLUMNS = {
     "Holy": "holy",
     "Protection": "protection",
     "Retribution": "retribution",
+    "Shockadin": "shockadin",
     "Arms": "arms",
     "Fury": "fury",
     "Beast Mastery": "beast_mastery",
@@ -71,6 +72,9 @@ SPEC_COLUMNS = {
     "Battle Mage Frost": "battlemage_frost",
     "Battle Mage Fire": "battlemage_fire",
     "Battle Mage Arcane": "battlemage_arcane",
+    "Battle Mage (Frost)": "battlemage_frost",
+    "Battle Mage (Fire)": "battlemage_fire",
+    "Battle Mage (Arcane)": "battlemage_arcane",
 }
 
 
@@ -176,6 +180,16 @@ def sync_class(ws, class_file: str, class_data: dict) -> list[str]:
     return updates
 
 
+def delete_stat_row(ws, stat_key: str) -> bool:
+    """Drop one live-grid stat row. Hunters have no ranged attack power row."""
+    values = ws.get_all_values()
+    for i, row in enumerate(values):
+        if len(row) > 1 and row[1].strip() == stat_key and row[0].strip():
+            ws.delete_rows(i + 1)
+            return True
+    return False
+
+
 def mark_suggestions_implemented(ws, name: str, rows: list[tuple[str, str]]) -> int:
     """Set Weber8210's note column for matching suggestion rows."""
     values = ws.get_all_values()
@@ -246,6 +260,9 @@ def main() -> int:
         block = weights[class_file]
         n = sync_class(ws, class_file, block)
         print(f"{class_file}: updated {len(n)} cells on tab {ws.title}")
+        removed = delete_stat_row(ws, "rap")
+        if removed:
+            print("  removed the Ranged attack power row")
         marks = {
             "SHAMAN": [
                 ("Maximus", "Enhancement", "Agility"),

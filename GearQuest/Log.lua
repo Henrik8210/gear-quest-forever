@@ -5040,19 +5040,24 @@ function GQ.Log:GetFilteredTopForSlot(slotName)
         end
     end
 
-    table.sort(pool, function(a, b)
-        local levelA = a.minLevel or 0
-        local levelB = b.minLevel or 0
-        if levelA ~= levelB then
-            return levelA > levelB
-        end
-        local scoreA = a.pipelineScore or 0
-        local scoreB = b.pipelineScore or 0
-        if scoreA ~= scoreB then
-            return scoreA > scoreB
-        end
-        return (a.curatedRank or 99) < (b.curatedRank or 99)
-    end)
+    local guided = self:GuideOrderedEntries(pool)
+    if guided ~= pool then
+        pool = guided
+    else
+        table.sort(pool, function(a, b)
+            local levelA = a.minLevel or 0
+            local levelB = b.minLevel or 0
+            if levelA ~= levelB then
+                return levelA > levelB
+            end
+            local scoreA = a.pipelineScore or 0
+            local scoreB = b.pipelineScore or 0
+            if scoreA ~= scoreB then
+                return scoreA > scoreB
+            end
+            return (a.curatedRank or 99) < (b.curatedRank or 99)
+        end)
+    end
 
     local results = {}
     local seenName = {}
@@ -18781,6 +18786,39 @@ function GQ.Log:BestInSlotLine(place, slotLabel)
     return string.format(L["This is the %d%s best in slot %s for you."], place, suffix, L[slotLabel])
 end
 
+-- Only Guide Gear keeps the Wowhead page, in page order, when this pool has
+-- any page piece. A pool with none keeps the scored list.
+function GQ.Log:GuideOrderedEntries(pool)
+    if not pool or not self:OnlyGuideGearEnabled() then
+        return pool
+    end
+    local guided = false
+    for i = 1, #pool do
+        if pool[i].guidePlace then
+            guided = true
+            break
+        end
+    end
+    if not guided then
+        return pool
+    end
+    local only = {}
+    for i = 1, #pool do
+        if pool[i].guidePlace then
+            only[#only + 1] = pool[i]
+        end
+    end
+    table.sort(only, function(a, b)
+        local placeA = a.guidePlace or 99
+        local placeB = b.guidePlace or 99
+        if placeA ~= placeB then
+            return placeA < placeB
+        end
+        return (a.itemId or 0) < (b.itemId or 0)
+    end)
+    return only
+end
+
 function GQ.Log:GetSlotRankList(slotName, handKind)
     local dataSlot = slotName == "WeaponPair" and "MainHand" or slotName
     if not dataSlot or not GQ.Data or not GQ.Data.GetClassSlotEntryList then
@@ -18852,33 +18890,10 @@ function GQ.Log:GetSlotRankList(slotName, handKind)
     -- Only Guide Gear, at 60, shows the Wowhead page in page order. The
     -- score rank stays on the row. A slot with no guide piece keeps the
     -- scored list. Below 60 the saved check hides nothing.
-    if self:OnlyGuideGearEnabled() then
-        local guided = false
-        for i = 1, #pool do
-            if pool[i].guidePlace then
-                guided = true
-                break
-            end
-        end
-        if guided then
-            local only = {}
-            for i = 1, #pool do
-                if pool[i].guidePlace then
-                    only[#only + 1] = pool[i]
-                end
-            end
-            table.sort(only, function(a, b)
-                local placeA = a.guidePlace or 99
-                local placeB = b.guidePlace or 99
-                if placeA ~= placeB then
-                    return placeA < placeB
-                end
-                return (a.itemId or 0) < (b.itemId or 0)
-            end)
-            pool = only
-            self._slotRankCache[cacheKey] = pool
-            return pool
-        end
+    local guided = self:GuideOrderedEntries(pool)
+    if guided ~= pool then
+        self._slotRankCache[cacheKey] = guided
+        return guided
     end
     local scores = self:WeaponCompareScoreMap(pool)
     table.sort(pool, function(a, b)
@@ -20323,6 +20338,17 @@ function GQ.Log:CasterBisOffHand()
         end
     end
     pool = GQ.Data:FilterToActiveBand(pool) or pool
+    local guided = self:GuideOrderedEntries(pool)
+    if guided ~= pool then
+        local best = guided[1]
+        local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+        if classFile and GQ.Data.IsClassExpanded and not GQ.Data:IsClassExpanded(classFile) then
+            return best
+        end
+        self._casterOffBand = ctx
+        self._casterOffHand = best
+        return best
+    end
     -- The one-hand rank adds this off hand. The best score is the partner,
     -- including when a later band stored a weaker piece at rank 1.
     local best
@@ -20493,6 +20519,13 @@ function GQ.Log:BuildCollectWeaponPool()
     end
     -- Both hands are already on the band that contains this level. A band
     -- that starts one level later does not outrank a higher score.
+    -- Only Guide Gear replaces that order with the page, for every spec.
+    local guided = self:GuideOrderedEntries(pool)
+    if guided ~= pool then
+        self._weaponPoolBand = ctx
+        self._weaponPool = guided
+        return guided
+    end
     local scores = self:WeaponCompareScoreMap(pool)
     table.sort(pool, function(a, b)
         local scoreA = scores[a]
@@ -21008,14 +21041,19 @@ function GQ.Log:HeldOffHandEntries()
         end
     end
     pool = GQ.Data:FilterToActiveBand(pool) or pool
-    table.sort(pool, function(a, b)
-        local scoreA = a.pipelineScore or 0
-        local scoreB = b.pipelineScore or 0
-        if scoreA ~= scoreB then
-            return scoreA > scoreB
-        end
-        return (a.itemId or 0) < (b.itemId or 0)
-    end)
+    local guided = self:GuideOrderedEntries(pool)
+    if guided == pool then
+        table.sort(pool, function(a, b)
+            local scoreA = a.pipelineScore or 0
+            local scoreB = b.pipelineScore or 0
+            if scoreA ~= scoreB then
+                return scoreA > scoreB
+            end
+            return (a.itemId or 0) < (b.itemId or 0)
+        end)
+    else
+        pool = guided
+    end
     local picked = {}
     local seenName = {}
     local limit = self:HuntsPerSlot()

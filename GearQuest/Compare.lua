@@ -245,6 +245,16 @@ function GQ.Compare:GetStatWeight(statName)
 
     local profile = GetStatWeightProfile(classFile, playerLevel, specId)
     local key = ResolveStatWeightKey(statName)
+    -- Spell hit, spell crit, and spell haste are the same three stats as
+    -- hit, crit, and haste, whatever the tooltip calls the line.
+    local unified = {
+        spellHit = "hit", hitRanged = "hit",
+        spellCrit = "crit", critRanged = "crit",
+        spellHaste = "haste",
+    }
+    if key and unified[key] then
+        key = unified[key]
+    end
     -- School spell power and armor are on the scoring row. The shorter
     -- stat table does not carry them, and the 0.5 fallback would turn
     -- +9 shadow spell power, or 21 armor, into a nonsense score.
@@ -258,8 +268,8 @@ function GQ.Compare:GetStatWeight(statName)
     end
     if profile then
         if key and profile[key] ~= nil then
-            -- Gear "+N Attack Power" is ranged DPS for hunters (1 AP ≈ 1 RAP).
-            if classFile == "HUNTER" and key == "ap" then
+            -- Ranged attack power is attack power. A ranged line uses that weight.
+            if key == "ap" or key == "rap" then
                 return math.max(profile.ap or 0, profile.rap or 0)
             end
             return profile[key]
@@ -475,6 +485,12 @@ local function ScoreNormalizedStats(statTable, leveled)
                 end
             end
         end
+    end
+
+    -- Ranged attack power is attack power on every class.
+    if (byName["Ranged Attack Power"] or 0) > 0 then
+        byName["Attack Power"] = (byName["Attack Power"] or 0) + byName["Ranged Attack Power"]
+        byName["Ranged Attack Power"] = nil
     end
 
     -- Classic spell power is damage and healing. Healers score the healing

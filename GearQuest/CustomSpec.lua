@@ -297,7 +297,7 @@ end
 -- typed. Leaving it off made a typed spell power ignore the classic line and
 -- score it as healing only. A heal-only line, with no spell power and no
 -- Damage Done, is one third spell power.
-local function Fold(stats)
+local function Fold(stats, foldRap)
     local out = {}
     for key, value in pairs(stats) do
         if type(value) == "number" and not SKIP_STAT[key] and not DEAD_STAT[key] then
@@ -320,6 +320,11 @@ local function Fold(stats)
         if not out.sp_from_heal or out.sp_from_heal < fromHeal then
             out.sp_from_heal = fromHeal
         end
+    end
+    -- Ranged attack power is attack power on every class.
+    if foldRap and out.rap then
+        out.ap = (out.ap or 0) + out.rap
+        out.rap = nil
     end
     return out
 end
@@ -694,7 +699,7 @@ local function ProcPoints(entry, row, weights, dpsWeight, specId, level, onUseOn
     return total
 end
 
-local function ScorePiece(entry, row, weights, dpsWeight, dpsRanged, speedWeight, armorClass, specId, level)
+local function ScorePiece(entry, row, weights, dpsWeight, dpsRanged, speedWeight, armorClass, specId, level, classFile)
     local base = {}
     if row then
         for key, value in pairs(row) do
@@ -703,7 +708,7 @@ local function ScorePiece(entry, row, weights, dpsWeight, dpsRanged, speedWeight
             end
         end
     end
-    local folded = Fold(base)
+    local folded = Fold(base, true)
     local best = StatScore(folded, weights)
     local suffix, suffixChance, suffixRange, suffixId
     local rolls = GQ.Data.itemRolls and entry.itemId and GQ.Data.itemRolls[entry.itemId]
@@ -719,7 +724,7 @@ local function ScorePiece(entry, row, weights, dpsWeight, dpsRanged, speedWeight
                     merged[key] = (merged[key] or 0) + value
                 end
             end
-            local score = StatScore(Fold(merged), weights)
+            local score = StatScore(Fold(merged, true), weights)
             if score > best then
                 best = score
                 suffix = roll.n
@@ -1070,7 +1075,7 @@ function GQ.Custom:Consume(job, entry)
             local row = stats and stats[entry.itemId]
             if row then
                 local score, suffix, chance, range, suffixId = ScorePiece(
-                    entry, row, weights, dpsWeight, dpsRanged, speedWeight, job.armorClass, base, level
+                    entry, row, weights, dpsWeight, dpsRanged, speedWeight, job.armorClass, base, level, classFile
                 )
                 copy.pipelineScore = RoundScore(score)
                 if GQ.Data.itemRolls and GQ.Data.itemRolls[entry.itemId] then
@@ -1898,24 +1903,33 @@ function GQ.Custom:RefreshFields()
         return
     end
     panel.placeholder:Hide()
+    local shownRows = 0
     for i = 1, #panel.rows do
         local row = panel.rows[i]
         local field = row.field
-        local value = EmptyBoxWeight(panel.classFile, panel.baseId, field.key, overrides)
-        local shown = FormatWeight(value)
-        row.shipped:SetText(string.format(L["shipped %s"], shown))
-        if row.ghost then
-            row.ghost:SetText(shown)
-        end
-        local typed = overrides[field.key]
-        if typed == nil then
-            row.box:SetText("")
+        -- Ranged attack power is attack power. The ranged row stays off the editor.
+        if field.key == "rap" then
+            row:Hide()
         else
-            row.box:SetText(FormatWeight(typed))
+            local value = EmptyBoxWeight(panel.classFile, panel.baseId, field.key, overrides)
+            local shown = FormatWeight(value)
+            row.shipped:SetText(string.format(L["shipped %s"], shown))
+            if row.ghost then
+                row.ghost:SetText(shown)
+            end
+            local typed = overrides[field.key]
+            if typed == nil then
+                row.box:SetText("")
+            else
+                row.box:SetText(FormatWeight(typed))
+            end
+            row:ClearAllPoints()
+            row:SetPoint("TOPLEFT", panel.content, "TOPLEFT", 0, -(shownRows * 24))
+            row:Show()
+            shownRows = shownRows + 1
         end
-        row:Show()
     end
-    panel.content:SetHeight(#FIELDS * 24)
+    panel.content:SetHeight(math.max(30, shownRows * 24))
 end
 
 function GQ.Custom:ShowEditor(classFile, specId)

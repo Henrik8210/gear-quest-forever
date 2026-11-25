@@ -28,12 +28,15 @@ The sheet number is the score at every level, including 60. Hit, crit, and
 weapon damage are the sheet numbers too. Do not put a hidden multiplier back.
 `scripts/ci/check_no_leveling_multipliers.py` fails when one returns.
 
-**Level 60 guardrail.** A spec with a page in `guides/forever_bis.json` uses
-that Wowhead Forever Best in Slot list, in the page's order, instead of the
-model. A slot the page lists is only those items, once any of them is legal
-for the faction. Rank 1 reads 100. A higher model score does not move a
-later piece in front of the page. A faction with none of that slot's pieces,
-a slot the page leaves empty, and a spec with no page stay on the scorer.
+**Level 60 guardrail.** A spec with a page in `guides/forever_bis.json` keeps
+the scored list. A page piece is marked with its page place. **Only Guide
+Gear** is a level-60 play style and starts off. Off, level 60 is the scored
+list and a page piece is labeled (Guide). On, that slot's hunt rows and rank
+list are only the page, in page order. Weapons, the shield and held off hand,
+the caster's paired off hand, and the paper-doll upgrade list follow the same
+card. A slot the page leaves empty stays the scored list, including a
+retribution shield when the page has no off-hand piece. A faction with none
+of that slot's pieces, and a spec with no page, stay on the scorer.
 Those specs today are Feral, Bear, Battle Mage (frost, fire, and arcane),
 Shockadin, Enhancement Tank, and Assassination. Levels 1-59 always stay on
 the scorer. `GQ_NO_GUIDES=1` only keeps the old Classic guide files out. It
@@ -1276,7 +1279,7 @@ Premade spec hover shows the `weights.json` row (Google Sheet grid). Hunt lists 
 
 `drop_faction.json` keeps a drop on the side that can attack the dropper when every Wowhead reaction is friendly to one faction and hostile to the other. Dun Garok Rifle (282710), Humbert's Helm, Humbert's Chestpiece, and Circlet of the Order are Horde only. Opportunistic Education is Horde, so Solid Gold Band (279845) and Larcenist's Belt (279846) stay off the Alliance list. Friend of the Library is 10 books and Greater Friend of the Library is 20. Both factions turn them in: Garion Wendell in Stormwind, Owen Thadd in Undercity.
 
-Ashbringer (13262) is a quest reward. Do not invent a quest name for it. Sulfuras (17182) is a boss drop from Ragnaros, and the description says you also need the Sulfuron Hammer. Nature's Whisper (20645) is A Terrible Purpose, required level 54, pinned in Silithus. Crown of the Fire Festival (23323) is not a hunt.
+Ashbringer (13262) stays out until that quest can be finished. The four Atiesh staves (22589 mage, 22630 warlock, 22631 priest, 22632 druid) stay out until Naxxramas is open. Do not invent a quest name for Ashbringer. Sulfuras (17182) is a boss drop from Ragnaros, and the description says you also need the Sulfuron Hammer. Nature's Whisper (20645) is A Terrible Purpose, required level 54, pinned in Silithus. Crown of the Fire Festival (23323) is not a hunt.
 
 Lookup searches the loaded class, both factions. The index is released when you leave the Lookup tab. Closing the log while that tab is still selected keeps it.
 
@@ -1782,7 +1785,7 @@ this filter.
 Ranged DPS, damage, and speed are the Forever tooltip, not a stale stored
 number. Beast Mastery and Marksmanship melee `dpsWeight` is **0.05** (they also
 melee: Raptor Strike, Wing Clip, Mongoose Bite). Strength is **0** for Beast
-Mastery and Marksmanship, and **0.7** for Survival. Ranged attack power is **0.4** for Beast Mastery, **0.38** for Marksmanship, and **0.34** for Survival. Melee attack power is **0.08**, **0.1**, and **0.28**. Agility stays **1**. Levels 1–9 stay at **0.3**.
+Mastery and Marksmanship, and **0.7** for Survival. Attack power is **0.4** for Beast Mastery, **0.38** for Marksmanship, **0.34** for Survival, and **0.45** at levels 1–9. There is no ranged attack power weight on any class. A ranged attack power line on an item is attack power. Agility stays **1**. Levels 1–9 strength stays **0.3**.
 Their `dpsWeightRanged` is
 **14**. Survival melee is **10** and ranged is **6**. Defense on every hunter
 spec is **0.02**. A gun with defense and a
@@ -1891,14 +1894,72 @@ Shaman **relic slot** is stored as pipeline slot **`Ranged`**; the log labels it
 
 ## Stat weights (Forever model)
 
-`data/weights.json` is the Forever combat scale: no expertise / armour pen /
-resilience, unified Hit/Crit/Haste, hunter 1 Agi = 1 RAP, 14 AP = 1 DPS, no
-Steady Shot, shaman no dual wield. At level 60, a spec with a page in
-`guides/forever_bis.json` uses that hand-entered Wowhead Forever list in
-the page's order. Specs with no page (Feral, Battle Mage, Shockadin,
-Enhancement Tank) stay on the model, and so does every level below 60.
-`GQ_NO_GUIDES=1` keeps the old Classic guide files out and does not skip
-that Forever list.
+`data/weights.json` is the Forever combat scale. Hit, crit, and haste are one
+weight each, shared by melee and spells. The stored point is the printed
+percent, so 2% hit is the hit weight times 2 and 0.5% is times 0.5. The same
+is true for crit, haste, dodge, parry, and expertise. Against the old rating
+scale the sheet is crit ×14, haste ×10, dodge ×12, parry ×15, expertise ×10,
+and hit ×5. Hit was halved after the first percent scale, because 1% hit was
+outranking hunter attack power and crit. Do not multiply these weights again.
+Armour pen and resilience stay 0. There is no ranged attack power weight on
+any spec. A ranged attack power line is attack power. Hunter attack power is
+**0.45** at levels 1–9, **0.4** Beast Mastery, **0.38** Marksmanship, and
+**0.34** Survival. Shamans do not dual wield. Melee specs score expertise.
+Casters leave expertise at 0.
+
+The spec tooltip, the Google Sheet, and the hunt use this table. A blank
+cell is 0 and stays off the tooltip. These are the v1.3.9 numbers.
+
+| Class | Spec | Hit | Crit | Haste | Dodge | Parry | Expertise | Attack power |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| Paladin | Levels 1–9 | 3.5 | 9.1 | 5.3 | 0.72 | 0.9 | 0.6 | 0.5 |
+| Paladin | Retribution | 6.85 | 7.98 | 4.7 | 0.48 | 0.6 | 1.4 | 0.5 |
+| Paladin | Protection | 3.25 | 4.9 | 2.5 | 7.8 | 9 | 1 | 0.15 |
+| Paladin | Holy | 0.25 | 11.2 | 5 | 0.36 | 0.3 |  |  |
+| Paladin | Shockadin | 2 | 7.7 | 3 | 0.48 | 0.6 | 0.6 | 0.1 |
+| Warrior | Levels 1–9 | 3.1 | 7.98 | 3.7 | 2.16 | 2.7 | 0.8 | 0.5 |
+| Warrior | Arms | 6.75 | 8.4 | 4 | 0.72 | 0.9 | 4.5 | 0.5 |
+| Warrior | Fury | 7.25 | 9.1 | 4.5 | 0.72 | 0.9 | 5 | 0.55 |
+| Warrior | Protection | 25 | 42 | 1.7 | 7.8 | 9 | 3 | 0.48 |
+| Hunter | Levels 1–9 | 6 | 7 | 6.5 | 0.6 |  | 0.6 | 0.45 |
+| Hunter | Beast Mastery | 11 | 10.92 | 6.5 | 0.6 |  | 0.4 | 0.4 |
+| Hunter | Marksmanship | 11.75 | 11.9 | 6.5 | 0.6 |  | 0.4 | 0.38 |
+| Hunter | Survival | 11 | 11.2 | 6.5 | 0.6 |  | 1.2 | 0.34 |
+| Druid | Levels 1–9 | 2 | 3.5 | 0.5 | 0.6 |  | 0.4 | 0.12 |
+| Druid | Guardian (Bear) | 4.4 | 8.12 | 1 | 8.4 |  | 1.2 | 0.18 |
+| Druid | Feral (Cat) | 6.5 | 11.9 | 6 | 1.2 |  | 1.3 | 0.35 |
+| Druid | Balance | 6 | 9.8 | 6 | 0.6 |  |  |  |
+| Druid | Restoration |  | 4.9 | 4 | 0.6 |  |  |  |
+| Shaman | Levels 1–9 | 2 | 7 |  | 0.6 | 0.3 | 0.4 | 0.15 |
+| Shaman | Elemental | 6.25 | 10.5 | 6 | 0.6 | 0.3 |  |  |
+| Shaman | Enhancement | 7 | 11.9 | 5.5 | 0.6 | 0.3 | 1.4 | 0.55 |
+| Shaman | Enhancement Tank | 3.75 | 4.9 | 2 | 7.8 | 8.25 | 1.2 | 0.22 |
+| Shaman | Restoration |  | 4.9 | 4 | 0.6 | 0.3 |  |  |
+| Rogue | Levels 1–9 | 6 | 7 | 3 | 1.2 | 0.45 | 1 | 0.35 |
+| Rogue | Combat | 10 | 11.9 | 6.5 | 1.2 | 0.45 | 1.6 | 0.35 |
+| Rogue | Assassination | 9.25 | 12.6 | 8.5 | 1.2 | 0.45 | 1.9 | 0.4 |
+| Rogue | Subtlety | 9.25 | 14 | 6 | 1.2 | 0.45 | 1.6 | 0.35 |
+| Priest | Levels 1–9 | 2 | 4.2 |  | 0.6 |  |  |  |
+| Priest | Holy |  | 5.6 | 4 | 0.6 |  |  |  |
+| Priest | Discipline |  | 4.9 | 4 | 0.6 |  |  |  |
+| Priest | Shadow | 6.25 | 9.8 | 6 | 0.6 |  |  |  |
+| Warlock | Levels 1–9 | 2 | 4.2 |  | 0.6 |  |  |  |
+| Warlock | Affliction | 6.25 | 9.8 | 5 | 0.6 |  |  |  |
+| Warlock | Demonology | 6.25 | 9.1 | 5 | 0.6 |  |  |  |
+| Warlock | Destruction | 6.25 | 13.3 | 5 | 0.6 |  |  |  |
+| Mage | Levels 1–9 | 2 | 4.2 |  | 0.6 |  |  |  |
+| Mage | Frost | 6.25 | 9.1 | 5.5 | 0.6 |  |  |  |
+| Mage | Fire | 6.25 | 11.9 | 5.5 | 0.6 |  |  |  |
+| Mage | Arcane | 6.25 | 9.8 | 5.5 | 0.6 |  |  |  |
+| Mage | Battle Mage (Frost) | 6.25 | 9.1 | 5.5 | 0.6 |  |  |  |
+| Mage | Battle Mage (Fire) | 6.25 | 11.9 | 5.5 | 0.6 |  |  |  |
+| Mage | Battle Mage (Arcane) | 6.25 | 9.8 | 5.5 | 0.6 |  |  |  |
+
+At level 60, a spec with a page in `guides/forever_bis.json` keeps the scored
+list, and **Only Guide Gear** shows just that page. Specs with no page
+(Feral, Battle Mage, Shockadin, Enhancement Tank, Assassination) stay on the
+model, and so does every level below 60. `GQ_NO_GUIDES=1` keeps the old
+Classic guide files out and does not skip that Forever list.
 
 `check_roles.py` enforces the role split: casters carry no str/ap/rap;
 physical specs carry no sp/heal except Ret, Enhance, Enhancement Tank,
@@ -1926,8 +1987,9 @@ Affliction is shadow (`spShadow` 0.95, fire near 0). Spirit is raised
 because Life Tap scales with it, and crit is real because DoTs can crit.
 Demonology prefers generic spell power; shadow and fire are both partial.
 Destruction prefers fire (`spFire` 0.95) over shadow (`spShadow` 0.2),
-and crit is its highest of the three specs because of Ruin. Hit stays
-above crit on all three.
+and crit is its highest of the three specs because of Ruin. After the
+percent weights, crit is above hit on all three. Do not put hit back above
+crit by hand.
 
 ### Holy paladin
 
@@ -1945,14 +2007,17 @@ on the hunt or on the tooltip.
 | Spirit | 0.3 |
 | Mana per 5 | 1.1 |
 | Mana | 0.04 |
-| Crit | 0.8 |
+| Crit | 11.2 |
+| Hit | 0.25 |
+| Haste | 5 |
 | Stamina | 0.3 |
 | Armor | 0.004 |
 
 A note written in v0.3.6 said healing, spell power, and holy spell power
 were **1.8**, intellect **1.2** (raw 0.60), spirit **1.5** (raw 0.75), and
 armor **0.15** (raw 0.075). Those figures were never copied into the weight
-row. The row has been the table above since the first Classic re-score.
+row. Healing, intellect, spirit, mana, stamina, and armor stay as they were.
+Crit, hit, and haste in the table are the v1.3.9 percent weights.
 Do not retune the row to match that note. `+N Holy Spell Damage` is
 `spHoly`. Holy, Protection, and Retribution each price it the same as generic spell power: Holy **1**, Protection **0.85**, Retribution **0.45**. Holy stays at **1**. Cloth is `armorClass` 0.62,
 leather 0.82, mail 0.96, plate 1.0. A cloth piece shows up only when its
@@ -1965,7 +2030,7 @@ Its `armorClass` is plate 1.0, mail 0.55, leather 0.35,
 cloth 0.18. That armor weight is not why cloth loses on hunts — survivability
 comes from the scored stats on the piece. Generic spell power is **0.85**.
 `spHoly` is **0.85**, the same as generic spell power. Mana per 5 is **0.2**. Ranged attack
-power is **0** on every paladin spec, including levels 1–9. Holy, Protection,
+power is **0** on every class. A ranged attack power line is attack power. Holy, Protection,
 and Retribution each price holy spell power the same as generic spell power. `speedWeight` is **-2**: points per
 second of weapon speed. A 2 second weapon loses 4 points and a 3 second
 weapon loses 6, on top of melee weapon damage **0.5**. The seal lands on
@@ -1991,9 +2056,9 @@ Do not multiply it by level:
 | Spell power | 1.0 |
 | Holy spell power | 0.85 |
 | Intellect | 0.4 |
-| Crit | 0.55 |
-| Hit | 0.4 |
-| Haste | 0.3 |
+| Crit | 7.7 |
+| Hit | 2 |
+| Haste | 3 |
 | Strength | 0.2 |
 | Stamina | 0.15 |
 | Attack power | 0.1 |
