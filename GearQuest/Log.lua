@@ -6067,6 +6067,32 @@ function GQ.Log:IsEntryObtained(id)
     return false
 end
 
+-- Changes whenever a hunt is obtained, completed, restored, or removed, or the
+-- catalog index is rebuilt. The obtained timestamps and completion times enter
+-- the sum, so swapping one record for another of the same count still changes it.
+function GQ.Log:ItemObtainedSignature()
+    local progress = CharProgress()
+    local count, sum = 0, 0
+    for _, stamp in pairs(progress.obtained or {}) do
+        count = count + 1
+        sum = sum + (tonumber(stamp) or 1)
+    end
+    for _, record in pairs(progress.hunts or {}) do
+        count = count + 1
+        if NormalizeHuntStatus(record.status) == "completed" then
+            sum = sum + (tonumber(record.completedAt) or 1) + 0.5
+        end
+    end
+    local data = GQ.Data
+    return count .. ":" .. sum .. ":" .. tostring(data and data._entryGeneration)
+        .. ":" .. tostring(data and data.byItemId)
+end
+
+-- A bag change asks this for every candidate on the hunt list. Answering it
+-- walks every catalog row of the item, and those rows are rebuilt from the
+-- packed catalog once its 64-item cache has cycled: about 200 ms for a full
+-- list. The answer only changes with progress or the index, so keep it until
+-- the signature changes.
 function GQ.Log:IsItemIdObtained(itemId)
     if not itemId then
         return false
@@ -6075,6 +6101,21 @@ function GQ.Log:IsItemIdObtained(itemId)
         return true
     end
 
+    local signature = self:ItemObtainedSignature()
+    if self._itemObtainedSignature ~= signature then
+        self._itemObtainedSignature = signature
+        self._itemObtainedMemo = {}
+    end
+    local key = tostring(itemId)
+    local cached = self._itemObtainedMemo[key]
+    if cached == nil then
+        cached = self:ComputeItemIdObtained(itemId)
+        self._itemObtainedMemo[key] = cached
+    end
+    return cached
+end
+
+function GQ.Log:ComputeItemIdObtained(itemId)
     local needle = tostring(itemId)
     local progress = CharProgress()
 
