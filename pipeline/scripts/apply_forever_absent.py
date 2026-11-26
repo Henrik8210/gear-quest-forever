@@ -3,10 +3,11 @@
 The Forever client has item rows for every Classic raid, but only the raids
 in `openRaids` are in the game. `pipeline/data/forever_absent.json` lists:
 
-- absentRaids: a boss drop, trash, rare, vendor, or quest reward filed in
-  one of these (by zone, or by a boss in `dungeon_entrances.json`
-  bossNpcs) gets obtainable false. A world drop keeps its row, because a
-  misfiled zone on an outdoor mob (Onyx Shredder Plate) is not a raid.
+- absentRaids: a boss drop, trash, rare, vendor, or quest reward filed
+  in one of these gets obtainable false. Zul'Gurub is not open. A world
+  drop keeps its row. Onyx Shredder Plate, Drake-scale Vest, and Gutrender
+  are not Zul'Gurub mobs. The zone is Stranglethorn Vale, and that zone
+  is locked. Wowhead files it as Zul'Gurub.
 - worldBosses and absentBosses: a boss drop or rare from one of these
   names is the Boss drop flyout's Other bucket. That boss is not in a
   dungeon or raid that is in the game yet.
@@ -15,6 +16,12 @@ in `openRaids` are in the game. `pipeline/data/forever_absent.json` lists:
 - absentFactions: a reputation requirement on one of these does the same.
 - items: single ids with the reason (a quest Forever does not offer, a
   plan that only drops in those raids, a test item).
+- unreleasedNames: the whole item name. Signet Ring of the Bronze
+  Dragonflight is the Ahn'Qiraj quest reward. Every rank of that ring
+  stays out until Ahn'Qiraj is open.
+- unreleasedNameParts: a piece of the name. Inquisition, Fireleaf, and
+  Waywatcher are the Scarlet Enclave token sets. The client already has
+  some Inquisition pieces, and those still stay out.
 
 Each row is marked with `absentRaid` (the reason key), so removing a raid
 from absentRaids, or an id from items, makes the row obtainable again.
@@ -102,6 +109,24 @@ def main() -> None:
             hit = next((r[0] for r in reps if r and r[0] in factions), None)
             if hit:
                 reason_key, reason = hit, f"{hit} reputation is not in WoW: Forever yet."
+        if not reason_key:
+            # The client already has some of these rows. A missing-item
+            # refresh must not put the Scarlet Enclave sets or the Ahn'Qiraj
+            # signet rings back on a hunt list.
+            item = items.get(key) or {}
+            name = item.get("name") or ""
+            if name in set(cfg.get("unreleasedNames") or []):
+                reason_key = "unreleased"
+                reason = (
+                    "The Path of the Protector, the Path of the Conqueror, and "
+                    "the Path of the Invoker need Ahn'Qiraj. That raid is not open yet."
+                )
+            elif any(part in name for part in (cfg.get("unreleasedNameParts") or [])):
+                reason_key = "unreleased"
+                reason = (
+                    "The Scarlet Enclave is not open yet. "
+                    "These token sets stay out until it is."
+                )
 
         marked = src.get("absentRaid")
         if reason_key:

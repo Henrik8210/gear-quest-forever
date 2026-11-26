@@ -2,62 +2,79 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.4.0
+## v1.4.1
 
-The log header reads **GearQuest Forever v1.4.0**. `/reload` after the update.
+The log header reads **GearQuest Forever v1.4.1**. `/reload` after the update.
 
-Level 60 is scored by GearQuest again. A Wowhead Forever page no longer replaces that list, and it no longer turns the first page piece into a score of 100. Season 1 epic PvP that the vendors do not sell yet is off the hunts.
+Raids that are not open leave the hunts, including the Scarlet Enclave sets. Only Guide Gear numbers the page for your faction. A bag change no longer walks the whole catalog.
 
-### Level 60 keeps GearQuest's score
+### Raids that are not open
 
-**Who:** Every class and spec at level 60, Alliance and Horde. Below 60 the guide card still does nothing.
+**Who:** Every class that was listing Hyjal Summit, Barrow Deeps, Zul'Aman, the Scarlet Enclave, or a piece that needs one of those raids.
 
-**What you see:** The hunt and the (i) list are the scored order. A piece that is also on the Wowhead Forever Best in Slot page is labeled (Guide) on the hunt row and (Guide #N) on the rank list. N is its place on that page. The 0–100 GearQuest score is how good the piece is for your spec. First on the page is not 100 unless it is also the best score in the slot.
+**What you see:** Those raids are not hunts. The first raids are still 8 December 2026, and nothing from them is on the list until then. Molten Core, Blackwing Lair, Onyxia's Lair, Zul'Gurub, Ahn'Qiraj, and Naxxramas stay off.
 
-**Only Guide Gear** still starts off. On, at 60, the hunt rows and that slot's rank list are only the page, in page order. A slot the page leaves empty stays the scored list. Retribution's page has no off-hand piece, so the shields stay. Specs with no page stay on the scored list: Feral, Bear, Battle Mage, Shockadin, Enhancement Tank, and Assassination.
+**Inquisition**, **Fireleaf**, and **Waywatcher** are the Scarlet Enclave token sets Bryon Steelblade sells. They leave every class, including Inquisition pieces the client already shows. **Signet Ring of the Bronze Dragonflight** stays off until Ahn'Qiraj is open. **Onyxia Scale Cloak** stays off with Onyxia's Lair.
 
-Turning Only Guide Gear off brings the weapon checkboxes back. A hunter who could see one-handers on the (i) list and could not turn that box on can turn it on again. The paper doll follows the scored list once the card is off. It does not keep the page's order.
+**Onyx Shredder Plate**, **Drake-scale Vest**, and **Gutrender** stay. They drop in Stranglethorn Vale, from Venture Co. Shredder, Mosh'Ogg Lord, and Mosh'Ogg Warmonger. They are not Zul'Gurub. Gutrender's map pin is no longer the Zul'Gurub door. The Brood of Onyxia rewards in Dustwallow Marsh stay: **Encarmine Boots**, **Boots of Zua'tec**, and **Black Whelp Boots**.
 
-### Season 1 epic PvP that is not sold yet
+The Season of Discovery plain-name dungeon copies stay out. **Feralheart Helm** and the rest of that copy say they may not be in Forever and name no source. The level-60 dungeon upgrade sets stay, including **Soulforge**, from **An Earnest Proposition**.
 
-**Who:** Every class at 60 that was listing rank epic armor or weapons.
+### Only Guide Gear counts your faction
 
-**What you see:** The pieces Season 1 vendors sell stay. Those are the Premier epic armor and the Premier rank-14 weapons. **Premier Grand Marshal's Longsword** stays on the Alliance weapon lists. The Premier High Warlord weapons stay on the Horde lists. They are bought with Honor and labeled (PvP).
+**Who:** Every spec with a Wowhead Forever page at 60, Alliance and Horde, when Only Guide Gear is on.
 
-The unprefixed epics are gone until a later season sells them. A name that does not start with Premier is not a hunt: Field Marshal, Grand Marshal, Warlord, High Warlord, Marshal, and General. **Field Marshal's Plate Helm** and **Warlord's Plate Headpiece** are that case.
+**What you see:** The number is this faction's place on the page. The other faction's piece does not hold a rank. **Darkspear Epaulets** is #1 for Horde Marksmanship shoulders. **Theramore Epaulets** is #1 for Alliance. The same close-up is on the Highlander and Defiler pieces, the Sentinel and Outrider pieces, the Grand Marshal and High Warlord page weapons, **Sageclaw** and **Mindfang**, the two **Ironbark Staves**, and **Songstone of Ironforge** and **Eye of Orgrimmar**. Page order stays. With the card off, the blue (Guide #N) label is still the place on the Wowhead page, so Darkspear can be score rank #1 and (Guide #2) at the same time.
 
-The blue PvP sets stay, with the classic names: Champion's, Lieutenant Commander's, Blood Guard's, Legionnaire's, Knight-Lieutenant's, Knight-Captain's, Centurion's, and Knight-Champion's. They are bought with Honor. The parchment does not invent a rank from the title. Warsong Gulch leggings, Alterac insignias, tabards, mounts, and trinkets stay, and they keep the rank when the tooltip states one. Every Honor piece is labeled (PvP), at every level.
+### Library rewards from level 50
 
-### The green arrow stays off gear you cannot wear
+**Who:** The classes that list the Greater Friend of the Library rewards. The report was Alliance Retribution.
 
-**Who:** Every class, on a quest reward, in a bag, and on a vendor.
+**What you see:** **Museum Keeper's Chain**, **Artifact Seeker's Pendant**, and **Antique Bulwark** show from level 50. They were starting at 53. On Alliance Retribution the chain is neck rank 4 at 50, the pendant is neck rank 1 at 50, and the bulwark is on the shield list from 50. The level 20 and level 40 library rewards are unchanged.
 
-**What you see:** A green upgrade arrow is only on a piece your class can equip. Plate does not get an arrow on a hunter. Leather stays off a mage, a priest, and a warlock. Mail stays off a hunter and a shaman until 40.
+### The (i) list keeps the roll you are wearing
 
-### A worn random enchant uses the roll you have
+**Who:** Every class, when two random enchants of one item are both ranked, or the piece you are wearing is one of those rolls.
 
-**Who:** Every class, when the piece you are wearing is a random-enchant green and that roll scores below the best suffix the hunt is ranked on.
+**What you see:** Both rolls are on the (i) list. The row that matches what you have equipped says Equipped. A belt that already did this still does. Boots and chest greens that used to sit between two rows are on the list.
 
-**What you see:** The hunt list still ranks the best possible roll, and it still tells you the chance. The comparison against what you are wearing uses the roll that is actually on the item when that roll is worse. A weaker suffix no longer compares as if it were the jackpot.
+### A worn roll compares to the listed jackpot
 
-### Hunter weapon enchants
+**Who:** Every class, when you are wearing a random-enchant green.
 
-**Who:** Beast Mastery, Marksmanship, and Survival, when Recommended gear enchantment is on.
+**What you see:** The hunt still ranks the best roll of that suffix, and it still tells you the chance. Wearing a lower number of that same suffix compares as the jackpot the list shows, so the +7 hunt is not an upgrade over the +6 you already have. A different "of" is a different piece. It is not scored as the suffix on the list.
 
-**What you see:** Crusader and Grand Crusader are not recommended on a hunter weapon. Beast Mastery and Marksmanship are recommended agility, +15 on a one-hander and +25 on a two-hander. Survival can still be recommended a weapon-damage enchant on a two-hander, because that spec prices weapon damage. A scope is still only a bow, a gun, or a crossbow.
+### Your spec on the item tooltip
 
-### Sources that were wrong or missing
+**Who:** Every class. The report was Enhancement on **Stromgarde Hood**.
 
-**Who:** The classes that hunt these pieces.
+**What you see:** On the Tooltips window, the item column has **Ranks for your other specs**. It stays on until you turn it off. Off hides the specs you have not selected. The spec you are playing or simulating stays. When that spec has no rank at your level, the line is grey: **Enhancement: Not ranked for your level**. When it does rank the piece, the score line names it: **Enhancement (your selected spec): Rank #N**. A **GearQuest** header sits above that block.
 
-**What you see:**
+### Vanquisher's Sword is both factions
 
-- **Filcher's Cowl** is a rogue cloak from Biding Our Time. The chain starts at Fool Me Twice, with Fahrad in Alterac Mountains. Both factions. It is on the cloak rank list from level 50.
-- **Wyvern Heart Band** drops from Heartrazor, a rare in Thousand Needles. The source is Rare NPC.
-- **Skin-Flayed Footguards** drop from trash in The Drowned City.
-- **Brinebelly Leggings** drop from Var'Taka in The Drowned City.
-- **Rocket Pilot Gloves** are the Alliance quest Contents Under Pressure. They leave the Horde lists for mage, priest, and warlock.
-- Named rares that were filed as world drops are Rare NPC. The map pin is where that rare spawns when the spot is known. Hunts that had no source now name the quest, the vendor, or the creature, and the source filter follows that.
+**Who:** Warrior, paladin, rogue, and hunter who hunt **Vanquisher's Sword**, from Bring the Light in Razorfen Downs.
+
+**What you see:** Horde lists it. It is no longer Alliance only.
+
+### Khan Jehn follows your faction's step
+
+**Who:** The classes that hunt the Magram and Gelkis rewards, including **Soulsplatter Mace** on a paladin.
+
+**What you see:** Alliance starts at Brutal Politics and does not list Magram Alliance. Horde starts at Magram Alliance and does not list Brutal Politics. Both continue at Broken Tears through Khan Jehn. Gelkis rewards start at Strange Alliance for Alliance and Gelkis Alliance for Horde. The mace stays on both lists. The map pin is the chain start at Nijel's Point in Desolace.
+
+### Bag changes hitch less
+
+**Who:** Everyone, when a bag changes, or when the paper doll rebuilds its arrows after login, a zone change, or opening a vendor.
+
+**What you see:** The same arrows, on the same pieces. They show up a few frames later instead of all at once. Ranking up a profession still turns a red skill line green on that hunt.
+
+### Credits
+
+**Goadah** and **Shengjie** are on The GearQuest Community list, under Settings.
+
+### v1.4.0
+
+Level 60 stays on GearQuest's score. A Wowhead page piece is labeled (Guide), and Only Guide Gear, which starts off, shows just that page. Season 1 epic PvP that vendors do not sell yet is off the hunts. The Premier pieces stay. A green arrow stays off gear your class cannot wear. Hunter weapon enchants recommend agility for Beast Mastery and Marksmanship. **Filcher's Cowl**, **Wyvern Heart Band**, **Skin-Flayed Footguards**, **Brinebelly Leggings**, and **Rocket Pilot Gloves** were corrected.
 
 ### v1.3.9
 

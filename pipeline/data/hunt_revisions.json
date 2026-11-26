@@ -39,6 +39,42 @@
         "questFaction": "Alliance"
       }
     },
+    "1677": {
+      "name": "Drake-scale Vest",
+      "reportedBy": "Henrik",
+      "date": "2026-11-26",
+      "where": "in game",
+      "verifiedInGame": true,
+      "wowheadSays": "Zone Zul'Gurub. Drops from Mosh'Ogg Lord.",
+      "kept": "Stranglethorn Vale. Mosh'Ogg Lord is not a Zul'Gurub mob.",
+      "lock": {
+        "zone": "Stranglethorn Vale"
+      }
+    },
+    "1986": {
+      "name": "Gutrender",
+      "reportedBy": "Henrik",
+      "date": "2026-11-26",
+      "where": "in game",
+      "verifiedInGame": true,
+      "wowheadSays": "Zone Zul'Gurub. Drops from Mosh'Ogg Warmonger.",
+      "kept": "Stranglethorn Vale. Mosh'Ogg Warmonger is not a Zul'Gurub mob.",
+      "lock": {
+        "zone": "Stranglethorn Vale"
+      }
+    },
+    "5755": {
+      "name": "Onyx Shredder Plate",
+      "reportedBy": "Henrik",
+      "date": "2026-11-26",
+      "where": "in game",
+      "verifiedInGame": true,
+      "wowheadSays": "Zone Zul'Gurub. Drops from Venture Co. Shredder.",
+      "kept": "Stranglethorn Vale. Venture Co. Shredder is not a Zul'Gurub mob.",
+      "lock": {
+        "zone": "Stranglethorn Vale"
+      }
+    },
     "12640": {
       "name": "Lionheart Helm",
       "reportedBy": "Henrik",
@@ -136,6 +172,52 @@
         "sourceType": "boss_drop",
         "npc": "Var'Taka",
         "zone": "The Drowned City"
+      }
+    },
+    "271804": {
+      "name": "Soulsplatter Mace",
+      "reportedBy": "Manuri",
+      "date": "2026-11-26",
+      "where": "Discord paladin",
+      "verifiedInGame": true,
+      "wowheadSays": "Khan Jehn (93196) is the Magram ritual. The stored chain listed Brutal Politics and then Magram Alliance. Those two quests are the same step: Friendly with the Magram, then speak with Warug. Brutal Politics is Alliance. Magram Alliance is Horde.",
+      "kept": "Both factions keep the mace. Alliance chain starts at Brutal Politics and skips Magram Alliance. Horde chain starts at Magram Alliance and skips Brutal Politics. Both continue at Broken Tears through Khan Jehn. The same split is on the other Magram rewards (271796, 271797, 271798, 271800, 271803). The Gelkis rewards skip the other faction's starter the same way: Alliance Strange Alliance, Horde Gelkis Alliance.",
+      "lock": {}
+    },
+    "281636": {
+      "name": "Museum Keeper's Chain",
+      "reportedBy": "rangzero",
+      "date": "2026-11-25",
+      "where": "Discord paladin",
+      "verifiedInGame": true,
+      "wowheadSays": "Greater Friend of the Library (84394) has no Requires Level. The tooltip has no Requires Level line. The page comment is 50. Stored required level was 53, the item-level floor for item level 58.",
+      "kept": "Required level 50. Rango wears it at 50. Artifact Seeker's Pendant (277202) and Antique Bulwark (281637) are the same reward and stay at 50.",
+      "lock": {
+        "rlvl": 50
+      }
+    },
+    "277202": {
+      "name": "Artifact Seeker's Pendant",
+      "reportedBy": "rangzero",
+      "date": "2026-11-25",
+      "where": "Discord paladin",
+      "verifiedInGame": false,
+      "wowheadSays": "Same quest as Museum Keeper's Chain. No Requires Level line. Stored required level was 53.",
+      "kept": "Required level 50, with the other two rewards from Greater Friend of the Library (84394).",
+      "lock": {
+        "rlvl": 50
+      }
+    },
+    "281637": {
+      "name": "Antique Bulwark",
+      "reportedBy": "rangzero",
+      "date": "2026-11-25",
+      "where": "Discord paladin",
+      "verifiedInGame": false,
+      "wowheadSays": "Same quest as Museum Keeper's Chain. No Requires Level line. The page comment is 50. Stored required level was 53.",
+      "kept": "Required level 50, with the other two rewards from Greater Friend of the Library (84394).",
+      "lock": {
+        "rlvl": 50
       }
     }
   }

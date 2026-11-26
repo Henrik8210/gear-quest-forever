@@ -280,6 +280,8 @@ L["Shows the score bar in the log header. Off restores the viewing-upgrades line
 L["%s: Rank #%d for your level"] = "%s: puesto n.º %d para tu nivel"
 L["%s: Rank #%d for your level (%s)"] = "%s: puesto n.º %d para tu nivel (%s)"
 L["%s: Not ranked for your level"] = "%s: sin puesto para tu nivel"
+L["GearQuest"] = "GearQuest"
+L["%s (your selected spec): %s"] = "%s (tu especialización): %s"
 L["Ranks for your other specs"] = "Puestos para tus otras especializaciones"
 L["Adds the rank each of your class's other specs gives the item at your level, for gearing two specs at once. Off shows only the spec you are playing or simulating."] = "Añade el puesto del objeto a tu nivel para cada otra especialización de tu clase, para equipar dos especializaciones a la vez. Desactivado, solo aparece la especialización que juegas o simulas."
 L["INTERFACE"] = "INTERFAZ"

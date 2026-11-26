@@ -25,12 +25,12 @@
     },
     "profession": {
       "ok": 198,
-      "gap": 165,
-      "gap:not indexed yet": 160,
+      "gap": 206,
+      "gap:not indexed yet": 201,
       "gap:recipe trainer is not listed on the Wowhead page we can fetch": 5
     },
     "quest_reward": {
-      "ok": 1663,
+      "ok": 1662,
       "gap": 322,
       "gap:not indexed yet": 116,
       "gap:quest starter has no map pin": 15,
@@ -41,34 +41,34 @@
       "ok": 132
     },
     "rare_npc": {
-      "ok": 238,
-      "gap": 28,
+      "ok": 297,
+      "gap": 34,
       "gap:not indexed yet": 20,
       "gap:Wowhead page not cached yet": 7,
-      "gap:not indexed since the source changed": 1
+      "gap:not indexed since the source changed": 7
     },
     "unsourced": {
-      "gap": 1226,
-      "gap:not indexed since the source changed": 972,
-      "ok": 377,
+      "gap": 1218,
+      "gap:not indexed since the source changed": 968,
+      "ok": 376,
       "gap:source not listed yet": 14,
-      "gap:not indexed yet": 240
+      "gap:not indexed yet": 236
     },
     "vendor": {
       "gap": 193,
       "gap:vendor has no map pin": 6,
-      "ok": 790,
+      "ok": 774,
       "gap:not indexed yet": 125,
       "gap:Wowhead page not cached yet": 37,
       "gap:not indexed since the source changed": 25
     },
     "world_drop": {
       "ok": 2167,
-      "gap": 832,
-      "gap:not indexed yet": 663,
-      "gap:world drop names no creature": 53,
-      "gap:Wowhead page not cached yet": 93,
-      "gap:drop creature has no map pin": 23
+      "gap": 767,
+      "gap:not indexed yet": 662,
+      "gap:Wowhead page not cached yet": 28,
+      "gap:drop creature has no map pin": 24,
+      "gap:world drop names no creature": 53
     }
   },
   "gaps": [
@@ -193,8 +193,8 @@
       "id": 1677,
       "name": "Drake-scale Vest",
       "sourceType": "world_drop",
-      "reason": "not indexed yet",
-      "zone": "Zul'Gurub",
+      "reason": "Wowhead page not cached yet",
+      "zone": "Stranglethorn Vale",
       "npc": "Mosh'Ogg Lord",
       "questName": null
     },
@@ -496,6 +496,15 @@
       "questName": null
     },
     {
+      "id": 1986,
+      "name": "Gutrender",
+      "sourceType": "world_drop",
+      "reason": "drop creature has no map pin",
+      "zone": "Stranglethorn Vale",
+      "npc": "Mosh'Ogg Warmonger",
+      "questName": null
+    },
+    {
       "id": 1992,
       "name": "Swampchill Fetish",
       "sourceType": "world_drop",
@@ -588,6 +597,15 @@
     {
       "id": 2314,
       "name": "Toughened Leather Armor",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 2315,
+      "name": "Dark Leather Boots",
       "sourceType": "profession",
       "reason": "not indexed yet",
       "zone": null,
@@ -2161,6 +2179,15 @@
       "questName": "Willix the Importer"
     },
     {
+      "id": 6787,
+      "name": "White Woolen Dress",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 6802,
       "name": "Sword of Omen",
       "sourceType": "quest_reward",
@@ -2224,6 +2251,24 @@
       "questName": null
     },
     {
+      "id": 7051,
+      "name": "Earthen Vest",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 7052,
+      "name": "Azure Silk Belt",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 7053,
       "name": "Azure Silk Cloak",
       "sourceType": "unsourced",
@@ -2237,6 +2282,15 @@
       "name": "Crimson Silk Cloak",
       "sourceType": "unsourced",
       "reason": "not indexed since the source changed",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 7058,
+      "name": "Crimson Silk Vest",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
       "zone": null,
       "npc": null,
       "questName": null
@@ -2269,6 +2323,15 @@
       "questName": null
     },
     {
+      "id": 7062,
+      "name": "Crimson Silk Pantaloons",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 7063,
       "name": "Crimson Silk Robe",
       "sourceType": "unsourced",
@@ -2290,6 +2353,15 @@
       "id": 7112,
       "name": "Aurora Armor",
       "sourceType": "world_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 7189,
+      "name": "Goblin Rocket Boots",
+      "sourceType": "profession",
       "reason": "not indexed yet",
       "zone": null,
       "npc": null,
@@ -2946,15 +3018,6 @@
     {
       "id": 7942,
       "name": "Blue Glittering Axe",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 7943,
-      "name": "Wicked Mithril Blade",
       "sourceType": "unsourced",
       "reason": "not indexed since the source changed",
       "zone": null,
@@ -4204,10 +4267,28 @@
       "questName": null
     },
     {
+      "id": 10030,
+      "name": "Admiral's Hat",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 10033,
       "name": "Red Mageweave Headband",
       "sourceType": "unsourced",
       "reason": "not indexed since the source changed",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 10040,
+      "name": "White Wedding Dress",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
       "zone": null,
       "npc": null,
       "questName": null
@@ -5509,10 +5590,37 @@
       "questName": null
     },
     {
+      "id": 10500,
+      "name": "Fire Goggles",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 10501,
+      "name": "Catseye Ultra Goggles",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 10502,
       "name": "Spellpower Goggles Xtreme",
       "sourceType": "unsourced",
       "reason": "not indexed since the source changed",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 10506,
+      "name": "Deepdive Helmet",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
       "zone": null,
       "npc": null,
       "questName": null
@@ -5531,6 +5639,15 @@
       "name": "Parachute Cloak",
       "sourceType": "unsourced",
       "reason": "not indexed since the source changed",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 10543,
+      "name": "Goblin Construction Helmet",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
       "zone": null,
       "npc": null,
       "questName": null
@@ -5594,6 +5711,15 @@
       "name": "Quillward Harness",
       "sourceType": "world_drop",
       "reason": "world drop names no creature",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 10588,
+      "name": "Goblin Rocket Helmet",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
       "zone": null,
       "npc": null,
       "questName": null
@@ -5691,6 +5817,24 @@
     {
       "id": 10721,
       "name": "Gnomish Harm Prevention Belt",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 10724,
+      "name": "Gnomish Rocket Boots",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 10726,
+      "name": "Gnomish Mind Control Cap",
       "sourceType": "profession",
       "reason": "not indexed yet",
       "zone": null,
@@ -6742,8 +6886,26 @@
       "questName": null
     },
     {
+      "id": 14101,
+      "name": "Brightcloth Gloves",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 14103,
       "name": "Brightcloth Cloak",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 14104,
+      "name": "Brightcloth Pants",
       "sourceType": "profession",
       "reason": "not indexed yet",
       "zone": null,
@@ -6791,6 +6953,33 @@
       "name": "Felcloth Shoulders",
       "sourceType": "unsourced",
       "reason": "not indexed since the source changed",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 14128,
+      "name": "Wizardweave Robe",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 14130,
+      "name": "Wizardweave Turban",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 14132,
+      "name": "Wizardweave Leggings",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
       "zone": null,
       "npc": null,
       "questName": null
@@ -8204,15 +8393,6 @@
       "name": "Cutthroat's Mitts",
       "sourceType": "world_drop",
       "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 15138,
-      "name": "Onyxia Scale Cloak",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
       "questName": null
@@ -9847,15 +10027,6 @@
       "questName": null
     },
     {
-      "id": 15853,
-      "name": "Windreaper",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": "Scholomance",
-      "npc": null,
-      "questName": "Dawn's Gambit"
-    },
-    {
       "id": 15854,
       "name": "Dancing Sliver",
       "sourceType": "unsourced",
@@ -9914,6 +10085,15 @@
       "name": "Flawless Arcanite Rifle",
       "sourceType": "unsourced",
       "reason": "not indexed since the source changed",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 16008,
+      "name": "Master Engineer's Goggles",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
       "zone": null,
       "npc": null,
       "questName": null
@@ -10004,6 +10184,24 @@
       "name": "Dark Iron Bracers",
       "sourceType": "unsourced",
       "reason": "not indexed since the source changed",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 17015,
+      "name": "Dark Iron Reaver",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 17016,
+      "name": "Dark Iron Destroyer",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
       "zone": null,
       "npc": null,
       "questName": null
@@ -10720,6 +10918,15 @@
       "questName": null
     },
     {
+      "id": 19056,
+      "name": "Argent Boots",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 19057,
       "name": "Gloves of the Dawn",
       "sourceType": "unsourced",
@@ -11188,8 +11395,26 @@
       "questName": "Voodoo Feathers"
     },
     {
+      "id": 20537,
+      "name": "Runed Stygian Boots",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 20538,
       "name": "Runed Stygian Leggings",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 20539,
+      "name": "Runed Stygian Belt",
       "sourceType": "profession",
       "reason": "not indexed yet",
       "zone": null,
@@ -12700,15 +12925,6 @@
       "questName": "A Lesson in Literacy"
     },
     {
-      "id": 227947,
-      "name": "Golem Fitted Pauldrons",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
       "id": 234819,
       "name": "Demonic Gauntlet",
       "sourceType": "unsourced",
@@ -13762,15 +13978,6 @@
       "questName": null
     },
     {
-      "id": 253884,
-      "name": "Template Item",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
       "id": 253999,
       "name": "Earthen Leggings",
       "sourceType": "unsourced",
@@ -14385,6 +14592,24 @@
     {
       "id": 260810,
       "name": "SAF-T Disposable Parachute",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 260828,
+      "name": "SAF-T Nitro Boosts",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 260829,
+      "name": "EZ-Thro Magnetic Displacer",
       "sourceType": "profession",
       "reason": "not indexed yet",
       "zone": null,
@@ -19144,6 +19369,15 @@
       "questName": null
     },
     {
+      "id": 273884,
+      "name": "Grovekeeper Trousers",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 273885,
       "name": "Grovekeeper Grips",
       "sourceType": "profession",
@@ -19164,6 +19398,15 @@
     {
       "id": 273887,
       "name": "Grovekeeper Stompers",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 273888,
+      "name": "Grovekeeper Kilt",
       "sourceType": "profession",
       "reason": "not indexed yet",
       "zone": null,
@@ -19261,8 +19504,62 @@
       "questName": null
     },
     {
+      "id": 273901,
+      "name": "Wildstalker's Gauntlets",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 273902,
       "name": "Wildstalker's Spaulders",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 273903,
+      "name": "Wildstalker's Greaves",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 273904,
+      "name": "Manaflare Pants",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 273905,
+      "name": "Manaflare Gloves",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 273907,
+      "name": "Manaflare Boots",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 273908,
+      "name": "Justice Leggings",
       "sourceType": "profession",
       "reason": "not indexed yet",
       "zone": null,
@@ -19351,6 +19648,15 @@
       "questName": null
     },
     {
+      "id": 273920,
+      "name": "Pants of Conviction",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 273928,
       "name": "Grimstitch Pants",
       "sourceType": "profession",
@@ -19387,8 +19693,35 @@
       "questName": null
     },
     {
+      "id": 273932,
+      "name": "Spiritcaller Leggings",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 273933,
+      "name": "Spiritcaller Grips",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 273934,
       "name": "Spiritcaller Spaulders",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 273935,
+      "name": "Spiritcaller Treads",
       "sourceType": "profession",
       "reason": "not indexed yet",
       "zone": null,
@@ -20275,15 +20608,6 @@
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
-      "questName": null
-    },
-    {
-      "id": 274517,
-      "name": "Unerring Purpose",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Forgotten Soldier",
       "questName": null
     },
     {
@@ -22537,15 +22861,6 @@
       "questName": null
     },
     {
-      "id": 277558,
-      "name": "Mushgog's Crown of Thorns",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Mushgog",
-      "questName": null
-    },
-    {
       "id": 277672,
       "name": "Rough Copper Chain Boots",
       "sourceType": "unsourced",
@@ -22645,15 +22960,6 @@
       "questName": null
     },
     {
-      "id": 278570,
-      "name": "Mardenholde Armbands",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Scarlet Interrogator",
-      "questName": null
-    },
-    {
       "id": 279246,
       "name": "Torch of Light",
       "sourceType": "unsourced",
@@ -22683,15 +22989,6 @@
     {
       "id": 279249,
       "name": "Totem of Urgency",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 279250,
-      "name": "Idol of Swiftness",
       "sourceType": "unsourced",
       "reason": "not indexed since the source changed",
       "zone": null,
@@ -23340,8 +23637,8 @@
     {
       "id": 280081,
       "name": "Sad-Sack Sandals",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
+      "sourceType": "rare_npc",
+      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Mopes",
       "questName": null
@@ -23524,7 +23821,7 @@
       "reason": "quest starter has no map pin",
       "zone": null,
       "npc": null,
-      "questName": null
+      "questName": "Stormwind's High Order"
     },
     {
       "id": 281290,
@@ -23662,30 +23959,12 @@
       "questName": "Too Bad to Bear"
     },
     {
-      "id": 281598,
-      "name": "Rusthowl's Worn Collar",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Old Rusthowl",
-      "questName": null
-    },
-    {
       "id": 281599,
       "name": "Ragged Colors",
       "sourceType": "unsourced",
       "reason": "not indexed yet",
       "zone": null,
       "npc": null,
-      "questName": null
-    },
-    {
-      "id": 281600,
-      "name": "Wail of Death",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Death Wailer",
       "questName": null
     },
     {
@@ -23986,60 +24265,6 @@
       "questName": null
     },
     {
-      "id": 281750,
-      "name": "Murloc Oracle's Dagger",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Gluggle",
-      "questName": null
-    },
-    {
-      "id": 281891,
-      "name": "Fishscale Hauberk",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Rippa",
-      "questName": null
-    },
-    {
-      "id": 282004,
-      "name": "Flesheater's Scales",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Gilmorian",
-      "questName": null
-    },
-    {
-      "id": 282005,
-      "name": "Saltwater Shawl",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Fingat",
-      "questName": null
-    },
-    {
-      "id": 282008,
-      "name": "Wyrmak's Cuirass",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Lord Captain Wyrmak",
-      "questName": null
-    },
-    {
-      "id": 282009,
-      "name": "Ravaged Leather Leggings",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Ravage",
-      "questName": null
-    },
-    {
       "id": 282010,
       "name": "Tusk of Grunter",
       "sourceType": "unsourced",
@@ -24055,42 +24280,6 @@
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
-      "questName": null
-    },
-    {
-      "id": 282014,
-      "name": "Twisted Shadow Staff",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Mojo the Twisted",
-      "questName": null
-    },
-    {
-      "id": 282019,
-      "name": "Braided Seer Stones",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Akubar the Seer",
-      "questName": null
-    },
-    {
-      "id": 282020,
-      "name": "Stonegaze Wand",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Deatheye",
-      "questName": null
-    },
-    {
-      "id": 282021,
-      "name": "Dreadscorn's Spaulders",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Dreadscorn",
       "questName": null
     },
     {
@@ -24121,66 +24310,12 @@
       "questName": null
     },
     {
-      "id": 282070,
-      "name": "Gruklash's Basher",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Gruklash",
-      "questName": null
-    },
-    {
-      "id": 282071,
-      "name": "Shin Slicers",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Hahk'Zor",
-      "questName": null
-    },
-    {
-      "id": 282074,
-      "name": "Ogre Sorcerer Belt",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Gorgon'och",
-      "questName": null
-    },
-    {
       "id": 282085,
       "name": "Dragonblood Greatsword",
       "sourceType": "unsourced",
       "reason": "not indexed yet",
       "zone": null,
       "npc": null,
-      "questName": null
-    },
-    {
-      "id": 282088,
-      "name": "Heart of Smoldar",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Smoldar",
-      "questName": null
-    },
-    {
-      "id": 282094,
-      "name": "Blackheart's Vest",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Slave Master Blackheart",
-      "questName": null
-    },
-    {
-      "id": 282097,
-      "name": "Unbreakable Golem Grips",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Faulty War Golem",
       "questName": null
     },
     {
@@ -24193,57 +24328,12 @@
       "questName": null
     },
     {
-      "id": 282551,
-      "name": "Golem Fist",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "War Golem",
-      "questName": null
-    },
-    {
       "id": 282555,
       "name": "Shadowforge Shield",
       "sourceType": "unsourced",
       "reason": "not indexed yet",
       "zone": null,
       "npc": null,
-      "questName": null
-    },
-    {
-      "id": 282556,
-      "name": "Groundshaker's Bindings",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Rumbler",
-      "questName": null
-    },
-    {
-      "id": 282557,
-      "name": "Broken Tooth's Flayed Hide",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Broken Tooth",
-      "questName": null
-    },
-    {
-      "id": 282568,
-      "name": "Fireflare Handwraps",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Rekk'tilac",
-      "questName": null
-    },
-    {
-      "id": 282633,
-      "name": "Mastrogonde's Sinister Gown",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Highlord Mastrogonde",
       "questName": null
     },
     {
@@ -24276,8 +24366,8 @@
     {
       "id": 284043,
       "name": "Dissolved Link Legguards",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
+      "sourceType": "rare_npc",
+      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "The Reak",
       "questName": null
@@ -24285,8 +24375,8 @@
     {
       "id": 284046,
       "name": "Witherheart's Stabber",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
+      "sourceType": "rare_npc",
+      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Witherheart the Stalker",
       "questName": null
@@ -24294,8 +24384,8 @@
     {
       "id": 284063,
       "name": "Witherbark Hatecleaver",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
+      "sourceType": "rare_npc",
+      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Zul'arek Hatefowler",
       "questName": null
@@ -24319,30 +24409,12 @@
       "questName": null
     },
     {
-      "id": 284070,
-      "name": "Dreadwhisper's Touch",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Dreadwhisper",
-      "questName": null
-    },
-    {
       "id": 284086,
       "name": "Scarlet Executioner's Guise",
       "sourceType": "world_drop",
       "reason": "Wowhead page not cached yet",
       "zone": null,
       "npc": "Scarlet Executioner",
-      "questName": null
-    },
-    {
-      "id": 284091,
-      "name": "Scarlet Forgemaster's Bindings",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Foreman Jerris",
       "questName": null
     },
     {
@@ -24364,147 +24436,12 @@
       "questName": null
     },
     {
-      "id": 284101,
-      "name": "Blade of Senseless Slaughter",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Duke Ragereaver",
-      "questName": null
-    },
-    {
-      "id": 284102,
-      "name": "Signet of the Soulless Rider",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Death Knight Soulbearer",
-      "questName": null
-    },
-    {
       "id": 284104,
       "name": "Cultist's Cuffs",
       "sourceType": "world_drop",
       "reason": "Wowhead page not cached yet",
       "zone": null,
       "npc": "Deathspeaker Selendre",
-      "questName": null
-    },
-    {
-      "id": 284154,
-      "name": "Unmovable Sabatons",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Gish the Unmoving",
-      "questName": null
-    },
-    {
-      "id": 284157,
-      "name": "Ranger Lord's Longsword",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Ranger Lord Hawkspear",
-      "questName": null
-    },
-    {
-      "id": 284158,
-      "name": "Mossflayer Warlord's Girdle",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Warlord Thresh'jin",
-      "questName": null
-    },
-    {
-      "id": 284161,
-      "name": "Treads of Rotting Flesh",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Hed'mush the Rotting",
-      "questName": null
-    },
-    {
-      "id": 284162,
-      "name": "Mossflayer Witchdoctor's Robe",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Zul'Brin Warpbranch",
-      "questName": null
-    },
-    {
-      "id": 284197,
-      "name": "Hide of Mongress",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Mongress",
-      "questName": null
-    },
-    {
-      "id": 284215,
-      "name": "Ancient Lichen Vestments",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Dessecus",
-      "questName": null
-    },
-    {
-      "id": 284218,
-      "name": "Slime-Coated Gloves",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "The Ongar",
-      "questName": null
-    },
-    {
-      "id": 284228,
-      "name": "Vial of Vile Liquid",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Alshirr Banebreath",
-      "questName": null
-    },
-    {
-      "id": 284230,
-      "name": "Rage Paw",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Ragepaw",
-      "questName": null
-    },
-    {
-      "id": 284231,
-      "name": "Sayaad Charm",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Lady Hederine",
-      "questName": null
-    },
-    {
-      "id": 284257,
-      "name": "Icesworn Decapitator",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "General Colbatann",
-      "questName": null
-    },
-    {
-      "id": 284262,
-      "name": "Howling Hide",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Mezzir the Howler",
       "questName": null
     },
     {
@@ -24517,37 +24454,10 @@
       "questName": null
     },
     {
-      "id": 284272,
-      "name": "Chimaera Hide Legs",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "The Evalcharr",
-      "questName": null
-    },
-    {
-      "id": 284282,
-      "name": "Queen Guard's Royal Seal",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Varo'then's Ghost",
-      "questName": null
-    },
-    {
-      "id": 284283,
-      "name": "Horn of Antilos",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Antilos",
-      "questName": null
-    },
-    {
       "id": 284403,
       "name": "Shapeshifting Sentinel's Strides",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
+      "sourceType": "rare_npc",
+      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Sentinel Amarassan",
       "questName": null
@@ -24616,30 +24526,12 @@
       "questName": null
     },
     {
-      "id": 284708,
-      "name": "Demonstrike Emblem",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Kaskk",
-      "questName": null
-    },
-    {
       "id": 284716,
       "name": "Band of the Better Half",
       "sourceType": "unsourced",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
-      "questName": null
-    },
-    {
-      "id": 284843,
-      "name": "Sturdy Bearhide Legguards",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Old Grizzlegut",
       "questName": null
     },
     {
@@ -24652,48 +24544,12 @@
       "questName": null
     },
     {
-      "id": 284850,
-      "name": "Naga Caster's Staff",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Lady Szallah",
-      "questName": null
-    },
-    {
-      "id": 285063,
-      "name": "Black Brood Battleguards",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Brimgore",
-      "questName": null
-    },
-    {
       "id": 285066,
       "name": "Ooze Rummagers",
       "sourceType": "unsourced",
       "reason": "not indexed yet",
       "zone": null,
       "npc": null,
-      "questName": null
-    },
-    {
-      "id": 285088,
-      "name": "Ooze Dripping Robes",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Oozeworm",
-      "questName": null
-    },
-    {
-      "id": 285089,
-      "name": "Swamp Roamer's Band",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Drogoth the Roamer",
       "questName": null
     },
     {
@@ -24717,8 +24573,8 @@
     {
       "id": 285177,
       "name": "Nature's Sting Legguards",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
+      "sourceType": "rare_npc",
+      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": "Vile Sting",
       "questName": null
@@ -24733,24 +24589,6 @@
       "questName": "The Reliquary of Tyr"
     },
     {
-      "id": 286552,
-      "name": "Sandcaster's Mantle",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Jin'Zallah the Sandbringer",
-      "questName": null
-    },
-    {
-      "id": 286556,
-      "name": "Winds of Tanaris",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Soul of Tanaris",
-      "questName": null
-    },
-    {
       "id": 286568,
       "name": "Blisterpaw Bones",
       "sourceType": "unsourced",
@@ -24760,53 +24598,8 @@
       "questName": null
     },
     {
-      "id": 286570,
-      "name": "Silithid Flesh Bindings",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Haarka the Ravenous",
-      "questName": null
-    },
-    {
-      "id": 286571,
-      "name": "Silithid Hauberk",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Soriid the Devourer",
-      "questName": null
-    },
-    {
-      "id": 286590,
-      "name": "Silithid Queen's Husk",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Zora",
-      "questName": null
-    },
-    {
-      "id": 286597,
-      "name": "Calm Air Band",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Huricanian",
-      "questName": null
-    },
-    {
       "id": 286609,
       "name": "Krellack's Carapace",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 286612,
-      "name": "Sand-Covered Silk Sash",
       "sourceType": "unsourced",
       "reason": "not indexed yet",
       "zone": null,
@@ -24820,15 +24613,6 @@
       "reason": "Wowhead page not cached yet",
       "zone": null,
       "npc": "King Mosh",
-      "questName": null
-    },
-    {
-      "id": 286614,
-      "name": "Gruff's Tough Tongue",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Gruff",
       "questName": null
     },
     {
@@ -24847,15 +24631,6 @@
       "reason": "not indexed yet",
       "zone": null,
       "npc": null,
-      "questName": null
-    },
-    {
-      "id": 286619,
-      "name": "Big Basher's Belt",
-      "sourceType": "world_drop",
-      "reason": "Wowhead page not cached yet",
-      "zone": null,
-      "npc": "Uhk'loc",
       "questName": null
     },
     {
@@ -24915,15 +24690,6 @@
     {
       "id": 286984,
       "name": "Mark of the Marsh",
-      "sourceType": "unsourced",
-      "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 286986,
-      "name": "Abandoned Leggings",
       "sourceType": "unsourced",
       "reason": "not indexed yet",
       "zone": null,
@@ -25324,7 +25090,7 @@
       "reason": "Wowhead page not cached yet",
       "zone": null,
       "npc": null,
-      "questName": null
+      "questName": "Gettin' Buzzed"
     }
   ]
 }

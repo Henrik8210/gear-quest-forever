@@ -5936,23 +5936,35 @@ end
 -- Bracers of Agility are stored as +7, and the +6 she is wearing is a
 -- worse piece. The arrow uses the roll on the link.
 function GQ.Data:WornRollScore(itemId, slotName, itemLink)
+    -- The worn piece is compared to the jackpot the hunt shows for this
+    -- exact suffix. A lower number in that range is not the piece on the
+    -- list, and a different "of" is a different enchant.
+    if itemLink and self.EntryForItemLink then
+        local entry = self:EntryForItemLink(itemLink)
+        if entry and entry.suffix and entry.suffix ~= ""
+            and self:EntrySuffixMatchesLink(entry, itemLink)
+            and type(entry.pipelineScore) == "number" then
+            return entry.pipelineScore
+        end
+        if entry and (not entry.suffix or entry.suffix == "")
+            and type(entry.pipelineScore) == "number" then
+            return entry.pipelineScore
+        end
+    end
     local stored = self:EquippedPipelineScore(itemId, slotName)
-    if not itemLink or type(stored) ~= "number" or stored <= 0 then
-        return stored
+    if itemLink and self.ItemLinkFullName then
+        local fullName = self:ItemLinkFullName(itemLink)
+        if fullName and string.find(fullName, " of ", 1, true) then
+            if GQ.Compare and GQ.Compare.ScoreItemLinkStats then
+                local actual = GQ.Compare:ScoreItemLinkStats(itemLink, slotName)
+                if type(actual) == "number" and actual > 0 then
+                    return actual
+                end
+            end
+            return nil
+        end
     end
-    if not GQ.Compare or not GQ.Compare.ScoreItemLinkStats or not self.EntryForItemLink then
-        return stored
-    end
-    local entry = self:EntryForItemLink(itemLink)
-    local range = entry and entry.suffixRange
-    if type(range) ~= "string" or not string.find(range, "%d+%-%d+") then
-        return stored
-    end
-    local actual = GQ.Compare:ScoreItemLinkStats(itemLink, slotName)
-    if type(actual) ~= "number" or actual <= 0 or actual >= stored then
-        return stored
-    end
-    return actual
+    return stored
 end
 
 -- The row of this item on the list in front of the player. Another spec's
@@ -6436,6 +6448,22 @@ function GQ.Data:GearScoreTooltipLine(entry)
     else
         rankText = nil
     end
+    local specName
+    if GQ.Spec and GQ.GetEffectiveClass and GQ.GetEffectiveSpec then
+        local classFile = GQ:GetEffectiveClass()
+        local spec = GQ:GetEffectiveSpec()
+        if classFile and GQ.Spec.GetOptions then
+            for _, opt in ipairs(GQ.Spec:GetOptions(classFile) or {}) do
+                if opt.id == spec then
+                    specName = L[opt.label] or opt.label
+                    break
+                end
+            end
+        end
+    end
+    if rankText and specName and specName ~= "" then
+        rankText = string.format(L["%s (your selected spec): %s"], specName, rankText)
+    end
     if rankText and GQ.Log and GQ.Log.OffHandPairNote then
         local pairNote = GQ.Log:OffHandPairNote(entry)
         if pairNote then
@@ -6478,19 +6506,37 @@ end
 
 -- Simulation still gets these lines. A rank does not depend on worn gear.
 function GQ.Data:AppendOtherSpecRanks(tooltip, link, entry)
-    if not (link or entry) or not self:OtherSpecRanksEnabled() or not (GQ.Log and GQ.Log.OtherSpecRankLines) then
+    if not (link or entry) or not (GQ.Log and GQ.Log.OtherSpecRankLines) then
         return
     end
-    local ok, lines = pcall(GQ.Log.OtherSpecRankLines, GQ.Log, link, entry)
-    if not ok or not lines then
+    -- The spec on screen stays, including "Enhancement: Not ranked for your
+    -- level". The Tooltips page hides the specs that are not selected.
+    local currentLine = GQ.Log.CurrentSpecRankLine and GQ.Log:CurrentSpecRankLine(link, entry)
+    local lines
+    if self:OtherSpecRanksEnabled() then
+        local ok, result = pcall(GQ.Log.OtherSpecRankLines, GQ.Log, link, entry)
+        if ok then
+            lines = result
+        end
+    end
+    if not currentLine and (not lines or #lines == 0) then
         return
     end
     if not tooltip.gqScoreLineAdded then
         tooltip.gqScoreLineAdded = true
         tooltip:AddLine(" ")
     end
-    for i = 1, #lines do
-        tooltip:AddLine("|cffd9bf73" .. lines[i] .. "|r", 1, 1, 1)
+    if not tooltip.gqGearQuestHeader then
+        tooltip.gqGearQuestHeader = true
+        tooltip:AddLine("|cffffd100" .. L["GearQuest"] .. "|r")
+    end
+    if currentLine then
+        tooltip:AddLine(currentLine, 1, 1, 1)
+    end
+    if lines then
+        for i = 1, #lines do
+            tooltip:AddLine("|cffd9bf73" .. lines[i] .. "|r", 1, 1, 1)
+        end
     end
 end
 
@@ -6527,6 +6573,10 @@ function GQ.Data:AppendGearScoreLine(tooltip, entry)
     end
     tooltip.gqScoreLineAdded = true
     tooltip:AddLine(" ")
+    if not tooltip.gqGearQuestHeader then
+        tooltip.gqGearQuestHeader = true
+        tooltip:AddLine("|cffffd100" .. L["GearQuest"] .. "|r")
+    end
     if enchant then
         tooltip.gqEnchantAdded = true
         GQ.Enchant:AddLines(tooltip, enchant)
@@ -6635,7 +6685,8 @@ function GQ.Data:AddGearScoreToItemTooltip(tooltip)
     tooltip.gqScoreBusy = true
     local entry = self:EntryForItemLink(link)
     if not entry then
-        local miss = self:GearScoreMissText(link)
+        local currentLine = GQ.Log and GQ.Log.CurrentSpecRankLine and GQ.Log:CurrentSpecRankLine(link, nil)
+        local miss = not currentLine and self:GearScoreMissText(link)
         local enchant = GQ.Enchant and GQ.Enchant.Text and not tooltip.gqEnchantAdded and GQ.Enchant:Text(link, nil)
         if not miss and not enchant then
             self:AppendOtherSpecRanks(tooltip, link)
@@ -6657,7 +6708,8 @@ function GQ.Data:AddGearScoreToItemTooltip(tooltip)
     end
     self:AppendGearScoreLine(tooltip, entry)
     if not tooltip.gqScoreLineAdded then
-        local miss = self:GearScoreMissText(link)
+        local currentLine = GQ.Log and GQ.Log.CurrentSpecRankLine and GQ.Log:CurrentSpecRankLine(link, entry)
+        local miss = not currentLine and self:GearScoreMissText(link)
         local enchant = GQ.Enchant and GQ.Enchant.Text and not tooltip.gqEnchantAdded and GQ.Enchant:Text(link, entry)
         if miss or enchant then
             tooltip.gqScoreLineAdded = true
@@ -6835,6 +6887,7 @@ function GQ.Data:HookItemScoreTooltips()
         tip:HookScript("OnTooltipCleared", function(self)
             self.gqScoreLineAdded = nil
             self.gqEnchantAdded = nil
+            self.gqGearQuestHeader = nil
         end)
     end
 

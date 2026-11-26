@@ -280,6 +280,8 @@ L["Shows the score bar in the log header. Off restores the viewing-upgrades line
 L["%s: Rank #%d for your level"] = "%s：在你的等级排名第 %d"
 L["%s: Rank #%d for your level (%s)"] = "%s：在你的等级排名第 %d（%s）"
 L["%s: Not ranked for your level"] = "%s：在你的等级未排名"
+L["GearQuest"] = "GearQuest"
+L["%s (your selected spec): %s"] = "%s（你选择的专精）：%s"
 L["Ranks for your other specs"] = "其他专精的排名"
 L["Adds the rank each of your class's other specs gives the item at your level, for gearing two specs at once. Off shows only the spec you are playing or simulating."] = "为你职业的每个其他专精加上该物品在你当前等级的排名，方便同时为两个专精配装。关闭后只显示你正在玩或模拟的专精。"
 L["INTERFACE"] = "界面"

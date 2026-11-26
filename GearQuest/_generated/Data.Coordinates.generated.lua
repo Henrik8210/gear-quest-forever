@@ -193,7 +193,6 @@ GQ.Data.coordinates = {
     [1958]={note="a farming spot",spots={{map="Westfall",mapId=1436,x=40.8,y=81.3}}},
     [1959]={note="a farming spot",spots={{map="Westfall",mapId=1436,x=40.7,y=81.1}}},
     [1965]={note="where this rare spawns",more=true,spots={{map="Dun Morogh",x=33.2,y=40.4},{map="Dun Morogh",x=33.4,y=40.8},{map="Dun Morogh",x=33.4,y=41.6},{map="Dun Morogh",x=33.6,y=40.2},{map="Dun Morogh",x=34.0,y=41.4},{map="Dun Morogh",x=34.2,y=41.5},{map="Dun Morogh",x=34.4,y=43.0},{map="Dun Morogh",x=34.6,y=41.2},{map="Dun Morogh",x=34.6,y=41.6},{map="Dun Morogh",x=34.6,y=44.0},{map="Dun Morogh",x=36.4,y=41.8}}},
-    [1986]={note="entrance to dungeon or raid",spots={{map="Stranglethorn Vale",x=53.8,y=17.5}}},
     [1993]={note="a farming spot",more=true,spots={{map="Alterac Mountains",mapId=1416,x=38.4,y=40.2},{map="Arathi Highlands",mapId=1417,x=50.4,y=74.2},{map="Arathi Highlands",x=18.0,y=68.4},{map="Badlands",mapId=1418,x=64.6,y=25.4}}},
     [1996]={note="a farming spot",spots={{map="Stranglethorn Vale",x=19.4,y=11.4}}},
     [2000]={note="beginning of the quest or chain",spots={{map="Duskwood",mapId=1431,x=17.7,y=29.2,faction="Alliance"}}},

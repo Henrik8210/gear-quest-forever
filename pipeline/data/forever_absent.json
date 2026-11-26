@@ -1,5 +1,5 @@
 {
-  "_note": "Content the Forever client has rows for that players cannot reach yet. apply_forever_absent.py sets obtainable false on those sources, and puts them back when a raid leaves absentRaids. raidContent zones and worldBosses feed Hunt settings > Hide raid hunts.",
+  "_note": "Content the Forever client has rows for that players cannot reach yet. apply_forever_absent.py sets obtainable false on those sources, and puts them back when a raid leaves absentRaids. raidContent zones and worldBosses feed Hunt settings > Hide raid hunts. openRaids stays empty until 8 December 2026. Hyjal Summit and Barrow Deeps are the first raids, and they are not open yet. A name in unreleasedNames or unreleasedNameParts stays out even when the client already has the row. The Scarlet Enclave token sets are that case.",
   "absentRaids": [
     "Molten Core",
     "Blackwing Lair",
@@ -8,11 +8,20 @@
     "Ruins of Ahn'Qiraj",
     "Temple of Ahn'Qiraj",
     "Ahn'Qiraj",
-    "Naxxramas"
-  ],
-  "openRaids": [
+    "Naxxramas",
     "Hyjal Summit",
-    "Barrow Deeps"
+    "Barrow Deeps",
+    "Zul'Aman",
+    "Scarlet Enclave"
+  ],
+  "openRaids": [],
+  "unreleasedNames": [
+    "Signet Ring of the Bronze Dragonflight"
+  ],
+  "unreleasedNameParts": [
+    "Inquisition",
+    "Fireleaf",
+    "Waywatcher"
   ],
   "absentBosses": [
     "Prince Skaldrenox",
@@ -82,6 +91,8 @@
     "19366": "The Lord of Blackrock turns in Nefarian's head. Blackwing Lair is not open yet.",
     "19383": "The Lord of Blackrock turns in Nefarian's head. Blackwing Lair is not open yet.",
     "19384": "The Lord of Blackrock turns in Nefarian's head. Blackwing Lair is not open yet.",
-    "14554": "Cloudkeeper Legplates drop from the Silithus colossi. That is not a dungeon that is in the game yet."
+    "14554": "Cloudkeeper Legplates drop from the Silithus colossi. That is not a dungeon that is in the game yet.",
+    "15138": "Onyxia Scale Cloak is made from the pattern awarded after turning in Onyxia's head. Onyxia's Lair is not open yet.",
+    "274560": "Hyjal Summit trash. Hyjal Summit is not open yet."
   }
 }

@@ -1698,13 +1698,35 @@ function GQ.Log:RefreshTooltipsPanelPreview()
         if settings.showGearScore ~= false and paint.note then
             rlines[#rlines + 1] = paint.note
         end
-        if settings.showOtherSpecRanks ~= false and paint.other then
-            for i = 1, #paint.other do
-                local otherLine = paint.other[i]
-                if otherLine:find("|cff") then
-                    rlines[#rlines + 1] = otherLine
+        local specName = "Enhancement"
+        local otherNames = {}
+        if GQ.Spec and GQ.GetEffectiveClass and GQ.GetEffectiveSpec and GQ.Spec.GetOptions then
+            local classFile = GQ:GetEffectiveClass()
+            local spec = GQ:GetEffectiveSpec()
+            for _, opt in ipairs(GQ.Spec:GetOptions(classFile) or {}) do
+                local label = L[opt.label] or opt.label
+                if opt.id == spec then
+                    specName = label
                 else
-                    rlines[#rlines + 1] = "|cffd9bf73" .. otherLine .. "|r"
+                    otherNames[#otherNames + 1] = label
+                end
+            end
+        end
+        rlines[#rlines + 1] = "|cff9d9d9d" .. string.format(L["%s: Not ranked for your level"], specName) .. "|r"
+        if settings.showOtherSpecRanks ~= false then
+            if paint.other then
+                for i = 1, #paint.other do
+                    local otherLine = paint.other[i]
+                    if otherLine:find("|cff") then
+                        rlines[#rlines + 1] = otherLine
+                    else
+                        rlines[#rlines + 1] = "|cffd9bf73" .. otherLine .. "|r"
+                    end
+                end
+            elseif otherNames[1] then
+                rlines[#rlines + 1] = "|cffd9bf73" .. string.format(L["%s: Rank #%d for your level"], otherNames[1], 2) .. "|r"
+                if otherNames[2] then
+                    rlines[#rlines + 1] = "|cff9d9d9d" .. string.format(L["%s: Not ranked for your level"], otherNames[2]) .. "|r"
                 end
             end
         end

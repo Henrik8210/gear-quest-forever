@@ -32,6 +32,31 @@ def _season1_locked_titles():
 
 SEASON1_LOCKED_EPIC_TITLES = _season1_locked_titles()
 
+def _unreleased_name_locks():
+    path = os.path.join(G, "forever_absent.json")
+    try:
+        cfg = json.load(open(path, encoding="utf-8"))
+    except OSError:
+        return (), ()
+    return tuple(cfg.get("unreleasedNames") or ()), tuple(cfg.get("unreleasedNameParts") or ())
+
+UNRELEASED_NAMES, UNRELEASED_NAME_PARTS = _unreleased_name_locks()
+
+def unreleased_content(it):
+    """Scarlet Enclave token sets, and the Ahn'Qiraj signet rings.
+
+    The client already has some Inquisition pieces. A tooltip refresh must
+    not score those names until the Scarlet Enclave is open. Fireleaf and
+    Waywatcher are the same vendor. Signet Ring of the Bronze Dragonflight
+    is The Path of the Protector, the Conqueror, and the Invoker.
+    """
+    if not it:
+        return False
+    name = it.get("name") or ""
+    if name in UNRELEASED_NAMES:
+        return True
+    return any(part in name for part in UNRELEASED_NAME_PARTS)
+
 def season1_epic_unavailable(it):
     """Unprefixed Field Marshal, Warlord, Marshal, General, and rank-14 epics.
 
@@ -495,6 +520,9 @@ def eligible(it, cls, spec, level, faction, prof, wsubs):
     # Season 1 epic PvP is the Premier line. The unprefixed rank epics stay
     # in the client for a later season, so a vendor refresh must not score them.
     if season1_epic_unavailable(it): return False
+    # Scarlet Enclave sets and the Ahn'Qiraj signet rings. The client has
+    # some of these rows, so a missing-item refresh must not score them.
+    if unreleased_content(it): return False
     if it.get("temporary"): return False        # conjured / duration-limited, not gear
     nm=(it.get("name") or "").lower()
     if "test copy" in nm or "animation as" in nm:
@@ -773,6 +801,7 @@ def best_variant(it, w, level, rscale, fold_rap=False):
 #           Wowhead before being added here.
 #
 # Verified against Wowhead, kept OUT:
+#   15138 Onyxia Scale Cloak       -- pattern from the head turn-in; Onyxia's Lair is not open
 #   15141 Onyxia Scale Breastplate  -- "This item is not available to players"
 #    6730 Ironforge Chain           -- "the actual recipe ... is no longer available"
 #    2867 Rough Bronze Bracers      -- "no way to make or find this item. A way to
@@ -786,7 +815,7 @@ def best_variant(it, w, level, rscale, fold_rap=False):
 # Not obtainable yet. Ashbringer's quest is not finished in the game.
 # The four Atiesh staves need Naxxramas, which is not open.
 # 22589 mage, 22630 warlock, 22631 priest, 22632 druid.
-HAND_EXCLUDED={15141, 6730, 2867, 13262, 22589, 22630, 22631, 22632}
+HAND_EXCLUDED={15138, 15141, 6730, 2867, 13262, 22589, 22630, 22631, 22632}
 # Forever lists these, but they are spells or QA items rather than gear you can hunt.
 # 280304 Invisible Dagger is spell 1308095, a hidden dummy aura.
 # 24358 is QATest +1000 Spell Dmg Ring. 19503 and 19504 are the 2200 Test swords.

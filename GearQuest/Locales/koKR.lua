@@ -280,6 +280,8 @@ L["Shows the score bar in the log header. Off restores the viewing-upgrades line
 L["%s: Rank #%d for your level"] = "%s: 현재 레벨 %d위"
 L["%s: Rank #%d for your level (%s)"] = "%s: 현재 레벨 %d위 (%s)"
 L["%s: Not ranked for your level"] = "%s: 현재 레벨 순위 없음"
+L["GearQuest"] = "GearQuest"
+L["%s (your selected spec): %s"] = "%s (선택한 특성): %s"
 L["Ranks for your other specs"] = "다른 전문화 순위"
 L["Adds the rank each of your class's other specs gives the item at your level, for gearing two specs at once. Off shows only the spec you are playing or simulating."] = "직업의 다른 전문화마다 현재 레벨에서 이 아이템의 순위를 추가해 두 전문화를 함께 갖출 수 있습니다. 끄면 플레이하거나 시뮬레이션 중인 전문화만 표시됩니다."
 L["INTERFACE"] = "인터페이스"

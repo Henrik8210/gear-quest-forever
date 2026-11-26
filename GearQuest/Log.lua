@@ -6067,6 +6067,32 @@ function GQ.Log:IsEntryObtained(id)
     return false
 end
 
+-- Changes whenever a hunt is obtained, completed, restored, or removed, or the
+-- catalog index is rebuilt. The obtained timestamps and completion times enter
+-- the sum, so swapping one record for another of the same count still changes it.
+function GQ.Log:ItemObtainedSignature()
+    local progress = CharProgress()
+    local count, sum = 0, 0
+    for _, stamp in pairs(progress.obtained or {}) do
+        count = count + 1
+        sum = sum + (tonumber(stamp) or 1)
+    end
+    for _, record in pairs(progress.hunts or {}) do
+        count = count + 1
+        if NormalizeHuntStatus(record.status) == "completed" then
+            sum = sum + (tonumber(record.completedAt) or 1) + 0.5
+        end
+    end
+    local data = GQ.Data
+    return count .. ":" .. sum .. ":" .. tostring(data and data._entryGeneration)
+        .. ":" .. tostring(data and data.byItemId)
+end
+
+-- A bag change asks this for every candidate on the hunt list. Answering it
+-- walks every catalog row of the item, and those rows are rebuilt from the
+-- packed catalog once its 64-item cache has cycled: about 200 ms for a full
+-- list. The answer only changes with progress or the index, so keep it until
+-- the signature changes.
 function GQ.Log:IsItemIdObtained(itemId)
     if not itemId then
         return false
@@ -6075,6 +6101,21 @@ function GQ.Log:IsItemIdObtained(itemId)
         return true
     end
 
+    local signature = self:ItemObtainedSignature()
+    if self._itemObtainedSignature ~= signature then
+        self._itemObtainedSignature = signature
+        self._itemObtainedMemo = {}
+    end
+    local key = tostring(itemId)
+    local cached = self._itemObtainedMemo[key]
+    if cached == nil then
+        cached = self:ComputeItemIdObtained(itemId)
+        self._itemObtainedMemo[key] = cached
+    end
+    return cached
+end
+
+function GQ.Log:ComputeItemIdObtained(itemId)
     local needle = tostring(itemId)
     local progress = CharProgress()
 
@@ -14936,7 +14977,7 @@ function GQ.Log:EnsureSettingsPage(frame)
     creditsBody:SetPoint("TOPLEFT", creditsTitle, "BOTTOMLEFT", 0, -6)
     creditsBody:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
     creditsBody:SetJustifyH("LEFT")
-    creditsBody:SetText("Eao\nMainWon\nStikmyre\nClick\nVaniron\nThrayne\nAlteredigor\nDeadlybrew\nTheWawan\nBart2137\nmoosetraxftw\nkaeldrin\nCookiesShorts")
+    creditsBody:SetText("Eao\nMainWon\nStikmyre\nClick\nVaniron\nThrayne\nAlteredigor\nDeadlybrew\nTheWawan\nBart2137\nmoosetraxftw\nkaeldrin\nCookiesShorts\nGoadah\nShengjie")
     creditsBody:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
     creditsBody:Hide()
     frame.settingsCreditsBody = creditsBody
@@ -17570,9 +17611,9 @@ function GQ.Log:HuntListRank(entry, slotName, handKind)
     if not entry then
         return nil
     end
-    if self:OnlyGuideGearEnabled() and entry.guidePlace then
-        return entry.guidePlace
-    end
+    -- Only Guide Gear keeps page order. The number is this faction's place
+    -- in that order. The other faction's page piece is not on the list, so
+    -- it does not hold a rank.
     local dataSlot = slotName == "WeaponPair" and "MainHand" or slotName
     if dataSlot == "MainHand" and self:IsWeaponHandKind(handKind) then
         return self:WeaponTrueRank(entry)
@@ -18521,6 +18562,50 @@ end
 -- entry with a suffix is matched on that suffix, not on the link. Each spec
 -- ranks its own jackpot roll, so a spec without that roll shows the rank of
 -- the roll it does rank, named in the line.
+function GQ.Log:CurrentSpecRankLine(link, baseEntry)
+    -- Same sentence as the other specs. A rank is already on the score line,
+    -- so this is only the grey line that stays when the spec on screen has
+    -- no rank. The Tooltips checkbox does not hide it.
+    if not GQ.Spec or not GQ.Spec.IsActive or not GQ.Spec:IsActive() then
+        return nil
+    end
+    local data = GQ.Data
+    local itemId = (baseEntry and baseEntry.itemId) or (link and data and data.ItemLinkToId and data:ItemLinkToId(link))
+    if not itemId or not data or not data.GetEntriesByItemId then
+        return nil
+    end
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    local spec = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec()
+    if not classFile or not spec then
+        return nil
+    end
+    local label
+    local anySpec = false
+    for _, opt in ipairs(GQ.Spec:GetOptions(classFile) or {}) do
+        if self:ItemHasSpecRow(itemId, classFile, opt.id) then
+            anySpec = true
+        end
+        if opt.id == spec then
+            label = L[opt.label] or opt.label
+        end
+    end
+    if not anySpec or not label or label == "" then
+        return nil
+    end
+    local level = GQ.GetEffectiveLevel and GQ:GetEffectiveLevel() or 1
+    local faction = GQ.GetEffectiveFaction and GQ:GetEffectiveFaction()
+    for _, row in ipairs(data:GetEntriesByItemId(itemId)) do
+        if type(row.pipelineScore) == "number"
+            and (not row.classes or row.classes[classFile])
+            and row.specs and row.specs[spec]
+            and (not row.factions or not faction or row.factions[faction])
+            and level >= (row.minLevel or 1) and level <= (row.maxLevel or level) then
+            return nil
+        end
+    end
+    return "|cff9d9d9d" .. string.format(L["%s: Not ranked for your level"], label) .. "|r"
+end
+
 function GQ.Log:OtherSpecRankLines(link, baseEntry)
     if not GQ.Spec or not GQ.Spec.IsActive or not GQ.Spec:IsActive() then
         return nil
@@ -18844,6 +18929,20 @@ function GQ.Log:GuideOrderedEntries(pool)
     return only
 end
 
+function GQ.Log:RankListSeenKey(entry)
+    -- Two rolls of one item share an id. That id is the item, the slot, and
+    -- the band. The suffix is not in it, so the (i) list kept the first roll
+    -- and dropped the one the character is wearing. The rank then sat between
+    -- two rows, and Equipped never appeared.
+    if not entry or not entry.id then
+        return nil
+    end
+    if entry.suffix and entry.suffix ~= "" then
+        return entry.id .. "\0" .. tostring(entry.suffixId or entry.suffix)
+    end
+    return entry.id
+end
+
 function GQ.Log:GetSlotRankList(slotName, handKind)
     local dataSlot = slotName == "WeaponPair" and "MainHand" or slotName
     if not dataSlot or not GQ.Data or not GQ.Data.GetClassSlotEntryList then
@@ -18899,8 +18998,9 @@ function GQ.Log:GetSlotRankList(slotName, handKind)
             slotPool = GQ.Data:FilterToActiveBand(slotPool) or slotPool
             for i = 1, #slotPool do
                 local entry = slotPool[i]
-                if entry.id and not seen[entry.id] then
-                    seen[entry.id] = true
+                local seenKey = self:RankListSeenKey(entry)
+                if seenKey and not seen[seenKey] then
+                    seen[seenKey] = true
                     pool[#pool + 1] = entry
                 end
             end
@@ -19278,9 +19378,7 @@ function GQ.Log:ShowSlotRankTooltip(row)
             local r, g, b = GetListItemQualityColor(entry.itemId)
             local color = string.format("|cff%02x%02x%02x", math.floor(r * 255 + 0.5), math.floor(g * 255 + 0.5), math.floor(b * 255 + 0.5))
             local place = i
-            if self:OnlyGuideGearEnabled() and entry.guidePlace then
-                place = entry.guidePlace
-            elseif weaponList and self.WeaponTrueRank then
+            if weaponList and self.WeaponTrueRank then
                 place = self:WeaponTrueRank(entry) or i
             end
             local equipped = ""
@@ -20534,8 +20632,9 @@ function GQ.Log:BuildCollectWeaponPool()
             slotPool = GQ.Data:FilterToActiveBand(slotPool) or slotPool
             for i = 1, #slotPool do
                 local entry = slotPool[i]
-                if entry.id and not seen[entry.id] then
-                    seen[entry.id] = true
+                local seenKey = self:RankListSeenKey(entry)
+                if seenKey and not seen[seenKey] then
+                    seen[seenKey] = true
                     pool[#pool + 1] = entry
                 end
             end

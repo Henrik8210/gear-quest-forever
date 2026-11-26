@@ -39,7 +39,10 @@ First on the page reads 100 only when it is also the best score in the slot.
 **Only Guide Gear** is a level-60 play style and starts off. It is a
 runtime filter. Off, level 60 is the scored list and a page piece is
 labeled (Guide) on the hunt and (Guide #N) on the rank list. On, that
-slot's hunt rows and rank list are only the page, in page order. Weapons,
+slot's hunt rows and rank list are only the page, in page order. The number
+is this faction's place in that order. A piece the other faction cannot get
+is left out and the numbers close up. The (Guide #N) label while the card
+is off stays the page place. Weapons,
 the shield and held off hand, the caster's paired off hand, and the
 paper-doll upgrade list follow the same card. A slot the page leaves empty
 stays the scored list, including a retribution shield when the page has no
@@ -98,11 +101,43 @@ rank list label every Honor piece (PvP), at every level.
 
 Plans are the start of a crafted hunt. **Plans: Lionheart Helm** drop from
 **Ferra** in Dire Maul, not from a Lower Blackrock Spire boss. The pin is
-the Dire Maul entrance in Feralas. **Stalwart Helm** plans drop from
+the Dire Maul entrance in Feralas. The lock is in `hunt_revisions.json`.
+**Stalwart Helm** plans drop from
 **Bloodaxe Veteran** in Blackrock Spire. **Frozen Heart of the Mountain**
 drops from **Mor Grayhoof**, and **Dormant Heart of the Mountain** from
 **Mother Smolderweb**, both in Blackrock Spire. **Arcanite Reaper** plans
 drop from **Bannok Grimaxe**. Those four pin the Blackrock Spire entrance.
+
+### Corrections locked from player reports
+
+`pipeline/data/hunt_revisions.json` is the list. A later scrape keeps a
+locked field. Stats the client shows stay in `client_item_overrides.json`
+and are not copied into that log. Rows added or kept on 26 Nov 2026:
+
+- **Museum Keeper's Chain** (281636), **Artifact Seeker's Pendant** (277202),
+  and **Antique Bulwark** (281637). Rango, in game at 50. Greater Friend of
+  the Library has no Requires Level. The stored 53 was the item-level floor.
+  Required level and gate stay 50. The level 20 and 40 library rewards were
+  not moved.
+- **Drake-scale Vest** (1677), **Gutrender** (1986), and **Onyx Shredder
+  Plate** (5755). Zone locked to Stranglethorn Vale. Wowhead files Zul'Gurub.
+  The droppers are Mosh'Ogg Lord, Mosh'Ogg Warmonger, and Venture Co.
+  Shredder. Gutrender does not pin the Zul'Gurub door.
+- **Soulsplatter Mace** (271804) and the other Magram rewards. Manuri.
+  Alliance chain starts at Brutal Politics and skips Magram Alliance. Horde
+  starts at Magram Alliance and skips Brutal Politics. Both continue at
+  Broken Tears through Khan Jehn. Gelkis rewards split the same way. The
+  mace stays on both lists. The pin is Nijel's Point, Desolace 66.4, 10.8.
+- **Vanquisher's Sword** (10823). Kasku. Bring the Light is both factions.
+  The Alliance lock is gone.
+- **Lionheart Helm** (12640). Boss drop, Ferra, Dire Maul. Already locked.
+
+The (i) list keeps each random-enchant roll. Two greens of one item share
+an entry id, so the list used to keep the first roll and drop the one the
+character is wearing. `RankListSeenKey` adds the suffix. Equipped is that
+worn roll. Only Guide Gear numbers the page pieces this faction can see.
+The other faction's page piece does not hold a rank. With the card off,
+(Guide #N) stays the Wowhead page place.
 
 `GQ.ScoringLeveling` in `GearQuest/_generated/ScoringWeights.generated.lua`
 is identity (every stat is 1). It is not applied. Hunt scoring, enchant
@@ -860,7 +895,7 @@ A hunt hover asks Auctionator for its price lines only when that addon is loaded
 
 ## Ranks for your other specs
 
-The item tooltip lists, under the rank line, the rank the item has at this level for each other spec of the class on screen, for example `Restoration: Rank #3 for your level`. It works while simulating and needs no hunt. A spec that does not rank that item at this level gets a grey line, `Holy: Not ranked for your level`, for every class, so a missing rank does not look like a line that failed to load. Netherpearl Shoulders (Shadow damage only) reads Shadow #2 and Discipline and Holy not ranked at 47. When no spec of the class ranks the item at any level (plate on a mage, food), no line is added. A random-suffix hunt is matched on its suffix. Each spec ranks its own jackpot roll, so a spec that ranks a different roll shows that roll's rank and names it (`Marksmanship: Rank #1 for your level (of the Falcon)` on Fire Opal Necklace of Agility). **General → Ranks for your other specs** (`settings.showOtherSpecRanks`) is on unless that setting is false. Off shows only the spec being played or simulated. `GQ.Log:WithSpecProbe` forces the spec through `GQ._ctx` and swaps in per-spec rank caches, so the active spec's hunt list and caches stay untouched. `InvalidateQueryCache` drops the probe caches.
+The item tooltip lists, under the rank line, the rank the item has at this level for each other spec of the class on screen, for example `Restoration: Rank #3 for your level`. It works while simulating and needs no hunt. A spec that does not rank that item at this level gets a grey line, `Holy: Not ranked for your level`, for every class, so a missing rank does not look like a line that failed to load. Netherpearl Shoulders (Shadow damage only) reads Shadow #2 and Discipline and Holy not ranked at 47. When no spec of the class ranks the item at any level (plate on a mage, food), no line is added. A random-suffix hunt is matched on its suffix. Each spec ranks its own jackpot roll, so a spec that ranks a different roll shows that roll's rank and names it (`Marksmanship: Rank #1 for your level (of the Falcon)` on Fire Opal Necklace of Agility). **Tooltips, item column → Ranks for your other specs** (`settings.showOtherSpecRanks`) is on unless that setting is false. Off hides the specs that are not selected. The spec being played or simulated stays. When that spec has no rank at this level, the line is `Enhancement: Not ranked for your level`, and it stays when the others are hidden. `GQ.Log:WithSpecProbe` forces the spec through `GQ._ctx` and swaps in per-spec rank caches, so the active spec's hunt list and caches stay untouched. `InvalidateQueryCache` drops the probe caches.
 
 ## Settings pages
 
@@ -927,7 +962,7 @@ promotion or the weights to make those two numbers match.
 
 A ding does not build the new list, the paper-doll arrows, and the obtain check on one frame. `PLAYER_LEVEL_UP` warms the query cache one slot per frame, then an idle frame (`WarmQueryCacheAsync` with gap 1). On that ding the weapon lists are walked a few milliseconds at a time. Other slots stay one frame. A warm that is not a ding still builds a weapon slot in one frame. Milestones, the obtain check, and the redraw each wait a frame after that. Paper-doll arrows on a ding are one slot per frame. The previous-level "new" probe idles between slots. The arrows you already have stay up until the new set is ready.
 
-Changing zone, logging in, and opening a merchant rebuild those arrows in the background the same way. Opening the log, changing a filter, or returning to Active, when the rank lists are not ready, keeps the rows on screen and swaps the whole list once they are built. Completed and Removed do not wait. A list that is already warm opens at once. Hovering an item tooltip, and switching class in the Simulator, stay on the frame they already used. Do not slice those.
+Changing zone, logging in, and opening a merchant rebuild those arrows in the background the same way. That pass paints one paper-doll slot per frame (`REBUILD_SLOTS_PER_FRAME` is 1 in `Indicator.lua`). Two slots in one frame was an 80 ms hitch right after login. The last slot paints on the next frame. The arrows are the same pieces. They arrive a few frames later. `IsItemIdObtained` remembers whether an item is already obtained until obtained items, completed hunts, or the catalog change. A piece just looted is still obtained on that same check, because `HasObtainedItemId` runs before the memo. A profession rank-up still turns the parchment skill line green. That line reads the live profession rank and does not use the obtain memo. Opening the log, changing a filter, or returning to Active, when the rank lists are not ready, keeps the rows on screen and swaps the whole list once they are built. Completed and Removed do not wait. A list that is already warm opens at once. Hovering an item tooltip, and switching class in the Simulator, stay on the frame they already used. Do not slice those.
 
 After the active spec is warm, the other specs' rank lists are built one spec and slot per frame with an idle frame between (`WarmOtherSpecRanksAsync`), so the first hover finds the other-spec lines ready. A band change or a dropped query cache stops that pass. Do not run `collectgarbage("collect")`. `GQ:CollectGarbageSoon` steps the same cycle over frames. The active list reads owned and obtained items from two sets (`EnsureOwnedItemSets`), rebuilt after a bag or equipment change, so it does not walk the bags or the progress table once per hunt. Bag and equipment events rebuild those sets at most once per frame. `QUEST_LOG_UPDATE` counts completed quests only within 10 seconds of a turn-in, on the first check, or while the quest titles are still being read. A weapon sort scores each piece once (`WeaponCompareScoreMap`).
 
@@ -1456,7 +1491,7 @@ Hunt-id probe (`pipeline/scripts/probe_forever_hunt_tooltips.py`) labels 200 vs 
 - **Log.lua locals.** A file-scope `local` at column 0 stays active until the end of the file. WoW's limit is 200. Crossing it fails the whole file with "main function has more than 200 local variables", and then `Minimap.lua` never loads, so the minimap button cannot open the log. The file is at 191. Do not add a file-scope local without removing one. New helpers go on `GQ.Log` as `function GQ.Log.Name(...)` — never `GQ.Log.GQ.Log.Name`. A replace-all that prefixes `GQ.Log.` on definitions caused the v1.2.5 open-log regression. CI: `check_rules.py`, `tests/addon/test_log_lua.py`.
 - **Version notice.** `GQ_Version` is one addon message to GUILD after login. A higher `X.Y.Z` prints once, even when Hide chat messages is on. It does not go through `GQ:Chat`.
 - **TomTom.** `PlaceForeverPin` returns after `TomTom:AddWaypoint` and clears a Blizzard user waypoint. Each Show on map adds one TomTom pin and leaves the earlier ones.
-- **(i) list.** `ShowSlotRankTooltip` writes Equipped only on the full-slot list, matched by inventory id and suffix. The same row prints the raw `pipelineScore` in parentheses after the 0–100 index. Hunt rows and the parchment do not.
+- **(i) list.** `ShowSlotRankTooltip` writes Equipped only on the full-slot list, matched by inventory id and suffix. Two rolls of one item share an entry id. `GetSlotRankList` and `BuildCollectWeaponPool` keep both, keyed by `RankListSeenKey` (the id plus the suffix). The worn roll is the row that says Equipped. The same row prints the raw `pipelineScore` in parentheses after the 0–100 index. Hunt rows and the parchment do not.
 - **New Forever pieces.** 37 gear ids were ingested and all nine classes re-scored. Named sources: Flightblade Throwing Axe (13173, War Master Voone), Blackmaw Reclamation rings 260216–260219, Plague Defiled Buckler (276456, Black Guard Swordsmith), Zarla's Snack Pouch and Beastbond Robe (276744, 276745, Blazeroar), Heartflame Gauntlets and Cinderedge Crescent (280028, 280029, Cinder), Horns of Varrox (280076), Furbolg Rib Protector (280084, Sabella No-Eyes). The rest of that batch stayed Unsourced. Do not invent a dropper. 8663 Mithril Insignia is a blacksmithing quest item and stayed out.
 
 **15 Nov 2026 (v1.1.7, target tooltip corrected in v1.1.8).** Do not undo these.
@@ -1614,6 +1649,14 @@ level 15 or below, and no real Requires Level, is wearable at 1. A higher
 item level with no quest stays on the lookup. Do not mark the dungeon sets
 wearable at 1.
 
+The 72 Season of Discovery plain-name copies stay out. Those ids run
+226815 through 227040, including Feralheart Helm (226819). The Forever
+page says they were added in Season of Discovery and may not be in WoW:
+Forever, and it names no source. Do not add them. The Forever spec copies
+already in the addon stay, including Soulforge (226969 through 226977)
+and the classic dungeon-set ids. Those are the level-60 quest chain above.
+Do not score the page bonuses on set 1667 unless asked.
+
 The item XML `https://www.wowhead.com/forever/item=ID&xml` first `<json>`
 CDATA `reqlevel` matches the quest page `Requires level N`. `jsonEquip`
 reqlevel is often the stub 1. Ignore it. Quest HTML `Requires level N` is
@@ -1671,9 +1714,9 @@ those world drops.
 
 Run `python pipeline/scripts/apply_unconfirmed.py`. An unconfirmed item moves to the `unsourced` source, which the log labels **Unsourced** and starts hidden. The stored instructions, zone, npc, and pins stay, and the old type is kept in `unconfirmedFrom`, so a later crawl that no longer flags it puts it back. The hover says Wowhead Forever marks the item unconfirmed (`GQ.Data.unconfirmed`, `Data.Unconfirmed.generated.lua`). The same pass copies Wowhead's item set id onto an item whose stored `itemset` is 0. Every piece with an item set gets the **(Set piece)** label in `payload.py`. Only Embrace of the Viper, Defias, Scarlet, and Rotmender carry bonus text and a set score package.
 
-Run `python pipeline/scripts/apply_forever_absent.py` before the rescore. `pipeline/data/forever_absent.json` lists the raids the client has rows for that are not in the game (Molten Core, Blackwing Lair, Zul'Gurub, both Ahn'Qiraj raids, Naxxramas), the reputations that go with them (Brood of Nozdormu, Zandalar Tribe), and single ids with the reason. A boss drop, trash, rare, vendor, or quest reward filed in one of those raids, or dropped by a boss `bossNpcs` files there, gets `obtainable` false and `absentRaid`. A world drop keeps its row, so Onyx Shredder Plate stays. Single ids: Ice Barbed Spear, Bloodseeker, and Wand of Biting Cold (Korrak the Bloodrager is not offered, and the Alterac Valley victory quests give reputation only), Sageblade and Persuader (the plans drop only in those raids), Thunderfury, the Treasure of the Timeless One weapons, The Only Prescription, and the test items. Remove a raid from `absentRaids` when it opens and run the script again; its rows come back. Onyxia's Lair is not open yet. The first raids are 8 December 2026. Until then a hunt is a dungeon or Blackrock Spire. Boss drop Other stays out: the green dragons, Lord Kazzak, Azuregos, the Silithus lords and colossi, Ivus, and a boss with no instance. Named bosses of Zul'Farrak, Razorfen Downs, Stratholme, Scholomance, Dire Maul, or Blackrock Spire are filed in that dungeon when the zone was empty. The Lord of Blackrock, For All To See, and Quel'Serrar stay out. The Brood of Onyxia in Dustwallow Marsh stays.
+Run `python pipeline/scripts/apply_forever_absent.py` before the rescore. `pipeline/data/forever_absent.json` lists the raids the client has rows for that are not in the game (Molten Core, Blackwing Lair, Zul'Gurub, both Ahn'Qiraj raids, Naxxramas, Hyjal Summit, Barrow Deeps, Zul'Aman, and the Scarlet Enclave), the reputations that go with them (Brood of Nozdormu, Zandalar Tribe), and single ids with the reason. `openRaids` stays empty until 8 December 2026. Hyjal Summit and Barrow Deeps are the first raids, and they are not open yet. `unreleasedNames` is Signet Ring of the Bronze Dragonflight (The Path of the Protector, the Conqueror, and the Invoker). `unreleasedNameParts` is Inquisition, Fireleaf, and Waywatcher, the Scarlet Enclave token sets Bryon Steelblade sells. The client already has some Inquisition pieces. Those names stay out anyway. A boss drop, trash, rare, vendor, or quest reward filed in one of those raids, or dropped by a boss `bossNpcs` files there, gets `obtainable` false and `absentRaid`. A world drop keeps its row. Onyx Shredder Plate, Drake-scale Vest, and Gutrender are not Zul'Gurub mobs. They drop in Stranglethorn Vale, from Venture Co. Shredder, Mosh'Ogg Lord, and Mosh'Ogg Warmonger. The zone is locked there. Wowhead files it as Zul'Gurub. Single ids: Ice Barbed Spear, Bloodseeker, and Wand of Biting Cold (Korrak the Bloodrager is not offered, and the Alterac Valley victory quests give reputation only), Sageblade and Persuader (the plans drop only in those raids), Thunderfury, the Treasure of the Timeless One weapons, The Only Prescription, and the test items. Remove a raid from `absentRaids` when it opens and run the script again; its rows come back. Onyxia's Lair is not open yet. The first raids are 8 December 2026. Until then a hunt is a dungeon or Blackrock Spire. Boss drop Other stays out: the green dragons, Lord Kazzak, Azuregos, the Silithus lords and colossi, Ivus, and a boss with no instance. Named bosses of Zul'Farrak, Razorfen Downs, Stratholme, Scholomance, Dire Maul, or Blackrock Spire are filed in that dungeon when the zone was empty. The Lord of Blackrock, For All To See, and Quel'Serrar stay out. The Brood of Onyxia in Dustwallow Marsh stays.
 
-Then run `python pipeline/scripts/apply_client_missing.py`. Wowhead Forever lists items the game client cannot load: `GetItemInfo` fails, and the hover could only show the stored tip with the red "This game client does not have it yet" lines. Those items stay out of the addon. `pipeline/data/client_missing.json` holds the list and the client build it was taken from. An item is in the client when that build's ItemSparse table (wago.tools) has the row, or the installed client's `Cache/ADB/enUS/DBCache.bin` holds a valid ItemSparse hotfix for it. An Item row alone is not enough, and the server answers those hotfix requests as invalid. Build 1.60.1.70938 is missing 10009 catalog items, 684 of them hunts: the Season of Discovery PvP rank sets, the Inquisition, Fireleaf, and Waywatcher sets, Baron Charr's Sceptre, and Abomination Skin Leggings among them. Each row gets `clientMissing` (the build) and `obtainable` false. The rows stay in `items.json` and `sources.json`. After a client patch, run it with `--refresh` (the installed build, or `--build`) and rescore; an item the new build has leaves the list and its row comes back. The red lines stay for anything the list does not catch.
+Then run `python pipeline/scripts/apply_client_missing.py`. Wowhead Forever lists items the game client cannot load: `GetItemInfo` fails, and the hover could only show the stored tip with the red "This game client does not have it yet" lines. Those items stay out of the addon. `pipeline/data/client_missing.json` holds the list and the client build it was taken from. An item is in the client when that build's ItemSparse table (wago.tools) has the row, or the installed client's `Cache/ADB/enUS/DBCache.bin` holds a valid ItemSparse hotfix for it. An Item row alone is not enough, and the server answers those hotfix requests as invalid. Build 1.60.1.70938 is missing 10009 catalog items, 684 of them hunts: the Season of Discovery PvP rank sets, the Inquisition, Fireleaf, and Waywatcher sets, Baron Charr's Sceptre, and Abomination Skin Leggings among them. Each row gets `clientMissing` (the build) and `obtainable` false. The rows stay in `items.json` and `sources.json`. After a client patch, run it with `--refresh` (the installed build, or `--build`), then run `apply_forever_absent.py` again before the rescore. An item the new build has leaves the missing list. The Inquisition pieces the client already loads were never on that list. A Scarlet Enclave name, the Bronze Dragonflight signet, and anything still in `absentRaids` stays out. The red lines stay for anything the list does not catch.
 
 Re-score with `python pipeline/scripts/rescore_hunter_shaman.py` after new
 gear is actually ingested. One class name does one class. Do not
