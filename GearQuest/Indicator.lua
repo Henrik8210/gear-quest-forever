@@ -1073,7 +1073,8 @@ function GQ.Indicator:RebuildCacheForSlot(slotName)
     end
 end
 
-local REBUILD_SLOTS_PER_FRAME = 2
+-- One slot can take 40 ms right after login, so two in a frame made an 80 ms hitch.
+local REBUILD_SLOTS_PER_FRAME = 1
 
 function GQ.Indicator:RebuildCacheAsync(onComplete, slotsPerFrame)
     if GQ.IsPreviewEnabled and GQ:IsPreviewEnabled() then
@@ -1155,8 +1156,8 @@ function GQ.Indicator:RebuildCacheAsync(onComplete, slotsPerFrame)
             end
             self:RefreshAll()
         end
-        -- A ding already spent this frame on the last slot. Paint next frame.
-        if perFrame < REBUILD_SLOTS_PER_FRAME and C_Timer and C_Timer.After then
+        -- This frame already went to the last slot. Paint next frame.
+        if C_Timer and C_Timer.After then
             C_Timer.After(0, done)
         else
             done()
