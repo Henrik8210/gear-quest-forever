@@ -2,75 +2,59 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.4.1
+## v1.4.2
 
-The log header reads **GearQuest Forever v1.4.1**. `/reload` after the update.
+The log header reads **GearQuest Forever v1.4.2**. `/reload` after the update.
 
-Raids that are not open leave the hunts, including the Scarlet Enclave sets. Only Guide Gear numbers the page for your faction. A bag change no longer walks the whole catalog.
+Black Dragonscale Helm is a hunt. Cat and bear price Increased Feral Combat. The score bar stays on the gear you are wearing. Crafted hunts name the seller, and the Alterac Valley weapons are on the lists.
 
-### Raids that are not open
+### Black Dragonscale Helm
 
-**Who:** Every class that was listing Hyjal Summit, Barrow Deeps, Zul'Aman, the Scarlet Enclave, or a piece that needs one of those raids.
+**Who:** Hunter and Enhancement, Alliance and Horde. Enhancement Tank keeps it just behind rank 1. Retribution, Arms, and Fury keep it further down the head list.
 
-**What you see:** Those raids are not hunts. The first raids are still 8 December 2026, and nothing from them is on the list until then. Molten Core, Blackwing Lair, Onyxia's Lair, Zul'Gurub, Ahn'Qiraj, and Naxxramas stay off.
+**What you see:** **Black Dragonscale Helm** was unsourced, so the default filter hid it. It is Leatherworking 300. The pattern drops from **Blackhand Assassin** in Blackrock Spire. The map pins are the Spire doors in Searing Gorge and Burning Steppes. It requires level 56.
 
-**Inquisition**, **Fireleaf**, and **Waywatcher** are the Scarlet Enclave token sets Bryon Steelblade sells. They leave every class, including Inquisition pieces the client already shows. **Signet Ring of the Bronze Dragonflight** stays off until Ahn'Qiraj is open. **Onyxia Scale Cloak** stays off with Onyxia's Lair.
+Beast Mastery, Marksmanship, and Survival list it as head rank 1 from 56 through 59. Marksmanship keeps rank 1 at 60. Beast Mastery and Survival are rank 4 at 60. Enhancement is rank 1 from 56 through 60. Enhancement Tank is rank 2 from 56 through 59.
 
-**Onyx Shredder Plate**, **Drake-scale Vest**, and **Gutrender** stay. They drop in Stranglethorn Vale, from Venture Co. Shredder, Mosh'Ogg Lord, and Mosh'Ogg Warmonger. They are not Zul'Gurub. Gutrender's map pin is no longer the Zul'Gurub door. The Brood of Onyxia rewards in Dustwallow Marsh stay: **Encarmine Boots**, **Boots of Zua'tec**, and **Black Whelp Boots**.
+### Living Crown
 
-The Season of Discovery plain-name dungeon copies stay out. **Feralheart Helm** and the rest of that copy say they may not be in Forever and name no source. The level-60 dungeon upgrade sets stay, including **Soulforge**, from **An Earnest Proposition**.
+**Who:** Restoration druid, restoration shaman, and holy paladin. Balance is just behind rank 1. Elemental is rank 3.
 
-### Only Guide Gear counts your faction
+**What you see:** **Living Crown** is Leatherworking 300. The pattern drops from **Warpwood Treant** in Dire Maul. The pins are the Dire Maul doors in Feralas. It requires level 56. Restoration druid, restoration shaman, and holy list it as head rank 1 from 56 through 60, both factions. Balance is rank 2 from 56 through 59.
 
-**Who:** Every spec with a Wowhead Forever page at 60, Alliance and Horde, when Only Guide Gear is on.
+### Increased Feral Combat
 
-**What you see:** The number is this faction's place on the page. The other faction's piece does not hold a rank. **Darkspear Epaulets** is #1 for Horde Marksmanship shoulders. **Theramore Epaulets** is #1 for Alliance. The same close-up is on the Highlander and Defiler pieces, the Sentinel and Outrider pieces, the Grand Marshal and High Warlord page weapons, **Sageclaw** and **Mindfang**, the two **Ironbark Staves**, and **Songstone of Ironforge** and **Eye of Orgrimmar**. Page order stays. With the card off, the blue (Guide #N) label is still the place on the Wowhead page, so Darkspear can be score rank #1 and (Guide #2) at the same time.
+**Who:** Feral cat and bear. Balance, restoration, and levels 1–9 do not price this stat.
 
-### Library rewards from level 50
+**What you see:** Each point of Increased Feral Combat is worth 1 on cat and 0.6 on bear. A piece with that line moves up on those two lists. The other druid specs stay as they were.
 
-**Who:** The classes that list the Greater Friend of the Library rewards. The report was Alliance Retribution.
+### The score bar stays on what you are wearing
 
-**What you see:** **Museum Keeper's Chain**, **Artifact Seeker's Pendant**, and **Antique Bulwark** show from level 50. They were starting at 53. On Alliance Retribution the chain is neck rank 4 at 50, the pendant is neck rank 1 at 50, and the bulwark is on the shield list from 50. The level 20 and level 40 library rewards are unchanged.
+**Who:** Everyone, when the GearQuest Index Score bar is on.
 
-### The (i) list keeps the roll you are wearing
+**What you see:** Only Guide Gear, a play style, the source filter, the weapon filter, and armor types change the hunt rows. They do not move the bar. The number stays the average of the gear you have equipped.
 
-**Who:** Every class, when two random enchants of one item are both ranked, or the piece you are wearing is one of those rolls.
+### Opening the world map
 
-**What you see:** Both rolls are on the (i) list. The row that matches what you have equipped says Equipped. A belt that already did this still does. Boots and chest greens that used to sit between two rows are on the list.
+**Who:** Everyone who opens the world map. The report was the gamepad pin error from Thrayne.
 
-### A worn roll compares to the listed jackpot
+**What you see:** Opening the map no longer reports GearQuest calling a protected map function. Show on map still sets the Blizzard waypoint. Shift-click share on a pin stays Blizzard's own click.
 
-**Who:** Every class, when you are wearing a random-enchant green.
+### Alterac Valley weapons
 
-**What you see:** The hunt still ranks the best roll of that suffix, and it still tells you the chance. Wearing a lower number of that same suffix compares as the jackpot the list shows, so the +7 hunt is not an upgrade over the +6 you already have. A different "of" is a different piece. It is not scored as the suffix on the list.
+**Who:** The classes that can use the three weapons from Hero of the Stormpike and Hero of the Frostwolf. The report was Feral, from Strazarachne and Dwarni.
 
-### Your spec on the item tooltip
+**What you see:** **Ice Barbed Spear**, **Bloodseeker**, and **Wand of Biting Cold** are the choice after The Battle of Alterac or The Battle for Alterac. They require level 58. Both factions list them. On cat the spear is weapon rank 5 at 58 and 59. On bear it is rank 4 at those levels. **Cold Forged Hammer** stays level 51.
 
-**Who:** Every class. The report was Enhancement on **Stromgarde Hood**.
+### Recipe sellers
 
-**What you see:** On the Tooltips window, the item column has **Ranks for your other specs**. It stays on until you turn it off. Off hides the specs you have not selected. The spec you are playing or simulating stays. When that spec has no rank at your level, the line is grey: **Enhancement: Not ranked for your level**. When it does rank the piece, the score line names it: **Enhancement (your selected spec): Rank #N**. A **GearQuest** header sits above that block.
+**Who:** Every class that hunts a crafted piece whose pattern is sold.
 
-### Vanquisher's Sword is both factions
+**What you see:** The hunt names the seller, and a reputation requirement prints on the parchment. The commerce-camp recipes name both stalls: Pawani and Daniel Stitchsong, Jim'bek and Mivin Shadowweave, Gor'mak and Stondry Darkhammer, Beneris and Alynsia, Fizzlefuse and Fritz Fizzle. Lokhtos Darkbargainer names the Thorium Brotherhood standing, and the pin is the Blackrock Depths entrance. Vayn Moongaze on Zephras Isle names Nightclaw Druids. The Argent Dawn quartermasters, Meilosh for Timbermaw Hold, Sutara for the Earthen Ring, and Archmage Alvareaux for the Kirin Tor do the same for the recipes they sell.
 
-**Who:** Warrior, paladin, rogue, and hunter who hunt **Vanquisher's Sword**, from Bring the Light in Razorfen Downs.
+### v1.4.1
 
-**What you see:** Horde lists it. It is no longer Alliance only.
-
-### Khan Jehn follows your faction's step
-
-**Who:** The classes that hunt the Magram and Gelkis rewards, including **Soulsplatter Mace** on a paladin.
-
-**What you see:** Alliance starts at Brutal Politics and does not list Magram Alliance. Horde starts at Magram Alliance and does not list Brutal Politics. Both continue at Broken Tears through Khan Jehn. Gelkis rewards start at Strange Alliance for Alliance and Gelkis Alliance for Horde. The mace stays on both lists. The map pin is the chain start at Nijel's Point in Desolace.
-
-### Bag changes hitch less
-
-**Who:** Everyone, when a bag changes, or when the paper doll rebuilds its arrows after login, a zone change, or opening a vendor.
-
-**What you see:** The same arrows, on the same pieces. They show up a few frames later instead of all at once. Ranking up a profession still turns a red skill line green on that hunt.
-
-### Credits
-
-**Goadah** and **Shengjie** are on The GearQuest Community list, under Settings.
+Raids that are not open leave the hunts, including the Scarlet Enclave sets. Only Guide Gear numbers the page for your faction. Greater Friend of the Library rewards show from level 50. A worn random enchant compares to the listed jackpot, and the (i) list keeps the roll you are wearing. Vanquisher's Sword is on both factions. Bag changes hitch less. Goadah and Shengjie are on the credits.
 
 ### v1.4.0
 

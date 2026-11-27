@@ -113,38 +113,13 @@ function GQ.Map:SpotForEntry(entry)
     }
 end
 
--- Shift-click on a user waypoint inserts the pin in chat, then copies a
--- /mappin command with CopyToClipboard. That copy is reserved for Blizzard
--- UI. A pin placed from this addon runs the click tainted, so the copy pops
--- "blocked from an action only available to the Blizzard UI" after the chat
--- link is already in. Skip the clipboard step; chat share stays.
-local function SkipWaypointClipboard()
-end
-
-local function GuardWaypointClipboard()
-    -- The gamepad UI closes the map through a protected focus clear. Do not
-    -- touch WorldMapFrame.pinPools or a live pin: writing an addon function
-    -- onto one taints that hide. Mouse mode only skips the clipboard copy.
-    if GQ.UsesGamepad and GQ:UsesGamepad() then
-        return
-    end
-    if type(WaypointLocationPinMixin) == "table"
-        and type(WaypointLocationPinMixin.CopySlashCommandToClipboard) == "function"
-        and WaypointLocationPinMixin.CopySlashCommandToClipboard ~= SkipWaypointClipboard
-    then
-        WaypointLocationPinMixin.CopySlashCommandToClipboard = SkipWaypointClipboard
-    end
-end
-
-local clipboardGuard = CreateFrame("Frame")
-clipboardGuard:RegisterEvent("ADDON_LOADED")
-clipboardGuard:RegisterEvent("PLAYER_LOGIN")
-clipboardGuard:SetScript("OnEvent", function()
-    GuardWaypointClipboard()
-end)
+-- Do not replace WaypointLocationPinMixin.CopySlashCommandToClipboard.
+-- That write taints the waypoint pin. Opening the world map then fails in
+-- AcquirePin, CheckMouseButtonPassthrough, Frame:SetPassThroughButtons.
+-- Show on map only calls C_Map.SetUserWaypoint. Shift-click share stays
+-- Blizzard's own click.
 
 local function OpenToMap(mapId)
-    GuardWaypointClipboard()
     if mapId and C_Map and C_Map.OpenWorldMap then
         C_Map.OpenWorldMap(mapId)
         return
@@ -205,10 +180,6 @@ function GQ.Map:Show(entry)
     end
 
     local pinned = SetPin(mapId, spot.x, spot.y, label)
-    GuardWaypointClipboard()
-    if C_Timer and C_Timer.After then
-        C_Timer.After(0, GuardWaypointClipboard)
-    end
     local where = string.format("%s %.1f, %.1f", spot.map and GQ.TN("zone", spot.map) or label, spot.x, spot.y)
     GQ:Chat(PREFIX .. where .. (pinned and L[" — pin placed"] or ""))
 end

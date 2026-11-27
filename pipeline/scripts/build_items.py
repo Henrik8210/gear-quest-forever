@@ -65,6 +65,7 @@ PATS=[
  (r"Increases your hit rating by (\d+)","hit"),
  (r"Improves spell hit rating by (\d+)","spellHit"),
  (r"Increases your spell hit rating by (\d+)","spellHit"),
+ (r"Increas(?:es|ed) Feral Combat \+(\d+)","feralCombat"),
  (r"Increases defense rating by (\d+)","defense"),
  (r"Increases your dodge rating by (\d+)","dodge"),
  (r"Increases your parry rating by (\d+)","parry"),

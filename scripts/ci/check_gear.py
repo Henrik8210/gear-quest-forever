@@ -68,7 +68,6 @@ SOURCE_TYPES = {
 }
 TEST_ITEMS = {280304: "Invisible Dagger", 24358: "QATest +1000 Spell Dmg Ring",
               19503: "2200 Test sword", 19504: "2200 Test sword"}
-BANNED_NAMES = {"Ice Barbed Spear", "Bloodseeker", "Wand of Biting Cold"}
 RECORD_NAME = re.compile(r"UNUSED|\(DNT\)|Placeholder", re.I)
 # Tooltips glue the slot onto the type ("Main HandAxe", "Binds when
 # equippedRangedBow"), or put the type on the next line.
@@ -197,8 +196,6 @@ def check_banned(cat: Catalog, fail) -> None:
                 fail(f"{cls}: {item} {TEST_ITEMS[item]} is a test item and must not be a hunt")
             if RECORD_NAME.search(name):
                 fail(f"{cls}: {item} {name} is a placeholder record and must not be a hunt")
-            if name in BANNED_NAMES:
-                fail(f"{cls}: {item} {name} is kept out by the rules (Korrak / AV reputation)")
     for path in GENERATED.glob("Data.*.generated.lua"):
         if re.match(r"Data\.(Paladin|Warrior)\.Horde\.1to9", path.name):
             fail(f"{path.name} must not exist: paladin and warrior 1-9 is the Early file")

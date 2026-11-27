@@ -29,6 +29,7 @@ local FIELDS = {
     { key = "ap", label = "Attack power" },
     { key = "rap", label = "Ranged attack power" },
     { key = "feralAp", label = "Feral attack power" },
+    { key = "feralCombat", label = "Feral combat" },
     { key = "sp", label = "Spell power" },
     { key = "heal", label = "Healing" },
     { key = "sp_from_heal", label = "Healing as spell power" },

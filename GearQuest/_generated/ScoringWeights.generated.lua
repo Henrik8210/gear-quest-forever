@@ -17,7 +17,7 @@ GQ.ScoringLeveling = {
     mana = 1,
 }
 
-GQ.SCORING_WEIGHTS_REVISION = "386057eb81"
+GQ.SCORING_WEIGHTS_REVISION = "a488d27eb1"
 
 GQ.ScoringWeights = {
     DRUID = {
@@ -53,6 +53,7 @@ GQ.ScoringWeights = {
                 agi = 0.55,
                 ap = 0.18,
                 feralAp = 0.18,
+                feralCombat = 0.6,
                 crit = 8.12,
                 hit = 4.4,
                 haste = 1,
@@ -78,6 +79,7 @@ GQ.ScoringWeights = {
                 agi = 1,
                 ap = 0.35,
                 feralAp = 0.35,
+                feralCombat = 1,
                 crit = 11.9,
                 hit = 6.5,
                 haste = 6,
@@ -1098,6 +1100,7 @@ GQ.ScoringWeightLabels = {
     ap = "Attack power",
     rap = "Ranged attack power",
     feralAp = "Feral attack power",
+    feralCombat = "Feral combat",
     heal = "Healing",
     sp_from_heal = "Healing as spell power",
     sp = "Spell power",

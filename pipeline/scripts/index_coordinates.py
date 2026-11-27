@@ -1178,19 +1178,36 @@ def resolve_item(item_id: int, src: dict, cache: dict, xml_cache: dict) -> tuple
         return None, "quest starter has no map pin"
 
     if kind == "vendor":
-        spots = camps_from_npcs((item_related(item_id, cache).get("sell") or []), cache, True)
-        if not spots:
-            spots = spots_for_npc_name(npc, cache)
-            for spot in spots:
-                spot["npc"] = npc
+        # Merchant's Favor recipes are bought, so the source is a vendor.
+        # The two stall pins live on the sentence, the same way a trainer recipe uses them.
+        pins = camp_pins(src.get("instructions") or "", src.get("profession"))
+        if pins:
+            return {"note": CAMP_NOTE, "spots": pins, "more": False}, None
+        spots = []
+        try:
+            spots = camps_from_npcs((item_related(item_id, cache).get("sell") or []), cache, True)
             if not spots:
-                for named, fac in faction_names(src.get("instructions") or ""):
-                    for spot in spots_for_npc_name(named, cache):
-                        spot["faction"] = fac
-                        spot["npc"] = named
-                        spots.append(spot)
+                spots = spots_for_npc_name(npc, cache)
+                for spot in spots:
+                    spot["npc"] = npc
+                if not spots:
+                    for named, fac in faction_names(src.get("instructions") or ""):
+                        for spot in spots_for_npc_name(named, cache):
+                            spot["faction"] = fac
+                            spot["npc"] = named
+                            spots.append(spot)
+        except CacheMiss:
+            spots = []
         if spots:
             return {"note": NOTE_VENDOR, "spots": spots, "more": len(spots) > 1}, None
+        # A seller who stands inside an instance uses that entrance.
+        if door:
+            spots = entrance_spots(door)
+            if spots:
+                if npc:
+                    for spot in spots:
+                        spot["npc"] = npc
+                return {"note": NOTE_DOOR, "spots": spots, "more": len(spots) > 1}, None
         if not npc and "quartermaster" not in (src.get("instructions") or "").lower():
             return None, "vendor is not named"
         return None, "vendor has no map pin"

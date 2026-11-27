@@ -5304,7 +5304,9 @@ function GQ.Data:SlotScoreSpan(slotName, handKind)
         end
     end
     if GQ.Log and GQ.Log.GetSlotRankList and slotName then
-        for _, entry in ipairs(GQ.Log:GetSlotRankList(slotName, handKind) or {}) do
+        -- The bar's 0-100 span is the scored list. Only Guide Gear and the
+        -- other filters change which hunts show. They do not change this span.
+        for _, entry in ipairs(GQ.Log:GetSlotRankList(slotName, handKind, true) or {}) do
             local score = entry.pipelineScore
             if handKind == "both" then
                 score = self:DisplayedWeaponScore(entry)
@@ -6017,7 +6019,7 @@ function GQ.Data:GearScoreContext(slotName, handKind)
     end
 
     if GQ.Log and GQ.Log.GetSlotRankList and slotName then
-        for _, entry in ipairs(GQ.Log:GetSlotRankList(slotName, handKind) or {}) do
+        for _, entry in ipairs(GQ.Log:GetSlotRankList(slotName, handKind, true) or {}) do
             -- Shields stay in the off-hand slot. A shield score is several
             -- times a weapon score, and putting it on this scale turned the
             -- rank #1 weapon into a 9.

@@ -105,6 +105,7 @@ PATS = [
     (r"Your attacks ignore (\d+) of your opponent's armor", "armorPen"),
     (r"Increases your spell penetration by (\d+)", "spellPen"),
     (r"Restores (\d+) health per 5 sec", "hp5"),
+    (r"Increas(?:es|ed) Feral Combat \+(\d+)", "feralCombat"),
     (r"Increased Defense \+(\d+)", "defense"),
     (r"Increases (?:your )?defense(?: skill)? by (\d+)", "defense"),
 ]

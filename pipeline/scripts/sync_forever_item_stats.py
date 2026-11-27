@@ -50,6 +50,7 @@ EQUIP = [
     (re.compile(r"Restores \+?(\d+) mana per 5", re.I), "mp5"),
     (re.compile(r"Restores \+?(\d+) health per 5", re.I), "hp5"),
     (re.compile(r"Increases attack power by (\d+) in Cat, Bear", re.I), "feralAp"),
+    (re.compile(r"Increas(?:es|ed) Feral Combat \+(\d+)", re.I), "feralCombat"),
 ]
 # Mashed "1051 Armor17 Block" / "9 BlockRestores" — no \b (digit and letter are \w).
 ARMOR = re.compile(r"(?<![.\d])(\d+)\s*Armor")
@@ -63,7 +64,7 @@ DMG = re.compile(
 
 SCORE = (
     "str", "agi", "sta", "int", "spi", "ap", "rap", "sp", "heal", "sp_from_heal",
-    "damageDone", "hit", "crit", "haste", "mp5", "hp5", "feralAp", "defense",
+    "damageDone", "hit", "crit", "haste", "mp5", "hp5", "feralAp", "feralCombat", "defense",
     "dodge", "parry", "blockValue", "armor",
     "spShadow", "spFire", "spFrost", "spNature", "spArcane", "spHoly",
 )

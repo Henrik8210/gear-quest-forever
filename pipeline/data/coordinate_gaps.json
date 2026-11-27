@@ -1,7 +1,7 @@
 {
   "summary": {
     "boss_drop": {
-      "ok": 970,
+      "ok": 971,
       "gap": 12,
       "gap:Wowhead page not cached yet": 3,
       "gap:not indexed since the source changed": 7,
@@ -25,20 +25,20 @@
     },
     "profession": {
       "ok": 198,
-      "gap": 206,
-      "gap:not indexed yet": 201,
+      "gap": 207,
+      "gap:not indexed yet": 202,
       "gap:recipe trainer is not listed on the Wowhead page we can fetch": 5
     },
     "quest_reward": {
-      "ok": 1662,
-      "gap": 322,
+      "ok": 1665,
+      "gap": 323,
       "gap:not indexed yet": 116,
+      "gap:not indexed since the source changed": 162,
       "gap:quest starter has no map pin": 15,
-      "gap:Wowhead page not cached yet": 30,
-      "gap:not indexed since the source changed": 161
+      "gap:Wowhead page not cached yet": 30
     },
     "raid_trash": {
-      "ok": 132
+      "ok": 134
     },
     "rare_npc": {
       "ok": 297,
@@ -48,27 +48,29 @@
       "gap:not indexed since the source changed": 7
     },
     "unsourced": {
-      "gap": 1218,
-      "gap:not indexed since the source changed": 968,
-      "ok": 376,
-      "gap:source not listed yet": 14,
-      "gap:not indexed yet": 236
+      "gap": 1040,
+      "gap:not indexed since the source changed": 785,
+      "ok": 167,
+      "gap:not indexed yet": 241,
+      "gap:source not listed yet": 14
     },
     "vendor": {
-      "gap": 193,
-      "gap:vendor has no map pin": 6,
-      "ok": 774,
-      "gap:not indexed yet": 125,
-      "gap:Wowhead page not cached yet": 37,
-      "gap:not indexed since the source changed": 25
+      "gap": 322,
+      "gap:vendor has no map pin": 110,
+      "ok": 997,
+      "gap:not indexed yet": 124,
+      "gap:not indexed since the source changed": 41,
+      "gap:vendor is not named": 10,
+      "gap:Wowhead page not cached yet": 37
     },
     "world_drop": {
       "ok": 2167,
-      "gap": 767,
-      "gap:not indexed yet": 662,
+      "gap": 781,
+      "gap:not indexed yet": 663,
       "gap:Wowhead page not cached yet": 28,
       "gap:drop creature has no map pin": 24,
-      "gap:world drop names no creature": 53
+      "gap:world drop names no creature": 53,
+      "gap:not indexed since the source changed": 13
     }
   },
   "gaps": [
@@ -541,15 +543,6 @@
       "questName": null
     },
     {
-      "id": 2160,
-      "name": "Padded Armor",
-      "sourceType": "vendor",
-      "reason": "not indexed yet",
-      "zone": "Stranglethorn Vale",
-      "npc": "Qixdi Goodstitch",
-      "questName": null
-    },
-    {
       "id": 2221,
       "name": "Targe Shield",
       "sourceType": "world_drop",
@@ -894,7 +887,7 @@
     {
       "id": 2869,
       "name": "Silvered Bronze Breastplate",
-      "sourceType": "unsourced",
+      "sourceType": "world_drop",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
@@ -1164,7 +1157,7 @@
     {
       "id": 3849,
       "name": "Hardened Iron Shortsword",
-      "sourceType": "unsourced",
+      "sourceType": "vendor",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
@@ -1173,7 +1166,7 @@
     {
       "id": 3851,
       "name": "Solid Iron Maul",
-      "sourceType": "unsourced",
+      "sourceType": "vendor",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
@@ -1182,7 +1175,7 @@
     {
       "id": 3853,
       "name": "Moonsteel Broadsword",
-      "sourceType": "unsourced",
+      "sourceType": "vendor",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
@@ -1191,7 +1184,7 @@
     {
       "id": 3855,
       "name": "Massive Iron Axe",
-      "sourceType": "unsourced",
+      "sourceType": "vendor",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
@@ -1524,7 +1517,7 @@
     {
       "id": 4248,
       "name": "Dark Leather Gloves",
-      "sourceType": "unsourced",
+      "sourceType": "world_drop",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
@@ -1533,7 +1526,7 @@
     {
       "id": 4255,
       "name": "Green Leather Armor",
-      "sourceType": "unsourced",
+      "sourceType": "vendor",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
@@ -1542,7 +1535,7 @@
     {
       "id": 4262,
       "name": "Gem-studded Leather Belt",
-      "sourceType": "unsourced",
+      "sourceType": "vendor",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
@@ -1560,7 +1553,7 @@
     {
       "id": 4319,
       "name": "Azure Silk Gloves",
-      "sourceType": "unsourced",
+      "sourceType": "vendor",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
@@ -1569,7 +1562,7 @@
     {
       "id": 4322,
       "name": "Enchanter's Cowl",
-      "sourceType": "unsourced",
+      "sourceType": "vendor",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
@@ -1578,7 +1571,7 @@
     {
       "id": 4327,
       "name": "Icy Cloak",
-      "sourceType": "unsourced",
+      "sourceType": "vendor",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
@@ -1587,7 +1580,7 @@
     {
       "id": 4329,
       "name": "Star Belt",
-      "sourceType": "unsourced",
+      "sourceType": "world_drop",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
@@ -1605,7 +1598,7 @@
     {
       "id": 4373,
       "name": "Shadow Goggles",
-      "sourceType": "unsourced",
+      "sourceType": "world_drop",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
@@ -1614,7 +1607,7 @@
     {
       "id": 4383,
       "name": "Moonsight Rifle",
-      "sourceType": "unsourced",
+      "sourceType": "world_drop",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
@@ -1623,7 +1616,7 @@
     {
       "id": 4393,
       "name": "Craftsman's Monocle",
-      "sourceType": "unsourced",
+      "sourceType": "world_drop",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
@@ -1632,19 +1625,19 @@
     {
       "id": 4455,
       "name": "Raptor Hide Harness",
-      "sourceType": "unsourced",
+      "sourceType": "world_drop",
       "reason": "not indexed since the source changed",
       "zone": null,
-      "npc": null,
+      "npc": "Dragonmaw Centurion",
       "questName": null
     },
     {
       "id": 4456,
       "name": "Raptor Hide Belt",
-      "sourceType": "unsourced",
+      "sourceType": "world_drop",
       "reason": "not indexed since the source changed",
       "zone": null,
-      "npc": null,
+      "npc": "Daggerspine Shorestalker",
       "questName": null
     },
     {
@@ -1749,7 +1742,7 @@
     {
       "id": 5541,
       "name": "Iridescent Hammer",
-      "sourceType": "unsourced",
+      "sourceType": "world_drop",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
@@ -1785,7 +1778,7 @@
     {
       "id": 5770,
       "name": "Robes of Arcana",
-      "sourceType": "unsourced",
+      "sourceType": "world_drop",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
@@ -1794,7 +1787,7 @@
     {
       "id": 5780,
       "name": "Murloc Scale Belt",
-      "sourceType": "unsourced",
+      "sourceType": "vendor",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
@@ -1803,7 +1796,7 @@
     {
       "id": 5781,
       "name": "Murloc Scale Breastplate",
-      "sourceType": "unsourced",
+      "sourceType": "vendor",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
@@ -1812,7 +1805,7 @@
     {
       "id": 5782,
       "name": "Thick Murloc Armor",
-      "sourceType": "unsourced",
+      "sourceType": "vendor",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
@@ -1821,7 +1814,7 @@
     {
       "id": 5783,
       "name": "Murloc Scale Bracers",
-      "sourceType": "unsourced",
+      "sourceType": "vendor",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
@@ -1839,7 +1832,7 @@
     {
       "id": 5958,
       "name": "Fine Leather Pants",
-      "sourceType": "unsourced",
+      "sourceType": "world_drop",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
@@ -1857,7 +1850,7 @@
     {
       "id": 5965,
       "name": "Guardian Cloak",
-      "sourceType": "unsourced",
+      "sourceType": "world_drop",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
@@ -1884,7 +1877,7 @@
     {
       "id": 6239,
       "name": "Red Linen Vest",
-      "sourceType": "unsourced",
+      "sourceType": "world_drop",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
@@ -1893,7 +1886,7 @@
     {
       "id": 6240,
       "name": "Blue Linen Vest",
-      "sourceType": "unsourced",
+      "sourceType": "vendor",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
@@ -1902,7 +1895,7 @@
     {
       "id": 6242,
       "name": "Blue Linen Robe",
-      "sourceType": "unsourced",
+      "sourceType": "vendor",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
@@ -1920,7 +1913,7 @@
     {
       "id": 6263,
       "name": "Blue Overalls",
-      "sourceType": "unsourced",
+      "sourceType": "vendor",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
@@ -1929,8 +1922,8 @@
     {
       "id": 6264,
       "name": "Greater Adept's Robe",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
+      "sourceType": "vendor",
+      "reason": "vendor is not named",
       "zone": null,
       "npc": null,
       "questName": null
@@ -2019,19 +2012,19 @@
     {
       "id": 6466,
       "name": "Deviate Scale Cloak",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
       "zone": null,
-      "npc": null,
+      "npc": "Kalldan Felmoon",
       "questName": null
     },
     {
       "id": 6467,
       "name": "Deviate Scale Gloves",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
       "zone": null,
-      "npc": null,
+      "npc": "Kalldan Felmoon",
       "questName": null
     },
     {
@@ -2118,11 +2111,11 @@
     {
       "id": 6709,
       "name": "Moonglow Vest",
-      "sourceType": "unsourced",
+      "sourceType": "quest_reward",
       "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
-      "questName": null
+      "questName": "Moonglow Vest"
     },
     {
       "id": 6723,
@@ -2271,8 +2264,8 @@
     {
       "id": 7053,
       "name": "Azure Silk Cloak",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
+      "sourceType": "vendor",
+      "reason": "vendor is not named",
       "zone": null,
       "npc": null,
       "questName": null
@@ -2280,8 +2273,8 @@
     {
       "id": 7056,
       "name": "Crimson Silk Cloak",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
+      "sourceType": "vendor",
+      "reason": "vendor is not named",
       "zone": null,
       "npc": null,
       "questName": null
@@ -2334,8 +2327,8 @@
     {
       "id": 7063,
       "name": "Crimson Silk Robe",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
+      "sourceType": "vendor",
+      "reason": "vendor is not named",
       "zone": null,
       "npc": null,
       "questName": null
@@ -2397,19 +2390,19 @@
     {
       "id": 7283,
       "name": "Black Whelp Cloak",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Redridge Mountains",
+      "npc": "Clyde Ranthal",
       "questName": null
     },
     {
       "id": 7284,
       "name": "Red Whelp Gloves",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Wetlands",
+      "npc": "Wenna Silkbeard",
       "questName": null
     },
     {
@@ -2433,10 +2426,10 @@
     {
       "id": 7352,
       "name": "Earthen Leather Shoulders",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Hillsbrad Foothills",
+      "npc": "Zixil",
       "questName": null
     },
     {
@@ -2478,8 +2471,8 @@
     {
       "id": 7386,
       "name": "Green Whelp Bracers",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
+      "sourceType": "vendor",
+      "reason": "vendor is not named",
       "zone": null,
       "npc": null,
       "questName": null
@@ -2919,8 +2912,8 @@
     {
       "id": 7924,
       "name": "Mithril Plate Bracers",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
+      "sourceType": "vendor",
+      "reason": "vendor is not named",
       "zone": null,
       "npc": null,
       "questName": null
@@ -3036,10 +3029,10 @@
     {
       "id": 7947,
       "name": "Ebon Shiv",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Western Plaguelands",
+      "npc": "Magnus Frostwake",
       "questName": null
     },
     {
@@ -3145,6 +3138,15 @@
       "id": 8174,
       "name": "Comfortable Leather Hat",
       "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 8187,
+      "name": "Turtle Scale Gloves",
+      "sourceType": "unsourced",
       "reason": "not indexed yet",
       "zone": null,
       "npc": null,
@@ -4280,6 +4282,24 @@
       "name": "Red Mageweave Headband",
       "sourceType": "unsourced",
       "reason": "not indexed since the source changed",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 10035,
+      "name": "Tuxedo Pants",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 10036,
+      "name": "Tuxedo Jacket",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
       "zone": null,
       "npc": null,
       "questName": null
@@ -6393,8 +6413,8 @@
     {
       "id": 12625,
       "name": "Dawnbringer Shoulders",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
       "zone": null,
       "npc": null,
       "questName": null
@@ -6411,10 +6431,10 @@
     {
       "id": 12632,
       "name": "Storm Gauntlets",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Western Plaguelands",
+      "npc": "Magnus Frostwake",
       "questName": null
     },
     {
@@ -6483,10 +6503,10 @@
     {
       "id": 12773,
       "name": "Ornate Thorium Handaxe",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Western Plaguelands",
+      "npc": "Magnus Frostwake",
       "questName": null
     },
     {
@@ -6501,10 +6521,10 @@
     {
       "id": 12775,
       "name": "Huge Thorium Battleaxe",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Western Plaguelands",
+      "npc": "Magnus Frostwake",
       "questName": null
     },
     {
@@ -6717,19 +6737,19 @@
     {
       "id": 13858,
       "name": "Runecloth Robe",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Moonglade",
+      "npc": "Darnall",
       "questName": null
     },
     {
       "id": 13860,
       "name": "Runecloth Cloak",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Moonglade",
+      "npc": "Darnall",
       "questName": null
     },
     {
@@ -6744,10 +6764,10 @@
     {
       "id": 13864,
       "name": "Runecloth Boots",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Moonglade",
+      "npc": "Darnall",
       "questName": null
     },
     {
@@ -7986,8 +8006,8 @@
     {
       "id": 15061,
       "name": "Living Shoulders",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
+      "sourceType": "vendor",
+      "reason": "vendor is not named",
       "zone": null,
       "npc": null,
       "questName": null
@@ -8022,10 +8042,10 @@
     {
       "id": 15065,
       "name": "Warbear Woolies",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Felwood",
+      "npc": "Meilosh",
       "questName": null
     },
     {
@@ -8130,10 +8150,10 @@
     {
       "id": 15077,
       "name": "Heavy Scorpid Bracers",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Silithus",
+      "npc": "Zannok Hidepiercer",
       "questName": null
     },
     {
@@ -8157,10 +8177,10 @@
     {
       "id": 15080,
       "name": "Heavy Scorpid Helm",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Silithus",
+      "npc": "Zannok Hidepiercer",
       "questName": null
     },
     {
@@ -9901,6 +9921,15 @@
       "questName": null
     },
     {
+      "id": 15673,
+      "name": "Magnificent Belt",
+      "sourceType": "world_drop",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 15674,
       "name": "Magnificent Greaves",
       "sourceType": "world_drop",
@@ -10121,69 +10150,6 @@
       "name": "Flarecore Mantle",
       "sourceType": "profession",
       "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 16982,
-      "name": "Corehound Boots",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 16983,
-      "name": "Molten Helm",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 16984,
-      "name": "Black Dragonscale Boots",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 16988,
-      "name": "Fiery Chain Shoulders",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 16989,
-      "name": "Fiery Chain Girdle",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 17013,
-      "name": "Dark Iron Leggings",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 17014,
-      "name": "Dark Iron Bracers",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
       "questName": null
@@ -10522,15 +10488,6 @@
       "questName": null
     },
     {
-      "id": 18486,
-      "name": "Mooncloth Robe",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
       "id": 18491,
       "name": "Lorespinner",
       "sourceType": "quest_reward",
@@ -10848,62 +10805,62 @@
     {
       "id": 19043,
       "name": "Heavy Timbermaw Belt",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Felwood",
+      "npc": "Meilosh",
       "questName": null
     },
     {
       "id": 19044,
       "name": "Might of the Timbermaw",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Felwood",
+      "npc": "Meilosh",
       "questName": null
     },
     {
       "id": 19047,
       "name": "Wisdom of the Timbermaw",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Felwood",
+      "npc": "Meilosh",
       "questName": null
     },
     {
       "id": 19048,
       "name": "Heavy Timbermaw Boots",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Felwood",
+      "npc": "Meilosh",
       "questName": null
     },
     {
       "id": 19049,
       "name": "Timbermaw Brawlers",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Felwood",
+      "npc": "Meilosh",
       "questName": null
     },
     {
       "id": 19050,
       "name": "Mantle of the Timbermaw",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Felwood",
+      "npc": "Meilosh",
       "questName": null
     },
     {
       "id": 19051,
       "name": "Girdle of the Dawn",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
       "zone": null,
       "npc": null,
       "questName": null
@@ -10911,8 +10868,8 @@
     {
       "id": 19052,
       "name": "Dawn Treaders",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
       "zone": null,
       "npc": null,
       "questName": null
@@ -10929,8 +10886,8 @@
     {
       "id": 19057,
       "name": "Gloves of the Dawn",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
       "zone": null,
       "npc": null,
       "questName": null
@@ -10938,8 +10895,8 @@
     {
       "id": 19058,
       "name": "Golden Mantle of the Dawn",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
       "zone": null,
       "npc": null,
       "questName": null
@@ -10963,177 +10920,6 @@
       "questName": null
     },
     {
-      "id": 19148,
-      "name": "Dark Iron Helm",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 19149,
-      "name": "Lava Belt",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 19156,
-      "name": "Flarecore Robe",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 19157,
-      "name": "Chromatic Gauntlets",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 19162,
-      "name": "Corehound Belt",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 19163,
-      "name": "Molten Belt",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 19164,
-      "name": "Dark Iron Gauntlets",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 19165,
-      "name": "Flarecore Leggings",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 19166,
-      "name": "Black Amnesty",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 19167,
-      "name": "Blackfury",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 19168,
-      "name": "Blackguard",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 19169,
-      "name": "Nightfall",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 19170,
-      "name": "Ebon Hand",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 19682,
-      "name": "Bloodvine Vest",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 19683,
-      "name": "Bloodvine Leggings",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 19684,
-      "name": "Bloodvine Boots",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 19685,
-      "name": "Primal Batskin Jerkin",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 19686,
-      "name": "Primal Batskin Gloves",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 19687,
-      "name": "Primal Batskin Bracers",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
       "id": 19688,
       "name": "Blood Tiger Breastplate",
       "sourceType": "profession",
@@ -11147,60 +10933,6 @@
       "name": "Blood Tiger Shoulders",
       "sourceType": "profession",
       "reason": "not indexed yet",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 19690,
-      "name": "Bloodsoul Breastplate",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 19691,
-      "name": "Bloodsoul Shoulders",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 19692,
-      "name": "Bloodsoul Gauntlets",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 19693,
-      "name": "Darksoul Breastplate",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 19694,
-      "name": "Darksoul Leggings",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 19695,
-      "name": "Darksoul Shoulders",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
       "zone": null,
       "npc": null,
       "questName": null
@@ -11233,24 +10965,6 @@
       "questName": "The Azure Key"
     },
     {
-      "id": 19998,
-      "name": "Bloodvine Lens",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 19999,
-      "name": "Bloodvine Goggles",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
       "id": 20035,
       "name": "Glacial Spike",
       "sourceType": "quest_reward",
@@ -11267,15 +10981,6 @@
       "zone": null,
       "npc": null,
       "questName": "Destroy Morphaz"
-    },
-    {
-      "id": 20039,
-      "name": "Dark Iron Boots",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
     },
     {
       "id": 20061,
@@ -11503,15 +11208,6 @@
       "questName": null
     },
     {
-      "id": 22191,
-      "name": "Obsidian Mail Tunic",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
       "id": 22194,
       "name": "Black Grasp of the Destroyer",
       "sourceType": "profession",
@@ -11541,15 +11237,6 @@
     {
       "id": 22197,
       "name": "Heavy Obsidian Belt",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 22198,
-      "name": "Jagged Obsidian Shield",
       "sourceType": "unsourced",
       "reason": "not indexed since the source changed",
       "zone": null,
@@ -12819,8 +12506,8 @@
     {
       "id": 215365,
       "name": "Invoker's Mantle",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
+      "sourceType": "vendor",
+      "reason": "vendor is not named",
       "zone": null,
       "npc": null,
       "questName": null
@@ -12828,8 +12515,8 @@
     {
       "id": 215366,
       "name": "Invoker's Cord",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
+      "sourceType": "vendor",
+      "reason": "vendor is not named",
       "zone": null,
       "npc": null,
       "questName": null
@@ -12873,8 +12560,8 @@
     {
       "id": 217270,
       "name": "Turtle Scale Gloves",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
+      "sourceType": "vendor",
+      "reason": "vendor is not named",
       "zone": null,
       "npc": null,
       "questName": null
@@ -13494,10 +13181,10 @@
     {
       "id": 250616,
       "name": "Bold Dirk",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
       "zone": null,
-      "npc": null,
+      "npc": "Pexmit",
       "questName": null
     },
     {
@@ -13728,10 +13415,10 @@
     {
       "id": 252552,
       "name": "Tooled Leather Armor",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
       "zone": null,
-      "npc": null,
+      "npc": "Pexmit",
       "questName": null
     },
     {
@@ -13800,15 +13487,6 @@
     {
       "id": 252560,
       "name": "Tooled Leather Pants",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
-      "questName": null
-    },
-    {
-      "id": 252561,
-      "name": "Living Crown",
       "sourceType": "unsourced",
       "reason": "not indexed since the source changed",
       "zone": null,
@@ -13935,10 +13613,10 @@
     {
       "id": 252599,
       "name": "Supple Scorpid Vest",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
       "zone": null,
-      "npc": null,
+      "npc": "Pexmit",
       "questName": null
     },
     {
@@ -14151,10 +13829,10 @@
     {
       "id": 254123,
       "name": "Runecloth Cuffs",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
       "zone": null,
-      "npc": null,
+      "npc": "Pexmit",
       "questName": null
     },
     {
@@ -19594,6 +19272,15 @@
       "questName": null
     },
     {
+      "id": 273912,
+      "name": "Justice Legplates",
+      "sourceType": "profession",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 273913,
       "name": "Justice Gloves",
       "sourceType": "profession",
@@ -21198,46 +20885,46 @@
     {
       "id": 275605,
       "name": "Venomspew Cord",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Silithus",
+      "npc": "Mishta",
       "questName": null
     },
     {
       "id": 275606,
       "name": "Venomspew Footpads",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Silithus",
+      "npc": "Mishta",
       "questName": null
     },
     {
       "id": 275607,
       "name": "Swarmtender's Gloves",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Silithus",
+      "npc": "Mishta",
       "questName": null
     },
     {
       "id": 275608,
       "name": "Swarmtender's Cord",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Silithus",
+      "npc": "Mishta",
       "questName": null
     },
     {
       "id": 275609,
       "name": "Swarmtender's Footpads",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Silithus",
+      "npc": "Mishta",
       "questName": null
     },
     {
@@ -21351,55 +21038,55 @@
     {
       "id": 275622,
       "name": "Goregasher Grips",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Silithus",
+      "npc": "Vargus",
       "questName": null
     },
     {
       "id": 275623,
       "name": "Goregasher Support",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Silithus",
+      "npc": "Vargus",
       "questName": null
     },
     {
       "id": 275624,
       "name": "Goregasher Stompers",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Silithus",
+      "npc": "Vargus",
       "questName": null
     },
     {
       "id": 275625,
       "name": "Clutchlord's Grips",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Silithus",
+      "npc": "Vargus",
       "questName": null
     },
     {
       "id": 275626,
       "name": "Clutchlord's Support",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Silithus",
+      "npc": "Vargus",
       "questName": null
     },
     {
       "id": 275627,
       "name": "Clutchlord's Stompers",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Silithus",
+      "npc": "Vargus",
       "questName": null
     },
     {
@@ -21990,568 +21677,568 @@
     {
       "id": 276992,
       "name": "Cloudy Skyforged Chainmail",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 276993,
       "name": "Cloudy Skyforged Wristguards",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 276994,
       "name": "Cloudy Skyforged Gauntlets",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 276995,
       "name": "Cloudy Skyforged Chain",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 276996,
       "name": "Cloudy Skyforged Legguards",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 276997,
       "name": "Cloudy Skyforged Greaves",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 276998,
       "name": "Cloudy Gustwoven Harness",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 276999,
       "name": "Cloudy Gustwoven Bracers",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277000,
       "name": "Cloudy Gustwoven Gloves",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277001,
       "name": "Cloudy Gustwoven Belt",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277002,
       "name": "Cloudy Gustwoven Trousers",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277003,
       "name": "Cloudy Gustwoven Boots",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277004,
       "name": "Cloudy Windraveled Jerkin",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277005,
       "name": "Cloudy Windraveled Armguards",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277006,
       "name": "Cloudy Windraveled Mitts",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277007,
       "name": "Cloudy Windraveled Strap",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277008,
       "name": "Cloudy Windraveled Pants",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277009,
       "name": "Cloudy Windraveled Footwraps",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277010,
       "name": "Cloudy Stormsewn Vest",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277011,
       "name": "Cloudy Stormsewn Cuffs",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277012,
       "name": "Cloudy Stormsewn Handwraps",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277013,
       "name": "Cloudy Stormsewn Cord",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277014,
       "name": "Cloudy Stormsewn Leggings",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277015,
       "name": "Cloudy Stormsewn Shoes",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277016,
       "name": "Azure Skyforged Chainmail",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277017,
       "name": "Azure Skyforged Wristguards",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277018,
       "name": "Azure Skyforged Gauntlets",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277019,
       "name": "Azure Skyforged Chain",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277020,
       "name": "Azure Skyforged Legguards",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277021,
       "name": "Azure Skyforged Greaves",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277022,
       "name": "Azure Gustwoven Harness",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277023,
       "name": "Azure Gustwoven Bracers",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277024,
       "name": "Azure Gustwoven Gloves",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277025,
       "name": "Azure Gustwoven Belt",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277026,
       "name": "Azure Gustwoven Trousers",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277027,
       "name": "Azure Gustwoven Boots",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277028,
       "name": "Azure Windraveled Jerkin",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277029,
       "name": "Azure Windraveled Armguards",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277030,
       "name": "Azure Windraveled Mitts",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277031,
       "name": "Azure Windraveled Strap",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277032,
       "name": "Azure Windraveled Pants",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277033,
       "name": "Azure Windraveled Footwraps",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277034,
       "name": "Azure Stormsewn Vest",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277035,
       "name": "Azure Stormsewn Cuffs",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277036,
       "name": "Azure Stormsewn Handwraps",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277037,
       "name": "Azure Stormsewn Cord",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277038,
       "name": "Azure Stormsewn Leggings",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277039,
       "name": "Azure Stormsewn Shoes",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Zephras Isle",
+      "npc": "Vayn Moongaze",
       "questName": null
     },
     {
       "id": 277040,
       "name": "Cloudy Skyforged Helm",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Mulgore",
+      "npc": "Sutara Plainstalker",
       "questName": null
     },
     {
       "id": 277041,
       "name": "Cloudy Skyforged Pauldrons",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Mulgore",
+      "npc": "Sutara Plainstalker",
       "questName": null
     },
     {
       "id": 277042,
       "name": "Cloudy Gustwoven Hood",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Mulgore",
+      "npc": "Sutara Plainstalker",
       "questName": null
     },
     {
       "id": 277043,
       "name": "Cloudy Gustwoven Spaulders",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Mulgore",
+      "npc": "Sutara Plainstalker",
       "questName": null
     },
     {
       "id": 277044,
       "name": "Cloudy Windraveled Cover",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Mulgore",
+      "npc": "Sutara Plainstalker",
       "questName": null
     },
     {
       "id": 277045,
       "name": "Cloudy Windraveled Drapes",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Mulgore",
+      "npc": "Sutara Plainstalker",
       "questName": null
     },
     {
       "id": 277046,
       "name": "Cloudy Stormsewn Cowl",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Mulgore",
+      "npc": "Sutara Plainstalker",
       "questName": null
     },
     {
       "id": 277047,
       "name": "Cloudy Stormsewn Epaulets",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
-      "zone": null,
-      "npc": null,
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
+      "zone": "Mulgore",
+      "npc": "Sutara Plainstalker",
       "questName": null
     },
     {
       "id": 277048,
       "name": "Azure Skyforged Helm",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
       "zone": null,
-      "npc": null,
+      "npc": "Archmage Alvareaux",
       "questName": null
     },
     {
       "id": 277049,
       "name": "Azure Skyforged Pauldrons",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
       "zone": null,
-      "npc": null,
+      "npc": "Archmage Alvareaux",
       "questName": null
     },
     {
       "id": 277050,
       "name": "Azure Gustwoven Hood",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
       "zone": null,
-      "npc": null,
+      "npc": "Archmage Alvareaux",
       "questName": null
     },
     {
       "id": 277051,
       "name": "Azure Gustwoven Spaulders",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
       "zone": null,
-      "npc": null,
+      "npc": "Archmage Alvareaux",
       "questName": null
     },
     {
       "id": 277052,
       "name": "Azure Windraveled Cover",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
       "zone": null,
-      "npc": null,
+      "npc": "Archmage Alvareaux",
       "questName": null
     },
     {
       "id": 277053,
       "name": "Azure Windraveled Drapes",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
       "zone": null,
-      "npc": null,
+      "npc": "Archmage Alvareaux",
       "questName": null
     },
     {
       "id": 277054,
       "name": "Azure Stormsewn Cowl",
-      "sourceType": "unsourced",
-      "reason": "not indexed since the source changed",
+      "sourceType": "vendor",
+      "reason": "vendor has no map pin",
       "zone": null,
-      "npc": null,
+      "npc": "Archmage Alvareaux",
       "questName": null
     },
     {
@@ -24283,6 +23970,15 @@
       "questName": null
     },
     {
+      "id": 282023,
+      "name": "Clack's Claw",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
       "id": 282026,
       "name": "Unyielding Battle Signet",
       "sourceType": "unsourced",
@@ -24690,6 +24386,15 @@
     {
       "id": 286984,
       "name": "Mark of the Marsh",
+      "sourceType": "unsourced",
+      "reason": "not indexed yet",
+      "zone": null,
+      "npc": null,
+      "questName": null
+    },
+    {
+      "id": 286986,
+      "name": "Abandoned Leggings",
       "sourceType": "unsourced",
       "reason": "not indexed yet",
       "zone": null,

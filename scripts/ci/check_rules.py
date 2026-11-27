@@ -6,8 +6,8 @@ not trip it.
 
 - No full garbage collection. GQ:CollectGarbageSoon steps the cycle.
 - The world map: no AddDataProvider, no write to WorldMapFrame.pinPools, no
-  WorldMapFrame OnShow hook, no SetIgnoreParentScale(true). Those taint the
-  gamepad and the map.
+  WorldMapFrame OnShow hook, no SetIgnoreParentScale(true), no replacement of
+  a WaypointLocationPinMixin method. Those taint the gamepad and the map.
 - The gamepad: no SetUIFocusState and no FrameControlsManager method call.
   Reading FrameControlsManager.currentFrame is fine.
 - Log.lua's main chunk is close to Lua 5.1's 200-local limit. It may not gain
@@ -33,6 +33,8 @@ BANNED = [
      "full garbage collection; use GQ:CollectGarbageSoon"),
     (r"\bAddDataProvider\s*\(", "WorldMapFrame data provider taints the map"),
     (r"pinPools\s*(\[[^\]]*\]\s*)?=(?!=)", "writing WorldMapFrame.pinPools taints the map"),
+    (r"WaypointLocationPinMixin\s*\.\s*\w+\s*=",
+     "replacing a waypoint pin method taints AcquirePin and SetPassThroughButtons"),
     (r"WorldMapFrame\s*:\s*HookScript\s*\(\s*[\"']OnShow", "hooking WorldMapFrame OnShow taints the map"),
     (r"hooksecurefunc\s*\(\s*WorldMapFrame\s*,\s*[\"']OnShow", "hooking WorldMapFrame OnShow taints the map"),
     (r"SetIgnoreParentScale\s*\(\s*true", "ignoring the canvas scale makes map pins gigantic"),

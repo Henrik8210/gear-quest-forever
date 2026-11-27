@@ -219,6 +219,34 @@
       "lock": {
         "rlvl": 50
       }
+    },
+    "252561": {
+      "name": "Living Crown",
+      "reportedBy": "Henrik",
+      "date": "2026-11-27",
+      "where": "in chat",
+      "verifiedInGame": false,
+      "wowheadSays": "The finished helm page lists no source. Pattern: Living Crown (252891) drops from Warpwood Treant in Dire Maul, about 6% (72 of 1203). Requires Leatherworking 300.",
+      "kept": "Dungeon trash. The Leatherworking pattern drops from Warpwood Treant. The pin is the Dire Maul entrance in Feralas. The helm is crafted. Both factions.",
+      "lock": {
+        "sourceType": "raid_trash",
+        "npc": "Warpwood Treant",
+        "zone": "Dire Maul"
+      }
+    },
+    "252605": {
+      "name": "Black Dragonscale Helm",
+      "reportedBy": "Henrik",
+      "date": "2026-11-27",
+      "where": "in chat",
+      "verifiedInGame": false,
+      "wowheadSays": "The finished helm page lists no source. Pattern: Black Dragonscale Helm (252939) drops from Blackhand Assassin in Blackrock Spire, 123 of 1290. The assassin is elite, level 60 to 61, and hostile to both factions. Requires Leatherworking 300.",
+      "kept": "Dungeon trash. The Leatherworking pattern drops from Blackhand Assassin. The pin is the Blackrock Spire entrance. The helm is crafted. Both factions.",
+      "lock": {
+        "sourceType": "raid_trash",
+        "npc": "Blackhand Assassin",
+        "zone": "Blackrock Spire"
+      }
     }
   }
 }

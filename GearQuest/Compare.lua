@@ -82,6 +82,7 @@ local STAT_NAME_TO_KEY = {
     ["Attack Power"] = "ap",
     ["Ranged Attack Power"] = "rap",
     ["Feral Attack Power"] = "feralAp",
+    ["Feral Combat"] = "feralCombat",
     Healing = "heal",
     ["Spell Damage"] = "sp",
     ["Spell Power"] = "sp",
@@ -140,6 +141,9 @@ local function ResolveStatWeightKey(statName)
 
     if statName:find("forms only", 1, true) then
         return "feralAp"
+    end
+    if statName:lower():find("feral combat", 1, true) then
+        return "feralCombat"
     end
 
     local lower = statName:lower()
@@ -275,6 +279,11 @@ function GQ.Compare:GetStatWeight(statName)
             end
             return profile[key]
         end
+    end
+    -- Feral Combat is a cat and bear skill. A spec that does not price it
+    -- scores 0, not the generic 0.5 fallback.
+    if key == "feralCombat" then
+        return 0
     end
 
     return LEGACY_STAT_WEIGHT[statName] or DEFAULT_STAT_WEIGHT[STAT_NAME_TO_KEY[statName]] or 0.5
@@ -569,6 +578,7 @@ local function ParseTooltipStatLine(text, byName)
         { "[Ii]mproves critical strike rating by (%d+)", "Critical Strike Rating" },
         { "[Ii]ncreases damage done by magical spells and effects by up to (%d+)", "Spell Damage" },
         { "[Ii]ncreases healing done by spells and effects by up to (%d+)", "Healing" },
+        { "[Ii]ncreas[a-z]* [Ff]eral [Cc]ombat %+(%d+)", "Feral Combat" },
     }
 
     for _, pattern in ipairs(patterns) do

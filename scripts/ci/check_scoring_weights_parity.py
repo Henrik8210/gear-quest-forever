@@ -16,7 +16,7 @@ SCORING_LUA = REPO / "GearQuest" / "_generated" / "ScoringWeights.generated.lua"
 GEN = REPO / "GearQuest" / "_generated"
 
 SCORING_LABELS = {
-    "agi", "str", "int", "sta", "spi", "ap", "rap", "feralAp",
+    "agi", "str", "int", "sta", "spi", "ap", "rap", "feralAp", "feralCombat",
     "heal", "sp_from_heal", "sp", "spHoly", "spFire", "spFrost", "spNature",
     "spArcane", "spShadow", "hit", "crit", "haste", "expertise",
     "armor", "health", "hp5", "mana", "mp5", "defense", "dodge", "parry",

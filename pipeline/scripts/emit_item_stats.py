@@ -46,6 +46,7 @@ LABEL = {
     "ap": "Attack Power",
     "rap": "Ranged Attack Power",
     "feralAp": "Feral Attack Power",
+    "feralCombat": "Feral Combat",
     "heal": "Healing",
     "sp": "Spell Power",
     "spHoly": "Holy Spell Power",

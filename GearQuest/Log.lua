@@ -10210,6 +10210,9 @@ function GQ.Log:SetOnlyGuideGear(enabled)
         GQ.Data:ClearTopUpgradeCache()
     end
     self._slotRankCache = nil
+    if GQ.Data then
+        GQ.Data._gearScoreCache = nil
+    end
     self._weaponPool = nil
     self._weaponPoolBand = nil
     self._weaponTrueList = nil
@@ -18943,7 +18946,7 @@ function GQ.Log:RankListSeenKey(entry)
     return entry.id
 end
 
-function GQ.Log:GetSlotRankList(slotName, handKind)
+function GQ.Log:GetSlotRankList(slotName, handKind, scoredOnly)
     local dataSlot = slotName == "WeaponPair" and "MainHand" or slotName
     if not dataSlot or not GQ.Data or not GQ.Data.GetClassSlotEntryList then
         return {}
@@ -18956,7 +18959,7 @@ function GQ.Log:GetSlotRankList(slotName, handKind)
         self._slotRankCache = {}
     end
     local cacheKey = tostring(slotName) .. ":" .. tostring(handKind)
-        .. (self:OnlyGuideGearEnabled() and ":guide" or "")
+        .. ((not scoredOnly and self:OnlyGuideGearEnabled()) and ":guide" or "")
     local cached = self._slotRankCache and self._slotRankCache[cacheKey]
     if cached then
         return cached
@@ -19015,7 +19018,9 @@ function GQ.Log:GetSlotRankList(slotName, handKind)
     -- Only Guide Gear, at 60, shows the Wowhead page in page order. The
     -- score rank stays on the row. A slot with no guide piece keeps the
     -- scored list. Below 60 the saved check hides nothing.
-    local guided = self:GuideOrderedEntries(pool)
+    -- The score bar and the tooltip index pass scoredOnly. That span is the
+    -- full scored list. A play style or a filter does not move it.
+    local guided = scoredOnly and pool or self:GuideOrderedEntries(pool)
     if guided ~= pool then
         self._slotRankCache[cacheKey] = guided
         return guided
