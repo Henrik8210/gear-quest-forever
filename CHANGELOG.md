@@ -2,7 +2,95 @@
 
 Forked from [GearQuest](https://github.com/Henrik8210/gear-quest) `v0.1.1-beta.3-bcc` for **World of Warcraft: Forever**.
 
-## v1.4.2
+## v1.4.3
+
+The log header reads **GearQuest Forever v1.4.3**. `/reload` after the update.
+
+Play style sits beside Filter. A custom spec can take its weights from Pawn. Ranged attack power counts for hunters and for nobody else. The compare tooltip repeats the rank of the piece you are wearing. Several hunts were corrected, and the Silithus badge rewards are off the lists.
+
+### Play style sits beside Filter
+
+**Who:** Everyone who uses the log.
+
+**What you see:** **Play style** is the button to the right of **Filter**, on the hunt list. **Tooltips** keeps the footer spot Play style used to occupy. The button still reads **Play style*** while a card is on. The knight's guide says the button beside Filter.
+
+### Import stat weights from Pawn
+
+**Who:** Anyone building a custom spec, on every class, when the Pawn addon is installed and loaded.
+
+**What you see:** Open the custom spec editor and choose the spec the weights should follow. **Import stat weights from Pawn** appears under that choice. It stays hidden when Pawn is not installed, and it stays hidden until a spec is selected. Clicking it fills the boxes from Pawn's scale for that same spec. You still save the custom spec yourself. The ranged attack power row is on the editor.
+
+### Ranged attack power
+
+**Who:** Hunters price it. Enhancement, warriors, and every other class do not.
+
+**What you see:** A ranged attack power line is its own stat. Hunters price it the same as attack power: 0.45 while leveling from 1 to 9, 0.4 Beast Mastery, 0.38 Marksmanship, and 0.34 Survival. Every other class prices it at 0, so a piece does not climb the list because that line was treated as ordinary attack power. **Swift Flight Bracers** keep their 41 ranged attack power for a hunter. Enhancement scores the stamina and armor on those bracers, and the ranged attack power adds nothing.
+
+### The worn rank on a comparison
+
+**Who:** Everyone who compares a reward to the piece they have equipped. The report was Goadah, a protection warrior comparing Noosegrip Gauntlets to Burnished Gloves.
+
+**What you see:** The comparison tooltip repeats the rank of the piece you are wearing, the same rank the item tooltip already shows, and then **Currently equipped**. The rest of that popup is unchanged.
+
+### Monstrous War Axe
+
+**Who:** The classes that can equip a two-hand axe. The report was cowboybenalman, a Beast Mastery hunter at 39, holding **Monstrous War Axe of Agility**.
+
+**What you see:** The axe ranks on the suffix it rolled. **Of Agility** is +16–17 Agility, about a 5.7% roll, and Beast Mastery lists that roll from level 37. The other client rolls are on the lists too: of Stamina, of Strength, of Intellect, of Spirit, of Power, of the Bear, of the Boar, of the Eagle, of the Whale, of the Wolf, of the Monkey, of the Tiger, of the Falcon, of the Gorilla, of the Owl, and of Holy Wrath. A roll that has no client property row is not listed.
+
+### Premier honor armor
+
+**Who:** The classes that can wear the six Premier families, Alliance and Horde. The report was _wolfpet.
+
+**What you see:** **Premier Plate**, **Premier Beasthide**, **Premier Chainmail**, **Premier Dreadweave**, **Premier Lunarhide**, and **Premier Dreamhide** are bought from **Sergeant Major Clate** in the Champions' Hall in Stormwind, or **First Sergeant Hola'mahi** in the Hall of Legends in Orgrimmar. They cost Honor and Marks of Honor. Both factions see them. The map pins are Clate at 75.8, 67.0 in Stormwind, and Hola'mahi at 38.0, 64.4 in Orgrimmar, with two more spots a step away.
+
+### Classic rare PvP sets
+
+**Who:** Anyone who was hunting a Lieutenant Commander's, Knight-Captain's, Knight-Lieutenant's, Knight-Champion's, Blood Guard's, Legionnaire's, Centurion's, or Champion's rare.
+
+**What you see:** Those classic rare rank sets are off the hunts. Season 1 sells the Premier pieces. Warsong Gulch leggings, Alterac insignias, tabards, and the other honor pieces that are not those titles stay.
+
+### Silithus badge rewards
+
+**Who:** Every class that was hunting a Cenarion Circle badge reward.
+
+**What you see:** These thirteen stay off the lists until Vargus offers the quests. **Champion's Battlegear:** Earthstrike, Wrath of Cenarius, Fist of Cenarius. **Stalwart's Battlegear:** Rockfury Bracers, Deeprock Bracers, Earthcalm Orb, Might of Cenarius. **Veteran's Battlegear:** Earthpower Vest, Grace of Earth, Band of Earthen Might. **Volunteer's Battlegear:** Gloves of Earthen Power, Earthweave Cloak, Band of Earthen Wrath.
+
+### Marbled Buckler
+
+**Who:** Shield specs, Alliance and Horde. The report was kasku12.
+
+**What you see:** **Marbled Buckler** is on both lists. Alliance starts **The Crone of the Kraul** with Falfindel Waywarder in Feralas. Horde starts **A Vengeful Fate** with Auld Stonespire in Thunder Bluff.
+
+### Clobrok's Block Rock
+
+**Who:** Horde shield specs. The report was marcosajc, an Alliance protection warrior who was being sent on a Horde quest.
+
+**What you see:** **Clobrok's Block Rock** and **Jom-jom's Gabbar** are Horde only. They come from **Jom-jom's Escape**. Alliance no longer sees them as an upgrade.
+
+### Skyfury Gauntlets
+
+**Who:** Shamans, Alliance and Horde. The report was terrainer.
+
+**What you see:** **Skyfury Gauntlets** are the shaman quest reward. They require level 58. Other classes do not list them. The pin is the trainer.
+
+### Timbermaw Tunic and Swift Flight Bracers
+
+**Who:** Leatherworking hunts, both factions. The reports were terrainer and spaceddoutt.
+
+**What you see:** **Timbermaw Tunic** is Leatherworking. The pattern drops from **Blackmaw Druid**. The pin is the Blackmaw Hold entrance in Azshara at 42.4, 20.2. **Swift Flight Bracers** are crafted from the pattern in **Knot Thimblejack's Cache** in Dire Maul. The pin is the Dire Maul entrance in Feralas. Not every leatherworking hunt was unsourced. These two were.
+
+### A Better Ingredient
+
+**Who:** Druids who finished the Sunken Temple class quest. The report was crazyants_de.
+
+**What you see:** **Forest's Embrace**, **Grizzled Pelt**, and **Moonshadow Stave** all count as obtained when **A Better Ingredient** is finished. The quest gives all three. The other classes' Sunken Temple quests still show a choice until each one is checked.
+
+### Donations
+
+**Garrett** is on the donators list, under Tony.
+
+### v1.4.2
 
 The log header reads **GearQuest Forever v1.4.2**. `/reload` after the update.
 

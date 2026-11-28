@@ -247,6 +247,702 @@
         "npc": "Blackhand Assassin",
         "zone": "Blackrock Spire"
       }
+    },
+    "6725": {
+      "name": "Marbled Buckler",
+      "reportedBy": "kasku12",
+      "date": "2026-11-28",
+      "where": "Discord bug-report",
+      "verifiedInGame": false,
+      "wowheadSays": "The stored quest is The Crone of the Kraul, Side Alliance. A Vengeful Fate (1102) is Side Horde, requires level 29, and also lets the player choose Marbled Buckler.",
+      "kept": "Both factions. Alliance still starts with Falfindel Waywarder in Feralas. Horde starts with Auld Stonespire in Thunder Bluff (36.2, 59.8). It is still a choice on both quests.",
+      "lock": {}
+    },
+    "274952": {
+      "name": "Jom-jom's Gabbar",
+      "reportedBy": "marcosajc",
+      "date": "2026-11-28",
+      "where": "Discord bug-report",
+      "verifiedInGame": false,
+      "wowheadSays": "Jom-jom's Escape (94556) is Side Horde. The reward is a choice of Jom-jom's Gabbar or Clobrok's Block Rock. Start is Jom-jom in Riverglades (68.8, 31.2).",
+      "kept": "Horde only. The pin is the quest start.",
+      "lock": {
+        "questFaction": "Horde"
+      }
+    },
+    "274955": {
+      "name": "Clobrok's Block Rock",
+      "reportedBy": "marcosajc",
+      "date": "2026-11-28",
+      "where": "Discord bug-report",
+      "verifiedInGame": false,
+      "wowheadSays": "Jom-jom's Escape (94556) is Side Horde. The item had no quest faction, so Alliance protection warriors were scored an upgrade.",
+      "kept": "Horde only. Same pin as Jom-jom's Gabbar. Required level stays 38.",
+      "lock": {
+        "questFaction": "Horde"
+      }
+    },
+    "20133": {
+      "name": "Skyfury Gauntlets",
+      "reportedBy": "terrainer",
+      "date": "2026-11-28",
+      "where": "Discord shaman",
+      "verifiedInGame": false,
+      "wowheadSays": "The item page has no source. The Darkreaver Menace is the shaman quest. Horde 8258 starts at Sagorne Creststrider in Orgrimmar (38.6, 36.2). Alliance 97169 starts at Eldrun Stormbreaker in Ironforge (47.4, 13.6). Both require level 58 and choose the helm or the gauntlets. Tooltip: mail hands, 249 armor, 12 stamina, 1% hit, 1% crit, damage and healing 14. Classes: Shaman.",
+      "kept": "Quest reward for shamans, both factions. Required level 58. The pin is the trainer, not Scholomance.",
+      "lock": {
+        "sourceType": "quest_reward",
+        "rlvl": 58,
+        "gateLevel": 58
+      }
+    },
+    "252484": {
+      "name": "Timbermaw Tunic",
+      "reportedBy": "terrainer",
+      "date": "2026-11-28",
+      "where": "Discord shaman",
+      "verifiedInGame": false,
+      "wowheadSays": "The finished tunic page lists no source. Pattern: Timbermaw Tunic (252893) drops from Blackmaw Druid in Blackmaw Hold, 18 of 286. Requires Leatherworking 300.",
+      "kept": "Dungeon trash. The Leatherworking pattern drops from Blackmaw Druid. The pin is the Blackmaw Hold entrance in Azshara (42.4, 20.2). The tunic is crafted. Both factions.",
+      "lock": {
+        "sourceType": "raid_trash",
+        "npc": "Blackmaw Druid",
+        "zone": "Blackmaw Hold"
+      }
+    },
+    "18508": {
+      "name": "Swift Flight Bracers",
+      "reportedBy": "terrainer",
+      "date": "2026-11-28",
+      "where": "Discord shaman",
+      "verifiedInGame": false,
+      "wowheadSays": "The finished bracer page lists no source. Pattern: Swift Flight Bracers (18516) is inside Knot Thimblejack's Cache in Dire Maul, 15 of 102. It is not sold. Requires Leatherworking 290.",
+      "kept": "The Leatherworking pattern is in the cache. The pin is the Dire Maul entrance in Feralas. The bracers are crafted. Both factions.",
+      "lock": {
+        "sourceType": "object_drop",
+        "npc": "Knot Thimblejack's Cache",
+        "zone": "Dire Maul"
+      }
+    },
+    "1640": {
+      "name": "Monstrous War Axe",
+      "reportedBy": "cowboybenalman",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": true,
+      "wowheadSays": "Forever item page only says <Random enchantment>. Classic lists 11 suffixes. of Agility is +16-17.",
+      "kept": "Suffix group expanded from the client property rows that match the rolled tooltip. of Agility is +17 Agility (property 359). The 11 Classic suffixes keep the Classic chance. Intellect, Spirit, Falcon, Gorilla, Owl, and Holy Wrath are on the same property tier and have no published chance.",
+      "lock": {}
+    },
+    "272656": {
+      "name": "Premier Lunarhide Leggings",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272657": {
+      "name": "Premier Dreadweave Legguards",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272669": {
+      "name": "Premier Lunarhide Headguard",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272670": {
+      "name": "Premier Lunarhide Shoulders",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272671": {
+      "name": "Premier Dreadweave Cowl",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272705": {
+      "name": "Premier Beasthide Footwraps",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272707": {
+      "name": "Premier Beasthide Armsplints",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272709": {
+      "name": "Premier Beasthide Gloves",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272711": {
+      "name": "Premier Beasthide Girdle",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272712": {
+      "name": "Premier Chainmail Girdle",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272713": {
+      "name": "Premier Chainmail Boots",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272715": {
+      "name": "Premier Chainmail Gauntlets",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272716": {
+      "name": "Premier Plate Boots",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272717": {
+      "name": "Premier Plate Gauntlets",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272730": {
+      "name": "Premier Beasthide Tunic",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272731": {
+      "name": "Premier Beasthide Leggings",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272732": {
+      "name": "Premier Beasthide Epaulets",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272733": {
+      "name": "Premier Beasthide Shroud",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272734": {
+      "name": "Premier Chainmail Hauberk",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272735": {
+      "name": "Premier Chainmail Leggings",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272736": {
+      "name": "Premier Chainmail Pauldrons",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272737": {
+      "name": "Premier Chainmail Helmet",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272738": {
+      "name": "Premier Plate Helm",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272739": {
+      "name": "Premier Plate Chestguard",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272740": {
+      "name": "Premier Plate Leggings",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272741": {
+      "name": "Premier Plate Pauldrons",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272794": {
+      "name": "Premier Dreadweave Boots",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272795": {
+      "name": "Premier Dreadweave Bracers",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272796": {
+      "name": "Premier Dreadweave Gloves",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272797": {
+      "name": "Premier Dreadweave Belt",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272800": {
+      "name": "Premier Dreadweave Robe",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272801": {
+      "name": "Premier Dreadweave Mantle",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272828": {
+      "name": "Premier Plate Wristguards",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272830": {
+      "name": "Premier Chainmail Armguards",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272834": {
+      "name": "Premier Dreamhide Armsplints",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "272835": {
+      "name": "Premier Lunarhide Armsplints",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "273325": {
+      "name": "Premier Plate Girdle",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "273368": {
+      "name": "Premier Lunarhide Gloves",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "273369": {
+      "name": "Premier Lunarhide Girdle",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "273370": {
+      "name": "Premier Lunarhide Footwraps",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "273371": {
+      "name": "Premier Lunarhide Tunic",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "273373": {
+      "name": "Premier Dreamhide Leggings",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "273374": {
+      "name": "Premier Dreamhide Headguard",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "273375": {
+      "name": "Premier Dreamhide Shoulders",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "273377": {
+      "name": "Premier Dreamhide Gloves",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "273378": {
+      "name": "Premier Dreamhide Girdle",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "273379": {
+      "name": "Premier Dreamhide Footwraps",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "273380": {
+      "name": "Premier Dreamhide Tunic",
+      "reportedBy": "_wolfpet",
+      "date": "2026-11-28",
+      "where": "Discord",
+      "verifiedInGame": false,
+      "wowheadSays": "No named seller on the Forever item page.",
+      "kept": "Bought from Sergeant Major Clate (Alliance) or First Sergeant Hola'mahi (Horde). Costs Honor Points and tokens (Marks of Honor). npc stays empty so one faction is not hidden. Sergeant Major Clate is Alliance. First Sergeant Hola'mahi is Horde.",
+      "lock": {}
+    },
+    "21180": {
+      "name": "Earthstrike",
+      "reportedBy": "Henrik",
+      "date": "2026-11-28",
+      "where": "in chat",
+      "verifiedInGame": true,
+      "wowheadSays": "Reward from Champion's Battlegear, started by Vargus in Silithus.",
+      "kept": "Unobtainable. The Cenarion Circle badge quests are not in the game yet. The id stays in forever_absent.json.",
+      "lock": {}
+    },
+    "21190": {
+      "name": "Wrath of Cenarius",
+      "reportedBy": "Henrik",
+      "date": "2026-11-28",
+      "where": "in chat",
+      "verifiedInGame": true,
+      "wowheadSays": "Reward from Champion's Battlegear, started by Vargus in Silithus.",
+      "kept": "Unobtainable. The Cenarion Circle badge quests are not in the game yet. The id stays in forever_absent.json.",
+      "lock": {}
+    },
+    "21188": {
+      "name": "Fist of Cenarius",
+      "reportedBy": "Henrik",
+      "date": "2026-11-28",
+      "where": "in chat",
+      "verifiedInGame": true,
+      "wowheadSays": "Reward from Champion's Battlegear, started by Vargus in Silithus.",
+      "kept": "Unobtainable. The Cenarion Circle badge quests are not in the game yet. The id stays in forever_absent.json.",
+      "lock": {}
+    },
+    "21186": {
+      "name": "Rockfury Bracers",
+      "reportedBy": "Henrik",
+      "date": "2026-11-28",
+      "where": "in chat",
+      "verifiedInGame": true,
+      "wowheadSays": "Reward from Stalwart's Battlegear, started by Vargus in Silithus.",
+      "kept": "Unobtainable. The Cenarion Circle badge quests are not in the game yet. The id stays in forever_absent.json.",
+      "lock": {}
+    },
+    "21184": {
+      "name": "Deeprock Bracers",
+      "reportedBy": "Henrik",
+      "date": "2026-11-28",
+      "where": "in chat",
+      "verifiedInGame": true,
+      "wowheadSays": "Reward from Stalwart's Battlegear, started by Vargus in Silithus.",
+      "kept": "Unobtainable. The Cenarion Circle badge quests are not in the game yet. The id stays in forever_absent.json.",
+      "lock": {}
+    },
+    "21185": {
+      "name": "Earthcalm Orb",
+      "reportedBy": "Henrik",
+      "date": "2026-11-28",
+      "where": "in chat",
+      "verifiedInGame": true,
+      "wowheadSays": "Reward from Stalwart's Battlegear, started by Vargus in Silithus.",
+      "kept": "Unobtainable. The Cenarion Circle badge quests are not in the game yet. The id stays in forever_absent.json.",
+      "lock": {}
+    },
+    "21189": {
+      "name": "Might of Cenarius",
+      "reportedBy": "Henrik",
+      "date": "2026-11-28",
+      "where": "in chat",
+      "verifiedInGame": true,
+      "wowheadSays": "Reward from Stalwart's Battlegear, started by Vargus in Silithus.",
+      "kept": "Unobtainable. The Cenarion Circle badge quests are not in the game yet. The id stays in forever_absent.json.",
+      "lock": {}
+    },
+    "21183": {
+      "name": "Earthpower Vest",
+      "reportedBy": "Henrik",
+      "date": "2026-11-28",
+      "where": "in chat",
+      "verifiedInGame": true,
+      "wowheadSays": "Reward from Veteran's Battlegear, started by Vargus in Silithus.",
+      "kept": "Unobtainable. The Cenarion Circle badge quests are not in the game yet. The id stays in forever_absent.json.",
+      "lock": {}
+    },
+    "21181": {
+      "name": "Grace of Earth",
+      "reportedBy": "Henrik",
+      "date": "2026-11-28",
+      "where": "in chat",
+      "verifiedInGame": true,
+      "wowheadSays": "Reward from Veteran's Battlegear, started by Vargus in Silithus.",
+      "kept": "Unobtainable. The Cenarion Circle badge quests are not in the game yet. The id stays in forever_absent.json.",
+      "lock": {}
+    },
+    "21182": {
+      "name": "Band of Earthen Might",
+      "reportedBy": "Henrik",
+      "date": "2026-11-28",
+      "where": "in chat",
+      "verifiedInGame": true,
+      "wowheadSays": "Reward from Veteran's Battlegear, started by Vargus in Silithus.",
+      "kept": "Unobtainable. The Cenarion Circle badge quests are not in the game yet. The id stays in forever_absent.json.",
+      "lock": {}
+    },
+    "21178": {
+      "name": "Gloves of Earthen Power",
+      "reportedBy": "Henrik",
+      "date": "2026-11-28",
+      "where": "in chat",
+      "verifiedInGame": true,
+      "wowheadSays": "Reward from Volunteer's Battlegear, started by Vargus in Silithus.",
+      "kept": "Unobtainable. The Cenarion Circle badge quests are not in the game yet. The id stays in forever_absent.json.",
+      "lock": {}
+    },
+    "21187": {
+      "name": "Earthweave Cloak",
+      "reportedBy": "Henrik",
+      "date": "2026-11-28",
+      "where": "in chat",
+      "verifiedInGame": true,
+      "wowheadSays": "Reward from Volunteer's Battlegear, started by Vargus in Silithus.",
+      "kept": "Unobtainable. The Cenarion Circle badge quests are not in the game yet. The id stays in forever_absent.json.",
+      "lock": {}
+    },
+    "21179": {
+      "name": "Band of Earthen Wrath",
+      "reportedBy": "Henrik",
+      "date": "2026-11-28",
+      "where": "in chat",
+      "verifiedInGame": true,
+      "wowheadSays": "Reward from Volunteer's Battlegear, started by Vargus in Silithus.",
+      "kept": "Unobtainable. The Cenarion Circle badge quests are not in the game yet. The id stays in forever_absent.json.",
+      "lock": {}
     }
   }
 }

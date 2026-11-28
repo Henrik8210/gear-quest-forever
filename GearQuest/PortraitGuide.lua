@@ -44,7 +44,7 @@ local PAGES = {
     {
         text = "The " .. Bold("Filter") .. " lets you well.. filter. So if you only want to see hunts in the list that are from that bastard Van Cleef's dungeon, you can do that along with many other options.\n\n"
             .. "There's also a filter if you scroll down near the bottom of the list for " .. Bold("Weapons") .. ".\n\n"
-            .. "Lastly there are " .. Bold("Play Styles") .. " that are sort of a combination of different filters, fx. " .. Bold("Zone Focus") .. " filters the list only to show you hunts that are available in the zone you're currently located in, while " .. Bold("No Dungeons!") .. " never leads you into a dungeon.",
+            .. "Lastly there are " .. Bold("Play Styles") .. ", the button beside " .. Bold("Filter") .. ", that are sort of a combination of different filters, fx. " .. Bold("Zone Focus") .. " filters the list only to show you hunts that are available in the zone you're currently located in, while " .. Bold("No Dungeons!") .. " never leads you into a dungeon.",
         sound = "Interface\\AddOns\\" .. ADDON_NAME .. "\\Sounds\\Guide-08.mp3",
         highlight = { "log", "filter", "weapons", "playstyle" },
     },

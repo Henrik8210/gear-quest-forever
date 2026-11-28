@@ -95,6 +95,10 @@ BOTH_FACTION_QUEST_ITEMS = {
     15106,  # Staff of Dar'Orahil
     15107,  # Orb of Noh'Orahil
     15108,  # Orb of Dar'Orahil
+    # Marbled Buckler. Horde chooses it from A Vengeful Fate (1102). Alliance
+    # chooses it from The Crone of the Kraul (1101). The stored quest name is
+    # the Alliance one, and that Side must not stamp the item Horde-only off.
+    6725,
 }
 
 HAND_FACTION = {

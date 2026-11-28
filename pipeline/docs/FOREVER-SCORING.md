@@ -1067,8 +1067,12 @@ The source **Filter** closes on a click outside the menu. The Profession
   `GearQuest/Art/GQ-Unsourced.png`, the orange circle.
   Checking Profession, Boss drop, Dungeon & Raid trash, Vendor, or Quest reward opens that flyout
   on the click. You do not have to leave the row and come back.
-- **Play style** is the button at the bottom of the log
-  (`GearQuestForeverDB.ui`). While any of them is on, the button reads
+- **Play style** is the button beside **Filter**, on the hunt list
+  (`GQ.Log:PlacePlayStyleButton`). The **Tooltips** button keeps the footer
+  spot Play style used to occupy. The onboarding sentence says "the button
+  beside Filter". `Guide-08.mp3` was recorded before that phrase, so the
+  spoken line is a little ahead of those words. The choice is saved in
+  `GearQuestForeverDB.ui`. While any of them is on, the button reads
   **Play style***. A page holds nine cards, names under the pictures, three then three,
   then **Focus Zone** under **Manageable Dungeons**, **Their Cities** under
   **Manageable Quests**, and **No Zephras!** under **Buy it**. Page 2 starts
@@ -1375,7 +1379,9 @@ Premade spec hover shows the `weights.json` row (Google Sheet grid). Hunt lists 
 
 `drop_faction.json` keeps a drop on the side that can attack the dropper when every Wowhead reaction is friendly to one faction and hostile to the other. Dun Garok Rifle (282710), Humbert's Helm, Humbert's Chestpiece, and Circlet of the Order are Horde only. Opportunistic Education is Horde, so Solid Gold Band (279845) and Larcenist's Belt (279846) stay off the Alliance list. Friend of the Library is 10 books and Greater Friend of the Library is 20. Both factions turn them in: Garion Wendell in Stormwind, Owen Thadd in Undercity.
 
-Ashbringer (13262) stays out until that quest can be finished. The four Atiesh staves (22589 mage, 22630 warlock, 22631 priest, 22632 druid) stay out until Naxxramas is open. Do not invent a quest name for Ashbringer. Sulfuras (17182) is a boss drop from Ragnaros, and the description says you also need the Sulfuron Hammer. Nature's Whisper (20645) is A Terrible Purpose, required level 54, pinned in Silithus. Crown of the Fire Festival (23323) is not a hunt.
+Ashbringer (13262) stays out until that quest can be finished. The thirteen Silithus Cenarion Circle badge rewards stay out until those quests exist. Vargus does not offer them yet. Champion's Battlegear is Earthstrike (21180), Wrath of Cenarius (21190), and Fist of Cenarius (21188). Stalwart's Battlegear is Rockfury Bracers (21186), Deeprock Bracers (21184), Earthcalm Orb (21185), and Might of Cenarius (21189). Veteran's Battlegear is Earthpower Vest (21183), Grace of Earth (21181), and Band of Earthen Might (21182). Volunteer's Battlegear is Gloves of Earthen Power (21178), Earthweave Cloak (21187), and Band of Earthen Wrath (21179). They stay in `forever_absent.json`. The four Atiesh staves (22589 mage, 22630 warlock, 22631 priest, 22632 druid) stay out until Naxxramas is open. Do not invent a quest name for Ashbringer. Sulfuras (17182) is a boss drop from Ragnaros, and the description says you also need the Sulfuron Hammer. Nature's Whisper (20645) is A Terrible Purpose, required level 54, pinned in Silithus. Crown of the Fire Festival (23323) is not a hunt.
+
+28 Nov 2026 corrections. Marbled Buckler (6725) is both factions: Alliance from The Crone of the Kraul, Horde from A Vengeful Fate. Clobrok's Block Rock (274955) and Jom-jom's Gabbar (274952) are Horde, from Jom-jom's Escape. Skyfury Gauntlets (20133) are shaman only, both factions, required level 58, pinned on the trainer. Timbermaw Tunic (252484) is the Leatherworking pattern from Blackmaw Druid, pinned at the Blackmaw Hold entrance in Azshara (42.4, 20.2). Swift Flight Bracers (18508) are the Dire Maul cache craft. The 41 ranged attack power counts for hunters and is not attack power for anyone else. Monstrous War Axe (1640) ranks the seventeen client suffix rows. Of Agility is +16–17 Agility, property 359, about 5.7%. A suffix with no client property row stays out. The six Premier families with no Wowhead seller (Plate, Beasthide, Chainmail, Dreadweave, Lunarhide, Dreamhide) are bought from Sergeant Major Clate or First Sergeant Hola'mahi, for Honor and Marks of Honor. npc stays empty so both factions see them. Pins are Stormwind 75.8, 67.0 and Orgrimmar 38.0, 64.4 plus the two nearby Hola'mahi spots. Classic rare rank titles stay off the lists. A Better Ingredient gives Forest's Embrace (22272), Grizzled Pelt (22274), and Moonshadow Stave (22458) together. The compare tooltip repeats the worn piece's rank on the same cached score path, then Currently equipped. The custom spec editor shows Import stat weights from Pawn only when Pawn is loaded and a shipped spec is selected. The click fills that spec's boxes. The player still saves. The button is 190 wide. The ranged attack power row is on the editor. Priest, Rogue, Shaman, Warlock, and Warrior still need a zero Ranged attack power row on the Google Sheet. `weights.json` already stores 0 for those classes.
 
 Lookup searches the loaded class, both factions. The index is released when you leave the Lookup tab. Closing the log while that tab is still selected keeps it.
 
@@ -1889,7 +1895,7 @@ this filter.
 Ranged DPS, damage, and speed are the Forever tooltip, not a stale stored
 number. Beast Mastery and Marksmanship melee `dpsWeight` is **0.05** (they also
 melee: Raptor Strike, Wing Clip, Mongoose Bite). Strength is **0** for Beast
-Mastery and Marksmanship, and **0.7** for Survival. Attack power is **0.4** for Beast Mastery, **0.38** for Marksmanship, **0.34** for Survival, and **0.45** at levels 1–9. There is no ranged attack power weight on any class. A ranged attack power line on an item is attack power. Agility stays **1**. Levels 1–9 strength stays **0.3**.
+Mastery and Marksmanship, and **0.7** for Survival. Attack power is **0.4** for Beast Mastery, **0.38** for Marksmanship, **0.34** for Survival, and **0.45** at levels 1–9. Ranged attack power uses the same weight as attack power for a hunter: 0.45 at levels 1–9, 0.4 Beast Mastery, 0.38 Marksmanship, 0.34 Survival. Every other class stays at 0, and a ranged attack power line is not scored as attack power for them. Agility stays **1**. Levels 1–9 strength stays **0.3**.
 Their `dpsWeightRanged` is
 **14**. Survival melee is **10** and ranged is **6**. Defense on every hunter
 spec is **0.02**. A gun with defense and a
@@ -2005,8 +2011,7 @@ is true for crit, haste, dodge, parry, and expertise. Against the old rating
 scale the sheet is crit ×14, haste ×10, dodge ×12, parry ×15, expertise ×10,
 and hit ×5. Hit was halved after the first percent scale, because 1% hit was
 outranking hunter attack power and crit. Do not multiply these weights again.
-Armour pen and resilience stay 0. There is no ranged attack power weight on
-any spec. A ranged attack power line is attack power. Hunter attack power is
+Armour pen and resilience stay 0. Ranged attack power uses the same weight as attack power for a hunter, and stays 0 on every other class. A ranged attack power line is not scored as attack power for those classes. Hunter attack power is
 **0.45** at levels 1–9, **0.4** Beast Mastery, **0.38** Marksmanship, and
 **0.34** Survival. Shamans do not dual wield. Melee specs score expertise.
 Casters leave expertise at 0.
@@ -2133,8 +2138,7 @@ Protection paladin armor is **0.2** on the grid, the tooltip, and the scorer.
 Its `armorClass` is plate 1.0, mail 0.55, leather 0.35,
 cloth 0.18. That armor weight is not why cloth loses on hunts — survivability
 comes from the scored stats on the piece. Generic spell power is **0.85**.
-`spHoly` is **0.85**, the same as generic spell power. Mana per 5 is **0.2**. Ranged attack
-power is **0** on every class. A ranged attack power line is attack power. Holy, Protection,
+`spHoly` is **0.85**, the same as generic spell power. Mana per 5 is **0.2**. Ranged attack power is **0** on every class except a hunter, where it matches that spec's attack power. A ranged attack power line is not scored as attack power on the other classes. Holy, Protection,
 and Retribution each price holy spell power the same as generic spell power. `speedWeight` is **-2**: points per
 second of weapon speed. A 2 second weapon loses 4 points and a 3 second
 weapon loses 6, on top of melee weapon damage **0.5**. The seal lands on

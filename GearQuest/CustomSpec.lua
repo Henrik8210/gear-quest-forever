@@ -322,7 +322,7 @@ local function Fold(stats, foldRap)
             out.sp_from_heal = fromHeal
         end
     end
-    -- Ranged attack power is attack power on every class.
+    -- Ranged attack power stays ranged. Hunters price it on its own weight.
     if foldRap and out.rap then
         out.ap = (out.ap or 0) + out.rap
         out.rap = nil
@@ -709,7 +709,7 @@ local function ScorePiece(entry, row, weights, dpsWeight, dpsRanged, speedWeight
             end
         end
     end
-    local folded = Fold(base, true)
+    local folded = Fold(base, false)
     local best = StatScore(folded, weights)
     local suffix, suffixChance, suffixRange, suffixId
     local rolls = GQ.Data.itemRolls and entry.itemId and GQ.Data.itemRolls[entry.itemId]
@@ -725,7 +725,7 @@ local function ScorePiece(entry, row, weights, dpsWeight, dpsRanged, speedWeight
                     merged[key] = (merged[key] or 0) + value
                 end
             end
-            local score = StatScore(Fold(merged, true), weights)
+            local score = StatScore(Fold(merged, false), weights)
             if score > best then
                 best = score
                 suffix = roll.n
@@ -1640,8 +1640,21 @@ function GQ.Custom:EnsureEditor()
     end)
     panel.specButton = specButton
 
+    local pawnButton = CreateFrame("Button", "GearQuestCustomPawnImport", panel, "UIPanelButtonTemplate")
+    pawnButton:SetSize(190, 22)
+    pawnButton:SetPoint("TOPLEFT", specButton, "BOTTOMLEFT", 0, -8)
+    pawnButton:SetText(L["Import stat weights from Pawn"])
+    if GQ.FitButton then
+        GQ:FitButton(pawnButton, 190)
+    end
+    pawnButton:Hide()
+    pawnButton:SetScript("OnClick", function()
+        GQ.Custom:ImportFromPawn()
+    end)
+    panel.pawnButton = pawnButton
+
     local hint = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    hint:SetPoint("TOPLEFT", specButton, "BOTTOMLEFT", 0, -16)
+    hint:SetPoint("TOPLEFT", pawnButton, "BOTTOMLEFT", 0, -12)
     hint:SetPoint("RIGHT", panel, "LEFT", 230, 0)
     hint:SetJustifyH("LEFT")
     hint:SetJustifyV("TOP")
@@ -1805,6 +1818,132 @@ function GQ.Custom:ToggleBaseMenu()
     menu:Show()
 end
 
+function GQ.Custom:ImportFromPawn()
+    local panel = self._editor
+    if not panel or not panel.baseId then
+        return
+    end
+    local pawn = _G.PawnCommon
+    local scales = pawn and pawn.Scales
+    if type(scales) ~= "table" then
+        if panel.errorText then
+            panel.errorText:SetTextColor(1, 0.35, 0.35)
+            panel.errorText:SetText(L["Pawn is not loaded."])
+        end
+        return
+    end
+    local classNames = {
+        WARRIOR = "warrior", PALADIN = "paladin", HUNTER = "hunter",
+        ROGUE = "rogue", PRIEST = "priest", SHAMAN = "shaman",
+        MAGE = "mage", WARLOCK = "warlock", DRUID = "druid",
+    }
+    local classIds = {
+        WARRIOR = 1, PALADIN = 2, HUNTER = 3, ROGUE = 4, PRIEST = 5,
+        SHAMAN = 7, MAGE = 8, WARLOCK = 9, DRUID = 11,
+    }
+    local phrases = {
+        arms = { "arms" },
+        fury = { "fury" },
+        protection = { "protection" },
+        retribution = { "retribution" },
+        holy = { "holy" },
+        shockadin = { "shockadin" },
+        beast_mastery = { "beast mastery" },
+        marksmanship = { "marksmanship" },
+        survival = { "survival" },
+        combat = { "combat" },
+        assassination = { "assassination" },
+        subtlety = { "subtlety" },
+        shadow = { "shadow" },
+        discipline = { "discipline" },
+        elemental = { "elemental" },
+        enhancement = { "enhancement" },
+        enhancement_tank = { "enhancement tank", "enhancement (tank)" },
+        restoration = { "restoration" },
+        frost = { "frost" },
+        arcane = { "arcane" },
+        fire = { "fire" },
+        battlemage_frost = { "battle mage (frost)", "battlemage (frost)" },
+        battlemage_fire = { "battle mage (fire)", "battlemage (fire)" },
+        battlemage_arcane = { "battle mage (arcane)", "battlemage (arcane)" },
+        affliction = { "affliction" },
+        demonology = { "demonology" },
+        destruction = { "destruction" },
+        feral = { "feral (damage)", "feral (cat)", ": feral" },
+        bear = { "feral (tank)", "guardian", "bear" },
+        balance = { "balance" },
+    }
+    local keyMap = {
+        Strength = "str", Agility = "agi", Stamina = "sta", Intellect = "int",
+        Spirit = "spi", Armor = "armor",
+        HitRating = "hit", CritRating = "crit", HasteRating = "haste",
+        ExpertiseRating = "expertise",
+        Ap = "ap", Rap = "rap", FeralAp = "feralAp",
+        SpellDamage = "sp", Healing = "heal", SpellHealing = "heal",
+        DefenseRating = "defense", DodgeRating = "dodge", ParryRating = "parry",
+        Hit = "hit", Crit = "crit", Haste = "haste", Expertise = "expertise",
+        AttackPower = "ap", RangedAttackPower = "rap",
+    }
+    local want = phrases[panel.baseId] or {}
+    local className = classNames[panel.classFile]
+    local classId = classIds[panel.classFile]
+    local best, bestLen
+    for _, scale in pairs(scales) do
+        if type(scale) == "table" then
+            local name = scale.Name or scale.LocalizedName or ""
+            local lower = string.lower(name)
+            local classOk = (classId and scale.ClassID == classId)
+                or (className and string.find(lower, className, 1, true))
+            if classOk then
+                if panel.baseId == "feral" and string.find(lower, "tank", 1, true) then
+                    classOk = false
+                end
+                if panel.baseId == "enhancement" and string.find(lower, "tank", 1, true) then
+                    classOk = false
+                end
+            end
+            if classOk then
+                for i = 1, #want do
+                    if string.find(lower, want[i], 1, true) then
+                        if not bestLen or #want[i] > bestLen then
+                            best = scale
+                            bestLen = #want[i]
+                        end
+                        break
+                    end
+                end
+            end
+        end
+    end
+    local values = best and (best.Values or best.values)
+    if type(values) ~= "table" then
+        if panel.errorText then
+            panel.errorText:SetTextColor(1, 0.35, 0.35)
+            panel.errorText:SetText(L["Pawn has no scale for this spec."])
+        end
+        return
+    end
+    panel.overrides = panel.overrides or {}
+    local wrote = 0
+    for pawnKey, statKey in pairs(keyMap) do
+        local amount = tonumber(values[pawnKey])
+        if amount then
+            panel.overrides[statKey] = amount
+            wrote = wrote + 1
+        end
+    end
+    self:RefreshFields()
+    if panel.errorText then
+        if wrote > 0 then
+            panel.errorText:SetTextColor(0.4, 0.85, 0.45)
+            panel.errorText:SetText(L["Imported stat weights from Pawn."])
+        else
+            panel.errorText:SetTextColor(1, 0.35, 0.35)
+            panel.errorText:SetText(L["Pawn has no scale for this spec."])
+        end
+    end
+end
+
 function GQ.Custom:SelectBase(baseId)
     local panel = self._editor
     if not panel then
@@ -1888,6 +2027,17 @@ local function EmptyBoxWeight(classFile, baseId, key, overrides)
     return (weights and weights[key]) or 0
 end
 
+function GQ.Custom:PawnInstalled()
+    if C_AddOns and C_AddOns.IsAddOnLoaded and C_AddOns.IsAddOnLoaded("Pawn") then
+        return true
+    end
+    if IsAddOnLoaded and IsAddOnLoaded("Pawn") then
+        return true
+    end
+    local pawn = _G.PawnCommon
+    return type(pawn) == "table" and type(pawn.Scales) == "table"
+end
+
 function GQ.Custom:RefreshFields()
     local panel = self._editor
     if not panel then
@@ -1895,6 +2045,23 @@ function GQ.Custom:RefreshFields()
     end
     local shipped = panel.baseId and self:Shipped(panel.classFile, panel.baseId)
     local overrides = panel.overrides or {}
+    local pawnOn = shipped and self:PawnInstalled()
+    if panel.pawnButton then
+        if pawnOn then
+            panel.pawnButton:Show()
+        else
+            panel.pawnButton:Hide()
+        end
+    end
+    if panel.hint and panel.specButton and panel.pawnButton then
+        panel.hint:ClearAllPoints()
+        if pawnOn then
+            panel.hint:SetPoint("TOPLEFT", panel.pawnButton, "BOTTOMLEFT", 0, -12)
+        else
+            panel.hint:SetPoint("TOPLEFT", panel.specButton, "BOTTOMLEFT", 0, -12)
+        end
+        panel.hint:SetPoint("RIGHT", panel, "LEFT", 230, 0)
+    end
     if not shipped then
         panel.placeholder:Show()
         for i = 1, #panel.rows do
@@ -1908,27 +2075,22 @@ function GQ.Custom:RefreshFields()
     for i = 1, #panel.rows do
         local row = panel.rows[i]
         local field = row.field
-        -- Ranged attack power is attack power. The ranged row stays off the editor.
-        if field.key == "rap" then
-            row:Hide()
-        else
-            local value = EmptyBoxWeight(panel.classFile, panel.baseId, field.key, overrides)
-            local shown = FormatWeight(value)
-            row.shipped:SetText(string.format(L["shipped %s"], shown))
-            if row.ghost then
-                row.ghost:SetText(shown)
-            end
-            local typed = overrides[field.key]
-            if typed == nil then
-                row.box:SetText("")
-            else
-                row.box:SetText(FormatWeight(typed))
-            end
-            row:ClearAllPoints()
-            row:SetPoint("TOPLEFT", panel.content, "TOPLEFT", 0, -(shownRows * 24))
-            row:Show()
-            shownRows = shownRows + 1
+        local value = EmptyBoxWeight(panel.classFile, panel.baseId, field.key, overrides)
+        local shown = FormatWeight(value)
+        row.shipped:SetText(string.format(L["shipped %s"], shown))
+        if row.ghost then
+            row.ghost:SetText(shown)
         end
+        local typed = overrides[field.key]
+        if typed == nil then
+            row.box:SetText("")
+        else
+            row.box:SetText(FormatWeight(typed))
+        end
+        row:ClearAllPoints()
+        row:SetPoint("TOPLEFT", panel.content, "TOPLEFT", 0, -(shownRows * 24))
+        row:Show()
+        shownRows = shownRows + 1
     end
     panel.content:SetHeight(math.max(30, shownRows * 24))
 end

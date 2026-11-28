@@ -2522,6 +2522,15 @@ function GQ.Data:QuestTitleDone(name, titles)
     return false
 end
 
+-- A Better Ingredient gives Forest's Embrace, Grizzled Pelt, and Moonshadow
+-- Stave together. Forever still prints a choice header. Finishing the quest
+-- means the character received all three.
+GQ.Data.QuestGaveAllRewards = {
+    [22272] = true,
+    [22274] = true,
+    [22458] = true,
+}
+
 function GQ.Data:QuestRewardClosed(entry)
     if not entry or entry.sourceType ~= "quest_reward" then
         return false
@@ -6660,10 +6669,6 @@ end
 
 function GQ.Data:AddGearScoreToItemTooltip(tooltip)
     if not tooltip or tooltip.gqSkipScoreHook or tooltip.gqScoreLineAdded or tooltip.gqScoreBusy then
-        return
-    end
-    local name = tooltip.GetName and tooltip:GetName()
-    if name and string.find(name, "ShoppingTooltip", 1, true) then
         return
     end
     if not tooltip.GetItem then

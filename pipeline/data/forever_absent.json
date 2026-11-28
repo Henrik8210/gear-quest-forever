@@ -70,6 +70,16 @@
     "Marshal's",
     "General's"
   ],
+  "season1LockedRareTitles": [
+    "Lieutenant Commander's ",
+    "Knight-Lieutenant's ",
+    "Knight-Captain's ",
+    "Knight-Champion's ",
+    "Blood Guard's ",
+    "Legionnaire's ",
+    "Centurion's ",
+    "Champion's "
+  ],
   "items": {
     "22383": "The Sageblade plan drops only in Molten Core, Blackwing Lair, Ahn'Qiraj, and Naxxramas.",
     "22384": "The Persuader plan drops only in Zul'Gurub and Ahn'Qiraj.",
@@ -90,6 +100,19 @@
     "19384": "The Lord of Blackrock turns in Nefarian's head. Blackwing Lair is not open yet.",
     "14554": "Cloudkeeper Legplates drop from the Silithus colossi. That is not a dungeon that is in the game yet.",
     "15138": "Onyxia Scale Cloak is made from the pattern awarded after turning in Onyxia's head. Onyxia's Lair is not open yet.",
-    "274560": "Hyjal Summit trash. Hyjal Summit is not open yet."
+    "274560": "Hyjal Summit trash. Hyjal Summit is not open yet.",
+    "21180": "Earthstrike is Champion's Battlegear. The Cenarion Circle badge quests in Silithus are not in the game yet.",
+    "21190": "Wrath of Cenarius is Champion's Battlegear. The Cenarion Circle badge quests in Silithus are not in the game yet.",
+    "21188": "Fist of Cenarius is Champion's Battlegear. The Cenarion Circle badge quests in Silithus are not in the game yet.",
+    "21186": "Rockfury Bracers are Stalwart's Battlegear. The Cenarion Circle badge quests in Silithus are not in the game yet.",
+    "21184": "Deeprock Bracers are Stalwart's Battlegear. The Cenarion Circle badge quests in Silithus are not in the game yet.",
+    "21185": "Earthcalm Orb is Stalwart's Battlegear. The Cenarion Circle badge quests in Silithus are not in the game yet.",
+    "21189": "Might of Cenarius is Stalwart's Battlegear. The Cenarion Circle badge quests in Silithus are not in the game yet.",
+    "21183": "Earthpower Vest is Veteran's Battlegear. The Cenarion Circle badge quests in Silithus are not in the game yet.",
+    "21181": "Grace of Earth is Veteran's Battlegear. The Cenarion Circle badge quests in Silithus are not in the game yet.",
+    "21182": "Band of Earthen Might is Veteran's Battlegear. The Cenarion Circle badge quests in Silithus are not in the game yet.",
+    "21178": "Gloves of Earthen Power are Volunteer's Battlegear. The Cenarion Circle badge quests in Silithus are not in the game yet.",
+    "21187": "Earthweave Cloak is Volunteer's Battlegear. The Cenarion Circle badge quests in Silithus are not in the game yet.",
+    "21179": "Band of Earthen Wrath is Volunteer's Battlegear. The Cenarion Circle badge quests in Silithus are not in the game yet."
   }
 }

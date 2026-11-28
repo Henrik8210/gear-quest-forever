@@ -12,9 +12,47 @@ Status: later. Not in the current build.
 
 ## Import and export stat weights
 
-A way to bring a weight string in, and to copy the current spec's weights back out. The two formats are a Pawn string and a Forever Leveling BiS string. Pasting one fills the custom spec. Copying one writes the weights that spec is using.
+The custom spec editor has Import stat weights from Pawn. The button stays hidden until Pawn is loaded and a shipped spec is selected. The click matches that class and spec to a Pawn scale and fills the weight boxes. Saving is still the player's step. The button is 190 wide.
 
-Status: later. Not in the current build.
+Still later: copy the current spec's weights back out, and a Forever Leveling BiS string in either direction.
+
+## Hit cap
+
+Reported in the shaman channel. Every class should be able to stop valuing hit once that spec's hit cap is reached. Not in this pass.
+
+## Tooltip specs the player chooses
+
+breeezx wants the item tooltip to list only the specs they care about (tank and retribution, for example) instead of every spec of the class. The current lines stay. A picker for which specs appear is later.
+
+## Bag upgrade arrows
+
+Reported by bart.2137 on 27 Nov 2026 in #feature-ideas. An arrow on the bag icon for a piece that beats what is worn. The loot window already draws that arrow. Walking the bags on every refresh hitched, so the bag icons stay plain.
+
+Status: later.
+
+## Stevestock's three greens
+
+Reported by stevestock on 27 Nov 2026 in #missing-or-wrong-items. Horde discipline priest at 22. Dervish Cape of Healing (6604), Clay Ring of Concentration (11993), and Zircon Band of Concentration (11967). The stored rows have no suffix stats, so they are not ranked. Do not invent the rolls.
+
+Status: later.
+
+## Quest pickup ahead of the item level
+
+Reported by tropik2908 on 28 Nov 2026 in #bug-report. Bottle of Powderfuse Port shows as an off-hand hunt for a level 37 holy priest. The Monster Surfaces cannot be picked up until 38. The parchment already prints the pickup level in red. The hunt row itself still shows. A later pass can hold the row until that pickup level without turning Manageable Quests on.
+
+Status: later.
+
+## One filter for Play style
+
+Reported by cowboybenalman and cookiesshorts on 27 Nov 2026 in #feature-ideas. Filter and Play style both hide hunts, and the combinations are hard to predict. v1.4.3 moves Play style beside Filter. It does not merge them. A later pass can make each play style a view of the same boxes a player can set by hand. CookiesShorts also asked for Current zone only as its own heading, with Quests, Crafts, and Bosses under it. Focus Zone already does the zone part.
+
+Status: later.
+
+## Other Sunken Temple class quests
+
+A Better Ingredient gives Forest's Embrace, Grizzled Pelt, and Moonshadow Stave together, and finishing it marks all three obtained. The other class quests in Sunken Temple still print a choice on Wowhead. Do not mark those obtained together until each quest is checked.
+
+Status: later.
 
 ## Unsourced recipe hunts that are in the game
 

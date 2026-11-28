@@ -32,6 +32,16 @@ def _season1_locked_titles():
 
 SEASON1_LOCKED_EPIC_TITLES = _season1_locked_titles()
 
+def _season1_locked_rare_titles():
+    path = os.path.join(G, "forever_absent.json")
+    try:
+        cfg = json.load(open(path, encoding="utf-8"))
+    except OSError:
+        return ()
+    return tuple(cfg.get("season1LockedRareTitles") or ())
+
+SEASON1_LOCKED_RARE_TITLES = _season1_locked_rare_titles()
+
 def _unreleased_name_locks():
     path = os.path.join(G, "forever_absent.json")
     try:
@@ -71,6 +81,22 @@ def season1_epic_unavailable(it):
     if name.startswith("Premier "):
         return False
     return any(name.startswith(title) for title in SEASON1_LOCKED_EPIC_TITLES)
+
+def season1_rare_unavailable(it, source_type=None):
+    """Classic rare PvP rank sets. Season 1 sells the Premier blue.
+
+    Warsong leggings, Alterac insignias, and Highlander's pieces are not
+    these titles. A Premier blue keeps its name and stays. A boss drop that
+    happens to start with one of these titles is not the honor set.
+    """
+    if not it or it.get("quality") != 3:
+        return False
+    if source_type not in (None, "vendor", "unsourced", "unknown"):
+        return False
+    name = it.get("name") or ""
+    if name.startswith("Premier "):
+        return False
+    return any(name.startswith(title) for title in SEASON1_LOCKED_RARE_TITLES)
 NO_GUIDES = os.environ.get("GQ_NO_GUIDES") == "1"
 # Wowhead Forever level-60 lists. Classic guides_*.json stay behind NO_GUIDES.
 # A spec with no page (feral, battle mage, shockadin, enhancement tank) is absent,
@@ -520,6 +546,7 @@ def eligible(it, cls, spec, level, faction, prof, wsubs):
     # Season 1 epic PvP is the Premier line. The unprefixed rank epics stay
     # in the client for a later season, so a vendor refresh must not score them.
     if season1_epic_unavailable(it): return False
+    if season1_rare_unavailable(it, src.get("sourceType")): return False
     # Scarlet Enclave sets and the Ahn'Qiraj signet rings. The client has
     # some of these rows, so a missing-item refresh must not score them.
     if unreleased_content(it): return False
@@ -743,13 +770,15 @@ def best_variant(it, w, level, rscale, fold_rap=False):
     """
     base=_level60_stats(it, level)
     def sc(st):
-        # Ranged attack power is attack power on every class.
         folded = forever_stats(st)
         if fold_rap:
             rap = folded.get("rap") or 0
             if rap:
                 folded["ap"] = (folded.get("ap") or 0) + rap
                 folded["rap"] = 0
+        # Ranged attack power uses the rap weight. Hunters set that equal to
+        # attack power. Every other class leaves it at 0, so a ranged attack
+        # power line is not scored as attack power.
         t=0.0
         for k,v in folded.items():
             wt=w.get(k,0.0)
@@ -782,7 +811,7 @@ def best_variant(it, w, level, rscale, fold_rap=False):
         for k,x in hi.items():  mHi[k]=mHi.get(k,0)+x
         mHi=forever_stats(mHi)
         s2=sc(mHi)
-        if best is None or s2>best[0]: best=(s2,v["suffix"],v["chance"],mHi,v.get("chanceAny"),lo,hi,v.get("suffixId"))
+        if best is None or s2>best[0]: best=(s2,v["suffix"],v.get("chance"),mHi,v.get("chanceAny"),lo,hi,v.get("suffixId"))
     if not best or best[0]<=bs: return bs, None, None, base, None, bs, None, None
     # score = jackpot; suffix/chance/stats = that same roll; 6th = jackpot again
     # (legacy notable-shelf slot; gain is now zero because rank == display);
@@ -1193,7 +1222,7 @@ def run(cls, spec_key, levels=range(1,70), factions=("Alliance","Horde")):
                     # Ritual Stein) scoring 1.4 against a shield's 20+.
                     if style=="onehand_dual" and level>=20 and it.get("kind")in("Shield","Buckler"): continue
                 s,suf,ch,st,chAny,sBest,srange,sid=best_variant(
-                    it, wl, level, rscale, True)
+                    it, wl, level, rscale, False)
                 _roll_gain=sBest-s
                 # Armour-class preference. A multiplier, never a filter: Protection strongly
                 # favours plate, Retribution mildly. Holy paladin solos in melee, so cloth

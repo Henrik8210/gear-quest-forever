@@ -601,8 +601,14 @@ local function ShowEquippedCompare(entry)
         if GetInventoryItemLink("player", invSlot) then
             local tip = _G["ShoppingTooltip" .. (#tips + 1)]
             if tip and tip.SetInventoryItem then
+                tip.gqScoreLineAdded = nil
+                tip.gqEnchantAdded = nil
+                tip.gqScoreBusy = nil
                 tip:SetOwner(GameTooltip, "ANCHOR_NONE")
                 tip:SetInventoryItem("player", invSlot)
+                if GQ.Data.AddGearScoreToItemTooltip then
+                    GQ.Data:AddGearScoreToItemTooltip(tip)
+                end
                 tip:AddLine(L["Currently equipped"], 1, 0.82, 0)
                 tip:Show()
                 tips[#tips + 1] = tip
@@ -6064,6 +6070,11 @@ function GQ.Log:IsEntryObtained(id)
     if entry and entry.itemId and self:IsItemIdObtained(entry.itemId) then
         return true
     end
+    if entry and entry.itemId and GQ.Data.QuestGaveAllRewards and GQ.Data.QuestGaveAllRewards[entry.itemId] then
+        if GQ.Data:QuestRewardClosed(entry) then
+            return true
+        end
+    end
     return false
 end
 
@@ -8036,6 +8047,7 @@ function GQ.Log:RepositionSpecButton(frame)
         frame.sourceFilterBtn:SetPoint("LEFT", frame.collapseAllBtn, "RIGHT", 4, 0)
         frame.sourceFilterBtn:SetFrameLevel(frame.collapseAllBtn:GetFrameLevel() or 1)
     end
+    self:PlacePlayStyleButton(frame)
 end
 
 function GQ.Log:LayoutListTopOpening()
@@ -9634,6 +9646,22 @@ function GQ.Log:ToggleArmorMenu(anchor)
     self:ShowArmorMenu(anchor)
 end
 
+function GQ.Log:PlacePlayStyleButton(frame)
+    frame = frame or self.frame
+    local btn = frame and frame.playStyleBtn
+    local filter = frame and frame.sourceFilterBtn
+    if not btn or not filter then
+        return
+    end
+    local parent = filter:GetParent() or frame
+    if btn:GetParent() ~= parent then
+        btn:SetParent(parent)
+    end
+    btn:ClearAllPoints()
+    btn:SetPoint("LEFT", filter, "RIGHT", 4, 0)
+    btn:SetFrameLevel(filter:GetFrameLevel() or 1)
+end
+
 function GQ.Log:EnsurePlayStyle(frame)
     frame = frame or self.frame
     if GearQuestForeverDB and GearQuestForeverDB.ui then
@@ -10382,20 +10410,11 @@ function GQ.Log:LayoutFooterButtons(frame)
     end
 
     self:EnsurePlayStyle(frame)
-    if frame.playStyleBtn then
-        frame.playStyleBtn:ClearAllPoints()
-        frame.playStyleBtn:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", CONTENT_LEFT + LEFT_COLUMN_WIDTH + COLUMN_GAP, FOOTER_BUTTON_Y)
-    end
+    self:PlacePlayStyleButton(frame)
     self:EnsureTooltipsPanel(frame)
     if frame.tooltipsBtn then
         frame.tooltipsBtn:ClearAllPoints()
-        if frame.playStyleBtn then
-            frame.tooltipsBtn:SetPoint("LEFT", frame.playStyleBtn, "RIGHT", 8, 0)
-        elseif frame.exitBtn then
-            frame.tooltipsBtn:SetPoint("RIGHT", frame.exitBtn, "LEFT", -8, 0)
-        else
-            frame.tooltipsBtn:SetPoint("BOTTOM", frame, "BOTTOM", 0, FOOTER_BUTTON_Y)
-        end
+        frame.tooltipsBtn:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", CONTENT_LEFT + LEFT_COLUMN_WIDTH + COLUMN_GAP, FOOTER_BUTTON_Y)
     end
     self:EnsureHuntsPerSlot(frame)
     self:EnsureArmorTypeButton(frame)
@@ -15191,7 +15210,7 @@ function GQ.Log:EnsureSettingsPage(frame)
     donationNames:SetPoint("RIGHT", donationChild, "RIGHT", -8, 0)
     donationNames:SetJustifyH("LEFT")
     donationNames:SetWordWrap(true)
-    donationNames:SetText("Rodeaschmi\nHugefan\nFucnred\nKamujin\nGuiggiani\nTony\nKestyn\nBonnie\nHendrik\nKrazedKlow\nGabriyel")
+    donationNames:SetText("Rodeaschmi\nHugefan\nFucnred\nKamujin\nGuiggiani\nTony\nGarrett\nKestyn\nBonnie\nHendrik\nKrazedKlow\nGabriyel")
     donationNames:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
     donationNames:Hide()
     frame.settingsDonationNames = donationNames

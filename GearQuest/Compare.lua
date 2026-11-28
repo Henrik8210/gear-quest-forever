@@ -273,16 +273,13 @@ function GQ.Compare:GetStatWeight(statName)
     end
     if profile then
         if key and profile[key] ~= nil then
-            -- Ranged attack power is attack power. A ranged line uses that weight.
-            if key == "ap" or key == "rap" then
-                return math.max(profile.ap or 0, profile.rap or 0)
-            end
             return profile[key]
         end
     end
-    -- Feral Combat is a cat and bear skill. A spec that does not price it
-    -- scores 0, not the generic 0.5 fallback.
-    if key == "feralCombat" then
+    -- A ranged attack power line uses the rap weight. Hunters store the same
+    -- number as attack power. A spec that does not price it scores 0, not
+    -- the attack power weight and not the generic 0.5 fallback.
+    if key == "rap" or key == "feralCombat" then
         return 0
     end
 
@@ -497,11 +494,8 @@ local function ScoreNormalizedStats(statTable, leveled)
         end
     end
 
-    -- Ranged attack power is attack power on every class.
-    if (byName["Ranged Attack Power"] or 0) > 0 then
-        byName["Attack Power"] = (byName["Attack Power"] or 0) + byName["Ranged Attack Power"]
-        byName["Ranged Attack Power"] = nil
-    end
+    -- Ranged attack power stays on its own weight. Hunters price it the same
+    -- as attack power. Every other class leaves that weight at 0.
 
     -- Classic spell power is damage and healing. Healers score the healing
     -- half, and casters still score the damage half.
